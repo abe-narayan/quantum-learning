@@ -7,25 +7,25 @@ const HEIGHT = 180;
  * A small, structurally-accurate (not decorative) schematic for each
  * physical qubit platform: the actual mechanism the lesson is describing,
  * not a generic "quantum computer" illustration. Kept intentionally
- * simple — a labeled diagram of the real physical structure, at the
+ * simple - a labeled diagram of the real physical structure, at the
  * level of detail a first pass through the platform-comparison lessons
  * needs, not an engineering drawing.
  */
 export function HardwarePlatformSchematic({ variant, ariaLabel }: { variant: HardwarePlatformVariant; ariaLabel: string }) {
   return (
     // `tabIndex={0}`. The note below this component already explains why this
-    // SVG is deliberately unresponsive — "Adding `w-full` here would scale
+    // SVG is deliberately unresponsive - "Adding `w-full` here would scale
     // these labels *down* to ~8px", so it keeps its intrinsic 320px width and
     // "the `overflow-x-auto` wrapper takes the overflow on a narrower screen".
     // That trade is right, but it was only ever honored for a mouse: an
     // `overflow-x-auto` div is focusable by default in no browser except
     // Firefox, so a keyboard-only reader got the left ~256px of a 320px
     // schematic and no way to reach the right-hand labels (the tweezer array,
-    // the readout resonator — the parts that distinguish one platform from
+    // the readout resonator - the parts that distinguish one platform from
     // another). No `role`/`aria-label` on the wrapper: the `<svg>` inside
     // already carries `role="img"` and the label, and naming both announces
     // the figure twice.
-    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-3">
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
         {variant === "superconducting" && <SuperconductingSchematic />}
         {variant === "trapped-ion" && <TrappedIonSchematic />}
@@ -38,19 +38,39 @@ export function HardwarePlatformSchematic({ variant, ariaLabel }: { variant: Har
 }
 
 /**
- * Deliberately left at 10 units. Elsewhere in this directory a 10-unit label is a
- * bug, because those figures set `className="w-full"` and a 460- or 480-unit
- * viewBox shrinks to a ~256px phone column, turning 10 units into ~5.6px. This
- * SVG has no `w-full`: it renders at its intrinsic 320px, so one unit is one CSS
- * pixel and 10 units really is 10px, above the ~9px floor. The `overflow-x-auto`
- * wrapper takes the overflow on a narrower screen. Adding `w-full` here would
- * scale these labels *down* to ~8px — the trade this component already makes
- * correctly, and the reason its longest label ("optical tweezer array (filled
- * traps highlighted)", ~282 units) is sized to fit 320 exactly.
+ * 11 units, which is 11px: this SVG has no `w-full`, so it renders at its
+ * intrinsic 320px and one unit is one CSS pixel. That is the whole reason the
+ * size is written here rather than inherited. Elsewhere in this directory a
+ * 10-unit label is a bug, because those figures do set `className="w-full"`
+ * and a 460- or 480-unit viewBox shrinks to a ~256px phone column, turning 10
+ * units into ~5.6px; adding `w-full` here would scale these *down* to ~8px,
+ * so the fixed width stays and the `overflow-x-auto` wrapper takes the
+ * overflow on a narrower screen.
+ *
+ * It was 10px, on the reasoning that the longest label had to fit 320 units.
+ * That constraint is real and it was never measured, only estimated. Measured
+ * in Chrome against the loaded Geist Mono, over all 17 labels in this file
+ * (the capstone lesson renders all five variants on one page, so one page
+ * measures the whole set):
+ *
+ *   10px   widest label 288 units, worst right edge 316 of 320
+ *   11px   widest label 316.8 units, worst right edge 319.6 of 320
+ *   12px   widest label 345.6 units, 12.8 units outside the viewBox - clipped
+ *
+ * So 11 fits and 12 does not, and the binding label at 11 is not the long one
+ * ("optical tweezer array (filled traps highlighted)", 316.8 units centred on
+ * 160, so 1.6 units clear at each end) but "RF electrode", which sits at
+ * x=280 in the trapped-ion figure. Its two instances moved to x=278 to buy
+ * back margin the estimate would otherwise have spent: 0.4 units is inside
+ * the error of a metric-compatible fallback font, and the outer `<svg>` clips
+ * at the viewBox with no scrollbar and no other symptom.
+ *
+ * If a label longer than 316 units is ever added, this has to go back to 10
+ * or the label has to get shorter. Re-measure rather than estimating.
  */
 function Label({ x, y, children }: { x: number; y: number; children: string }) {
   return (
-    <text x={x} y={y} textAnchor="middle" className="fill-muted-foreground text-[10px] font-mono">
+    <text x={x} y={y} textAnchor="middle" className="fill-muted-foreground text-[11px] font-mono">
       {children}
     </text>
   );
@@ -61,7 +81,7 @@ function SuperconductingSchematic() {
     <g>
       {/* Substrate. Kept on `stroke-border` on purpose: it is already drawn by its
           `--surface` fill standing against the darker `panel-inset` ground, so the
-          stroke here is a panel edge and nothing else — nothing in the schematic is
+          stroke here is a panel edge and nothing else - nothing in the schematic is
           measured against it, and the qubit structure on top carries the content.
           `--axis` is for marks a reader must perceive; promoting a filled container
           to it would put a loud rectangle around the two things that matter. */}
@@ -92,22 +112,45 @@ function TrappedIonSchematic() {
     <g>
       <rect x={20} y={30} width={280} height={12} rx={4} className="fill-surface stroke-brand" strokeWidth={1.5} />
       <rect x={20} y={138} width={280} height={12} rx={4} className="fill-surface stroke-brand" strokeWidth={1.5} />
-      <Label x={280} y={26}>
+      {/* x=278, not 280. At 11 units "RF electrode" is 79.2 units wide and
+          `textAnchor="middle"` put its right edge at 319.6 of a 320-unit
+          viewBox: inside, but by less than the width of one stem, and the
+          outer `<svg>` clips at the viewBox silently. Two units left is
+          imperceptible against a rail that runs from 20 to 300 and buys 2.4
+          units of margin. See `Label`. */}
+      <Label x={278} y={26}>
         RF electrode
       </Label>
-      <Label x={280} y={162}>
+      <Label x={278} y={162}>
         RF electrode
+      </Label>
+      {/* DC endcaps. Added 2026-08-30: the figure previously drew only the two
+          RF rails, which reads as "the oscillating field does the whole job".
+          It does not. In a linear Paul trap the RF pseudopotential confines the
+          ions *radially*; along the trap axis the confinement is electrostatic,
+          from a pair of DC endcap electrodes at either end. That is not an
+          Earnshaw violation, because the RF is covering the other two
+          directions. It is also the axial mode those endcaps define that an
+          entangling gate usually drives, so the omission hid the very degree of
+          freedom the label beneath the chain names. */}
+      <rect x={26} y={62} width={14} height={46} rx={3} className="fill-surface stroke-brand" strokeWidth={1.5} />
+      <rect x={280} y={62} width={14} height={46} rx={3} className="fill-surface stroke-brand" strokeWidth={1.5} />
+      <Label x={33} y={124}>
+        DC
+      </Label>
+      <Label x={287} y={124}>
+        DC
       </Label>
       {ionXs.map((x, i) => (
         <circle key={i} cx={x} cy={85} r={9} className="fill-accent" />
       ))}
       {/* The trap axis threading the ion chain. Load-bearing: it is what the label
-          directly beneath it names, and "the ions share one motional mode" — the
-          physical fact this schematic exists to show — is carried by the line that
+          directly beneath it names, and "the ions share one motional mode" - the
+          physical fact this schematic exists to show - is carried by the line that
           joins them. On `stroke-border` (1.41:1 on `--surface-muted`) the ions read as
           five unrelated dots. `stroke-axis` clears WCAG 2.1 SC 1.4.11's 3:1. */}
       <line x1={70} y1={85} x2={270} y2={85} className="stroke-axis" strokeWidth={1} strokeDasharray="2 3" />
-      <Label x={160} y={110}>
+      <Label x={160} y={108}>
         linear ion chain (shared motional mode)
       </Label>
     </g>
@@ -136,7 +179,7 @@ function NeutralAtomSchematic() {
                 // The empty traps are half the information: the label says "filled
                 // traps highlighted", which is a claim about the *contrast* between
                 // loaded and unloaded sites, so a reader who cannot see the unloaded
-                // ones cannot see stochastic loading at all — they just see six atoms
+                // ones cannot see stochastic loading at all - they just see six atoms
                 // in an odd arrangement. `stroke-border` (1.41:1 on `--surface-muted`)
                 // left nine of the fifteen sites effectively blank; `stroke-axis`
                 // clears WCAG 2.1 SC 1.4.11's 3:1 while the filled traps stay louder
@@ -157,7 +200,7 @@ function NeutralAtomSchematic() {
 
 function PhotonicSchematic() {
   // A single beam (one physical path) traveling left to right. Polarization
-  // isn't which route the photon takes — it's the orientation of the field's
+  // isn't which route the photon takes - it's the orientation of the field's
   // oscillation plane, transverse to travel. That's shown as a head-on
   // cross-section of the SAME beam: two perpendicular double-headed arrows
   // (H and V), not two separate bent paths.
@@ -176,7 +219,7 @@ function PhotonicSchematic() {
       {/* head-on view of the same beam: field oscillation plane */}
       {/* Kept on `stroke-border`: this dashed circle is a viewport, not a measurement.
           It says "what follows is drawn head-on", and the two double-headed arrows
-          inside it are the whole content — nothing is read off the circle's edge, and
+          inside it are the whole content - nothing is read off the circle's edge, and
           its `--surface` fill already separates it from the beam line behind it. */}
       <circle cx={205} cy={100} r={32} className="fill-surface stroke-border" strokeWidth={1} strokeDasharray="2 3" />
       <line

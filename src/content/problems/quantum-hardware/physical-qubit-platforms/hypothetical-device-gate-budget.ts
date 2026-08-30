@@ -42,7 +42,7 @@ export const hypotheticalDeviceGateBudget: NumericProblem = {
   },
   explanation: {
     correctIdea: "This lets the reader compare against the trapped-ion lesson's own 100,000-gate budget, directly testing the capstone's 'is the no-free-lunch pattern permanent?' discussion question.",
-    whyCorrect: "Direct unit-consistent division, matching the established methodology from earlier lessons.",
-    whyWrong: ["Even with this improvement, the resulting budget (10,000) is still an order of magnitude below trapped ions' 100,000 — illustrating that a single-axis improvement doesn't automatically overturn the overall tradeoff pattern."],
+    whyCorrect: "Dividing a coherence time by a gate time leaves a pure number, which is the count of gate-length intervals that fit inside the coherence window. The units are themselves the check that the division was set up the right way round.",
+    whyWrong: ["Even with this improvement, the resulting budget of 10,000 is still an order of magnitude below trapped ions' 100,000, which shows that a single-axis improvement does not automatically overturn the overall tradeoff pattern."],
   },
 };

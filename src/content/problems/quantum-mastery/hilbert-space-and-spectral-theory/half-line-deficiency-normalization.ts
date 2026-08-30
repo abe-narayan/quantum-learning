@@ -46,15 +46,15 @@ export const halfLineDeficiencyNormalization: NumericProblem = {
         latex: "\\int_0^\\infty e^{-2x}\\,dx = \\left[-\\frac{1}{2}e^{-2x}\\right]_0^\\infty = 0 - \\left(-\\frac12\\right) = \\frac12",
       },
     ],
-    finalAnswer: "‖ψ‖² = 1/2, so ψ(x)=e^{-x} IS normalizable on (0,∞), giving n₊=1.",
+    finalAnswer: "‖ψ‖² = 1/2, so ψ(x)=e^{-x} is normalizable on (0,∞), giving n₊=1.",
   },
   explanation: {
     correctIdea:
-      "e^{-x} decays on the half-line, so its L² norm converges — it genuinely belongs to L²(0,∞), which is exactly why it counts toward the n₊ deficiency index.",
+      "e^{-x} decays on the half-line, so its L² norm converges. It belongs to L²(0,∞), which is why it counts toward the n₊ deficiency index.",
     whyCorrect:
       "The exponential integral ∫e^{-2x}dx converges because the integrand decays; this is the direct computation behind the lesson's claim n₊=1.",
     whyWrong: [
-      "Confusing this with the companion solution e^{+x}, whose integral ∫₀^∞e^{2x}dx diverges (n₋=0) — the two deficiency solutions behave oppositely, which is exactly why the indices are unequal.",
+      "Confusing this with the companion solution e^{+x}, whose integral ∫₀^∞e^{2x}dx diverges (n₋=0). The two deficiency solutions behave oppositely, which is why the indices are unequal.",
     ],
   },
 };

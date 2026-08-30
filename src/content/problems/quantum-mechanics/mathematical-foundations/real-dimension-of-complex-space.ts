@@ -14,14 +14,14 @@ export const realDimensionOfComplexSpace: NumericProblem = {
   },
   question: {
     type: "numeric",
-    prompt: "What is $\\dim_{\\mathbb{R}}(\\mathbb{C}^3)$ — the dimension of $\\mathbb{C}^3$ viewed as a vector space over $\\mathbb{R}$?",
+    prompt: "What is $\\dim_{\\mathbb{R}}(\\mathbb{C}^3)$, the dimension of $\\mathbb{C}^3$ viewed as a vector space over $\\mathbb{R}$?",
     inputHint: "an integer",
   },
   answer: {
     type: "numeric",
     value: 6,
     tolerance: 0.001,
-    incorrectFeedback: "Each complex coordinate needs two independent real numbers (real and imaginary parts) — the real dimension isn't just the number of complex coordinates.",
+    incorrectFeedback: "Each complex coordinate needs two independent real numbers (real and imaginary parts), so the real dimension is not the number of complex coordinates.",
     nearMisses: [
       { value: 3, feedback: "3 is the complex dimension. Over the reals, each coordinate splits into a real and an imaginary part, doubling the count." },
       { value: 9, feedback: "9 squares the complex dimension. The relationship between the two dimensions is a factor of 2, not a power." },
@@ -42,6 +42,6 @@ export const realDimensionOfComplexSpace: NumericProblem = {
   explanation: {
     correctIdea: "Complex dimension and real dimension of the same space differ by a factor of 2.",
     whyCorrect: "dim_C(C^3)=3 counts complex coordinates; dim_R(C^3)=6 counts the real numbers needed, since each complex coordinate is really a pair of real numbers.",
-    whyWrong: ["Answering 3 confuses the complex dimension with the real dimension — they're genuinely different numbers for the same space."],
+    whyWrong: ["Answering 3 confuses the complex dimension with the real dimension; they are different numbers for the same space."],
   },
 };

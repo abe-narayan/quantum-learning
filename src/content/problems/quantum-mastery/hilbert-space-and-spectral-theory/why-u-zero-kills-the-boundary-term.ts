@@ -15,23 +15,35 @@ export const whyUZeroKillsTheBoundaryTerm: ConceptualProblem = {
   question: {
     type: "conceptual",
     prompt:
-      "Lagrange's identity's boundary term is [p(y₂y₁′−y₁y₂′)]ₐᵇ. For the hydrogen radial equation (p=1 everywhere, including at r=0), explain exactly why the boundary condition u(0)=0 (applied to BOTH eigenfunctions u₁,u₂) is enough to make this term vanish at the r=0 end, using the term's explicit form.",
+      "Lagrange's identity's boundary term is [p(y₂y₁′−y₁y₂′)]ₐᵇ. For the hydrogen radial equation (p=1 everywhere, including at r=0), explain exactly why the boundary condition u(0)=0, applied to both eigenfunctions u₁ and u₂, is enough to make this term vanish at the r=0 end, using the term's explicit form.",
     placeholder: "At r=0, the boundary term becomes p(0)·(u₂(0)u₁′(0) − u₁(0)u₂′(0)). If u(0)=0 for both u₁ and u₂, then...",
   },
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["u1(0)=0", "u2(0)=0", "both vanish", "both eigenfunctions vanish"],
-      ["each term", "product", "zero times", "multiplied by zero"],
+      {
+        phrases: ["both vanish", "both eigenfunctions vanish", "vanish at the origin", "vanish at zero", "zero at the origin", "dirichlet", "boundary condition at the origin"],
+        missingFeedback:
+          "State the condition you are given and say which functions it applies to. That is what determines whether the bracket has anything left in it.",
+      },
+      {
+        phrases: ["each term", "product", "zero times", "multiplied by zero"],
+        missingFeedback:
+          "You have the condition. Now substitute it into the bracket and say what each of the two pieces inside it comes to.",
+      },
     ],
     incorrectFeedback:
-      "Substitute u₁(0)=0 and u₂(0)=0 directly into the boundary term's explicit form p(0)(u₂(0)u₁′(0)−u₁(0)u₂′(0)) and show each of the two products vanishes.",
-    partialFeedback: "Good — now be explicit that BOTH products in the bracket vanish individually, because each contains a factor u(0)=0.",
+      "Do the substitution rather than describing it. Write the bracket out as p(0)(u₂(0)u₁′(0)−u₁(0)u₂′(0)), put the radial boundary condition into it, and show what happens to the two pieces separately. Note what the derivatives and p(0) are doing while that happens: nothing.",
+    partialFeedback: "Good. Now be explicit about why the bracket dies without any help from the derivatives: take the two pieces one at a time and say what factor sits inside each of them.",
+    modelAnswers: [
+      "At r=0 the bracket is p(0)(u2(0)u1'(0) - u1(0)u2'(0)). Both eigenfunctions vanish at the origin, so each term in it is a product carrying a factor of zero, and the whole bracket dies whatever the derivatives or p(0) happen to be.",
+      "Since u1 and u2 are both zero at the origin, every product in the bracket is multiplied by zero. It is a Dirichlet condition doing the work, so you never need p to vanish there as well.",
+    ],
   },
   hints: [
     { text: "Write out the boundary term at r=0 explicitly: p(0)[u₂(0)u₁′(0) − u₁(0)u₂′(0)]." },
     { text: "If both u₁(0)=0 and u₂(0)=0 (the radial equation's boundary condition, applied to any two eigenfunctions), substitute directly." },
-    { text: "Each of the two products in the bracket contains a factor that is exactly zero, so the whole bracket is zero — regardless of what u₁′(0), u₂′(0), or p(0) are." },
+    { text: "Each of the two products in the bracket contains a factor that is exactly zero, so the whole bracket is zero regardless of what u₁′(0), u₂′(0), or p(0) are." },
   ],
   solution: {
     steps: [
@@ -45,14 +57,14 @@ export const whyUZeroKillsTheBoundaryTerm: ConceptualProblem = {
       },
     ],
     finalAnswer:
-      "Both products in the bracket contain a factor u(0)=0, so the bracket is exactly zero regardless of the derivatives u₁′(0), u₂′(0) or the value of p(0) — the boundary term vanishes at r=0 purely from the Dirichlet-type condition, without needing p to vanish there too.",
+      "Both eigenfunctions vanish at the origin, so each product in the bracket carries a factor of zero and the bracket dies regardless of the derivatives u₁′(0), u₂′(0) or the value of p(0). The Dirichlet-type condition alone does it, and p is not required to vanish there too.",
   },
   explanation: {
     correctIdea:
-      "u(0)=0 is a genuine Dirichlet boundary condition (not a 'natural'/singular one relying on p vanishing) — it kills the boundary term the same direct way the infinite well's y(±a)=0 does, even though r=0 is a singular endpoint of the underlying 3D problem.",
-    whyCorrect: "Matches the lesson's explicit boundary-term formula, substituted directly with the radial equation's own boundary condition.",
+      "u(0)=0 is a genuine Dirichlet boundary condition, not a 'natural' or singular one relying on p vanishing. It kills the boundary term the same direct way the infinite well's y(±a)=0 does, even though r=0 is a singular endpoint of the underlying 3D problem.",
+    whyCorrect: "Each of the two products in the bracket carries a factor u(0), and one zero factor kills a product regardless of what multiplies it. The derivatives and p(0) never enter, which is why the Dirichlet-type condition alone suffices and p is not required to vanish at the origin.",
     whyWrong: [
-      "Claiming the term vanishes because p(0)=0 is wrong for this specific operator — p=1 everywhere in the radial equation's Sturm-Liouville form, so it's the u(0)=0 condition itself doing the work, not a vanishing p.",
+      "Claiming the term vanishes because p(0)=0 is wrong for this operator. p=1 everywhere in the radial equation's Sturm-Liouville form, so the u(0)=0 condition itself is doing the work, not a vanishing p.",
     ],
   },
 };

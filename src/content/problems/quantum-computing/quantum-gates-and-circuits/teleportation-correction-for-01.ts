@@ -17,7 +17,7 @@ export const teleportationCorrectionFor01: MultipleChoiceProblem = {
     prompt:
       "The lesson works through the branch where Alice's two measurement outcomes are $(1,1)$, requiring Bob to apply $X$ then $Z$. Suppose instead Alice's outcomes come out $(m_0,m_1)=(0,1)$. According to the correction table, what should Bob apply?",
     options: [
-      { id: "a", text: "Nothing — his qubit is already $|\\psi\\rangle$." },
+      { id: "a", text: "Nothing; his qubit is already $|\\psi\\rangle$." },
       { id: "b", text: "Apply $X$ only." },
       { id: "c", text: "Apply $Z$ only." },
       { id: "d", text: "Apply $X$, then $Z$." },

@@ -50,7 +50,7 @@ export const hhWithDephasingP0: NumericProblem = {
   },
   explanation: {
     correctIdea: "This directly reproduces the lesson's central numerical demonstration of noise degrading an otherwise-perfect identity circuit.",
-    whyCorrect: "Matches runNoisyCircuit's own computed output.",
+    whyCorrect: "The two Hadamards would undo each other exactly, but they can only do so through the coherence that sits between them. Dephasing at λ = 0.2 shrinks that off-diagonal weight to 0.8 of its value, and P(0) = (1 + 0.8)/2 = 0.9 follows. runNoisyCircuit computes the same number.",
     whyWrong: ["Answering exactly 1.0 would ignore the noise entirely: that's the no-noise (identity channel) case, not this dephasing scenario."],
   },
 };

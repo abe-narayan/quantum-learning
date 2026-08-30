@@ -55,11 +55,14 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
-Commuting <Term id="hermitian-operator">Hermitian</Term> operators can always be simultaneously diagonalized. There exists one basis that is an eigenbasis for both operators at once, so a single state can have a perfectly definite value of both observables together.
+<LessonHook eyebrow="Equivalent, not merely consequent">
+  Whether two properties of a system can both be sharp at once is not a
+  question about apparatus. It is settled by multiplying two
+  <Term id="hermitian-operator">Hermitian</Term> matrices in each order and
+  seeing whether the answers agree.
 </LessonHook>
 
-## Motivation
+## A consequence, turned into a criterion
 
 From Classical to Quantum proved that commuting observables have no
 uncertainty tradeoff: $[A,B]=0$ makes the general bound $\Delta A\,\Delta
@@ -75,16 +78,16 @@ result was a *consequence*. This lesson proves the *reason* why.
   license="CC BY 4.0"
 />
 
-## Intuition
+## The easy direction, and the one with content
 
 If two operators share a common eigenbasis, applying either one to a basis
 vector only rescales it, and rescaling commutes with rescaling in any
 order. That direction is easy. The content is in the converse: commuting
-is not merely a *consequence* of sharing a basis, it is *equivalent* to
+is not merely a *consequence* of sharing a basis; it is *equivalent* to
 it, so a commutator you can compute in two lines settles a question about
 what can be measured together.
 
-## Mathematical Development
+## Both directions of the if-and-only-if
 
 ### Shared eigenbasis $\implies$ commute
 
@@ -128,16 +131,21 @@ eigenbasis for $A$, trivially, and the extra step makes it one for $B$
 too. Not spelled out in full here; it is the tool the Complete Sets of
 Commuting Observables lesson picks up next.)
 
-## Physical Interpretation
+## Where the finite-dimensional hypothesis earns its keep
 
 "Compatible observables" and "commuting observables" are the same thing,
-now proven rather than merely named. When $[A,B]=0$, a state can be
-prepared with perfectly definite values of *both* $A$ and $B$
-simultaneously. Measuring one doesn't disturb the other's value, because
-they share the same eigenbasis and a measurement of either just projects
-onto (a subspace of) that shared basis.
+now proven rather than merely named. When $[A,B]=0$, in finite dimensions
+(or whenever the spectra are purely discrete), a state can be prepared
+with perfectly definite values of *both* $A$ and $B$ simultaneously.
+Measuring one doesn't disturb the other's value, because they share the
+same eigenbasis and a measurement of either just projects onto (a subspace
+of) that shared basis. That hypothesis is doing real work: operators with
+continuous spectra can commute and still have no shared eigenbasis, since
+they may have no eigenvectors in the Hilbert space at all. [Continuous
+Spectra and Rigged Hilbert Space](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space)
+is where that case gets handled honestly.
 
-## Worked Example
+## Do X and Z share an eigenbasis?
 
 **Do Pauli-$X$ and Pauli-$Z$ share an eigenbasis? Check by computing
 $[X,Z]$ directly.**
@@ -179,27 +187,47 @@ other.
     { label: "90° apart on the sphere", value: "ninety" },
   ]}
   correctValue="ninety"
-  explanation="90° apart. One order lands on −x, the other on +z. A 90° separation on the Bloch sphere is not orthogonality in Hilbert space: those two states overlap with probability (1 + cos 90°)/2 = 0.5, so no measurement tells them apart better than a coin flip half the time. Swapping the order of two operations produced a state that is different but not maximally different, which is the geometric content of [X,Z] being nonzero but finite."
+  explanation="90° apart. Z then X lands on −x; X then Z lands on +z. Note what that separation is not: 90° on the Bloch sphere is not orthogonality in Hilbert space, which takes a full 180°. The two states overlap with probability (1 + cos 90°)/2 = 0.5, so measuring the −x state along the z axis returns +z and −z equally often, and no single measurement separates the two orderings with certainty. Swapping the order of two operations produced a state that is different but not maximally different, which is the geometric content of [X,Z] being nonzero but finite."
 />
 
 <InteractiveSection title="Same two rotations, opposite order, different landing point" description="All three spheres are draggable to inspect from any angle. The start state is identical on the left. The middle sphere applies X-rotation then Z-rotation; the right sphere applies Z-rotation then X-rotation, the same two quarter-turns, reversed. They land in different places on the sphere, the geometric picture behind [X,Z] ≠ 0: X and Z rotations don't commute, so neither do the observables that generate them.">
-  <div className="not-prose grid grid-cols-1 gap-4 sm:grid-cols-3">
+  {/* `BlochSphereCanvas` authors its axis and pole labels at 17 units on a
+      400-unit viewBox and renders `w-full`, so effective type is
+      17 x box / 400 and a `max-w` cap set here is a hard ceiling on it. The
+      previous `max-w-[180px]` painted 7.65px at every viewport, measured
+      against the served DOM, under the ~9px legibility floor this project
+      works to (see src/lib/design/__tests__/figureLegibility.test.ts, whose
+      scan reads `<svg>` literals and so cannot see a cap applied at a
+      component call site like this one). Clearing 9px needs a box of at
+      least 9 x 400 / 17 = 211.8px.
+
+      `sm:grid-cols-3` was the worse half of the defect: at a 640px viewport
+      three columns measure 172.7px each, narrower than the cap, so the
+      spheres painted 7.34px there whatever the cap said. Three across is
+      gated to `lg` instead, where the columns measure 220.7px inside the
+      736px reading measure and the type lands at 9.38px. Below `lg` the
+      single column runs 254px (320px viewport) upward, and the 260px cap
+      holds the spheres at 10.8px to 11.05px rather than letting one sphere
+      swell to the full column. 260 is chosen to sit above the 211.8px floor
+      and above the widest three-across column, so the cap never binds in
+      the three-across arrangement and never limits type again. */}
+  <div className="not-prose grid grid-cols-1 gap-4 lg:grid-cols-3">
     <div className="flex flex-col items-center gap-2">
-      <BlochSphereCanvas blochPoint={quarterTurnStartBloch} className="mx-auto w-full max-w-[180px]" />
+      <BlochSphereCanvas blochPoint={quarterTurnStartBloch} className="mx-auto w-full max-w-[260px]" />
       <span className="text-center text-sm text-muted-foreground">Start: |ψ⟩</span>
     </div>
     <div className="flex flex-col items-center gap-2">
-      <BlochSphereCanvas blochPoint={quarterTurnZXBloch} className="mx-auto w-full max-w-[180px]" />
+      <BlochSphereCanvas blochPoint={quarterTurnZXBloch} className="mx-auto w-full max-w-[260px]" />
       <span className="text-center text-sm text-muted-foreground">X then Z</span>
     </div>
     <div className="flex flex-col items-center gap-2">
-      <BlochSphereCanvas blochPoint={quarterTurnXZBloch} className="mx-auto w-full max-w-[180px]" />
+      <BlochSphereCanvas blochPoint={quarterTurnXZBloch} className="mx-auto w-full max-w-[260px]" />
       <span className="text-center text-sm text-muted-foreground">Z then X</span>
     </div>
   </div>
 </InteractiveSection>
 
-## Common Mistakes
+## A shared eigenvector is weaker than a shared basis
 
 <Callout type="note">
 **Assuming any two Hermitian operators share *some* common eigenvector.**
@@ -219,18 +247,153 @@ itself.
 
 1. Compute $[Z,X]$ (the operators in the *opposite* order from the worked
    example) and confirm it's the negative of $[X,Z]$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   ZX = \begin{pmatrix}1&0\\0&-1\end{pmatrix}\begin{pmatrix}0&1\\1&0\end{pmatrix} = \begin{pmatrix}0&1\\-1&0\end{pmatrix}, \qquad XZ = \begin{pmatrix}0&-1\\1&0\end{pmatrix}
+   $$
+
+   $$
+   [Z,X] = ZX - XZ = \begin{pmatrix}0&2\\-2&0\end{pmatrix} = 2i\begin{pmatrix}0&-i\\i&0\end{pmatrix} = 2i\,Y
+   $$
+
+   The worked example found $[X,Z]=-2iY$, so indeed $[Z,X]=-[X,Z]$, both
+   confirmed against the engine's `commutator(PAULI_Z, PAULI_X)`.
+
+   Antisymmetry is not a fact about the Pauli matrices; it is immediate
+   from the definition, $[B,A]=BA-AB=-(AB-BA)=-[A,B]$, and holds for any
+   two operators whatsoever. So the arithmetic here is a check on the
+   arithmetic, not a discovery. What it is worth checking *for* is the
+   two places a sign gets lost: writing $ZX$ where $XZ$ was meant (matrix
+   products do not commute, which is the entire subject), and mishandling
+   the extraction of $2i$ from $\begin{pmatrix}0&2\\-2&0\end{pmatrix}$,
+   since $Y$ itself carries $\mp i$ off its diagonal.
+
+   The physically important point is what the sign does *not* change. The
+   uncertainty bound is $\tfrac12|\langle[A,B]\rangle|$, with an absolute
+   value, so $X$ and $Z$ constrain each other identically whichever is
+   named first, as they must: nothing physical distinguishes the two
+   orderings of a question about compatibility. Likewise "do they share an
+   eigenbasis" is a symmetric question, and both commutators vanish or
+   neither does.
+
+   Where the sign is real is in dynamics rather than compatibility. A
+   commutator with $H$ sets the *direction* an expectation value moves,
+   through Ehrenfest's theorem, and there flipping the order reverses the
+   sense of the motion. Compatibility discards the sign; evolution does
+   not.
+
+   </details>
+
 2. Two Hermitian operators satisfy $[A,B]=0$. If $A$'s spectrum is
    completely nondegenerate, explain in one sentence why this alone
    guarantees $A$ and $B$ share a full eigenbasis (not just one shared
    eigenvector).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the nondegenerate argument applies to *every* eigenvector of
+   $A$, not to a favoured one, and a nondegenerate $A$ on a $d$-dimensional
+   space has $d$ of them forming a complete basis, so proving each is also
+   an eigenvector of $B$ delivers a full shared eigenbasis rather than a
+   single shared vector.
+
+   Spelled out, the derivation above showed that for any eigenvector
+   $|a\rangle$ of $A$, commuting makes $B|a\rangle$ another eigenvector of
+   $A$ with the same eigenvalue $a$. Nondegeneracy says that eigenspace is
+   one-dimensional, so $B|a\rangle$ has nowhere to go but back along
+   $|a\rangle$: $B|a\rangle=\mu|a\rangle$. Nothing in that chain singled
+   out which eigenvector was chosen, so it runs identically for each of
+   $A$'s $d$ eigenvectors, and the spectral theorem guarantees those $d$
+   vectors are a basis of the whole space.
+
+   The two hypotheses are both load-bearing, and it is worth seeing what
+   each one is preventing.
+
+   Drop commuting, and the very first step fails: $B|a\rangle$ is
+   generally not an eigenvector of $A$ at all, and $A$ and $B$ typically
+   share no nonzero eigenvector, as the Common Mistakes note warns.
+
+   Drop nondegeneracy, and the argument stalls where the parenthetical in
+   the lesson picks it up. $B|a\rangle$ is still an $A$-eigenvector with
+   eigenvalue $a$, but now the eigenspace has room, so $B|a\rangle$ can be
+   some *other* vector inside it and $|a\rangle$ need not be an eigenvector
+   of $B$. The conclusion is recovered, but only after an extra step:
+   $B$ restricted to that eigenspace is Hermitian on it, so it has its own
+   orthonormal eigenbasis *within* the eigenspace, and any basis of a
+   degenerate eigenspace is automatically an $A$-eigenbasis. The shared
+   basis exists either way; what nondegeneracy buys is that it is forced
+   rather than constructed, and that it is unique up to phases.
+
+   And one hypothesis is hiding in the background of both: finite
+   dimensions, or at least purely discrete spectra. Commuting operators
+   with continuous spectra can have no eigenvectors in the Hilbert space to
+   share, which is why the lesson keeps repeating that qualification rather
+   than stating the theorem bare.
+
+   </details>
+
 3. Are $X$ and $Y$ (Pauli matrices) compatible observables? Justify using
    this lesson's criterion, not just a memorized fact.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. They are incompatible, because their commutator is nonzero.
+
+   The criterion this lesson proved is that compatibility is *equivalent*
+   to commuting, so the whole question reduces to one product computed
+   twice:
+
+   $$
+   XY = \begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}0&-i\\i&0\end{pmatrix} = \begin{pmatrix}i&0\\0&-i\end{pmatrix}, \qquad YX = \begin{pmatrix}-i&0\\0&i\end{pmatrix}
+   $$
+
+   $$
+   [X,Y] = XY - YX = \begin{pmatrix}2i&0\\0&-2i\end{pmatrix} = 2i\,Z \ne 0
+   $$
+
+   Since $[X,Y]\ne0$, the theorem's "if and only if" says no shared
+   eigenbasis exists, so no state has definite values of both $X$ and $Y$
+   at once.
+
+   Confirm it independently, since a two-line calculation deserves a
+   second opinion. $X$'s eigenvectors are $|\pm\rangle =
+   (|0\rangle\pm|1\rangle)/\sqrt2$ and $Y$'s are $(|0\rangle\pm
+   i|1\rangle)/\sqrt2$. Those are four different vectors, and no vector
+   appears on both lists: on the Bloch sphere they are the two poles of the
+   $x$ axis and the two poles of the $y$ axis, four distinct points. The
+   algebraic answer and the geometric one agree.
+
+   The reason the question insists on the criterion rather than the
+   memorized fact is that memory generalizes badly here. "Different Pauli
+   matrices never commute" is true, and it stops being useful the moment
+   the operators are not Paulis. The commutator calculation transfers
+   without modification: it settles $Z\otimes I$ against $I\otimes Z$
+   (they commute, later this course), $H$ against $L^2$ in the hydrogen
+   atom, and any pair a future course puts in front of you. It is also the
+   only route that works when the eigenvectors are not already known,
+   which is the usual situation.
+
+   One caution worth attaching. $[X,Y]=2iZ$ is nonzero as an *operator*,
+   which is what settles compatibility. That is a separate question from
+   whether $\langle[X,Y]\rangle$ is nonzero in some particular state, which
+   is what enters the uncertainty bound and which does vanish for states on
+   the equator of the Bloch sphere. Compatibility is a property of the pair
+   of operators; the size of the trade-off is a property of the pair and
+   the state together.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
-- Two operators share an eigenbasis if and only if they commute, proven
+- Two operators share an eigenbasis if and only if they commute, in
+  finite dimensions (or whenever the spectra are purely discrete), proven
   in both directions (the nondegenerate direction fully; the degenerate
   direction sketched, completed next lesson).
 - "Compatible observables" is exactly synonymous with "commuting
@@ -239,7 +402,7 @@ itself.
   confirmed directly and consistent with their genuinely different
   eigenbases.
 
-## Further Exploration
+## What the degenerate case still needs
 
 <NextDiscovery>
 [Complete Sets of Commuting Observables](/lessons/quantum-mechanics/operators-observables-measurement/complete-sets-of-commuting-observables) uses this lesson's

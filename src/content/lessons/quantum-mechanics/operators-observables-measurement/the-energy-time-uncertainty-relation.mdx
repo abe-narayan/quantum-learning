@@ -38,13 +38,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="There is no time operator">
   Energy-time uncertainty gets quoted constantly, but it cannot come from
   a commutator the way position-momentum does. There is no time operator
   to commute with anything.
 </LessonHook>
 
-## Motivation
+## The one relation with no commutator to lean on
 
 Every uncertainty relation built so far, $\Delta x\Delta p\ge\hbar/2$,
 the general $\Delta A\Delta B\ge\tfrac12|\langle[A,B]\rangle|$, came from
@@ -64,7 +64,7 @@ relation honestly, from a different starting point.
   license="CC BY-SA 3.0"
 />
 
-## Intuition
+## Ask how long a change takes instead
 
 Instead of asking "how spread out is time," ask a question that *does*
 make sense: "how long does it take for this state to visibly change?"
@@ -72,7 +72,7 @@ Define that as a *timescale*, not an uncertainty in an operator's
 eigenvalues, and the energy-time relation falls out of tools you already
 have: Ehrenfest's theorem and the ordinary operator uncertainty bound.
 
-## Mathematical Development
+## A timescale first, then the bound that follows
 
 ### A timescale for any observable
 
@@ -121,14 +121,14 @@ an uncertainty in a measured time, but the shortest timescale on which
   question="Push the bound you just derived to its extreme: a state with ΔE = 0, an exact energy eigenstate. Can the mean ⟨A⟩ of any observable change at all?"
   options={[
     { label: "Yes, but only slowly, at a rate proportional to ΔE", value: "slowly" },
+    { label: "No: every expectation value is frozen", value: "frozen" },
     { label: "Yes, but only for observables that commute with H", value: "commuting" },
-    { label: "No: every expectation value is frozen, for every observable", value: "frozen" },
   ]}
   correctValue="frozen"
   explanation="Step 3 of the derivation reads ΔE·ΔA ≥ (ℏ/2)|d⟨A⟩/dt|. Set ΔE = 0 and the left side vanishes, forcing |d⟨A⟩/dt| = 0 for every observable with finite spread. Equivalently, Δt_A = ∞ for every A. This is the stationary-state result from two courses ago, rederived from the uncertainty bound alone, and the next section unpacks that agreement."
 />
 
-## Physical Interpretation
+## Sharp energy means everything moves slowly
 
 A state with a very sharply defined energy ($\Delta E$ small) must have
 *every* observable's expectation value changing slowly, a large
@@ -166,7 +166,7 @@ lifetimes are the same fact.
 
 <LinewidthDiagram ariaLabel="Two linked panels: an excited energy level drawn as a soft band above a sharp ground state line, and below it a Lorentzian emission-line profile. A slider sets the lifetime delta t sub A; a shorter lifetime widens both the band and the emission peak, a longer lifetime narrows both, with delta E fixed at h-bar over two delta t sub A." />
 
-## Worked Example
+## Testing the bound on explicit numbers
 
 **A state has $\Delta E = 0.5$ (natural units, $\hbar=1$) and, for some
 observable $A$, $\Delta A = 2$ with $|d\langle A\rangle/dt| = 3$. Is the
@@ -189,16 +189,16 @@ that. The relation constrains which combinations of these quantities can
 occur at all; it is not merely an arithmetic check performed after the
 fact.
 
-<InteractiveSection title="Find the minimum allowed Δt_A for a given ΔE" description="Drag ΔE and watch the line ΔE · Δt_A sweep. The reference line marks ℏ/2. Everywhere the curve sits below it is physically forbidden, so the crossing point is the minimum Δt_A this ΔE allows. A larger ΔE pushes that minimum smaller, matching this lesson's own practice question.">
+<InteractiveSection title="Find the minimum allowed Δt_A for a given ΔE" description="Drag ΔE and watch the line ΔE · Δt_A sweep. The reference line marks ℏ/2. Everywhere the curve sits below it is physically forbidden, so the crossing point is the minimum Δt_A this ΔE allows. Which way a larger ΔE pushes that minimum is this lesson's own practice question.">
   <ParametricCurve
     frames={Array.from({ length: 9 }, (_, i) => boundFrame(i + 1))}
     sliderLabel="ΔE"
     referenceLines={[{ y: 0.5, label: "ℏ/2 bound" }]}
-    ariaLabel="A line showing delta E times delta t sub A growing with delta t sub A, against a fixed reference line at h-bar over 2, with a slider controlling delta E"
+    ariaLabel="A straight line through the origin, the product delta E times delta t sub A plotted against delta t sub A from 0 to 3, with a dashed reference line at 0.5, h-bar over 2. The slider sets delta E from 0.50 to 4.50 in steps of 0.50, which is the line's slope. At delta E = 0.50 the line is shallow and does not reach the dashed line until delta t sub A = 1. At delta E = 4.50 it is steep and crosses at delta t sub A of about 0.11. Everything to the left of a crossing lies below the dashed line and is forbidden."
   />
 </InteractiveSection>
 
-## Common Mistakes
+## A timescale, not a measured time
 
 <Callout type="warning">
 **Treating $\Delta t$ as "the uncertainty in a measured time," the way
@@ -221,12 +221,147 @@ Ehrenfest's theorem instead.
 1. For a stationary state, use this lesson's relation directly (not the
    stationary-state result itself) to argue that $\Delta t_A$ must be
    infinite for every $A$, given $\Delta E=0$.
-2. A state has $\Delta E=2$. What is the minimum possible value of
-   $\Delta t_A$ for any observable $A$ in this state?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Put $\Delta E = 0$ into the bound and there is nowhere for a finite
+   $\Delta t_A$ to hide:
+
+   $$
+   \Delta E\,\Delta t_A \ge \frac{\hbar}{2} \quad\Longrightarrow\quad 0\cdot\Delta t_A \ge \frac{\hbar}{2}
+   $$
+
+   The left side is zero for any finite $\Delta t_A$, and zero is not
+   greater than $\hbar/2$. So no finite value is consistent with the bound,
+   and $\Delta t_A=\infty$ is the only option left. Since $A$ was
+   arbitrary, this holds for every observable at once.
+
+   It is cleaner, and less reliant on infinity as an arithmetic object, to
+   run the argument one step earlier, at the line before the division:
+
+   $$
+   \Delta E\,\Delta A \ge \frac{\hbar}{2}\left|\frac{d\langle A\rangle}{dt}\right|
+   $$
+
+   With $\Delta E=0$ the left side is exactly zero, so
+   $|d\langle A\rangle/dt|=0$ for every $A$ with finite spread. That is
+   the substantive conclusion: no expectation value changes, ever. The
+   infinite $\Delta t_A$ is then just $\Delta A/0$ read as a definition,
+   and this route never divides by zero.
+
+   The question's parenthetical is the point of the exercise, so it is
+   worth saying what it is holding back. The stationary-state result from
+   two courses ago proves the same thing from a completely different
+   direction: an energy eigenstate evolves as
+   $e^{-iE_nt/\hbar}|n\rangle$, a global phase, which cancels out of every
+   squared magnitude. Arriving at the same conclusion from an inequality
+   about spreads, having never mentioned the evolution operator, is a
+   genuine consistency check across three separate derivations in three
+   separate courses. Quoting the earlier result here would have skipped
+   the check.
+
+   One thing not to over-read. $\Delta t_A=\infty$ says the state's
+   *expectation values* are frozen, which is what "stationary" has meant
+   throughout. The state vector itself keeps accruing phase the whole time.
+
+   </details>
+
+2. A state has $\Delta E=2$ (natural units, $\hbar=1$). Find the minimum
+   possible value of $\Delta t_A$ for any observable $A$ in this state.
+   Then suppose that for one particular observable $\Delta A = 0.5$: what
+   is the largest $|d\langle A\rangle/dt|$ the bound permits, and is that
+   ceiling a fact about the state, about that observable, or about both?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\Delta t_A \ge 0.25$, and with $\Delta A = 0.5$ the rate is capped at
+   $|d\langle A\rangle/dt| \le 2$. The first number is a fact about the
+   state alone; the second needs the observable too.
+
+   Rearranging the bound gives
+
+   $$
+   \Delta t_A \ge \frac{\hbar}{2\,\Delta E} = \frac{1}{2\times2} = 0.25
+   $$
+
+   and since $\Delta E$ is a property of the state, this floor applies to
+   *every* observable of that state simultaneously. Nothing about the
+   system can shift, relative to its own spread, faster than that.
+
+   Now convert the timescale into a rate, using the definition
+   $\Delta t_A=\Delta A/|d\langle A\rangle/dt|$:
+
+   $$
+   \frac{\Delta A}{\left|d\langle A\rangle/dt\right|} \ge 0.25 \quad\Longrightarrow\quad \left|\frac{d\langle A\rangle}{dt}\right| \le \frac{\Delta A}{0.25} = 4\,\Delta A = 4(0.5) = 2
+   $$
+
+   So the ceiling on the raw rate is $2$, and it depends on $\Delta A$.
+   That is the distinction the question is after. A state with $\Delta E=2$
+   forbids any observable from moving by a full standard deviation in less
+   than $0.25$ of time, whatever the observable is. But an observable with
+   a large spread is permitted a correspondingly large raw rate, simply
+   because it has further to travel before it has moved by one $\Delta A$.
+   Doubling $\Delta A$ doubles the permitted $|d\langle A\rangle/dt|$ and
+   leaves the timescale floor untouched.
+
+   The wrong reading is to treat $\Delta t_A \ge 0.25$ as "nothing can
+   change faster than four units per unit time." It says nothing of the
+   kind: rates are not bounded, ratios are. This is why the lesson insists
+   $\Delta t_A$ is a *timescale derived from* $A$'s own dynamics rather
+   than an uncertainty in a measured time, and it is also why the relation
+   survives a rescaling of $A$: replacing $A$ by $10A$ multiplies both
+   $\Delta A$ and $|d\langle A\rangle/dt|$ by $10$, leaving $\Delta t_A$
+   exactly where it was.
+
+   </details>
+
 3. Explain in one or two sentences why a *short-lived* excited state
    (one that decays quickly, small $\Delta t$ for some relevant
    observable) is expected to have a correspondingly large spread in
    energy, a real, measurable effect called "natural linewidth."
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the bound is a product: $\Delta E \ge \hbar/(2\Delta t_A)$, so
+   a short characteristic timescale forces a large energy spread, and an
+   energy level with a spread emits over a band of frequencies rather than
+   at one sharp value.
+
+   Running the lesson's own numbers backwards makes the size concrete.
+   Sodium's excited $3p$ state lives about $\tau=16$ ns, giving
+   $\Delta E\gtrsim\hbar/(2\tau)\approx3\times10^{-27}$ J, around
+   $2\times10^{-8}$ eV, which read as a frequency spread is roughly
+   $5$ MHz. The measured full width at half maximum,
+   $1/(2\pi\tau)\approx10$ MHz, is twice that, the factor coming from the
+   Lorentzian shape an exponentially decaying state emits while
+   $\Delta E$ is the half width. Against an optical frequency near
+   $5\times10^{14}$ Hz that is a line sharp to about two parts in $10^8$,
+   and a state living a thousand times more briefly would be a thousand
+   times blurrier.
+
+   Two clarifications, because this is the relation most often misquoted.
+
+   The lifetime is not literally the $\Delta t_A$ of the derivation. The
+   derivation's timescale is defined for a specific observable as
+   $\Delta A/|d\langle A\rangle/dt|$, whereas a lifetime is a decay
+   constant for an unstable state, and connecting the two rigorously needs
+   machinery this course has not built. What survives without that
+   machinery is the scaling and the order of magnitude, which is what the
+   sodium numbers above check, and it is why the lesson writes
+   $\Delta E\,\Delta t\gtrsim\hbar/2$ with a wavy inequality when talking
+   about lifetimes.
+
+   And nothing here says energy is not conserved during the decay. The
+   spread is in what a measurement of the excited level's energy would
+   return, not a licence for the atom to borrow energy and repay it. The
+   "borrowed energy" story is the standard misreading, and this lesson's
+   derivation contains no such step: it came from an inequality between
+   spreads plus Ehrenfest's theorem, and neither mentions a loan.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -243,7 +378,7 @@ Ehrenfest's theorem instead.
   states never change, a consistency check across three
   separate derivations in three different courses.
 
-## Further Exploration
+## Comparing two energy spreads directly
 
 <ChallengePrompt prompt="Two different states have ΔE₁ = 1 and ΔE₂ = 4. Which one is guaranteed to have the shorter minimum Δt_A, and by what factor?">
   Same rearranged bound as before, $\Delta t_A\ge\hbar/(2\Delta E)$, but

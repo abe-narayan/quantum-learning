@@ -56,9 +56,9 @@ export const lessonMeta = {
   estimatedMinutes: 25,
   prerequisites: ["quantum-hardware/noise-decoherence-and-scaling/sources-of-noise"],
   objectives: [
-    "State the definitions of T1 (energy relaxation time) and T2 (dephasing/coherence time) as continuous exponential decay constants",
+    "State the definitions of T1 (energy relaxation time) and T2 (the total coherence time, distinct from the pure-dephasing time T_phi) as continuous exponential decay constants",
     "Connect T1/T2 to this platform's discrete Kraus-channel model via decayProbabilityForTimestep",
-    "Explain the general inequality T2 ≤ 2T1, and why T2 cannot exceed this bound",
+    "Derive where the inequality T2 ≤ 2T1 comes from, and state the Markovian, exponential-decay hypothesis it rests on",
   ],
   related: [
     {
@@ -69,16 +69,15 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Beyond the spec-sheet line">
-Every hardware press release leads with T1 and T2, and it's easy to nod along without actually knowing what "T1 = 100 μs" commits a device to.
+Every hardware press release leads with T1 and T2, and it's easy to nod along without knowing what "T1 = 100 μs" commits a device to.
 </LessonHook>
 
-## Motivation
+## Beyond the Press-Release Number
 
 Every time a hardware company announces a new chip, the press release
 leads with two numbers: <Term id="t1-t2-coherence-times">T1 and T2</Term>, usually in microseconds for
-superconducting devices, stretching all the way to seconds for
-hyperfine trapped-ion qubits (with neutral atoms typically somewhat
-shorter, though still far beyond any superconducting chip). Reporters
+superconducting devices, stretching all the way to seconds for the
+hyperfine qubits of trapped ions and neutral atoms alike. Reporters
 repeat them, and competitors get
 compared by them. Physical Qubit Platforms and Advanced
 Topics in Quantum Mechanics already built everything needed to define
@@ -89,17 +88,17 @@ the moment you see it quoted.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f3/MRI_Scanner_Mark_One.jpg"
   alt="The Mark One, the first MRI scanner ever used clinically, now on permanent display at Aberdeen Royal Infirmary"
-  caption="T1 and T2 weren't invented for qubits. Felix Bloch defined both time constants in 1946 for nuclear spin relaxation, and every MRI scan, including ones taken on this machine, the first ever used clinically, measures the same T1 and T2 this lesson computes, just for protons in tissue instead of a qubit's energy levels."
+  caption="The Mark One, the first MRI scanner put to clinical use. Everything a radiologist reads off an image like its output is contrast between tissues that differ in T1, in T2, or in how many protons they hold, and the scan sequence is chosen to favour whichever of those differences is largest. A qubit datasheet quotes the same two constants, extracted the same way: prepare a state, wait, and fit the exponential."
   credit="AndyGaskell / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:MRI_Scanner_Mark_One.jpg"
   license="CC BY-SA 4.0"
 />
 
 <HistoricalMoment date="1946">
-Felix Bloch defines both T1 and T2 for nuclear spin relaxation — the same time constants every MRI scan measures for protons in tissue, and every qubit spec sheet measures for energy levels.
+Felix Bloch defines both T1 and T2 for nuclear spin relaxation: the same time constants every MRI scan measures for protons in tissue, and every qubit spec sheet measures for energy levels.
 </HistoricalMoment>
 
-## Engineering Development
+## Two Decay Constants, and the Bound Between Them
 
 ### T1: energy relaxation
 
@@ -114,25 +113,66 @@ over total time $t=N\,dt$ give $(1-\gamma)^N=e^{-N\,dt/T_1}=e^{-t/T_1}$
 approximation; this platform's test suite confirms $N=10$, $100$, and
 $1000$ all give $P_1(T_1)=e^{-1}$ to 9 decimal places).
 
-### T2: dephasing / coherence time
+### T2: the total coherence time
 
 **T2** is the analogous time constant for off-diagonal <Term id="coherence">coherence</Term> decay:
-$|\rho_{01}(t)|=|\rho_{01}(0)|\,e^{-t/T_2}$, exactly
-`dephasingChannel`'s continuous-time limit, connected the same way via
-`decayProbabilityForTimestep(T2,dt)` as the per-step dephasing
-probability $\lambda$.
+$|\rho_{01}(t)|=|\rho_{01}(0)|\,e^{-t/T_2}$. Reproducing that curve on
+its own takes one channel, `dephasingChannel` fed
+`decayProbabilityForTimestep(T2,dt)` as its per-step probability
+$\lambda$, since the channel multiplies $\rho_{01}$ by $1-\lambda$ per
+step and $(1-\lambda)^N=e^{-t/T_2}$ exactly.
+
+Read that as a phenomenological shortcut rather than a decomposition,
+because it is one. `dephasingChannel` models *pure* dephasing, whose own
+time constant is $T_\varphi$, and $T_2$ is not $T_\varphi$: the next
+section is about the difference. Feeding $T_2$ into the pure-dephasing
+channel reproduces the observed coherence envelope only when that
+channel is acting alone. Compose it with `amplitudeDampingChannel` at
+$T_1$ and the relaxation contributes its own coherence loss on top, so
+the pair decays faster than $e^{-t/T_2}$. To build both mechanisms at
+once, feed $T_1$ to the damping channel and $T_\varphi$, not $T_2$, to
+the dephasing channel.
 
 ### The T2 ≤ 2T1 bound
 
-T1 processes (energy relaxation) *also* randomize phase as a side
-effect; losing populational information necessarily disturbs
-coherence too, while T2 processes (pure dephasing) need not involve any
-energy loss at all. This asymmetry gives the general bound
-$T_2\leq2T_1$: coherence can never outlast twice the energy-relaxation
-time, though it can decay much faster (if pure dephasing dominates)
-independent of T1. A device with $T_2$ close to $2T_1$ is described as
-"T1-limited" (dephasing is not the bottleneck); one with $T_2\ll2T_1$ is
-"T2-limited" (dephasing dominates).
+Two separate mechanisms destroy coherence, and it is worth naming them
+apart before combining them. T1 processes (energy relaxation) *also*
+randomize phase as a side effect: losing populational information
+necessarily disturbs coherence too. Pure dephasing, with its own time
+constant $T_\varphi$, scrambles the relative phase without any energy
+leaving the qubit at all.
+
+$T_2$ is not one of those two mechanisms. It is the rate at which the
+coherence actually decays once both are acting, so the two rates add:
+
+$$
+\frac{1}{T_2}=\frac{1}{2T_1}+\frac{1}{T_\varphi}.
+$$
+
+The factor of 2 on the first term is the asymmetry above, written down:
+energy relaxation costs coherence at half the rate it costs population.
+Reading the bound off that equation now takes no argument at all. The
+$1/T_\varphi$ term cannot be negative, so $1/T_2\geq1/(2T_1)$, which is
+$T_2\leq2T_1$. Coherence can never outlast twice the energy-relaxation
+time, and it can fall far short of it when $T_\varphi$ is small.
+
+The two limiting cases have names. A device with $T_2$ close to $2T_1$
+is "T1-limited": $T_\varphi$ is long enough to contribute almost
+nothing, and the only way to improve coherence is to improve $T_1$. One
+with $T_2\ll2T_1$ is "T2-limited", meaning pure dephasing dominates the
+sum. Watch the wording in the literature here, because "T2 processes" is
+a common shorthand for pure dephasing and it is the same word doing two
+jobs: $T_2$ is the total, $T_\varphi$ is the one mechanism.
+
+The bound holds under Markovian (Lindblad) dynamics, where both decays
+are exponential, which is the regime in which $T_1$ and $T_2$ are
+defined as rates at all. On real hardware that caveat has teeth: the
+flux noise, charge noise, and TLS defects catalogued in Sources of Noise
+are all weighted toward low frequencies, and against a bath the qubit
+effectively remembers, the coherence envelope bends away from a pure
+exponential toward a Gaussian. A "$T_2$" extracted from such a curve is
+a fit parameter belonging to a particular pulse sequence, not a rate,
+and setting it against $2T_1$ compares two different kinds of number.
 
 Watching both channels decay side by side, from the same starting point
 and at the same per-step strength, makes the asymmetry visible as two
@@ -142,11 +182,11 @@ different directions of travel rather than two different formulas:
   ariaLabel="Two Bloch-circle panels comparing amplitude damping (T1) and dephasing (T2) decay from the same equatorial starting state: amplitude damping pulls the vector toward the north pole |0⟩, while dephasing shrinks it straight toward the center along z=0"
 />
 
-<InteractiveSection title="Dephasing vs. amplitude damping" description="Compare the two channels directly: start from |+⟩ (equal parts |0⟩ and |1⟩, maximal initial coherence) and step through dephasing, watching only x and y shrink while z stays at 0. Then switch to amplitude damping from the same starting state and watch z move too, as the state gets pulled all the way to the north pole — the same T1-vs-T2 distinction just derived above, now visible qubit by qubit.">
+<InteractiveSection title="Dephasing vs. amplitude damping" description="Compare the two channels directly: start from |+⟩ (equal parts |0⟩ and |1⟩, maximal initial coherence) and step through dephasing, reading x, y, and z at each step. Then run amplitude damping from the same starting state and read the same three again. Which of the components each channel is allowed to touch is the T1-vs-T2 distinction just derived above, now visible qubit by qubit.">
   <LazyNoiseExplorer />
 </InteractiveSection>
 
-## Physical Interpretation
+## Not Two Free Parameters
 
 T1 and T2 aren't independent free parameters a device designer can set
 arbitrarily. They reflect two physically distinct (if related)
@@ -157,16 +197,14 @@ field is enough). This is why realistic devices often report $T_2<2T_1$
 substantially; dephasing processes with no direct T1 analogue are
 common (Sources of Noise's flux-noise example).
 
-Bloch's 1946 definitions carry over without amendment. "T1-weighted" and
-"T2-weighted" are standard clinical MRI scan types, and each voxel of
-such a scan reports the same two constants this lesson computes, for
-protons in tissue rather than a qubit's energy levels. Nothing about the
-definitions changed on the way to a superconducting datasheet; only the
-system being measured did.
+Bloch's definitions carry over without amendment: "T1-weighted" and
+"T2-weighted" are still the names of standard clinical scan types.
+Nothing about them changed on the way to a superconducting datasheet;
+only the system being measured did.
 
 <Callout type="note">
 **Reading a T1/T2 number in a press release.** A quoted T1 or T2 is a
-time constant, not a "the qubit is dead here" cutoff — at $t=T_1$, 37%
+time constant, not a "the qubit is dead here" cutoff: at $t=T_1$, 37%
 ($e^{-1}$) of the population is still there, not zero. Two numbers only
 mean something read together: is $T_2$ close to $2T_1$ (T1-limited,
 dephasing is well under control) or well below it (T2-limited, some
@@ -176,7 +214,7 @@ across all of them, and over what run of the device. A headline T1 from
 one cherry-picked qubit is a different claim than a chip-wide median.
 </Callout>
 
-## Worked Example
+## Reading a Device From Its Two Numbers
 
 **A device has $T_1=80\mu s$. What is the absolute maximum possible
 $T_2$, and what does it mean if the measured $T_2$ is only $30\mu s$?**
@@ -192,32 +230,35 @@ identifying and suppressing the extra dephasing source instead.
   question="Same device: T1 = 80 μs, T2 = 30 μs. At t = 80 μs (one full T1), which has decayed further: the population P1(t), or the coherence |ρ01(t)|?"
   options={[
     { label: "Coherence has decayed further (it's lower)", value: "coherence-lower" },
-    { label: "Population has decayed further (it's lower)", value: "population-lower" },
     { label: "They're equal at t = 80 μs", value: "equal" },
+    { label: "Population has decayed further (it's lower)", value: "population-lower" },
   ]}
   correctValue="coherence-lower"
-  explanation="P1(80) = e^(-80/80) = e^-1 ≈ 0.37, but |ρ01(80)| = e^(-80/30) = e^-2.67 ≈ 0.07. Coherence has fallen much further, exactly what a T2-limited device (T2 well under the 2T1 ceiling) means: it loses phase information faster than it loses energy. Drag the slider below to see both curves move together and check this at any point along the axis, not just t = 80 μs."
+  explanation="P1(80) = e^(-80/80) = e^-1 ≈ 0.37, but |ρ01(80)| = e^(-80/30) = e^-2.67 ≈ 0.07. Coherence has fallen much further, which is what a T2-limited device (T2 well under the 2T1 ceiling) means: it loses phase information faster than it loses energy. Drag the slider below to see both curves move together and check this at any point along the axis, not just t = 80 μs."
 />
 
-<InteractiveSection title="Drag T2 toward the 2T1 ceiling" description="T1 is fixed at the Worked Example's 80μs. Drag T2 from a strongly dephasing-dominated 10μs up toward the 160μs = 2T1 ceiling and watch both real-time-axis curves, P1(t)=e^(-t/T1) (population) and |ρ01(t)|=e^(-t/T2) (coherence). The vertical markers show t=T1 and t=T2 directly; the frame label reports the live T2/T1 ratio and names the regime T1-limited or T2-limited the same way the prose above does. Set T2=30μs to see the Worked Example's own numbers.">
+<InteractiveSection title="Drag T2 toward the 2T1 ceiling" description={`T1 is fixed at the Worked Example's ${WORKED_EXAMPLE_T1_US}μs. Drag T2 from a strongly dephasing-dominated ${T2_SWEEP_US[0]}μs up toward the ${T2_CEILING_US}μs = 2T1 ceiling and watch both real-time-axis curves, P1(t)=e^(-t/T1) (population) and |ρ01(t)|=e^(-t/T2) (coherence). The vertical markers show t=T1 and t=T2 directly; the frame label reports the live T2/T1 ratio and names the regime T1-limited or T2-limited the same way the prose above does. Set T2=30μs to see the Worked Example's own numbers.`}>
   <ParametricCurve
     frames={t1T2DecayFrames}
     sliderLabel="T2"
+    xAxisLabel="time t (μs)"
+    yAxisLabel="fraction remaining"
     referenceLines={[
       { y: 1, label: "full population / coherence" },
       { y: Math.exp(-1), label: "1/e ≈ 0.37 (one time constant)" },
     ]}
-    ariaLabel="Population decay P1(t) = e^(-t/T1) and coherence decay |ρ01(t)| = e^(-t/T2) plotted against real time in microseconds, with T1 fixed at 80 microseconds and T2 sweeping from 10 microseconds up to the 160-microsecond 2T1 ceiling, with vertical markers at t=T1 and t=T2"
+    ariaLabel={`Population decay P1(t) = e^(-t/T1) and coherence decay |ρ01(t)| = e^(-t/T2) plotted against real time in microseconds, with T1 fixed at ${WORKED_EXAMPLE_T1_US} microseconds and T2 sweeping from ${T2_SWEEP_US[0]} microseconds up to the ${T2_CEILING_US}-microsecond 2T1 ceiling, with vertical markers at t=T1 and t=T2`}
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Treating T1 and T2 as Unrelated
 
 <Callout type="warning">
 **Assuming T1 and T2 are independent, unrelated numbers.** They're
-physically related via $T_2\leq2T_1$. Reported $T_2$ values exceeding
-this bound would indicate a measurement or definition error, not a
-device that's actually better.
+physically related via $T_2\leq2T_1$. Where both decays really are
+exponential, a reported $T_2$ above that ceiling indicates a measurement
+or definition error rather than a better device; where they are not, the
+first question to ask is what was fit, and to what.
 </Callout>
 
 <Callout type="note">
@@ -226,45 +267,276 @@ merely a good approximation.** It's an EXACT identity, for any step
 count. The telescoping product
 $(1-\gamma)^N=(e^{-dt/T})^N=e^{-Ndt/T}$ has no approximation error at
 all, unlike (for example) the WKB approximation from Approximation
-Methods, which actually is only approximate.
+Methods, which is only approximate.
 </Callout>
 
 ## Practice Questions
 
 1. For $T_1=100\mu s$, what per-step damping probability $\gamma$
-   corresponds to a $dt=1\mu s$ timestep?
+   corresponds to a $dt=1\mu s$ timestep? Then show that applying the
+   channel with that $\gamma$ over one full $T_1$ reproduces $e^{-1}$
+   exactly, rather than approximately.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \gamma = 1-e^{-dt/T_1} = 1-e^{-1/100} \approx 0.00995017,
+   $$
+
+   just under 1% per step. `decayProbabilityForTimestep(100, 1)` returns
+   $0.009950166250831893$.
+
+   Note it is *not* $dt/T_1=0.01$. That is the linearization, and it sits
+   about $5\times10^{-5}$ high. Small, and using it would break the exact
+   identity below, which is the whole reason the formula is written with
+   the exponential.
+
+   **The exactness.** Over one full $T_1$ the channel is applied
+   $N=T_1/dt=100$ times, and the surviving population is the product of
+   100 independent survivals:
+
+   $$
+   (1-\gamma)^N = \left(e^{-dt/T_1}\right)^N = e^{-N\,dt/T_1} = e^{-T_1/T_1} = e^{-1}.
+   $$
+
+   The exponentials telescope. There is no truncation, no small-$dt$
+   assumption and no error term, so the answer does not improve as you
+   step more finely because it was never wrong. Running the real Kraus
+   channel confirms it: `applyChannelRepeatedly` on $|1\rangle$ with
+   amplitude damping gives $P_1$ after one $T_1$ of
+
+   $0.3678794411714424$ at $N=10$,
+   $0.367879441171443$ at $N=100$,
+   $0.3678794411714576$ at $N=1000$,
+
+   against $e^{-1}=0.36787944117144233$. All three agree to about nine
+   decimal places, and the residual differences are floating-point noise
+   that grows very slightly with the number of multiplications, not a
+   discretization error that shrinks with smaller steps. Notice the
+   $N=1000$ result is marginally *further* from $e^{-1}$ than $N=10$,
+   which is the signature of accumulated rounding rather than of an
+   approximation converging.
+
+   Two wrong turns. The first is treating this as the usual
+   "fine-stepping converges to the continuous limit" story, which would
+   predict the opposite trend. The second is reading $\gamma$ as a rate.
+   It is a probability per step, dimensionless and capped at 1; the rate
+   is $1/T_1$, and the two coincide only to first order in $dt/T_1$.
+
+   </details>
+
 2. If a device's measured $T_2$ equals exactly $2T_1$, what does this
    say about its dominant decoherence mechanism?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   That there is no pure dephasing at all: the only thing destroying
+   coherence is the energy-relaxation process itself. The device is as
+   $T_1$-limited as it is possible to be.
+
+   Within the Markovian picture where both decays really are exponential,
+   the two coherence-destroying contributions add as rates:
+
+   $$
+   \frac{1}{T_2} = \frac{1}{2T_1} + \frac{1}{T_\varphi},
+   $$
+
+   where $T_\varphi$ is the pure-dephasing time. The first term is the
+   phase disruption forced by relaxation, which question 4 derives; the
+   second is everything else, the fluctuating fields that randomize phase
+   without moving energy. Setting $T_2=2T_1$ forces $1/T_\varphi=0$: the
+   second channel contributes nothing.
+
+   **The engineering consequence is the reason anyone cares.** On a
+   device at the ceiling, effort spent on the usual dephasing remedies is
+   wasted. Better magnetic shielding, quieter flux lines, longer
+   dynamical-decoupling sequences, all of them attack $T_\varphi$, and
+   $T_\varphi$ is already infinite. The only route to longer coherence is
+   a longer $T_1$: better materials, fewer two-level-system defects, a
+   Purcell filter on the readout path. That is exactly the diagnosis the
+   two numbers exist to give you, and it is why the lesson insists they
+   only mean something read together.
+
+   Three caveats, because "exactly $2T_1$" is a limit rather than a
+   measurement.
+
+   Real devices report $T_2$ at the ceiling *within error bars*. No
+   physical device has literally zero pure dephasing.
+
+   A reported $T_2$ *above* $2T_1$ is not a better device. Where both
+   decays are genuinely exponential it indicates a measurement or
+   definition problem; where they are not, the first question is what
+   was fit, and to what. Against the low-frequency-weighted flux and
+   charge noise this course catalogues, the coherence envelope bends away
+   from exponential toward Gaussian, and a "$T_2$" pulled off such a
+   curve is a fit parameter belonging to one pulse sequence, not a rate
+   that can be set against $2T_1$ at all.
+
+   Which raises the practical question of *which* $T_2$ is being quoted.
+   A Ramsey measurement with no refocusing gives $T_2^*$, which includes
+   slow, quasi-static field variation and is typically much shorter. A
+   Hahn echo refocuses that slow component and gives a longer $T_2$. A
+   device quoted at the $2T_1$ ceiling is almost certainly quoting an
+   echo number, and comparing it against someone else's $T_2^*$ compares
+   two different experiments.
+
+   </details>
+
 3. Using the worked example's numbers, would doubling $T_1$ (to $160\mu s$)
    necessarily double the measured $T_2$? Why or why not?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **No.** On the worked example's device, $T_2$ would go from 30 μs to
+   about 33 μs: a 10% improvement, not a 100% one.
+
+   $T_2\leq2T_1$ is a *ceiling*, not a proportionality. The worked example
+   has $T_1=80\ \mu$s and a measured $T_2=30\ \mu$s, which sits far below
+   the existing $160\ \mu$s ceiling. Raising the ceiling to $320\ \mu$s
+   does nothing on its own, because the ceiling was not what was binding.
+
+   Working it out with the rate decomposition makes the size of the
+   effect concrete. From the original numbers:
+
+   $$
+   \frac{1}{T_\varphi} = \frac{1}{T_2}-\frac{1}{2T_1} = \frac{1}{30}-\frac{1}{160} \approx 0.027083\ \mu\text{s}^{-1}, \qquad T_\varphi \approx 36.9\ \mu\text{s}.
+   $$
+
+   The pure-dephasing process is untouched by whatever improved $T_1$, so
+   with $T_1=160\ \mu$s:
+
+   $$
+   \frac{1}{T_2'} = \frac{1}{320}+0.027083 = 0.030208 \implies T_2' \approx 33.1\ \mu\text{s},
+   $$
+
+   a gain of 10.3%.
+
+   The limiting case is the clearest statement of the situation. Push
+   $T_1$ to infinity and $T_2$ saturates at $T_\varphi\approx36.9\ \mu$s.
+   Perfect energy relaxation buys a 23% improvement in coherence on this
+   device and not one microsecond more. The bottleneck is the extra
+   dephasing source, and until it is found and suppressed, $T_1$ work is
+   the wrong project.
+
+   The wrong turn is reading the inequality as an equality in disguise,
+   as though $T_2$ tracked $2T_1$ and simply fell short by some fixed
+   inefficiency. It does not track it at all. $T_1$ and $T_2$ come from
+   physically different requirements: relaxation needs an
+   energy-exchanging coupling to the environment, while pure dephasing
+   needs only a fluctuating, energy-neutral field. There is no reason for
+   the second to improve when the first does, and on real hardware it
+   usually does not.
+
+   One hypothesis this argument leans on, and should not be dropped: the
+   rates add like this in the Markovian regime, where both decays are
+   exponential and $T_1$ and $T_2$ are rates at all. Against a
+   slow, correlated bath the arithmetic above is not the right model, and
+   the honest answer becomes "no, and the numbers cannot be combined this
+   way either."
+
+   </details>
+
 4. Explain physically why T1 processes necessarily disturb phase
-   coherence too, while T2 (pure dephasing) processes need not involve
-   any energy exchange.
+   coherence too, while pure dephasing ($T_\varphi$) processes need not
+   involve any energy exchange. Then show how that asymmetry produces
+   the factor of 2 in $T_2\leq2T_1$ specifically.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **The direction that is forced.** Coherence is the off-diagonal
+   element $\rho_{01}$, and for any legitimate density matrix positivity
+   requires
+
+   $$
+   |\rho_{01}| \le \sqrt{\rho_{00}\,\rho_{11}} .
+   $$
+
+   Coherence between two levels is bounded by the populations of those
+   two levels. So as relaxation empties $|1\rangle$ and $\rho_{11}\to0$,
+   $\rho_{01}$ is dragged to zero with it whether any phase-randomizing
+   process is present or not. You cannot hold a superposition of two
+   things when one of them is no longer occupied.
+
+   That inequality also produces the factor of two, which is worth seeing
+   rather than memorizing. With $\rho_{11}(t)\propto e^{-t/T_1}$ and
+   $\rho_{00}\le1$,
+
+   $$
+   |\rho_{01}(t)| \le \sqrt{e^{-t/T_1}} = e^{-t/(2T_1)},
+   $$
+
+   so the coherence envelope is capped by a decay with time constant
+   $2T_1$. If the coherence really is exponential with constant $T_2$,
+   that cap says $T_2\le2T_1$ directly. The square root is the whole
+   origin of the 2.
+
+   **Why physically, and not just algebraically.** A $T_1$ event is the
+   emission of a real energy quantum into the environment. Something out
+   there now holds a record of which branch of the superposition the
+   qubit was in, and a which-path record in the environment is
+   decoherence, whether or not anyone reads it. Relaxation is, in effect,
+   a measurement performed by the surroundings.
+
+   **The direction that is not forced.** Pure dephasing needs nothing of
+   the sort. A fluctuating local field, stray flux for a superconducting
+   qubit, a wandering magnetic field for an ion, a nuclear-spin bath for
+   a spin qubit, shifts the qubit's level splitting slightly up and down.
+   The accumulated relative phase between $|0\rangle$ and $|1\rangle$
+   becomes random. No quantum is exchanged, and the populations
+   $\rho_{00}$ and $\rho_{11}$ are untouched, which is exactly what the
+   lesson's explorer shows when dephasing leaves $z$ fixed and shrinks
+   only $x$ and $y$. Coherence can be destroyed with no energy budget at
+   all.
+
+   **So the implication runs one way.** Energy relaxation implies phase
+   disturbance; phase disturbance does not imply energy relaxation. A
+   one-way implication produces a one-sided inequality, which is why the
+   relation is $T_2\le2T_1$ and not $T_2=2T_1$, and why $T_2$ is free to
+   fall arbitrarily far below the ceiling while never rising above it.
+
+   The wrong turn is reading $T_2\le2T_1$ as a rough empirical
+   observation about typical devices, and therefore expecting $T_2$ to
+   sit near $2T_1$ most of the time. It is a bound, its cause is the
+   positivity constraint above, and real devices are usually well under
+   it because dephasing sources with no $T_1$ counterpart are common.
+   Both statements need the Markovian, exponential-decay setting to even
+   be comparable, which is the hypothesis this lesson attaches to the
+   bound and which is not optional.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
-- T1 (energy relaxation) and T2 (dephasing) are the continuous-time
-  limits of `amplitudeDampingChannel` and `dephasingChannel`, connected
-  exactly (not approximately) via `decayProbabilityForTimestep`.
+- T1 (energy relaxation) is the continuous-time limit of
+  `amplitudeDampingChannel`, and coherence decay is `dephasingChannel`'s,
+  connected exactly (not approximately) via
+  `decayProbabilityForTimestep`. T2 is the *total* coherence time, not a
+  mechanism: the mechanism with its own channel is pure dephasing, at
+  $T_\varphi$.
 - The bound $T_2\leq2T_1$ reflects that energy relaxation necessarily
   disturbs phase, while pure dephasing needs no energy exchange.
 - A device's $T_2/T_1$ ratio diagnoses whether it's T1-limited or
-  T2-limited, a real, actionable engineering distinction.
+  T2-limited, an actionable engineering distinction.
 - A quoted T1 or T2 is a time constant (37% remaining at $t=T$), not a
   hard cutoff, and it's only fully meaningful alongside the other number
   and a sense of how and over how many qubits it was measured.
 
-## Further Exploration
+## The Noise a Single-Qubit Picture Cannot See
 
 <NextDiscovery>
 [Crosstalk](/lessons/quantum-hardware/noise-decoherence-and-scaling/crosstalk) is an inherently two-qubit noise source that this lesson's
 single-qubit T1/T2 picture doesn't capture.
 
-The $T_2\leq2T_1$ bound stated here as a physical fact is *derived*, from
-the Lindblad generator's structure, in [The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation),
-which also proves this lesson's discrete Kraus-channel picture and the
+The $T_2\leq2T_1$ bound is *derived*, from the Lindblad generator's
+structure, in [The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation),
+which is where its Markovian hypothesis stops being a caveat and becomes
+a line in a proof, and which also shows this lesson's discrete Kraus-channel picture and the
 continuous-time master equation are exactly the same physics, not two
 independent models that happen to agree.
 </NextDiscovery>

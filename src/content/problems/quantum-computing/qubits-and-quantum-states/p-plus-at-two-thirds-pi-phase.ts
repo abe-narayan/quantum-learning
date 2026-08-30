@@ -42,7 +42,7 @@ export const pPlusAtTwoThirdsPiPhase: NumericProblem = {
   hints: [
     { text: "This is the same P(+) formula from the Measurement lesson, applied to a state with an explicit relative phase δ between α and β." },
     { text: "α*β = (1/√2)·e^{iδ}·(1/√2) = e^{iδ}/2, so Re(α*β) = cos(δ)/2." },
-    { text: "At δ=2π/3, cos(δ) = −1/2." },
+    { text: "2π/3 is 120°, in the second quadrant, so cos(δ) is negative. Evaluate it, then substitute into the P(+) formula." },
   ],
   solution: {
     steps: [
@@ -54,9 +54,9 @@ export const pPlusAtTwoThirdsPiPhase: NumericProblem = {
   },
   explanation: {
     correctIdea: "P(+) is a continuous function of the relative phase δ, sweeping from 1 (constructive, δ=0) down to 0 (destructive, δ=π) and back.",
-    whyCorrect: "At δ=2π/3, cos(δ) is negative but not at its most negative, giving a P(+) below 1/2 but above 0 — a genuinely partial-interference case, distinct from the lesson's own δ=π/2 worked example.",
+    whyCorrect: "At δ=2π/3, cos(δ) is negative but not at its most negative, giving a P(+) below 1/2 but above 0: a partial-interference case, distinct from the lesson's own δ=π/2 worked example.",
     whyWrong: [
-      "Using P(0)=|α|²=0.5 instead — that's the computational-basis probability, which by design doesn't depend on δ at all.",
+      "Using P(0)=|α|²=0.5 gives the computational-basis probability, which by construction does not depend on δ.",
       "Forgetting the factor of 1/2 out front and reporting cos(δ) itself as the answer.",
     ],
   },

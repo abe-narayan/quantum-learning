@@ -30,7 +30,7 @@ export const complexModulus: NumericProblem = {
   hints: [
     { text: "The modulus formula is |z| = sqrt(a^2 + b^2) for z = a + bi." },
     { text: "Here a = 3 and b = 4." },
-    { text: "3^2 + 4^2 = 9 + 16 = 25 — take the square root." },
+    { text: "3^2 + 4^2 = 9 + 16 = 25. Take the square root." },
   ],
   solution: {
     steps: [

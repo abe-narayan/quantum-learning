@@ -40,6 +40,6 @@ export const superdenseLambdaForTargetSuccess: NumericProblem = {
   },
   explanation: {
     correctIdea: "Superdense coding's success probability under this specific noise model degrades linearly in the dephasing strength lambda.",
-    whyCorrect: "This matches the lesson's own two checked data points (lambda=0.2 giving 0.9, lambda=0.4 giving 0.8), confirming the linear formula.",
+    whyCorrect: "Two data points checked in the lesson (lambda=0.2 giving 0.9, lambda=0.4 giving 0.8) lie on the same straight line as this one, which is what shows the relation is genuinely linear rather than merely fitted at a single value.",
   },
 };

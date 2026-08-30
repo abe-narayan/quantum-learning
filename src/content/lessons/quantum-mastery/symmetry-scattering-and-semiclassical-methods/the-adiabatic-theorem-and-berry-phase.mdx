@@ -79,7 +79,7 @@ export const lessonMeta = {
   keeps is a record of the loop's shape.
 </LessonHook>
 
-## Motivation
+## A Phase That Depends Only on the Path
 
 Holonomic and topological quantum computing build logic gates out of
 the phase this lesson derives: a control field is walked slowly
@@ -87,7 +87,7 @@ around a loop in parameter space, and the qubit picks up a phase that
 depends only on the loop's shape, not on how fast or exactly how it was
 traversed. Gates built this way inherit that same insensitivity, which is
 part of why the geometric phase is treated as a serious resource for
-noise-resistant qubit control rather than a mathematical curiosity. Before
+noise-resistant qubit control. Before
 any of that is usable, though, the phase itself has to be shown to exist,
 and that takes two questions and one answer.
 
@@ -97,27 +97,48 @@ the way a marble stays near the bottom of a slowly-tilting bowl? Second:
 if it does, is that all that happens, or does the system remember
 something about the *path* the Hamiltonian took, even after returning
 exactly to where it started? The first question is the **adiabatic
-theorem**. The second question's answer, yes, it remembers, as a real,
+theorem**. The second question's answer, yes, it remembers, as a
 measurable phase, is **Berry's phase**, and both come out of the same
 four lines of algebra.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/1/10/Michael_Berry%2C_Yerevan_-_Ashtarak%2C_Armenia%2C_FOP-2014%2C_03.09.2014_%28cropped%29.jpg"
   alt="Michael Berry, cropped to head and shoulders, attending the International Advanced School on Frontiers in Optics and Photonics near Yerevan, Armenia, in September 2014"
-  caption="Sir Michael Berry, who discovered in 1984 that a slowly-cycled quantum system picks up a real, measurable geometric phase depending only on the path traced in parameter space, the phase this lesson derives and computes for a spin-1/2 dragged around a cone."
+  caption="Sir Michael Berry, who discovered in 1984 that a slowly-cycled quantum system picks up a measurable geometric phase depending only on the path traced in parameter space, the phase this lesson derives and computes for a spin-1/2 dragged around a cone."
   credit="Vahram Mekhitarian (photo), Jakob Gottfried (crop) / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Michael_Berry,_Yerevan_-_Ashtarak,_Armenia,_FOP-2014,_03.09.2014_(cropped).jpg"
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## Leakage Rate, and the Phase That Survives It
 
 ### Setting up the adiabatic expansion
 
 Let $H(t)$ have instantaneous eigenstates $|n(t)\rangle$,
 $H(t)|n(t)\rangle=E_n(t)|n(t)\rangle$, at every fixed $t$ (a well-defined
 notion, since diagonalizing a Hermitian operator at one instant needs no
-information about how it changes). Expand the true state as
+information about how it changes).
+
+Two hypotheses go in at this point and are used at every step after it.
+First, the level of interest stays **non-degenerate** along the whole
+path: $E_n(t)\neq E_m(t)$ for every $m\neq n$ and every $t$. That is what
+makes $|n(t)\rangle$ a well-defined ray rather than an arbitrary vector
+in a subspace, and the leakage formula derived below divides by
+$E_n-E_m$, so a level crossing does not merely weaken the theorem; it
+destroys the derivation. Second, $|n(t)\rangle$ can be chosen to depend
+smoothly on $t$, so that $|\dot n\rangle$ exists. The phase of each
+$|n(t)\rangle$ is free at every instant, and the whole geometric-phase
+story is about what that freedom does and does not permit.
+
+Both hypotheses can be relaxed, at a cost. If the level is degenerate
+throughout, the phase $\gamma_n$ is replaced by a **matrix** acting
+within the degenerate subspace, the non-abelian **Wilczek–Zee
+holonomy** (1984), and the resulting matrices generally do not commute.
+That is the version holonomic quantum computing, named at the outset,
+uses to build multi-qubit gates: a scalar phase alone
+cannot generate a non-trivial gate, but a non-commuting holonomy can.
+
+Expand the true state as
 
 $$
 |\psi(t)\rangle = \sum_n c_n(t)\,e^{i\theta_n(t)}\,|n(t)\rangle, \qquad
@@ -182,7 +203,7 @@ n|\dot n\rangle=0$, i.e. $\langle n|\dot n\rangle+\overline{\langle
 n|\dot n\rangle}=0$, so its real part vanishes. Write
 $\langle n|\dot n\rangle=i\dot\gamma_n(t)$ for a real function
 $\gamma_n$. Then $c_n(t)=c_n(0)\,e^{i\gamma_n(t)}$: a real phase, on
-top of the dynamical phase $\theta_n$ already factored out. Crucially,
+top of the dynamical phase $\theta_n$ already factored out. And
 $\gamma_n(t)=i\int_0^t\langle n(t')|\dot n(t')\rangle\,dt'=i\oint\langle
 n|\nabla_R n\rangle\cdot d\vec R$ (chain rule, $R$ the Hamiltonian's slow
 parameters) depends only on the **path** $R(t)$ traces through parameter
@@ -205,8 +226,8 @@ this platform's own `blochStateFromAngles`.
 
 Computing $\gamma$ over one full loop ($\phi:0\to2\pi$ at fixed $\theta$)
 as a real discretized loop integral, summing the phase of
-$\langle\psi(t_i)|\psi(t_{i+1})\rangle$ at each small step (a real,
-computed quantity, not read off a formula), and comparing directly to the
+$\langle\psi(t_i)|\psi(t_{i+1})\rangle$ at each small step (computed step
+by step, not read off a formula), and comparing directly to the
 famous closed-form prediction $\gamma=-\tfrac12\Omega$, minus half the
 **solid angle** $\Omega=2\pi(1-\cos\theta)$ the loop encloses on the
 sphere of field directions:
@@ -216,7 +237,7 @@ sphere of field directions:
   options={[
     { label: "γ doubles, since the field spends twice as long at every point", value: "doubles" },
     { label: "γ is cut in half, since the phase accumulates more slowly", value: "halves" },
-    { label: "γ is unchanged — it depends only on the loop's shape, not its duration", value: "same" },
+    { label: "γ is unchanged, since it depends only on the loop's shape, not its duration", value: "same" },
   ]}
   correctValue="same"
   explanation="γ = i∮⟨n|∇_R n⟩·dR is a line integral over the path in parameter space, with no leftover dt anywhere in the integrand; the chain rule that produced it cancelled the time-parametrization out completely. Slow the loop down, speed it up, traverse it unevenly: γ doesn't move. The dynamical phase θ_n, by contrast, does grow with how long the loop takes."
@@ -228,12 +249,14 @@ sphere of field directions:
 >
   <ParametricCurve
     frames={berryCurveFrames}
+    xAxisLabel="cone half-angle θ (degrees)"
+    yAxisLabel="Berry phase γ (rad)"
     ariaLabel="Numerically computed Berry phase versus the closed-form minus one half solid angle formula, as the cone half-angle theta varies from 10 to 170 degrees, showing near-exact agreement"
   />
 </InteractiveSection>
 
 That plot confirms the numbers agree, but it's an abstract phase-vs-angle
-curve. The actual geometric object behind $\gamma=-\tfrac12\Omega$ is a
+curve. The geometric object behind $\gamma=-\tfrac12\Omega$ is a
 literal cap on the sphere of field directions:
 
 <InteractiveSection
@@ -243,7 +266,7 @@ literal cap on the sphere of field directions:
   <BerryPhaseCone ariaLabel="A sphere of field directions with a loop traced at a draggable cone half-angle theta around a fixed axis, with the enclosed spherical cap shaded to represent the solid angle Omega, and live-computed values of Omega and the Berry phase gamma equal to minus one half Omega" />
 </InteractiveSection>
 
-## Physical Interpretation
+## Geometric, and Measurable
 
 The geometric phase is real, not a computational artifact: interfering a
 spin (or a photon, where the analogous effect is well-measured) that took
@@ -251,14 +274,14 @@ the loop against one that didn't produces an observable fringe shift. The
 loop returns exactly to its starting field direction, so the dynamical
 phase alone would predict no leftover phase distinguishing "went around
 the loop" from "stayed put"; $\gamma$'s survival despite that shows it is
-a property of the *loop itself*, traced out in parameter space, rather
-than of either endpoint — exactly the sense in which it's geometric
-rather than dynamical. The minus sign and
+a property of the *loop itself*, traced out in parameter space. Neither
+endpoint accounts for it. That is exactly the sense in which it is
+geometric rather than dynamical. The minus sign and
 the factor of $\tfrac12$ both trace back to spin-$\tfrac12$'s specific
 $\cos(\theta/2),\sin(\theta/2)$ half-angle structure, not to any
 arbitrary convention.
 
-## Worked Example
+## A Spin-Half Dragged Around a Cone
 
 **Compute the <Term id="adiabatic-theorem-berry-phase">Berry phase</Term> for $\theta=60°$ by hand from the solid-angle
 formula, and compare to the computed loop integral.**
@@ -266,11 +289,14 @@ formula, and compare to the computed loop integral.**
 $\Omega=2\pi(1-\cos60°)=2\pi(1-\tfrac12)=\pi$. So
 $\gamma=-\tfrac12\Omega=-\tfrac\pi2\approx-1.5708$, a clean, exactly
 checkable value. The platform's discretized loop integral at
-$\theta=60°$ gives $\gamma\approx-1.5708$ as well, matching to better
-than $10^{-4}$. That is an independent numerical confirmation of the
-closed-form geometric formula, not a restatement of it.
+$\theta=60°$ gives $\gamma\approx-1.5708$ as well. Across all seven
+angles plotted above the largest discrepancy is $4.3\times10^{-7}$, which
+is the residual of chopping the loop into $3000$ finite steps, with no
+disagreement of substance. That is an independent numerical
+confirmation of the closed-form geometric formula, not a restatement
+of it.
 
-## Common Mistakes
+## Confusing a Ray With a State
 
 <Callout type="mistake">
 **Thinking the adiabatic theorem guarantees the system returns to
@@ -294,18 +320,229 @@ tiny gap needs a much slower sweep than one with a large gap, at the
 1. Compute the solid angle $\Omega$ and the Berry phase $\gamma$ for
    $\theta=90°$ (the field sweeping exactly along the equator), and
    compare to the numeric value read off the plot above.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\Omega=2\pi$ and $\gamma=-\pi$, and at this one angle the discretized
+   loop integral returns $-\pi$ *exactly*, not merely to seven digits.
+
+   The solid angle first:
+
+   $$
+   \Omega=2\pi(1-\cos90°)=2\pi(1-0)=2\pi,\qquad \gamma=-\tfrac12\Omega=-\pi\approx-3.1415926536.
+   $$
+
+   An equatorial loop bisects the sphere, so it encloses exactly half of
+   the full $4\pi$, and the Berry phase is minus a quarter of the total
+   solid angle available. The plot's numeric point at $\theta=90°$ reads
+   $-3.1415926536$, agreeing with the closed form to every digit printed.
+
+   That exactness is worth a second look, because at $\theta=60°$ the same
+   3000-step calculation was off by $4.3\times10^{-7}$. Here the residual
+   is zero to machine precision, and there is a reason. The discretized
+   integral sums the argument of $\langle\psi(\phi_i)|\psi(\phi_{i+1})\rangle$
+   over $N$ steps of size $\Delta=2\pi/N$, and with
+   $|\psi(\phi)\rangle=\cos(\theta/2)|0\rangle+e^{i\phi}\sin(\theta/2)|1\rangle$
+   that overlap is
+
+   $$
+   \langle\psi(\phi_i)|\psi(\phi_{i+1})\rangle=\cos^2(\theta/2)+e^{i\Delta}\sin^2(\theta/2).
+   $$
+
+   At $\theta=90°$ the two weights are both $\tfrac12$, so the overlap
+   collapses to $\tfrac12(1+e^{i\Delta})=e^{i\Delta/2}\cos(\Delta/2)$,
+   whose argument is $\Delta/2$ on the nose. Summing $N$ of those gives
+   $N\Delta/2=\pi$ for *any* number of steps, so the answer is exact even
+   at $N=3$. Away from the equator the per-step argument is
+   $\arctan\!\big[\sin^2(\theta/2)\sin\Delta\,/\,(\cos^2(\theta/2)+\sin^2(\theta/2)\cos\Delta)\big]$,
+   which departs from the ideal $\sin^2(\theta/2)\,\Delta$ at order
+   $\Delta^3$; $N$ of those leave an $O(\Delta^2)$ residue, which is the
+   $4\times10^{-7}$ seen at $N=3000$. Quadrupling $N$ should cut it by
+   sixteen, and does.
+
+   The physical content of $\gamma=-\pi$ is the one every treatment of
+   this example stops at: $e^{-i\pi}=-1$, so walking the field once around
+   the equator brings a spin-1/2 back to *minus* its original state. It is
+   the same sign a $2\pi$ rotation produces, arrived at here without
+   rotating the spin at all, only the field it follows.
+
+   The tempting wrong turn is to call $-1$ a global phase and therefore
+   unobservable. It is global only for a system that took the loop in its
+   entirety. In the interference measurement the lesson describes, the
+   arm that went around the loop is compared against an arm that did not,
+   and a relative factor of $-1$ moves the fringes by half a period, which
+   is the largest shift the experiment can produce. The practical
+   complication is the opposite one: the dynamical phase $\theta_n$ is
+   also accumulating during the loop and is generally huge, so a real
+   experiment has to cancel it (spin echo, or running the two arms with
+   opposite loop orientation) before the geometric part is visible.
+
+   </details>
+
 2. Explain in one or two sentences why $\langle n|\dot n\rangle$ being
    purely imaginary is essential to $\gamma_n$ coming out real (a
    physically sensible phase), rather than some complex number.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $c_n(t)=c_n(0)\exp[-\int\langle n|\dot n\rangle\,dt']$ puts
+   $\langle n|\dot n\rangle$ in an exponent: its imaginary part rotates
+   $c_n$, and its real part would rescale $|c_n|$. A real part is
+   therefore not a complex phase at all, it is growth or decay of the
+   amplitude, which unitary evolution inside a single non-degenerate level
+   cannot produce.
+
+   And it cannot appear, for a reason that costs one line. Differentiating
+   the normalization $\langle n(t)|n(t)\rangle=1$ gives
+   $\langle\dot n|n\rangle+\langle n|\dot n\rangle=2\,\mathrm{Re}\langle
+   n|\dot n\rangle=0$. So $\langle n|\dot n\rangle=i\dot\gamma_n$ with
+   $\gamma_n$ real, and $c_n(t)=c_n(0)e^{i\gamma_n(t)}$ has modulus fixed
+   at $|c_n(0)|$ for all time, exactly as a state that never leaves level
+   $n$ requires.
+
+   The hypothesis actually being used is worth naming, because it is easy
+   to violate by accident. The argument needs $|n(t)\rangle$ to be
+   normalized at *every* $t$, not just at $t=0$. Feed the same loop
+   integral a family of eigenvectors whose norm drifts (what a numerical
+   eigensolver hands back if you forget to renormalize each step) and
+   $\mathrm{Re}\langle n|\dot n\rangle\neq0$, producing a spurious
+   apparent decay of $c_n$ that has nothing to do with leakage between
+   levels. The cure is to renormalize before differencing, not to discard
+   the real part by hand. The discretized computation in this lesson is
+   immune to it for free, since it reads the *argument* of each overlap
+   and never looks at the modulus.
+
+   </details>
+
 3. As $\theta\to0$ (a vanishingly small cone, the field barely moving off
    the north pole), what does the solid-angle formula predict for
    $\gamma$? Does this match physical intuition about a "loop" that
    barely encloses any area?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It predicts $\gamma\to0$, and quadratically, which is the part worth
+   getting right:
+
+   $$
+   \Omega=2\pi(1-\cos\theta)=4\pi\sin^2(\theta/2)\approx\pi\theta^2,
+   \qquad \gamma=-\tfrac12\Omega\approx-\tfrac{\pi\theta^2}{2}.
+   $$
+
+   Intuition agrees, and the quadratic behaviour is what makes the
+   agreement meaningful. A small cap on a sphere is well approximated by a
+   flat disk of radius $\theta$, whose area is $\pi\theta^2$: the phase
+   tracks enclosed *area*, not the loop's circumference $2\pi\sin\theta$,
+   which vanishes only linearly. Halving the cone angle therefore quarters
+   the phase. The state-space picture says the same thing: the
+   instantaneous eigenstate is
+   $|0\rangle+\tfrac\theta2 e^{i\phi}|1\rangle+O(\theta^2)$, so the only
+   $\phi$-dependent component has amplitude $O(\theta)$ and the phase it
+   can generate over a cycle is $O(\theta^2)$. The plot bears this out:
+   at $\theta=10°$, $\gamma\approx-0.0477$, and $\pi\theta^2/2$ with
+   $\theta=10°=0.1745$ rad gives $0.0478$.
+
+   The far more interesting limit is the other degenerate one. As
+   $\theta\to\pi$ the loop again shrinks to a point, this time around the
+   south pole, so the phase must again be unobservable. The formula gives
+   $\Omega\to4\pi$ and $\gamma\to-2\pi$, which is not zero but is zero
+   *modulo* $2\pi$, and a phase is only ever defined modulo $2\pi$. The
+   two shrinking-loop limits are consistent, but only because the value at
+   $\theta=\pi$ came out an exact multiple of $2\pi$. It had to: the same
+   physical loop can be regarded as enclosing either the cap of solid
+   angle $\Omega$ or its complement $4\pi-\Omega$, with opposite
+   orientation, and the two answers differ by $2\pi$. That ambiguity being
+   invisible is Dirac's monopole quantization condition wearing different
+   clothes, and it is the reason the coefficient in $\gamma=-\tfrac12\Omega$
+   cannot be adjusted freely.
+
+   One thing not to conclude: that a small cone makes the geometric phase
+   negligible in practice. It is small per loop, but it is coherent and
+   path-dependent rather than random, so $N$ circuits of the same small
+   cone accumulate $N\gamma$. And nothing else obstructs running many of
+   them, since $|\dot{\hat n}|=\omega\sin\theta\to0$ makes the
+   adiabaticity condition *easier* to satisfy for a narrow cone, not
+   harder.
+
+   </details>
+
 4. The adiabaticity condition here was $\omega\ll\omega_0$. Using the
    leakage-rate formula $\langle m|\dot n\rangle=\langle m|\dot
    H|n\rangle/(E_n-E_m)$, explain qualitatively why a *larger* field
    strength (larger $\omega_0$) makes the adiabatic approximation *easier*
    to satisfy at fixed sweep rate $\omega$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the gap enters the *final* suppression twice while the driving
+   term only grows once, and the second factor of the gap comes from the
+   dynamical phase, not from the leakage rate.
+
+   Work the two ingredients out for this Hamiltonian. With
+   $H=-\tfrac{\hbar\omega_0}{2}\hat n(t)\cdot\vec\sigma$,
+
+   $$
+   \dot H=-\frac{\hbar\omega_0}{2}\,\dot{\hat n}(t)\cdot\vec\sigma,\qquad |\dot{\hat n}|=\omega\sin\theta,
+   $$
+
+   since the tip of $\hat n$ runs around a circle of radius $\sin\theta$
+   at angular rate $\omega$. Because $\hat n$ is a unit vector,
+   $\dot{\hat n}\perp\hat n$, so $\dot{\hat n}\cdot\vec\sigma$ is purely
+   off-diagonal in the instantaneous eigenbasis of $\hat n\cdot\vec\sigma$,
+   with off-diagonal magnitude $|\dot{\hat n}|$. The gap is
+   $|E_n-E_m|=\hbar\omega_0$. Hence
+
+   $$
+   |\langle m|\dot H|n\rangle|=\frac{\hbar\omega_0\,\omega\sin\theta}{2},
+   \qquad
+   |\langle m|\dot n\rangle|=\frac{|\langle m|\dot H|n\rangle|}{|E_n-E_m|}=\frac{\omega\sin\theta}{2}.
+   $$
+
+   Read that second result carefully, because it names the tempting wrong
+   turn. The leakage *rate* $\langle m|\dot n\rangle$ does not depend on
+   $\omega_0$ at all. Raising the field strength enlarges the denominator
+   $E_n-E_m$, but it enlarges $\langle m|\dot H|n\rangle$ by precisely the
+   same factor, since a stronger field means the Hamiltonian itself is
+   bigger and so its time derivative is too. "Bigger gap, smaller
+   coupling" is not the mechanism here, and an argument that stops at
+   $\langle m|\dot n\rangle$ predicts, wrongly, that field strength is
+   irrelevant.
+
+   The suppression lives one step further on. In the exact equation
+   $\dot c_m=-c_m\langle m|\dot m\rangle-\sum_{n\neq m}c_n\langle m|\dot
+   n\rangle e^{i(\theta_n-\theta_m)}$, what matters is not the
+   instantaneous rate but the *accumulated* transfer
+   $\int\langle m|\dot n\rangle\,e^{i(\theta_n-\theta_m)}\,dt$. The
+   exponent oscillates at frequency $(E_n-E_m)/\hbar=\omega_0$, far faster
+   than $\langle m|\dot n\rangle$ varies, so integrating by parts gives
+   boundary terms of size
+
+   $$
+   \left|\frac{\hbar\,\langle m|\dot n\rangle}{E_n-E_m}\right|
+   =\frac{\hbar\,|\langle m|\dot H|n\rangle|}{|E_n-E_m|^2}
+   =\frac{\omega\sin\theta}{2\omega_0},
+   $$
+
+   and the interior term is smaller still. That is where the *square* of
+   the gap in the adiabaticity condition
+   $\hbar|\langle m|\dot H|n\rangle|\ll|E_n-E_m|^2$ comes from: one power
+   converts $\dot H$ into a rate of change of eigenvectors, and the second
+   is the price the rapidly rotating relative dynamical phase charges for
+   letting any of that leakage actually build up.
+
+   With the numbers in front of you the stated condition is now exact
+   rather than qualitative: transfer amplitude $\sim\omega\sin\theta/2\omega_0$,
+   so $\omega\ll\omega_0$ suffices for every $\theta$, and a narrow or
+   nearly-polar cone ($\sin\theta$ small) is more forgiving still. Doubling
+   $\omega_0$ at fixed $\omega$ halves the leakage amplitude and quarters
+   the leaked probability, which is why strong-field, large-gap systems
+   are the ones where geometric-phase gates are practical.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -322,10 +559,10 @@ tiny gap needs a much slower sweep than one with a large gap, at the
 - For spin-$\tfrac12$ dragged around a cone by a slowly rotating field,
   $\gamma=-\tfrac12\Omega$ ($\Omega$ the solid angle traced), verified
   here as a real discretized loop integral over real Bloch-sphere
-  states, matching the closed-form prediction to better than $10^{-4}$
-  across every angle swept.
+  states, matching the closed-form prediction to within
+  $4.3\times10^{-7}$ across every angle swept.
 
-## Further Exploration
+## Minimal-Uncertainty States Under the Same Lens
 
 <NextDiscovery>
   [Coherent and Squeezed States](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states)

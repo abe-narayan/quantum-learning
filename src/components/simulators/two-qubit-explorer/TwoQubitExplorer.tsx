@@ -34,16 +34,16 @@ function gateNarration(gate: SingleQubitGateId, qubit: 0 | 1) {
 
 /** How mixed a reduced state is, in words a first-time reader can act on. */
 function purityDescription(p: number): string {
-  if (p > 0.999) return "pure — this qubit has a definite state of its own";
-  if (p < 0.501) return "maximally mixed — no state of its own at all";
-  return "partly mixed — some of its state lives in the correlation";
+  if (p > 0.999) return "pure: this qubit has a definite state of its own";
+  if (p < 0.501) return "maximally mixed: no state of its own at all";
+  return "partly mixed: some of its state lives in the correlation";
 }
 
 /**
  * "Qubit 0 alone / Qubit 1 alone": the reduced state of each qubit with the
  * other traced out, summarised by its purity Tr(ρ²). Computed with the same
  * `reducedDensityMatrixQubit0/1` + `purity` engine functions
- * `EntanglementCorrelation` uses — for a product state each purity is 1
+ * `EntanglementCorrelation` uses; for a product state each purity is 1
  * (each qubit is a complete description by itself); for a Bell state each is
  * 0.5 (all the information is in the pair, none in either half).
  */
@@ -60,7 +60,7 @@ function ReducedStatesPanel({ state }: { state: StateVector }) {
     <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
       <h3 className="text-sm font-semibold text-foreground">Each qubit alone</h3>
       <p className="mt-1 text-xs text-muted-foreground">
-        Ignore one qubit entirely — what is left of the other? Purity Tr(ρ²) = 1 means a complete
+        Ignore one qubit entirely: what is left of the other? Purity Tr(ρ²) = 1 means a complete
         state of its own; 0.5 means maximally mixed, with everything in the correlation.
       </p>
       <dl className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -83,7 +83,7 @@ function ReducedStatesPanel({ state }: { state: StateVector }) {
   );
 }
 
-/** The Bell pair (|00⟩ + |11⟩)/√2 the instrument now opens on — built with the same engine calls the "bell" guided preset replays. */
+/** The Bell pair (|00⟩ + |11⟩)/√2 the instrument now opens on, built with the same engine calls the "bell" guided preset replays. */
 function initialBellState(): StateVector {
   return applyCNOT(applySingleQubitGate(StateVector.zero(2), gateMatrix("H"), 0), 0, 1);
 }
@@ -91,7 +91,7 @@ function initialBellState(): StateVector {
 export function TwoQubitExplorer() {
   const [state, setState] = useState<StateVector>(initialBellState);
   const [narration, setNarration] = useState(
-    "Starting mid-experiment: H then CNOT already ran, so the pair sits in the Bell state (|00⟩ + |11⟩)/√2 — entangled. Neither qubit has a definite value, yet they always agree. Measure qubit 0 and watch qubit 1's fate lock in instantly. Reset returns to plain |00⟩."
+    "Starting mid-experiment: H then CNOT already ran, so the pair sits in the Bell state (|00⟩ + |11⟩)/√2: entangled. Neither qubit has a definite value, yet they always agree. Measure qubit 0 and watch qubit 1's fate lock in instantly. Reset returns to plain |00⟩."
   );
   const [activePresetId, setActivePresetId] = useState<string | null>("bell");
   const [lastMeasurement, setLastMeasurement] = useState<string | null>(null);
@@ -126,7 +126,7 @@ export function TwoQubitExplorer() {
     setState((prev) => applyCNOT(prev, 0, 1));
     setActivePresetId(null);
     setLastMeasurement(null);
-    setNarration("Applied CNOT — qubit 0 is the control, qubit 1 is the target.");
+    setNarration("Applied CNOT: qubit 0 is the control, qubit 1 is the target.");
   }, [disabled]);
 
   const applySwapAction = useCallback(() => {
@@ -134,7 +134,7 @@ export function TwoQubitExplorer() {
     setState((prev) => applySwap(prev, 0, 1));
     setActivePresetId(null);
     setLastMeasurement(null);
-    setNarration("Applied SWAP — qubit 0 and qubit 1 exchanged their values.");
+    setNarration("Applied SWAP: qubit 0 and qubit 1 exchanged their values.");
   }, [disabled]);
 
   const initialize = useCallback(
@@ -158,11 +158,11 @@ export function TwoQubitExplorer() {
       } else if (id === "plus-plus") {
         const afterQ0 = applySingleQubitGate(StateVector.zero(2), gateMatrix("H"), 0);
         next = applySingleQubitGate(afterQ0, gateMatrix("H"), 1);
-        message = "Prepared |++⟩ — two independent superpositions, no entanglement.";
+        message = "Prepared |++⟩: two independent superpositions, no entanglement.";
       } else {
         const afterH = applySingleQubitGate(StateVector.zero(2), gateMatrix("H"), 0);
         next = applyCNOT(afterH, 0, 1);
-        message = "Prepared a Bell state — entangled.";
+        message = "Prepared a Bell state: entangled.";
       }
 
       setState(next);
@@ -181,11 +181,11 @@ export function TwoQubitExplorer() {
       setActivePresetId(null);
       setLastMeasurement(`Measured qubit ${qubit} → ${result.outcome}`);
       setNarration(
-        `Measured qubit ${qubit}: got ${result.outcome} (probability was ${Math.round(result.probability * 100)}%). The state has collapsed — this was an instantaneous event, not a smooth transition.`
+        `Measured qubit ${qubit}: got ${result.outcome} (probability was ${Math.round(result.probability * 100)}%). The state has collapsed: this was an instantaneous event, not a smooth transition.`
       );
       // Resolve only when the measured state really is the Bell preparation
       // the question describes (freshly mounted, or after re-running the
-      // "bell" walkthrough) — measuring some other state the visitor built
+      // "bell" walkthrough); measuring some other state the visitor built
       // should not grade this prediction.
       if (qubit === 0 && predictOutcomeId === null && activePresetId === "bell") {
         // Resolve the "measure qubit 0 only" prediction from the real
@@ -244,7 +244,7 @@ export function TwoQubitExplorer() {
         } else if (step.kind === "cnot") {
           current = applyCNOT(current, 0, 1);
           setState(current);
-          setNarration("Applied CNOT — qubit 0 is the control, qubit 1 is the target.");
+          setNarration("Applied CNOT: qubit 0 is the control, qubit 1 is the target.");
         } else {
           const result = measureQubit(current, step.qubit);
           current = result.collapsed;
@@ -265,13 +265,13 @@ export function TwoQubitExplorer() {
 
   return (
     <SimulatorInstrument
-      label="Two-qubit states — entanglement"
+      label="Two-qubit states: entanglement"
       footnote="Next: try building the same Bell state gate-by-gate in the Circuit Builder."
       stageClassName="space-y-6"
       stage={
         <>
           <p className="text-sm text-muted-foreground">
-            Two qubits can be genuinely independent — knowing one tells you nothing about the other — or
+            Two qubits can be genuinely independent (knowing one tells you nothing about the other) or
             they can be <em>entangled</em>, where neither has a state of its own and measuring one instantly
             fixes the other. Nothing travels between them; the correlation was always in the pair. The
             correlation table below is where the difference shows up.
@@ -288,9 +288,9 @@ export function TwoQubitExplorer() {
           </div>
 
           <Predict
-            question="The pair starts in a Bell state. Measure qubit 0 only — what can you then say about qubit 1?"
+            question="The pair starts in a Bell state. Measure qubit 0 only. What can you then say about qubit 1?"
             options={[
-              { id: "unchanged", label: "Nothing new — it stays 50/50" },
+              { id: "unchanged", label: "Nothing new; it stays 50/50" },
               { id: "fixed-match", label: "It is now certain, and matches qubit 0" },
               { id: "fixed-opposite", label: "It is now certain, and opposite to qubit 0" },
             ]}
@@ -302,9 +302,9 @@ export function TwoQubitExplorer() {
           <CorrelationView state={state} />
 
           <SimulatorFraming
-            shows="Whether two qubits act independently or become entangled — correlated in a way no classical coin pair can be."
-            watchFor="Initialize |++⟩ and the correlation table shows all four outcomes at 25%: independent. Build a Bell state and only the diagonal survives — same 50/50 odds per qubit, but the two now always agree."
-            tryThis="Run the Bell-state guided preset, then measure qubit 0 — notice qubit 1's outcome is now fixed too, even though you never touched it."
+            shows="Whether two qubits act independently or become entangled: correlated in a way no classical coin pair can be."
+            watchFor="Initialize |++⟩ and the correlation table shows all four outcomes at 25%: independent. Build a Bell state and only the diagonal survives: same 50/50 odds per qubit, but the two now always agree."
+            tryThis="Run the Bell-state guided preset, then measure qubit 0. Notice qubit 1's outcome is now fixed too, even though you never touched it."
           />
         </>
       }

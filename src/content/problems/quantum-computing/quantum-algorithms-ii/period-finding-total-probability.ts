@@ -25,11 +25,16 @@ export const periodFindingTotalProbability: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
-    incorrectFeedback: "This is a probability distribution over a valid quantum state's measurement outcomes — what must any such distribution sum to?",
+    nearMisses: [
+      { value: 0, tolerance: 0.0005, feedback: "0 would say no outcome can occur at all. Any measurement on a valid state has to land somewhere." },
+      { value: 64, tolerance: 0.5, feedback: "64 counts the possible outcomes for t = 6 rather than summing their probabilities. The question asks for the total weight, not the number of entries." },
+      { value: 0.015625, tolerance: 0.0005, feedback: "That is 1/64, the weight one outcome would carry if the distribution were flat. The sum runs over all of them, and the distribution is not flat here anyway." },
+    ],
+    incorrectFeedback: "This is a probability distribution over a valid quantum state's measurement outcomes. What must any such distribution sum to?",
   },
   hints: [
     { text: "This is a full probability distribution over the counting register's outcomes." },
-    { text: "Probabilities of all possible outcomes of any measurement always sum to 1." },
+    { text: "Recall the normalization constraint every measurement-outcome distribution obeys, whatever circuit produced it." },
     { text: "No special property of period finding changes this basic normalization fact." },
   ],
   solution: {
@@ -39,6 +44,6 @@ export const periodFindingTotalProbability: NumericProblem = {
   explanation: {
     correctIdea: "This is a basic normalization sanity check, not specific to period finding's structure.",
     whyCorrect: "Confirmed directly from the engine's actual output.",
-    whyWrong: ["Any answer other than 1 would indicate either a genuine engine bug or a misunderstanding of what a probability distribution is."],
+    whyWrong: ["Any answer other than 1 would mean either an engine bug or a misreading of what a probability distribution is."],
   },
 };

@@ -1,6 +1,5 @@
 import type { Pillar } from "@/lib/content/types";
 import { PILLAR_ORDER, PILLAR_VISUALS } from "@/lib/design/pillars";
-import { problemPillar } from "./problemPillarIndex";
 
 /**
  * ============================================================
@@ -33,29 +32,41 @@ export const ROUTE_TO_PILLAR: Partial<Record<string, Pillar>> = Object.fromEntri
  *    lives at `src/content/lessons/<pillar>/...`, see
  *    `src/lib/content/lessons.ts`), so detecting it is a string compare
  *    against the six known pillar slugs, not a curriculum lookup.
- * 3. A problem route, `/problems/<slug>`. Unlike lessons, a problem's slug
- *    doesn't encode its pillar (`ProblemMeta.slug` is a flat identifier —
- *    see `src/lib/problems/types.ts`), so this can't be a string compare.
- *    `ProblemLayout` (a server component) resolves the real pillar via
- *    `getProblem(slug) -> getCourse(...).pillar` and scopes the page's
- *    background/accent/focus-ring color to it — `./problemPillarIndex.ts`
- *    is a small, chrome-only slug -> pillar table (deliberately *not* an
- *    import of `@/lib/problems/registry`, which would bundle the entire
- *    problem corpus — every question, hint and worked solution — into the
- *    client just for this badge) so the navbar can agree with it.
+ *
+ * A problem route, `/problems/<slug>`, is deliberately NOT a third case, and
+ * the reason is the interesting one. A problem's slug doesn't encode its
+ * pillar (`ProblemMeta.slug` is a flat identifier — see
+ * `src/lib/problems/types.ts`), so answering it from a pathname alone needs a
+ * table: `components/layout/problemPillarIndex.ts` used to hold one row per
+ * problem for exactly this. That table was 7.2KB gzip — 7.2% of the whole
+ * client-data ceiling in `lib/design/__tests__/clientBoundary.test.ts` — and
+ * `Navbar` is in the root layout, so all 823 routes downloaded all 556 rows
+ * to tint one badge on 556 of them.
+ *
+ * The page already publishes the answer. `ProblemLayout` resolves the real
+ * pillar on the server (`getProblem(slug) -> getCourse(...).pillar`) and
+ * hands it to `<PillarScope pillar>`, which writes it to the module-level
+ * `components/field/fieldStore`. `Navbar` reads it from there with
+ * `useFieldState()` — see the note on `scopePillar` in Navbar.tsx — so the
+ * badge is tinted from the page's own declaration, by subscription, with no
+ * table and no fetch.
  */
 export function detectPillar(pathname: string): Pillar | undefined {
   const lessonSegment = pathname.match(/^\/lessons\/([^/]+)/)?.[1];
   if (lessonSegment && (PILLAR_ORDER as readonly string[]).includes(lessonSegment)) {
     return lessonSegment as Pillar;
   }
-  const problemSlug = pathname.match(/^\/problems\/([^/]+)/)?.[1];
-  if (problemSlug) {
-    return problemPillar(problemSlug);
-  }
   for (const pillar of PILLAR_ORDER) {
     const route = PILLAR_VISUALS[pillar].route;
     if (pathname === route || pathname.startsWith(`${route}/`)) return pillar;
   }
   return undefined;
+}
+
+/** A single problem's page, `/problems/<slug>` — not the `/problems` catalog,
+ *  which belongs to no pillar. The one route shape whose pillar `detectPillar`
+ *  cannot answer from the path, and so the only one that reads the field
+ *  store's scoped pillar instead. */
+export function isProblemPage(pathname: string): boolean {
+  return /^\/problems\/[^/]+/.test(pathname);
 }

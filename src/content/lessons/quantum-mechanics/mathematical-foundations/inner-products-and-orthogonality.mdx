@@ -24,6 +24,25 @@ export const csDemoFrame = (angleDeg) => ({
   ]
 });
 
+export const helstromSuccess = (overlap) => 0.5 * (1 + Math.sqrt(1 - overlap * overlap));
+export const zeroVsPlusOverlap = Math.SQRT1_2;
+export const zeroVsPlusCeiling = helstromSuccess(zeroVsPlusOverlap);
+export const helstromFrames = [
+  {
+    paramLabel: "Best possible success rate at telling two states apart, against their overlap",
+    series: [
+      {
+        label: "P_success",
+        color: "brand",
+        points: Array.from({ length: 101 }, (_, i) => {
+          const overlap = i / 100;
+          return { x: overlap, y: helstromSuccess(overlap) };
+        })
+      }
+    ]
+  }
+];
+
 export const lessonMeta = {
   title: "Inner Products and Orthogonality",
   description:
@@ -47,13 +66,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Perpendicular, and therefore distinguishable">
   Two quantum states being "perpendicular" is not decoration borrowed from
   geometry. It is the condition, necessary and sufficient, for a single
   measurement to tell them apart with certainty.
 </LessonHook>
 
-## Motivation
+## A space with no notion of length
 
 A <Term id="vector-space">vector space</Term>, as built in the last lesson, has no notion of length or
 angle: you can add and scale vectors, but nothing yet says how "big" one
@@ -72,7 +91,7 @@ supplies length and angle is called an **<Term id="inner-product">inner product<
   license="Public domain (US)"
 />
 
-## Intuition
+## The dot product, plus one conjugation
 
 For ordinary real vectors, the dot product $u\cdot v = \sum u_iv_i$ already
 does this job: $u\cdot u$ gives squared length, and $u\cdot v=0$ means
@@ -80,7 +99,7 @@ perpendicular. The complex case needs one modification, conjugation, and
 the reason for it is concrete: without conjugation, squared lengths can
 come out negative. Everything else follows from repairing that.
 
-## Mathematical Development
+## Why conjugation is forced, and what follows from it
 
 ### Why conjugation is required
 
@@ -137,22 +156,29 @@ work with, for a reason the Bra-Ket Formalism lesson makes precise
 
 ### The Cauchy-Schwarz inequality
 
+$\langle u,v\rangle$, $\|u\|$, and $\|v\|$ are three numbers built from
+the same pair of vectors, so it would be odd if nothing tied them
+together. There is one relation, and you have most of what you need to
+guess it: for real vectors the dot product is $\|u\|\|v\|\cos\theta$, and
+$\cos\theta$ can never leave $[-1,1]$.
+
+<PredictBeforeReveal
+  question="Fix ‖u‖ and ‖v‖ and let u and v range over a complex vector space. How large can |⟨u,v⟩| get?"
+  options={[
+    { label: "At most ‖u‖‖v‖, the same ceiling as the real case", value: "same" },
+    { label: "At most ‖u‖‖v‖ for real vectors, but complex ones can exceed it", value: "complex-bigger" },
+    { label: "No finite ceiling, since cos θ means nothing for complex vectors", value: "unbounded" },
+    { label: "At most ‖u‖ + ‖v‖", value: "sum" },
+  ]}
+  correctValue="same"
+  explanation="The real-case ceiling survives conjugation intact: |⟨u,v⟩| ≤ ‖u‖‖v‖ in every inner product space, real or complex, and it is achieved (with equality) whenever u and v are parallel. Complex vectors do not have a literal angle θ to appeal to, so cos θ cannot be the argument, but the bound does not need one. The derivation below gets it from positive-definiteness alone, applied to a single cleverly chosen vector. ‖u‖ + ‖v‖ is not a bound at all: take u = v = (10,0) and the left side is 100 against a right side of 20."
+/>
+
 For any $u,v\in V$:
 
 $$
 |\langle u,v\rangle| \le \|u\|\,\|v\|
 $$
-
-<PredictBeforeReveal
-  question="Can |⟨u,v⟩| ever come out larger than ‖u‖‖v‖, for some choice of u and v?"
-  options={[
-    { label: "Yes, for some complex vectors", value: "yes" },
-    { label: "No, it never exceeds ‖u‖‖v‖", value: "no" },
-    { label: "Only when u and v are linearly dependent", value: "dependent" },
-  ]}
-  correctValue="no"
-  explanation="Never, for any u and v in any inner product space. Equality is achievable (when u and v are parallel), but the inequality never breaks in the other direction. The derivation below shows this falls out of nothing more exotic than positive-definiteness, applied to one specific, cleverly chosen vector."
-/>
 
 Here's the derivation, worked from scratch.
 
@@ -207,7 +233,7 @@ $w=u-cv=(2,-1)$. Drawing $w$ starting at $cv$'s tip and ending at $u$'s
 tip shows the whole construction at once: $cv$ is $u$'s shadow along $v$,
 and $w$ is what's left over, sitting at a right angle to $v$.
 
-<InteractiveSection title="Watch w stay perpendicular to v" description="v is fixed. Drag the slider to spin u all the way around. cv (u's shadow along v) and w = u - cv update live. Confirm that w stays at a right angle to v at every angle, as the Cauchy-Schwarz derivation guarantees.">
+<InteractiveSection title="Spin u, and watch the angle between w and v" description="v is fixed. Drag the slider to spin u all the way around. cv (u's shadow along v) and w = u - cv update live. As u spins, watch the angle between w and v, and decide whether it depends on where u happens to be pointing. The Cauchy-Schwarz derivation above commits to an answer.">
   <VectorDiagramExplorer
     frames={Array.from({ length: 36 }, (_, i) => csDemoFrame(i * 10))}
     sliderLabel="Angle of u"
@@ -215,7 +241,21 @@ and $w$ is what's left over, sitting at a right angle to $v$.
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## Reading the angle bracket as physics writes it
+
+<Callout type="note">
+**Reading the notation in this section.** Physics writes a vector as
+$|\psi\rangle$ instead of $v$, and the inner product $\langle u,v\rangle$
+as $\langle u|v\rangle$, closing up the comma. Nothing changes but the
+ink: $\langle\phi|\psi\rangle$ below is the same conjugate-symmetric,
+second-slot-linear inner product built above. The two symbols
+$|0\rangle$ and $|1\rangle$ are names for a chosen orthonormal basis of
+$\mathbb{C}^2$, so $\langle 0|0\rangle = \langle 1|1\rangle = 1$ and
+$\langle 0|1\rangle = 0$, which is all the next paragraph needs about
+them. The [Bra-Ket Formalism](/lessons/quantum-mechanics/mathematical-foundations/bra-ket-formalism)
+lesson explains why the notation is worth adopting; here it is borrowed
+early only so the physics can be stated in the form you will meet it in.
+</Callout>
 
 Two quantum states with $\langle\phi|\psi\rangle=0$ are the states, and
 the only states, that a single measurement can tell apart with certainty.
@@ -246,9 +286,30 @@ $$
 Orthogonal states put $|\langle\phi|\psi\rangle| = 0$ into that formula and
 recover $P_{\text{success}} = 1$; identical states put in $1$ and give
 $0.5$, which is a coin flip. The single number $|\langle\phi|\psi\rangle|$
-interpolates between the two.
+interpolates between the two, and the shape of that interpolation is worth
+seeing rather than taking on the two endpoints alone:
 
-## Worked Example
+<ParametricCurve
+  frames={helstromFrames}
+  referenceLines={[
+    { y: zeroVsPlusCeiling, label: "|0⟩ vs |+⟩" },
+    { y: 0.5, label: "coin flip" },
+  ]}
+  xAxisLabel="overlap |⟨φ|ψ⟩|"
+  yAxisLabel="best achievable P_success"
+  ariaLabel="Best achievable probability of correctly identifying which of two states was prepared, plotted against their overlap from 0 to 1. The curve starts at 1 for orthogonal states and stays above 0.9 for every overlap up to 0.6, reading 0.977 at an overlap of 0.3. Past 0.6 it bends downward with increasing steepness, passing 0.854 at an overlap of 0.707 and reaching 0.5 at overlap 1, which it approaches with a vertical tangent"
+/>
+
+The curve is not a straight line, and the departure matters. Small
+overlaps cost almost nothing: at $|\langle\phi|\psi\rangle| = 0.3$ the
+ceiling is still $0.977$, and it does not fall below $0.9$ until the
+overlap reaches $0.6$. States that are merely *close* to orthogonal stay
+nearly as distinguishable as orthogonal ones. The penalty is concentrated
+at the far end, where the curve turns and drops into the coin flip with a
+vertical tangent. Distinguishability degrades gently across most of the
+range and then collapses at the end of it.
+
+## Testing (1,i) against (i,1)
 
 **Are $u=(1,i)$ and $v=(i,1)$ orthogonal? If not, find the angle-like
 overlap ratio.**
@@ -263,7 +324,7 @@ under this inner product. An overall phase factor
 like this $i$ never changes orthogonality, since $|\langle u, cv\rangle| =
 |c|\,|\langle u,v\rangle|$ for any scalar $c$.)
 
-## Common Mistakes
+## The conjugate, and the order of the arguments
 
 <Callout type="warning">
 **Forgetting to conjugate.** $\langle u,v\rangle=\sum u_i^*v_i$, not $\sum
@@ -287,11 +348,141 @@ for the opposite convention when reading other sources.
 1. Compute $\langle u,v\rangle$ for $u=(1,0)$ and $v=(1,1)/\sqrt2$. Is
    Cauchy-Schwarz satisfied (check $|\langle u,v\rangle|\le\|u\|\|v\|$
    numerically)?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \langle u,v\rangle = 1^*\cdot\tfrac{1}{\sqrt2} + 0^*\cdot\tfrac{1}{\sqrt2} = \frac{1}{\sqrt2} \approx 0.707.
+   $$
+
+   Both vectors are already unit length, $\|u\| = \sqrt{1+0} = 1$ and
+   $\|v\| = \sqrt{\tfrac12+\tfrac12} = 1$, so Cauchy-Schwarz reads
+
+   $$
+   0.707 = |\langle u,v\rangle| \le \|u\|\|v\| = 1 \checkmark
+   $$
+
+   and it is satisfied with room to spare.
+
+   The slack is the interesting part. Cauchy-Schwarz becomes an *equality*
+   exactly when the two vectors are parallel, and these two are $45°$ apart,
+   so the inequality is strict. Reading the inner product of two unit vectors
+   as a cosine, $\cos45° = 1/\sqrt2 \checkmark$, which is what the geometric
+   interpretation in this lesson asserts and what makes "how much of $v$ points
+   along $u$" a legitimate translation of the symbol.
+
+   Both entries are real here, so the conjugation in the first slot is
+   invisible. Do not read that as permission to drop it. The very next question
+   has an imaginary entry, and there the conjugate is the difference between
+   getting the length right and getting a negative number.
+
+   In quantum notation this is $\langle 0|+\rangle = 1/\sqrt2$, and squaring it
+   gives the probability $\tfrac12$ of reading 0 when measuring $|+\rangle$ in
+   the computational basis.
+
+   </details>
+
 2. Normalize $v=(3,4i)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \|v\| = \sqrt{\langle v,v\rangle} = \sqrt{|3|^2 + |4i|^2} = \sqrt{9+16} = 5, \qquad \hat v = \left(\frac{3}{5},\ \frac{4i}{5}\right).
+   $$
+
+   The modulus of $4i$ is 4, since multiplying by $i$ rotates a complex number
+   without stretching it, so $|4i|^2 = 16$. Check the result:
+   $\left|\tfrac35\right|^2 + \left|\tfrac{4i}{5}\right|^2 = \tfrac{9}{25}+\tfrac{16}{25} = 1 \checkmark$.
+
+   The error this question exists to catch is squaring the components instead
+   of their moduli: $3^2 + (4i)^2 = 9 - 16 = -7$, and then $\|v\| = \sqrt{-7}$,
+   an imaginary length. That is precisely the outcome the conjugation in the
+   inner product's definition exists to prevent. Written out,
+   $\langle v,v\rangle = \sum_i v_i^* v_i = \sum_i |v_i|^2$, a sum of
+   non-negative reals, and the conjugate is what makes each term non-negative.
+
+   Note also what normalizing does *not* do: it leaves the phase of each
+   component alone. $\hat v$ still carries the $i$ on its second entry, and it
+   must, since $(3/5, 4/5)$ is a different vector with a different relative
+   phase. Rescaling changes length, never direction.
+
+   </details>
+
 3. Find a vector orthogonal to $(1,1)$ in $\mathbb{C}^2$, using the
    Gram-Schmidt idea from this lesson.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $(1,-1)$, or any nonzero multiple of it.
+
+   Gram-Schmidt says: take any vector not already parallel to $u = (1,1)$, and
+   subtract off its component along $u$. Starting from $w = (1,0)$,
+
+   $$
+   w_\perp = w - \frac{\langle u,w\rangle}{\langle u,u\rangle}u = (1,0) - \frac{1}{2}(1,1) = \left(\tfrac12, -\tfrac12\right),
+   $$
+
+   which is $\tfrac12(1,-1)$. Confirm:
+   $\langle (1,1),(1,-1)\rangle = 1 - 1 = 0 \checkmark$. Normalized it is
+   $\tfrac{1}{\sqrt2}(1,-1)$, and the orthonormal pair
+   $\left\{\tfrac{1}{\sqrt2}(1,1),\ \tfrac{1}{\sqrt2}(1,-1)\right\}$ is
+   $\{|+\rangle, |-\rangle\}$, the X basis.
+
+   Two things worth being careful about in $\mathbb{C}^2$ specifically.
+
+   The subtraction formula needs the conjugate in the right place.
+   $\langle u,w\rangle$ conjugates $u$'s entries, and using $\langle w,u\rangle$
+   instead gives the conjugate coefficient, which for complex $u$ produces a
+   $w_\perp$ that is not orthogonal to anything. Here $u$ is real so both
+   orderings agree, which hides the issue rather than removing it.
+
+   And "orthogonal to $(1,1)$" does not pin the answer down. The orthogonal
+   complement of a line in $\mathbb{C}^2$ is another complex line, so
+   $(i,-i)$, $(-1,1)$ and $\tfrac{1}{\sqrt2}(1,-1)$ are all correct and all the
+   same direction. What is *not* correct is $(1,i)$:
+   $\langle (1,1),(1,i)\rangle = 1 + i \ne 0$. Guessing by swapping and negating a component is a
+   real-vector habit that stops working the moment an entry is complex.
+
+   </details>
+
 4. Explain, using positive-definiteness, why $\langle v,v\rangle=0$ forces
    $v$ to be the zero vector, not just "small."
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because positive-definiteness is stated as an "if and only if", and in
+   $\mathbb{C}^n$ that clause is not an assumption but a consequence of the
+   formula.
+
+   Written out componentwise,
+
+   $$
+   \langle v,v\rangle = \sum_i v_i^* v_i = \sum_i |v_i|^2,
+   $$
+
+   a sum of terms each of which is a real number $\ge 0$. A sum of
+   non-negative numbers is zero only when *every* term is zero, so
+   $|v_i|^2 = 0$ for every $i$, hence $|v_i| = 0$, hence $v_i = 0$ for every
+   $i$. There is no way for one large positive term to be offset by a negative
+   one, because there are no negative ones to offset with. So $v$ is the zero
+   vector exactly, not merely close to it.
+
+   Compare what would happen without the conjugate. Using a plain
+   $\sum_i v_i^2$ on $\mathbb{C}^2$, the nonzero vector $(1, i)$ gives
+   $1 + i^2 = 0$: a vector of "length zero" that is not the zero vector. The
+   cancellation the conjugate rules out is not hypothetical.
+
+   The stakes are the whole rest of the course. Without this clause, $\|v\| = \sqrt{\langle v,v\rangle}$
+   is not a norm, "normalize the state" is not always possible, and the
+   inner-product space is not an inner-product space. Every later result that
+   divides by a norm, Gram-Schmidt, the Born rule, the projection formula,
+   quietly depends on knowing that only $0$ has zero length.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -308,7 +499,7 @@ for the opposite convention when reading other sources.
   projecting out the component along one vector and using
   positive-definiteness on what's left.
 
-## Further Exploration
+## When Cauchy-Schwarz becomes an equality
 
 <ChallengePrompt prompt="The explanation above says Cauchy–Schwarz becomes an equality exactly when u and v are parallel. For v=(1,1), pick a nonzero u that makes it an equality, and verify |⟨u,v⟩|=‖u‖‖v‖ directly.">
   Try $u$ as any scalar multiple of $v$ itself, then plug both sides into

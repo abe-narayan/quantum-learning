@@ -44,13 +44,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Enough energy, and it still bounces back">
   Give a quantum particle more than enough energy to clear a step and it
   still, some of the time, bounces back. No amount of extra energy
   removes the effect; it only shrinks it.
 </LessonHook>
 
-## Motivation
+## Classically certain, quantum mechanically not
 
 A ball rolling toward a downhill (or gentle uphill, as long as it has
 enough energy) step always makes it across, classically, with
@@ -66,7 +66,7 @@ crossing it meets a step of exactly this kind, and the reflection derived
 below is a standard ingredient in modelling carrier injection across a
 semiconductor heterojunction.
 
-## Intuition
+## Working with plane waves on purpose
 
 The Free-Particle Wave Packets lesson built <Term id="normalization">normalizable</Term> wave packets
 from superpositions of plane waves; scattering problems instead work
@@ -77,7 +77,7 @@ abruptly, and just like light partially reflecting at any interface
 where its speed changes (a glass-air boundary, for instance), a matter
 wave partially reflects wherever its wavenumber changes discontinuously.
 
-## Mathematical Development
+## Matching at the step, then counting flux
 
 ### Setting up the two regions
 
@@ -187,8 +187,8 @@ worth seeing directly:
 <PredictBeforeReveal
   question="As the incident energy E climbs far above the step height V0, what happens to the reflection probability R?"
   options={[
-    { label: "R drops smoothly to exactly 0 at some finite E", value: "zero" },
     { label: "R approaches 0 but never quite reaches it", value: "asymptotic" },
+    { label: "R drops smoothly to exactly 0 at some finite E", value: "zero" },
     { label: "R levels off at some fixed nonzero value", value: "plateau" },
     { label: "R starts increasing again once E is large enough", value: "increases" },
   ]}
@@ -212,8 +212,7 @@ worth seeing directly:
       ]
     }
   ]}
-  sliderLabel="Step height"
-  ariaLabel="Reflection probability R versus energy ratio E over V0 for a fixed step height, showing R falling toward but never reaching zero"
+  ariaLabel="Reflection probability R against the energy ratio E/V0, from 1.05 up to 6, at a fixed step height V0 = 4. The curve starts high at 0.41, drops very steeply through the first unit, is down to 0.029 by E/V0 = 2, and reaches 0.0021 by E/V0 = 6. Over the right-hand half it is visually flat against the axis, but it is still positive there and never crosses it."
 />
 
 $R$ drops fast as $E/V_0$ grows past 1, but the curve only approaches the
@@ -229,14 +228,20 @@ transmitted wave $t\,e^{ik_2x}$ survives:
 <ScatteringStandingWave
   frames={stepWaveFrames}
   sliderLabel="Energy ratio"
-  ariaLabel="Probability density |psi(x)|^2 overlaid on the step potential: a rippled standing-wave interference pattern for x less than 0 from the incident and reflected waves, meeting a flat uniform density for x greater than 0 from the transmitted wave, as the energy ratio E over V0 is scanned"
+  ariaLabel="Probability density |psi(x)|² over the step potential, x from -4 to 1.5, as the energy ratio E/V0 is stepped from 1.08 up to 6. Left of x=0 the density is a regular ripple; right of it, a flat horizontal line. At E/V0 = 1.08 the ripple is deep, swinging between 0.18 and 2.47, and the flat right-hand level sits at 2.47. By E/V0 = 6 the ripple has almost vanished, running between 0.91 and 1.09 with the flat level at 1.09. In every frame the ripple's peak value and the flat transmitted level are the same number, and the two sides meet without a jump at x = 0."
 />
 
 Near $E/V_0=1$ the ripple amplitude is largest (large $r$, strong
 interference); as $E/V_0$ grows the ripples shrink toward the flat
 $|t|^2\to1$ line, the spatial picture of $R\to0$ only asymptotically.
 
-## Physical Interpretation
+One detail in that picture is not decoration. The ripple's crests reach
+exactly the height of the flat transmitted line, in every frame, because
+$t=1+r$ makes $(1+r)^2$ and $|t|^2$ the same number. That is continuity of
+$\psi$ at $x=0$, the first boundary condition of the derivation, showing
+up as a geometric fact about the plot.
+
+## However small the step, some reflection survives
 
 $R=0$ only in the trivial case $k_1=k_2$ (no step at all, $V_0=0$).
 Otherwise $R>0$ always: however small the step, however large the
@@ -247,7 +252,7 @@ are. The underlying situation is identical in both cases: a wave equation
 whose coefficient jumps discontinuously, and a wave that cannot cross the
 jump without leaving part of itself behind.
 
-## Worked Example
+## R and T for a step of height four
 
 **For $E=10$, $V_0=4$ (natural units), find $R$ and $T$.**
 
@@ -268,7 +273,7 @@ $1.6\%$ of an incident beam still reflects: small, but never zero. The
 engine's `stepPotentialScattering` function computes these same
 numbers, and its test suite confirms $R+T=1$.
 
-## Common Mistakes
+## Flux is what is conserved, not amplitude squared
 
 <Callout type="warning">
 **Forgetting the $k_2/k_1$ factor in $T$.** Probability flux, not
@@ -285,12 +290,154 @@ a small-energy artifact that a fast enough particle escapes.
 
 ## Practice Questions
 
-1. For $E=8$, $V_0=2$, compute $k_1,k_2,R,T$ and confirm $R+T=1$.
+1. For $E=8$, $V_0=2$, compute $k_1,k_2,R,T$ and confirm $R+T=1$. Then
+   show that $R$ depends only on the ratio $E/V_0$, not on $E$ and $V_0$
+   separately, and name two other $(E,V_0)$ pairs that give this same $R$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   k_1=\sqrt{2(8)}=4, \qquad k_2=\sqrt{2(8-2)}=\sqrt{12}\approx3.4641
+   $$
+
+   $$
+   R = \left(\frac{4-3.4641}{4+3.4641}\right)^{\!2} = (0.071797)^2 \approx 0.0051548
+   $$
+
+   $$
+   T = \frac{4k_1k_2}{(k_1+k_2)^2} \approx 0.9948452, \qquad R+T = 1.0000000 \;\checkmark
+   $$
+
+   matching the engine's `stepPotentialScattering(8, 2)` to eight decimal
+   places. Just under $0.52\%$ of the beam reflects off a step it carries
+   four times the energy to clear.
+
+   **Why only the ratio matters.** Divide numerator and denominator of $R$
+   by $k_1$ and the absolute scale drops out:
+
+   $$
+   R = \left(\frac{1-k_2/k_1}{1+k_2/k_1}\right)^{\!2}, \qquad \frac{k_2}{k_1} = \sqrt{\frac{2(E-V_0)}{2E}} = \sqrt{1-\frac{V_0}{E}}
+   $$
+
+   Everything on the right depends on $E$ and $V_0$ only through $V_0/E$.
+   So $R$ is a function of one variable, and the pair $(8,2)$ is just one
+   representative of the whole family with $E/V_0=4$.
+
+   **Two others with the same $R$.** $(E,V_0)=(4,1)$ and $(40,10)$. The
+   engine returns $R=0.00515478$ for all three, with completely different
+   wavenumbers: $k_1$ runs $2.828$, $4.000$, $8.944$ across them. Only
+   their *ratio* $k_2/k_1=\sqrt{3}/2$ is shared, and that is what $R$
+   sees.
+
+   The lesson worth taking is that there is no absolute energy scale in
+   this problem. Nothing in the setup supplies a length or a mass to
+   compare $E$ against, so the answer cannot depend on $E$ alone; the only
+   dimensionless combination available is $E/V_0$, and the reflection has
+   to be a function of it. That is also why the lesson's plot of $R$ can
+   be drawn once, against $E/V_0$, and be correct for every step height at
+   once.
+
+   The predictable slip is comparing $R$ across problems by comparing
+   energies. A particle with $E=40$ is not more likely to cross than one
+   with $E=8$; it depends entirely on what it is crossing.
+
+   </details>
+
 2. Show that $R\to0$ as $V_0\to0$ directly from the boxed formula (not by
    re-deriving from scratch).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   As $V_0\to0$, $k_2=\sqrt{2(E-V_0)}\to\sqrt{2E}=k_1$, so the numerator
+   of
+
+   $$
+   R = \left(\frac{k_1-k_2}{k_1+k_2}\right)^{\!2}
+   $$
+
+   goes to zero while the denominator goes to $2k_1\ne0$. Hence $R\to0$,
+   and $T\to1$.
+
+   The physical reading is that a step of zero height is no step at all.
+   With $V(x)$ constant everywhere, the wavefunction is a single
+   uninterrupted plane wave with nothing to match at $x=0$, so nothing
+   reflects. The formula reproduces that, which is a sanity check the
+   derivation had to pass.
+
+   It is worth seeing *how fast* it goes, because the rate is the
+   interesting part. Expanding for small $V_0/E$:
+
+   $$
+   \frac{k_2}{k_1}=\sqrt{1-\frac{V_0}{E}} \approx 1-\frac{V_0}{2E} \quad\Longrightarrow\quad R \approx \left(\frac{V_0/2E}{2}\right)^{\!2} = \frac{V_0^2}{16E^2}
+   $$
+
+   quadratic in the step height. A step ten times smaller reflects a
+   hundred times less, which is why a gentle potential gradient is nearly
+   invisible to a fast particle and why the curve in the plot above hugs
+   the axis so tightly at large $E/V_0$.
+
+   The distinction the question is guarding is between a limit and a
+   value. $R\to0$ *as* $V_0\to0$ does not say $R=0$ for small $V_0$. At
+   any nonzero step height, however tiny, $k_1\ne k_2$ strictly and $R>0$
+   strictly. The lesson's warning makes the same point at the other end of
+   the range: $R\to0$ as $E\to\infty$ too, and never actually arrives
+   there either. Reflection off a discontinuity is a wave phenomenon that
+   scales down smoothly and never switches off.
+
+   </details>
+
 3. Explain briefly why $t=2k_1/(k_1+k_2)$ can be *greater* than 1
-   (amplitude, not probability) without violating anything. Which
-   physical quantity is the one guaranteed to be $\le1$?
+   (amplitude, not probability) without violating anything, and name the
+   quantity that is guaranteed to be $\le1$. Then find the largest value
+   $t$ can reach for an over-the-step problem, and say what limit produces
+   it.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $t$ is an *amplitude*, and no conservation law bounds an
+   amplitude. What is bounded is the probability current ratio
+   $T=(k_2/k_1)|t|^2$, and the factor $k_2/k_1<1$ is exactly what pulls
+   the oversized amplitude back below one.
+
+   The physical picture is the same as a wave slowing down. Past the step
+   the particle moves more slowly, $k_2<k_1$, so the same flow of
+   probability per unit time has to be carried by a *taller* wave: fewer
+   arrivals per second at each crest, so more amplitude per crest. Water
+   waves piling up as they run into shallows do the same thing, and so
+   does light entering a slower medium. Nothing is being created; the
+   bookkeeping quantity is flux, not height.
+
+   Check it on the worked example. At $E=10$, $V_0=4$, $t\approx1.1270$ so
+   $|t|^2\approx1.2701$, comfortably over one, while
+
+   $$
+   T = \frac{k_2}{k_1}|t|^2 = \frac{3.4641}{4.4721}(1.2701) \approx 0.9839 < 1
+   $$
+
+   and $R+T=1$ exactly. It is $T$, never $|t|^2$, that the conservation
+   law constrains.
+
+   **The largest $t$ can get.** Write it as
+   $t=2/(1+k_2/k_1)$ and note $k_2/k_1\in(0,1)$ for an over-the-step
+   problem, so $t\in(1,2)$. It approaches $2$ as $k_2/k_1\to0$, that is as
+   $E\to V_0^+$: a particle with only just enough energy to clear the
+   step. The engine bears it out: at $E=2.0001$, $V_0=2$, it returns
+   $t\approx1.98596$.
+
+   That endpoint is worth reading carefully, because it is the most
+   counter-intuitive corner of the problem. As $t$ climbs toward its
+   maximum of $2$, the transmission $T$ falls toward *zero* and $R$ climbs
+   toward $1$: in the same limit, $R\to0.9721$ at $E=2.0001$. The
+   transmitted wave is at its tallest exactly where almost nothing gets
+   through, because $k_2\to0$ means it is barely moving. A tall,
+   near-stationary wave carries almost no current. Reading the amplitude
+   as a probability would give precisely the wrong answer about this
+   limit, which is why the current factor is in the formula.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -304,9 +451,9 @@ a small-energy artifact that a fast enough particle escapes.
   much energy they have above it. The effect shrinks with energy but
   never vanishes.
 
-## Further Exploration
+## Taking the transmitted wavenumber to zero
 
-<ChallengePrompt prompt="Physical Interpretation showed R→0 only asymptotically as E/V0→∞. What happens to R in the OPPOSITE limit, as E approaches V0 from above (just barely enough energy to classically cross)?">
+<ChallengePrompt prompt="The plot above showed R→0 only asymptotically as E/V0→∞, never reaching zero. What happens to R in the OPPOSITE limit, as E approaches V0 from above (just barely enough energy to classically cross)?">
   Take $k_2=\sqrt{2(E-V_0)}$ to zero in the boxed $R$ formula, with $k_1$
   fixed at $\sqrt{2V_0}$. No new derivation is needed, only the limit.
 </ChallengePrompt>

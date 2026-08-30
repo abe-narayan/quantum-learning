@@ -75,9 +75,13 @@ export function LessonSearch({
               this static box — the input keeps its own clicks. */}
           <Link
             href="/lessons"
-            className="-my-4 py-4 font-tech text-[0.7rem] uppercase tracking-wide text-pillar-text underline-offset-4 hover:underline"
+            className="-my-4 py-4 tech-label text-pillar-text underline-offset-4 hover:underline"
           >
-            Browse all {lessons.length} →
+            {/* "Browse all 219 →" named a number and nothing else; in a
+                screen reader's link list, next to a dozen other links, it said
+                nothing at all about where it went. The noun is the whole
+                point of the escape hatch. */}
+            Browse all {lessons.length} lessons <span aria-hidden="true" data-decorative="">→</span>
           </Link>
         </div>
         <div className="relative mt-2">
@@ -159,7 +163,7 @@ export function LessonSearch({
                   <Link
                     key={lesson.slug}
                     href={`/lessons/${lesson.slug}`}
-                    aria-label={course ? `${lesson.title} — ${course.title}` : lesson.title}
+                    aria-label={course ? `${lesson.title}, in ${course.title}` : lesson.title}
                     className="group block h-full"
                   >
                     <Panel interactive className="h-full p-5">
@@ -170,12 +174,12 @@ export function LessonSearch({
                       <div className="mt-3 flex flex-wrap items-center gap-2.5">
                         <DifficultyMark difficulty={lesson.difficulty} />
                         {course ? (
-                          <span className="font-tech text-[0.65rem] uppercase tracking-wide text-subtle-foreground">
+                          <span className="tech-label text-subtle-foreground">
                             {course.title}
                           </span>
                         ) : null}
                         {pillar ? (
-                          <span className="rounded-full border border-pillar-edge px-2 py-0.5 font-tech text-[0.6rem] uppercase tracking-wide text-pillar-text">
+                          <span className="rounded-full border border-pillar-edge px-2 py-0.5 font-tech text-micro uppercase tracking-meta text-pillar-text">
                             {pillar.title}
                           </span>
                         ) : null}

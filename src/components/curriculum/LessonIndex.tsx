@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { Instrument } from "@/components/ui/Panel";
 import { Eyebrow, SectionTitle, TechValue } from "@/components/ui/Typography";
+import { ListBypassEnd, ListBypassLink } from "@/components/ui/ListBypass";
 import { DifficultyMark } from "./DifficultyMark";
 import { FilterChips, type FilterOption } from "./FilterChips";
 import { LessonCompletionMark } from "./LessonCompletionMark";
 import { getCourseHref } from "./courseHref";
 import { COURSES, PILLARS } from "@/lib/content/curriculum";
-import { PILLAR_ORDER } from "@/lib/design/pillars";
+import { PILLAR_ORDER, pillarVisual } from "@/lib/design/pillars";
 import {
   DIFFICULTY_LABEL,
   type Difficulty,
@@ -125,6 +126,12 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
   const [difficulty, setDifficulty] = useState<DifficultyFilter>("all");
   const inputRef = useRef<HTMLInputElement>(null);
   const searchId = useId();
+  // Fragment target for the end-of-list bypass pair (`ui/ListBypass.tsx`).
+  // A literal, unlike `searchId`: `useId` output is fine for `htmlFor`, which
+  // only has to match within one render, but a fragment target is a URL, and
+  // `/lessons#«r3»` is neither stable across builds nor typeable. This index
+  // is mounted once per page, so a fixed id has nothing to collide with.
+  const listEndId = "lessons-list-end";
 
   const allRows = useMemo(() => buildRows(lessons), [lessons]);
   const trimmed = query.trim().toLowerCase();
@@ -147,11 +154,19 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
     const base = allRows.filter(
       (row) => matchesQuery(row, trimmed) && (difficulty === "all" || row.lesson.difficulty === difficulty)
     );
+    // "All", not "All tracks", and the short pillar name, not the full title.
+    // One reset word and one value vocabulary across every filter on the site:
+    // this row said "All tracks / Quantum Mechanics …" while `/problems` said
+    // "All / Quantum Mechanics …" and `/current-quantum` said "All /
+    // Mechanics …", which is three spellings of one control. The group heading
+    // below still carries the full pillar title — a heading introducing a
+    // section of the list and a chip selecting it are allowed to differ — but
+    // the *selector* vocabulary is now the same everywhere.
     return [
-      { id: "all", label: "All tracks", count: base.length },
+      { id: "all", label: "All", count: base.length },
       ...PILLAR_ORDER.map((slug) => ({
         id: slug as PillarFilter,
-        label: PILLARS.find((p) => p.slug === slug)?.title ?? slug,
+        label: pillarVisual(slug).short,
         count: base.filter((row) => row.pillar === slug).length,
       })),
     ];
@@ -162,7 +177,10 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
       (row) => matchesQuery(row, trimmed) && (pillar === "all" || row.pillar === pillar)
     );
     return [
-      { id: "all", label: "Any level", count: base.length },
+      // "All", matching the track row above and every other filter reset on
+      // the site. "Any level" was a third word for the same idea, beside
+      // `/problems`' "All" and `/learn`'s "All levels".
+      { id: "all", label: "All", count: base.length },
       ...(Object.entries(DIFFICULTY_LABEL) as [Difficulty, string][])
         .sort(([a], [b]) => DIFFICULTY_RANK[a] - DIFFICULTY_RANK[b])
         .map(([id, label]) => ({
@@ -229,7 +247,18 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
         readout={
           // `aria-live` so changing a filter is announced, not left as a
           // silent number change next to a chip that only changed color.
-          <span aria-live="polite" className="font-tech text-xs text-muted-foreground">
+          //
+          // `aria-atomic` is what makes that announcement mean anything.
+          // `aria-live` on a role-less element defaults to
+          // `aria-atomic="false"`, so a screen reader announces only the
+          // *changed* node: picking a filter said "42" and stopped, a bare
+          // number with no unit and no frame, which is the same defect as an
+          // unlabelled readout. With `aria-atomic` the whole sentence is
+          // re-read ("42 of 219 lessons"), which is how it has to arrive since
+          // it arrives with no surrounding context at all. (`LessonSearch`'s
+          // equivalent readout gets this for free from `role="status"`, whose
+          // implicit `aria-atomic` is `true`; this one has no role.)
+          <span aria-live="polite" aria-atomic="true" className="font-tech text-xs text-muted-foreground">
             <TechValue>{rows.length}</TechValue> of {allRows.length} lessons
           </span>
         }
@@ -278,20 +307,42 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
             options={pillarOptions}
             selected={pillar}
             onChange={setPillar}
+            countNoun="lessons"
           />
+          {/* "Difficulty", not "Level". The site filters on this one axis in
+              three places and called it three things: "Difficulty" on /learn,
+              "Level" here, and (out of this pass's scope) nothing consistent
+              on /problems. One axis, one name, so a reader who has learned the
+              control once does not have to re-learn it per page. */}
           <FilterChips
-            label="Level"
+            label="Difficulty"
             options={difficultyOptions}
             selected={difficulty}
             onChange={setDifficulty}
-            action={isFiltered ? clearButton : undefined}
+            countNoun="lessons"
           />
+
+          {/* The reset used to hang off the difficulty chip row's `action` slot,
+              which put a control that clears the *search box and both filters*
+              under a heading naming one of them. It now sits on its own line
+              under everything it undoes, next to a plain-language statement of
+              what is currently being shown — the count in the instrument
+              header is a live region for screen readers, but a sighted reader
+              scrolling the chips had no result count in front of them at all. */}
+          {isFiltered ? (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border pt-4">
+              <p className="text-sm text-muted-foreground">
+                Showing {rows.length} of {allRows.length} lessons.
+              </p>
+              {clearButton}
+            </div>
+          ) : null}
         </div>
       </Instrument>
 
       {rows.length === 0 ? (
         <p className="mt-10 rounded-panel border border-dashed border-border px-5 py-8 text-sm text-muted-foreground">
-          No lesson matches those constraints yet. Widen the level or the pillar — or{" "}
+          No lesson matches those constraints yet. Widen the level or the track, or{" "}
           <button
             type="button"
             onClick={clearAll}
@@ -303,6 +354,13 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
         </p>
       ) : (
         <div className="mt-12 space-y-14">
+          {/* Same bypass pair as /glossary and /problems, one component, see
+              `ui/ListBypass.tsx`. This page is the smallest of the three at
+              295 tab stops served, which is still 278 anchors between the
+              search field and the footer. */}
+          <ListBypassLink targetId={listEndId}>
+            Skip past the {rows.length} {rows.length === 1 ? "lesson" : "lessons"} below
+          </ListBypassLink>
           {groups.map((group) => (
             <section key={group.slug} data-pillar={group.slug} aria-labelledby={`group-${group.slug}`}>
               <Eyebrow>
@@ -331,8 +389,8 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
                           list are twenty links to nowhere in particular. */}
                       <Link
                         href={getCourseHref(course.courseSlug, course.rows[0]?.lesson.slug)}
-                        aria-label={`${course.title} — course overview`}
-                        className="-my-4 py-4 font-tech text-[0.7rem] uppercase tracking-wide text-pillar-text underline-offset-4 hover:underline"
+                        aria-label={`Course overview for ${course.title}`}
+                        className="-my-4 py-4 tech-label text-pillar-text underline-offset-4 hover:underline"
                       >
                         Course overview →
                       </Link>
@@ -340,11 +398,43 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
                     <ul className="mt-1">
                       {course.rows.map((row) => (
                         <li key={row.lesson.slug}>
+                          {/* Stacked below `sm`, a row from `sm` up, and the
+                              arithmetic is why `flex-wrap` alone was not
+                              enough. Flexbox decides line breaks from each
+                              item's *hypothetical* main size, i.e. its resolved
+                              `flex-basis` — not from its content. The meta
+                              group is `shrink-0` with `basis: auto`, so it
+                              contributes its max-content width; the title group
+                              is `flex-1`, i.e. `flex: 1 1 0%`, so it
+                              contributes 0. Their sum is therefore always under
+                              the line width, the row never wraps, and the title
+                              absorbs the entire shortfall.
+
+                              At 320px: `Container` leaves 288px, `px-2.5`
+                              leaves 268px. The meta group is a `DifficultyMark`
+                              (four 6px ticks with 3px gaps = 33px, an 8px gap,
+                              and a 12-character label at 0.6875rem monospace
+                              with 0.12em tracking = 95px, so 136px), a 16px
+                              gap, and a `w-14` minutes column = 208px. Take the
+                              208px and the 16px `gap-x-4` off 268px and the
+                              title is left with 44px: about six characters a
+                              line, and any word longer than that (`min-w-0`
+                              removes the min-content floor, and `Superposition`
+                              is 91px) simply overflows its box and paints over
+                              the difficulty ticks. 375px gives the title 99px
+                              and 430px gives it 154px, so this is every phone,
+                              not an edge case.
+
+                              Stacking below `sm` hands the title the full 268px
+                              and puts the meta on its own line under it.
+                              `items-start` rather than `items-center` so the
+                              two lines are left-aligned while stacked; the
+                              `sm:` half restores the original row exactly. */}
                           <Link
                             href={`/lessons/${row.lesson.slug}`}
-                            className="group flex min-h-11 flex-wrap items-center gap-x-4 gap-y-1 rounded-(--radius-tight) px-2.5 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted"
+                            className="group flex min-h-11 flex-col items-start gap-x-4 gap-y-1 rounded-(--radius-tight) px-2.5 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted sm:flex-row sm:flex-wrap sm:items-center"
                           >
-                            <span className="flex min-w-0 flex-1 items-center gap-2.5">
+                            <span className="flex w-full min-w-0 items-center gap-2.5 sm:w-auto sm:flex-1">
                               <LessonCompletionMark slug={row.lesson.slug} />
                               <span className="min-w-0 text-sm text-foreground group-hover:text-pillar-text">
                                 {row.lesson.title}
@@ -352,7 +442,7 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
                             </span>
                             <span className="flex shrink-0 items-center gap-4">
                               <DifficultyMark difficulty={row.lesson.difficulty} />
-                              <span className="w-14 text-right font-tech text-[0.65rem] tabular-nums text-subtle-foreground">
+                              <span className="w-14 text-right font-tech text-micro tabular-nums text-subtle-foreground">
                                 {row.lesson.estimatedMinutes} min
                               </span>
                             </span>
@@ -365,6 +455,10 @@ export function LessonIndex({ lessons }: { lessons: LessonMetaWithSlug[] }) {
               </div>
             </section>
           ))}
+
+          <ListBypassEnd id={listEndId} backTo={searchId} backLabel="Back to the search field">
+            End of the lesson index. {rows.length} of {allRows.length} lessons listed.
+          </ListBypassEnd>
         </div>
       )}
     </div>

@@ -13,7 +13,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Interference in Quantum Circuits",
   description:
-    "Extending single-qubit interference to multiple qubits: how a uniform superposition collapses onto one outcome through pure phase manipulation.",
+    "Extending single-qubit interference to multiple qubits: what a single phase gate, sandwiched between two layers of Hadamards, does to a uniform four-way superposition, worked end to end on the engine.",
   course: "quantum-gates-and-circuits",
   module: "interference-in-quantum-circuits",
   order: 1,
@@ -32,16 +32,16 @@ export const afterFirstH = applySingleQubitGate(applySingleQubitGate(start, HADA
 export const afterPhase = applySingleQubitGate(afterFirstH, PAULI_Z, 1);
 export const afterSecondH = applySingleQubitGate(applySingleQubitGate(afterPhase, HADAMARD, 0), HADAMARD, 1);
 
-<LessonHook eyebrow="Why this matters">
-In the first course, H|+⟩=|0⟩ turned two amplitudes that each gave 50/50 probabilities into one definite outcome. This lesson asks whether the trick scales past a single qubit. It does, and that is the whole engine of every algorithm in the courses ahead.
+<LessonHook eyebrow="The engine under every algorithm ahead">
+In the first course, H|+⟩=|0⟩ turned two amplitudes that each gave 50/50 probabilities into one definite outcome. This lesson asks whether the trick scales past a single qubit, and the answer is what every algorithm in the courses ahead runs on.
 </LessonHook>
 
-## Motivation
+## The same trick, at four times the size
 
 $H|+\rangle=|0\rangle$ was <Term id="phase-interference">interference</Term> on a single qubit. This lesson runs a
-fully worked circuit showing the same trick at larger scale: uniform
-randomness across *four* outcomes turned into one certain outcome, using
-nothing but Hadamards and a phase gate.
+fully worked circuit that tries the same trick on *four* outcomes at
+once, using nothing but Hadamards and one phase gate, and reads the
+result off the engine rather than asserting it.
 
 That pattern is worth recognizing now, because every algorithm in the two
 courses ahead has the same three-part shape. Spread amplitude over many
@@ -57,7 +57,7 @@ superposition and read off what survived.
   license="CC BY-SA 4.0"
 />
 
-## Intuition
+## Multiple paths, and the freedom to set their phases
 
 Interference needs two things: multiple paths (<Term id="amplitude">amplitudes</Term>) contributing
 to the same final outcome, and the freedom to arrange their phases so
@@ -68,7 +68,7 @@ encounter in later courses is, at its core, an elaborate arrangement of
 phases designed to make wrong answers cancel and the right answer
 reinforce.
 
-## Mathematical Development
+## Spread, phase, then collapse back down
 
 The circuit for the whole derivation below is: $H$ on both qubits, then
 $Z$ on qubit 1 only, then $H$ on both qubits again.
@@ -114,6 +114,22 @@ $$
 Still a product state, still uniform *probabilities*, but the phases are
 no longer all the same.
 
+Everything so far is bookkeeping: a product state, uniform probabilities,
+one misaligned phase. The next step is where that phase turns into
+something a detector could report. Commit to an answer before reading it.
+
+<PredictBeforeReveal
+  question="Starting from |00⟩: apply H to both qubits (uniform 4-way superposition), then Z to qubit 1 only, then H to both qubits again. How many of the four outcomes end up with nonzero probability?"
+  options={[
+    { label: "All four, still uniform", value: "four" },
+    { label: "Two outcomes, 50/50", value: "two" },
+    { label: "Exactly one outcome, with certainty", value: "one" },
+    { label: "Zero: the state cancels entirely", value: "zero" },
+  ]}
+  correctValue="one"
+  explanation="The Z gate turns |+⟩⊗|+⟩ into |+⟩⊗|−⟩: still uniform probabilities, but with a relative phase now in place. The second H⊗H collides those phases, and since H|+⟩=|0⟩ and H|−⟩=|1⟩, the result is |01⟩ with certainty. All the probability that was spread over four outcomes concentrates onto one, from interference alone. No measurement, no entanglement."
+/>
+
 ### Undo the superposition, and watch the phases collide
 
 Apply $H\otimes H$ again:
@@ -132,19 +148,7 @@ certainty. No measurement narrowed anything down. The phases introduced by
 a single $Z$ gate produced constructive interference on $|01\rangle$ and
 exact cancellation everywhere else.
 
-<PredictBeforeReveal
-  question="Starting from |00⟩: apply H to both qubits (uniform 4-way superposition), then Z to qubit 1 only, then H to both qubits again. How many of the four outcomes end up with nonzero probability?"
-  options={[
-    { label: "All four, still uniform", value: "four" },
-    { label: "Two outcomes, 50/50", value: "two" },
-    { label: "Exactly one outcome, with certainty", value: "one" },
-    { label: "Zero: the state cancels entirely", value: "zero" },
-  ]}
-  correctValue="one"
-  explanation="The Z gate turns |+⟩⊗|+⟩ into |+⟩⊗|−⟩: still uniform probabilities, but with a relative phase now in place. The second H⊗H collides those phases, and since H|+⟩=|0⟩ and H|−⟩=|1⟩, the result is |01⟩ with certainty. All the probability that was spread over four outcomes concentrates onto one, from interference alone. No measurement, no entanglement."
-/>
-
-<InteractiveSection title="Four outcomes collapse to one" description="Apply H to both qubits, then Z to qubit 1 only, then H to both again, the exact sequence just derived above. Watch all four probabilities collapse onto exactly one outcome, purely from interference, with no measurement and no entanglement involved anywhere in the sequence.">
+<InteractiveSection title="Four outcomes collapse to one" description="Apply H to both qubits, then Z to qubit 1 only, then H to both again, the exact sequence just derived above. Then read all four probabilities. Nothing in that sequence measures anything or entangles anything, so whatever the four bars have done, interference did it alone.">
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
@@ -158,7 +162,7 @@ is phases rearranging inside an entangled state, reproducing the same
 correlated pattern rather than concentrating onto one outcome. Both are
 interference. They differ in what structure the state had going in.
 
-## Physical Interpretation
+## Shaping which outcomes reinforce
 
 A circuit that ends in a <Term id="superposition">superposition</Term> carries no information until it's
 measured. The *only* way a circuit's design can influence what you're
@@ -169,7 +173,7 @@ picking the right one" (a common but misleading way to describe
 superposition), but arranging the entire computation so that wrong
 answers' amplitudes cancel and the right answer's amplitude survives.
 
-## Worked Example
+## The same circuit with the Z moved
 
 **What does $H\otimes H$, $Z$ on qubit 0 (instead of qubit 1), $H\otimes H$
 produce, starting from $|00\rangle$?**
@@ -180,7 +184,7 @@ and the second $H\otimes H$ gives $H|-\rangle\otimes H|+\rangle=|1\rangle\otimes
 Concentration still happens, on a different outcome, because the phase
 was introduced on a different qubit.
 
-## Common Mistakes
+## Interference and entanglement are independent
 
 <Callout type="note">
 **Assuming interference requires entanglement.** The main derivation in
@@ -202,11 +206,135 @@ guaranteed $|01\rangle$. Interference requires the amplitudes to stay
 
 1. Starting from $|00\rangle$, predict the result of: $H\otimes H$, then
    $Z$ on *both* qubits, then $H\otimes H$ again.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $|11\rangle$, with certainty.
+
+   The circuit stays a product state throughout, so run each qubit's story
+   separately. Qubit 0 goes $|0\rangle \to |+\rangle \to |-\rangle \to |1\rangle$,
+   using $Z|+\rangle = |-\rangle$ and $H|-\rangle = |1\rangle$. Qubit 1
+   does exactly the same. Tensoring the two:
+
+   $$
+   |00\rangle \to |{+}{+}\rangle \to |{-}{-}\rangle \to |11\rangle
+   $$
+
+   Written out in the four-term form, the middle state is
+   $\tfrac12(|00\rangle - |01\rangle - |10\rangle + |11\rangle)$, which the
+   engine confirms, along with the final probabilities $[0,0,0,1]$.
+
+   The pattern across the three variants is worth collecting, because it is
+   the whole lesson in one line. A $Z$ on qubit 1 concentrates onto
+   $|01\rangle$; a $Z$ on qubit 0 concentrates onto $|10\rangle$; a $Z$ on
+   both concentrates onto $|11\rangle$; and no $Z$ at all returns
+   $|00\rangle$, since $H^2 = I$ on each wire. The output label is a
+   readout of *which qubits got a phase*, one bit per qubit. That is not a
+   coincidence of small cases. It is the two-qubit instance of the pattern
+   the Deutsch-Jozsa and Bernstein-Vazirani algorithms run at $n$ qubits:
+   write a phase pattern into a uniform superposition, then apply
+   $H^{\otimes n}$ to read the pattern back out as a bit string.
+
+   The wrong turn is expecting cancellation to *shrink* the state, and
+   answering that with a phase on both qubits everything cancels and
+   nothing is left. Amplitude is conserved, always: the second $H\otimes H$
+   is unitary, so the four probabilities still sum to 1. Interference moves
+   probability between outcomes; it never destroys it.
+
+   </details>
+
 2. Explain why applying $Z$ to qubit 1 in the main derivation, rather
    than doing nothing, is what causes concentration onto $|01\rangle$
    specifically rather than back onto $|00\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $H$ is its own inverse, so with no $Z$ the two $H\otimes H$
+   layers cancel exactly and the state returns to $|00\rangle$, engine
+   confirmed. The $Z$ is the only thing standing between them, and its job
+   is to change *which* superposition the second layer is undoing.
+
+   Follow qubit 1 alone, since that is the only wire the $Z$ touches. After
+   the first $H$ it holds $|+\rangle$, an equal sum with both amplitudes
+   positive. $Z$ flips the sign of the $|1\rangle$ amplitude, producing
+   $|-\rangle$: the same two probabilities, a different relative phase. Now
+   the second $H$ arrives. $H$ sends $|+\rangle$ to $|0\rangle$ and
+   $|-\rangle$ to $|1\rangle$, because it adds the two amplitudes to make
+   the new $|0\rangle$ amplitude and subtracts them to make the new
+   $|1\rangle$ amplitude. Same-sign amplitudes reinforce in the sum and
+   cancel in the difference; opposite-sign amplitudes do the reverse. So
+   the sign $Z$ planted decides which of the two ways the final $H$ can
+   go, and qubit 1 lands on $|1\rangle$ instead of $|0\rangle$. Qubit 0,
+   untouched, still lands on $|0\rangle$, giving $|01\rangle$.
+
+   The general moral: a phase is invisible where it is introduced and
+   decisive where paths recombine. Immediately after the $Z$, all four
+   probabilities are still $\tfrac14$, so no measurement at that instant
+   distinguishes the with-$Z$ circuit from the without-$Z$ one. The
+   difference only becomes real when the second $H\otimes H$ brings the
+   amplitudes back together and forces them to add or subtract.
+
+   The tempting wrong answer is that $Z$ "made $|01\rangle$ more likely" by
+   somehow favouring it directly. It did not: $Z$ is diagonal, so it never
+   moves probability between basis states at all, and its output has the
+   same distribution as its input. All the redistribution is done by the
+   final $H\otimes H$. $Z$ only writes down the instruction that the final
+   layer then carries out.
+
+   </details>
+
 3. Is $|+\rangle\otimes|+\rangle$, on its own, "interfering"? Why or why
    not: what has to happen before interference occurs?
+
+   <details className="answer-reveal">
+   <summary>A defensible answer</summary>
+
+   There is no single correct verdict here, so the question is marked on
+   what the answer commits to and why. One position worked in full, then
+   the defensible alternatives, then the answers that are simply wrong.
+
+   The position worth defending: no, not on its own. $|{+}{+}\rangle$ is a
+   state, and interference is something that happens to amplitudes when a
+   later operation brings distinct paths back to the same final basis
+   label. Nothing in the four amplitudes $\tfrac12,\tfrac12,\tfrac12,\tfrac12$
+   is adding to or cancelling anything; each basis state carries exactly one
+   amplitude and there is nothing for it to combine with. What has to happen
+   is a subsequent operation that maps two or more basis states onto a shared
+   outcome, at which point their amplitudes add as complex numbers and their
+   relative phases start to matter. In this lesson that operation is the
+   second $H\otimes H$, and the proof that it is the operative step is the
+   comparison in question 2: the same $|{+}{+}\rangle$ can end at
+   $|00\rangle$ or, after a $Z$, at $|01\rangle$. If the state alone were
+   already interfering, its future could not depend on what comes next.
+
+   Equally defensible. You can say yes, on the grounds that
+   $|+\rangle$ *is* what came out of an earlier interference, $H$ acting on
+   $|0\rangle$, and that "a state in superposition" is exactly the standing
+   condition for interference in the double-slit sense: the electron is
+   already going both ways, and the screen only reveals it. That is a
+   coherent use of the word, and physicists do speak this way. You can also
+   take the operational line: interference is defined by observable
+   consequences, so the honest answer is that the question is not settled
+   until a measurement basis is chosen, since $|{+}{+}\rangle$ shows no
+   interference in the X basis and full interference in the Z basis after
+   an $H$. Any of these earns credit provided it names what would have to be
+   true for the verdict to change.
+
+   What a bad answer looks like. "Yes, because it is entangled" is wrong
+   twice: $|{+}{+}\rangle$ is a plain product state, and entanglement is not
+   what interference requires, which is this lesson's headline. "No, because
+   there is no measurement yet" inverts the physics: measurement is what
+   *ends* the opportunity for interference, not what creates it, which is why
+   the lesson's warning callout says measuring after the $Z$ destroys the
+   effect. And any answer that leans on "the qubit is secretly 0 and 1 at the
+   same time and the circuit tries both" is the parallel-universe story the
+   lesson explicitly rejects: a circuit that merely tried all four
+   possibilities would leave them all at $\tfrac14$ forever, which is exactly
+   the state you start from and exactly not the state you end on.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -221,7 +349,7 @@ guaranteed $|01\rangle$. Interference requires the amplitudes to stay
   outcomes' amplitudes cancel and the desired outcome's amplitude survives
   until measurement.
 
-## Further Exploration
+## Everything in this course, combined
 
 <NextDiscovery>
 [Building Quantum Circuits](/lessons/quantum-computing/quantum-gates-and-circuits/building-quantum-circuits) is the capstone for this course: every

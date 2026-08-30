@@ -62,13 +62,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Matrix multiplication falls out on its own">
   Matrix multiplication isn't a rule someone invented for grids of
   numbers. Insert the completeness relation between two composed
   operators, and it falls out on its own.
 </LessonHook>
 
-## Motivation
+## Narrowing an enormous space of functions
 
 Rotate a system, evolve it forward in time, apply a quantum gate: every
 one of these turns one <Term id="quantum-state">state vector</Term> into another, so physics needs a
@@ -88,7 +88,7 @@ piece separately. Lose linearity and superposition stops meaning anything.
   license="Public domain"
 />
 
-## Intuition
+## The structure an operator has to respect
 
 A linear operator is a rule for turning vectors into vectors that respects
 the vector-space structure: scale the input, and the output scales the
@@ -98,7 +98,7 @@ it buys something specific: a linear operator is fully determined by what
 it does to a <Term id="basis">basis</Term>, rather than needing to be specified vector by
 vector.
 
-## Mathematical Development
+## Matrix multiplication, derived from completeness
 
 ### Definition
 
@@ -190,7 +190,7 @@ nonzero vector $(1,-1)$ to $(0,0)$, and any operator that sends a nonzero
 vector to zero can't be undone (there's no way to recover which input
 produced that zero output), so it has no inverse.
 
-## Physical Interpretation
+## Gates, observables, and evolution, all one type
 
 Every gate in a quantum circuit, every <Term id="observable">observable</Term> in the sense of "the
 mathematical object representing a measurable quantity," and the operator
@@ -202,7 +202,7 @@ physics uses, though: the raising and lowering operators the harmonic
 oscillator is solved with are linear and indispensable, and are neither
 Hermitian nor unitary.
 
-## Worked Example
+## Composing two operators, two ways
 
 **Verify the composition formula by computing $AB$ two ways, for
 $A=\begin{pmatrix}2&0\\0&3\end{pmatrix}$ and
@@ -236,7 +236,7 @@ matching the direct computation.
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Order matters, and it matters physically
 
 <Callout type="warning">
 **Assuming $AB=BA$.** Operator composition generally does not commute:
@@ -255,14 +255,156 @@ exactly when it sends some nonzero vector to zero.
 
 1. Is the map $f(v) = v + (1,0)$ on $\mathbb{C}^2$ linear? Justify your
    answer using the definition.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. Linearity requires $f(av + bw) = af(v) + bf(w)$, and this map fails it.
+
+   The fastest disproof is at the origin. Every linear map sends $0$ to $0$,
+   because $f(0) = f(0\cdot 0) = 0\cdot f(0) = 0$. Here $f(0) = (1,0) \ne 0$,
+   so $f$ cannot be linear, and no further checking is needed.
+
+   Spelled out on the additivity axiom, to see where the offset accumulates:
+
+   $$
+   f(v+w) = v + w + (1,0), \qquad f(v)+f(w) = v + w + (2,0).
+   $$
+
+   These differ by $(1,0)$. The constant is added once on the left and twice on
+   the right, and no choice of $v$ and $w$ repairs it.
+
+   The map is not badly behaved, it is just in a different category. A map of
+   the form "linear part plus a constant" is called **affine**, and translations
+   are the standard example. Affine maps are perfectly good geometry, but they
+   are not operators in this course's sense and they do not have matrices in the
+   $2\times2$ sense: you cannot write $f(v) = Mv$ for any $M$, precisely because
+   $Mv$ always sends $0$ to $0$.
+
+   That matters physically. Time evolution, measurement projection and every
+   gate in the quantum-computing courses are linear, which is exactly what
+   guarantees that knowing an operator's action on a basis determines its
+   action on every superposition. An affine map would break that, and with it
+   the whole matrix-element machinery this lesson builds.
+
+   </details>
+
 2. Compute $BA$ for the $A,B$ in the worked example above, and confirm it
    differs from $AB$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $A = \begin{pmatrix}2&0\\0&3\end{pmatrix}$ and
+   $B = \begin{pmatrix}0&1\\1&0\end{pmatrix}$:
+
+   $$
+   BA = \begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}2&0\\0&3\end{pmatrix} = \begin{pmatrix}0&3\\2&0\end{pmatrix},
+   $$
+
+   against the worked example's
+
+   $$
+   AB = \begin{pmatrix}0&2\\3&0\end{pmatrix}.
+   $$
+
+   They differ: the 2 and the 3 have traded places, so $AB \ne BA$ and these two
+   operators do not commute.
+
+   The structural reason is visible without arithmetic. $B$ swaps the two
+   coordinates and $A$ scales them by different factors, so "scale then swap"
+   and "swap then scale" apply the scalings to different coordinates. Had $A$
+   been $\mathrm{diag}(2,2)$, a single scalar in disguise, the two orders would
+   have agreed; it is the *different* diagonal entries that make the order
+   matter.
+
+   Non-commutativity is not a nuisance in this subject, it is the content. The
+   commutator $[A,B] = AB - BA$, here
+   $\begin{pmatrix}0&-1\\1&0\end{pmatrix}$, is nonzero, and it is exactly such
+   nonzero commutators that produce the uncertainty relations: two observables
+   can have a shared set of eigenvectors, and so be simultaneously measurable,
+   only when they commute.
+
+   The reading error to avoid is treating $AB$ as "$A$ first". In
+   $(AB)|v\rangle = A(B|v\rangle)$ the rightmost operator acts first, so $AB$
+   means $B$ then $A$. Composition notation runs right to left, and this
+   question is a duplicate of the worked example only if you read it the other
+   way round.
+
+   </details>
+
 3. Is $\begin{pmatrix}1&2\\2&4\end{pmatrix}$ invertible? Justify your
    answer by finding a nonzero vector it sends to zero, or explaining why
    none exists.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Not invertible. The nonzero vector $(2,-1)^\mathsf{T}$ is sent to zero:
+
+   $$
+   \begin{pmatrix}1&2\\2&4\end{pmatrix}\begin{pmatrix}2\\-1\end{pmatrix} = \begin{pmatrix}2-2\\4-4\end{pmatrix} = \begin{pmatrix}0\\0\end{pmatrix}.
+   $$
+
+   That settles it by the argument this lesson gives: an operator sending a
+   nonzero vector to zero also sends the zero vector to zero, so two different
+   inputs share an output, and there is no way for an inverse to decide which
+   one to return.
+
+   Finding the vector is not guesswork. The columns are $(1,2)$ and $(2,4)$,
+   and the second is twice the first, so the combination
+   $2\times(\text{column 1}) - 1\times(\text{column 2})$ vanishes, and those
+   coefficients *are* the vector. Whenever the columns are linearly dependent,
+   the dependency relation hands you the kernel vector directly.
+
+   The determinant agrees, $\det = (1)(4) - (2)(2) = 0$, and is quicker to
+   compute. It is worth knowing both, because the determinant tells you *that*
+   the operator is singular while the kernel vector tells you *what* it
+   destroys. Geometrically, this matrix flattens all of $\mathbb{C}^2$ onto the
+   single line spanned by $(1,2)$, and the information about where along the
+   perpendicular direction a vector started is gone.
+
+   That is also why no quantum gate can look like this. Gates are unitary,
+   unitaries preserve norms, and a norm-preserving operator can never send a
+   nonzero vector to zero.
+
+   </details>
+
 4. Using the derived composition formula, compute the $(2,1)$ entry of
    $AB$ from the worked example, and check it against direct
    multiplication.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $(AB)_{21} = 3$.
+
+   The formula derived from completeness is $(AB)_{ik} = \sum_j A_{ij}B_{jk}$.
+   With $i=2$, $k=1$ and $j$ running over 1 and 2:
+
+   $$
+   (AB)_{21} = A_{21}B_{11} + A_{22}B_{21} = (0)(0) + (3)(1) = 3.
+   $$
+
+   Direct multiplication gave $AB = \begin{pmatrix}0&2\\3&0\end{pmatrix}$, whose
+   $(2,1)$ entry is 3 $\checkmark$.
+
+   What the exercise is really checking is that the sum over $j$ is not an
+   arbitrary rule. It is the completeness relation
+   $\sum_j |e_j\rangle\langle e_j| = I$ inserted between $A$ and $B$ inside
+   $\langle e_2|AB|e_1\rangle$, which is legal because inserting the identity
+   changes nothing. Row-times-column matrix multiplication is the shadow that
+   insertion casts, rather than a definition anyone had to choose.
+
+   Two index habits are worth fixing here. The free indices $i$ and $k$ are the
+   ones naming the entry you want and they appear once each; the summed index
+   $j$ appears twice and disappears from the answer. And the shared index sits
+   *adjacent* in $A_{ij}B_{jk}$, second slot of the left factor and first slot
+   of the right, which is why $AB$ needs $A$'s column count to match $B$'s row
+   count. Writing $A_{ji}B_{jk}$ by mistake computes an entry of
+   $A^\mathsf{T}B$, a different operator entirely.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -275,7 +417,7 @@ exactly when it sends some nonzero vector to zero.
 - Not every operator is invertible; $A^{-1}$ exists only when $A$ never
   sends a nonzero vector to zero.
 
-## Further Exploration
+## Reading matrix elements off a map's action
 
 <ChallengePrompt prompt="Is g(x,y) = (y,x) (swapping the two coordinates) linear? Justify using the definition, and if so, write down its matrix in the standard basis.">
   Check $g(a\cdot u+b\cdot v)$ against $a\cdot g(u)+b\cdot g(v)$ directly,
@@ -286,6 +428,6 @@ exactly when it sends some nonzero vector to zero.
 <NextDiscovery>
   Up next, [Eigenvalues and Eigenvectors](/lessons/quantum-mechanics/mathematical-foundations/eigenvalues-and-eigenvectors): the vectors an operator leaves
   "directionally unchanged." Those turn out to be the states with definite
-  physical properties, and every measurement postulate in this pillar is
+  physical properties, and every measurement postulate in this track is
   written in terms of them.
 </NextDiscovery>

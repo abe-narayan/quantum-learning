@@ -27,8 +27,8 @@ export const kineticTermForm: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "Check the sign: two factors of -i from applying p-hat twice give i^2=-1, which combines with the overall structure to leave a minus sign, not a plus.",
-      c: "This has only a single derivative, not p-hat squared — the kinetic term needs the second derivative from applying p-hat twice.",
-      d: "The two factors of i from applying p-hat twice multiply to -1 (a real number) — there should be no leftover factor of i in the final kinetic term.",
+      c: "This has only a single derivative, not p-hat squared. The kinetic term needs the second derivative from applying p-hat twice.",
+      d: "The two factors of i from applying p-hat twice multiply to -1, a real number, so there should be no leftover factor of i in the final kinetic term.",
     },
     defaultIncorrectFeedback: "Apply p-hat = -i*hbar*d/dx twice and simplify i^2 = -1 carefully.",
   },
@@ -46,7 +46,7 @@ export const kineticTermForm: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Applying p-hat twice and simplifying i^2=-1 gives a real, negative-signed second-derivative operator.",
-    whyCorrect: "This exactly matches the derivation in the lesson.",
+    whyCorrect: "This matches the derivation in the lesson.",
     whyWrong: [
       { optionId: "b", text: "Loses the minus sign, which comes from (-i)^2 = -1 and not from anywhere else." },
       { optionId: "c", text: "Squares the constant but not the derivative, leaving one power of d/dx where two belong." },

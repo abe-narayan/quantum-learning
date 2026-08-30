@@ -10,7 +10,7 @@ import type { FieldRegime } from "@/lib/design/pillars";
  *
  * Context would mean a client Provider wrapping the whole app in
  * src/app/layout.tsx, which would opt every page's tree into being a client
- * boundary child — for a site that is otherwise almost entirely server
+ * boundary child, for a site that is otherwise almost entirely server
  * components and static HTML, that is a real cost for a decorative feature.
  * A module store keeps the client surface to exactly two leaf components:
  * `<QuantumField>` (subscribes) and `<FieldRegimeSetter>` (publishes).
@@ -29,13 +29,13 @@ export type FieldState = {
 
 /**
  * What the field shows before any page declares otherwise: `atlas`, the
- * calm, pillar-less reference environment (see regimes.ts) — never
+ * calm, pillar-less reference environment (see regimes.ts), never
  * `journey`. `journey` is the homepage's own narrative, six pillars
  * crossfading in curriculum order as you scroll; it means something only on
  * a page whose scroll position tracks a descent through the curriculum. A
  * default has no such position, so a default that resolved to `journey`
  * would play that crossfade behind *any* page that forgot to declare a
- * regime — which is exactly what happened before this was `atlas` (see
+ * regime, which is exactly what happened before this was `atlas` (see
  * docs/UX_REVIEW.md P1-2): six routes with no `<PillarScope>` at all
  * inherited the homepage's crossfade purely by omission. Every route should
  * now declare its regime explicitly via `<PillarScope>` (bare for the

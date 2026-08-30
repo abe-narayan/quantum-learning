@@ -56,7 +56,7 @@ export const capstonePipelineRoutedGateCountFewerSteps: NumericProblem = {
   },
   hints: [
     { text: "Stage 2 of the capstone scales each per-step count by the number of Trotter steps: two-qubit gates = 50 x steps, T gates = 30 x steps." },
-    { text: "Stage 3 applies the 2.5x SWAP-overhead multiplier to the two-qubit gate count only -- never to the T-count, since T gates are single-qubit and need no routing." },
+    { text: "Stage 3 applies the 2.5x SWAP-overhead multiplier to the two-qubit gate count only, never to the T-count, since T gates are single-qubit and need no routing." },
     { text: "Add the two stages' outputs: the routed two-qubit count and the untouched T-count. Sanity check the result against the capstone's own 20-step total of 3100, which this shortened circuit should come in below." },
   ],
   solution: {
@@ -69,9 +69,9 @@ export const capstonePipelineRoutedGateCountFewerSteps: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "Trotter-step scaling (Stage 2) and routing overhead (Stage 3) are two separate multiplications applied to two different quantities -- step count scales both gate types, but the SWAP-overhead multiplier applies only to the two-qubit gate count.",
+      "Trotter-step scaling (Stage 2) and routing overhead (Stage 3) are two separate multiplications applied to two different quantities. Step count scales both gate types, but the SWAP-overhead multiplier applies only to the two-qubit gate count.",
     whyCorrect:
-      "This mirrors exactly how the capstone computed its own 20-step numbers (1000 raw two-qubit gates -> 2500 routed, 600 T gates untouched, 3100 total), just re-run at 15 steps instead of 20.",
+      "This mirrors how the capstone computed its own 20-step numbers (1000 raw two-qubit gates -> 2500 routed, 600 T gates untouched, 3100 total), re-run at 15 steps instead of 20.",
     whyWrong: [
       "Applying the 2.5x multiplier to the T-count, or to the raw total gate count, would incorrectly inflate a quantity that routing overhead never touches.",
       "Forgetting to rescale the per-step counts by 15 (instead of reusing the lesson's own 20-step totals) would answer a different question than the one asked.",

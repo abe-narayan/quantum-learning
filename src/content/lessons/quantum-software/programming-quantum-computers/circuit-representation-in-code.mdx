@@ -11,7 +11,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Circuit Representation in Code",
   description:
-    "Quantum Gates & Circuits applied matrices directly, immediately. Real software instead builds a circuit as DATA first, a list of named instructions, and only executes it later, exactly the pattern this platform's own QuantumCircuit class implements, reusing every gate from gates.ts unchanged underneath.",
+    "Quantum Gates & Circuits applied matrices directly, immediately. Real software instead builds a circuit as DATA first, a list of named instructions, and only executes it later, the pattern this platform's own QuantumCircuit class implements, reusing every gate from gates.ts unchanged underneath.",
   course: "programming-quantum-computers",
   module: "circuit-representation-in-code",
   order: 1,
@@ -29,13 +29,13 @@ export const lessonMeta = {
 Quantum Gates & Circuits taught the physics: apply this matrix, to this qubit, right now, and watch the state vector change immediately. Real software doesn't usually work this way.
 </LessonHook>
 
-## Motivation
+## Why Build a Description Instead of Running It
 
 A quantum program is typically
 built as a *description* of a circuit first (a list of instructions),
 which is only later sent off to be executed (on a simulator or real
-hardware). This lesson covers that software-engineering pattern
-directly.
+hardware). Why bother with the description, instead of just applying
+each gate as the line of code runs?
 
 The payoff for keeping the circuit as data shows up the moment the
 target changes. A circuit written as immediate matrix applications is
@@ -46,15 +46,15 @@ of it being rewritten.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Full_wafer_of_Intel_quantum_computers.jpg"
   alt="A full silicon wafer containing dozens of Intel quantum processor chips, before dicing"
-  caption="A wafer of Intel quantum processor chips. No two of these chips have identical qubit frequencies, connectivity, or calibration, and none of them run 'H on qubit 0' natively. Keeping the circuit as data is what lets one instruction list be aimed at any of them — or at a simulator — with the translation left to a separate compilation step."
+  caption="A wafer of Intel quantum processor chips. No two of these chips have identical qubit frequencies, connectivity, or calibration, and none of them run 'H on qubit 0' natively. Keeping the circuit as data is what lets one instruction list be aimed at any of them, or at a simulator, with the translation left to a separate compilation step."
   credit="Steve Jurvetson, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Full_wafer_of_Intel_quantum_computers.jpg"
   license="CC BY 2.0"
 />
 
-## Engineering Development
+## Build First, Run Later
 
-### Build first, run later
+### The shape every SDK shares
 
 Every major quantum SDK (Qiskit, Cirq, PennyLane, and others) follows
 the same basic shape: construct a circuit object by appending gate
@@ -76,7 +76,7 @@ const state = runCircuit(circuit);
 appends two `GateInstruction` objects (plain data: `{gate:"H",
 targets:[0]}` and `{gate:"CNOT",targets:[0,1]}`) to a list.
 `runCircuit(circuit)` is the separate execution step: it starts from
-$|00\rangle$ and dispatches each instruction to the exact same
+$|00\rangle$ and dispatches each instruction to the same
 `applySingleQubitGate`/`applyCNOT` functions Quantum Gates & Circuits
 already used directly. No new gate physics, only a new way of
 organizing *when* that physics runs.
@@ -91,32 +91,40 @@ optimizer before ever touching real hardware. None of this is possible
 if gates are applied immediately and irreversibly as each line of code
 runs.
 
-## Physical Interpretation
+## Structure, Not Physics
 
-This lesson introduces no new physics. `SINGLE_QUBIT_MATRICES` inside
+No new physics enters here. `SINGLE_QUBIT_MATRICES` inside
 `circuitBuilder.ts` holds the same `PAULI_X`, `HADAMARD`, and the rest,
 imported from `gates.ts`. The content here is about *software structure*
-rather than physics — which is a fair description of most quantum
+rather than physics, which is a fair description of most quantum
 programming work day to day: less deriving new matrices, more organizing
 gate sequences correctly.
 
-## Worked Example
+## An Identity, Assembled From Instructions
 
 **Build a circuit implementing $H\,Z\,H$ on a single qubit (a known
 identity: $HZH=X$), and confirm it flips $|0\rangle$ to $|1\rangle$.**
 
 <PredictBeforeReveal
-  question="circuit.h(0).z(0).h(0) has just been called, but runCircuit(circuit) has not. What has happened to the qubit's quantum state so far?"
+  question="Write circuit.h(0).z(0) and runCircuit executes the list front to back: H first, then Z. Written instead as one matrix multiplied onto |0⟩, which order does that product go in?"
   options={[
-    { label: "It's been rotated by H, then Z, then H", value: "rotated" },
-    { label: "Nothing — three instructions were appended to a list, no state exists yet", value: "nothing" },
-    { label: "It collapsed to |1⟩ already", value: "collapsed" },
+    { label: "Z·H: the last gate applied sits leftmost", value: "reversed" },
+    { label: "H·Z: same order as the code reads", value: "same" },
+    { label: "Either; matrix products commute for gates", value: "commute" },
   ]}
-  correctValue="nothing"
-  explanation="circuit.h(0).z(0).h(0) only appends three GateInstruction objects to circuit.instructions. No StateVector is created or touched until runCircuit(circuit) actually runs — that's the whole point of build-then-execute. Watch the diagram below grow one instruction at a time before anything executes."
+  correctValue="reversed"
+  explanation="A matrix acts on what sits to its right, so the gate applied first has to be written closest to the state: runCircuit's H-then-Z list is the product Z·H|0⟩, read right to left. Code order and matrix order run opposite to each other, which is why the instruction list is worth keeping as a list rather than collapsing it into one product in your head. (H and Z do not commute: H·Z|0⟩ is |0⟩'s image under Z, then H, which is |+⟩, while Z·H|0⟩ is |−⟩.)"
 />
 
-Here's that instruction list actually growing, one appended call at a time, exactly as `circuit.h(0).z(0).h(0)` builds it — still just data, nothing executed yet:
+The three-instruction list this section's worked example builds,
+`circuit.h(0).z(0).h(0)`, happens to read the same forwards and
+backwards, which is exactly why it is safe to eyeball. Most circuits are
+not palindromes, and the instruction list is what keeps the order
+unambiguous.
+
+Here's that instruction list growing, one appended call at a time, as
+`circuit.h(0).z(0).h(0)` builds it. It is still just data, nothing
+executed yet:
 
 <CircuitDiagramExplorer
   sliderLabel="After calling"
@@ -165,10 +173,10 @@ This platform's test suite confirms `state.probabilities()` gives
 exactly `[0, 1]`. The circuit-as-data representation reproduces the
 matrix identity $HZH=X$ to full precision, because underneath,
 `runCircuit` does nothing more than apply $H$, then $Z$, then $H$ in
-sequence — the same three calls Quantum Gates & Circuits made directly.
+sequence, the same three calls Quantum Gates & Circuits made directly.
 
-The instruction list above is still just data — here's what happens once
-`runCircuit` actually dispatches it, the real $|{\text{amplitude}}|^2$ at
+The instruction list above is still just data. Here's what happens once
+`runCircuit` dispatches it: the real $|{\text{amplitude}}|^2$ at
 each qubit after every gate, not an interpolated guess:
 
 <CircuitStateStepper
@@ -185,18 +193,18 @@ each qubit after every gate, not an interpolated guess:
 The circuit builder below is the same tool Quantum Gates & Circuits
 used, so it works in terms of qubit wires rather than a bare
 `QuantumCircuit(1)` and always keeps at least two of them on the
-canvas. Build the same three-instruction list — $H$, $Z$, $H$ — on
+canvas. Build the same three-instruction list ($H$, $Z$, $H$) on
 qubit 0 and leave qubit 1 untouched: since gates act only on the wires
 they're applied to, an idle second qubit has no effect on qubit 0's
 evolution, so stepping through it reproduces the circuit above. Watch
-the state land on $|1\rangle$ after the final $H$ rather than reading it
-as a claim about someone else's code:
+the state land on $|1\rangle$ after the final $H$, and you never have to
+take it on trust from someone else's code:
 
 <InteractiveSection title="Build HZH and confirm it matches X" description="Build H, Z, H on qubit 0 yourself, leaving qubit 1 idle. Step through each gate. Confirm q0 lands on |1⟩, exactly matching X|0⟩.">
   <LazyCircuitBuilder />
 </InteractiveSection>
 
-## Common Mistakes
+## Expecting a State Before You Run
 
 <Callout type="warning">
 **Assuming `circuit.h(0)` immediately changes some quantum state.** It
@@ -207,7 +215,7 @@ until `runCircuit` is called.
 <Callout type="note">
 **Thinking this is a different kind of quantum computing.** It is the
 same physics: every instruction dispatches to Quantum Gates & Circuits'
-own functions. Only the software organization has changed —
+own functions. Only the software organization has changed:
 data-then-execute in place of immediate-execute.
 </Callout>
 
@@ -215,15 +223,229 @@ data-then-execute in place of immediate-execute.
 
 1. After calling `circuit.h(0).cnot(0,1)` but BEFORE calling
    `runCircuit`, what (if anything) has happened to any quantum state?
+   Then name two things that fact makes possible.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Nothing, because there is no quantum state yet.** Not an unchanged
+   one; none at all.
+
+   What the two calls did was append two plain objects to a list. Read
+   the circuit's `instructions` array afterwards and it holds exactly
+
+   `[{"gate":"H","targets":[0]},{"gate":"CNOT","targets":[0,1]}]`
+
+   and nothing else. Each method also returns `this`, which is the only
+   reason the calls chain. The starting $|00\rangle$ is created inside
+   `runCircuit`, when execution begins, and it does not exist before
+   that.
+
+   The wrong turn is a reading habit rather than a misunderstanding of
+   physics. Chained method calls that look like commands read as though
+   they are doing something to an object's state, and in most code they
+   would be. Here the object being mutated is the *instruction list*,
+   which is a description of a program, and a description of an H gate is
+   no more a quantum state than a recipe is a meal.
+
+   The signature settles it. `runCircuit(circuit)` takes the circuit as
+   an argument and *returns* a `StateVector`. If the circuit were already
+   carrying a state, there would be nothing for that function to return
+   and no reason for it to accept the circuit as input.
+
+   Two consequences follow directly, and they are the payoff of the whole
+   arrangement.
+
+   The circuit is not consumed. Call `runCircuit` on the same object
+   twice and you get two independent state vectors, which is precisely
+   how multi-shot statistics are collected without rebuilding anything.
+
+   And the circuit can be read. Print the list, inspect it
+   instruction by instruction, or hand it to an optimizer, all before a
+   single amplitude has been touched. Question 2 is about why that
+   matters.
+
+   </details>
+
 2. Why does separating circuit construction from execution make later
    optimization (Compilation & Hybrid Algorithms) possible in a way that
    immediate execution would not?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because an optimizer transforms *programs*, and immediate execution
+   destroys the program while producing its result.
+
+   Think about what applying a gate immediately does. It multiplies a
+   matrix into a state vector. The state vector afterwards holds the
+   combined effect of everything applied so far, and it holds nothing at
+   all about what those things were. Given a vector of amplitudes there
+   is no way to recover the fact that it was reached by an H followed by
+   a CNOT rather than by some other sequence with the same effect. The
+   structure is gone, irreversibly, as soon as the multiplication
+   happens.
+
+   Every compiler transformation the later course applies needs exactly
+   that structure back:
+
+   **Algebraic simplification** needs to see neighbouring instructions.
+   Two adjacent X gates cancel; $HZH$ collapses to $X$; a rotation
+   followed by its inverse is nothing. Each of those is a statement about
+   a pattern in the list, and none of them is visible in the resulting
+   vector.
+
+   **Routing** needs the whole circuit at once. Deciding where to insert
+   SWAP gates so that every two-qubit instruction lands on a physically
+   connected pair is a question about which pairs interact and in what
+   order, over the entire program.
+
+   **Scheduling** needs a dependency graph. Two gates on disjoint qubits
+   can run in the same time slot, which shortens the circuit's depth and
+   therefore its exposure to decoherence, and working out which gates
+   those are means reading ahead.
+
+   **Retargeting** needs the abstract instructions to survive. The same
+   list can be lowered onto one machine's native gate set today and a
+   different one tomorrow. Immediate execution has already committed to
+   one interpretation.
+
+   The single sentence version: immediate execution is a destructive
+   fold, collapsing the program into its effect, while the instruction
+   list keeps the program itself, and a compiler is a function from
+   programs to programs.
+
+   Two wrong turns.
+
+   The first is "you could optimize by reading ahead in the source code
+   instead." That is not an alternative to this design, it *is* this
+   design. Reading ahead requires some representation of what is coming,
+   and an instruction list is what that representation looks like once
+   you build it deliberately rather than accidentally.
+
+   The second is that the extra layer must cost performance, since
+   building a list is work that immediate execution skips. It runs the
+   other way for anything nontrivial. Applying two X gates that cancel
+   means two full passes over $2^n$ amplitudes; noticing they cancel
+   means comparing two small objects, and then doing neither pass. The
+   list costs a few bytes per gate and saves exponentially sized work.
+
+   </details>
+
 3. Write out (in your own words, not code) the sequence of
    `GateInstruction` objects that `circuit.x(0).h(1).cnot(0,1)` would
    produce.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Three objects, in call order:
+
+   an X instruction targeting qubit 0, recorded as gate name `"X"` with a
+   targets list holding the single entry 0;
+
+   an H instruction targeting qubit 1, gate name `"H"`, targets list
+   holding 1;
+
+   a CNOT instruction, gate name `"CNOT"`, whose targets list holds two
+   entries in a fixed order: the control, 0, first, then the target, 1.
+
+   Verbatim from the engine, `circuit.instructions` is
+
+   `[{"gate":"X","targets":[0]},{"gate":"H","targets":[1]},{"gate":"CNOT","targets":[0,1]}]`.
+
+   Three details in that structure are worth noticing.
+
+   **Order matters and is preserved.** The list is the program, and
+   `runCircuit` walks it front to back. Nothing sorts or reorders it.
+
+   **A two-qubit gate is not two instructions.** It is one instruction
+   with two targets, which is what lets a router later ask "are these two
+   qubits adjacent on the hardware?" as a single question about a single
+   object.
+
+   **`targets` is positional, not a set.** `[0,1]` means control 0,
+   target 1. Swapping them to `[1,0]` is a genuinely different gate, so
+   the ordering carries meaning that a set would lose.
+
+   Now the part worth more than the transcription. Run this circuit and
+   the probabilities come back as $[0,\ 0,\ 0.5,\ 0.5]$: the outcomes
+   $|10\rangle$ and $|11\rangle$, equally likely. **That is a product
+   state, not an entangled one, despite the circuit containing a CNOT.**
+
+   Follow it through. X on qubit 0 takes $|00\rangle$ to $|10\rangle$. H
+   on qubit 1 gives $(|10\rangle+|11\rangle)/\sqrt2$. The CNOT's control,
+   qubit 0, is now in a *definite* $|1\rangle$, so the gate acts as a
+   plain X on qubit 1 and simply swaps the two terms, leaving the same
+   state it started from. The result is $|1\rangle\otimes|+\rangle$,
+   perfectly separable.
+
+   A CNOT only entangles when its control is itself in superposition,
+   which is why the Bell circuit puts the H on the *control* and this one
+   puts it on the target. Being able to see that from the instruction
+   list, before running anything, is exactly the kind of reasoning
+   keeping the circuit as data is for.
+
+   </details>
+
 4. Explain why `runCircuit`'s implementation needs no new gate-physics
    code beyond what Quantum Gates & Circuits' `gates.ts` already
    provides.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because `runCircuit` is a dispatcher, not a simulator. It contains no
+   physics to be new.
+
+   Its whole job is: create a $|0\dots0\rangle$ state, walk the
+   instruction list, and for each entry decide which already-existing
+   function to call. A single-qubit instruction looks its matrix up in
+   `SINGLE_QUBIT_MATRICES`, a table whose entries are literally
+   `PAULI_X`, `PAULI_Y`, `PAULI_Z`, `HADAMARD`, `S_GATE` and `T_GATE`
+   imported from `gates.ts`, and hands it to `applySingleQubitGate`. A
+   parametrized instruction calls `rotationX`, `rotationY`, `rotationZ`
+   or `phaseGate` to build its matrix and then the same applier. A
+   two-qubit instruction calls `applyCNOT`, `applyCZ` or `applySwap`.
+   Every one of those was written and tested before this lesson existed.
+
+   The reason this is possible at all is that the circuit-as-data layer
+   changes *when* gate application happens and *how it is described*, not
+   *what it is*. Those are orthogonal concerns, and the separation is the
+   lesson's actual content: physics in `gates.ts`, software structure in
+   `circuitBuilder.ts`.
+
+   The evidence is in the numbers. Building $H$, $Z$, $H$ as an
+   instruction list and running it returns probabilities
+   $[0,\ 1.0000000000000004]$, which is the identity $HZH=X$ reproduced
+   to floating-point precision, and is bit-for-bit what applying the same
+   three matrices by hand gives. If the new layer had reimplemented
+   anything, there would be some possibility of it disagreeing. There
+   isn't, because there is nothing to disagree with.
+
+   Two practical consequences.
+
+   A bug fixed in `gates.ts` is fixed for every circuit ever built,
+   because there is only one implementation of each gate in the codebase.
+
+   And a bug in the circuit layer cannot silently produce wrong physics.
+   It can dispatch to the wrong gate, target the wrong qubit, or lose an
+   instruction, and all of those are loud, structural failures. It cannot
+   quietly return an almost-right amplitude, because it never computes an
+   amplitude.
+
+   One instruction is the exception, and it is instructive. `MEASURE`
+   does not touch the state vector at all: it is a diagram and notation
+   marker recording "read this wire here." It is the one entry in the
+   instruction vocabulary with no gate physics behind it, precisely
+   because it is not a gate.
+
+   The wrong turn is expecting a new abstraction layer to bring its own
+   approximations, so that a "circuit simulator" is a distinct and
+   presumably less exact thing than applying matrices directly. Here it
+   is the same code path with a list in front of it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -232,14 +454,14 @@ data-then-execute in place of immediate-execute.
 - Real quantum SDKs build a circuit as data (a list of gate
   instructions) before executing it, a "build first, run later"
   pattern.
-- This platform's `QuantumCircuit`/`runCircuit` implement exactly this
+- This platform's `QuantumCircuit`/`runCircuit` implement this
   pattern, dispatching every instruction to the same gate functions
   Quantum Gates & Circuits already built and tested.
-- This is a software-structure lesson, not new physics — the same
+- This is a software-structure lesson, not new physics: the same
   content as this platform's matrix-heavy courses, organized
   differently.
 
-## Further Exploration
+## How Real SDKs Do the Same Thing
 
 <NextDiscovery>
 [Quantum SDKs Overview](/lessons/quantum-software/programming-quantum-computers/quantum-sdks-overview) surveys how real-world SDKs

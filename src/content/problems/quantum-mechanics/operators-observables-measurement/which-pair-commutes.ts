@@ -26,15 +26,16 @@ export const whichPairCommutes: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "c",
     optionFeedback: {
-      a: "X and Z are different Pauli operators along different axes — they anticommute, not commute (confirmed directly by computing [X,Z] elsewhere in this course).",
-      b: "Y and Z are different Pauli operators along different axes — they anticommute too.",
-      d: "X and Y are different Pauli operators along different axes — same story, they anticommute.",
+      a: "X and Z are different Pauli operators along different axes, so they anticommute rather than commute (confirmed by computing [X,Z] elsewhere in this course).",
+      b: "Y and Z are different Pauli operators along different axes, so they anticommute too.",
+      d: "X and Y are different Pauli operators along different axes, with the same result: they anticommute.",
     },
-    defaultIncorrectFeedback: "The identity operator commutes with everything — that's the pair to look for.",
+    defaultIncorrectFeedback: "The identity operator commutes with everything. That is the pair to look for.",
   },
   hints: [
-    { text: "Distinct Pauli operators (X, Y, Z on different axes) never commute with each other." },
-    { text: "Is there an operator here that commutes with literally anything?" },
+    { text: "Commuting means the two orderings of a product agree, so the test is one multiplication carried out both ways." },
+    { text: "Two distinct Pauli operators anticommute: swapping their order flips the sign of the product. Work out how many of the listed pairs that eliminates." },
+    { text: "One of the four operators appearing in the list is not a Pauli at all. Check what multiplying by it does to the ordering of any product." },
   ],
   solution: {
     steps: [

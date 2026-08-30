@@ -24,14 +24,14 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Norm 1.0000, energy off by thirty times">
   A real bug found during this platform's own development: a simulated
   state's norm held at exactly 1.0000 while its energy was wrong by
   thousands of percent. Norm conservation and accuracy are not the same
   guarantee.
 </LessonHook>
 
-## Motivation
+## Opening up the method behind every number so far
 
 Every numerical claim this course has made (norm staying at 1.0000,
 energy matching analytical formulas, stationary states staying
@@ -46,10 +46,10 @@ can account for.
   caption="John von Neumann, whose stability analysis of finite-difference schemes for PDEs set the template this lesson follows in a different form: not just deriving a numerical method, but proving something concrete about when and how well it works."
   credit="Los Alamos National Laboratory, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.gif"
-  license="Public domain (LANL)"
+  license="Attribution (LANL)"
 />
 
-## Intuition
+## Kinetic and potential want different bases
 
 The formal solution to the time-dependent <Term id="schrodinger-equation">Schrödinger equation</Term> is
 $|\psi(t)\rangle = e^{-i\hat Ht/\hbar}|\psi(0)\rangle$, but $\hat H
@@ -61,7 +61,7 @@ split into $e^{-i\hat Tt/\hbar}$ times $e^{-i\hat Vt/\hbar}$. It
 doing that approximation carefully, many times in a row, is the whole
 method.
 
-## Mathematical Development
+## Splitting an exponential that will not split
 
 ### Why the split isn't exact
 
@@ -164,7 +164,7 @@ harmonic-oscillator preset in this course is tuned with that constraint in
 mind. It is a real engineering trade-off, and stating it is more useful
 than hiding it.
 
-## Physical Interpretation
+## The knob that separates a simulation from an animation
 
 The split-operator method is a physics simulation rather than a curve fit
 or an animation trick: every frame is produced by applying the approximate
@@ -173,11 +173,11 @@ that this one has a knob. Halve $\Delta t$ and the answer gets closer to
 the truth, at the cost of computation. A decorative animation has no such
 knob, because it is not approximating anything.
 
-<InteractiveSection title="Step through one slice at a time" description="Use the Step button (rather than Play) on any stationary preset to advance one single symmetric split-operator step at a time, and watch ⟨H⟩ in the comparison panel. For a reasonable time step (this course's presets are tuned this way) it should barely move at all, step to step, even though each step is only an approximation.">
+<InteractiveSection title="Step through one slice at a time" description="Use the Step button (rather than Play) on any stationary preset to advance one single symmetric split-operator step at a time, and watch ⟨H⟩ in the comparison panel, step by step. Each step is only an approximation, so how far ⟨H⟩ drifts per step is the honest measure of how well this course's tuned time step is doing.">
   <LazyWavefunctionExplorer initialPresetId="harmonic-ground" />
 </InteractiveSection>
 
-## Worked Example
+## Why ten times smaller buys a thousand times better
 
 **Why does making $\Delta t$ ten times smaller improve the split-operator
 method's per-step error by roughly $1000\times$, not $10\times$?**
@@ -190,7 +190,7 @@ now requires 10× more steps, each contributing error, so the *total*
 accumulated error improves by roughly $1000/10=100\times$, still a
 substantial win for a $10\times$ smaller time step.)
 
-## Common Mistakes
+## The guarantee norm conservation does not give
 
 <Callout type="warning">
 **Assuming norm conservation proves accuracy.** It doesn't. This
@@ -212,11 +212,138 @@ for smooth, responsive animation.
 1. If $[\hat T,\hat V]=0$ for some special potential, what would that
    imply about the split-operator method's accuracy for that potential
    specifically?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The split would be **exact**, at every order and for any time step. The
+   method would stop being an approximation at all.
+
+   The derivation above located the entire leading error in
+   $\tfrac{[A,B]}{2}\Delta t^2$. Setting $[\hat T,\hat V]=0$ kills it, and
+   the same is true at every higher order: for commuting operators
+   $e^{A+B}=e^Ae^B$ is an identity, exactly as it is for ordinary numbers.
+   With no error term, $\Delta t$ could be as large as the whole simulation
+   and the answer would still be right.
+
+   The obvious question is when this actually happens. $\hat T$ commutes
+   with $\hat V$ precisely when $V$ is *constant*, since $[\hat T,V(x)]$ is
+   built from $[\hat p^2,V]$, which vanishes only if $V' \equiv 0$. So the
+   free particle qualifies, and so does a free particle with an arbitrary
+   constant offset added to its energy, which changes nothing observable.
+   That is the entire list on the line, and it is why this is a thought
+   experiment rather than an optimization: any potential worth simulating
+   has a nonzero gradient somewhere.
+
+   It is still a useful thought experiment, for two reasons.
+
+   It identifies what the numerical error is *made of*. The split-operator
+   method is inexact for the same reason position and momentum have an
+   uncertainty relation: $\hat T$ and $\hat V$ are built from operators
+   that do not commute. The commutator is not an artifact of the algorithm;
+   it is the physics the algorithm has to work around, which is why no
+   amount of clever reordering removes it and why the symmetric split can
+   only cancel the leading term rather than all of them.
+
+   It predicts where the method performs best. The error scales with how
+   much $\hat T$ and $\hat V$ fail to commute, which grows with the size of
+   $V'$ and $V''$. A smooth, shallow potential is nearly free over a short
+   step and the method is nearly exact; a very tall, very steep wall is the
+   opposite, which is exactly the regime the lesson's `wallHeight * dt`
+   constraint and the third question below are about.
+
+   </details>
+
 2. Explain in one sentence why the *kinetic* step is done in momentum
    space rather than position space.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $\hat T=\hat p^2/2m$ is diagonal in momentum space, where it is
+   just multiplication by $\hbar^2k^2/2m$, so $e^{-i\hat T\Delta t/\hbar}$
+   becomes a pointwise multiplication by the number
+   $e^{-i\hbar k^2\Delta t/2m}$ at each $k$; in position space it is a
+   second derivative, and exponentiating a differential operator is not a
+   pointwise operation at all.
+
+   Unpacking that, since the one sentence hides the useful part.
+   Exponentiating an operator is easy exactly when the operator is
+   diagonal: you exponentiate each diagonal entry separately, which for a
+   continuum of labels means multiplying by a number at each point. In
+   position space $e^{-i\hat T\Delta t/\hbar}$ has no such form. Expanding
+   its power series would require applying $d^2/dx^2$ arbitrarily many
+   times, each application coupling every grid point to its neighbours, and
+   truncating that series is what makes naive finite-difference schemes
+   both inaccurate and non-unitary.
+
+   This is why the method alternates bases at all. $\hat V$ is diagonal in
+   position space and $\hat T$ is diagonal in momentum space, and neither
+   is diagonal in the other's basis. Rather than fight that, the algorithm
+   goes where each factor is easy: multiply pointwise in position space,
+   FFT, multiply pointwise in momentum space, inverse FFT, multiply
+   pointwise again. The FFT is affordable enough ($O(N\log N)$) that
+   changing basis twice per step is cheaper than any scheme that stays put.
+
+   And it is the same property that buys exact norm conservation. Each of
+   the three factors multiplies by a number of magnitude exactly $1$, or
+   applies a unitary transform, so no step can change $\||\psi\rangle\|$
+   regardless of $\Delta t$. That guarantee comes from the *form* of the
+   factors, not from the size of the time step, which is precisely why it
+   is independent of accuracy.
+
+   </details>
+
 3. Using the commutator-error argument, explain qualitatively why a
    *taller* barrier (larger $V$) needs a *smaller* time step for the same
    accuracy, all else equal.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the per-step error is set by the commutator $[\hat T,\hat V]$,
+   and that commutator grows with $V$. Making $V$ larger enlarges the error
+   at fixed $\Delta t$, so $\Delta t$ has to shrink to bring it back.
+
+   The scaling is visible in the structure of the error term. The leading
+   error is proportional to $[\hat T,\hat V]\Delta t^2$ for the naive
+   split, and $\hat V$ appears *linearly* inside the commutator, so
+   doubling the barrier height roughly doubles the error at a fixed time
+   step. Since the error also carries $\Delta t^2$, restoring the previous
+   accuracy needs $\Delta t$ smaller by about $\sqrt2$. Note what this
+   argument holds fixed: $V\Delta t^2$, not $V\Delta t$.
+
+   A second, stricter condition is what the `wallHeight * dt` rule of thumb
+   actually encodes. The split is
+   accurate when the potential does not do much *during* one time step,
+   because each factor is applied as though the other were frozen. What
+   counts as "not much" is the phase $V\Delta t/\hbar$ that the potential
+   factor imprints. If that phase is a large fraction of a full turn, the
+   step is trying to represent a rapid rotation in one jump, and the
+   alternation between the two bases stops tracking the true evolution. A
+   taller wall winds that phase faster, so the step has to be shorter to
+   keep it small. Keeping $V\Delta t$ itself bounded is a harder demand than
+   keeping $V\Delta t^2$ bounded once $\Delta t$ is already small, which is
+   why the practical rule is stated as a product and not as the commutator
+   estimate alone.
+
+   The reason this bites hardest at a very tall wall is that the wall is
+   also where $\psi$ has its sharpest features. A steep potential produces
+   rapidly varying, high-$k$ content, and $\langle p^2\rangle$ weights high
+   $k$ quadratically, so the energy readout is far more sensitive to
+   under-resolution there than the density is. That is the shape of the
+   real bug the lesson describes: the norm stayed at $1.0000$ and the
+   density looked stationary, both of which are insensitive to this error,
+   while $\langle H\rangle$ was off by a factor of thirty.
+
+   The practical conclusion is that the infinite well's idealization is
+   numerically expensive. A literally infinite wall would demand
+   $\Delta t\to0$, so the platform uses a tall-but-finite wall chosen so
+   that the leakage is invisible on the plot *and* the product with
+   $\Delta t$ stays small. Both constraints have to be met at once, and
+   satisfying only the first is what produced the bug.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -236,7 +363,7 @@ for smooth, responsive animation.
   was found and fixed during this platform's own development, and is
   documented honestly rather than hidden.
 
-## Further Exploration
+## Per-step error against total error
 
 <ChallengePrompt prompt="The naive split has O(Δt²) error per step; the symmetric split has O(Δt³). For a fixed total simulated time T split into N steps (Δt=T/N), how does each method's total ACCUMULATED error scale with N?">
   Total error ≈ $N\times$(per-step error). Substitute $\Delta t=T/N$

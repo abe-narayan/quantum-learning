@@ -20,11 +20,29 @@ export const phaseFlipCodeStabilizers: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["x0x1", "x₀x₁", "x_0x_1", "x_0 x_1", "x0 x1", "x⊗x⊗i", "xxi"],
-      ["x1x2", "x₁x₂", "x_1x_2", "x_1 x_2", "x1 x2", "i⊗x⊗x", "ixx"],
+      // Subscript forms ("x₀x₁") are deliberately absent: normalization strips
+      // them to the two-token phrase "x x", which the *other* generator's
+      // subscript form collapses to as well, so either one would satisfy both
+      // groups. The ASCII and Pauli-string forms below stay distinct, so a
+      // one-generator answer scores partial and only a two-generator answer is
+      // correct.
+      {
+        phrases: ["x0x1", "x_0x_1", "x_0 x_1", "x0 x1", "x⊗x⊗i", "xxi"],
+        missingFeedback:
+          "Conjugate the generators one at a time. Write out the first one after the H's have been applied to every qubit.",
+      },
+      {
+        phrases: ["x1x2", "x_1x_2", "x_1 x_2", "x1 x2", "i⊗x⊗x", "ixx"],
+        missingFeedback:
+          "You have the first generator. Do the same to the other one and write it out, on the same three qubits.",
+      },
     ],
     incorrectFeedback: "Conjugating Z₀Z₁ by H on every qubit replaces each Z with HZH. What does HZH equal?",
-    partialFeedback: "Good. Now give the second stabilizer generator as well.",
+    partialFeedback: "One generator down. Give the second one as well, and write both in the same notation so it is clear which qubits each acts on.",
+    modelAnswers: [
+      "Conjugating Z0Z1 by H on every qubit turns each Z into an X, so the first generator becomes X0X1, and Z1Z2 becomes X1X2. As Pauli strings that is XXI and IXX.",
+      "HZH = X, so applying H to each qubit maps Z0Z1 to X0X1 and Z1Z2 to X1X2. The stabilizer generators are XXI and IXX.",
+    ],
   },
   hints: [
     { text: "HZH = X (derived in an earlier practice question)." },
@@ -36,7 +54,7 @@ export const phaseFlipCodeStabilizers: ConceptualProblem = {
       { description: "Z₀Z₁ conjugated by H^⊗3 becomes X₀X₁ (each Z replaced by HZH=X)." },
       { description: "Z₁Z₂ similarly becomes X₁X₂." },
     ],
-    finalAnswer: "The phase-flip code's stabilizers are X₀X₁ and X₁X₂.",
+    finalAnswer: "The phase-flip code's stabilizer generators are X0X1 and X1X2, that is, the Pauli strings XXI and IXX.",
   },
   explanation: {
     correctIdea: "This is exactly the same conjugation argument the phase-flip code's entire construction relies on, applied specifically to the stabilizer generators.",

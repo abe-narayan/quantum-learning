@@ -44,7 +44,7 @@ export const qsvtReferenceLines = qsvtDemoResults.map((result) => ({
 export const lessonMeta = {
   title: "The Quantum Singular Value Transformation",
   description:
-    "How alternating a block-encoding unitary with ancilla-only phase rotations lifts single-qubit quantum signal processing onto the singular values of an arbitrary matrix — the single construction now understood to unify Grover's algorithm, Hamiltonian simulation, and linear-systems solving.",
+    "How alternating a block-encoding unitary with ancilla-only phase rotations lifts single-qubit quantum signal processing onto the singular values of an arbitrary matrix: the construction now understood to unify Grover's algorithm, Hamiltonian simulation, and linear-systems solving.",
   course: "algorithmic-frontiers",
   module: "the-quantum-singular-value-transformation",
   order: 3,
@@ -53,31 +53,30 @@ export const lessonMeta = {
   prerequisites: ["apex/algorithmic-frontiers/quantum-signal-processing"],
   objectives: [
     "Explain how QSVT lifts single-qubit Quantum Signal Processing to act on the singular values of an arbitrary block-encoded matrix, by alternating the block-encoding unitary with projector-controlled phase rotations",
-    "State the key theorem: for a block-encoded matrix A with singular value decomposition A = sum_i sigma_i |u_i><v_i|, QSVT with the right phases produces a block encoding of P(A) := sum_i P(sigma_i) |u_i><v_i| for the same polynomial P realized in single-qubit QSP",
-    "Explain concretely how QSVT recovers, as SPECIAL CASES of one construction, Grover's amplitude amplification, Hamiltonian simulation, and (qualitatively) the HHL linear-systems algorithm",
+    "State the key theorem, parity clause included: for a block-encoded matrix A with singular value decomposition A = sum_i sigma_i |u_i><v_i|, QSVT with the right phases produces a block encoding of the singular value transform, sum_i P(sigma_i) |u_i><v_i| for odd P and sum_i P(sigma_i) |v_i><v_i| for even P, for the same polynomial P realized in single-qubit QSP, the two coinciding when A is Hermitian",
+    "Recover, concretely, Grover's amplitude amplification, Hamiltonian simulation, and (qualitatively) the HHL linear-systems algorithm as special cases of one construction",
   ],
   related: [
     {
       slug: "apex/algorithmic-frontiers/quantum-signal-processing",
-      note: "QSVT is literally that lesson's signal rotation W(x) and phase sequence, run independently inside one 2D subspace per singular value — same phases, same polynomial, same degree/parity constraints, just embedded in an ancilla-tagged subspace instead of applied by hand to a bare qubit.",
+      note: "QSVT is that lesson's signal rotation W(x) and phase sequence, run independently inside one 2D subspace per singular value: same phases, same polynomial, same degree/parity constraints, embedded in an ancilla-tagged subspace instead of applied by hand to a bare qubit.",
     },
     {
       slug: "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries",
-      note: "The unitary U and ancilla register this lesson alternates with U-dagger and phase rotations are exactly that lesson's block encoding and its |0>-ancilla subspace — QSVT is what you can DO once a matrix is block-encoded, not a substitute for encoding it.",
+      note: "The unitary U and ancilla register this lesson alternates with U-dagger and phase rotations are exactly that lesson's block encoding and its |0>-ancilla subspace. QSVT is what you can do once a matrix is block-encoded, not a substitute for encoding it.",
     },
   ],
 };
 
 <LessonHook eyebrow="The conceptual summit">
-  One circuit template that, for the right choice of phases, IS Grover's
-  algorithm, IS optimal Hamiltonian simulation, and IS a modern
+  One circuit template. Change only the phases and it becomes Grover's
+  algorithm, or near-optimal Hamiltonian simulation, or the modern
   replacement for the HHL linear-systems algorithm.
 </LessonHook>
 
-## Motivation
+## Both Ingredients, Finally Combined
 
-Every earlier lesson in this course has been building toward a single
-moment, and this is it. Block encodings showed how to smuggle an arbitrary
+Block encodings showed how to smuggle an arbitrary
 matrix $A$ into a single unitary, as long as you're willing to pay for it
 with an ancilla register and accept success only in a subspace. Quantum
 signal processing showed something that looks, at first, like a cute fact
@@ -92,10 +91,9 @@ these two results are not separate tricks: they are one machine. Feed a
 block encoding of $A$ into the QSP phase sequence, treating the
 block-encoding ancilla itself as the "signal qubit," and the *entire
 matrix* $A$ gets the same polynomial transformation, applied
-simultaneously and independently to every one of its singular values. This
-is the conceptual summit of the Algorithmic Frontiers course, and arguably
-of the whole APEX pillar. Nothing else in this curriculum compresses that
-much of the field into one idea.
+simultaneously and independently to every one of its singular values. That
+observation is what the rest of this lesson unpacks, and it is the piece of
+this course with the widest reach into current research.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Singular_value_decomposition_visualisation.svg"
@@ -106,7 +104,7 @@ much of the field into one idea.
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## Many Decoupled Single-Qubit Problems
 
 ### Setup: what QSVT starts from
 
@@ -120,9 +118,40 @@ $$
 (\langle0|^{\otimes a}\otimes I)\,U\,(|0\rangle^{\otimes a}\otimes I) = A
 $$
 
-Write $A$'s singular value decomposition as $A=\sum_i\sigma_i|u_i\rangle\langle v_i|$,
-with real $\sigma_i\in[0,1]$ (bounded by 1 because $\|A\|\leq1$), and
-$\{|u_i\rangle\}$, $\{|v_i\rangle\}$ each orthonormal.
+Before the second ingredient, one piece of linear algebra that neither of
+those lessons supplies and that this course's prerequisite chain never
+delivers either. It is what the whole construction acts on, so it is stated
+here rather than assumed.
+
+<TheoremBox title="Singular value decomposition" provenance="cited">
+
+Every matrix $A$ on a finite-dimensional space can be written
+
+$$
+A=\sum_i\sigma_i|u_i\rangle\langle v_i|,
+$$
+
+with real $\sigma_i\geq0$ and the sets $\{|u_i\rangle\}$ and
+$\{|v_i\rangle\}$ each orthonormal. The $\sigma_i$, the **singular
+values**, are the non-negative square roots of the eigenvalues of
+$A^\dagger A$; the $|v_i\rangle$ are $A^\dagger A$'s eigenvectors (the
+**right** singular vectors), and $|u_i\rangle=A|v_i\rangle/\sigma_i$ for
+each $\sigma_i>0$ (the **left** singular vectors). When $A$ is Hermitian
+this collapses to the spectral decomposition, with $\sigma_i=|\lambda_i|$
+and $|u_i\rangle=\pm|v_i\rangle$; for general $A$ the two bases differ,
+which is exactly why a *singular value* transformation is a different
+object from an eigenvalue one.
+
+Borrowed, not proved here. The corpus proves it once, inside Schmidt
+Decomposition and Purification in Rigorous Quantum Information Theory,
+which is not on this course's prerequisite path. Nothing below needs the
+proof, only the form.
+
+</TheoremBox>
+
+For a block-encoded $A$ the norm bound $\|A\|\leq1$ puts every $\sigma_i$
+in $[0,1]$, which is the interval quantum signal processing works on, and
+that coincidence is the whole hinge of this lesson.
 
 **Quantum signal processing** showed that alternating the single-qubit
 signal rotation $W(x)=\begin{pmatrix}x&i\sqrt{1-x^2}\\i\sqrt{1-x^2}&x\end{pmatrix}$
@@ -135,24 +164,51 @@ U_\Phi(x) = e^{i\varphi_0Z}\prod_{k=1}^{d}\Big[W(x)\,e^{i\varphi_kZ}\Big]
 $$
 
 whose top-left entry is a degree-$d$ polynomial $P(x)$, with parity fixed
-by $d\bmod2$, satisfying $|P(x)|\leq1$ on $[-1,1]$ — and essentially any
+by $d\bmod2$, satisfying $|P(x)|\leq1$ on $[-1,1]$, and essentially any
 polynomial obeying those constraints is reachable by some choice of $\Phi$.
 
 <TheoremBox title="Quantum Signal Processing (recap)" provenance="cited">
 
-For any degree-$d$ real polynomial $P$ with parity $d\bmod2$ and
-$|P(x)|\leq1$ on $[-1,1]$ (plus a mild boundary condition), there exists a
-phase sequence $\Phi=(\varphi_0,\dots,\varphi_d)$ such that the alternating
-sequence above realizes $P$ as $U_\Phi(x)$'s top-left entry, for every
-$x\in[-1,1]$ simultaneously. Stated (with machine-checked low-degree cases)
-in the prerequisite lesson; cited there, used here.
+For any degree-$d$ real polynomial $P$ with parity $d\bmod2$,
+$|P(x)|\leq1$ on $[-1,1]$, **and** satisfying the *completeness*
+condition, that there exists a **complementary polynomial** $Q$ (degree
+$\leq d$, parity matching $d-1$) with
+
+$$
+|P(x)|^2+(1-x^2)\,|Q(x)|^2=1 \quad\text{for all } x\in[-1,1],
+$$
+
+there exists a phase sequence $\Phi=(\varphi_0,\dots,\varphi_d)$ such that
+the alternating sequence above realizes $P$ as $U_\Phi(x)$'s top-left entry,
+for every $x\in[-1,1]$ simultaneously. Stated (with machine-checked
+low-degree cases) in the prerequisite lesson; cited there, used here.
 
 </TheoremBox>
+
+<Callout type="warning">
+That last condition is a real obstruction, not a boundary technicality:
+$P$ and $Q$ have to be assemblable into two genuine rows of a unitary,
+and plenty of otherwise-legal polynomials cannot be. Take $P(x)=x^2$,
+which is degree 2, even, and bounded by 1 on $[-1,1]$. Completeness
+forces $(1-x^2)|Q(x)|^2=1-x^4=(1-x^2)(1+x^2)$, so $|Q(x)|^2=1+x^2$,
+while $Q$ must have odd parity, and any odd polynomial vanishes at
+$x=0$, where $1+x^2$ equals $1$. No such $Q$ exists at degree 2 or at
+any higher even degree, so no phase sequence realizes $x^2$ at all.
+Quantum Signal Processing's own $d=2$
+closed form, $P(x)=e^{ia}x^2-e^{ib}(1-x^2)$, says the same thing
+directly: the coefficient of $(1-x^2)$ has modulus 1 and can never be
+cancelled, so every achievable degree-2 polynomial carries that second
+term. The standard workaround is not to weaken the condition but to read
+out differently. With one extra ancilla and a linear combination of two
+phase sequences, a real $P$ obeying only parity and $|P|\leq1$ can be
+realized as the *real part* of the top-left entry, which is how applied
+QSVT papers usually state their guarantees.
+</Callout>
 
 ### The projector-controlled phase rotation
 
 QSP's phase gate $e^{i\varphi Z}$ only makes sense because, in QSP, the
-"signal register" is the entire system — there's nothing else to act on.
+"signal register" is the entire system; there is nothing else to act on.
 Once $A$ is block-encoded, that's no longer true: $U$ acts on $a+n$ qubits,
 and the phase gate has to single out the ancilla without touching the
 $n$-qubit register $A$ lives on. QSVT's fix is the direct generalization:
@@ -167,7 +223,7 @@ $$
 On a single qubit, $2|0\rangle\langle0|-I=Z$, so $\Pi_\varphi$ collapses to
 the ordinary QSP phase gate $e^{i\varphi Z}$ exactly when $a=1$ and $n=0$.
 For general $a,n$, $\Pi_\varphi$ still only ever needs to know whether the
-ancilla is in $|0\rangle$ or not — it acts as $e^{i\varphi}$ on the
+ancilla is in $|0\rangle$ or not. It acts as $e^{i\varphi}$ on the
 ancilla-zero subspace and $e^{-i\varphi}$ on its orthogonal complement,
 never referencing the $n$-qubit register directly.
 
@@ -181,8 +237,8 @@ $$
 
 ### The key leap: one matrix problem, many decoupled single-qubit problems
 
-Here is the fact that makes all of this work, and it deserves to be
-understood as a picture, not just an equation. Fix one singular pair
+One fact carries the whole construction, and it is easier to hold as a
+picture than as an equation. Fix one singular pair
 $(\sigma_i,|u_i\rangle,|v_i\rangle)$, and look only at the state
 $|v_i^0\rangle:=|0\rangle^{\otimes a}|v_i\rangle$. By the block-encoding
 relation:
@@ -198,7 +254,7 @@ $$
 U|v_i^0\rangle = \sigma_i|u_i^0\rangle + \sqrt{1-\sigma_i^2}\,|u_i^\perp\rangle
 $$
 </DerivationStep>
-<DerivationStep annotation="That one equation already fixes U's action on the two-dimensional subspace H_i = span{|v_i⁰⟩, |u_i⊥⟩} up to the phase convention chosen for |u_i⊥⟩. Fixing that phase the standard way — as Gilyén, Su, Low & Wiebe's construction does, absorbing a factor of i into |u_i⊥⟩'s definition — puts U's restriction, in this ordered basis, into exactly the QSP signal-rotation form evaluated at x = σᵢ.">
+<DerivationStep annotation="That one equation already fixes U's action on the two-dimensional subspace H_i = span{|v_i⁰⟩, |u_i⊥⟩} up to the phase convention chosen for |u_i⊥⟩. Fixing that phase the standard way (as Gilyén, Su, Low & Wiebe's construction does, absorbing a factor of i into |u_i⊥⟩'s definition) puts U's restriction, in this ordered basis, into exactly the QSP signal-rotation form evaluated at x = σᵢ.">
 $$
 U\big|_{\mathcal H_i} = \begin{pmatrix}\sigma_i&i\sqrt{1-\sigma_i^2}\\i\sqrt{1-\sigma_i^2}&\sigma_i\end{pmatrix} = W(\sigma_i)
 $$
@@ -206,7 +262,7 @@ $$
 </DerivationSteps>
 
 (the general theorem, proved in full in Gilyén, Su, Low & Wiebe's
-original construction, cited below rather than re-derived here, extends
+original construction, cited below without re-derivation here, extends
 this to show $\mathcal H_i$ is invariant under the *whole* alternating
 sequence, not just one application of $U$, that $U^\dagger$ preserves
 $\mathcal H_i$ too, and that distinct $\mathcal
@@ -219,21 +275,31 @@ $\Pi_\varphi$ restricted to $\mathcal H_i$ is *identical* to the
 single-qubit phase gate $e^{i\varphi Z}$ in that subspace's own local
 basis.
 
+Before reading on, price the construction.
+
+<PredictBeforeReveal
+  question="A degree-d QSVT sequence applies P to every singular value of A at once. If A has 2^n distinct singular values instead of 3, how many times does the circuit have to call the block encoding U?"
+  options={[
+    { label: "About 2^n times, one call per singular value", value: "exponential" },
+    { label: "About n times, one call per qubit A acts on", value: "log" },
+    { label: "d times, the length of the phase sequence, whatever A's dimension", value: "degree" },
+    { label: "d x 2^n times, the sequence re-run once per invariant subspace", value: "product" },
+  ]}
+  correctValue="degree"
+  explanation="d times, regardless of how many singular values A has. Nothing in the alternating sequence U, Π_φ, U†, Π_φ, … references a particular σᵢ: one physical circuit acts linearly across every invariant subspace at once. The query cost is set by the degree the target polynomial needs for the accuracy you want, and by nothing about A's spectrum. That decoupling is the entire content of the theorem, and it is why the same construction is affordable for a 2^n-dimensional matrix and a 2-dimensional one."
+/>
+
 <InsightBlock>
   The huge $(a+n)$-qubit Hilbert space splits into many independent
   two-dimensional "rooms," one per singular value $\sigma_i$, each
   running its own private copy of the identical QSP phase sequence with
-  $x=\sigma_i$ plugged in — no room's computation talks to any other
+  $x=\sigma_i$ plugged in. No room's computation talks to any other
   room's.
 </InsightBlock>
 
-The picture: the huge $(a+n)$-qubit Hilbert space splits into many
-independent two-dimensional "rooms," one per singular value $\sigma_i$,
-each of them running its own private copy of exactly the same QSP phase
-sequence, with $x=\sigma_i$ plugged in. No room's computation talks to any
-other room's. The phases $\Phi$ are chosen once, globally, from the
-*single-qubit* QSP theorem — and then, for free, every room applies them
-to its own $\sigma_i$ simultaneously.
+The phases $\Phi$ are chosen once, globally, from the *single-qubit* QSP
+theorem, and every room then applies them to its own $\sigma_i$ at the same
+time, with no extra calls to $U$.
 
 <TheoremBox title="The Quantum Singular Value Transformation" provenance="cited">
 
@@ -241,54 +307,62 @@ Let $U$ be a block encoding of $A=\sum_i\sigma_i|u_i\rangle\langle v_i|$,
 and let $\Phi$ be phases realizing polynomial $P$ in single-qubit QSP (same
 degree/parity/boundedness constraints as above). Then the QSVT sequence
 $U_\Phi$ built from $U$, $U^\dagger$, and $\Pi_\varphi$ is a block encoding
-of
+of the **singular value transform** $P^{\mathrm{SV}}(A)$, which is
+*parity-dependent*:
 
 $$
-\boxed{P(A) := \sum_i P(\sigma_i)\,|u_i\rangle\langle v_i|}
+\boxed{P^{\mathrm{SV}}(A) = \begin{cases}
+\displaystyle\sum_i P(\sigma_i)\,|u_i\rangle\langle v_i| & P\ \text{odd},\\[6pt]
+\displaystyle\sum_i P(\sigma_i)\,|v_i\rangle\langle v_i| & P\ \text{even},
+\end{cases}}
 $$
 
-i.e. $(\langle0|^{\otimes a}\otimes I)\,U_\Phi\,(|0\rangle^{\otimes a}\otimes I)=P(A)$,
+i.e. $(\langle0|^{\otimes a}\otimes I)\,U_\Phi\,(|0\rangle^{\otimes a}\otimes I)=P^{\mathrm{SV}}(A)$,
 for the *same* $P$ QSP realizes on a single qubit. (Gilyén, Su, Low &
-Wiebe, 2019 — see "Why This Matters" below.)
+Wiebe, 2019; see "Why This Matters" below.)
+
+The parity split is not cosmetic. An odd $P$ maps right singular vectors
+to *left* ones and so lands on $|u_i\rangle\langle v_i|$; an even $P$
+maps the right singular space to itself and lands on
+$|v_i\rangle\langle v_i|$. In the general statement, where the block
+encoding carries distinct left and right projectors $\Pi$ and
+$\tilde\Pi$, the even case's block sits on $\tilde\Pi$ from both sides
+rather than between $\Pi$ and $\tilde\Pi$; here $\Pi_0$ plays both
+roles, so the extraction formula above is unchanged either way. The two
+forms coincide whenever
+$A$ is **Hermitian**, $A=\sum_i\lambda_i|w_i\rangle\langle w_i|$: there
+$\sigma_i=|\lambda_i|$, $|v_i\rangle=|w_i\rangle$ and
+$|u_i\rangle=\mathrm{sgn}(\lambda_i)|w_i\rangle$, and since
+$P(\lambda)=\mathrm{sgn}(\lambda)P(|\lambda|)$ for odd $P$ and
+$P(\lambda)=P(|\lambda|)$ for even $P$, *both* branches reduce to the
+ordinary eigenvalue transform $P(A)=\sum_i P(\lambda_i)|w_i\rangle\langle w_i|$.
+Every worked case below (including the degree-4, even-parity
+$\cos$ approximation) is Hermitian, so the distinction never changes a
+number here; it changes what the theorem is allowed to claim for a
+general, non-Hermitian $A$.
 
 </TheoremBox>
 
-The theorem's cost is worth pinning down before reading on, because the
-answer is the reason QSVT is a useful construction rather than a
-restatement of QSP.
-
-<PredictBeforeReveal
-  question="A degree-d QSVT sequence applies P to every singular value of A at once. If A has 2^n distinct singular values instead of 3, how many times does the circuit have to call the block encoding U?"
-  options={[
-    { label: "About 2^n times — once per singular value", value: "exponential" },
-    { label: "About n times — logarithmically many, one per qubit", value: "log" },
-    { label: "d times — unchanged, because the count depends only on the polynomial's degree", value: "degree" },
-    { label: "d × 2^n times — the polynomial has to be applied in each subspace separately", value: "product" },
-  ]}
-  correctValue="degree"
-  explanation="d times, regardless of how many singular values A has. Nothing in the alternating sequence U, Π_φ, U†, Π_φ, … references a particular σᵢ: one physical circuit acts linearly across every invariant subspace at once. The query cost is set by the degree the target polynomial needs for the accuracy you want, and by nothing about A's spectrum. That decoupling is the entire content of the theorem, and it is why the same construction is affordable for a 2^n-dimensional matrix and a 2-dimensional one."
-/>
-
-## Physical Interpretation
+## Grover, Simulation, and Linear Systems as One
 
 ### Special case 1: Grover's algorithm and amplitude amplification
 
 Suppose $A$'s relevant singular value $\sigma=\sqrt{p}$ is the amplitude of
 some target subspace under a state-preparation routine with success
-probability $p$ — small $p$ means the "good" outcome is a rare needle in a
-haystack. A polynomial $P$ that's steep and pushes small $\sigma$ sharply
+probability $p$, so small $p$ means the "good" outcome is a rare needle in
+a haystack. A polynomial $P$ that's steep and pushes small $\sigma$ sharply
 toward $1$ (a Chebyshev polynomial is the standard, near-optimal choice)
 applied via QSVT *is* amplitude amplification: it's the same reflection
 that classic Grover search performs, generalized from "reflect about the
 uniform superposition" to "reflect about whatever state-preparation
 circuit you actually have." In fact, a single query to the
-state-preparation/block-encoding unitary is literally the $d=1$ case of
+state-preparation/block-encoding unitary is the $d=1$ case of
 this construction: one QSP layer, alternating one block-encoding call with
 one specific, simple phase choice, rotates the 2D subspace spanned by
 "target" and "everything else" by a fixed angle, exactly as $W(\sigma)$
-rotates $\mathcal H_i$ above. A full Grover iterate — reflect about the
-marked state, then reflect about the initial superposition — spends two
-such queries and is therefore the $d=2$ case. Repeating that basic layer
+rotates $\mathcal H_i$ above. A full Grover iterate (reflect about the
+marked state, then reflect about the initial superposition) spends one call
+to $U$ and one to $U^\dagger$, and is therefore the $d=2$ case. Repeating that basic layer
 $d$ times is what higher-degree QSVT polynomials do all at once, with a
 phase sequence chosen to make the net rotation as steep as a single
 polynomial can be.
@@ -298,25 +372,24 @@ polynomial can be.
 Let $A=H$ be a Hermitian matrix, block-encoded exactly as in the
 prerequisite lesson. A truncated Jacobi-Anger/Chebyshev expansion of
 $e^{-ixt}$ in the variable $x$ is a genuine polynomial of degree scaling
-with $t$ and the desired precision $\varepsilon$ — so QSP/QSVT can realize
+with $t$ and the desired precision $\varepsilon$, so QSP/QSVT can realize
 it directly. Applying that polynomial to $H$'s block encoding via QSVT
 reproduces $e^{-iHt}$ to accuracy $\varepsilon$, giving a completely
 different route to Hamiltonian simulation than the prerequisite Mastery
 course's Trotter-Suzuki product formulas.
 
-The comparison is worth stating precisely, because it's an
-important, citable result, not folklore: first-order Trotterization is a
+The comparison is worth stating precisely. First-order Trotterization is a
 first-principles product-formula approximation whose error per unit
 simulation scales like $t^2/n$ for $n$ steps (derived in full in that
 earlier lesson), a *polynomial* dependence on $1/\varepsilon$. QSVT-based
 simulation instead achieves query complexity that is optimal, or
 near-optimal, in *all* of $t$, $1/\varepsilon$, and the block encoding's
-own cost, scaling like $t+\log(1/\varepsilon)/\log\log(1/\varepsilon)$,
+own cost, scaling like $t\lVert H\rVert+\log(1/\varepsilon)/\log\log(1/\varepsilon)$,
 matching, up to the log factor, the information-theoretic
 no-fast-forwarding lower bound of $\Omega(t)$. That "$\log(1/\varepsilon)$
-instead of $\mathrm{poly}(1/\varepsilon)$" gap is the real, citable
-headline of Low & Chuang's QSP-based Hamiltonian simulation result:
-provably near-optimal query complexity, not merely "another method."
+instead of $\mathrm{poly}(1/\varepsilon)$" gap is the headline of Low &
+Chuang's QSP-based Hamiltonian simulation result: provably near-optimal
+query complexity.
 
 <ResearchConnection
   title="The optimality claim behind special case 2"
@@ -352,12 +425,12 @@ costs.
 ### Special case 3: linear systems (a preview)
 
 Let $A$ again be Hermitian and block-encoded, and suppose we want (a state
-proportional to) $A^{-1}|b\rangle$ — the quantum linear-systems problem
-HHL first solved. Exact $1/x$ isn't a bounded polynomial on $[-1,1]$ (it
-blows up at $x=0$), so no QSP phase sequence can realize it exactly; but a
-polynomial that closely approximates $1/x$ on $[-1,1]$ away from a small
-regularized region near $0$ *is* realizable, and applying it via QSVT to
-$H$'s block encoding produces (something proportional to) $H^{-1}|b\rangle$.
+proportional to) $A^{-1}|b\rangle$, the quantum linear-systems problem HHL
+first solved. Exact $1/x$ is not a polynomial at all, and it is unbounded
+near $x=0$, so no QSP phase sequence realizes it; but a polynomial that
+closely approximates $1/x$ on $[-1,1]$ away from a small regularized region
+near $0$ *is* realizable, and applying it via QSVT to $A$'s block encoding
+produces (something proportional to) $A^{-1}|b\rangle$.
 This is the modern, QSVT-based approach to solving linear systems,
 superseding HHL's original, more specialized phase-estimation-based
 construction, and its full derivation, including exactly how the
@@ -375,10 +448,9 @@ different choice of $P$.
   url="https://arxiv.org/abs/1806.01838"
 >
   Building on Low and Chuang's earlier "qubitization" technique, this
-  paper is now widely regarded, a real, well-cited claim in the research
-  literature, not marketing, as a unifying framework subsuming most of
-  the pre-2018 "zoo" of specialized quantum algorithms as special cases
-  of a single construction: Grover's algorithm and amplitude estimation,
+  paper is widely cited as a unifying framework, subsuming most of the
+  pre-2018 "zoo" of specialized quantum algorithms as special cases of a
+  single construction: Grover's algorithm and amplitude estimation,
   essentially every variant of Hamiltonian simulation, and HHL-style
   linear-systems solving all fall out of "block-encode a matrix, then
   apply a polynomial to its singular values," for different choices of
@@ -393,21 +465,17 @@ different choice of $P$.
   This review makes exactly the unification case above at length.
 </ResearchConnection>
 
-None of this is a claim that QSVT
-proves new physics or new complexity-theoretic results by itself: it's a
-claim about *organization*, an entire research area's separately-invented
-tricks turned out to be one trick, viewed correctly. That kind of
-unification is rare and significant in any field, and this is
-the platform's own explanation of that real, citable body of work, not a
-new result of its own.
+QSVT does not prove new physics or new complexity-theoretic results by
+itself. The claim is about *organization*: an entire research area's
+separately-invented tricks turned out to be one trick, viewed correctly.
 
-## Worked Example
+## A Polynomial Approximation, Checked Numerically
 
 **Apply one polynomial to three different "singular values," and check its
 accuracy against the function it's meant to approximate.**
 
 Take the degree-4, even-parity polynomial $P(x)=1-\tfrac{x^2}{2}+\tfrac{x^4}{24}$
-— the first three terms of $\cos x$'s Taylor series, standing in here for
+(the first three terms of $\cos x$'s Taylor series), standing in here for
 the kind of truncated Jacobi-Anger/Chebyshev polynomial that special case
 2 above uses to approximate $e^{-ixt}$ (with $t=1$). Evaluate it, using
 this lesson's own `qsvtDemoPolynomial`, at three representative singular
@@ -425,7 +493,7 @@ per-$\sigma_i$ retuning. QSVT would apply this exact polynomial
 simultaneously to *all three* singular values (and any others $A$ has) in
 a single circuit, because each lives in its own decoupled $\mathcal H_i$.
 Notice also the error column: it grows with $\sigma_i$, which is exactly
-the qualitative tradeoff special case 2 describes — a fixed-degree
+the qualitative tradeoff special case 2 describes. A fixed-degree
 truncation is more accurate near $x=0$ and less accurate as $|x|$ grows, so
 approximating $e^{-iHt}$ well across $H$'s whole spectrum for larger $t$
 requires a higher-degree polynomial (and hence more QSVT
@@ -434,6 +502,8 @@ layers), not a fixed one.
 <ParametricCurve
   frames={qsvtCurveFrames}
   referenceLines={qsvtReferenceLines}
+  xAxisLabel="singular value x"
+  yAxisLabel="P(x)"
   ariaLabel="The polynomial P(x) = 1 - x^2/2 + x^4/24 plotted over x in [-1, 1], with three horizontal reference lines marking P evaluated at the three sample singular values 0.2, 0.6, and 0.9"
 />
 
@@ -450,8 +520,8 @@ directly. Each row below is one invariant subspace $\mathcal H_i$, running
 its own private copy of the identical phase sequence; the polynomial
 values shown match the worked example's table exactly.
 
-<div role="img" aria-label="Three independent two-dimensional subspaces, one per singular value 0.2, 0.6, and 0.9, each showing the same alternating sequence of the block-encoding unitary U and projector-controlled phase rotations acting entirely within that subspace, converging to P evaluated at that subspace's own singular value" className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-<svg viewBox="0 0 640 320" width="640" className="w-full">
+<div role="img" aria-label="Three independent two-dimensional subspaces, one per singular value 0.2, 0.6, and 0.9, each showing the same alternating sequence of the block-encoding unitary U and projector-controlled phase rotations acting entirely within that subspace, converging to P evaluated at that subspace's own singular value" tabIndex={0} className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
+<svg viewBox="0 0 640 320" width="640" height="320">
   <g>
     <rect x="4" y="8" width="628" height="80" rx="10" fill="none" className="stroke-border" strokeWidth="1.5" strokeDasharray="5 4" />
     <text x="16" y="26" className="fill-muted-foreground text-[10px] font-mono">H_1 (invariant subspace for sigma_1 = {qsvtDemoResults[0].sigma})</text>
@@ -518,7 +588,7 @@ values shown match the worked example's table exactly.
     <rect x="458" y="224" width="168" height="34" rx="6" className="fill-accent/10 stroke-accent" strokeWidth="1.5" />
     <text x="542" y="245" textAnchor="middle" className="fill-accent text-[10px] font-mono">P(sigma_3) &#8776; {qsvtDemoResults[2].approx.toFixed(3)}</text>
   </g>
-  <text x="320" y="298" textAnchor="middle" className="fill-foreground text-[11px] font-mono">P(A) = sum_i P(sigma_i) |u_i⟩⟨v_i|  (one polynomial, every subspace, at once)</text>
+  <text x="320" y="298" textAnchor="middle" className="fill-foreground text-[10px] font-mono">P^SV(A) = sum_i P(sigma_i) |u_i⟩⟨v_i| for odd P, |v_i⟩⟨v_i| for even P</text>
 </svg>
 </div>
 
@@ -534,8 +604,8 @@ once.
 
 <Callout type="note">
 **Thinking QSVT makes Hamiltonian simulation or Grover's algorithm
-obsolete.** It doesn't. QSVT *explains* why they work — as two of many
-possible choices of the polynomial $P$ inside one construction — and it
+obsolete.** It doesn't. QSVT *explains* why they work, as two of many
+possible choices of the polynomial $P$ inside one construction, and it
 can *sometimes* (as in Hamiltonian simulation's query complexity) give a
 genuine asymptotic improvement over the specialized method it
 generalizes. But "unifying framework" is not the same claim as "always
@@ -550,18 +620,124 @@ size.
 
 1. For the polynomial $P(x)=1-\tfrac{x^2}{2}+\tfrac{x^4}{24}$ used in this
    lesson's worked example, compute $P(\sigma)$ for $\sigma=0.5$ by hand,
-   and compare it to $\cos(0.5)$.
+   and compare it to $\cos(0.5)$. Then say which branch of the main
+   theorem's parity split this $P$ falls under, and what operator the QSVT
+   circuit therefore block-encodes if the matrix $A$ is *not* Hermitian.
+   Finally, check this $P$ against the completeness condition at $x=1$: is
+   it realizable by a single QSP phase sequence at all?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **The arithmetic.** With $\sigma=0.5$: $\sigma^2=0.25$ and $\sigma^4=0.0625$, so
+
+   $$
+   P(0.5)=1-\frac{0.25}{2}+\frac{0.0625}{24}=1-0.125+0.002604166\overline{6}=0.877604166\overline{6}.
+   $$
+
+   Against $\cos(0.5)=0.877582561890$, the absolute error is $2.160478\times10^{-5}$. Worth one more line: the first omitted Taylor term is $-\sigma^6/720=-2.170139\times10^{-5}$, which accounts for the error to within half a percent of itself. For an alternating series with decreasing terms that is exactly what should happen, and it is a cheap way to predict a truncation error without computing the true value at all. The same check holds across the lesson's three sample points: errors $8.88\times10^{-8}$, $6.44\times10^{-5}$, $7.28\times10^{-4}$ at $\sigma=0.2,0.6,0.9$, against first-omitted terms $8.89\times10^{-8}$, $6.48\times10^{-5}$, $7.38\times10^{-4}$.
+
+   **Which branch of the parity split.** $P$ contains only $x^0$, $x^2$ and $x^4$, so it is **even**, and the theorem's even branch applies: the circuit block-encodes
+
+   $$
+   \sum_iP(\sigma_i)\,|v_i\rangle\langle v_i| ,
+   $$
+
+   built entirely from the *right* singular vectors, not $\sum_iP(\sigma_i)|u_i\rangle\langle v_i|$. For a non-Hermitian $A$ those are genuinely different operators: the even branch is diagonal in the $\{|v_i\rangle\}$ basis and so is normal (and positive semidefinite whenever $P\geq0$), while $\sum_iP(\sigma_i)|u_i\rangle\langle v_i|$ maps one orthonormal basis to a different one and in general is neither. This lesson's worked numbers are unaffected only because every $A$ it uses is Hermitian, where $|u_i\rangle=\pm|v_i\rangle$ and the two branches collapse into the ordinary eigenvalue transform. Quoting the odd-branch formula for an even $P$ on a general $A$ is dropping a hypothesis, not simplifying a notation.
+
+   **The completeness check, which the polynomial fails.** Evaluate the condition $|P(x)|^2+(1-x^2)|Q(x)|^2=1$ at $x=1$. The second term dies whatever $Q$ is, so the condition demands $|P(1)|=1$. But
+
+   $$
+   P(1)=1-\tfrac12+\tfrac1{24}=0.541666\overline{6},
+   $$
+
+   giving $1-P(1)^2=0.706597$, nowhere near zero. So no complementary $Q$ exists and **no single phase sequence realizes this $P$ as the top-left entry of a QSP unitary**. It is realizable only through the workaround the lesson's earlier callout describes: one extra ancilla, a linear combination of two phase sequences, and $P$ recovered as the *real part* of the top-left entry.
+
+   That is the part most worth carrying away, because it is invisible if you only check degree, parity and boundedness. This $P$ passes all three of those (degree $4$, even, $|P(x)|\leq1$ on $[-1,1]$) and is still not directly realizable. Boundedness is not the same condition as completeness; completeness asks for $|P|$ to reach $1$ exactly at the endpoints so that $P$ and $Q$ can be assembled into two honest rows of a unitary, and a merely-bounded polynomial that stays strictly inside $1$ at $x=\pm1$ has no room for a $Q$ at all. The truncated Taylor polynomial here is a stand-in for a Jacobi-Anger or Chebyshev approximant, and real implementations reach for the two-sequence real-part construction for exactly this reason rather than because the target was badly chosen.
+
+   </details>
+
 2. In the decoupled-subspace argument, explain why
    $\langle u_i|\langle0|^{\otimes a}\,U\,|0\rangle^{\otimes a}|v_i\rangle=\sigma_i$
    follows directly from the block-encoding relation $(\langle0|^{\otimes
    a}\otimes I)U(|0\rangle^{\otimes a}\otimes I)=A$ and the definition of
    the singular value decomposition.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The block-encoding relation is an *operator* equation on the $n$-qubit system space. Sandwich both sides between $\langle u_i|$ and $|v_i\rangle$, which are vectors in exactly that space:
+
+   $$
+   \langle u_i|\big(\langle0|^{\otimes a}\otimes I\big)\,U\,\big(|0\rangle^{\otimes a}\otimes I\big)|v_i\rangle=\langle u_i|A|v_i\rangle .
+   $$
+
+   The left-hand side, with the tensor factors written out in order, is exactly $\langle u_i|\langle0|^{\otimes a}\,U\,|0\rangle^{\otimes a}|v_i\rangle$: the ancilla is prepared in $|0\rangle^{\otimes a}$ and projected back onto $\langle0|^{\otimes a}$, while the system register enters in $|v_i\rangle$ and is read out against $\langle u_i|$.
+
+   The right-hand side is where the SVD does its work, in two separate steps that use two different orthonormality facts:
+
+   $$
+   A|v_i\rangle=\sum_j\sigma_j|u_j\rangle\langle v_j|v_i\rangle=\sum_j\sigma_j|u_j\rangle\delta_{ji}=\sigma_i|u_i\rangle ,
+   $$
+
+   using orthonormality of the *right* singular vectors to collapse the sum, and then
+
+   $$
+   \langle u_i|\big(\sigma_i|u_i\rangle\big)=\sigma_i\langle u_i|u_i\rangle=\sigma_i ,
+   $$
+
+   using normalization of the left singular vector to turn the surviving amplitude into a bare number. Both steps are needed; neither is decoration.
+
+   **The wrong turn that matters here is putting $\langle v_i|$ on the left instead of $\langle u_i|$.** It is the natural slip, because bra and ket then look pleasingly symmetric, and it gives $\langle v_i|A|v_i\rangle=\sigma_i\langle v_i|u_i\rangle$, which is not $\sigma_i$ unless the left and right singular vectors happen to coincide. For a general $A$ that overlap can be anything, zero included. Take
+
+   $$
+   A=\begin{pmatrix}0&1\\0&0\end{pmatrix} .
+   $$
+
+   Its singular values are $1$ and $0$, with $|v_1\rangle=|1\rangle$ and $|u_1\rangle=|0\rangle$, so $\langle v_1|A|v_1\rangle=0$ while $\langle u_1|A|v_1\rangle=1$. The same matrix disposes of a neighbouring slip, that $\sigma_i$ is an eigenvalue of $A$: both eigenvalues of this $A$ are $0$ and its largest singular value is $1$. Singular values are eigenvalues of $\sqrt{A^\dagger A}$, and coincide with $|{\lambda_i}|$ only when $A$ is normal.
+
+   That asymmetry is not a side remark. It is the same fact that later forces the main theorem's parity split, where an odd $P$ lands on $|u_i\rangle\langle v_i|$ and an even $P$ on $|v_i\rangle\langle v_i|$. Any step here that quietly identifies $|u_i\rangle$ with $|v_i\rangle$ has silently assumed $A$ is Hermitian.
+
+   One point of precision about what this identity does and does not deliver. On its own it is a single matrix element, and the decoupled-subspace argument needs strictly more: it needs the full operator identity, which says that the *entire* ancilla-zero component of $U|0\rangle^{\otimes a}|v_i\rangle$ is $\sigma_i|0\rangle^{\otimes a}|u_i\rangle$, with nothing else hiding in that subspace. Only then does unitarity force the remaining weight, of norm $\sqrt{1-\sigma_i^2}$, entirely outside the ancilla-zero subspace, which is what manufactures the $W(\sigma_i)$ form. And $\sqrt{1-\sigma_i^2}$ is real only because $\sigma_i\leq1$, that is, only because $\|A\|\leq1$ was assumed when the block encoding was defined. Two hypotheses, the operator-strength relation and the norm bound, and both are load-bearing.
+
+   </details>
+
 3. A classmate argues that since QSVT-based Hamiltonian simulation has
    better asymptotic scaling in $1/\varepsilon$ than first-order
    Trotterization, Trotterization is now obsolete. Using this lesson's
    "Common Mistake" above, explain precisely what's wrong with treating an
    asymptotic query-complexity result as a universal practical
-   recommendation.
+   recommendation. Then make it concrete rather than general: name the
+   three costs the lesson's warning callout says sit *outside* the query
+   bound, and for a Hamiltonian with $\|H\|=1$ block-encoded by an LCU
+   decomposition whose coefficient vector has $\|\alpha\|_1=40$, say what
+   the bound's leading $t\|H\|$ term actually becomes and by what factor
+   the query count grows against a naive reading.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **What the claim gets wrong.** It promotes a statement about one cost, measured in one asymptotic limit, into a recommendation about total running time at a fixed problem size. Three separate leaps are involved, and each fails on its own.
+
+   The first is asymptotic against finite. "Better scaling in $1/\varepsilon$" describes a limit, and says nothing about which method is cheaper at the $\varepsilon$ you actually want. A $\log(1/\varepsilon)$ method with a large constant loses to a $\mathrm{poly}(1/\varepsilon)$ method with a small one until $\varepsilon$ is small enough, and where that crossover sits is a property of exactly the constants the asymptotic statement discards on purpose.
+
+   The second is queries against gates. The QSVT bound counts calls to the block encoding and prices each at one unit. A real circuit pays whatever the block encoding costs in gates, multiplied by every one of those queries. Trotterization carries no such multiplier, because it applies the Hamiltonian's terms directly.
+
+   The third is what QSVT actually establishes, which is organization rather than replacement. It shows that Grover's algorithm, amplitude amplification, Hamiltonian simulation and linear-systems solving are one construction with different choices of $P$. Explaining why a specialized method works is not the same as beating it: the specialized method can still have a smaller circuit, fewer ancillas, and no classical phase-finding problem attached.
+
+   **The three costs sitting outside the query bound**, as the callout lists them: the gate cost of *constructing* the block encoding, which multiplies every query; the *subnormalization factor* an LCU-style encoding introduces, which rescales $H$; and the *classical phase-finding* for $\Phi$, which at the degrees a useful approximation needs is a numerically delicate calculation in its own right.
+
+   **The concrete case.** The bound reads $t\|H\|+\log(1/\varepsilon)/\log\log(1/\varepsilon)$, and the norm appearing in it belongs to the operator the circuit actually block-encodes. LCU block-encodes $H/\|\alpha\|_1$, not $H$, so reaching simulation time $t$ on the physical Hamiltonian means driving the encoded evolution as though the norm were $\|\alpha\|_1$. The leading term is therefore
+
+   $$
+   t\|\alpha\|_1=40\,t\quad\text{rather than}\quad t\|H\|=t ,
+   $$
+
+   a **factor of 40** more queries than a naive substitution of the physical spectral norm $\|H\|=1$ suggests. Two things make that worse than it first looks. It multiplies the *dominant* term, the one that does not shrink as $\varepsilon$ tightens, so demanding more accuracy never makes it relatively smaller. And $40$ is not a worst case: molecular Hamiltonians in a realistic basis routinely carry $\|\alpha\|_1$ in the hundreds or thousands while $\|H\|$ stays modest, which is why shrinking $\|\alpha\|_1$ through a better decomposition is an open research problem rather than a preprocessing step.
+
+   The honest summary is narrower than either the classmate's claim or its opposite. QSVT-based simulation has provably near-optimal *query* complexity, matching the $\Omega(t)$ no-fast-forwarding bound up to a log factor. That is a true and useful statement about one of at least four costs, and it turns into a practical recommendation only once the other three have been priced for the specific Hamiltonian, the specific accuracy, and the specific hardware in front of you.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -574,10 +750,12 @@ size.
 - The key structural fact: the big Hilbert space decomposes into
   independent 2D invariant subspaces $\mathcal H_i$, one per singular
   value $\sigma_i$ of $A$, in each of which $U$ acts exactly as the
-  single-qubit QSP rotation $W(\sigma_i)$ — so one globally-chosen phase
+  single-qubit QSP rotation $W(\sigma_i)$, so one globally-chosen phase
   sequence $\Phi$ realizing polynomial $P$ in ordinary QSP produces a block
-  encoding of $P(A)=\sum_iP(\sigma_i)|u_i\rangle\langle v_i|$ for the whole
-  matrix at once.
+  encoding of the singular value transform for the whole matrix at once:
+  $\sum_iP(\sigma_i)|u_i\rangle\langle v_i|$ when $P$ is odd, and
+  $\sum_iP(\sigma_i)|v_i\rangle\langle v_i|$ when $P$ is even, the two
+  coinciding exactly when $A$ is Hermitian.
 - Three special cases of one construction: a steep polynomial gives
   Grover's algorithm and amplitude amplification (a single query is the
   $d=1$ case; a full Grover iterate, two queries via its two reflections,
@@ -587,10 +765,10 @@ size.
   QSVT-based replacement for HHL.
 - Gilyén, Su, Low & Wiebe's 2018-2019 QSVT construction is now widely
   regarded as the framework that unifies most of the pre-2018 "zoo" of
-  specialized quantum algorithms, a real, significant, and well-cited
+  specialized quantum algorithms, a real and well-cited
   organizing result in quantum algorithms research.
 
-## Further Exploration
+## The Framework's Own Limits
 
 <NextDiscovery>
   [Amplitude Estimation Without Phase Estimation](/lessons/apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation)

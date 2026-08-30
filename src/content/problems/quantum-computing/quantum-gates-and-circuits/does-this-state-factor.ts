@@ -18,9 +18,9 @@ function statesAgree(a: StateVector, b: StateVector): boolean {
   return a.amplitudes.every((amp, i) => amp.equals(b.amplitudes[i], 1e-9));
 }
 
-// Verify none of the three candidate product states match the target —
+// Verify none of the three candidate product states match the target,
 // confirming by direct engine computation (not just hand algebra) that it
-// genuinely doesn't factor as any of the "obvious" candidates.
+// does not factor as any of the "obvious" candidates.
 if (statesAgree(target, plusPlus) || statesAgree(target, plusMinus) || statesAgree(target, minusPlus)) {
   throw new Error("does-this-state-factor: an option unexpectedly matches the target state");
 }
@@ -43,7 +43,7 @@ export const doesThisStateFactor: MultipleChoiceProblem = {
     options: [
       { id: "a", text: "Yes, it equals $|+\\rangle\\otimes|+\\rangle$." },
       { id: "b", text: "Yes, it equals $|+\\rangle\\otimes|-\\rangle$." },
-      { id: "c", text: "No — no choice of $|a\\rangle,|b\\rangle$ satisfies the required coefficient equations." },
+      { id: "c", text: "No; it is entangled, not a product." },
       { id: "d", text: "Yes, it equals $|-\\rangle\\otimes|+\\rangle$." },
     ],
   },
@@ -51,9 +51,9 @@ export const doesThisStateFactor: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "c",
     optionFeedback: {
-      a: "$|+\\rangle\\otimes|+\\rangle=\\frac12(|00\\rangle+|01\\rangle+|10\\rangle+|11\\rangle)$ — every coefficient is $+\\frac12$, but the target has $-\\frac12$ on $|11\\rangle$.",
-      b: "$|+\\rangle\\otimes|-\\rangle=\\frac12(|00\\rangle-|01\\rangle+|10\\rangle-|11\\rangle)$ — the sign on $|01\\rangle$ doesn't match the target.",
-      d: "$|-\\rangle\\otimes|+\\rangle=\\frac12(|00\\rangle+|01\\rangle-|10\\rangle-|11\\rangle)$ — the sign on $|10\\rangle$ doesn't match the target.",
+      a: "$|+\\rangle\\otimes|+\\rangle=\\frac12(|00\\rangle+|01\\rangle+|10\\rangle+|11\\rangle)$, where every coefficient is $+\\frac12$. The target carries $-\\frac12$ on $|11\\rangle$.",
+      b: "$|+\\rangle\\otimes|-\\rangle=\\frac12(|00\\rangle-|01\\rangle+|10\\rangle-|11\\rangle)$, whose sign on $|01\\rangle$ does not match the target.",
+      d: "$|-\\rangle\\otimes|+\\rangle=\\frac12(|00\\rangle+|01\\rangle-|10\\rangle-|11\\rangle)$, whose sign on $|10\\rangle$ does not match the target.",
     },
     defaultIncorrectFeedback:
       "Set up the four coefficient equations $a_0b_0=\\frac12$, $a_0b_1=\\frac12$, $a_1b_0=\\frac12$, $a_1b_1=-\\frac12$ and look for a contradiction, the same method as the lesson's Bell-numerator proof.",
@@ -61,15 +61,15 @@ export const doesThisStateFactor: MultipleChoiceProblem = {
   hints: [
     { text: "Match coefficients: $a_0b_0=\\frac12$, $a_0b_1=\\frac12$, $a_1b_0=\\frac12$, $a_1b_1=-\\frac12$." },
     { text: "From $a_0b_0=a_0b_1$ (both $\\frac12$) and $a_0\\neq0$, conclude $b_0=b_1$." },
-    { text: "But then $a_1b_0$ and $a_1b_1$ would have to be equal too (since $b_0=b_1$) — check whether that's consistent with the required values $\\frac12$ and $-\\frac12$." },
+    { text: "But then $a_1b_0$ and $a_1b_1$ would have to be equal too (since $b_0=b_1$). Check whether that is consistent with the required values $\\frac12$ and $-\\frac12$." },
   ],
   solution: {
     steps: [
       { description: "Match coefficients against $|a\\rangle\\otimes|b\\rangle=a_0b_0|00\\rangle+a_0b_1|01\\rangle+a_1b_0|10\\rangle+a_1b_1|11\\rangle$.", latex: "a_0b_0=\\tfrac12,\\ a_0b_1=\\tfrac12,\\ a_1b_0=\\tfrac12,\\ a_1b_1=-\\tfrac12" },
       { description: "Since $a_0b_0=a_0b_1\\neq0$, $a_0\\neq0$, so $b_0=b_1$." },
-      { description: "But then $a_1b_0=a_1b_1$ would be required — yet the target needs $a_1b_0=\\frac12$ and $a_1b_1=-\\frac12$, which are unequal. Contradiction: no such $a_0,a_1,b_0,b_1$ exist." },
+      { description: "But then $a_1b_0=a_1b_1$ would be required, yet the target needs $a_1b_0=\\frac12$ and $a_1b_1=-\\frac12$, which are unequal. No such $a_0,a_1,b_0,b_1$ exist." },
     ],
-    finalAnswer: "No — this state is entangled; it cannot be factored as any product state.",
+    finalAnswer: "No. This state is entangled; it cannot be factored as any product state.",
   },
   explanation: {
     correctIdea: "A quick check against the 'obvious' candidate product states (built from $|\\pm\\rangle$) is useful, but only a full coefficient-matching argument proves factorization is impossible in general.",

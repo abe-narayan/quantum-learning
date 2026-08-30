@@ -36,7 +36,7 @@ export const piPulseDuration25Mhz: NumericProblem = {
     incorrectFeedback: "Check the factor of 2 in the denominator: using π/Ω instead of π/(2Ω) doubles the answer. Then check units: the formula gives seconds, and the question asks for nanoseconds.",
     nearMisses: [
       { value: 20, tolerance: 0.1, feedback: "20 ns is t = π/Ω, missing the factor of 2 in the denominator." },
-      { value: 40, tolerance: 0.2, feedback: "40 ns is 1/(25 MHz), the drive period. The π-pulse takes a quarter of that at this Ω convention." },
+      { value: 40, tolerance: 0.2, feedback: "40 ns is 1/(25 MHz), the period of the frequency quoted inside Ω rather than a pulse duration. Under this track's convention the π-pulse takes a quarter of it." },
     ],
   },
   hints: [

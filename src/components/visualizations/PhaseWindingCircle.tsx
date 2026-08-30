@@ -91,9 +91,9 @@ export function PhaseWindingCircle({ ariaLabel }: { ariaLabel: string }) {
   const statusText = !isFullLap
     ? null
     : landsAtStart
-      ? "Full lap complete: the marker lands exactly back on the start point. e^{im·2π} = 1 — single-valued, m is allowed."
+      ? "Full lap complete: the marker lands exactly back on the start point. e^{im·2π} = 1: single-valued, m is allowed."
       : landsAtAntipode
-        ? "Full lap complete: the marker lands on the exact opposite point. e^{im·2π} = −1 ≠ 1 — the wavefunction disagrees with itself at a point it never left, so this m is not allowed."
+        ? "Full lap complete: the marker lands on the exact opposite point. e^{im·2π} = −1 ≠ 1: the wavefunction disagrees with itself at a point it never left, so this m is not allowed."
         : "Full lap complete: the marker does not return to the start point.";
 
   return (

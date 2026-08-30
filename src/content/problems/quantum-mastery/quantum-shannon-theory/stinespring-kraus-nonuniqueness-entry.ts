@@ -32,8 +32,8 @@ export const stinespringKrausNonuniquenessEntry: NumericProblem = {
   },
   hints: [
     { text: "K0 = diag(1, sqrt(0.6)) is diagonal, so its (0,1) entry is exactly 0." },
-    { text: "K1's (0,1) entry is sqrt(0.4) (approx 0.6325)." },
-    { text: "K0' = (K0+K1)/sqrt(2), so its (0,1) entry is (0 + sqrt(0.4))/sqrt(2) = sqrt(0.4/2) = sqrt(0.2)." },
+    { text: "K1 is strictly off-diagonal, so read its (0,1) entry straight off the matrix given in the prompt." },
+    { text: "Matrix addition is entry by entry, so only the (0,1) slots of the two matrices matter here, and one of them contributes nothing. Divide what is left by sqrt(2)." },
   ],
   solution: {
     steps: [
@@ -45,7 +45,7 @@ export const stinespringKrausNonuniquenessEntry: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "Rotating the environment's readout basis by a unitary W mixes the original Kraus operators linearly, K_i' = sum_j W_ij K_j -- a genuinely different-looking matrix that nonetheless describes the identical physical channel, since it comes from the same joint unitary U and the same fixed environment state, just read out in a different basis.",
+      "Rotating the environment's readout basis by a unitary W mixes the original Kraus operators linearly, K_i' = sum_j W_ij K_j. The result is a different-looking matrix that describes the identical physical channel, since it comes from the same joint unitary U and the same fixed environment state, read out in a different basis.",
     whyCorrect:
       "This is a direct entry-by-entry computation of K0' = (K0+K1)/sqrt(2) from the lesson's stated non-uniqueness relation K_i' = sum_j W_ij K_j with W the given Hadamard-like matrix.",
     whyWrong: [

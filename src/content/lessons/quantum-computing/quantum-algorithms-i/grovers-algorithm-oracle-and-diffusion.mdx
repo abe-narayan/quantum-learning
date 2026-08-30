@@ -49,11 +49,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="A million items and no structure at all">
 Suppose someone hands you a list of one million unsorted items and asks you to find the one that satisfies some hard-to-guess condition, checkable only by testing items one at a time. Classically, there's no way around it: up to a million checks in the worst case.
 </LessonHook>
 
-## Motivation
+## How many guesses should you expect to need?
 
 Handed a million unsorted items and one condition to test, how many
 guesses should you expect
@@ -68,8 +68,8 @@ needs $O(N)$ queries on average, with no way around it.
   options={[
     { label: "Linearly in N, same as classical, just a smaller constant", value: "linear" },
     { label: "Quadratically in N, which is worse than classical", value: "quadratic" },
-    { label: "As √N, a quadratic speedup over classical", value: "sqrt" },
     { label: "As log N, exponentially fewer queries", value: "log" },
+    { label: "As √N, a quadratic speedup over classical", value: "sqrt" },
   ]}
   correctValue="sqrt"
   explanation="Grover needs O(√N) queries rather than O(N). For a million items that is roughly a thousand queries instead of up to a million: a real and useful speedup, and also a much smaller one than the exponential separations quantum computing is usually advertised on. Square-root speedups are what unstructured problems get, and this one is provably optimal, so the modest size of it is not a defect of the algorithm."
@@ -83,7 +83,7 @@ waiting on someone cleverer.
 This lesson builds the two operators the algorithm alternates between. The
 next one composes them and counts the iterations.
 
-## Mathematical Development
+## The oracle, the diffusion operator, and a real bug
 
 ### The oracle
 
@@ -162,11 +162,11 @@ full Grover iterations) passed anyway, since a global phase never affects
 Born-rule probabilities. The bug was caught only by testing the reflection
 *in isolation*: $D|s\rangle$ must equal $|s\rangle$ **exactly** (not
 $-|s\rangle$), and the buggy version failed that specific check. This is
-why `grover.test.ts` tests `groverDiffusion(|s\rangle)=|s\rangle$`
+why `grover.test.ts` tests `groverDiffusion` against $D|s\rangle=|s\rangle$
 directly rather than only Grover's end-to-end success rate. Some bugs are
 invisible to outcome-only tests, and a global phase is the classic one.
 
-## Physical Interpretation
+## Two reflections compose into a rotation
 
 Geometrically, both the oracle and the diffusion operator are reflections:
 the oracle reflects about the "unmarked" subspace, diffusion reflects
@@ -178,7 +178,7 @@ Grover's $O(\sqrt N)$ query count directly.
   <LazyGroverExplorer />
 </InteractiveSection>
 
-## Worked Example
+## Checking the reflection on one basis state
 
 **Verify $2|0\rangle\langle0|-I$ acting on $|1\rangle$ (a 1-qubit basis
 state, $k\neq0$) gives $-|1\rangle$.**
@@ -188,7 +188,7 @@ $2|0\rangle\langle0|1\rangle-|1\rangle=2|0\rangle(0)-|1\rangle=-|1\rangle$.
 Matches the general rule: every state except $|0\rangle$ itself picks up a
 sign flip.
 
-## Common Mistakes
+## The sign convention that hides a bug
 
 <Callout type="warning">
 **Building the reflection by flipping $|0\rangle$'s sign instead of
@@ -202,25 +202,180 @@ structurally wrong global phase.
 **Testing only end-to-end success probability.** A global-phase bug can
 hide indefinitely behind measurement statistics that only ever depend on
 $|{\rm amplitude}|^2$. Testing an intermediate operator's exact action on
-a known input (as `groverDiffusion(|s\rangle)=|s\rangle` does) catches
-what an outcome-only test cannot.
+a known input (as the `groverDiffusion` check $D|s\rangle=|s\rangle$ does)
+catches what an outcome-only test cannot.
 </Callout>
 
 ## Practice Questions
 
 1. Show that $2|0\rangle\langle0|-I$ acting on $|0\rangle$ (for any number
    of qubits) leaves it exactly unchanged.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \big(2|0\rangle\langle0|-I\big)|0\rangle = 2|0\rangle\langle0|0\rangle - |0\rangle = 2|0\rangle(1) - |0\rangle = |0\rangle
+   $$
+
+   using $\langle0|0\rangle=1$. The engine confirms it on three qubits:
+   the operator returns $|000\rangle$ with amplitude $1$, while any other
+   basis state, say $|101\rangle$, comes back as $-|101\rangle$, since
+   $\langle 0|101\rangle = 0$ kills the first term.
+
+   The two cases together are the definition of a reflection. In the
+   language of projectors, $2P-I$ with $P=|0\rangle\langle0|$ acts as $+1$
+   on the subspace $P$ projects onto and $-1$ on everything orthogonal to
+   it, which is exactly what a mirror does: fixed points on the mirror,
+   sign flip along the perpendicular. Nothing here is special to
+   $|0\rangle^{\otimes n}$ or to any particular qubit count; the same two
+   lines work for $2|v\rangle\langle v|-I$ for any unit vector $|v\rangle$,
+   which is how the lesson gets $D = 2|s\rangle\langle s| - I$.
+
+   The wrong turn is expecting the $2$ to double something. It does not:
+   the factor of $2$ is exactly what is needed to turn "project onto
+   $|0\rangle$" into "keep $|0\rangle$ and flip the rest", and any other
+   coefficient gives an operator that is not even unitary. Check it: with a
+   coefficient $\lambda$, the operator has eigenvalues $\lambda-1$ and
+   $-1$, and unitarity needs $|\lambda-1|=1$, so $\lambda=2$ is the only
+   real choice other than the trivial $\lambda=0$.
+
+   </details>
+
 2. Using $D=H^{\otimes n}(2|0\rangle\langle0|-I)H^{\otimes n}$, explain why
    $D$ applied twice returns the original state (i.e. $D$ is its own
    inverse).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Square it and let the inner Hadamards cancel:
+
+   $$
+   D^2 = H^{\otimes n}R\,H^{\otimes n}H^{\otimes n}R\,H^{\otimes n} = H^{\otimes n}R\,I\,R\,H^{\otimes n} = H^{\otimes n}R^2H^{\otimes n}
+   $$
+
+   writing $R = 2|0\rangle\langle0|-I$ and using $H^{\otimes n}H^{\otimes n}=I$.
+   And $R^2 = I$ from question 1: $R$ fixes $|0\rangle$ and negates every
+   other basis state, so applying it twice fixes everything. That leaves
+   $D^2 = H^{\otimes n}H^{\otimes n} = I$.
+
+   The engine agrees. `groverDiffusion` applied to $|101\rangle$ gives
+   amplitude $-0.75$ on $|101\rangle$ and $+0.25$ on the other seven, and
+   applying it again returns $|101\rangle$ with amplitude $1$ and nothing
+   elsewhere.
+
+   The geometric reading is shorter and worth having. $D$ is a reflection
+   about $|s\rangle$, and every reflection is its own inverse: reflect
+   twice in the same mirror and you are back where you started. The
+   sandwich form is just that same reflection written in the basis where
+   the mirror is $|0\rangle^{\otimes n}$ rather than $|s\rangle$, and
+   conjugation by a unitary cannot change whether an operator squares to
+   the identity.
+
+   The wrong turn is inferring that Grover's whole iteration is its own
+   inverse, since both of its pieces are. It is not. The oracle and $D$ are
+   each involutions, but their *product* is a rotation by $2\theta$, and
+   applying it twice rotates by $4\theta$ rather than returning anywhere.
+   That the composition of two reflections is a rotation, not a reflection,
+   is precisely what makes the algorithm work, and it is the next lesson's
+   subject.
+
+   </details>
+
 3. Confirm algebraically that $-(2|0\rangle\langle0|-I)$ and
    $2|0\rangle\langle0|-I$ give identical measurement probabilities for
    any input state, using $|{-z}|^2=|z|^2$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Let $R = 2|0\rangle\langle0|-I$ and take any state
+   $|\psi\rangle$ with $R|\psi\rangle = \sum_k z_k|k\rangle$. Then
+   $-R|\psi\rangle = \sum_k(-z_k)|k\rangle$, and the probability of
+   outcome $k$ is
+
+   $$
+   |-z_k|^2 = (-1)^2|z_k|^2 = |z_k|^2
+   $$
+
+   the same number, for every $k$ and every input. More generally
+   $|{-z}|^2 = \overline{(-z)}(-z) = \bar z z = |z|^2$ for complex $z$, so
+   the argument does not depend on the amplitudes being real.
+
+   The two operators differ by an overall factor of $-1$, which is a global
+   phase, and global phase is invisible to the Born rule by construction.
+   That makes them the same physical operation, and either one can be
+   called "the reflection" without changing any prediction of the
+   algorithm.
+
+   This is the fact behind the bug the lesson describes, and it is worth
+   being precise about why the bug was hard to catch. An implementation
+   that flips $|0\rangle$'s sign and leaves the rest alone computes $-R$
+   instead of $R$. Every probability-based test passes, because
+   probabilities cannot see the difference. What such a bug does break is
+   any *later* use of the operator inside a controlled operation or on one
+   branch of a superposition, where the overall sign becomes a relative
+   sign between branches and is fully measurable. The test suite was
+   testing the right numbers and the wrong level.
+
+   The wrong turn is concluding that sign errors are harmless in general.
+   A sign is harmless exactly when it multiplies the entire state, and
+   catastrophic when it multiplies part of it. Grover's own oracle is the
+   example: it flips one amplitude out of $N$, every probability is
+   unchanged at that instant, and the whole algorithm depends on the
+   flip.
+
+   </details>
+
 4. Why is "the marked-item oracle reflects about the unmarked subspace" an
    accurate description, given that it only ever flips the sign of the
    *marked* item (not every unmarked one)? (Hint: a reflection about a
    subspace and a sign flip on its orthogonal complement have the same
    overall effect up to global phase; connect this to question 3.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a reflection about a subspace *is* a sign flip on the orthogonal
+   complement. Writing $P$ for the projector onto the unmarked subspace,
+   the reflection about it is
+
+   $$
+   2P - I = 2(I - P_{\text{marked}}) - I = I - 2P_{\text{marked}},
+   $$
+
+   which fixes every unmarked basis state ($|k\rangle \mapsto |k\rangle$)
+   and negates the marked one ($|m\rangle \mapsto -|m\rangle$). That is the
+   oracle, exactly, with no global phase to reconcile. Flipping the sign of
+   the one marked item and reflecting about the $N-1$-dimensional unmarked
+   subspace are the same operator written two ways.
+
+   The intuition that has to be dropped is that a reflection must move most
+   of the vectors it acts on. A mirror leaves everything *in* the mirror
+   alone, and the mirror here is $N-1$ dimensional, so almost everything is
+   left alone. Only the single direction perpendicular to it is flipped.
+
+   Question 3 supplies the other half of the picture. The oracle is also
+   often described as "reflecting about the marked item", and that
+   description corresponds to $2P_{\text{marked}} - I$, which is
+   $-(I - 2P_{\text{marked}})$: the same operator times $-1$. So the two
+   descriptions differ by a global phase and are physically identical, and
+   the choice between them is a convention rather than a fact. The lesson
+   uses the unmarked version because it is the one that matches the
+   amplitude picture, where the marked amplitude is the one that goes
+   negative.
+
+   The wrong turn is thinking the two reflections are different operations
+   that happen to agree on probabilities. In the two-dimensional
+   $\{|\alpha\rangle, |\beta\rangle\}$ picture the next lesson uses, they
+   are the reflection about the $|\alpha\rangle$ axis and the reflection
+   about the $|\beta\rangle$ axis, which in the plane really are the same
+   map up to sign. Composed with the diffusion operator, both give a
+   rotation by the same $2\theta$, which is why the algorithm's iteration
+   count does not depend on which convention you picked.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -236,7 +391,7 @@ what an outcome-only test cannot.
   a global-phase error invisible to success-probability tests, caught only
   by testing $D|s\rangle=|s\rangle$ directly.
 
-## Further Exploration
+## Composing the two into a rotation
 
 <NextDiscovery>
 [Grover's Algorithm: Amplitude Amplification](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification)

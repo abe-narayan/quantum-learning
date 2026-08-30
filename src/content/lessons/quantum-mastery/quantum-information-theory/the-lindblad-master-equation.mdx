@@ -32,7 +32,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence",
-      note: "That lesson stated T2<=2T1 as a physical fact; this lesson derives it from the Lindblad generator's linearity in its jump operators.",
+      note: "That lesson states T2<=2T1 with its Markovian proviso attached but no derivation; this lesson supplies the derivation, from the Lindblad generator's linearity in its jump operators, and shows exactly where that proviso is spent.",
     },
   ],
 };
@@ -103,11 +103,11 @@ export const t2Frames = [
 
 <LessonHook eyebrow="Two pictures, one dynamics">
   The Lindblad master equation and this platform's discrete Kraus
-  channels aren't just analogous descriptions of decoherence — they're
+  channels aren't just analogous descriptions of decoherence. They are
   the same dynamics, sampled at different resolutions.
 </LessonHook>
 
-## Motivation
+## From Discrete Kraus Steps to a Generator
 
 Open Quantum Systems & Kraus Operators built the discrete Kraus picture
 of decoherence and explicitly declined to build the continuous-time
@@ -130,13 +130,13 @@ generator's general form independently and in the same year.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Planar_Ion_Trap%3B_Magnesium_Ions_%285884514798%29.jpg"
   alt="False-color fluorescence images of magnesium ions confined in NIST's planar ion trap, showing 1, 2, 3, 6, and 12 trapped ions"
-  caption="Real trapped-ion qubits like these are one of the physical platforms whose T1 (energy relaxation) and T2 (dephasing) times are measured directly against the Lindblad equation's predictions. This lesson's amplitude-damping and dephasing generators are not abstractions; they describe this kind of hardware."
+  caption="Real trapped-ion qubits like these are one of the physical platforms whose T1 (energy relaxation) and T2 (total coherence) times are measured directly against the Lindblad equation's predictions. T2 is not one of the two mechanisms; it is what both leave behind, 1/T2 = 1/(2·T1) + 1/T_phi, and the pure-dephasing time T_phi (written T_2,pure below) is what the second dissipator actually carries. This lesson's amplitude-damping and dephasing generators are not abstractions; they describe this kind of hardware."
   credit="Signe Seidelin and John Chiaverini / NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Planar_Ion_Trap;_Magnesium_Ions_(5884514798).jpg"
-  license="Public domain (U.S. government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Mathematical Development
+## The Most General Markovian CP Generator
 
 ### What a Markovian CP generator must look like
 
@@ -152,6 +152,18 @@ lesson's scope) states that *any* generator of a completely positive,
 trace-preserving Markovian semigroup necessarily has the form
 
 <TheoremBox title="GKLS (Lindblad) equation" provenance="cited">
+
+**Hypotheses.** $\mathcal H$ is finite-dimensional, and
+$\{\Lambda_t\}_{t\geq0}$ is a CPTP semigroup that is *uniformly*
+continuous, meaning $\|\Lambda_t-\mathbb1\|\to0$ in operator norm as
+$t\to0$. That is what makes the generator $\mathcal L$ a bounded operator
+with a power series, and in finite dimensions it comes free with
+continuity. In infinite dimensions it does not, and the difference is
+real: a damped harmonic oscillator's semigroup on $L^2(\mathbb R)$ is
+only *strongly* continuous, its generator is unbounded, and the boxed
+form then holds only formally, on a dense domain, with the sum over $k$
+requiring its own convergence argument. Every qubit in this lesson is
+safely finite-dimensional.
 
 $$
 \boxed{\dot\rho = \mathcal L(\rho) = -i[H,\rho] + \sum_k\left(L_k\rho L_k^\dagger - \frac12\{L_k^\dagger L_k,\rho\}\right)}
@@ -191,12 +203,12 @@ dynamics at every infinitesimal step.
 <PredictBeforeReveal
   question="Under pure amplitude damping (population decaying from |1⟩ to |0⟩ at rate Gamma), how fast do you expect the off-diagonal coherence rho01 to decay, relative to the population?"
   options={[
-    { label: "The same rate, Gamma — it's all one decay process", value: "same" },
-    { label: "Twice as fast, rate 2*Gamma — losing population should scramble phase even harder", value: "double" },
+    { label: "The same rate, Gamma, since it is all one decay process", value: "same" },
+    { label: "Twice as fast, rate 2*Gamma, since losing population should scramble phase even harder", value: "double" },
     { label: "Half as fast, rate Gamma/2", value: "half" },
   ]}
   correctValue="half"
-  explanation="The coherence decays at exactly half the population's rate, derived below directly from the Lindblad equation's own algebra, not assumed. That factor of two is why pure amplitude damping alone gives T2 = 2*T1 rather than T2 = T1. It is the best-case coherence time a purely population-decaying qubit can have, before any additional pure dephasing shortens it further."
+  explanation="The coherence decays at exactly half the population's rate, derived below from the Lindblad equation's own algebra. That factor of two is why pure amplitude damping alone gives T2 = 2*T1 rather than T2 = T1. It is the best-case coherence time a purely population-decaying qubit can have, before any additional pure dephasing shortens it further."
 />
 
 Take $H=0$ and a single jump operator $L=\sqrt\Gamma\,\sigma_-$, where
@@ -219,8 +231,8 @@ $$
 
 The population decays exactly as T1 & T2 Decoherence defined it. The
 *coherence* decays at exactly **half** that rate in the exponent; this
-single fact, derived here for the first time on this platform rather
-than asserted, is about to reproduce the $T_2\leq2T_1$ bound exactly.
+single fact, derived here for the first time on this platform, is about
+to reproduce the $T_2\leq2T_1$ bound exactly.
 
 ### The discrete channel is this solution, evaluated at $t=dt$: exactly, not approximately
 
@@ -246,11 +258,12 @@ chosen, matching this platform's engine to full numerical precision:
 
 <ParametricCurve
   frames={t1Frames}
+  xAxisLabel="time t"
+  yAxisLabel="P(1)"
   ariaLabel="Continuous exponential decay e^(-t/T1) of P(1) plotted against the discrete Kraus channel stepped forward with gamma(dt), for T1=2, showing the two curves coincide exactly"
 />
 
-The same exact match holds for the *coherence*, not just the
-population: starting from $\rho=|+\rangle\langle+|$ (so
+The *coherence* matches just as exactly: starting from $\rho=|+\rangle\langle+|$ (so
 $\rho_{01}(0)=1/2$) and stepping `amplitudeDampingChannel(gamma(dt))`
 forward with `applyChannelRepeatedly` reproduces
 $|\rho_{01}(t)|=\rho_{01}(0)\,e^{-t/(2T_1)}$ exactly at every sampled
@@ -260,6 +273,8 @@ $\rho_{11}$:
 
 <ParametricCurve
   frames={t2Frames}
+  xAxisLabel="time t"
+  yAxisLabel="|ρ₀₁|"
   ariaLabel="Continuous exponential decay of the coherence magnitude |rho01(t)| = |rho01(0)| e^(-t/2T1), plotted against the discrete Kraus channel stepped forward with gamma(dt) starting from the plus state, for T1=2, showing the two curves coincide exactly"
 />
 
@@ -277,6 +292,14 @@ $\dot\rho_{01}$:
 
 <TheoremBox title="The T2 ≤ 2T1 bound" provenance="derived">
 
+**Hypotheses.** A single qubit with $H=0$ and exactly two jump
+operators, $L=\sqrt\Gamma\,\sigma_-$ and $L'=\sqrt\kappa\,\sigma_z$ with
+$\Gamma,\kappa\geq0$. The bound survives adding further jump operators,
+since any additional $L''$ can only contribute a non-negative extra rate
+to $\dot\rho_{01}$, but it does assume the dynamics is Markovian: a
+non-Markovian bath can transiently return coherence and violate this as
+an instantaneous statement.
+
 $$
 \dot\rho_{01} = -\Big(\tfrac{\Gamma}{2}+2\kappa\Big)\rho_{01} \qquad\Longrightarrow\qquad \frac1{T_2} = \frac1{2T_1} + \frac1{T_{2,\text{pure}}}
 $$
@@ -287,12 +310,25 @@ $\boxed{T_2\leq2T_1}$.
 </TheoremBox>
 
 This bound is **derived** from the Lindblad generator's
-structure, not merely stated as an empirical fact the way T1 & T2
-Decoherence introduced it. Equality holds exactly when
+structure, which is what turns the Markovian proviso T1 & T2
+Decoherence could only assert into a hypothesis you can watch being
+spent. Equality holds exactly when
 $T_{2,\text{pure}}\to\infty$ (no pure dephasing at all, a "T1-limited"
 device in that lesson's language).
 
-## Physical Interpretation
+The rate equation also fixes what a datasheet number may be fed into
+which generator, and this is the one place the distinction bites in
+practice. $T_2$ is the *total* coherence time, not the pure-dephasing
+mechanism: it is $1/T_2=1/(2T_1)+1/T_{2,\text{pure}}$ already summed.
+So the dephasing jump operator's constant is $T_{2,\text{pure}}$, and
+handing it a measured $T_2$ while an amplitude-damping generator with
+that device's $T_1$ is also running counts the relaxation contribution
+twice and predicts coherence decaying faster than the device does. The
+same caution applies to this platform's `dephasingChannel`, whose
+strength parameter reproduces a measured $T_2$ envelope only when it acts
+alone.
+
+## Decoherence as Continuous Drift
 
 The Lindblad equation says decoherence is a *continuous drift*, not a
 sequence of discrete jolts: the discrete Kraus channel was always a
@@ -305,7 +341,7 @@ combine: any two Lindblad jump operators contribute additively to every
 coherence's decay rate, so adding a *new* noise source can only shrink
 $T_2$ further, never lengthen it.
 
-## Worked Example
+## The Discrete Channel Recovered Exactly
 
 **Verify $P_1(T_1)=e^{-1}$ using $N=2000$ discrete steps of size
 $dt=T_1/N$, confirming the exact match holds even far from the
@@ -318,13 +354,13 @@ $\gamma(dt)=1-e^{-dt/T_1}\approx0.00049988$. Stepping
 $\rho_{11}(N\,dt)\approx0.367879441$, matching $e^{-1}\approx0.367879441$
 to 9 decimal places; this platform's own existing test suite already
 confirms this (T1 & T2 Decoherence cites it for $N=10,100,1000$;
-here it's shown to hold for the coherence too, not only the population).
+here it's shown to hold for the coherence as well).
 Starting instead from $\rho=|+\rangle\langle+|$ and taking just **one**
 step of size $dt=0.001$: the off-diagonal entry shrinks from $0.5$ to
 $0.5\,e^{-dt/(2T_1)}\approx0.499875$, matching
 `applyChannelRepeatedly`'s single-step output exactly.
 
-## Common Mistakes
+## Where the Factor of Two Comes From
 
 <Callout type="warning">
 **Thinking coherence decays at the same rate as population under pure
@@ -349,18 +385,231 @@ argument, not what's being used for this specific numerical check.
 1. Derive $\dot\rho_{00}$ from the amplitude-damping Lindblad equation
    above, and confirm $\rho_{00}(t)+\rho_{11}(t)=1$ is preserved for all
    $t$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\dot\rho_{00}=+\Gamma\rho_{11}$, the exact mirror of
+   $\dot\rho_{11}=-\Gamma\rho_{11}$, so the two rates cancel and the trace
+   never moves.
+
+   Take the $(0,0)$ entry of each term separately, with
+   $\sigma_-=|0\rangle\langle1|$ and $\sigma_-^\dagger\sigma_-=|1\rangle\langle1|$.
+
+   The jump term contributes everything:
+   $\sigma_-\rho\sigma_-^\dagger=|0\rangle\langle1|\rho|1\rangle\langle0|=\rho_{11}|0\rangle\langle0|$,
+   whose $(0,0)$ entry is $\rho_{11}$.
+
+   The anticommutator term contributes nothing:
+   $\{|1\rangle\langle1|,\rho\}$ has $(0,0)$ entry
+   $\langle0|1\rangle\langle1|\rho|0\rangle+\langle0|\rho|1\rangle\langle1|0\rangle=0$,
+   since $\langle0|1\rangle=0$ both times.
+
+   So $\dot\rho_{00}=\Gamma\rho_{11}$, matching the matrix printed above.
+   Integrating with $\rho_{11}(t)=\rho_{11}(0)e^{-\Gamma t}$,
+
+   $$
+   \rho_{00}(t)=\rho_{00}(0)+\rho_{11}(0)\left(1-e^{-\Gamma t}\right),
+   $$
+
+   and adding the two,
+
+   $$
+   \rho_{00}(t)+\rho_{11}(t)=\rho_{00}(0)+\rho_{11}(0)-\rho_{11}(0)e^{-\Gamma t}+\rho_{11}(0)e^{-\Gamma t}=1.
+   $$
+
+   Every bit of population that leaves $|1\rangle$ arrives in $|0\rangle$,
+   which is what a decay process should do and what the $\sigma_-$ jump
+   operator was chosen to say.
+
+   The more useful observation is that this is not a special property of
+   amplitude damping. Trace preservation is built into the shape of the
+   GKLS generator for *any* $H$ and any $\{L_k\}$:
+
+   $$
+   \mathrm{Tr}\,\mathcal L(\rho)=\underbrace{-i\,\mathrm{Tr}[H,\rho]}_{=\,0}
+   +\sum_k\Big(\underbrace{\mathrm{Tr}(L_k\rho L_k^\dagger)}_{=\,\mathrm{Tr}(L_k^\dagger L_k\rho)}
+   -\tfrac12\underbrace{\mathrm{Tr}\{L_k^\dagger L_k,\rho\}}_{=\,2\,\mathrm{Tr}(L_k^\dagger L_k\rho)}\Big)=0,
+   $$
+
+   using cyclicity of the trace on the jump term and
+   $\mathrm{Tr}\{A,\rho\}=2\,\mathrm{Tr}(A\rho)$ on the anticommutator. The
+   factor of $\tfrac12$ in the boxed equation is there for exactly this
+   reason: it is the unique coefficient that makes the anticommutator's
+   trace cancel the jump term's. Change it and the equation stops
+   describing probability. That is worth knowing when reading the boxed
+   form, because the $\tfrac12$ otherwise looks like a convention.
+
+   </details>
+
 2. Using the dephasing-only Lindblad equation ($\Gamma=0$,
    $\kappa=1/(2T_{2,\text{pure}})$), verify that populations $\rho_{00},\rho_{11}$
    are exactly constant in time, consistent with "pure" dephasing
    meaning no energy exchange.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $H=0$, $\Gamma=0$ and the single jump operator
+   $L'=\sqrt\kappa\,\sigma_z$, note first that $\sigma_z^\dagger\sigma_z=I$,
+   so the anticommutator term collapses to
+   $-\tfrac12\kappa\{I,\rho\}=-\kappa\rho$. The generator is therefore
+
+   $$
+   \dot\rho=\kappa\left(\sigma_z\rho\,\sigma_z-\rho\right).
+   $$
+
+   Now compute $\sigma_z\rho\sigma_z$ entry by entry. Conjugating by
+   $\sigma_z=\mathrm{diag}(1,-1)$ multiplies the $(i,j)$ entry by
+   $(-1)^i(-1)^j$, so the diagonal is untouched and the off-diagonals flip
+   sign:
+
+   $$
+   \sigma_z\rho\,\sigma_z=\begin{pmatrix}\rho_{00}&-\rho_{01}\\-\rho_{10}&\rho_{11}\end{pmatrix},
+   \qquad
+   \dot\rho=\kappa\begin{pmatrix}0&-2\rho_{01}\\-2\rho_{10}&0\end{pmatrix}.
+   $$
+
+   So $\dot\rho_{00}=\dot\rho_{11}=0$ exactly, at every instant and for
+   every initial state, while $\dot\rho_{01}=-2\kappa\rho_{01}$ gives
+   $\rho_{01}(t)=\rho_{01}(0)e^{-2\kappa t}=\rho_{01}(0)e^{-t/T_{2,\rm pure}}$
+   with $\kappa=1/(2T_{2,\rm pure})$, which is the rate the lesson quotes.
+
+   "Exactly constant" is worth pausing on: this is not a decay so slow it
+   is negligible, it is a derivative that is identically zero. The
+   structural reason is that $\sigma_z$ is diagonal in the population
+   basis, so $\sigma_z|i\rangle\langle i|\sigma_z=|i\rangle\langle i|$ and
+   the jump leaves every population eigenstate exactly where it was. The
+   channel is a random unitary, applying $Z$ with some probability and $I$
+   otherwise, and $Z$ does nothing observable to a population.
+
+   That is the precise sense in which the dephasing is "pure". If the
+   qubit's own Hamiltonian is $H_0\propto\sigma_z$, then $[L',H_0]=0$, so
+   $\langle H_0\rangle$ is a constant of the motion and the process
+   exchanges no energy with the bath at all. It only randomizes the
+   relative phase. Contrast amplitude damping, where $\sigma_-$ maps
+   $|1\rangle$ to $|0\rangle$ and $\langle H_0\rangle$ falls: that process
+   necessarily dumps energy somewhere.
+
+   One caution about the basis. Populations are constant *in the
+   $\sigma_z$ eigenbasis*, the one $L'$ was written in. Start from
+   $|{+}\rangle$ and the populations in the $\sigma_x$ basis decay all the
+   way to $(\tfrac12,\tfrac12)$; that is the same coherence decay, read in
+   rotated coordinates. "Dephasing does not change populations" is a
+   statement about a preferred basis, and the preferred basis is whichever
+   one the jump operator is diagonal in.
+
+   </details>
+
 3. A device has $T_1=50\mu s$ and a measured $T_2=40\mu s$. Using
    $1/T_2=1/(2T_1)+1/T_{2,\text{pure}}$, solve for $T_{2,\text{pure}}$,
    the time constant of whatever additional dephasing process is present
    beyond amplitude damping alone.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $T_{2,\rm pure}=200/3\approx66.7\,\mu s$.
+
+   Work in rates, which is the only way these combine cleanly:
+
+   $$
+   \frac{1}{T_{2,\rm pure}}=\frac{1}{T_2}-\frac{1}{2T_1}=\frac{1}{40}-\frac{1}{100}=0.025-0.010=0.015\ \mu s^{-1},
+   $$
+
+   $$
+   T_{2,\rm pure}=\frac{1}{0.015}=66.67\ \mu s.
+   $$
+
+   Two consistency checks before trusting it. The answer must be positive,
+   and it is, which is the same statement as $T_2\leq2T_1$: here
+   $40\leq100$, comfortably. And $T_{2,\rm pure}$ must exceed $T_2$, since
+   it describes only one of the two contributions to a total rate; $66.7>40$,
+   as required.
+
+   The engineering content is in the rate split, not the time. Of the total
+   coherence decay rate $0.025\ \mu s^{-1}$, amplitude damping supplies
+   $0.010$ and pure dephasing supplies $0.015$: sixty percent of this
+   device's decoherence has nothing to do with energy relaxation. So
+   lengthening $T_1$ is the wrong thing to work on. Even an infinite $T_1$
+   would only lift $T_2$ from $40$ to $66.7\,\mu s$, whereas eliminating
+   the dephasing source entirely would take it to $2T_1=100\,\mu s$.
+   Rate additivity is what makes that comparison possible at a glance and
+   is the practical reason the Lindblad picture is worth having on a
+   hardware team.
+
+   The wrong turn to avoid is averaging or subtracting the *times*:
+   $2T_1-T_2=60\,\mu s$ is not $T_{2,\rm pure}$ and has no meaning. Decay
+   rates add because independent exponential processes multiply their
+   survival probabilities; time constants do not.
+
+   </details>
+
 4. Explain why the first-order Kraus construction
    ($K_0\approx I+(\cdots)dt$, $K_k\approx\sqrt{dt}L_k$) needed $H$ to be
    Hermitian specifically to make $K_0^\dagger K_0+\sum K_k^\dagger K_k=I+O(dt^2)$
    work out: what would go wrong with a non-Hermitian $H$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the $\pm iH$ terms in $K_0^\dagger K_0$ cancel only if
+   $H^\dagger=H$. Otherwise a term survives at first order in $dt$, and it
+   is a term that changes the trace, meaning probability leaks away or is
+   manufactured at a rate proportional to how non-Hermitian $H$ is.
+
+   Do the expansion without assuming Hermiticity. With
+   $K_0=I+\big(-iH-\tfrac12\sum_kL_k^\dagger L_k\big)dt$,
+
+   $$
+   K_0^\dagger K_0=I+\Big(iH^\dagger-iH-\sum_kL_k^\dagger L_k\Big)dt+O(dt^2),
+   $$
+
+   and $\sum_{k\geq1}K_k^\dagger K_k=dt\sum_kL_k^\dagger L_k$ exactly. The
+   $L$ terms cancel between the two by construction, leaving
+
+   $$
+   K_0^\dagger K_0+\sum_{k\geq1}K_k^\dagger K_k=I+i\big(H^\dagger-H\big)\,dt+O(dt^2).
+   $$
+
+   Hermiticity is precisely the condition that kills the surviving term.
+
+   Quantify the damage when it fails. Write $H=H_R+iH_I$ with $H_R,H_I$
+   Hermitian; then $i(H^\dagger-H)=2H_I$, so
+
+   $$
+   \mathrm{Tr}\,\rho(t+dt)=\mathrm{Tr}\Big[\rho\Big(I+2H_I\,dt\Big)\Big]+O(dt^2)=1+2\,dt\,\langle H_I\rangle_\rho+O(dt^2).
+   $$
+
+   Total probability drifts at rate $2\langle H_I\rangle$, which is
+   state-dependent, so it is not even a uniform rescaling one could
+   normalize away. A second failure arrives at the same time: for
+   non-Hermitian $H$, $(-i[H,\rho])^\dagger=-i[H^\dagger,\rho]\neq-i[H,\rho]$,
+   so $\dot\rho$ stops being Hermitian and $\rho$ leaves the space of
+   density matrices in a second, independent way.
+
+   The instructive part is that non-Hermiticity is not forbidden here; it
+   is already present, in a precisely metered amount. $K_0$ itself is the
+   short-time propagator of the **effective Hamiltonian**
+
+   $$
+   H_{\rm eff}=H-\frac{i}{2}\sum_kL_k^\dagger L_k,
+   $$
+
+   which is deliberately non-Hermitian, and the norm it loses is exactly
+   the probability that a quantum jump occurred instead. That is the entire
+   basis of the quantum-trajectory (Monte Carlo wavefunction) method:
+   propagate with $H_{\rm eff}$, watch the norm decay, and interpret the
+   deficit as the chance to apply an $L_k$ and renormalize.
+
+   So the correct reading of the condition is not "the generator must be
+   Hermitian". It is that the anti-Hermitian part of the generator must be
+   exactly $-\tfrac{i}{2}\sum_kL_k^\dagger L_k$ and nothing more, because
+   that is the amount the jump terms $\sum_{k\geq1}K_k\rho K_k^\dagger$ put
+   back. Any extra anti-Hermitian piece in $H$ has no jump term to
+   compensate it, and the books do not balance.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -377,11 +626,11 @@ argument, not what's being used for this specific numerical check.
   half the population's rate.
 - This platform's existing discrete `amplitudeDampingChannel(gamma(dt))`
   reproduces this continuous solution **exactly** at $t=dt$, for both
-  population and coherence, at any step size, not an approximation.
+  population and coherence, at any step size.
 - $T_2\leq2T_1$ is derived, not just stated: independent Lindblad jump
   operators contribute additively to a coherence's total decay rate.
 
-## Further Exploration
+## Measuring Distance Between the States That Result
 
 <NextDiscovery>
   [Relative Entropy and Mixed-State Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement)

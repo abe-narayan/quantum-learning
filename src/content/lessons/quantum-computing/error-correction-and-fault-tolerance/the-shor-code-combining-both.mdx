@@ -27,7 +27,7 @@ export const lessonMeta = {
 What happens when a single qubit suffers both an X error and a Z error at once, the two failure modes the last two lessons treated as entirely separate problems? Neither 3-qubit code alone handles it.
 </LessonHook>
 
-## Motivation
+## The error each code alone cannot see
 
 A qubit hit by both an $X$ and a $Z$ error defeats each 3-qubit code
 separately. The bit-flip code is blind to phase errors; the phase-flip code
@@ -39,18 +39,18 @@ answer is more economical than that: **concatenate** the two codes you
 already have. Nine <Term id="physical-qubit">physical qubits</Term>, protecting against an arbitrary
 single-qubit error, with no third mechanism invented.
 
-## Intuition
+## Protect the protectors
 
 The fix is short once you see it. Encode against phase flips, then encode
 *each piece of that encoding* again against bit flips. Nest one code inside
 the other, and an error that slips past one layer meets the other.
 
-The Physical Interpretation section calls this "protecting the protectors,"
-a strategy that outlives this particular code. The rest of the lesson is
+That is what "protecting the protectors" means, and the strategy outlives
+this particular code. The rest of the lesson is
 bookkeeping: how nine qubits split into three groups of three, and why that
 split catches every single-qubit error there is.
 
-## Mathematical Development
+## Nine qubits, and why nine
 
 ### The construction
 
@@ -75,34 +75,48 @@ All three groups are, in turn, phase-flip protected as a single outer
 block (the $\alpha|+++\rangle+\beta|---\rangle$ structure spans all
 three groups together), the nesting the rest of this lesson explains.
 
+There are now two independent protection mechanisms in the register, an
+inner bit-flip check inside each group of three and an outer phase-flip
+check across the three groups. Before reading how each error type is
+handled, work out what the awkward case does.
+
+<PredictBeforeReveal
+  question="A Y error hits one physical qubit in group 1: a bit flip and a phase flip at once, since Y = iXZ. Which of the two mechanisms responds?"
+  options={[
+    { label: "Only group 1's inner bit-flip check", value: "inner" },
+    { label: "Only the outer phase-flip check", value: "outer" },
+    { label: "Neither, since Y is a third error type that neither code was designed for", value: "neither" },
+    { label: "Both, independently", value: "both" },
+  ]}
+  correctValue="both"
+  explanation="Y decomposes into an X part and a Z part acting on the same qubit. The inner bit-flip code only ever looks for X, so it catches the X part and fires group 1's inner check, oblivious to any phase problem. The outer phase-flip code only ever looks for Z, so it independently catches the Z part and fires the outer check. Neither mechanism needs to know the other exists, and neither needed a special case written for Y: the error just happens to trip both wires at once. That is the entire reason nesting two codes covers an error type neither one covers alone."
+/>
+
 ### Why this catches every single-qubit error
 
 An $X$ error on one physical qubit is caught by that qubit's own
 bit-flip group, just as in Lesson 2. The outer phase-flip structure
 is irrelevant to it.
 
-A $Z$ error on one physical qubit flips the relative phase *within* its
-group of three identical qubits, which (because all three qubits in a
-group carry the same logical bit-flip-encoded value) is equivalent to a
-single logical $Z$ on that whole group: exactly what the outer
+A $Z$ error on one physical qubit is invisible to that qubit's own
+bit-flip group and shows up one level out. Each group holds
+$(|000\rangle\pm|111\rangle)/\sqrt2$, and $Z$ on any one of its three
+qubits leaves $|000\rangle$ alone while flipping the sign of
+$|111\rangle$, since $Z|0\rangle=|0\rangle$ and $Z|1\rangle=-|1\rangle$
+on every qubit alike. So $Z_0$, $Z_1$ and $Z_2$ all do the identical
+thing to a codeword: they turn
+$(|000\rangle+|111\rangle)$ into $(|000\rangle-|111\rangle)$, which is a
+single logical $Z$ on that whole group. That is exactly what the outer
 phase-flip code (Lesson 3) is built to catch, now applied at the level
-of the three groups rather than three individual qubits.
+of the three groups rather than three individual qubits. Note what
+follows from the three being identical: the outer code cannot tell which
+qubit in the group was hit, and correcting any one of the three fixes the
+state. That kind of many-to-one error-to-correction map is called a
+*degenerate* code, and it has no classical counterpart.
 
-A $Y$ error (both at once, on the same physical qubit) is caught by
-both mechanisms simultaneously, independently. The inner code doesn't
+A $Y$ error is the case predicted above, caught by both mechanisms at
+once and independently. The inner code doesn't
 care that an outer-level phase problem also exists, and vice versa.
-
-<PredictBeforeReveal
-  question="A Y error hits one physical qubit in group 1 (both a bit flip and a phase flip at once, since Y = iXZ). Which boundary in the diagram below should light up?"
-  options={[
-    { label: "Only group 1's inner bit-flip boundary", value: "inner" },
-    { label: "Only the outer phase-flip boundary", value: "outer" },
-    { label: "Both boundaries, independently", value: "both" },
-    { label: "Neither, since Y wasn't designed for by either code alone", value: "neither" },
-  ]}
-  correctValue="both"
-  explanation="Y decomposes into an X part and a Z part acting on the same qubit. The inner bit-flip code only ever looks for X, so it catches the X part and fires group 1's inner boundary, oblivious to any phase problem. The outer phase-flip code only ever looks for Z, so it independently catches the Z part and fires the outer boundary. Neither mechanism needs to know the other exists; a Y error just happens to trip both wires at once. Try it below."
-/>
 
 <InteractiveSection
   title="Trip each wire yourself"
@@ -124,7 +138,7 @@ scope limit, not a claim that the construction is unverifiable in
 principle; every piece of it is the same two mechanisms already built
 and verified separately, just nested.
 
-## Physical Interpretation
+## Concatenation as a general strategy
 
 Concatenation is a general strategy rather than a feature of Shor's code:
 protect the protectors. A code handling one error type, nested inside a
@@ -135,12 +149,12 @@ scales, and the capstone puts numbers on what that costs.
 You have already run both nested mechanisms yourself, in their own
 lessons: the bit-flip syndrome explorer in Lesson 2, the phase-flip one
 in Lesson 3. Nothing about either engine changes inside the Shor code,
-so this lesson doesn't rerun them. They return two lessons from now, in
+so this lesson doesn't rerun them. They return three lessons from now, in
 [Surface Codes](/lessons/quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction),
 carrying a new meaning: the same two parity-check mechanisms, relabeled
 as the vertex and face stabilizers of a 2D grid.
 
-## Worked Example
+## Following one Z error through both layers
 
 **Trace what happens to a lone $Z$ error on one physical qubit within the
 first group of three.**
@@ -155,7 +169,7 @@ as its own three "logical qubits," sees a logical $Z$ error on
 that one group, and corrects it using Lesson 3's mechanism at the
 group level.
 
-## Common Mistakes
+## Three times three is structural, not numerology
 
 <Callout type="note">
 **Assuming 9 qubits are needed because $3\times3=9$ is somehow a
@@ -178,15 +192,209 @@ what Lessons 2 and 3 already built.
 1. How many physical qubits would a 3-level concatenation (bit-flip code,
    inside phase-flip code, inside another bit-flip code) use? Generalize
    the counting argument from this lesson.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Twenty-seven. Each level of encoding replaces every qubit it is
+   handed by a block of three, so the count multiplies by three per
+   level:
+
+   $$
+   1 \;\to\; 3 \;\to\; 9 \;\to\; 27,
+   \qquad n = 3^{L}.
+   $$
+
+   The general version, for a tower of codes with parameters
+   $[[n_1,1,\cdot]],[[n_2,1,\cdot]],\ldots,[[n_L,1,\cdot]]$, is
+   $n=\prod_i n_i$. The outermost code's block size counts how many
+   copies of the next code down are needed, and each of those is
+   independently expanded, so the sizes compose multiplicatively rather
+   than additively. Nothing in the counting depends on which code sits
+   at which level, which is why the Shor code and the phase-inside-bit
+   ordering both come to 9.
+
+   One tempting generalization does *not* survive the trip, and it is
+   worth stopping on. For genuine quantum codes, concatenation also
+   multiplies distances: $d=\prod_i d_i$. Applying that here would give
+   the Shor code distance $1\times1=1$, since a 3-qubit repetition code
+   has quantum distance $1$ (a single $Z$ defeats the bit-flip version,
+   as Lesson 2 showed). The Shor code's distance is $3$. The product
+   rule holds for codes that are distance-$d$ against arbitrary errors,
+   and these two are not; what makes the pair work is that their blind
+   spots are complementary, which the distance figures do not record.
+   Count qubits with the product. Do not count distance with it.
+
+   And ask what the third level actually buys, because in this
+   particular arrangement the answer is uncomfortable. The two-level
+   code, the Shor code, already corrects any single physical error, and
+   the third layer does not change that. What a bit-flip layer does at
+   the top is suppress *logical bit* errors of the Shor blocks
+   quadratically, while leaving logical *phase* errors of those blocks
+   entirely untouched, since a bit-flip code's logical $Z$ is a $Z$ on
+   one block. With three blocks each carrying phase-error rate $p_L$, the
+   27-qubit code's phase-error rate is roughly $3p_L$: three times worse
+   than one Shor block alone. Eighteen extra qubits, bought to make half
+   the problem better and the other half worse. The layer that would pay
+   is another *full* code, which is why real concatenation schemes stack
+   Shor or Steane blocks rather than alternating repetition codes, and
+   why the capstone's threshold argument is stated for codes that handle
+   both error types at every level.
+
+   </details>
+
 2. Explain why a $Y$ error on one physical qubit is caught by *both* the
    inner and outer mechanisms independently, rather than needing a
    dedicated third mechanism for the combined case.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $Y=iXZ$ is a *product*, and the two mechanisms are each
+   sensitive to exactly one of its factors and blind to the other. Neither
+   check has to know that a $Y$ has occurred; each sees only its own half
+   and reports it.
+
+   The bookkeeping is a commutation count. The inner checks are $Z$-type,
+   the parities $Z_0Z_1$ and $Z_1Z_2$ inside each group of three. A $Z$
+   factor commutes with them and contributes nothing to the syndrome; an
+   $X$ factor anticommutes and flips it. So the inner syndrome of $Y_j$
+   is identical to the inner syndrome of $X_j$: the $Z$ half of the error
+   is invisible at that level and does not interfere. The outer checks
+   are $X$-type, running across the three groups, and the situation
+   inverts exactly: the $X$ factor commutes and is ignored, the $Z$
+   factor anticommutes and fires the check. So the outer syndrome of
+   $Y_j$ is identical to the outer syndrome of $Z_j$.
+
+   The recovery composes just as cleanly. The inner layer applies $X_j$,
+   the outer layer applies a $Z$ on that group, and
+
+   $$
+   Z_jX_j\,Y_j = Z_jX_j(iX_jZ_j) = i\,Z_j Z_j = i\,I,
+   $$
+
+   the identity up to a global phase, which no measurement can see. There
+   was never a partial fix or a leftover.
+
+   The wrong turn is to think of $Y$ as a third direction of error that
+   deserves its own detector, by analogy with the three axes of the Bloch
+   sphere. Operationally there are only two independent things a Pauli
+   error can do, flip a bit and flip a sign, and $Y$ does both at once.
+   The Pauli group is generated by $X$ and $Z$; $Y$ is not a new
+   generator, it is their product. A code that covers both generators has
+   already covered everything they generate, and Lesson 1's
+   discretization argument extends that from the three Paulis to the
+   whole continuum of single-qubit errors.
+
+   A second, subtler worry is worth answering too: does the inner
+   correction spoil the outer syndrome? It does not, and for the same
+   reason. The $X_j$ that the inner layer applies commutes with every
+   outer $X$-type check, so the outer syndrome reads the same before and
+   after. The two layers can be run in either order.
+
+   </details>
+
 3. The Shor code uses 9 physical qubits to protect 1 logical qubit, a
    9:1 overhead. Why might a lower-overhead code be preferable in
    practice, even if Shor's code was historically first?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the same job can be done with five qubits, and under
+   concatenation the difference between 5 and 9 compounds into the
+   difference between a machine you might build and one you will not.
+
+   The job in question is precise: correct an arbitrary error on any one
+   physical qubit, which means distance 3. Steane's code does it with
+   $[[7,1,3]]$, and the $[[5,1,3]]$ code does it with five, which is the
+   proven floor. The counting is the quantum Hamming bound: a
+   nondegenerate code needs a distinct syndrome for the identity and for
+   each of the $3n$ single-qubit Paulis, so $2^{n-k}\ge 1+3n$. At $k=1$
+   that reads $2^{n-1}\ge 3n+1$, which fails at $n=4$ ($8 \ge 13$ is
+   false) and is met with nothing to spare at $n=5$ ($16\ge16$). The
+   $[[5,1,3]]$ code exists and saturates it exactly.
+
+   Overhead compounds, which is the practical point. Physical qubits are
+   the scarcest resource on every platform in Quantum Hardware, and
+   concatenation multiplies: three levels of Shor is $9^3=729$ physical
+   qubits per logical one against $5^3=125$. More qubits also means more
+   syndrome circuitry, and syndrome circuitry is itself faulty, so a
+   larger code is not merely more expensive but can have a *worse*
+   threshold than a smaller one. Shor's outer checks are weight-6 $X$
+   strings, and measuring a six-qubit parity reliably is a substantially
+   harder engineering problem than measuring a two-qubit one.
+
+   Now the strongest argument on the other side, because taken alone the
+   answer above is misleading. Qubit ratio is not the figure of merit
+   anyone optimizes. The surface code, which the whole industry is
+   actually building, has a far *worse* ratio than any of these: hundreds
+   or thousands of physical qubits per logical qubit. It wins anyway,
+   because its checks are weight-4 in the bulk, smaller at the boundary
+   of a patch and never larger, and involve only physically adjacent
+   qubits, and because its threshold is around $1\%$ rather than the far
+   tighter tolerances small codes demand. The $[[5,1,3]]$ code is
+   optimal in qubit count and awkward on hardware, since its stabilizers
+   are weight-4 operators mixing $X$ and $Z$ across qubits that no planar
+   chip places next to each other.
+
+   So the honest statement is narrower than "smaller is better". Holding
+   locality, check weight and threshold fixed, lower overhead is
+   strictly better and Shor's 9 is not optimal. In practice those things
+   are never held fixed, and the code that wins is the one whose checks
+   the hardware can actually perform.
+
+   </details>
+
 4. Explain, in your own words, why this lesson's honesty about
    *not* simulating the 9-qubit circuit doesn't undermine confidence that
    the construction works.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the lesson is not asking you to accept a new mechanism. It is
+   asking you to accept that two mechanisms you have already watched run,
+   wired in series, still work, and that composition claim is the kind of
+   thing an argument settles better than a simulation does.
+
+   Three separate reasons hold it up.
+
+   The parts are checked. Lesson 2's bit-flip cycle and Lesson 3's
+   phase-flip cycle are real code with real tests, verified for arbitrary
+   $\alpha,\beta$ on every error position. The Shor code contains no
+   third mechanism. It contains three copies of the first, one per group,
+   and one of the second across them.
+
+   The composition is checkable by hand, and question 2 did it: the inner
+   $Z$-type checks are transparent to $Z$ errors, the outer $X$-type
+   checks are transparent to $X$ errors, and each layer's correction
+   commutes with the other layer's checks. That is a commutation
+   calculation on a page, not an empirical question. A simulation would
+   confirm it; it would not be the reason to believe it.
+
+   The result is not this platform's to establish. Shor's construction is
+   a 1995 result that has been rederived in every textbook since and
+   implemented on real hardware. The engine here is a teaching
+   instrument, and its silence about a 30-year-old theorem is not
+   evidence against the theorem.
+
+   There is a real cost, though, and it should be named rather than
+   waved away. Not simulating means a specific class of mistake would go
+   uncaught: not an error in the physics, but an error in *this lesson's
+   description* of it, such as getting a stabilizer's weight or an
+   ordering wrong. Lessons 2 and 3 have a machine checking their prose
+   against arithmetic. This one does not. What limits the exposure is
+   that the argument is short enough to audit, which is why the audit is
+   written out rather than asserted.
+
+   The reason to trust the lesson more, not less, for saying so is that
+   the alternative is worse. A page that showed a nine-qubit animation
+   and let you assume it had been computed would be making a stronger
+   claim on weaker evidence, and you would have no way to tell. A stated
+   boundary is a boundary you can reason about.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -201,7 +409,7 @@ what Lessons 2 and 3 already built.
   the full nested 9-qubit circuit, an explicit, documented scope
   boundary.
 
-## Further Exploration
+## A compact language for all of this
 
 <NextDiscovery>
 [Stabilizer Formalism Basics](/lessons/quantum-computing/error-correction-and-fault-tolerance/stabilizer-formalism-basics) gives a compact, general

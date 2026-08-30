@@ -35,9 +35,9 @@ export const blochXCoordinateCalculation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "sin(2π/3) = sin(120°) = √3/2." },
-    { text: "cos(π/3) = cos(60°) = 1/2." },
-    { text: "Multiply the two: (√3/2)(1/2)." },
+    { text: "The formula needs two trig values. In degrees, θ = 120° and φ = 60°." },
+    { text: "120° is in the second quadrant, where sine is positive and sin(180° − x) = sin(x). Reduce sin(120°) to a first-quadrant value you know, and do the same for cos(60°)." },
+    { text: "Multiply the two factors, then check the sign: cos φ is positive here, so x should land on the positive side." },
   ],
   solution: {
     steps: [

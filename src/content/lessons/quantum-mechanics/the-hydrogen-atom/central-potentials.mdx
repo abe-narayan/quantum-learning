@@ -24,13 +24,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="One commutator, three unrelated potentials">
   Hydrogen, a spherical well, and a 3D harmonic oscillator share nothing
   as potentials. Their angular wavefunctions are nevertheless built from
   the same handful of functions, and one commutator explains why.
 </LessonHook>
 
-## Motivation
+## Different potentials, the same angular functions
 
 Hydrogen, the finite spherical well, and the 3D <Term id="quantum-harmonic-oscillator">harmonic oscillator</Term> look
 nothing alike as potentials, yet every one of them factors into a radial
@@ -55,7 +55,7 @@ a commutator.
   license="Public domain"
 />
 
-## Intuition
+## Kepler's second law, and why it holds
 
 A planet orbiting the sun sweeps out equal areas in equal times, Kepler's
 second law, and the textbook reason is that gravity, like the Coulomb
@@ -72,7 +72,7 @@ of $V(r)$, and whenever some operation is a symmetry of the Hamiltonian,
 the operator that *generates* that operation, here, angular momentum,
 has to commute with $H$. Nothing more exotic than that is needed.
 
-## Mathematical Development
+## What depends on angle, and what does not
 
 ### Central potentials
 
@@ -89,7 +89,22 @@ components. The load-bearing step is that $V(r)$, depending only on the
 radial distance $r=\sqrt{x^2+y^2+z^2}$, commutes with $L_z$: rotating
 about the $z$-axis leaves $r$ untouched, since a rotation preserves
 distance from the origin by definition, and $L_z$ is the generator of
-that rotation.
+that rotation. That last clause is imported rather than re-derived here;
+Angular Momentum & Spin established it.
+
+Anyone who would rather see the cancellation than trust the symmetry can
+have it in two lines, using only $[p_x,x]=[p_y,y]=-i\hbar$ and the fact
+that a momentum commutes with every coordinate along a different axis:
+
+$$
+[L_z, r^2] = [xp_y, y^2] - [yp_x, x^2] = x(-2i\hbar y) - y(-2i\hbar x) = 0
+$$
+
+since $xp_y$ commutes with $x^2$ and $z^2$, and $yp_x$ with $y^2$ and
+$z^2$. The two surviving terms are the same quantity with opposite signs.
+Notice that the cancellation turned on $x$ and $y$ entering $r^2$ with
+equal weight, which is the algebra's version of "no direction is
+special."
 
 The kinetic term $p^2/2m$ commutes with $L_z$ too, for the same kind of
 reason: $L_z$ generates rotations, and rotations don't change how "spread
@@ -105,24 +120,25 @@ all mutually commute, energy <Term id="eigenvalue-eigenvector">eigenstates</Term
 satisfy $\vec L^{\,2}\psi=l(l+1)\hbar^2\psi$ and $L_z\psi=m\hbar\psi$,
 which means the angular part of any such $\psi$ has to be one of Angular
 Momentum & Spin's $Y_l^m(\theta,\varphi)$ functions, already derived and
-verified there, with no new angular calculation needed here. That is why
-the shapes below are the *only* angular shapes any central potential's
-energy eigenstates can take, regardless of $V(r)$'s radial form:
+verified there, with no new angular calculation needed here.
 
 <PredictBeforeReveal
   question="Swap hydrogen's Coulomb potential for a 3D harmonic oscillator's V(r)=½mω²r², keeping the same (l, m). Does the angular shape |Y_l^m|² plotted below change?"
   options={[
     { label: "Yes, a different V(r) gives a different angular shape", value: "changes" },
-    { label: "No, the angular shape depends only on (l, m), never on V(r)", value: "same" },
     { label: "Only the l=0 shape stays the same; l>0 shapes change", value: "l0-only" },
+    { label: "No: the shape depends on (l, m) alone, never on V(r)", value: "same" },
   ]}
   correctValue="same"
-  explanation="The commutators proved above, [H,L²]=[H,Lz]=0, never used the specific form of V(r), only that it depends on r alone. Swap in any other central potential and the same argument goes through unchanged, so the angular factor is still one of these Y_l^m shapes. Only the radial factor R(r), not plotted here, differs between hydrogen and an oscillator."
+  explanation="Look back at what the commutator argument actually used. [H,L²]=[H,Lz]=0 was established from V depending on r alone, and nowhere from the particular way it depends on r. Swap in any other central potential and every step goes through untouched, so the angular factor is still one of these same Y_l^m. What does change is the radial factor R(r), which is not plotted here and is where hydrogen and an oscillator part company completely."
 />
 
-<OrbitalShapePlot ariaLabel="Angular shape |Y_l^m|^2 for each (l, m), the only angular forms any central potential's eigenstates can take" />
+So the shapes below are the *only* angular shapes any central potential's
+energy eigenstates can take, whatever $V(r)$'s radial form:
 
-## Physical Interpretation
+<OrbitalShapePlot ariaLabel="A polar cross-section of the angular density |Y_l^m|² for a chosen (l, m), with nine choices from l=0 up to l=2. At l=0 it is a plain circle: the density is the same in every direction. At l=1, m=0 it is two lobes stacked along the vertical z axis with a pinch to zero across the equator; at l=1, m=±1 the same pair of lobes lies flat in the equatorial plane instead, zero along z. At l=2, m=0 there are two long lobes along z plus a small equatorial ring; at m=±1, four lobes tilted between the axes; at m=±2, a single flattened equatorial disc." />
+
+## Nothing here is special to hydrogen
 
 None of this is special to hydrogen. *Any* central potential, a 3D
 harmonic oscillator or a finite spherical well included, separates the
@@ -130,7 +146,7 @@ same way and for the same reason: rotational symmetry of $V(r)$ guarantees
 $H$ commutes with the generators of rotation. Hydrogen is the one case
 this course solves in full, at $V(r)=-e^2/4\pi\epsilon_0r$.
 
-## Worked Example
+## Commuting p-squared with Lz, without expanding
 
 **Confirm $[p^2, L_z]=0$ using only that $p^2=p_x^2+p_y^2+p_z^2$ is
 rotationally symmetric (built the same way from $p_x,p_y,p_z$ as $r^2$
@@ -145,7 +161,7 @@ $[L_z,p^2]=0$ (rotation preserves total momentum magnitude); both are
 rotationally invariant scalars, and $L_z$, generating rotations, commutes
 with any rotationally invariant quantity by definition.
 
-## Common Mistakes
+## Which potentials fail the central test
 
 <Callout type="warning">
 **Assuming this separation works for *any* potential.** It specifically
@@ -166,14 +182,145 @@ structure, not even on $l$) for the Coulomb potential specifically.
 
 1. Is $V(x,y,z)=x^2+y^2+z^2$ (the 3D harmonic oscillator) a central
    potential? Justify using the definition.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes. The definition asks whether $V$ can be written as a function of
+   $r$ alone, and this one is $r^2$ on the nose:
+
+   $$
+   x^2+y^2+z^2 = \left(\sqrt{x^2+y^2+z^2}\right)^2 = r^2
+   $$
+
+   Two points at the same distance from the origin get the same potential
+   energy, whichever directions they lie in, so the commutator argument
+   applies unchanged and this oscillator's energy eigenstates carry the
+   same $Y_l^m$ angular factors hydrogen does.
+
+   The word carrying the weight is *isotropic*, and it is easy to lose.
+   The physical oscillator is $V=\tfrac12m\omega^2r^2$, one frequency for
+   all three directions. Give the three axes different stiffnesses,
+
+   $$
+   V = \tfrac12 m\left(\omega_x^2x^2 + \omega_y^2y^2 + \omega_z^2z^2\right)
+   $$
+
+   and it is still a sum of squares, still perfectly solvable, and no
+   longer central unless the three frequencies are equal. A point on the
+   $x$ axis and a point at the same distance along $y$ now sit at
+   different energies, so no function of $r$ alone reproduces it,
+   $[H,\vec L^{\,2}]\neq0$, and the wavefunctions are products of
+   one-dimensional Hermite functions rather than anything angular. "Sum of
+   squares" is not the test. "Depends on $r$ and nothing else" is.
+
+   </details>
+
 2. Is $V(x,y,z)=x^2+y^2$ (no $z$-dependence, but not full 3D symmetry) a
    central potential? Why or why not?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. It fails the definition at a single pair of points. Take
+   $(0,0,5)$ and $(5,0,0)$: both sit at $r=5$, yet the first has $V=0$ and
+   the second has $V=25$. A function of $r$ alone cannot assign two
+   different values to the same $r$.
+
+   What it is instead is *axially* symmetric: $x^2+y^2=\rho^2$ is the
+   squared distance from the $z$ axis, not from the origin, so $V$ is
+   unchanged by rotations about $z$ and changed by rotations about $x$ or
+   $y$. That partial symmetry has a precise consequence worth tracing,
+   because it is not all-or-nothing.
+
+   $[H,L_z]=0$ still holds, since $L_z$ generates exactly the rotations
+   this potential does respect. So $m$ survives as a good quantum number
+   and energy eigenstates can still be chosen with definite $L_z$.
+
+   $[H,L_x]$ and $[H,L_y]$ do not vanish, so
+   $\vec L^{\,2}=L_x^2+L_y^2+L_z^2$ does not commute with $H$ either, and
+   $l$ stops being a good quantum number. Energy eigenstates of this
+   potential are generally superpositions of different $l$ at fixed $m$,
+   and the wavefunction does not separate as $R(r)Y_l^m$. Cylindrical
+   coordinates work; spherical ones do not.
+
+   This is the useful way to hold the whole topic: how much symmetry $V$
+   has decides how many labels the states get. Full rotational symmetry
+   buys both $l$ and $m$; axial symmetry buys $m$ only; no symmetry buys
+   neither.
+
+   </details>
+
 3. Explain in one sentence why $[H,L_z]=0$ is necessary (though not
    sufficient on its own) for the energy eigenstates to be labeled by a
    definite $m$ quantum number.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because commuting is what makes a shared eigenbasis *available*, so
+   without it no energy eigenstate could carry a definite $m$ at all,
+   while with it you still have to go and choose that basis, since a
+   degenerate energy level also contains superpositions of different $m$
+   that are perfectly good energy eigenstates with no definite $m$
+   whatsoever.
+
+   The gap is worth seeing concretely. Hydrogen's $n=2$ level holds four
+   degenerate states, among them $\psi_{2,1,+1}$ and $\psi_{2,1,-1}$. Any
+   combination $a\psi_{2,1,+1}+b\psi_{2,1,-1}$ is still an eigenstate of
+   $H$ with the same energy, because $H$ acts as one number on the whole
+   degenerate subspace. It is not an eigenstate of $L_z$: measuring $L_z$
+   on it returns $+\hbar$ or $-\hbar$ at random. The real $p_x$ and $p_y$
+   orbitals that chemistry draws are precisely such combinations, and they
+   have no definite $m$.
+
+   So the correct statement of the theorem is "the eigenbasis can be
+   chosen simultaneous," not "every energy eigenstate is automatically an
+   $L_z$ eigenstate." Reading the second into the first is the standard
+   error, and degeneracy is where it bites. When the spectrum is
+   nondegenerate the two statements coincide, which is why the difference
+   is easy to go years without noticing.
+
+   </details>
+
 4. If $[H,\vec L^{\,2}]=0$ but a specific potential's energy levels
    *did* depend on $l$ (unlike hydrogen's, which don't), would that
    contradict $[H,\vec L^{\,2}]=0$? Explain why or why not.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No contradiction. A commutator constrains the eigen*vectors*, not the
+   eigen*values*: it says $H$ and $\vec L^{\,2}$ can be diagonalized in
+   one basis, and says nothing about how $H$'s numbers vary across that
+   basis.
+
+   In fact $l$-dependent energies are the normal case and hydrogen is the
+   exception. Any central potential that is not $1/r$ (or the isotropic
+   oscillator) gives $E_{n,l}$ depending on both labels, while the
+   separation into $R_{n,l}(r)Y_l^m$ still holds perfectly. You can see it
+   without leaving the periodic table: in every atom past hydrogen, the
+   inner electrons screen the nucleus, the outer electron feels something
+   that is central but no longer pure $1/r$, and $2s$ and $2p$ split apart
+   in energy. That splitting is why lithium's chemistry is not helium's,
+   and nothing about it disturbs $[H,\vec L^{\,2}]=0$, which still holds
+   for the screened central potential.
+
+   The converse case makes the same point from the other side and is
+   worth having. Put a hydrogen atom in a magnetic field along $z$. The
+   Hamiltonian gains a term proportional to $L_z$, which still commutes
+   with $L_z$, so $[H,L_z]=0$ survives and $m$ remains a good quantum
+   number. The energies now depend on $m$ and the level splits into
+   $2l+1$ lines. That is the Zeeman effect, and it is a commuting pair
+   with eigenvalue dependence, in plain sight.
+
+   What *would* contradict $[H,\vec L^{\,2}]=0$ is a state with definite
+   $l$ evolving into a mixture of different $l$, or a level whose
+   eigenstates could not be organized by $l$ at all. Degeneracy patterns
+   are a separate question, and answering it requires knowing the actual
+   $V(r)$, not just its symmetry.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -188,9 +335,9 @@ structure, not even on $l$) for the Coulomb potential specifically.
   L^{\,2}$, $L_z$ eigenstates, forcing the angular part to be one of
   Angular Momentum & Spin's already-derived $Y_l^m$ functions.
 
-## Further Exploration
+## Does the argument care which axis?
 
-<ChallengePrompt prompt="The Mathematical Development section proves [H,Lz]=0 using rotations about the z-axis specifically. Does the same argument show [H,Lx]=0 and [H,Ly]=0 too, or is z somehow special?">
+<ChallengePrompt prompt="The commutator argument above proves [H,Lz]=0 using rotations about the z-axis specifically. Does the same argument show [H,Lx]=0 and [H,Ly]=0 too, or is z somehow special?">
   Retrace the rotation argument with the rotation axis relabeled. Does
   any step of it depend on which axis was chosen?
 </ChallengePrompt>

@@ -46,7 +46,7 @@ export function GroverControls({
             {
               symbol: "N",
               name: "search space size",
-              means: `the number of items you're searching, N = 2 to the power of the qubit count. ${numQubits} qubits index ${dimension} items — one bar each in the chart.`,
+              means: `the number of items you're searching, N = 2 to the power of the qubit count. ${numQubits} qubits index ${dimension} items, one bar each in the chart.`,
             },
           ]}
         />
@@ -55,16 +55,16 @@ export function GroverControls({
       <ControlSection
         id="grover-marked"
         title="Marked item"
-        description="The one item the black box says yes to — the needle. Pick a different one and the tall bar moves with it."
+        description="The one item the black box says yes to: the needle. Pick a different one and the tall bar moves with it."
       >
         <select
           value={markedIndex}
           disabled={disabled}
-          aria-label="Marked item — the one item the oracle recognizes"
+          aria-label="Marked item: the one item the oracle recognizes"
           onChange={(e) => onMarkedIndexChange(Number(e.target.value))}
           className={
             // text-base below sm keeps the effective font size at 16px on
-            // phones — iOS Safari auto-zooms the page on focusing any form
+            // phones; iOS Safari auto-zooms the page on focusing any form
             // control whose font is smaller than that.
             "min-h-11 w-full rounded-(--radius-tight) border border-border bg-surface px-2 py-1.5 font-mono text-base text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-sm"
           }
@@ -80,7 +80,7 @@ export function GroverControls({
       <ControlSection
         id="grover-run"
         title="Run"
-        description={`Currently at round ${iteration}. The best number of rounds for N=${dimension} with one marked item is ${optimalIteration} — past that, success probability falls again.`}
+        description={`Currently at round ${iteration}. The best number of rounds for N=${dimension} with one marked item is ${optimalIteration}. Past that, success probability falls again.`}
       >
         <div className="flex flex-wrap gap-2">
           <Button variant="primary" size="sm" disabled={disabled} onClick={onStep}>
@@ -96,7 +96,7 @@ export function GroverControls({
               symbol: "1.",
               name: "oracle",
               means:
-                "the black box that recognizes the item you want. It doesn't reveal it — it just flips the sign of that one item's amplitude, leaving every probability unchanged.",
+                "the black box that recognizes the item you want. It doesn't reveal it; it just flips the sign of that one item's amplitude, leaving every probability unchanged.",
               glossaryId: "oracle",
             },
             {

@@ -26,15 +26,16 @@ export const identifyHermitianMatrix: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "b",
     optionFeedback: {
-      a: "Its conjugate transpose has -i in the off-diagonal spots, not i — this matrix does not equal its own adjoint.",
-      c: "This is real but not symmetric (its transpose flips the signs) — its adjoint is not itself.",
+      a: "Its conjugate transpose has -i in the off-diagonal spots, not i, so this matrix does not equal its own adjoint.",
+      c: "This is real but not symmetric (its transpose flips the signs), so its adjoint is not itself.",
       d: "A Hermitian matrix must have real diagonal entries; i is not real, so this fails immediately.",
     },
     defaultIncorrectFeedback: "Check the diagonal entries are real, and that swapping-and-conjugating the off-diagonal entries reproduces the same matrix.",
   },
   hints: [
-    { text: "A Hermitian matrix's diagonal entries must be real — check that first." },
-    { text: "Then check that conjugating and transposing gives back the exact same matrix." },
+    { text: "A Hermitian matrix equals its own adjoint, and one consequence is cheap to check first: every diagonal entry must be real." },
+    { text: "For whatever survives that check, take the adjoint properly: transpose the matrix, then conjugate every entry." },
+    { text: "Compare the adjoint against the original entry by entry. The off-diagonal pair is where the remaining candidates differ, so watch what conjugation does to an entry of $i$ and where the transpose then puts it." },
   ],
   solution: {
     steps: [
@@ -42,7 +43,7 @@ export const identifyHermitianMatrix: MultipleChoiceProblem = {
         description: "Compute the adjoint of $\\begin{pmatrix}1&i\\\\-i&1\\end{pmatrix}$: transpose, then conjugate.",
         latex: "M^T = \\begin{pmatrix}1&-i\\\\i&1\\end{pmatrix} \\quad\\Longrightarrow\\quad M^\\dagger = \\begin{pmatrix}1&i\\\\-i&1\\end{pmatrix}",
       },
-      { description: "$M^\\dagger$ matches $M$ exactly — Hermitian confirmed." },
+      { description: "$M^\\dagger$ matches $M$ entry for entry, so the matrix is Hermitian." },
     ],
     finalAnswer: "$\\begin{pmatrix}1&i\\\\-i&1\\end{pmatrix}$ is Hermitian.",
   },

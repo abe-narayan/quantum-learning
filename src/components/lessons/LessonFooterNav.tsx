@@ -57,7 +57,14 @@ export function LessonFooterNav({
   prevLesson: LessonMetaWithSlug | null;
   nextLesson: LessonMetaWithSlug | null;
   finishedCourse: Course | undefined;
-  nextCourseSuggestions: { course: Course; lesson: LessonMetaWithSlug }[];
+  /**
+   * Courses to offer on finishing this one, resolved by `nextCoursesAfter` in
+   * LessonLayout (the same computation `/courses/[slug]` runs). `alsoNeeds`
+   * is the suggestion's *other* prerequisites, the ones finishing this course
+   * does not supply, and is empty for a course the reader can start straight
+   * away. Startable suggestions come first.
+   */
+  nextCourseSuggestions: { course: Course; lesson: LessonMetaWithSlug; alsoNeeds: Course[] }[];
   pillar: PillarInfo | undefined;
   unlocks: LessonMetaWithSlug[];
   /** The course this lesson belongs to, whether or not it is finished — used
@@ -81,12 +88,48 @@ export function LessonFooterNav({
   const fallbackLabel = courseHref && course ? course.title : pillar ? pillar.title : "All courses";
   const showFallbackCard = !nextLesson && !finishedCourse;
 
+  /**
+   * The standing links at the foot of the "course complete" panel: look back
+   * at the course just finished, and — when nothing in the curriculum builds
+   * on it — a way onward that is not the course itself.
+   *
+   * Both rows used to be one link to `courseHref` under two different
+   * labels, so a terminal course (the last one in its pillar, where the
+   * reader has genuinely run out of curriculum and needs the most help)
+   * showed a row reading "Browse more courses" that went back to the page
+   * for the course they had just completed. The label promised the one thing
+   * the destination could not do. Two rows, two destinations, and the pillar
+   * index is a real onward move because it lists that pillar's other
+   * courses. Never empty while `finishedCourse` is set: `courseHref` is
+   * resolved from that same course by `getCourseHref`, and the second row
+   * falls back to `/learn` with no pillar.
+   *
+   * The onward row is suppressed only when a suggestion above it is genuinely
+   * startable, which is the one case where it would be a third competing
+   * answer to a question already answered. A suggestion the reader cannot
+   * open yet ("Also needs …") does not count as an answer, so a course whose
+   * every forward edge is blocked keeps its way out.
+   */
+  const hasStartableSuggestion = nextCourseSuggestions.some(
+    (suggestion) => suggestion.alsoNeeds.length === 0
+  );
+  const escapeRoutes: { href: string; label: string }[] = [
+    ...(courseHref ? [{ href: courseHref, label: "Review this course" }] : []),
+    ...(hasStartableSuggestion
+      ? []
+      : [
+          pillar
+            ? { href: `/learn#${pillar.slug}`, label: `More in ${pillar.title}` }
+            : { href: "/learn", label: "Browse all courses" },
+        ]),
+  ];
+
   return (
-    // `max-w-[46rem]` is the lesson page's reading measure
+    // `max-w-reading` is the lesson page's reading measure
     // (docs/DESIGN_SYSTEM.md); `max-w-3xl` is 48rem and left this nav's right
     // edge 32px outside the `FadeRule` and completion instrument directly
     // above it. See the matching note in LessonMetaStrip.tsx.
-    <nav aria-label="Lesson navigation" className="mt-12 max-w-[46rem]">
+    <nav aria-label="Lesson navigation" className="mt-12 max-w-reading">
       <TechLabel className="text-subtle-foreground">What&rsquo;s next</TechLabel>
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
         {prevLesson ? (
@@ -135,11 +178,29 @@ export function LessonFooterNav({
               <>
                 <p className="mt-4 text-xs uppercase tracking-wide text-subtle-foreground">Continues into</p>
                 <ul className="mt-1 space-y-0.5">
-                  {nextCourseSuggestions.map(({ course: suggestedCourse, lesson }) => (
+                  {nextCourseSuggestions.map(({ course: suggestedCourse, lesson, alsoNeeds }) => (
                     <li key={suggestedCourse.slug}>
-                      <Link href={`/lessons/${lesson.slug}`} className={NEXT_STEP_ROW}>
-                        <span>Start {suggestedCourse.title}</span>
-                        <span aria-hidden="true" data-decorative="">
+                      <Link
+                        href={`/lessons/${lesson.slug}`}
+                        className={cn(NEXT_STEP_ROW, "items-start")}
+                      >
+                        <span className="flex min-w-0 flex-col gap-0.5">
+                          <span>Start {suggestedCourse.title}</span>
+                          {/* The clause that stops this being a wall. Half the
+                              graph's forward edges point at a course with a
+                              second, unmet prerequisite, and an unannotated
+                              link sent the reader to a page telling them they
+                              were not ready. Naming the specific gap turns
+                              that into an itinerary. Same wording as
+                              `/courses/[slug]`, deliberately, so the two
+                              surfaces read as one voice. */}
+                          {alsoNeeds.length > 0 ? (
+                            <span className="text-xs text-subtle-foreground">
+                              Also needs {alsoNeeds.map((needed) => needed.title).join(" and ")}
+                            </span>
+                          ) : null}
+                        </span>
+                        <span aria-hidden="true" data-decorative="" className="mt-0.5">
                           →
                         </span>
                       </Link>
@@ -151,17 +212,29 @@ export function LessonFooterNav({
             {/* Always offered, even when a next course exists: finishing the
                 last lesson of a course is also the moment a reader wants to
                 look back at what they just covered. Previously the only
-                escape from a terminal course was a single small text link. */}
-            <div className="mt-2 border-t border-border pt-1">
-              <Link href={courseHref ?? (pillar ? `/learn#${pillar.slug}` : "/learn")} className={NEXT_STEP_ROW}>
-                <span>
-                  {nextCourseSuggestions.length > 0 ? "Review this course" : "Browse more courses"}
-                </span>
-                <span aria-hidden="true" data-decorative="">
-                  →
-                </span>
-              </Link>
-            </div>
+                escape from a terminal course was a single small text link.
+
+                The two labels also need two different destinations, which
+                they did not have. Both used to resolve to `courseHref`, so on
+                a terminal course — the last course of a pillar, the one case
+                where the reader has genuinely run out of curriculum and needs
+                the most help — a row reading "Browse more courses" linked
+                back to the course page of the course they had just finished.
+                The label promised the one thing the link could not do. A
+                terminal course now gets both rows: the review link it always
+                had, plus a real way out, into the rest of its pillar. */}
+            {escapeRoutes.length > 0 ? (
+              <div className="mt-2 border-t border-border pt-1">
+                {escapeRoutes.map((route) => (
+                  <Link key={route.href} href={route.href} className={NEXT_STEP_ROW}>
+                    <span>{route.label}</span>
+                    <span aria-hidden="true" data-decorative="">
+                      →
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
           </Instrument>
         ) : showFallbackCard ? (
           <Link
@@ -201,8 +274,12 @@ export function LessonFooterNav({
               </li>
             ))}
             {hiddenUnlockCount > 0 ? (
+              /* The overflow pointer named the panel by its old label,
+                 "Lineage", which was jargon; it also named the wrong half of
+                 it. These are lessons this one feeds *into*, which that panel
+                 files under "Resurfaces in", not under its prerequisites. */
               <li className="inline-flex items-center px-1 text-sm text-subtle-foreground">
-                +{hiddenUnlockCount} more in Lineage above
+                +{hiddenUnlockCount} more under &ldquo;Resurfaces in&rdquo; above
               </li>
             ) : null}
           </ul>

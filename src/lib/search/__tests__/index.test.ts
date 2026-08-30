@@ -107,6 +107,11 @@ describe("glossary terms in the index", () => {
       description: TERMS[0].definition,
       href: `/glossary#${TERMS[0].id}`,
       pillar: TERMS[0].pillar,
+      // 0 because this call passes no link counts. The field is a ranking
+      // weight the generator fills from the real corpus (see `linkCount` in
+      // ../types.ts); asserted rather than ignored so that adding another
+      // invisible field to a term entry has to be a deliberate edit here.
+      linkCount: 0,
     });
   });
 });

@@ -29,6 +29,10 @@ export const bitFlipCodeBlindToZ: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.5,
+    nearMisses: [
+      { value: 1, feedback: "1 would mean exactly one parity check fired. A Z error commutes with both ZZ checks, so neither of them registers anything at all." },
+      { value: 2, feedback: "2 would mean both checks fired, which is the syndrome for an error on the middle qubit. That is what an X error on qubit 1 produces; a Z error is a different matter entirely." },
+    ],
     incorrectFeedback: "Z changes only the relative phase, never which computational-basis term carries amplitude. Ask whether a parity check on basis values can register a pure phase change at all; the syndrome bits you sum should reflect that.",
   },
   hints: [
@@ -46,6 +50,6 @@ export const bitFlipCodeBlindToZ: NumericProblem = {
   explanation: {
     correctIdea: "This confirms directly, not just by argument, that the bit-flip code is completely blind to Z errors.",
     whyCorrect: "Matches the engine's actual syndrome output of (0,0) for this error.",
-    whyWrong: ["Expecting a nonzero syndrome here misunderstands that Z errors are a fundamentally different error type this specific code isn't designed to catch."],
+    whyWrong: ["Expecting a nonzero syndrome here misunderstands that Z errors are a different error type, one this code was never designed to catch."],
   },
 };

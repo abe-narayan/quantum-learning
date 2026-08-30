@@ -41,11 +41,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Chemistry's word for what we already built">
 "Orbital" is chemistry's word for the object this course has been building all along: a specific ψₙₗₘ(r,θ,φ), fixed completely by three integers.
 </LessonHook>
 
-## Motivation
+## Assembly work, worth doing carefully
 
 Nothing new needs deriving here. This lesson is assembly work: multiply
 the previous lesson's radial functions by Angular Momentum & Spin's
@@ -69,7 +69,7 @@ $p$, $d$ stop being nomenclature and become values of $l$.
   license="Free Art License"
 />
 
-## Mathematical Development
+## Three integers, and the function they fix
 
 ### The three quantum numbers
 
@@ -108,7 +108,7 @@ product, $|R_{nl}(r)|^2|Y_l^m(\theta,\varphi)|^2$, plotted as a
 cross-section through the $(r,\theta)$ half-plane, the standard textbook
 electron-cloud picture, for the three $m=0$ states 1s, 2s, and 2p$_0$:
 
-<OrbitalDensityCloud ariaLabel="Combined orbital probability density, radial times angular squared, for 1s, 2s, and 2p-zero" />
+<OrbitalDensityCloud ariaLabel="Cross-sections of the full probability density |R(r)|²|Y(θ,φ)|² through a half-plane containing the vertical z axis, for 1s, 2s and 2p-zero. The 1s cloud is a single round blob, densest at the centre and fading smoothly outward, with no direction preferred. The 2s cloud is also round and directionless but larger, and it is split by a spherical gap where the density falls to zero, an inner core inside a thicker outer shell. The 2p-zero cloud is the one that is not round: two lobes stacked above and below the origin along z, separated by a plane through the equator where the density is exactly zero." />
 
 ### The 1s orbital's radial shape
 
@@ -128,31 +128,36 @@ just algebraically different:
 <PredictBeforeReveal
   question="Which of the three radial distributions, 1s, 2s, or 2p, shows a node (a radius where the probability touches zero, then rises again)?"
   options={[
+    { label: "None of them: all three are node-free", value: "none" },
     { label: "1s", value: "1s" },
     { label: "2s", value: "2s" },
     { label: "2p", value: "2p" },
-    { label: "None of them; all three are node-free", value: "none" },
   ]}
   correctValue="2s"
-  explanation="2s's (2−r) factor in radial2s changes sign at r=2, giving it a real node the 1s and 2p profiles don't have: 1s peaks once near the origin, 2p peaks once farther out, and only 2s dips to zero and rises again. Slide through the three orbitals below and watch 2s's curve touch the axis."
+  explanation="2s. The (2−r) factor in radial2s changes sign at r=2, so the distribution touches the axis there and climbs again, splitting 2s into two humps. Neither 1s nor 2p has such a factor, and each rises to a single peak and falls. Slide through the three below and watch only 2s reach the axis."
 />
 
 <ParametricCurve
   frames={radialDensityFrames}
   sliderLabel="Orbital"
-  ariaLabel="Radial probability distribution r-squared times R(r)-squared, for 1s, 2s, and 2p"
+  ariaLabel="The radial distribution r² |R(r)|² against r from 0 to 15, one frame per orbital, all three sharing one vertical axis. 1s rises to a single sharp peak of 0.54 at r=1 and decays to nothing by about r=5. 2p rises much more slowly to a single broad peak of 0.20 at r=4, barely a third of 1s's height, with almost no weight inside r=1. 2s is the odd one: a small hump of 0.05 near r=0.76, then a return to exactly zero at r=2, then a second, larger hump of 0.19 out at r=5.2."
 />
 
-Compare 1s and 2p's radial profiles directly: 1s peaks once, close to
-the origin (at $r=1$, computed above); 2p peaks once too, but farther
-out and shorter, since the $r$ in `radial2p`'s explicit $r\,e^{-r/2}$
-makes the plotted $r^2|R|^2$ start off as $r^4$ near the origin rather
-than $r^2$, pushing its weight away from the nucleus in a way 1s's is
-not. 2s shows something neither does: a **node**,
-a radius where the distribution touches zero before rising again, coming
-from the $(2-r)$ factor in `radial2s` changing sign.
+Compare 1s and 2p directly: 1s peaks once, close to the origin (at $r=1$,
+computed above); 2p peaks once too, but farther out and only a third as
+tall, since the $r$ in `radial2p`'s explicit $r\,e^{-r/2}$ makes the
+plotted $r^2|R|^2$ start off as $r^4$ near the origin rather than $r^2$,
+pushing its weight away from the nucleus in a way 1s's is not.
 
-## Physical Interpretation
+2s shows something neither does: a **node**, a radius where the
+distribution touches zero before rising again, from the $(2-r)$ factor in
+`radial2s` changing sign at $r=2$. It leaves 2s with two humps, a small
+one inside the node and a larger one outside. The count generalizes:
+$R_{nl}$ has $n-l-1$ radial nodes, which gives $0$ for 1s, $0$ for 2p,
+and $1$ for 2s, and is the reason 2s and 2p sit at the same energy while
+looking nothing alike.
+
+## Why s orbitals are round and p orbitals point
 
 The 1s and 2s orbitals ($l=0$) are spherically symmetric: $Y_0^0$ is a
 constant, so all angular dependence vanishes, and the "shape" is purely
@@ -163,9 +168,9 @@ application well beyond this course's scope). The angular part
 alone, independent of which radial function it's paired with, looks like
 this:
 
-<OrbitalShapePlot ariaLabel="Orbital angular shape |Y_l^m|^2" />
+<OrbitalShapePlot ariaLabel="A polar cross-section of the angular density |Y_l^m|² for a chosen (l, m), with nine choices from l=0 up to l=2. At l=0, the s case, it is a plain circle: the same in every direction, which is why an s orbital has no shape to point. At l=1, the p case, m=0 gives two lobes stacked along the vertical z axis with a pinch to zero across the equator, while m=±1 lays the same pair of lobes flat in the equatorial plane instead. At l=2, the d case, m=0 gives two long z lobes plus a small equatorial ring, m=±1 gives four lobes tilted between the axes, and m=±2 gives a single flattened equatorial disc." />
 
-## Worked Example
+## Normalization, from two already-normalized factors
 
 **Confirm that $\psi_{100}$ (the 1s orbital) is properly normalized,
 using the fact that both factors are independently normalized.**
@@ -178,7 +183,7 @@ using `radialNormSquared(radial1s)`$\approx1$ (verified, previous
 lesson) and `sphericalHarmonicNormSquared({l:0,m:0})`$\approx1$
 (verified, Angular Momentum & Spin), no new integral needed.
 
-## Common Mistakes
+## Radial density against radial distribution
 
 <Callout type="note">
 **Confusing $|R_{nl}(r)|^2$ (radial probability density) with $r^2|R_{nl}(r)|^2$
@@ -201,14 +206,146 @@ continuous distribution, not a trajectory.
 
 1. List all $(n,l,m)$ triples for $n=3$, grouped by $l$, and state the
    chemistry shorthand name (3s, 3p, 3d) for each group.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $l$ running from $0$ to $n-1=2$, and $m$ from $-l$ to $+l$:
+
+   | $l$ | $(n,l,m)$ triples | Name | Count |
+   |---|---|---|---|
+   | $0$ | $(3,0,0)$ | 3s | 1 |
+   | $1$ | $(3,1,-1),(3,1,0),(3,1,+1)$ | 3p | 3 |
+   | $2$ | $(3,2,-2),(3,2,-1),(3,2,0),(3,2,+1),(3,2,+2)$ | 3d | 5 |
+
+   Nine in total, which is $n^2$ at $n=3$, and $18$ once spin is counted.
+   All nine sit at $E_3=-1.51\text{ eV}$ in pure hydrogen.
+
+   Note the constraint $l\le n-1$ is doing real work here: there is no
+   "3f." The reason is in the last lesson's derivation, where $n$ was
+   *defined* as $j_{\max}+l+1$ with $j_{\max}\ge0$ counting the terms of
+   the terminating polynomial, so $l$ can never reach $n$. Equivalently,
+   $n-l-1$ is the number of radial nodes and cannot be negative. The rule
+   is not a separate postulate; it is the series-termination condition
+   restated.
+
+   </details>
+
 2. Why is $|\psi_{1s}|^2$ spherically symmetric while $|\psi_{2p_0}|^2$
    is not? Trace this to a specific property of $Y_0^0$ vs. $Y_1^0$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $Y_0^0=\dfrac{1}{2\sqrt\pi}$ is a constant while
+   $Y_1^0=\sqrt{\dfrac{3}{4\pi}}\cos\theta$ is not. The angular factor is
+   the only place direction can enter, and at $l=0$ there is nothing
+   there.
+
+   Take the densities apart:
+
+   $$
+   |\psi_{1s}|^2 = |R_{10}(r)|^2\cdot\frac{1}{4\pi}, \qquad |\psi_{2p_0}|^2 = |R_{21}(r)|^2\cdot\frac{3}{4\pi}\cos^2\theta
+   $$
+
+   The first depends on $r$ alone, so every direction from the nucleus
+   looks the same. The second carries $\cos^2\theta$, which is maximal
+   along $\pm z$ and vanishes at $\theta=\pi/2$, producing the two lobes
+   and the nodal plane through the equator.
+
+   The step worth making explicit is that the radial factor is
+   *incapable* of breaking spherical symmetry, whatever it looks like.
+   $R_{nl}(r)$ is a function of distance only, by construction. $2s$ has a
+   node, two humps and a shape nothing like $1s$'s, and it is still
+   perfectly spherical, because a node in $r$ is a spherical shell. So
+   the question "is this orbital round" is answered by $l$ alone, and
+   never by $n$: every $s$ orbital is round, no $p$ or $d$ orbital is.
+
+   One refinement on "not symmetric." $2p_0$ has $m=0$, so its
+   $e^{im\varphi}$ factor is $1$ and the density has no $\varphi$
+   dependence at all: it is symmetric about the $z$ axis, just not about
+   every axis. That partial symmetry is the visible trace of $m$ being a
+   good quantum number about $z$ specifically.
+
+   </details>
+
 3. Explain in one sentence why $\int|\psi_{nlm}|^2\,d^3r=1$ follows
    automatically from the radial and angular pieces each separately
    normalizing to 1, without a new 3D integral.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because in spherical coordinates both the integrand and the volume
+   element factor into a purely radial part and a purely angular part, so
+   the triple integral separates into a product of two integrals that were
+   each already computed and each already equal to $1$.
+
+   Written out, with $d^3r=r^2\,dr\,\sin\theta\,d\theta\,d\varphi$:
+
+   $$
+   \int|R_{nl}|^2|Y_l^m|^2\,d^3r = \left(\int_0^\infty |R_{nl}(r)|^2r^2\,dr\right)\left(\int|Y_l^m|^2\,d\Omega\right) = (1)(1) = 1
+   $$
+
+   Two conditions make that split legal, and both happen to hold here
+   rather than being automatic. The integrand has to factor, which it does
+   because $\psi$ was separable to begin with. And the region has to be a
+   product region: $r$ ranges over $[0,\infty)$ independently of the
+   angles, and the angles over the full sphere independently of $r$. Over
+   a region where the limits on one variable depended on another, the
+   integral would not separate no matter how cleanly the integrand did.
+
+   The $r^2$ has to travel with the radial factor, and that is the part
+   people drop. It belongs to the volume element rather than to the
+   wavefunction, which is why the platform's `radialNormSquared` includes
+   it and why the radial distribution plotted above is $r^2|R|^2$ rather
+   than $|R|^2$.
+
+   </details>
+
 4. Is the most-probable-radius result ($r=1$ for 1s) evidence that the
    Bohr model was secretly correct about orbits? Explain what it does
    and doesn't establish.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. It establishes that the two treatments agree on a length scale, and
+   nothing whatever about orbits.
+
+   What the agreement does mean is worth stating fairly, because it is not
+   empty. Both descriptions produce the same characteristic size for the
+   ground state, and that size is not a fitted parameter in either one. It
+   is also, on reflection, not much of a coincidence: $a_0=4\pi\epsilon_0
+   \hbar^2/me^2$ is the only length that can be assembled from the
+   constants in the problem, so any correct account of hydrogen has to
+   land on it up to a factor of order one.
+
+   What it does not establish is a trajectory, and the clearest way to see
+   that is to notice where the two models flatly contradict each other
+   rather than merely differ in emphasis. Bohr's $n=1$ orbit has orbital
+   angular momentum $|\vec L|=\hbar$, by construction: quantized circular
+   motion was the whole postulate. The true $1s$ state has $l=0$, so
+   $\vec L^{\,2}=0$ and every component of angular momentum is zero. The
+   real ground state has no orbital motion at all. Bohr got the right
+   energy from a picture whose central quantity has the wrong value.
+
+   Two more things the number hides. The distribution is broad: $r=a_0$ is
+   its mode, while its mean is $\langle r\rangle=\tfrac32a_0$, and the
+   probability of finding the electron at any $r>0$ is nonzero. A single
+   radius is a summary statistic of a spread-out cloud, not a location.
+   And the mode only appears at $a_0$ once the $r^2$ volume weighting is
+   included: the density $|R_{10}|^2$ itself is largest at the nucleus and
+   falls monotonically, with no special feature at $a_0$ at all.
+
+   The broader test is what each model predicts beyond this one number.
+   Bohr gives no orbital shapes, no $l$ or $m$ labels, no degeneracies, no
+   selection rules, and fails outright for helium. The Schrödinger
+   treatment gives all of them. Agreement on one length is what you should
+   expect from a wrong model that got the scale right, not evidence that
+   it was secretly correct.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -224,7 +361,7 @@ continuous distribution, not a trajectory.
   between the full quantum treatment and the older Bohr model, reached by
   two unrelated arguments.
 
-## Further Exploration
+## The corrections this model leaves out
 
 <NextDiscovery>
 [Fine Structure (Introduction)](/lessons/quantum-mechanics/the-hydrogen-atom/fine-structure-introduction) is a conceptual closer previewing

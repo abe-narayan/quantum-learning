@@ -24,17 +24,17 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Nature isn't classical, dammit">
-"If you want to make a simulation of nature, you'd better make it quantum mechanical" — Feynman's 1981 diagnosis of why simulating an n-particle quantum system on an ordinary computer requires resources that grow like 2ⁿ, no matter how clever the algorithm.
+Feynman's 1981 diagnosis of why simulating an n-particle quantum system on an ordinary computer requires resources that grow like 2ⁿ, no matter how clever the algorithm: "If you want to make a simulation of nature, you'd better make it quantum mechanical."
 </LessonHook>
 
-## Motivation
+## Feynman's Objection, Costed
 
 In 1981, at a keynote co-organized by MIT and IBM, Feynman put his
 finger on the reason a quantum computer might be worth building at all.
 His diagnosis: simulating an $n$-particle quantum system on an ordinary
 computer seems to require resources that grow like $2^n$, no matter how
-clever the algorithm, because the system's state genuinely has that many
-independent numbers in it. His proposed fix was blunt — "nature isn't
+clever the algorithm, because the system's state has that many
+independent numbers in it. His proposed fix was blunt: "nature isn't
 classical, dammit, and if you want to make a simulation of nature,
 you'd better make it quantum mechanical." This lesson is the other side
 of that same coin: it puts exact figures on the classical price tag
@@ -44,7 +44,7 @@ receipts.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/1/1a/RichardFeynman-PaineMansionWoods1984_copyrightTamikoThiel_bw.jpg"
   alt="Richard Feynman photographed in 1984 at the Paine Estate in Waltham, Massachusetts, during his consulting work for Thinking Machines Corporation"
-  caption="Feynman in 1984, a few years after his 1981 keynote, consulting for Thinking Machines Corporation on the design of the Connection Machine — a massively parallel classical supercomputer built partly to attack the same simulation problem he'd identified."
+  caption="Feynman in 1984, a few years after his 1981 keynote, consulting for Thinking Machines Corporation on the design of the Connection Machine, a massively parallel classical supercomputer built partly to attack the same simulation problem he'd identified."
   credit="Photo © Tamiko Thiel"
   creditUrl="https://commons.wikimedia.org/wiki/File:RichardFeynman-PaineMansionWoods1984_copyrightTamikoThiel_bw.jpg"
   license="CC BY-SA 3.0"
@@ -54,16 +54,23 @@ State-Vector Simulation named the technique this course has used since
 lesson one. Every number below follows from a single fact already built
 into this platform's engine: `applySingleQubitGate` iterates over every
 amplitude in the state (Circuit Representation in Code's underlying
-implementation), an $O(2^n)$ operation, every single time — Feynman's
-argument, run as actual code instead of asserted from a podium.
+implementation), an $O(2^n)$ operation, every single time. That is
+Feynman's argument run as code instead of asserted from a podium.
 
-## Engineering Development
+## Memory and Time, Both Exponential
 
 ### Memory cost
 
-Each complex <Term id="amplitude">amplitude</Term> needs two double-precision floats (real and
+Each complex <Term id="amplitude">amplitude</Term> is two double-precision floats (real and
 imaginary), 8 bytes each: 16 bytes per amplitude. Total memory:
 $16\times2^n$ bytes.
+
+Production simulators often let you drop to single precision, storing
+each amplitude as two 32-bit floats for 8 bytes instead of 16. It is
+worth knowing what that buys, because the answer is the whole lesson in
+one line: $8\times2^{n+1}=16\times2^n$, so halving the bytes per
+amplitude buys **exactly one more qubit**. Every figure below shifts one
+column and nothing else changes.
 
 <PredictBeforeReveal
   question="Going from 20 to 30 qubits is only 10 more qubits. Roughly how much more memory does that cost?"
@@ -73,7 +80,7 @@ $16\times2^n$ bytes.
     { label: "About 1,000,000× more", value: "million" },
   ]}
   correctValue="1000x"
-  explanation="Each additional qubit doubles the amplitude count, so 10 more qubits multiplies memory by 2¹⁰ = 1024. That's exactly the jump the table below shows: ~16.8 MB at 20 qubits becomes ~17.2 GB at 30, a ~1024× increase from adding a number of qubits you could count on two hands."
+  explanation="Each additional qubit doubles the amplitude count, so 10 more qubits multiplies memory by 2¹⁰ = 1024. That's the jump the table below shows: ~16.8 MB at 20 qubits becomes ~17.2 GB at 30, a ~1024× increase from adding a number of qubits you could count on two hands."
 />
 
 | Qubits | Amplitudes | Memory |
@@ -94,6 +101,8 @@ underlying, un-logged bytes):
 
 <ParametricCurve
   ariaLabel="State-vector memory (log10 bytes) vs qubit count, 10 to 50 qubits"
+  xAxisLabel="qubit count n"
+  yAxisLabel="log₁₀(bytes)"
   frames={[
     {
       paramLabel: "10-50 qubits",
@@ -114,8 +123,8 @@ underlying, un-logged bytes):
 
 Trace the line from 30 qubits: it crosses from gigabyte territory into
 petabyte territory by 50 qubits, the same "narrow 20-qubit span" the
-table already states, now visible as a slope rather than four isolated
-rows.
+table already states, now visible as a slope where the table gave four
+isolated rows.
 
 ### Time cost per gate, and per circuit
 
@@ -129,7 +138,7 @@ independent reason deep circuits are expensive: not just accumulating
 physical error on real hardware, but accumulating classical simulation
 cost too, if simulating instead of running on hardware.
 
-### Where the wall actually bites
+### Where the wall bites
 
 State-vector simulation is practical up to roughly 30-40 qubits on
 serious classical hardware (well beyond a laptop, but within reach of
@@ -141,16 +150,15 @@ count at which *no* classical simulation technique (including the more
 sophisticated approaches the rest of this course covers) can
 straightforwardly keep up.
 
-<ExternalFigure
-  src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Summit_supercomputer_%2844552257460%29.jpg"
-  alt="Rows of Summit supercomputer cabinets at Oak Ridge National Laboratory"
-  caption="Oak Ridge National Laboratory's Summit — 200 petaflops of classical computing power, and still nowhere near enough RAM to hold a generic 50-qubit state vector. This is the wall Feynman was describing in 1981, decades before anyone had a machine this size to run into it with."
-  credit="Photo by Carlos Jones / Oak Ridge National Laboratory / Wikimedia Commons"
-  creditUrl="https://commons.wikimedia.org/wiki/File:Summit_supercomputer_(44552257460).jpg"
-  license="CC BY 2.0"
-/>
+The table's bottom row is what makes "essentially impossible" the right
+phrase rather than a rhetorical one. 18 PB is not a figure anyone
+reaches by fitting more memory to an existing machine. Through the
+mid-2020s the largest supercomputers carried total memory measured in
+single-digit petabytes, so a 50-qubit state vector exceeds the whole
+memory of any one of them, and it buys one state vector with no gate
+applied to it yet.
 
-## Physical Interpretation
+## A Wall No Implementation Can Move
 
 This cost is not a limitation of any particular implementation choice.
 It's a direct consequence of quantum mechanics' own structure: an
@@ -158,9 +166,9 @@ $n$-qubit state has $2^n$ independent complex degrees of freedom
 (Mathematical Foundations' tensor-product dimension counting), and
 representing that exactly requires storing all of them. This is, in one
 sense, why quantum computers are potentially powerful at all: classical
-memory cannot compress this information away for a generic state — the
-exact structural point Feynman was making in 1981, well before there
-was hardware capable of testing it directly.
+memory cannot compress this information away for a generic state, the
+structural point Feynman was making in 1981, well before there was
+hardware capable of testing it directly.
 
 <ResearchConnection title="Choosing a qubit count to sit past the wall" source="Arute et al., Nature 574, 505-510 (2019)" url="https://www.nature.com/articles/s41586-019-1666-5">
 Google's 2019 Sycamore experiment used 53 qubits specifically: that
@@ -174,7 +182,7 @@ past this specific wall means abandoning exact state-vector simulation
 entirely, not just buying a bigger machine.
 </ResearchConnection>
 
-## Worked Example
+## Costing 500 Gates on Thirty-Five Qubits
 
 **A circuit runs 500 gates on 35 qubits. Roughly how many floating-point
 operations does exact state-vector simulation require?**
@@ -189,7 +197,7 @@ take roughly 17 seconds, for JUST 35 qubits and a modest 500 gates,
 illustrating how quickly even "reasonable-sounding" circuit sizes push
 into serious computational cost.
 
-## Common Mistakes
+## Expecting Memory and Time to Fail at Different Sizes
 
 <Callout type="note">
 **Treating memory and time cost as separate concerns with different
@@ -209,17 +217,196 @@ solution to it.
 ## Practice Questions
 
 1. Compute the exact memory (in bytes) for a 25-qubit state-vector
-   simulation.
+   simulation. Then write that figure as a power of two, and say why the
+   same number can be quoted as both 512 MiB and 536.9 MB.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   16\times2^{25} = 16\times33{,}554{,}432 = 536{,}870{,}912 \text{ bytes}.
+   $$
+
+   `stateVectorMemoryBytes(25)` returns exactly 536,870,912. That is
+   $2^{29}$ bytes, or 512 MiB exactly, which is a nice sanity check in
+   itself: $16=2^4$, so $16\times2^{25}=2^{29}$, and every entry in this
+   table is an exact power of two.
+
+   Where the 16 comes from: one complex amplitude is two
+   double-precision floats, real and imaginary, at 8 bytes each. Nothing
+   is stored per qubit; everything is stored per basis state, and there
+   are $2^{25}=33{,}554{,}432$ of those.
+
+   Note that this is comfortable. Half a gigabyte for 25 qubits sits well
+   inside a laptop, and it is easy to conclude from that that 25 qubits
+   is a modest problem. The relevant comparison is what the next few
+   qubits cost: 30 qubits is 17.2 GB, and 40 is 17.6 TB. Fifteen more
+   qubits than this question's, and the answer has moved from "fits in
+   RAM without thinking about it" to "needs a serious cluster."
+
+   The wrong turn is a units one, and it is easy to make in either
+   direction. The formula gives *bytes*. Reporting 33.5 million because
+   you stopped at the amplitude count is off by the factor of 16, and
+   reporting 536.9 MB rather than 512 MiB is not wrong but is a different
+   convention: decimal megabytes and binary mebibytes differ by about
+   5%, which is worth naming explicitly whenever these figures are
+   compared against a machine's advertised memory.
+
+   </details>
+
 2. Using the worked example's methodology, estimate the total
-   floating-point operations for a 1000-gate circuit on 30 qubits.
+   floating-point operations for a 1000-gate circuit on 30 qubits. Set it
+   against the worked example itself (500 gates on 35 qubits) and say
+   which of the two inputs, gate count or qubit count, accounts for most
+   of the difference.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \text{numGates}\times2^{n} = 1000\times2^{30} = 1000\times1{,}073{,}741{,}824 \approx 1.07\times10^{12}.
+   $$
+
+   `estimatedGateFlops(30, 1000)` returns 1,073,741,824,000, about a
+   trillion floating-point operations.
+
+   At roughly $10^{12}$ operations per second on a fast modern system,
+   that is on the order of a second of compute. Compare the lesson's
+   worked example, 500 gates on 35 qubits, which came to
+   $1.72\times10^{13}$ and roughly 17 seconds. Double the gates and five
+   fewer qubits, and the cost still dropped by a factor of sixteen: the
+   extra gates multiplied the work by two, and the five fewer qubits
+   divided it by $2^5=32$.
+
+   That asymmetry is the thing to take away. The circuit's *depth* enters
+   linearly, so doubling the gate count doubles the work. The *width*
+   enters exponentially, so five more qubits multiplies it by 32. A
+   simulation that is uncomfortably slow can be rescued by shortening
+   the circuit and cannot be rescued by anything at all if the problem
+   is the qubit count.
+
+   The reason a single-qubit gate costs $O(2^n)$ rather than $O(1)$ is
+   worth restating, since it is the origin of the whole cost model.
+   `applySingleQubitGate` pairs up every amplitude with its
+   bit-flipped partner and rewrites both, so it reads and writes the
+   entire array. Nothing in the array announces which entries happen to
+   be zero, which is exactly what the lesson's worked 3-qubit Hadamard
+   showed: one gate on one qubit, and all eight slots were touched.
+
+   The wrong turn is treating this as a running-time upper bound to be
+   compared against a real profile. It is a leading-order operation
+   count, and a real simulator's wall-clock time is usually dominated by
+   memory bandwidth rather than arithmetic, since it is streaming
+   gigabytes through a pipeline that does two multiplies per element. The
+   scaling is right; the constant is not something to bet on.
+
+   </details>
+
 3. If a research group upgrades from a system that can simulate 40
    qubits to one with 1000× more memory, roughly how many additional
-   qubits can they now simulate? Use the Common Mistakes section's
-   reasoning.
+   qubits can they now simulate? Reason the way the cautions above do.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **About nine or ten.** Nine for certain.
+
+   Each extra qubit doubles the memory requirement, so a factor of $M$ in
+   memory buys $\log_2 M$ qubits, and
+
+   $$
+   \log_2 1000 \approx 9.97 .
+   $$
+
+   Checking against the engine rather than the logarithm: 40 qubits needs
+   17.6 TB, and 49 qubits needs exactly $2^9=512$ times that, which fits
+   inside a 1000-fold budget with room to spare. Fifty qubits needs
+   $2^{10}=1024$ times, just past it. So nine more qubits is comfortable,
+   the tenth is a near miss, and 49 to 50 is the honest answer.
+
+   That is the caution's arithmetic run at a larger scale. The lesson
+   notes a 10× hardware improvement buys $\log_2 10\approx3.3$ qubits.
+   Multiplying the improvement by a hundred, from 10× to 1000×, only
+   triples the number of qubits gained, because the buyer is on the
+   wrong side of an exponential. The relationship between resources and
+   capability is logarithmic, and logarithms are unimpressed by large
+   inputs.
+
+   Put the result next to what it took. A thousandfold memory increase is
+   not an upgrade cycle; it is the difference between a workstation and
+   one of the largest machines in the world. The prize is nine qubits,
+   landing at 49, still below Google's 53-qubit Sycamore experiment,
+   which was chosen at that size precisely to sit past this wall.
+
+   The wrong turn is to conclude the wall is therefore a hardware-funding
+   problem, solvable by a sufficiently determined institution. Follow the
+   arithmetic one step further: another thousandfold on top of the first
+   buys nine more, reaching 58. Every additional qubit costs as much as
+   everything spent so far. Getting meaningfully past this point means
+   abandoning exact state-vector simulation for something that exploits
+   structure, which is what Tensor Network Methods does and what IBM's
+   response to the Sycamore claim did.
+
+   </details>
+
 4. Explain, using the tensor-product dimension-counting idea from
    Mathematical Foundations, why $2^n$ growth is a fact about quantum
    mechanics itself, not an artifact of how this platform's engine
-   happens to be implemented.
+   happens to be implemented. Then say what that same fact implies about
+   why a quantum computer might beat a classical one.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $2^n$ is the *dimension of the state space*, and dimension is a
+   property of the physics, not of any program.
+
+   Mathematical Foundations' counting rule: combining two systems takes
+   the tensor product of their state spaces, and tensor products
+   multiply dimensions. One qubit lives in a two-dimensional complex
+   space. Two qubits live in $\mathbb{C}^2\otimes\mathbb{C}^2$, dimension
+   $2\times2=4$. Add another and it is 8. After $n$ qubits the dimension
+   is $2^n$, and a basis for a space of that dimension has $2^n$ vectors,
+   so a general state needs $2^n$ complex coefficients to specify it.
+
+   The load-bearing word is **general**. A basis has $2^n$ elements, and a
+   generic vector has a nonzero component along every one of them. There
+   is no smaller set of numbers that determines an arbitrary state,
+   because if there were, the space would have had a smaller dimension.
+   That is what dimension means.
+
+   So the storage cost is not a choice this engine made. Any exact
+   representation of an arbitrary $n$-qubit state, in any language, on
+   any machine, using any clever data structure, must be able to
+   distinguish $2^n$ independent complex directions. Compression works
+   only where a state is not generic, which is a real and important
+   escape route and precisely the one Tensor Network Methods takes. It is
+   not available in general.
+
+   The physical significance runs the other way round, and this is the
+   part worth carrying. That the information *cannot* be compressed away
+   for a generic state is exactly why a quantum computer might be able to
+   do something a classical one cannot. If $n$ qubits could always be
+   described by, say, $n^2$ classical numbers, a classical machine would
+   simply track those numbers and there would be no advantage to chase.
+   The cost of simulation and the possibility of advantage are two
+   readings of one fact, which is what Feynman was pointing at in 1981,
+   before any hardware existed to test it.
+
+   Two wrong turns.
+
+   The first is expecting a better data structure to help. Sparse
+   storage, for instance, is a genuine optimization for states with many
+   zero amplitudes, and generic states do not have many zero amplitudes.
+   It saves nothing in the case that sets the wall.
+
+   The second is confusing the count of qubits with the count of degrees
+   of freedom. $n$ qubits is $n$ physical objects and $2^n$ complex
+   amplitudes, and the whole subject lives in the gap between those two
+   numbers. Real hardware pays the first, linearly, in control lines and
+   cooling. A classical simulator pays the second.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -231,11 +418,11 @@ solution to it.
 - The practical wall sits around 30-40 qubits (serious clusters) to ~50
   qubits (beyond any existing classical system), a narrow 20-qubit span
   covering "easy" to "impossible."
-- This cost is fundamental (from $2^n$ real degrees of freedom in an
-  $n$-qubit state, the same count Feynman pointed to in 1981), not an
-  implementation artifact fixable by better classical hardware alone.
+- This cost is fundamental, coming from the $2^n$ complex amplitudes in
+  an $n$-qubit state, the same count Feynman pointed to in 1981. Better
+  classical hardware alone cannot fix it.
 
-## Further Exploration
+## Getting Past the Wall, Conditionally
 
 <NextDiscovery>
 [Tensor Network Methods](/lessons/quantum-software/simulating-quantum-systems/tensor-network-methods) push past this wall for a

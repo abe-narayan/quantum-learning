@@ -57,12 +57,12 @@ export const shotNoiseStandardErrorP75N300: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "The standard error of an estimated probability from N shots is sqrt(p(1-p)/N), exactly the formula this lesson derived from the binomial distribution's variance.",
+      "The standard error of an estimated probability from N shots is sqrt(p(1-p)/N), the formula this lesson derived from the binomial distribution's variance.",
     whyCorrect:
       "k successes out of N independent trials is binomially distributed with variance Np(1-p); dividing by the constant N to form p̂ = k/N scales the variance by 1/N², giving Var(p̂) = p(1-p)/N and hence SE(p̂) = sqrt(p(1-p)/N).",
     whyWrong: [
       "Forgetting to divide by N before taking the square root gives the single-trial standard deviation, sqrt(p(1-p)) ≈ 0.433, dramatically overstating the uncertainty in the average of 300 trials.",
-      "Using sqrt(p(1-p)) × N or sqrt(N) alone confuses the shot count's role in reducing uncertainty (it divides variance, inside the square root) with scaling it up.",
+      "Multiplying sqrt(p(1-p)) by N or by sqrt(N) confuses the shot count's role. It divides the variance, inside the square root; it never scales the uncertainty up.",
     ],
   },
 };

@@ -5,7 +5,14 @@ import { Footer } from "@/components/layout/Footer";
 import { QuantumField } from "@/components/field/QuantumField";
 import { getLessonMeta } from "@/lib/content/lessons";
 import { START_LEARNING_SLUG } from "@/lib/nav";
-import { BASE_URL, buildOrganizationSchema, buildWebSiteSchema } from "@/lib/structuredData";
+import {
+  BASE_URL,
+  PROBLEM_COUNT,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  buildOrganizationSchema,
+  buildWebSiteSchema,
+} from "@/lib/structuredData";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -75,22 +82,48 @@ const fraunces = Fraunces({
   preload: false,
 });
 
+// The tab title and the search-result snippet are the first sentences anyone
+// reads about this site, usually before they have seen a single page of it, so
+// they carry the whole "what is this, who is it for, why should I care" load.
+// The description names the three things a visitor can actually do here and the
+// range they span, rather than describing the site as a platform: "219 lessons
+// and 14 simulators" tells someone what they are getting, "an interactive
+// platform" tells them nothing.
+//
+// It is now *imported* from `SITE_DESCRIPTION` rather than kept in step with
+// it by hand. It carries a problem count, and a count that has to be retyped
+// in four files is a count that is wrong: this one said 549 against a real
+// corpus of 556 that grew twice in a day. `SITE_DESCRIPTION` derives that
+// figure from the generated problem-meta array, so the search snippet, the
+// JSON-LD and the web-app manifest cannot drift apart or fall behind the
+// corpus. See the note on `PROBLEM_COUNT` in src/lib/structuredData.ts for why
+// counting there is free of the build-memory cost the full registry carries.
 const title = {
-  default: "QuantumLearn — Learn Quantum Mechanics & Quantum Computing",
-  template: "%s · QuantumLearn",
+  default: "StudyQuantum: Quantum Mechanics and Quantum Computing from Scratch",
+  template: "%s · StudyQuantum",
 };
-const description =
-  "An interactive platform for learning quantum mechanics and quantum computing — lessons, simulators, and problem sets for advanced high-school and early-college students.";
+const description = SITE_DESCRIPTION;
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title,
   description,
   alternates: { canonical: BASE_URL },
+  // No `images` key here, deliberately. Next merges the file-convention card
+  // (src/app/opengraph-image.tsx) into a segment's `openGraph` only when that
+  // segment does not declare `images` itself, so writing one here would trade
+  // this route's `og:image:alt` and `og:image:type` for a URL it already has.
+  // Every *other* route declares its own `openGraph`, which replaces this
+  // object wholesale and so loses the merged image — those re-declare the card
+  // through `SITE_OG_IMAGES` in src/lib/pageMetadata.ts. `siteName` is new and
+  // has to be stated on both paths: it was absent site-wide, so a shared link
+  // showed a title and a description with nothing naming the site they came
+  // from.
   openGraph: {
     title: title.default,
     description,
     url: BASE_URL,
+    siteName: SITE_NAME,
     type: "website",
   },
   twitter: {
@@ -117,16 +150,45 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             before first paint, so a returning visitor's explicit light/dark
             choice (ThemeToggle, src/components/layout/ThemeToggle.tsx)
             applies immediately instead of flashing the OS-default theme
-            first. Left unset (no attribute) for the "system" choice or a
-            first-time visitor, so the `prefers-color-scheme` fallback in
-            globals.css keeps driving the theme. suppressHydrationWarning
+            first. "system" is written as its own attribute value, not encoded
+            as the absence of one: globals.css §4 gates the light palette on
+            `:root[data-theme="system"]` inside `prefers-color-scheme: light`,
+            so an unset attribute means dark, full stop. That is the site's
+            dark-first default and what a first-time visitor gets whatever
+            their OS is set to (globals.css §"Three selectors drive the
+            theme"). This comment used to claim the opposite, that an unset
+            attribute let `prefers-color-scheme` drive; it described the
+            selector the stylesheet had before the dark-first decision landed.
+            suppressHydrationWarning
             above tells React to accept the DOM attribute this sets rather
             than treat it as a mismatch. Keep this in sync with the storage
-            key/values ThemeToggle reads and writes. */}
+            key/values ThemeToggle reads and writes.
+
+            The rename to StudyQuantum moved the key from `quantumlearn:theme`
+            to `studyquantum:theme`. This script is the single place the
+            forward-copy happens, and it happens here rather than in
+            ThemeToggle because it has to run before first paint anyway: a
+            returning visitor who chose light must not see one dark frame
+            while React boots. Read the new key; only if it is absent, read
+            the old one, use it, and copy it forward once so every later read
+            (this script, ThemeToggle, global-error.tsx) finds the new key. The
+            old key is left in place rather than removed: deleting it buys
+            nothing, and keeping it means a rollback to the previous build
+            still finds the reader's choice.
+
+            The whole body is inside one try/catch because `localStorage`
+            itself throws (not just its methods) when a browser is set to
+            block site data, and an uncaught throw in a synchronous head
+            script is a blank page. The inner try/catch around `setItem`
+            covers the quota/read-only case separately, so a failed copy
+            still leaves the theme applied for this page view. With nothing
+            stored at all, no attribute is written and globals.css's
+            dark-first default renders, which is the correct first-visit
+            page. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              '(function(){try{var t=localStorage.getItem("quantumlearn:theme");if(t==="light"||t==="dark"||t==="system")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()',
+              '(function(){try{var k="studyquantum:theme",t=localStorage.getItem(k);if(t===null){var o=localStorage.getItem("quantumlearn:theme");if(o!==null){t=o;try{localStorage.setItem(k,o)}catch(e){}}}if(t==="light"||t==="dark"||t==="system")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()',
           }}
         />
         {/* Scroll-reveal safety net. `[data-reveal]` starts at `opacity: 0`
@@ -144,6 +206,25 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
         </noscript>
+        {/* The two hosts the lesson figures load from, and the only two
+            `img-src` allows (next.config.ts): of 141 external figures in 141
+            lessons, 138 come from `upload.wikimedia.org` and three from
+            `www.nist.gov`. Two components load them, not one: 133
+            `ExternalFigure` (130 Wikimedia, 3 NIST) and 8 `AnnotatedFigure`
+            (all Wikimedia), which renders the same plain `<img>`. Nothing on this
+            origin resolved either name before, so the first figure a reader
+            scrolled to paid a cold DNS lookup plus TCP plus TLS before a byte
+            of image arrived — on a connection where the document, the CSS and
+            the fonts had all been served from `self` already.
+
+            `dns-prefetch`, not `preconnect`. Preconnect would open a TCP and
+            TLS connection on all 823 routes, including the ~680 that load no
+            external figure at all, to save a handshake on the 133 that do. A
+            DNS hint is a resolver query the browser is free to drop, costs
+            nothing on a route that never uses it, and covers the part of the
+            delay that is pure latency. */}
+        <link rel="dns-prefetch" href="https://upload.wikimedia.org" />
+        <link rel="dns-prefetch" href="https://www.nist.gov" />
       </head>
       <body className="flex min-h-full flex-col font-sans">
         <script
@@ -171,7 +252,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             here, on the server, and only the number crosses the boundary.
             `getLessonMeta` is a synchronous registry lookup (plain data, no
             MDX import), so this layout stays non-async. */}
-        <Navbar startLessonMinutes={getLessonMeta(START_LEARNING_SLUG)?.estimatedMinutes} />
+        {/* `problemCount` travels the same way and for the same reason: the
+            only derivation of it counts the generated problem-meta array,
+            which no client bundle may reach, so the number crosses the
+            boundary rather than the module that knows it. */}
+        <Navbar
+          startLessonMinutes={getLessonMeta(START_LEARNING_SLUG)?.estimatedMinutes}
+          problemCount={PROBLEM_COUNT}
+        />
         {/* `tabIndex={-1}` is what makes the skip link above actually skip.
             A fragment link to a non-focusable element only moves the scroll
             position and sets the sequential-focus starting point; browsers

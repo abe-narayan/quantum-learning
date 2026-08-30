@@ -29,7 +29,7 @@ export const thetaPreservedUnderRz: NumericProblem = {
     type: "numeric",
     value: theta,
     tolerance: 0.02,
-    incorrectFeedback: "Recall which coordinate Rz changes and which one it leaves alone — the lesson states this as a directly testable, falsifiable claim.",
+    incorrectFeedback: "Recall which Bloch coordinate Rz changes and which it leaves alone. The lesson states this as a testable claim.",
     nearMisses: [
       { value: 1.3, feedback: "1.3 is the rotation angle you applied. It advances the longitude φ, and leaves the latitude θ where it was." },
       { value: Math.PI / 2 + 1.3, tolerance: 0.02, feedback: "You added the rotation angle to θ. Rz adds to φ instead; θ is measured from the very axis Rz turns about, so it cannot change." },
@@ -53,8 +53,8 @@ export const thetaPreservedUnderRz: NumericProblem = {
     correctIdea: "Rz rotates about the axis θ is measured from, so it structurally cannot change θ, for any rotation angle.",
     whyCorrect: "This is confirmed directly: applying Rz(1.3), an angle with no special relationship to π/2, still leaves θ completely unchanged.",
     whyWrong: [
-      "Assuming the applied angle (1.3) somehow adds to or replaces θ — that's what Rz does to φ, not θ.",
-      "Assuming any rotation changes both θ and φ — true for Rx and Ry, but specifically false for Rz.",
+      "Assuming the applied angle (1.3) adds to or replaces θ. That is what Rz does to φ, not to θ.",
+      "Assuming every rotation changes both θ and φ. That holds for Rx and Ry, but not for Rz.",
     ],
   },
 };

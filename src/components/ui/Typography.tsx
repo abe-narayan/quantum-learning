@@ -72,26 +72,117 @@ export function SectionTitle({
 
 /** Standfirst / deck: the paragraph directly under a title. Slightly larger
  *  than body copy and always measured, because an unmeasured 20px line at
- *  full page width is unreadable. */
-export function Lede({ children, className }: { children: ReactNode; className?: string }) {
+ *  full page width is unreadable.
+ *
+ *  `text-xl` (20px), not `text-lg`. `.prose` is now set at 1.125rem
+ *  (globals.css §"reading measure"), which is exactly `text-lg` — so on every
+ *  page that carries both a lede and a prose body, the lesson page above all,
+ *  the standfirst had collapsed onto the body size and the voice with it. 20px
+ *  is a visible step over 18px prose and the classic 1.25x standfirst ratio
+ *  over the 16px body on the index pages, which is the size this component's
+ *  own measure was chosen for. `ApexHero` already overrode to `text-xl` by
+ *  hand; that override is now the default. */
+/**
+ * How wide this standfirst is allowed to run. A **prop**, not a `max-w-*`
+ * class passed through `className`, and the difference was not cosmetic.
+ *
+ * `cn()` is a plain string join with no tailwind-merge, so a `max-w-reading`
+ * passed in did not replace the base `max-w-lede`: both landed in the class
+ * attribute and *stylesheet* order decided the winner. `globals.css`'s
+ * `@theme inline` declares `--container-reading` (46rem) before
+ * `--container-lede` (42rem), so `max-w-lede` is emitted last and won every
+ * time. Seven call sites across /about, /learn, /lessons, /mastery,
+ * /simulators, /current-quantum and `ApexHero` asked for 46rem and silently
+ * got 42rem; three more asked for `max-w-none` and stayed capped.
+ *
+ * Naming the widths here means the component emits exactly one `max-w-*` and
+ * there is nothing left to lose a specificity race with. Same class of bug as
+ * the `p-4` note in `curriculum/PillarLessonStrip.tsx`; the alternative,
+ * adding `tailwind-merge`, is a new dependency against 7.3 KB of client budget
+ * headroom for what is really a three-value enum.
+ */
+type LedeWidth = "lede" | "reading" | "wide" | "none";
+
+const LEDE_WIDTH_CLASS: Record<LedeWidth, string> = {
+  lede: "max-w-lede",
+  reading: "max-w-reading",
+  wide: "max-w-3xl",
+  none: "max-w-none",
+};
+
+export function Lede({
+  children,
+  className,
+  width = "lede",
+}: {
+  children: ReactNode;
+  className?: string;
+  width?: LedeWidth;
+}) {
   return (
-    <p className={cn("max-w-[42rem] text-lg leading-relaxed text-muted-foreground", className)}>
+    <p
+      className={cn(
+        LEDE_WIDTH_CLASS[width],
+        "text-xl leading-relaxed text-muted-foreground",
+        className
+      )}
+    >
       {children}
     </p>
   );
 }
+
+/**
+ * The one ARIA attribute the two instrument voices forward, and why it has to
+ * be declared rather than assumed.
+ *
+ * A closed props type on a JSX component does **not** reject a hyphenated
+ * attribute. TypeScript permits `aria-*` and `data-*` names on any JSX element
+ * regardless of the component's declared props, so
+ * `<TechValue aria-hidden="true">` type-checks, is destructured by nobody,
+ * reaches no element, and emits nothing. `tsc --noEmit` stays green and the
+ * markup reads exactly right — the same shape of silent failure as the
+ * unlayered-CSS and `rounded-[--x]` traps this codebase already guards.
+ *
+ * It had shipped. `DailyPuzzleClient`'s reserved-space readout wrote
+ * `<TechValue className="text-xs opacity-0" aria-hidden="true">0000-00-00`,
+ * and the served homepage carried
+ * `<span class="tech-value text-xs opacity-0">0000-00-00</span>`: invisible to
+ * a sighted reader, announced to a screen-reader one, which is the exact
+ * inversion of what the call site asked for.
+ *
+ * `aria-hidden` **only**, deliberately. `aria-label` is not forwarded: these
+ * render a bare `<span>`, which has the implicit `generic` role, ARIA prohibits
+ * naming that role, and every major screen reader drops the attribute — so
+ * forwarding it would swap a visibly dead attribute for an invisibly dead one.
+ * A caller who needs a name needs a role with it, which is `Panel`'s
+ * `nameableRole()` problem and not this one. Note that both components below
+ * destructure this attribute *by name* rather than collecting a `...rest`:
+ * a rest spread would forward whatever a caller passed, including the
+ * `aria-label` this type exists to refuse, and the refusal would then hold
+ * only for callers TypeScript actually checks. See
+ * `__tests__/ariaPassthrough.test.ts`.
+ */
+type Hideable = {
+  "aria-hidden"?: boolean | "true" | "false";
+};
 
 /** Instrument metadata label — uppercase, tracked, mono. */
 export function TechLabel({
   children,
   className,
   as: Component = "span",
-}: {
+  "aria-hidden": ariaHidden,
+}: Hideable & {
   children: ReactNode;
   className?: string;
   as?: ElementType;
 }) {
-  return <Component className={cn("tech-label", className)}>{children}</Component>;
+  return (
+    <Component aria-hidden={ariaHidden} className={cn("tech-label", className)}>
+      {children}
+    </Component>
+  );
 }
 
 /** A numeric readout. Tabular figures so a changing value doesn't reflow the
@@ -100,12 +191,17 @@ export function TechValue({
   children,
   className,
   as: Component = "span",
-}: {
+  "aria-hidden": ariaHidden,
+}: Hideable & {
   children: ReactNode;
   className?: string;
   as?: ElementType;
 }) {
-  return <Component className={cn("tech-value", className)}>{children}</Component>;
+  return (
+    <Component aria-hidden={ariaHidden} className={cn("tech-value", className)}>
+      {children}
+    </Component>
+  );
 }
 
 /**

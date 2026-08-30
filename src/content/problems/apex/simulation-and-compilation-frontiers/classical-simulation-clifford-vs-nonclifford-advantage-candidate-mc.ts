@@ -15,23 +15,23 @@ export const classicalSimulationCliffordVsNonCliffordAdvantageCandidateMc: Multi
   question: {
     type: "multiple-choice",
     prompt:
-      "A team is choosing between two deep, highly-entangling circuits (both scrambling entanglement across the whole system in a fast, 2D-brickwork pattern) as a candidate for demonstrating quantum advantage. Circuit P uses only random Clifford gates (H, S, CNOT). Circuit Q uses random single-qubit rotations that are NOT restricted to Clifford angles, plus the same entangling two-qubit gates. Which is the better quantum-advantage candidate, and why?",
+      "A team is choosing between two deep, highly-entangling circuits (both scrambling entanglement across the whole system in a fast, 2D-brickwork pattern) as a candidate for demonstrating quantum advantage. Circuit P uses only random Clifford gates (H, S, CNOT). Circuit Q uses random single-qubit rotations that are not restricted to Clifford angles, plus the same entangling two-qubit gates. Which is the better quantum-advantage candidate, and why?",
     options: [
       {
         id: "a",
-        text: "Circuit Q is the better candidate: it violates both known efficient-classical-simulation criteria at once (it isn't a stabilizer circuit, and it generates volume-law entanglement), whereas Circuit P, however entangled, remains a stabilizer circuit and is therefore simulable in polynomial time by the Gottesman-Knill tableau algorithm regardless of how much entanglement it generates.",
+        text: "Circuit Q: it is neither a stabilizer circuit nor entanglement-bounded, while Circuit P stays stabilizer and Gottesman-Knill handles it however entangled",
       },
       {
         id: "b",
-        text: "Circuit P is the better candidate, because it generates more entanglement than Circuit Q, and entanglement alone determines classical simulability.",
+        text: "Circuit Q, because non-Clifford rotations are what make a state entangled, so Circuit P stays close to a product state throughout",
       },
       {
         id: "c",
-        text: "Neither is a meaningfully better candidate: since both circuits scramble entanglement across the whole system equally fast, both are equally hard to simulate classically.",
+        text: "Circuit P, because it generates entanglement faster than Circuit Q does, and how much entanglement a circuit builds is what decides classical simulability",
       },
       {
         id: "d",
-        text: "Circuit P is the better candidate, because Clifford circuits use more distinct gate types (H, S, and CNOT) than Circuit Q's single rotation-plus-entangler pattern, and using more distinct gates always makes a circuit harder to simulate.",
+        text: "Neither is better: both scramble entanglement across the whole system at the same rate, so both resist classical simulation equally",
       },
     ],
   },
@@ -39,12 +39,12 @@ export const classicalSimulationCliffordVsNonCliffordAdvantageCandidateMc: Multi
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Entanglement alone does not determine classical simulability. Circuit P can be pushed to maximal entanglement and remain trivially easy to simulate via Gottesman-Knill, since that theorem's efficiency guarantee depends only on the gate set (Clifford + Pauli measurement), never on how entangled the resulting state is.",
-      c: "This ignores the gate-set criterion entirely. Circuit P's entanglement is irrelevant to its simulability, because it never leaves the stabilizer formalism: the tableau algorithm tracks its stabilizer generators in polynomial time no matter how volume-law its entanglement gets. Circuit Q has no such escape hatch.",
-      d: "The number of distinct gate *types* used has nothing to do with classical simulability. What matters is whether every gate belongs to the Clifford group (H, S, CNOT, and products thereof) -- Circuit P qualifies regardless of using three different named gates, and a single non-Clifford gate in Circuit Q is enough to remove Gottesman-Knill's guarantee entirely.",
+      b: "The verdict is right and the reason is not. Clifford circuits reach volume-law entanglement quite happily, so Circuit P is nowhere near a product state. What keeps it out of contention is the tableau algorithm, not any shortage of entanglement.",
+      c: "Entanglement on its own does not decide simulability. Circuit P can be pushed to maximal entanglement and still be simulated in polynomial time, because Gottesman-Knill's guarantee depends on the gate set and never on how entangled the state becomes.",
+      d: "This applies one criterion and skips the other. Circuit P never leaves the stabilizer formalism, so its entanglement growth costs a simulator nothing, while Circuit Q has no such escape hatch.",
     },
     defaultIncorrectFeedback:
-      "Apply both classical-simulability criteria independently: is the circuit Clifford-only (regardless of entanglement), and/or does its entanglement stay bounded (regardless of gate set)? Circuit P fails to violate the first; Circuit Q violates both.",
+      "Apply the two efficient-simulation criteria separately: is the circuit Clifford-only, whatever its entanglement, and does its entanglement stay bounded, whatever its gate set? One of these circuits escapes only one of them.",
   },
   hints: [
     { text: "Classify each circuit against both of the lesson's two independent criteria: gate set (Clifford-only?) and entanglement growth (bounded or volume-law?)." },
@@ -53,7 +53,7 @@ export const classicalSimulationCliffordVsNonCliffordAdvantageCandidateMc: Multi
   ],
   solution: {
     steps: [
-      { description: "Circuit P: gate set is entirely Clifford, so the gate-set criterion (Gottesman-Knill) applies regardless of how much entanglement the circuit generates -- it is efficiently simulable no matter how deep or scrambling it is." },
+      { description: "Circuit P: gate set is entirely Clifford, so the gate-set criterion (Gottesman-Knill) applies regardless of how much entanglement the circuit generates. It is efficiently simulable no matter how deep or scrambling it is." },
       { description: "Circuit Q: gate set includes non-Clifford rotations, so the gate-set criterion does not apply; and it generates volume-law entanglement, so the bounded-bond-dimension criterion does not apply either." },
       { description: "Circuit Q is therefore the only one of the two that violates both known efficient classical-simulation criteria at once, making it the actual candidate worth pursuing for a quantum-advantage claim." },
     ],
@@ -65,9 +65,9 @@ export const classicalSimulationCliffordVsNonCliffordAdvantageCandidateMc: Multi
     whyCorrect:
       "Applying both criteria independently to each circuit shows Circuit P failing to escape Gottesman-Knill no matter how entangled it becomes, while Circuit Q escapes both known efficient methods at once. That is why real quantum-advantage experiments use random, non-Clifford, fast-entangling circuits rather than merely 'entangled' ones.",
     whyWrong: [
-      { optionId: "b", text: "Treats entanglement as the sole determinant of simulability, the Common Mistake this lesson warns against." },
-      { optionId: "c", text: "Ignores that Circuit P never leaves the efficiently-simulable stabilizer formalism, regardless of its entanglement." },
-      { optionId: "d", text: "Invents a 'more gate types is harder' rule with no basis in the theorem. Membership in the Clifford group, not gate-type variety, is what matters." },
+      { optionId: "b", text: "Lands on the right circuit for a reason that is false. Clifford gates generate plenty of entanglement; what makes Circuit P simulable is that the tableau tracks it regardless." },
+      { optionId: "c", text: "Treats entanglement as the only thing deciding simulability, when a heavily entangled stabilizer state is still simulated efficiently by Gottesman-Knill." },
+      { optionId: "d", text: "Weighs the two circuits on entanglement growth alone and never checks the gate set, which is the criterion that separates them." },
     ],
   },
 };

@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazySyndromeExplorer } from "@/components/simulators/syndrome-explorer/LazySyndromeExplorer";
+import { ScrollableFigure } from "@/components/mdx/ScrollableFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction"
@@ -24,10 +25,10 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Local stabilizers, arbitrarily large grids">
-The Shor code needs stabilizers spanning six qubits at a time and offers no way to improve its distance without a redesign. The surface code fixes both: every stabilizer touches only 4 neighboring qubits, however large the grid grows.
+The Shor code needs stabilizers spanning six qubits at a time and offers no way to improve its distance without a redesign. The surface code fixes both: no stabilizer ever touches more than 4 neighboring qubits, however large the grid grows.
 </LessonHook>
 
-## Motivation
+## Two problems that appear only when you build it
 
 The Shor code has two problems that only show up when you try to build it.
 Its $X$-type stabilizers span six of its nine qubits at once, two whole
@@ -37,35 +38,55 @@ protection means designing a different code.
 
 The **<Term id="surface-codes">surface code</Term>** fixes both, and that is why it, rather than
 anything in the last four lessons, is what fault-tolerance roadmaps are
-built around. Every stabilizer touches 4 neighbouring qubits on a 2D grid,
-however large the grid becomes, and protection increases by making the grid
-bigger with the same pattern repeated.
+built around. Its stabilizers touch 4 neighbouring qubits on a 2D grid,
+and never more, however large the grid becomes, and protection increases
+by making the grid bigger with the same pattern repeated.
 
-## Mathematical Development
+## A lattice, local checks, and distance from grid size
 
 ### The lattice structure
 
 Physical qubits sit on the edges of a 2D grid. Two types of <Term id="stabilizer-formalism">stabilizer</Term>,
 one per grid vertex and one per grid face, are each a product of $Z$'s
 (vertex stabilizers) or $X$'s (face stabilizers) on the 4 qubits touching
-that vertex or face, always exactly 4 qubits, **regardless of how large
-the grid grows**. This is the key structural improvement over the 3- and
+that vertex or face, still 4 qubits **regardless of how large
+the grid grows** (on a finite patch, stabilizers along the boundary are
+smaller, never larger). This is the key structural improvement over the 3- and
 9-qubit codes: every one of this course's earlier codes needed a
 stabilizer touching *every* qubit in some group; a surface code's
 stabilizers stay local and small, however large the overall code gets.
 
-A small $3\times3$-vertex patch makes the pattern concrete: physical
-qubits (small squares) sit on every edge between neighboring vertices.
-The **vertex stabilizer** highlighted at the center is a product of $Z$
-on the 4 qubits touching that vertex; the **face stabilizer** highlighted
-at top left is a product of $X$ on the 4 qubits bordering that face. The
-two double-outlined qubits belong to *both* highlighted stabilizers at
-once, exactly the local overlap that lets neighboring stabilizers jointly
-pin down where an error occurred. Every other vertex and face in a larger
-grid has the identical local pattern, just repeated:
+Name the layout, because there are two of them and you will meet both.
+The one drawn here, qubits on edges with one stabilizer per vertex and
+one per face, is the **unrotated** (or planar) surface code, and it is
+the layout this curriculum builds on: Apex's Surface Codes in Depth lays
+out a complete distance-3 patch of exactly this lattice, coordinate by
+coordinate. The other is the **rotated** surface code, which tilts the
+lattice by 45 degrees, puts the data qubits on vertices instead of edges,
+and reaches the same distance with roughly half as many of them, which is
+why hardware demonstrations run it. Same code family, different
+bookkeeping. So a surface-code figure elsewhere that looks nothing like
+this one is not a contradiction, and every qubit count below is the
+unrotated one.
 
-<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-  <svg width={300} height={280} viewBox="0 0 300 280" role="img" aria-label="A 3 by 3 vertex surface-code lattice: physical qubits on edges, a Z-type vertex stabilizer highlighted at the center touching 4 qubits, and an X-type face stabilizer highlighted at top left touching a different 4 qubits, sharing 2 qubits with the vertex stabilizer">
+A $3\times3$-vertex window makes the pattern concrete: physical
+qubits (small squares) sit on every edge between neighboring vertices,
+twelve of them here. The **vertex stabilizer** highlighted at the center
+is a product of $Z$ on the 4 qubits touching that vertex; the **face
+stabilizer** highlighted at top left is a product of $X$ on the 4 qubits
+bordering that face. The two double-outlined qubits belong to *both*
+highlighted stabilizers at once. Count them: exactly two, and that number
+is not decoration, as the prediction after the figure works out.
+
+One thing that twelve is not is a code size. This is a window onto the
+lattice's interior, drawn to show the repeating tile, and a real
+distance-3 patch has to close off its boundary as well; doing that
+properly brings the count to the 13 data qubits the distance section
+below arrives at. Every other vertex and face in a larger grid has the
+identical local pattern, just repeated:
+
+<ScrollableFigure label="Unrotated surface code lattice with one vertex stabilizer and one face stabilizer highlighted">
+  <svg width={300} height={280} viewBox="0 0 300 280" role="img" aria-label="A 3 by 3 grid of vertices from the interior of an unrotated surface-code lattice, with twelve physical qubits drawn as small squares, one on each of the twelve edges between neighboring vertices. A Z-type vertex stabilizer is highlighted at the center, covering the 4 qubits on the edges meeting that vertex. An X-type face stabilizer is highlighted at the top left, covering the 4 qubits bordering that face. Two qubits carry a double outline because they belong to both highlighted stabilizers at once.">
     <line x1={60} y1={60} x2={150} y2={60} className="stroke-border" strokeWidth={2} />
     <line x1={150} y1={60} x2={240} y2={60} className="stroke-border" strokeWidth={2} />
     <line x1={60} y1={140} x2={150} y2={140} className="stroke-border" strokeWidth={2} />
@@ -104,7 +125,19 @@ grid has the identical local pattern, just repeated:
     <text x={150} y={20} textAnchor="middle" className="fill-brand text-[11px] font-medium">Z vertex stabilizer</text>
     <text x={70} y={252} textAnchor="middle" className="fill-accent text-[11px] font-medium">X face stabilizer</text>
   </svg>
-</div>
+</ScrollableFigure>
+
+<PredictBeforeReveal
+  question="The highlighted vertex stabilizer is a product of Z's; the highlighted face stabilizer is a product of X's; and the figure shows them sharing exactly two qubits. X and Z anticommute on any qubit they share. So do these two stabilizers commute, or anticommute?"
+  options={[
+    { label: "They commute: two shared qubits mean two sign flips, and the two cancel", value: "commute" },
+    { label: "They anticommute, since X and Z anticommute on every qubit they share", value: "anticommute" },
+    { label: "It depends on which particular vertex and face you pick", value: "depends" },
+    { label: "The question does not apply: an all-Z operator and an all-X operator are not comparable this way", value: "na" },
+  ]}
+  correctValue="commute"
+  explanation="Lesson 5's counting rule decides it: two Pauli strings commute when they anticommute on an even number of qubits. Here the count is 2, so the two minus signs multiply back to plus, and the stabilizers commute. That is not luck about this one pair. On a square lattice, a vertex and a face either share no qubits at all or share exactly two, so every vertex stabilizer commutes with every face stabilizer, everywhere on the grid. That matters because stabilizer generators have to commute with each other to be measurable together at all: a pair that anticommuted could never both be assigned a definite eigenvalue, and the code would have no code space to protect. The whole lattice construction is built to keep that overlap even."
+/>
 
 ### Try it: the vertex and face mechanisms, already simulated
 
@@ -128,9 +161,15 @@ Inject an error into each below and watch the same engine run, at the
 
 ### Distance scales with grid size
 
-A surface code's <Term id="code-distance">distance</Term> equals the grid's linear size (roughly, the
-shorter of its two dimensions): a $d\times d$ grid gives a
-distance-$d$ code, using $O(d^2)$ physical qubits for 1 logical qubit.
+A surface code's <Term id="code-distance">distance</Term> is the length of the shortest chain of data
+qubits running all the way across the patch from one boundary to the
+opposite one, so it tracks the patch's linear size: widen the lattice and
+every such chain gets longer. A distance-$d$ unrotated patch holds
+$2d^2-2d+1$ data qubits for 1 logical qubit, which is $13$ at $d=3$ and
+$1741$ at $d=30$. (The rotated layout reaches the same distance with
+$d^2$ data qubits, so $9$ and $900$. Both are $O(d^2)$, which is the
+scaling the rest of this course cares about; the constant is what
+hardware cares about.)
 Where reaching a larger distance with the Shor code means a different,
 hand-designed construction, a surface code's distance is one tunable
 parameter. Build a bigger grid, get a more robust code, with the same
@@ -159,8 +198,8 @@ build anything.
 
 ### Scope: conceptual only
 
-Simulating even a small surface code (distance 3, needing roughly 9
-physical qubits plus stabilizer-measurement ancillas, arranged and
+Simulating even a small surface code (distance 3, needing 13 data qubits
+plus 12 stabilizer-measurement ancillas, arranged and
 connected on a real 2D pattern) is substantially more engineering than this
 course's `errorCorrection.ts` builds. Real
 implementations also need a nontrivial *decoding* algorithm (commonly
@@ -171,63 +210,53 @@ explicitly as out of scope, not glossed over: this course teaches the
 structural *idea* (local stabilizers, tunable distance) precisely, without
 claiming a working simulated implementation that doesn't exist here.
 
-## Physical Interpretation
+## An architectural insight, not a mathematical one
 
 The surface code's core insight is architectural, not purely
 mathematical: trade some qubit efficiency (more physical qubits per
 logical qubit than a hypothetical "optimal" code) for a stabilizer
 structure that physically-constrained hardware can measure at all. That is
-the kind of tradeoff the Quantum Hardware pillar explores from the
+the kind of tradeoff the Quantum Hardware track explores from the
 engineering side.
 
 None of this is only conceptual. In December 2024, Google's Willow chip ran
 the distance-scaling experiment this lesson describes: distance-3,
 distance-5 and distance-7 surface-code patches on the same device, each a
-bigger grid of the same local stabilizer pattern. The logical error rate
+bigger grid of the same local stabilizer pattern (rotated patches, as
+hardware always builds). The logical error rate
 dropped roughly in half with each distance increase.
 
 That halving is the whole claim. It is the measured version of "distance is
 a single tunable parameter", and it is the difference between a code that
 works on paper and a code you would build a machine around.
 
-<PredictBeforeReveal
-  question="Both the Shor code and a surface code can be built at distance 3, using roughly the same qubit count. Which one keeps its qubit-efficiency edge as you push to much larger distance, say 11?"
-  options={[
-    { label: "The Shor code, since it was designed first and is more general", value: "shor" },
-    { label: "The surface code, since its local pattern just repeats", value: "surface" },
-    { label: "Neither, both scale identically in qubit count", value: "same" },
-    { label: "It depends entirely on the hardware, not the code", value: "depends" },
-  ]}
-  correctValue="surface"
-  explanation="At distance 3 the two are roughly tied, both around 9 data qubits. But reaching distance 11 with a Shor-style code means an entirely new, larger hand-designed construction, while a surface code just needs an 11x11 grid of the identical local stabilizer pattern already shown above. The surface code's advantage isn't in beating Shor's code at small size, it's that its design cost stays flat as distance grows. Worked out concretely below."
-/>
-
-## Worked Example
+## Qubit counts at distance three, side by side
 
 **Compare qubit efficiency: the Shor code's 9 physical qubits for
-distance 3, versus a surface code's approximate qubit count for the same
-distance.**
+distance 3, versus the unrotated surface code's 13 data qubits for the
+same distance.**
 
-A distance-3 surface code needs roughly $3^2=9$ data qubits (matching the
-Shor code's count here, since both happen to need $\sim d^2$ or $3d$
-qubits respectively at this small size) *plus* separate ancilla qubits for
-each stabilizer measurement (proportional to the number of stabilizers,
-also $O(d^2)$), so at distance 3 specifically, the surface code isn't
-obviously more efficient. The real advantage shows up at *larger*
+A distance-3 unrotated surface code needs $2(3)^2-2(3)+1=13$ data qubits
+against the Shor code's 9, *plus* 12 ancilla qubits, one per stabilizer
+measurement (the stabilizer count is also $O(d^2)$). At distance 3 the
+surface code is the more expensive of the two, and that is worth sitting
+with rather than explaining away. The real advantage shows up at *larger*
 distance: reaching distance 11, say, needs a Shor-style code with an
 entirely different, much larger hand-designed construction, while a
-surface code just needs an $11\times11$ grid of the *same* repeated
-stabilizer pattern, an engineering and design advantage that grows with
-scale, not a small-distance one.
+surface code just needs a bigger patch of the *same* repeated stabilizer
+pattern, 221 data qubits placed by the identical local rule. That is an
+engineering and design advantage that grows with scale, not a
+small-distance one.
 
-## Common Mistakes
+## Fewer qubits is not the advantage
 
 <Callout type="note">
 **Assuming surface codes always use fewer qubits than the Shor code.**
-At small distance, the comparison is roughly even: the surface code's
-real advantage is in how its qubit count and stabilizer structure scale
-to *larger* distances with a repeated, local pattern, not in beating the
-Shor code outright at distance 3.
+At distance 3 the surface code is the more expensive one, 13 data qubits
+against 9 (or 9 against 9 in the rotated layout). Its real advantage is
+in how its qubit count and stabilizer structure scale to *larger*
+distances with a repeated, local pattern, not in beating the Shor code
+outright at distance 3.
 </Callout>
 
 <Callout type="note">
@@ -243,23 +272,211 @@ purposes.
 
 1. Why does a vertex stabilizer's 4-qubit locality remain exactly 4,
    regardless of whether the overall grid is $3\times3$ or $30\times30$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the stabilizer is defined by a vertex's *neighbourhood*, not
+   by the code. A vertex of a square lattice has four incident edges,
+   qubits live on edges, so the vertex operator is a product of four
+   $Z$s. Tiling more of the plane adds more vertices; it does not give
+   any existing vertex a fifth edge.
+
+   That sounds like a small observation and it is the entire design. Put
+   it beside the earlier codes and the contrast is sharp. The bit-flip
+   code's checks are parities of a *block*, and the Shor code's outer
+   checks span two whole blocks, so in both cases the check weight is
+   tied to the code size: make the code bigger and the checks get wider.
+   The surface code cuts that link by defining checks geometrically. Code
+   size is how much lattice you lay down; check weight is a property of
+   the tile, and the tile never changes.
+
+   Why it matters is worth spelling out, because "local checks are nice"
+   undersells it. A weight-$w$ stabilizer needs roughly $w$ two-qubit
+   gates and an ancilla to measure, and every one of those gates can
+   itself fail. If $w$ grew with the distance $d$, then each round of
+   syndrome extraction on a bigger code would inject more errors than the
+   round before, and beyond some size the extra distance would be
+   swallowed by the noise of measuring it. There would be no threshold at
+   all, only a best grid size. Constant check weight is the property that
+   makes "just build a bigger patch" a coherent plan rather than a
+   diminishing return.
+
+   One honest refinement, since the lesson's count of 4 is a statement
+   about the bulk. On Kitaev's original toric code, where the
+   lattice wraps around a torus and has no edges, every vertex really
+   does have degree 4 and every stabilizer really is weight 4. On the
+   planar patch that hardware actually builds, vertices on the boundary
+   have only three incident edges and carry weight-3 stabilizers, with
+   weight-2 at the corners. The claim that survives is the one that
+   matters: check weight is bounded by a constant that does not depend on
+   $d$.
+
+   </details>
+
 2. Explain, using the distance-and-correctable-error relationship from
-   the last lesson, why a $30\times30$ surface code tolerates far more
-   simultaneous errors than a $3\times3$ one.
+   the last lesson, why a distance-30 surface code tolerates far more
+   simultaneous errors than a distance-3 one.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Distance is the shortest way across the patch, and it tracks the
+   patch's linear size; a distance-$d$ code
+   corrects any error touching fewer than $d/2$ qubits. So $d=3$ gives
+   $t=\lfloor(3-1)/2\rfloor=1$ and $d=30$ gives
+   $t=\lfloor(30-1)/2\rfloor=14$. One guaranteed error becomes fourteen,
+   for a cost of $2(30)^2-2(30)+1=1741$ rather than $13$ data qubits in
+   the unrotated layout this lesson draws.
+
+   The reason distance tracks the grid's width is geometric, and it is
+   worth seeing rather than accepting. A logical operator on the surface
+   code is a chain of single-qubit Paulis running all the way across the
+   patch from one boundary to the opposite one. Any shorter chain has
+   loose ends, and a loose end sits inside some stabilizer that it
+   anticommutes with, which is a syndrome. Only a chain that spans the
+   lattice terminates on the boundaries and leaves no trace. The
+   cheapest such chain is a straight line, whose length is the grid's
+   linear size. Distance is the length of the shortest way across.
+
+   Two things that the bare number $14$ gets wrong, in opposite
+   directions, are both worth carrying.
+
+   It badly understates typical performance. Fourteen is a worst-case
+   guarantee over *every* weight-14 error, and the surface code corrects
+   far more than that almost all the time. What actually determines
+   success is not how many errors occurred but whether the error chain
+   and the decoder's chosen correction chain together close into a loop
+   that wraps the patch. Fifty errors scattered randomly across a
+   distance-30 lattice form short, well-separated chains that
+   minimum-weight matching pairs up correctly; fifteen errors arranged in
+   a line across the patch defeat it. This gap between worst case and
+   typical case is exactly why the surface code's threshold sits near
+   $1\%$ while codes with better distance-per-qubit ratios do worse in
+   practice.
+
+   And it says nothing about the cost of getting there. $1741$ data
+   qubits, plus $1740$ measurement ancillas, one per stabilizer, buys one
+   logical qubit good against fourteen errors per round. The rotated
+   layout would do it for $900$ and $899$, which is a real saving and
+   changes none of what follows. The scaling is
+   $O(d^2)$ physical qubits for $O(d)$ distance, which is the honest
+   price of the locality that makes the whole thing buildable, and the
+   number the capstone's overhead discussion is really about.
+
+   </details>
+
 3. Name one piece of real hardware engineering (not covered by this
    platform's engine) that a working surface-code implementation would
-   need beyond what Lessons 2–3's 3-qubit codes required.
+   need beyond what Lessons 2 and 3's 3-qubit codes required.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   A real-time classical decoder: a piece of ordinary computing hardware
+   that ingests a continuous stream of syndrome measurements and returns
+   a correction fast enough to keep up with the device.
+
+   The engine's decode step is `decodeBitFlipSyndrome`, a four-entry
+   lookup with no notion of time in it. A surface code cannot work that
+   way. Its syndrome is hundreds of bits per round, rounds arrive every
+   microsecond or so, and interpreting them means solving a
+   minimum-weight perfect matching problem over the defects. The hard
+   constraint is latency, not correctness: qubits keep decohering while
+   the decoder thinks, so a decoder that averages slower than the
+   measurement rate accumulates an unbounded backlog and the error
+   information goes stale faster than it can be used. This is why the
+   Google result the lesson cites is reported as a decoder achievement as
+   much as a physics one, and why decoding hardware is built in FPGAs and
+   custom silicon rather than run as a script.
+
+   The strongest rival for this answer, and arguably the better one, is
+   repeated syndrome measurement under *faulty* measurement. This
+   platform's `measureQubit` is exact, so one round of syndromes is
+   definitive. On real hardware the ancilla readout itself fails, so a
+   single round cannot be trusted: you measure $d$ rounds and decode the
+   result as a three-dimensional problem in space and time, matching
+   defects across rounds as well as across the lattice. That is a
+   stronger answer than the decoder in one respect, because it changes
+   the code being decoded rather than only the engineering around it.
+
+   Others, named briefly because they are all real and none of them
+   appear in this course's engine: an ancilla qubit per stabilizer with
+   fast, non-demolition readout and reset inside the cycle time; a
+   deliberate ordering of the four CNOTs in each stabilizer circuit,
+   since a careless order lets one ancilla fault propagate into two data
+   errors and halves the effective distance; leakage out of the
+   computational subspace entirely, which is not a Pauli error and needs
+   dedicated removal; and the fabrication problem of making a thousand
+   qubits uniform enough that one calibration works across the chip.
+
+   </details>
+
 4. Why might a hardware platform with only nearest-neighbor qubit
    connectivity struggle to implement the *Shor* code efficiently, even
    though this platform's own engine implements it (conceptually) with no
    difficulty at all?
 
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the Shor code's $X$-type stabilizers, $X_0\cdots X_5$ and
+   $X_3\cdots X_8$, each span six qubits drawn from two different blocks.
+   Measuring one means coupling a single ancilla to all six, and on a
+   nearest-neighbour device an ancilla can only touch the qubits
+   physically beside it.
+
+   The workaround is routing, and routing is expensive in exactly the
+   currency error correction cannot spend. To interact two distant
+   qubits you SWAP one along a chain until it is adjacent to the other,
+   and each SWAP is three CNOTs. So a stabilizer measurement acquires a
+   circuit depth proportional to the physical separation of its
+   qubits, and every gate in that depth is a fresh chance to fail. Worse,
+   SWAPs move errors as well as states, so one fault mid-route can be
+   carried onto a qubit the error never touched. Syndrome extraction
+   stops being a cheap side observation and becomes the dominant source
+   of noise, which is the circuit-level version of Lesson 2's
+   $p<\tfrac12$ crossover: a check that injects more errors than it
+   catches makes the encoded qubit worse than the bare one.
+
+   The engine sees none of this because `applyCNOT` takes two integer
+   indices and does linear algebra. $\text{CNOT}(0,5)$ costs precisely
+   what $\text{CNOT}(0,1)$ costs, which is nothing, because the model has
+   no representation of where a qubit is. That is the right simplification
+   for teaching what a code *is*, and the wrong one for deciding what to
+   build, and the gap between those two is most of what the Quantum
+   Hardware track is about.
+
+   One sharpening, because the obvious summary is slightly off. The
+   problem is not that six is bigger than four. A weight-6 stabilizer
+   whose six qubits sat in a row would be perfectly buildable, and a
+   weight-4 stabilizer whose four qubits were scattered across the chip
+   would not be. Locality is the property that matters, and weight is
+   secondary. The surface code has both, and it has them at every code
+   size, which the Shor code could not achieve even in principle: its
+   outer checks are defined as "everything in these two blocks", so
+   concatenating it to reach a larger distance stretches those checks
+   further across the device with every level.
+
+   And the honest limit of the argument: at nine qubits, the Shor code is
+   small enough that a real device could route it with a handful of
+   SWAPs and survive. The objection is not that the Shor code is
+   unbuildable. It is that nothing about it gets easier as it grows,
+   which is the only property that matters for a machine.
+
+   </details>
+
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
-- Surface codes use local, 4-qubit stabilizers on a 2D grid, a
+- Surface codes use local stabilizers of weight at most 4 on a 2D grid, a
   structural improvement over the Shor code's whole-group stabilizers.
+- This lesson draws the **unrotated** layout, data qubits on lattice
+  edges, $2d^2-2d+1$ of them at distance $d$. The **rotated** layout that
+  hardware runs reaches the same distance with $d^2$ data qubits on the
+  vertices of a tilted grid. Same code family, so a figure drawn the
+  other way is not a different answer.
 - Distance scales directly with grid size, using a single repeated
   stabilizer pattern rather than a new hand-designed construction per
   distance.
@@ -270,7 +487,7 @@ purposes.
   a small surface code (plus its decoding algorithm) is explicitly out of
   scope.
 
-## Further Exploration
+## What all of this costs
 
 <NextDiscovery>
 Next, the capstone: [Fault-Tolerant Thresholds and Resource Overhead](/lessons/quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead),

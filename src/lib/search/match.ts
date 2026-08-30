@@ -11,20 +11,29 @@ import type { SearchEntry } from "./types";
 /**
  * Notation the corpus writes in Unicode but nobody can type: the angle
  * brackets of Dirac notation (U+27E8/U+27E9, plus the CJK and legacy
- * lookalikes KaTeX and hand-authored prose both produce) and the true minus
- * sign U+2212. 118 of the 1,073 index entries carry a ket in their title or
- * description — "The Density Matrix of |1⟩", "A 50/50 Mixture of |+⟩ and
- * |−⟩" — and a reader who types `|0>` or `|-⟩` on an ordinary keyboard got
- * the zero-result screen for a query the index could answer 118 times over.
- * Folding both sides onto the ASCII form makes the two spellings the same
- * string, so either one finds it.
+ * lookalikes KaTeX and hand-authored prose both produce), the true minus
+ * sign U+2212, and the typographic dashes. 118 of the 1,073 index entries
+ * carry a ket in their title or description — "The Density Matrix of |1⟩",
+ * "A 50/50 Mixture of |+⟩ and |−⟩" — and a reader who types `|0>` or `|-⟩`
+ * on an ordinary keyboard got the zero-result screen for a query the index
+ * could answer 118 times over. Folding both sides onto the ASCII form makes
+ * the two spellings the same string, so either one finds it.
+ *
+ * The dashes are the same failure one keyboard row over, and it was live: two
+ * glossary titles were spelled with an en dash ("Eastin–Knill Theorem") while
+ * every lesson, problem and other definition in the corpus writes the same
+ * names with a hyphen, so `eastin-knill` and `gottesman-knill` reached the
+ * entries that merely *mention* the theorem and never the entry for the
+ * theorem itself. Both titles are hyphens now; this table is the general fix,
+ * so no future en dash in a title, a lesson name or a problem title can put a
+ * thing out of reach of the way people spell it.
  */
 // Six of these render identically in every editor font, so read the trailing
 // comment rather than the glyph: U+2329/U+232A and U+3008/U+3009 are distinct
 // codepoints that merely look the same, not duplicated keys. (NFD, which runs
 // first below, already collapses the U+2329 pair onto the U+3008 pair; both
 // are listed anyway so this table stays correct if the fold order changes.)
-const TYPEABLE_NOTATION: Record<string, string> = {
+const ANGLE_AND_MINUS: Record<string, string> = {
   "⟨": "<", // U+27E8 mathematical left angle bracket — what KaTeX and the corpus write
   "〈": "<", // U+2329 legacy left-pointing angle bracket
   "〈": "<", // U+3008 CJK left angle bracket
@@ -33,7 +42,20 @@ const TYPEABLE_NOTATION: Record<string, string> = {
   "〉": ">", // U+3009 CJK right angle bracket
   "−": "-", // U+2212 true minus sign
 };
-const TYPEABLE_NOTATION_PATTERN = /[⟨〈〈⟩〉〉−]/gu;
+
+/** U+2010 hyphen through U+2015 horizontal bar: every dash in the Unicode
+ *  punctuation block. Built from escapes rather than written as glyphs
+ *  because all six are indistinguishable from an ASCII hyphen at editor
+ *  sizes, and a table of lookalikes is a table nobody can proofread. */
+const TYPOGRAPHIC_DASHES = Array.from({ length: 6 }, (_, index) =>
+  String.fromCharCode(0x2010 + index)
+);
+
+const TYPEABLE_NOTATION: Record<string, string> = {
+  ...ANGLE_AND_MINUS,
+  ...Object.fromEntries(TYPOGRAPHIC_DASHES.map((dash) => [dash, "-"])),
+};
+const TYPEABLE_NOTATION_PATTERN = /[⟨〈〈⟩〉〉−‐-―]/gu;
 
 /**
  * Folds a string for matching: strips diacritics (NFD-decompose, drop the
@@ -180,9 +202,10 @@ export function tokenizeQuery(query: string): string[] {
 
 /**
  * AND-semantics across tokens: every token must appear somewhere in the
- * entry's folded title-plus-description, or name that entry's initialism, or
- * appear among the terms its body teaches. Word order doesn't matter, so
- * "state bell" finds "Bell state" just as "bell state" does.
+ * entry's folded title-plus-description (`containsToken`, which is where the
+ * definition of "appear" lives), or name that entry's initialism, or appear
+ * among the terms its body teaches. Word order doesn't matter, so "state bell"
+ * finds "Bell state" just as "bell state" does.
  *
  * The initialism is the second channel because the corpus writes concept
  * names out in full: "QEC" appears in no title and no description anywhere in
@@ -201,9 +224,9 @@ export function matchesAllTokens(candidate: SearchableEntry, tokens: string[]): 
   if (tokens.length === 0) return false;
   return tokens.every(
     (token) =>
-      candidate.foldedText.includes(token) ||
+      containsToken(candidate.foldedText, token) ||
       matchesAcronym(candidate.foldedAcronym, token) ||
-      candidate.foldedKeywords.includes(token)
+      containsToken(candidate.foldedKeywords, token)
   );
 }
 
@@ -232,6 +255,65 @@ function isWordCharacter(character: string | undefined): boolean {
   return character !== undefined && /[\p{L}\p{N}]/u.test(character);
 }
 
+/** Whether `needle` occurs in `haystack` at the start of a word. */
+function containsWordStart(haystack: string, needle: string): boolean {
+  let from = 0;
+  for (;;) {
+    const at = haystack.indexOf(needle, from);
+    if (at === -1) return false;
+    if (!isWordCharacter(haystack[at - 1])) return true;
+    from = at + 1;
+  }
+}
+
+/**
+ * Whether a haystack contains one query token — the single predicate every
+ * matching and scoring decision in this file asks, so that "does this entry
+ * match?" and "how well?" can never disagree about what a match is.
+ *
+ * A token has to *begin* a word. It need not finish one: `gate` still finds
+ * "Quantum Gates" and `state` still finds "Bell States", because a reader
+ * types the singular of a term the corpus writes in the plural constantly.
+ * What it refuses is a token buried inside a word, which is where the noise
+ * came from: `bra` inside "cali-bra-tion" and "alge-bra", `ion` inside every
+ * word in the corpus ending "-tion", `angle` inside "ent-angle-ment".
+ *
+ * Measured against the real committed index (counts move with the corpus;
+ * the ratios are the point):
+ *
+ *   query    hits before → after   first result before → after
+ *   bra      80 → 19               (unchanged; the noise was below it)
+ *   ion      742 → 13              (unchanged)
+ *   angle    129 → 27              Entanglement → Grover's Algorithm
+ *   bit      310 → 58              (unchanged)
+ *
+ * `ion` is the one to read twice: it had been matching every word in the
+ * corpus ending "-tion", so more than two thirds of the index answered it.
+ * `bra` loses its entire Courses and Tracks groups (four rows, every one of
+ * them an "algebra" or a "calibration") and two thirds of its Problems group.
+ * No group's first result got worse for any query in the pinned or recovery
+ * tables, and all 22 pins still hold.
+ *
+ * A token that does not start with a word character is matched literally: the
+ * boundary question is meaningless for `|0>`, whose first character is a pipe,
+ * and the ket queries are why substring matching is load-bearing here.
+ *
+ * Two neighbouring rules were measured and rejected, both against the pins in
+ * `__tests__/recoveryQueries.test.ts`:
+ *
+ *  - *Whole word* rather than word-start breaks `bell state`, which has to
+ *    reach the glossary's "Bell States" and cannot if "states" is not a match
+ *    for "state".
+ *  - Applying the rule *only to short tokens* (the four-character cut-off the
+ *    review proposed) leaves `angle` returning 128 rows led by "Entanglement".
+ *    Length is not what makes a fragment a fragment, and a length-dependent
+ *    definition of "match" is a rule nobody can predict from the search box.
+ */
+function containsToken(haystack: string, token: string): boolean {
+  if (!isWordCharacter(token[0])) return haystack.includes(token);
+  return containsWordStart(haystack, token);
+}
+
 /** Whether `needle` appears in `haystack` as a whole term rather than buried
  *  inside a longer word. */
 function containsWholeTerm(haystack: string, needle: string): boolean {
@@ -251,22 +333,29 @@ function containsWholeTerm(haystack: string, needle: string): boolean {
  * and word-bounded — rather than as fragments scattered through the text.
  *
  * This is a tie-break inside a `matchScore` band, never a band of its own, and
- * it exists because substring matching is load-bearing here and cannot be
- * given up. `|0>` finds "|0⟩⟨1|" and `bra-ket` finds "Dirac Notation
- * (Bra-Ket)" precisely because a token needs no word boundary; the price is
- * that `bra` also finds "cali**bra**tion" and "alge**bra**", and `half angle`
- * finds a lesson holding "half-turn" and "rotation-angle" in different
- * sentences. Both were measured: before this, `what is a bra` led with
- * "Capstone: From Abstract Algebra to the Hydrogen Atom", and `half angle`
- * with "Quantum Gates", ahead of the two lessons that derive the Bloch
- * half-angle.
+ * it exists because a token still does not have to *finish* a word to match
+ * (`containsToken`). That is deliberate — `state` has to find "Bell States" —
+ * and the price is that `bra` also finds "**bra**nch", and `half angle` finds
+ * a lesson holding "half-turn" and "rotation-angle" in different sentences.
+ * Both were measured: before this, `what is a bra` led with "Capstone: From
+ * Abstract Algebra to the Hydrogen Atom", and `half angle` with "Quantum
+ * Gates", ahead of the two lessons that derive the Bloch half-angle.
  *
- * Three separator spellings are tried — space, hyphen, slash — because the
- * corpus writes compound terms all three ways ("half-angle", "matrix
- * multiplication", "theta/2") and a reader types whichever they remember. A
- * tie-break is the right instrument rather than a score band: it can reorder
- * equally-relevant rows, and can never move a row past one the query names
- * more strongly.
+ * Four separator spellings are tried — space, hyphen, slash, and nothing at
+ * all — because the corpus writes compound terms every one of those ways
+ * ("half-angle", "matrix multiplication", "theta/2", "wavefunction") and a
+ * reader types whichever they remember. The empty separator is the one that
+ * is not obvious, and it was live: `wave function`, which is how most physics
+ * textbooks spell it, led with "Orbital Angular Momentum and Spherical
+ * Harmonics" and put the glossary's own Wavefunction entry in the scattered
+ * band, because "wave" and "function" appear in different sentences of a
+ * dozen entries and contiguously in none. It only ever runs for a multi-token
+ * query (single tokens `break` after the first pass), so it cannot change
+ * anything for the queries that are one word.
+ *
+ * A tie-break is the right instrument rather than a score band: it can
+ * reorder equally-relevant rows, and can never move a row past one the query
+ * names more strongly.
  */
 export function matchesAsTerm(candidate: SearchableEntry, tokens: string[]): boolean {
   if (tokens.length === 0) return false;
@@ -274,7 +363,7 @@ export function matchesAsTerm(candidate: SearchableEntry, tokens: string[]): boo
     candidate.foldedKeywords === ""
       ? candidate.foldedText
       : `${candidate.foldedText} ${candidate.foldedKeywords}`;
-  for (const separator of [" ", "-", "/"]) {
+  for (const separator of [" ", "-", "/", ""]) {
     if (containsWholeTerm(haystack, tokens.join(separator))) return true;
     if (tokens.length === 1) break;
   }
@@ -358,6 +447,16 @@ export function relevanceBand(
  * to the keyword set for, which is why the loop below checks `foldedText`
  * rather than only the title once it has decided the title is insufficient.
  *
+ * The phrase is tried in two spellings, spaced and closed up, because the
+ * corpus and the textbooks a reader arrives from disagree about the space in
+ * exactly the terms a beginner looks up first. `wavefunction` is written that
+ * way 319 times in the lesson corpus and `wave function` twice, while Griffiths
+ * and Shankar both write the two-word form, so a reader typing what their book
+ * taught them got the glossary's own Wavefunction entry demoted to a
+ * description-only hit under two lessons that merely contain both words. The
+ * closed-up form is only ever tried for a multi-token query, and only ever
+ * *raises* a score, so no entry can lose a band to it.
+ *
  * Only call with a candidate that already passed `matchesAllTokens`; the
  * score of a non-match is meaningless (it still returns 3 or 4).
  */
@@ -368,16 +467,21 @@ export function matchScore(
 ): number {
   const title = candidate.foldedTitle;
   if (title === phrase) return 0;
+  if (tokens.length > 1) {
+    const closedUp = tokens.join("");
+    if (title === closedUp) return 0;
+    if (title.startsWith(closedUp)) return 1;
+  }
   if (title.startsWith(phrase)) return 1;
   if (candidate.foldedAcronym !== "" && candidate.foldedAcronym === phrase) return 1;
   let worst = 2;
   for (const token of tokens) {
-    if (title.includes(token) || matchesAcronym(candidate.foldedAcronym, token)) continue;
+    if (containsToken(title, token) || matchesAcronym(candidate.foldedAcronym, token)) continue;
     // The title doesn't cover this token; the question is only whether the
     // description does. One token that only the keyword set answers pins the
     // whole entry to the bottom band, so there is nothing further to learn
     // from the remaining tokens once that happens.
-    if (!candidate.foldedText.includes(token)) return SCORE_KEYWORD_ONLY;
+    if (!containsToken(candidate.foldedText, token)) return SCORE_KEYWORD_ONLY;
     worst = 3;
   }
   return worst;

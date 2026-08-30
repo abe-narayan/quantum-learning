@@ -185,18 +185,34 @@ function collectSourceFiles(dir: string, out: string[]): void {
     const stat = statSync(full);
     if (stat.isDirectory()) {
       collectSourceFiles(full, out);
-    } else if (/\.(tsx|ts)$/.test(entry) && !/\.test\.tsx?$/.test(entry)) {
+    } else if (/\.(tsx|ts|mdx)$/.test(entry) && !/\.test\.tsx?$/.test(entry)) {
       out.push(full);
     }
   }
 }
 
-/** Every non-test `.ts`/`.tsx` file under `src/components` and `src/app`,
- *  concatenated. This is deliberately component/app source only — not
- *  `src/content` (lesson MDX) or `src/lib` — since a print/motion selector's
- *  job is to key off a *component's* rendered structure. */
+/** Every non-test `.ts`/`.tsx` file under `src/components` and `src/app`, plus
+ *  every `.mdx` under `src/content`, concatenated.
+ *
+ *  The first two roots were the original scope, on the premise that a
+ *  print/motion selector keys off a *component's* rendered structure. That
+ *  premise held until lesson MDX started authoring structural hooks of its own:
+ *  `.answer-reveal` is a class written directly onto a `<details>` in
+ *  `what-is-a-qubit.mdx`, because a reveal-after-trying disclosure is content
+ *  markup and registering it in `mdx-components.tsx` would spend one of the
+ *  three remaining slots in that file's documented 30-entry budget. Under the
+ *  old roots that live hook read as a dead selector and failed this test.
+ *
+ *  Widening to MDX does not loosen the guard: its job is to catch a selector
+ *  whose target was rewritten out from under it, and a hook that exists in no
+ *  component *and* no lesson is still exactly as dead as before. `src/lib` stays
+ *  out, since nothing there renders markup. */
 function readComponentSource(): string {
-  const roots = [path.join(SRC_ROOT, "components"), path.join(SRC_ROOT, "app")];
+  const roots = [
+    path.join(SRC_ROOT, "components"),
+    path.join(SRC_ROOT, "app"),
+    path.join(SRC_ROOT, "content"),
+  ];
   const files: string[] = [];
   for (const root of roots) collectSourceFiles(root, files);
   return files.map((f) => readFileSync(f, "utf8")).join("\n");

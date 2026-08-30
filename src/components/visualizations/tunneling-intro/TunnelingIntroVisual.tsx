@@ -81,7 +81,7 @@ export function TunnelingIntroVisual() {
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <Badge tone="brand">What we&rsquo;re watching</Badge>
         {prefersReducedMotion ? (
-          <Badge tone="neutral">Reduced motion — showing the settled outcome</Badge>
+          <Badge tone="neutral">Reduced motion: showing the settled outcome</Badge>
         ) : (
           // `aria-disabled` rather than the native `disabled` prop. This is the
           // one and only control in the figure, and it disables itself *as the
@@ -127,8 +127,8 @@ export function TunnelingIntroVisual() {
 
       <p className="mt-3 text-xs text-muted-foreground">
         {prefersReducedMotion
-          ? "This is the exact result of a real split-operator time evolution run to completion, not a video — the same physics the interactive Explorer below computes live."
-          : "A real numerical simulation — an actual split-operator time evolution, precomputed once and played back — using the same engine as the interactive Explorer below, not a scripted animation."}
+          ? "This is the exact result of a real split-operator time evolution run to completion, not a video. It is the same physics the interactive Explorer below computes live."
+          : "A real numerical simulation (an actual split-operator time evolution, precomputed once and played back) using the same engine as the interactive Explorer below, not a scripted animation."}
       </p>
     </div>
   );

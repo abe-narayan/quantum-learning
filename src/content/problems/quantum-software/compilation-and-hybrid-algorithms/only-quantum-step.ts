@@ -16,10 +16,10 @@ export const onlyQuantumStep: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "In the general hybrid loop, which single step must actually run on a quantum device, and why can't classical hardware perform it efficiently instead?",
     options: [
-      { id: "a", text: "Preparing the ansatz state and measuring it, because sampling a generic quantum state's distribution is the classically hard step" },
-      { id: "b", text: "Proposing the next parameters, because the search space is exponential in the parameter count" },
+      { id: "a", text: "Preparing the ansatz state and measuring it, because sampling that distribution is the classically hard part" },
+      { id: "b", text: "Proposing the next parameters, because the search space is exponential in the number of angles to tune" },
       { id: "c", text: "Computing the cost from the measurement results, because the expectation value sums over 2ⁿ amplitudes" },
-      { id: "d", text: "Checking convergence, because deciding when a noisy estimate has settled needs the device's own shot statistics" },
+      { id: "d", text: "Checking convergence, because deciding when a noisy estimate has settled needs the device's shot statistics" },
     ],
   },
   answer: {
@@ -43,7 +43,7 @@ export const onlyQuantumStep: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "A classical machine can carry out every step of the hybrid loop; it is only the state preparation and sampling step where doing so costs exponential time, which is where a device earns its place.",
-    whyCorrect: "Matches the lesson's 'What runs where' section.",
+    whyCorrect: "Three of the four steps operate on ordinary numbers a laptop can hold. Only preparing the ansatz and sampling it touches a state whose classical description is 2ⁿ amplitudes, which is the one place a device earns its keep.",
     whyWrong: [
       { optionId: "b", text: "Mistakes a large classical search for a quantum one. Optimizing over a few angles is ordinary numerical optimization." },
       { optionId: "c", text: "Puts the 2ⁿ sum in the wrong place. The device performs it; the classical side averages the counts that come back." },

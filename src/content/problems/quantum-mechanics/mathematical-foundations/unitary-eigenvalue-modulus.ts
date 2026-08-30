@@ -27,8 +27,9 @@ export const unitaryEigenvalueModulus: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Unitary operators preserve vector norms: ‖Uv‖ = ‖v‖." },
-    { text: "If Uv = λv, then ‖λv‖ = |λ|·‖v‖ must equal ‖v‖." },
+    { text: "Unitarity is a statement about lengths: applying $U$ to any vector leaves that vector's norm unchanged." },
+    { text: "Apply that statement to an eigenvector in particular, where acting with $U$ is the same thing as multiplying by a single number." },
+    { text: "Pull the scalar out of the norm so its modulus stands as a factor. An eigenvector is nonzero by definition, so its own norm can be divided out." },
   ],
   solution: {
     steps: [

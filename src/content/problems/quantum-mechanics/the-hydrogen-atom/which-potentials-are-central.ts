@@ -26,9 +26,9 @@ export const whichPotentialsAreCentral: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "This depends only on x, not on the full distance r=√(x²+y²+z²) — rotating about the y or z axis changes it.",
-      c: "This is not even invariant under reflecting a single coordinate, let alone full rotations — far from central.",
-      d: "This is cylindrically symmetric (invariant under rotations about z only), not fully spherically symmetric — not central.",
+      b: "This depends only on x, not on the full distance r=√(x²+y²+z²), so rotating about the y or z axis changes it.",
+      c: "This is not even invariant under reflecting a single coordinate, let alone under full rotations, so it is far from central.",
+      d: "This is cylindrically symmetric (invariant under rotations about z only), not fully spherically symmetric, so it is not central.",
     },
     defaultIncorrectFeedback: "A central potential must be expressible as a function of r=√(x²+y²+z²) alone, unchanged by any rotation about the origin.",
   },

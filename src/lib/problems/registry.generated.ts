@@ -24,6 +24,7 @@ import type { Problem } from "./types";
 
 import { amplitudeEstimationGroverIterateProbability } from "@/content/problems/apex/algorithmic-frontiers/amplitude-estimation-grover-iterate-probability";
 import { amplitudeEstimationQpeFreeScalingMc } from "@/content/problems/apex/algorithmic-frontiers/amplitude-estimation-qpe-free-scaling-mc";
+import { blockEncodingSubnormalizationFactorOfAUnitaryBlock } from "@/content/problems/apex/algorithmic-frontiers/block-encoding-subnormalization-factor-of-a-unitary-block";
 import { capstoneToolboxHonestUnificationMc } from "@/content/problems/apex/algorithmic-frontiers/capstone-toolbox-honest-unification-mc";
 import { capstoneToolboxTrotterStepsT10 } from "@/content/problems/apex/algorithmic-frontiers/capstone-toolbox-trotter-steps-t10";
 import { lcuPrepareRegisterSize } from "@/content/problems/apex/algorithmic-frontiers/lcu-prepare-register-size";
@@ -33,30 +34,38 @@ import { linearSystemsReadoutVsFullVector } from "@/content/problems/apex/algori
 import { qspD1PhaseSumRealPart } from "@/content/problems/apex/algorithmic-frontiers/qsp-d1-phase-sum-real-part";
 import { qspD2DegreeCollapseImaginaryPart } from "@/content/problems/apex/algorithmic-frontiers/qsp-d2-degree-collapse-imaginary-part";
 import { qsvtPolynomialValueAtASingularValue } from "@/content/problems/apex/algorithmic-frontiers/qsvt-polynomial-value-at-a-singular-value";
+import { qsvtThreePolynomialsThreeSpecialCasesMc } from "@/content/problems/apex/algorithmic-frontiers/qsvt-three-polynomials-three-special-cases-mc";
 import { qsvtVersusTrotterAsymptoticClaim } from "@/content/problems/apex/algorithmic-frontiers/qsvt-versus-trotter-asymptotic-claim";
 import { decodingDefectPairForABoundaryQubit } from "@/content/problems/apex/fault-tolerance-frontiers/decoding-defect-pair-for-a-boundary-qubit";
+import { decodingMwpmFourDefectMatchingWeight } from "@/content/problems/apex/fault-tolerance-frontiers/decoding-mwpm-four-defect-matching-weight";
 import { decodingThresholdScalingRatio } from "@/content/problems/apex/fault-tolerance-frontiers/decoding-threshold-scaling-ratio";
+import { gottesmanKnillWhichCircuitIsSimulableMc } from "@/content/problems/apex/fault-tolerance-frontiers/gottesman-knill-which-circuit-is-simulable-mc";
 import { latticeSurgeryCnotMergeCount } from "@/content/problems/apex/fault-tolerance-frontiers/lattice-surgery-cnot-merge-count";
+import { latticeSurgeryMergeSplitMeasuredOperatorMc } from "@/content/problems/apex/fault-tolerance-frontiers/lattice-surgery-merge-split-measured-operator-mc";
 import { latticeSurgeryTransversalGateFailure } from "@/content/problems/apex/fault-tolerance-frontiers/lattice-surgery-transversal-gate-failure";
 import { magicStateDistillationRoundsNeeded } from "@/content/problems/apex/fault-tolerance-frontiers/magic-state-distillation-rounds-needed";
 import { magicStateEastinKnillTransversalGates } from "@/content/problems/apex/fault-tolerance-frontiers/magic-state-eastin-knill-transversal-gates";
 import { resourceEstimationCodeDistanceForTighterBudget } from "@/content/problems/apex/fault-tolerance-frontiers/resource-estimation-code-distance-for-tighter-budget";
 import { resourceEstimationFactoryShareWithNineLogicalQubits } from "@/content/problems/apex/fault-tolerance-frontiers/resource-estimation-factory-share-with-nine-logical-qubits";
 import { surfaceCodeGeneratorCountAtDistance5 } from "@/content/problems/apex/fault-tolerance-frontiers/surface-code-generator-count-at-distance-5";
+import { surfaceCodeLogicalStringMinimumWeight } from "@/content/problems/apex/fault-tolerance-frontiers/surface-code-logical-string-minimum-weight";
 import { thresholdConcatenationTwoLevels } from "@/content/problems/apex/fault-tolerance-frontiers/threshold-concatenation-two-levels";
 import { thresholdDifferingValuesNotContradiction } from "@/content/problems/apex/fault-tolerance-frontiers/threshold-differing-values-not-contradiction";
 import { whyStabilizerOverlapsAreAlwaysEven } from "@/content/problems/apex/fault-tolerance-frontiers/why-stabilizer-overlaps-are-always-even";
 import { capstoneClassifyRcsClaimMc } from "@/content/problems/apex/quantum-complexity-theory/capstone-classify-rcs-claim-mc";
 import { capstoneNpNotSubsetBqpConjecture } from "@/content/problems/apex/quantum-complexity-theory/capstone-np-not-subset-bqp-conjecture";
+import { capstoneTieringNltsAgainstQuantumPcpMc } from "@/content/problems/apex/quantum-complexity-theory/capstone-tiering-nlts-against-quantum-pcp-mc";
 import { evaluatingAWorstCaseNpCompleteClaimMc } from "@/content/problems/apex/quantum-complexity-theory/evaluating-a-worst-case-np-complete-claim-mc";
 import { localHamiltonianPropagationTermNullSpaceMc } from "@/content/problems/apex/quantum-complexity-theory/local-hamiltonian-propagation-term-null-space-mc";
 import { localHamiltonianVerificationPrecisionUnionBound } from "@/content/problems/apex/quantum-complexity-theory/local-hamiltonian-verification-precision-union-bound";
 import { qmaAmplificationThreshold5Percent } from "@/content/problems/apex/quantum-complexity-theory/qma-amplification-threshold-5-percent";
 import { qmaSoundnessQuantifierMc } from "@/content/problems/apex/quantum-complexity-theory/qma-soundness-quantifier-mc";
 import { queryComplexityAdversaryBoundN64 } from "@/content/problems/apex/quantum-complexity-theory/query-complexity-adversary-bound-n64";
+import { queryLowerBoundVersusWallClockTime } from "@/content/problems/apex/quantum-complexity-theory/query-lower-bound-versus-wall-clock-time";
 import { shorsAlgorithmDoesNotProvePNeqBqp } from "@/content/problems/apex/quantum-complexity-theory/shors-algorithm-does-not-prove-p-neq-bqp";
 import { twoIndependentProofsOfGroverOptimalityMc } from "@/content/problems/apex/quantum-complexity-theory/two-independent-proofs-of-grover-optimality-mc";
 import { capstoneLandscapeHardwareClaimClassification } from "@/content/problems/apex/research-methods-and-synthesis/capstone-landscape-hardware-claim-classification";
+import { capstoneLandscapeLogicalQubitsFromAPhysicalCount } from "@/content/problems/apex/research-methods-and-synthesis/capstone-landscape-logical-qubits-from-a-physical-count";
 import { capstoneLandscapeTimelinePredictionEvaluation } from "@/content/problems/apex/research-methods-and-synthesis/capstone-landscape-timeline-prediction-evaluation";
 import { classifyingTheOracleSpeedupAbstractMc } from "@/content/problems/apex/research-methods-and-synthesis/classifying-the-oracle-speedup-abstract-mc";
 import { explainingTheOracleModelGap } from "@/content/problems/apex/research-methods-and-synthesis/explaining-the-oracle-model-gap";
@@ -573,6 +582,7 @@ import { whySingleQubitScope } from "@/content/problems/quantum-software/simulat
 export const PROBLEMS: Problem[] = [
   amplitudeEstimationGroverIterateProbability,
   amplitudeEstimationQpeFreeScalingMc,
+  blockEncodingSubnormalizationFactorOfAUnitaryBlock,
   capstoneToolboxHonestUnificationMc,
   capstoneToolboxTrotterStepsT10,
   lcuPrepareRegisterSize,
@@ -582,30 +592,38 @@ export const PROBLEMS: Problem[] = [
   qspD1PhaseSumRealPart,
   qspD2DegreeCollapseImaginaryPart,
   qsvtPolynomialValueAtASingularValue,
+  qsvtThreePolynomialsThreeSpecialCasesMc,
   qsvtVersusTrotterAsymptoticClaim,
   decodingDefectPairForABoundaryQubit,
+  decodingMwpmFourDefectMatchingWeight,
   decodingThresholdScalingRatio,
+  gottesmanKnillWhichCircuitIsSimulableMc,
   latticeSurgeryCnotMergeCount,
+  latticeSurgeryMergeSplitMeasuredOperatorMc,
   latticeSurgeryTransversalGateFailure,
   magicStateDistillationRoundsNeeded,
   magicStateEastinKnillTransversalGates,
   resourceEstimationCodeDistanceForTighterBudget,
   resourceEstimationFactoryShareWithNineLogicalQubits,
   surfaceCodeGeneratorCountAtDistance5,
+  surfaceCodeLogicalStringMinimumWeight,
   thresholdConcatenationTwoLevels,
   thresholdDifferingValuesNotContradiction,
   whyStabilizerOverlapsAreAlwaysEven,
   capstoneClassifyRcsClaimMc,
   capstoneNpNotSubsetBqpConjecture,
+  capstoneTieringNltsAgainstQuantumPcpMc,
   evaluatingAWorstCaseNpCompleteClaimMc,
   localHamiltonianPropagationTermNullSpaceMc,
   localHamiltonianVerificationPrecisionUnionBound,
   qmaAmplificationThreshold5Percent,
   qmaSoundnessQuantifierMc,
   queryComplexityAdversaryBoundN64,
+  queryLowerBoundVersusWallClockTime,
   shorsAlgorithmDoesNotProvePNeqBqp,
   twoIndependentProofsOfGroverOptimalityMc,
   capstoneLandscapeHardwareClaimClassification,
+  capstoneLandscapeLogicalQubitsFromAPhysicalCount,
   capstoneLandscapeTimelinePredictionEvaluation,
   classifyingTheOracleSpeedupAbstractMc,
   explainingTheOracleModelGap,

@@ -19,7 +19,7 @@ import { NoiseControls, type ChannelType } from "./NoiseControls";
 
 const MAX_STEPS = 40;
 /**
- * Zero steps is an undisturbed pure state sitting exactly on the sphere — in
+ * Zero steps is an undisturbed pure state sitting exactly on the sphere. In
  * an instrument whose entire subject is decoherence, that's the one
  * configuration showing none of it. Opening part-way into the decay means the
  * Bloch vector is already visibly shrunk inside the sphere, and purity reads
@@ -32,7 +32,7 @@ const COPY_CONFIRMATION_MS = 1500;
 const STRENGTH_MIN = 0.01;
 const STRENGTH_MAX = 0.5;
 
-// Minimal shareable state is the starting preset, channel type, and strength —
+// Minimal shareable state is the starting preset, channel type, and strength;
 // together they fully determine the trajectory computed below. The step scrub
 // is playback state, not configuration, so it's deliberately excluded: a
 // shared link reproduces the setup, not a paused mid-animation frame. Params
@@ -50,7 +50,7 @@ function clampStrength(value: number): number {
   return Math.min(STRENGTH_MAX, Math.max(STRENGTH_MIN, value));
 }
 
-/** Reads and validates `?noise_preset=&noise_channel=&noise_strength=`. Never throws — returns null on anything malformed or absent. */
+/** Reads and validates `?noise_preset=&noise_channel=&noise_strength=`. Never throws; returns null on anything malformed or absent. */
 function parseNoiseParams(
   params: { get(key: string): string | null }
 ): { presetId: string; channel: ChannelType; strength: number } | null {
@@ -67,7 +67,7 @@ function parseNoiseParams(
 /**
  * A single-qubit noise channel applied step by step, watching the Bloch
  * vector shrink from the sphere's surface toward each channel's fixed
- * point — reusing the platform's existing, tested Kraus-channel engine
+ * point, reusing the platform's existing, tested Kraus-channel engine
  * (openSystems.ts) exactly as Advanced Quantum Mechanics' Open Quantum
  * Systems lesson and Quantum Hardware's T1/T2 lesson describe it, not a
  * separate or re-derived noise model.
@@ -97,7 +97,7 @@ export function NoiseExplorer() {
   }, []);
 
   // Keep the URL in sync with the settled configuration so the page is always
-  // shareable. Debounced so a slider drag doesn't spam `history.replaceState` —
+  // shareable. Debounced so a slider drag doesn't spam `history.replaceState`;
   // only the value it settles on after a short pause gets written. Skips the
   // very first run so mounting doesn't immediately rewrite the URL we just read
   // from.
@@ -131,7 +131,7 @@ export function NoiseExplorer() {
       if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
       copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
     } catch {
-      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+      // Clipboard access can be denied in some browser security contexts, so no crash and no link copied.
     }
   }, []);
 
@@ -189,14 +189,14 @@ export function NoiseExplorer() {
    * started, so "north pole" is always the answer there. Dephasing does not:
    * it drives x and y to zero and leaves z exactly where it was, so its
    * resting place is (0, 0, z₀). Four of the six starting presets (|+⟩, |−⟩,
-   * |+i⟩, |−i⟩ — including |+⟩, the one the instrument opens on) sit on the
+   * |+i⟩, |−i⟩, including |+⟩, the one the instrument opens on) sit on the
    * equator with z₀ = 0, and for those the vector really does end at the
    * centre of the sphere. The old code told a reader who answered "centre"
    * from |+⟩ that they were wrong.
    *
    * The two options are also chosen per starting state, not just graded
    * differently, because "in to the z-axis keeping its height" and "in to the
-   * centre" are the *same* destination when z₀ = 0 — offering both would make
+   * centre" are the *same* destination when z₀ = 0; offering both would make
    * one of two identical answers wrong.
    *
    * z₀ = cos(θ) is read off the preset's own Bloch angles (see
@@ -226,26 +226,26 @@ export function NoiseExplorer() {
 
   const narration =
     clampedSteps === 0
-      ? "No decoherence yet — this is the starting pure state, sitting exactly on the sphere's surface."
+      ? "No decoherence yet: this is the starting pure state, sitting exactly on the sphere's surface."
       : channel === "amplitude-damping"
         ? purityValue > 0.995
-          ? `After ${clampedSteps} applications, the state has nearly fully decayed to |0⟩ — amplitude damping's fixed point, itself pure again.`
+          ? `After ${clampedSteps} applications, the state has nearly fully decayed to |0⟩, amplitude damping's fixed point, itself pure again.`
           : `After ${clampedSteps} applications: purity Tr(ρ²) = ${purityValue.toFixed(3)}. The Bloch vector is being pulled toward the north pole, |0⟩.`
         : purityValue < 0.505
-          ? `After ${clampedSteps} applications, x and y have nearly vanished: only the population information (z) survives — this is dephasing's fixed behavior.`
+          ? `After ${clampedSteps} applications, x and y have nearly vanished: only the population information (z) survives. This is dephasing's fixed behavior.`
           : `After ${clampedSteps} applications: purity Tr(ρ²) = ${purityValue.toFixed(3)}. Phase information (x, y) is randomizing away while z stays fixed.`;
 
   return (
     <SimulatorInstrument
-      label="Noise channel — open-system decoherence"
+      label="Noise channel: open-system decoherence"
       readout={<Readout label="Purity" value={purityValue.toFixed(3)} />}
-      footnote="Next: this is exactly the T1/T2 decay hardware engineers measure — see it framed that way in the Quantum Hardware lessons."
+      footnote="Next: this is exactly the T1/T2 decay hardware engineers measure; see it framed that way in the Quantum Hardware lessons."
       stageClassName="space-y-6"
       stage={
         <>
           <p className="text-sm text-muted-foreground">
             A qubit is never truly alone: it leaks information into everything around it, a little at a time.
-            This runs that leakage for real, one step at a time. The arrow is the qubit&rsquo;s state — on the
+            This runs that leakage for real, one step at a time. The arrow is the qubit&rsquo;s state. On the
             sphere&rsquo;s surface means a definite quantum state, and the further inside the surface it
             sinks, the more of that state has been lost to the environment for good.
           </p>
@@ -254,7 +254,11 @@ export function NoiseExplorer() {
             <BlochSphereCanvas blochPoint={blochVector} className="mx-auto w-full" />
           </div>
 
-          <div aria-live="polite" className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+          {/* `role="status"` + `aria-atomic="true"`: a role-less live region's
+              implicit `aria-atomic` is `false`, so an update announces only
+              the text nodes that actually changed. This one swaps a whole
+              sentence, so it was safe in practice but not by construction. */}
+          <div role="status" aria-live="polite" aria-atomic="true" className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {narration}
           </div>
 
@@ -267,7 +271,7 @@ export function NoiseExplorer() {
 
           <Predict
             key={`${presetId}-${channel}`}
-            question="Keep stepping this channel forward — where does the Bloch vector eventually settle?"
+            question="Keep stepping this channel forward. Where does the Bloch vector eventually settle?"
             options={predictOptions}
             // Resolved only once the reader has scrubbed to the end of the
             // trajectory. The question is about the limit, not the current
@@ -276,7 +280,7 @@ export function NoiseExplorer() {
           />
 
           <SimulatorFraming
-            shows="Real qubits leak information to their environment — this applies an actual Kraus-operator noise channel step by step so you can watch a pure state decay toward the channel&rsquo;s fixed point."
+            shows="Real qubits leak information to their environment. This applies an actual Kraus-operator noise channel step by step so you can watch a pure state decay toward the channel&rsquo;s fixed point."
             watchFor="Purity is the one number to keep an eye on: 1 means the qubit still holds a definite quantum state, 0.5 means it has decayed to a coin flip and the quantum information is gone. Amplitude damping ends back at purity 1 (at |0⟩); dephasing does not."
             tryThis={
               <ul>
@@ -285,7 +289,7 @@ export function NoiseExplorer() {
                   at |0⟩. Then reset, pick Dephasing instead, and compare where the Bloch vector ends up.
                 </li>
                 <li>
-                  Compare a low strength (0.05) against a high one (0.5) — same number of steps, very
+                  Compare a low strength (0.05) against a high one (0.5): same number of steps, very
                   different decay speed.
                 </li>
               </ul>

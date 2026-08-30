@@ -15,23 +15,23 @@ export const magicStateEastinKnillTransversalGates: MultipleChoiceProblem = {
   question: {
     type: "multiple-choice",
     prompt:
-      "On the surface code, H, S, and CNOT can be implemented transversally (fault-tolerantly, with no error spreading within a logical block), but T cannot. Which statement best explains why this is not just a current engineering limitation?",
+      "On the surface code, every Clifford operation (H, S, CNOT) has a fault-tolerant implementation, and the code's transversal gates are all Clifford. T is the one gate with no fault-tolerant circuit of its own: it has to be injected from a separately prepared magic state. Which statement best explains why that is not just a current engineering limitation?",
     options: [
       {
         id: "a",
-        text: "The Eastin-Knill theorem proves no code can have both a universal transversal gate set and the ability to correct arbitrary single-qubit errors, so a transversal fault-tolerant T gate on an error-correcting surface code is provably impossible, not merely undiscovered",
+        text: "Eastin-Knill shows no code can hold a universal transversal gate set while also correcting arbitrary single-qubit errors",
       },
       {
         id: "b",
-        text: "T is simply a harder gate to engineer than H, S, or CNOT, and a sufficiently clever lattice-surgery scheme could eventually make it transversal too",
+        text: "Eastin-Knill rules out a transversal T on the surface code specifically, while other code families have one and give up nothing for it",
       },
       {
         id: "c",
-        text: "T cannot be made transversal only because current decoders are too slow to keep up with T gates specifically",
+        text: "Adding a transversal T would cut the surface code's distance, so the code's distance excludes it rather than any theorem",
       },
       {
         id: "d",
-        text: "T is already transversal on the surface code; magic-state distillation is used only to reduce qubit overhead, not because transversal T is impossible",
+        text: "T is already transversal on the surface code, and distillation exists only to cut the qubit overhead of injection",
       },
     ],
   },
@@ -39,12 +39,12 @@ export const magicStateEastinKnillTransversalGates: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "This treats it as an engineering gap. Eastin-Knill is a no-go theorem: it is not that nobody has found the right transversal circuit for T, it is that no such fault-tolerant transversal circuit can exist on a code that also corrects arbitrary single-qubit errors.",
-      c: "Decoder speed affects how fast syndromes are processed, not whether a transversal circuit for T exists at all. The obstruction is structural (Eastin-Knill), not a speed problem.",
-      d: "T is exactly the gate that is NOT transversal on the surface code; that is the whole reason magic-state injection and distillation are needed as a separate mechanism.",
+      b: "The theorem is not about the surface code in particular; it constrains every code that corrects arbitrary single-qubit errors. Other families do have a transversal T, but they lose transversality of some other gate in exchange, so universality is never free.",
+      c: "Transversality is about how a gate acts across a block, not about distance, and a transversal circuit leaves the code's distance untouched. The obstruction is the no-go theorem, which forbids the combination rather than the individual gate.",
+      d: "T is the one gate here that is not transversal, and that is precisely why magic-state injection and distillation exist as a separate mechanism rather than as an optimisation.",
     },
     defaultIncorrectFeedback:
-      "Recall the lesson's precise statement of the Eastin-Knill theorem: no code can simultaneously have a universal transversal gate set and correct arbitrary single-qubit errors.",
+      "Name the theorem that constrains which gate sets a code can implement transversally, and state the two properties it says no code can hold at once.",
   },
   hints: [
     { text: "This is a named no-go theorem, not an open engineering problem." },
@@ -57,19 +57,19 @@ export const magicStateEastinKnillTransversalGates: MultipleChoiceProblem = {
         description: "Eastin-Knill states: no quantum error-correcting code can have both (i) a universal set of transversal logical gates, and (ii) the ability to correct arbitrary single-qubit errors.",
       },
       {
-        description: "The surface code corrects arbitrary single-qubit errors (up to its distance), so by the theorem it cannot also have a universal transversal gate set. Since H, S, CNOT (Clifford) are already transversal, T (which would complete universality) is the gate that must fail to be transversal.",
+        description: "The surface code corrects arbitrary single-qubit errors (up to its distance), so by the theorem it cannot also have a universal transversal gate set. Its transversal gates sit inside the Clifford group, and Clifford gates alone are not universal, so the gate that would complete universality, T, is the one the theorem forbids. Fault-tolerant Cliffords still exist on the surface code, but by lattice surgery, patch deformation and twist braiding rather than by qubit-by-qubit transversal circuits.",
       },
     ],
-    finalAnswer: "Eastin-Knill makes a transversal fault-tolerant T provably impossible on a code that corrects arbitrary single-qubit errors, not merely undiscovered.",
+    finalAnswer: "Eastin-Knill makes a universal transversal gate set provably impossible on any code that corrects arbitrary single-qubit errors. On the surface code, whose transversal gates are all Clifford, that is what puts a transversal T permanently out of reach, rather than a circuit nobody has found yet.",
   },
   explanation: {
     correctIdea:
       "Eastin-Knill is a structural no-go result, not an unsolved engineering challenge: any error-correcting code with full single-qubit error correction is barred from also having a universal transversal gate set.",
     whyCorrect:
-      "This is exactly why magic-state injection (a fundamentally different, non-transversal mechanism) exists as the standard workaround, rather than the field simply waiting for a better transversal T circuit.",
+      "This is why magic-state injection, a different and non-transversal mechanism, exists as the standard workaround, rather than the field waiting for a better transversal T circuit.",
     whyWrong: [
-      { optionId: "b", text: "Mistakes a proven impossibility for a temporary limitation. No lattice-surgery scheme can route around a no-go theorem." },
-      { optionId: "c", text: "Confuses decoder throughput with the existence of a fault-tolerant circuit. Speed is not the obstruction; structure is." },
+      { optionId: "b", text: "Reads a general theorem as a fact about one code. Codes with a transversal T exist, and they give up transversality elsewhere; the constraint is on the set, not on the gate." },
+      { optionId: "c", text: "Blames distance for a constraint on gate sets. A transversal circuit does not change a code's distance, and the obstruction is a proven no-go rather than a parameter." },
       { optionId: "d", text: "Gets the facts backwards. T is the one non-transversal gate here, which is why distillation exists at all." },
     ],
   },

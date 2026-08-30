@@ -21,20 +21,11 @@ export const synthesisWellDepthAndBoundStateCount: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      [
-        "more and more branches",
-        "more branches",
-        "more crossings",
-        "additional crossings",
-        "unboundedly many crossings",
-        "number of bound states grows without bound",
-        "grows without bound",
-        "without limit",
-        "unbounded",
-        "arbitrarily many",
-        "more bound states",
-        "keeps growing",
-      ],
+      {
+        phrases: ["more and more branches", "more branches", "more crossings", "additional crossings", "unboundedly many crossings", "number of bound states grows without bound", "grows without bound", "without limit", "unbounded", "arbitrarily many", "more bound states", "keeps growing"],
+        missingFeedback:
+          "Say what happens to the quarter-circle as V0 is increased, and what that does to the number of places it meets the fixed branches.",
+      },
       {
         phrases: [
           "approaches the infinite well",
@@ -49,18 +40,26 @@ export const synthesisWellDepthAndBoundStateCount: ConceptualProblem = {
           "matches the infinite",
         ],
         missingFeedback:
-          "You have the growth in bound-state count. Close the loop with the limiting case: V₀ → ∞ is the infinite square well, whose endless ladder of levels is exactly what an unbounded number of crossings has to reproduce.",
+          "You have the growth in count. Now close the loop: name the idealization that V₀ → ∞ turns the well into, and check that its level structure is what an ever-growing count of crossings must reproduce.",
       },
     ],
-    incorrectFeedback: "Name both pieces: that the number of bound states grows without bound as V0 grows (the quarter-circle sweeps past ever more tangent/cotangent branches), and that this is exactly consistent with the infinite well's endless ladder of states.",
+    incorrectFeedback: "You said the well holds more states when it is deeper, which is the observation, not the argument. Use the graph: one curve's size is set by V0 and the other family is fixed. Say what happens to the count of intersections as the first grows, and what already-known system the endpoint of that process is.",
+    modelAnswers: [
+      "As V0 grows the quarter-circle's radius grows with it, so it sweeps past more and more branches and picks up additional crossings without limit. The number of bound states grows without bound, which is exactly the infinite well's endless ladder in the limit.",
+      "A bigger V0 means a bigger quarter-circle, so there are more crossings and therefore arbitrarily many bound states. In the limit you recover the infinite square well with infinitely many levels.",
+    ],
   },
-  hints: [{ text: "What happens to the quarter-circle's radius as V0 grows, and how many branches can it eventually cross?" }],
+  hints: [
+    { text: "Two things are plotted. Which of them changes when you make the well deeper, and which is fixed by the well's width alone?" },
+    { text: "The fixed family repeats along the axis forever. Ask how far along that axis the other curve reaches when V0 is enormous." },
+    { text: "Each intersection is one state. Count them for a modest V0, then for one a hundred times deeper, and say what the sequence of counts is heading towards." },
+  ],
   solution: {
     steps: [
       { description: "As $V_0\\to\\infty$, the quarter-circle's radius $\\sqrt{2V_0}$ grows without bound, eventually sweeping past every tangent and cotangent branch, however far out." },
-      { description: "The number of bound states therefore grows without bound too — consistent with the infinite well (the $V_0\\to\\infty$ limit) having infinitely many bound states." },
+      { description: "The number of bound states therefore grows without bound too, consistent with the infinite well (the $V_0\\to\\infty$ limit) having infinitely many bound states." },
     ],
-    finalAnswer: "As V0 grows, the quarter-circle sweeps past more and more branches, so the number of bound states grows without bound — consistent with the infinite well's endless ladder as the V0 -> infinity limiting case.",
+    finalAnswer: "As V0 grows, the quarter-circle sweeps past more and more branches, so the number of bound states grows without bound, consistent with the infinite well's endless ladder as the V0 -> infinity limiting case.",
   },
   explanation: {
     correctIdea: "The finite well's bound-state count smoothly interpolates between 'exactly one' (very shallow) and 'infinitely many' (the infinite-well limit).",

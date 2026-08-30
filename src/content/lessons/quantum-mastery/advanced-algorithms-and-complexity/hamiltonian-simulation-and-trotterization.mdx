@@ -77,7 +77,7 @@ export const trotterCurveFrames = [
 export const lessonMeta = {
   title: "Hamiltonian Simulation and Trotterization",
   description:
-    "Deriving the first-order Trotter-Suzuki product formula and a Taylor-series error bound for simulating e^{-iHt} when H's terms don't commute, then verifying both the mechanism and the O(1/n) error scaling numerically on a real 2-qubit Ising Hamiltonian against exact matrix exponentiation.",
+    "Deriving the first-order Trotter-Suzuki product formula and a Taylor-series error bound for simulating exp(−iHt) when H's terms don't commute, then verifying both the mechanism and the O(1/n) error scaling numerically on a real 2-qubit Ising Hamiltonian against exact matrix exponentiation.",
   course: "advanced-algorithms-and-complexity",
   module: "hamiltonian-simulation-and-trotterization",
   order: 2,
@@ -101,7 +101,7 @@ export const lessonMeta = {
   derives exactly how good the fix is, not just that it exists.
 </LessonHook>
 
-## Motivation
+## The Exponential Everyone Wants to Compute
 
 Simulating $e^{-iHt}$ is the whole point of a quantum computer, in the
 sense Feynman originally proposed it: a real physical Hamiltonian $H$
@@ -109,8 +109,7 @@ generally isn't a single gate this platform's engine already knows how to
 apply. But $H$ almost always decomposes as a sum of *local* pieces,
 $H=\sum_iH_i$, each individually easy to simulate; the trouble is that
 $e^{-iHt}\neq\prod_ie^{-iH_it}$ unless every $H_i$ commutes with every
-other, which is essentially never true for anything physically
-interesting.
+other, which almost never holds for anything physically interesting.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/06/Richard_Feynman_1959.png"
@@ -121,7 +120,7 @@ interesting.
   license="Public domain"
 />
 
-## Mathematical Development
+## Product Formulas and Their Error, by Taylor Expansion
 
 ### The product formula
 
@@ -161,9 +160,18 @@ cross term:
 
 <TheoremBox title="First-order Trotter single-step error" provenance="derived">
 
+**Hypotheses.** $A$ and $B$ are *bounded* self-adjoint operators on a
+Hilbert space (in particular, any two finite Hermitian matrices), and
+$\delta\in\mathbb R$. Boundedness is what makes both exponential series
+converge absolutely in operator norm, so the two expansions may be
+multiplied and subtracted term by term.
+
 $$
 \boxed{e^{-iA\delta}e^{-iB\delta} - e^{-i(A+B)\delta} = -\frac{\delta^2}{2}[A,B] + O(\delta^3)}
 $$
+
+The implied constant in $O(\delta^3)$ depends only on $\|A\|$ and
+$\|B\|$, so the estimate is uniform in $\delta$ on any bounded interval.
 
 </TheoremBox>
 
@@ -175,6 +183,23 @@ leading-order per-step error is $\frac{\delta^2}{2}\|[A,B]\|$, with the
 $O(\delta^3)$ remainder bounded by a standard (cited, not re-derived)
 Taylor-remainder estimate for bounded operators.
 
+The boundedness hypothesis is not decoration, and it is where
+matrix intuition and operator theory part company. Every $H$ in this
+lesson is a finite Hermitian matrix, so $\|A\|,\|B\|<\infty$ and the
+argument above is complete as written. The Hamiltonians of continuum
+quantum mechanics are not: for $H=-\tfrac{\hbar^2}{2m}\Delta+V$ on
+$L^2(\mathbb R^3)$, neither the kinetic nor the potential term is
+bounded, the exponential series do not converge in norm, and
+$\|[A,B]\|=\infty$ makes the bound above vacuous. The product formula
+itself survives, but in a weaker form: the **Trotter–Kato theorem**
+gives $\left(e^{-iA t/n}e^{-iB t/n}\right)^n\to e^{-i(A+B)t}$ in the
+*strong* operator topology, vector by vector, whenever $A$, $B$, and
+$\overline{A+B}$ are each self-adjoint. Strong convergence with no rate
+is exactly what a gate-count argument cannot use, which is why
+rigorous continuum simulation bounds are always proved after
+discretizing onto a lattice, where the operators are matrices again and
+this lesson's finite-dimensional estimate applies.
+
 ### From one step to n: a submultiplicativity lemma
 
 To bound the error after $n$ repeated steps, not just one, use a short,
@@ -182,9 +207,18 @@ fully general lemma:
 
 <TheoremBox title="Submultiplicativity lemma" provenance="derived">
 
-If $U_1,\dots,U_n$ and $V_1,\dots,V_n$ are unitary with
-$\|U_k-V_k\|\leq\varepsilon$ for every $k$, then $\|U_n\cdots
+**Hypotheses.** $U_1,\dots,U_n$ and $V_1,\dots,V_n$ are unitary
+operators on one Hilbert space, and $\|\cdot\|$ is any unitarily
+invariant norm ($\|WM\|=\|MW\|=\|M\|$ for unitary $W$), which covers
+both the operator norm used in the bound and the Frobenius norm used in
+this lesson's numerics.
+
+If $\|U_k-V_k\|\leq\varepsilon$ for every $k$, then $\|U_n\cdots
 U_1-V_n\cdots V_1\|\leq n\varepsilon$.
+
+Nothing here is finite-dimensional: the lemma holds verbatim for unitary
+operators on an infinite-dimensional Hilbert space. It is only the
+per-step $\varepsilon$ fed into it that needed $A$ and $B$ bounded.
 
 </TheoremBox>
 
@@ -209,7 +243,7 @@ $$
 \boxed{\left\|e^{-iHt}-\left(e^{-iA\delta}e^{-iB\delta}\right)^n\right\| \;\leq\; n\cdot\frac{\delta^2}2\|[A,B]\| \;=\; \frac{t\delta}2\|[A,B]\| \;=\; \frac{t^2}{2n}\|[A,B]\|}
 $$
 
-a derived total-error bound, not an asserted one: it shrinks
+This total-error bound is derived, not quoted: it shrinks
 as $O(1/n)$ for fixed simulation time $t$, the defining signature of a
 *first-order* method, and the number of Trotter steps needed for a
 target error $\epsilon$ scales as $n=O(t^2\|[A,B]\|/\epsilon)$.
@@ -245,6 +279,10 @@ S_2(\delta) = I - i(A+B)\delta - \tfrac12\big(A^2+AB+BA+B^2\big)\delta^2 + O(\de
 $$
 
 <TheoremBox title="Second-order (Strang) single-step error" provenance="derived">
+
+**Hypotheses.** The same as at first order: $A$, $B$ bounded and
+self-adjoint, $\delta$ real. No commutation, positivity, or
+smallness assumption is added.
 
 $$
 \boxed{S_2(\delta) - e^{-i(A+B)\delta} = O(\delta^3)}
@@ -306,7 +344,7 @@ with nested commutators playing the role $[A,B]$ played at first order.
   precision.
 </ResearchConnection>
 
-## Physical Interpretation
+## Non-Commutation as the Source of Error
 
 Every non-commuting pair of Hamiltonian terms is a place where "do $A$,
 then do $B$" differs from "do both at once". The same
@@ -314,7 +352,7 @@ noncommutativity that gives quantum mechanics its structure is what
 Trotterization has to pay a price for approximating. Splitting into
 smaller steps doesn't remove the noncommutativity; it just makes each
 individual step's exposure to it smaller, at the cost of needing more
-steps: a real, quantified tradeoff, not a free lunch.
+steps. The tradeoff is quantified, and it is not a free lunch.
 
 This isn't only a textbook exercise: IBM's 127-qubit Eagle processor ran
 Trotterized time-evolution circuits, with up to 60 layers of two-qubit
@@ -325,7 +363,7 @@ approximation methods. That's the same family of Hamiltonian, coupling
 term plus transverse field, this lesson's own worked example
 Trotterizes, just at a scale of 127 qubits instead of 2.
 
-## Worked Example
+## An Ising Step, First Order and Second
 
 **Verify the derivation on a real 2-qubit Hamiltonian: the transverse-field
 Ising terms $A=Z\otimes Z$ (coupling) and $B=X\otimes I+I\otimes X$
@@ -340,8 +378,8 @@ norms here).**
 <MatrixGrid matrix={hamA} label="A = Z⊗Z" compareTo={hamB} compareLabel="B = X⊗I + I⊗X" ariaLabel="The two non-commuting 4x4 Hamiltonian terms A=Z⊗Z and B=X⊗I+I⊗X used for the Trotter verification" />
 
 Their commutator has Frobenius norm $\|[A,B]\|_F\approx5.656854$,
-exactly $4\sqrt2$ (computed directly via this platform's `commutator`
-function, not asserted), nonzero, confirming $A$ and $B$ fail
+which is exactly $4\sqrt2$, computed by this platform's `commutator`
+function. It is nonzero, confirming $A$ and $B$ fail
 to commute, the regime the error bound above is about. (The bound above is stated for the operator norm
 $\|\cdot\|$; using the readily-computed Frobenius norm in its place only
 makes the bound *more* conservative, since the operator norm, the
@@ -361,20 +399,22 @@ $\frac{\delta^2}2\|[A,B]\|_F$:
 | $0.0625$ | $1.102\times10^{-2}$ | $1.105\times10^{-2}$ | $0.998$ |
 | $0.03125$ | $2.761\times10^{-3}$ | $2.762\times10^{-3}$ | $0.9995$ |
 
-The ratio climbs steadily toward exactly $1$ as $\delta\to0$,
-confirming the derivation's leading-order coefficient and not merely its
-existence, with the $O(\delta^3)$ remainder shrinking away as
-predicted.
+The ratio climbs steadily toward $1$ as $\delta\to0$. That confirms the
+derivation's leading *coefficient*, $\tfrac12\|[A,B]\|$, and not just the
+$\delta^2$ power: a wrong constant would drive the ratio to some other
+limit. The gap from $1$ at each row is the $O(\delta^3)$ remainder, and
+it is falling by roughly the expected factor of $2$ per halving of
+$\delta$.
 
 <PredictBeforeReveal
   question="The derived total-error bound is t²/(2n)‖[A,B]‖. Fix t=1 and double the number of Trotter steps n. What happens to the bound?"
   options={[
     { label: "It roughly halves", value: "half" },
     { label: "It drops by a factor of 4", value: "quarter" },
-    { label: "It barely changes — n isn't the dominant factor", value: "same" },
+    { label: "It barely changes, since n isn't the dominant factor", value: "same" },
   ]}
   correctValue="half"
-  explanation="The bound is inversely proportional to n (everything else fixed), so doubling n exactly halves it — no square, no exponential, a plain O(1/n) first-order scaling. The table below confirms this directly: error×n converges to a constant (≈1.0) as n grows, which is precisely what error∝1/n means numerically, not just asymptotically."
+  explanation="The bound is inversely proportional to n (everything else fixed), so doubling n exactly halves it. No square, no exponential, a plain O(1/n) first-order scaling. The table below confirms this directly: error×n converges to a constant (≈1.0) as n grows, which is precisely what error∝1/n means numerically, not just asymptotically."
 />
 
 **Total error over $n$ steps, fixed $t=1$.** Comparing the full $n$-step
@@ -382,19 +422,26 @@ product against exact $e^{-iHt}$:
 
 <ParametricCurve
   frames={trotterCurveFrames}
-  ariaLabel="log10 of actual Trotter error and log10 of the derived bound, both plotted against log10(number of Trotter steps n), showing both decreasing with slope close to -1, confirming O(1/n) scaling"
+  xAxisLabel="log₁₀(Trotter steps n)"
+  yAxisLabel="log₁₀(error)"
+  ariaLabel="log10 of actual Trotter error and log10 of the derived bound, both plotted against log10(number of Trotter steps n). The bound is an exact straight line of slope -1; the error curve runs below it, starts steeper (slope -1.49 over the first doubling) and settles onto the same slope -1.00 by the last doubling, confirming O(1/n) scaling"
 />
 
-Both curves are straight and nearly parallel on these log-log axes, the
-signature of a power law, with slope close to $-1$, confirming the
-derived $O(1/n)$ total-error scaling:
+The bound is an exact straight line of slope $-1$ on these log-log axes.
+The error curve runs below it throughout and converges onto the same
+slope: measured segment by segment it goes
+$-1.49,-1.15,-1.04,-1.01,-1.00$, steepest where $\delta=t/n$ is largest
+and the neglected $O(\delta^3)$ term still contributes a real fraction of
+the error. Parallel straight lines on log-log axes are the signature of a
+power law with the same exponent, so this is the derived $O(1/n)$
+total-error scaling made visible:
 
 | $n$ | error | derived bound | error $\times\,n$ |
 |---|---|---|---|
 | $1$ | $1.598$ | $2.828$ | $1.598$ |
 | $2$ | $0.5694$ | $1.414$ | $1.139$ |
 | $4$ | $0.2573$ | $0.7071$ | $1.029$ |
-| $8$ | $0.1254$ | $0.3536$ | $1.004$ |
+| $8$ | $0.1255$ | $0.3536$ | $1.004$ |
 | $16$ | $0.06233$ | $0.1768$ | $0.9973$ |
 | $32$ | $0.03112$ | $0.08839$ | $0.9957$ |
 
@@ -404,7 +451,7 @@ below the derived bound at every single $n$ tested as well, so the
 inequality itself holds, not only the scaling it implies.
 
 **First versus second order: the step-count crossover.** How much does
-the Strang splitting actually save on this same Hamiltonian? Both bounds
+the Strang splitting save on this same Hamiltonian? Both bounds
 are computable by hand. The nested commutators follow from the same
 Pauli algebra that gave $[A,B]=2i(Y\otimes Z+Z\otimes Y)$:
 
@@ -430,14 +477,17 @@ against $2\times16+1=33$ for Strang (adjacent $A$ half-steps merge, so
 $n$ symmetric steps cost $2n+1$ exponentials, not $3n$). A factor of
 about 17 fewer gates, from one symmetrization.
 
-Where is the actual crossover? Setting the two step counts equal and
-solving shows first order is only competitive when
-$\epsilon\gtrsim1$, an error target so loose the "approximation" would
-be meaningless for a unitary of norm 1. For any target you would
-actually use, the symmetric splitting wins, and its advantage grows
-like $1/\sqrt\epsilon$ as the target tightens.
+Where is the crossover? Setting the two step counts equal,
+$\tfrac{2\sqrt2}\epsilon=\sqrt{\tfrac{5\sqrt2}{3\epsilon}}$, gives
+$\epsilon=\tfrac{8}{5\sqrt2/3}=\tfrac{24}{5\sqrt2}\approx3.39$. First
+order is cheaper only above that, at an error target three times the
+norm of the unitary being approximated, where both formulas call for
+fewer than one step and the word "approximation" has stopped meaning
+anything. For any target you would use in practice the symmetric
+splitting wins, and its margin widens like $1/\sqrt\epsilon$ as the
+target tightens.
 
-## Common Mistakes
+## Confusing Total Time With Step Size
 
 <Callout type="warning">
 **Assuming the Trotter error bound requires $A$ and $B$ to be small.**
@@ -466,19 +516,226 @@ looseness in action, not a sign of an error in the derivation.
    $0.01$? (Use the bound's exact form
    $\frac{t^2}{2n}\|[A,B]\|\leq\epsilon$, not just the asymptotic
    $O(\cdot)$.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $n=283$.
+
+   Rearrange the bound rather than guessing and checking:
+
+   $$
+   \frac{t^2}{2n}\|[A,B]\|\leq\epsilon
+   \;\Longleftrightarrow\;
+   n\geq\frac{t^2\|[A,B]\|}{2\epsilon}=\frac{1\cdot4\sqrt2}{2(0.01)}=\frac{5.656854}{0.02}=282.84,
+   $$
+
+   and $n$ must be a whole number, so $n=283$. The boundary is worth
+   confirming because $282.84$ is uncomfortably close to $282$: at $n=282$
+   the bound reads $0.010030$, over target, and at $n=283$ it reads
+   $0.0099944$, under. Rounding down would have failed the specification.
+
+   The more useful observation is how much slack that number carries.
+   The measured errors in the table above satisfy
+   $\text{error}\times n\to0.996$, so the *actual* error is about
+   $0.996/n$ and reaches $0.01$ at roughly $n=100$. The certified bound
+   asks for nearly three times as many steps as the job needs, and the
+   overshoot has two identifiable sources, neither of which is a mistake.
+
+   About a factor of $\sqrt2$ comes from using the Frobenius norm in place
+   of the operator norm. For this Hamiltonian $[A,B]=2i(Y\otimes Z+Z\otimes Y)$,
+   and $(Y\otimes Z+Z\otimes Y)^2=2I+2X\otimes X$ has eigenvalues $4$ and
+   $0$, so $\|[A,B]\|=4$ exactly while $\|[A,B]\|_F=4\sqrt2$.
+
+   The remaining factor of about two comes from the triangle inequality in
+   the submultiplicativity lemma, which adds the $n$ per-step errors as
+   though they all point the same way. They do not; successive steps
+   partially cancel.
+
+   This is the normal condition of a rigorous resource estimate. The bound
+   is a guarantee, so it has to hold in the worst case over everything it
+   declines to track, and a factor of three in step count is a cheap price
+   for a number you can put in a proof. It is also why papers report both
+   a proved bound and a measured error, and why the two are never expected
+   to coincide.
+
+   </details>
+
 2. Explain, from the single-step Taylor derivation, exactly why
    $[A,B]=0$ makes the product formula *exact* at every Trotter step,
    not merely small-error.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because when $A$ and $B$ commute the two expansions agree term by term
+   at *every* order, not only at the $\delta^2$ order the boxed result
+   examines.
+
+   It is worth being clear that the boxed result alone does not establish
+   this. It says the difference is $-\tfrac{\delta^2}2[A,B]+O(\delta^3)$,
+   so setting $[A,B]=0$ kills the leading term and leaves an $O(\delta^3)$
+   remainder that, for all the boxed statement knows, might be nonzero.
+   Exactness needs the same comparison run at general order $k$.
+
+   Do that. Collect the $\delta^k$ coefficient on each side. The product
+   formula gives the Cauchy product of the two series,
+
+   $$
+   \left[e^{-iA\delta}e^{-iB\delta}\right]_k=(-i)^k\sum_{m+n=k}\frac{A^mB^n}{m!\,n!},
+   $$
+
+   while the exact exponential gives
+
+   $$
+   \left[e^{-i(A+B)\delta}\right]_k=\frac{(-i)^k}{k!}(A+B)^k
+   =\frac{(-i)^k}{k!}\sum_{\text{words } w}w,
+   $$
+
+   the sum running over all $2^k$ ordered words in $A$ and $B$ of length
+   $k$. With $[A,B]=0$ every word with $m$ letters $A$ and $n$ letters $B$
+   collapses to $A^mB^n$, and there are $\binom km$ such words, so the
+   second expression becomes
+   $(-i)^k\sum_{m+n=k}\binom km A^mB^n/k!=(-i)^k\sum_{m+n=k}A^mB^n/(m!\,n!)$.
+   The two coefficients are identical, for every $k$. Hence
+   $e^{-iA\delta}e^{-iB\delta}=e^{-i(A+B)\delta}$ exactly, with no
+   remainder at all.
+
+   The commutativity is used in exactly one place: reordering the letters
+   of each word so the binomial theorem applies. That single step is the
+   whole content of the failure in the general case, and it is why the
+   error at order $\delta^2$ came out as a commutator rather than as some
+   other combination.
+
+   Physically the statement is unremarkable once seen this way. Commuting
+   terms can be evolved independently because they generate independent
+   one-parameter groups; "do all of $A$, then all of $B$" and "do both at
+   once" are the same operation, not an approximation to it. A pure Ising
+   coupling with no transverse field is the case in point: every term is
+   diagonal, everything commutes, and Trotterization of it is exact at any
+   step size, which is the sanity check any implementation should be run
+   against first.
+
+   </details>
+
 3. The submultiplicativity lemma's proof telescopes a difference of
    products into a sum. Explain, in your own words, why each term in
    that sum has norm exactly $\|U_k-V_k\|$, using the fact that
    multiplying by a unitary preserves operator norm.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because each summand is $(U_k-V_k)$ with a unitary glued on each side,
+   and the hypothesis on the norm is that gluing a unitary on either side
+   changes nothing.
+
+   The $k$-th summand is
+
+   $$
+   \underbrace{V_n\cdots V_{k+1}}_{W_L}\,(U_k-V_k)\,\underbrace{U_{k-1}\cdots U_1}_{W_R}.
+   $$
+
+   A product of unitaries is unitary, so $W_L$ and $W_R$ are unitary. Then
+   $\|W_L M W_R\|=\|MW_R\|=\|M\|$ by two applications of unitary
+   invariance, giving $\|W_L(U_k-V_k)W_R\|=\|U_k-V_k\|$. The word
+   "exactly" in the statement is doing real work: this is an equality, not
+   the inequality $\|W_LMW_R\|\leq\|W_L\|\|M\|\|W_R\|$ that general
+   submultiplicativity would give.
+
+   Both norms this lesson uses have that property, for different-looking
+   reasons that are the same reason. The operator norm is the largest
+   singular value, and multiplying by a unitary permutes nothing in the
+   singular value list. The Frobenius norm is $\sqrt{\mathrm{Tr}(M^\dagger M)}$,
+   and $\mathrm{Tr}(W^\dagger M^\dagger MW)=\mathrm{Tr}(M^\dagger M)$ by
+   cyclicity. Every Schatten norm behaves the same way, which is why the
+   lemma is stated for unitarily invariant norms rather than for one
+   specific choice.
+
+   Now see what would go wrong without unitarity. If the factors were
+   merely bounded with $\|U_k\|,\|V_k\|\leq C$ for some $C>1$, each
+   summand would only be bounded by $C^{n-1}\|U_k-V_k\|$, and the total
+   would grow like $nC^{n-1}\varepsilon$: exponential in the number of
+   steps, which for $n=283$ is not a bound anybody could use. The linear
+   $n\varepsilon$ result, and with it the whole $O(t^2/n)$ scaling and
+   every gate count derived from it, rests entirely on the fact that both
+   the exact evolution and its Trotter approximation are unitary. Errors in
+   a quantum circuit accumulate additively rather than multiplicatively,
+   and this lemma is where that fact is proved.
+
+   </details>
+
 4. Rerun the Strang-splitting Taylor multiplication for the reversed
    ordering $e^{-iB\delta/2}e^{-iA\delta}e^{-iB\delta/2}$ and confirm
    the $\delta^2$ cancellation survives swapping the roles of $A$ and
    $B$. Then, using the cited Childs et al. bound with the roles
    swapped, compute this ordering's per-step error coefficient for the
    lesson's Ising Hamiltonian. Which ordering has the smaller bound?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The cancellation survives, and the reversed ordering has the *smaller*
+   bound: coefficient $\tfrac{4\sqrt2}{3}\approx1.886$ against
+   $\tfrac{5\sqrt2}{3}\approx2.357$, a $20\%$ improvement for free.
+
+   **The cancellation.** There is nothing to rerun, and seeing why is
+   better than grinding through the multiplication again. The derivation
+   above produced
+
+   $$
+   S_2(\delta)=I-i(A+B)\delta-\tfrac12\big(A^2+AB+BA+B^2\big)\delta^2+O(\delta^3)
+   =I-i(A+B)\delta-\tfrac12(A+B)^2\delta^2+O(\delta^3),
+   $$
+
+   and $(A+B)^2$ is symmetric under swapping $A$ and $B$. Every step of
+   the multiplication treats the outer operator and the inner one by the
+   same rules, so relabelling gives the same expansion. Both orderings are
+   second order.
+
+   The structural reason is worth having, because it explains why every
+   symmetric splitting behaves this way. Both products are palindromic, so
+   $S_2(-\delta)=S_2(\delta)^{-1}$, and the exact exponential satisfies the
+   same identity. A difference of two functions that both invert under
+   $\delta\to-\delta$ can carry only odd powers of $\delta$ in its error,
+   so the $\delta^2$ term has no choice but to vanish. Symmetrizing buys
+   the extra order; which operator sits in the middle does not affect
+   whether it is bought.
+
+   **The coefficient.** It does affect how much the third order costs. In
+   the cited bound the $1/12$ weight attaches to the *inner* operator
+   nested twice against the outer one, and $1/24$ to the reverse. For the
+   lesson's ordering (outer $A$, inner $B$),
+
+   $$
+   \frac{1}{12}\|[B,[B,A]]\|_F+\frac{1}{24}\|[A,[A,B]]\|_F=\frac{16\sqrt2}{12}+\frac{8\sqrt2}{24}=\frac{5\sqrt2}{3}\approx2.357.
+   $$
+
+   Swapping the roles puts $B$ outside and $A$ inside, so the two weights
+   trade places:
+
+   $$
+   \frac{1}{12}\|[A,[A,B]]\|_F+\frac{1}{24}\|[B,[B,A]]\|_F=\frac{8\sqrt2}{12}+\frac{16\sqrt2}{24}=\frac{4\sqrt2}{3}\approx1.886.
+   $$
+
+   The reversed ordering wins by a factor of $4/5$. At the lesson's target
+   $\epsilon=0.01$ it needs $n^2\geq1.886/0.01=188.6$, so $n=14$ steps
+   ($n=13$ gives $0.01116$, over target) against the $16$ the original
+   ordering needs.
+
+   **The rule that generalizes.** The larger of the two nested-commutator
+   norms should be the one multiplied by $1/24$, so the operator whose
+   *self*-nested commutator against the other is larger belongs on the
+   outside. Here $\|[B,[B,A]]\|_F=16\sqrt2$ exceeds
+   $\|[A,[A,B]]\|_F=8\sqrt2$, so the transverse field $B$ goes in the half
+   steps and the coupling $A=Z\otimes Z$ sits in the middle. That is a real
+   compiler decision with a real gate cost attached, and it is invisible
+   to any analysis that stops at "the method is second order". It also
+   comes with a caveat: the ranking is a statement about this bound and
+   this Hamiltonian, so it should be recomputed rather than assumed for a
+   different term splitting.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -497,15 +754,18 @@ looseness in action, not a sign of an error in the derivation.
   Hamiltonian at target error $0.01$, that is 16 steps instead of 283.
   Higher-order commutator bounds (Childs et al. 2021) and randomized
   compilation (qDRIFT, Campbell 2019) extend the same story, and are
-  cited rather than re-derived.
+  cited, not re-derived.
 - Verified numerically on a real 2-qubit Ising Hamiltonian, using this
   platform's actual `Matrix`/`Complex`/gate primitives plus a
   from-scratch Taylor-series matrix exponential: the single-step error
   ratio converges to exactly $1$ as $\delta\to0$, and the $n$-step error
-  scales as $O(1/n)$, both confirmed directly against exact matrix
-  exponentiation, not merely asserted.
+  scales as $O(1/n)$, with the measured log-log slope reaching $-1.00$.
+- The whole quantitative story assumes $A$ and $B$ are *bounded*. For the
+  unbounded Hamiltonians of continuum quantum mechanics, Trotter–Kato
+  still gives strong convergence but no rate, which is why rigorous
+  simulation bounds discretize first.
 
-## Further Exploration
+## Beyond Product Formulas
 
 <NextDiscovery>
   [Quantum Walks](/lessons/quantum-mastery/advanced-algorithms-and-complexity/quantum-walks)

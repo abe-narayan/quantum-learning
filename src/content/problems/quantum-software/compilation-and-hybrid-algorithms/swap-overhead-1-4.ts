@@ -42,7 +42,7 @@ export const swapOverhead14: NumericProblem = {
   },
   explanation: {
     correctIdea: "This applies the lesson's own formula to a new control/target pair, distinct from the worked example's control=0,target=5 case.",
-    whyCorrect: "Matches swapOverheadForLinearChain(1,4) computed directly from the engine.",
+    whyCorrect: "Control and target sit d = 3 apart, so the control has to be walked d − 1 = 2 hops to become adjacent and then walked back, giving 2(d − 1) = 4 SWAPs. swapOverheadForLinearChain(1,4) returns the same count.",
     whyWrong: ["Using d instead of d-1 (forgetting that adjacent qubits need 0 swaps) would give an incorrect answer of 6 instead of 4."],
   },
 };

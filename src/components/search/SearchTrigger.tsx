@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * The shortcut is Cmd+K on macOS and Ctrl+K everywhere else, and the badge in
- * the trigger has to say which one — a Mac user who reads "Ctrl K" concludes
+ * the trigger has to say which one, a Mac user who reads "Ctrl K" concludes
  * the site has no shortcut for them, which is exactly the discoverability
  * failure the badge exists to prevent.
  *
@@ -46,7 +46,7 @@ export function SearchTrigger({ className }: { className?: string }) {
         aria-haspopup="dialog"
         aria-expanded={open}
         // `aria-controls` may only name an id that is actually in the
-        // document, and the dialog only exists while open — so this is
+        // document, and the dialog only exists while open, so this is
         // conditional rather than always-on. Closes the last open item from
         // docs/A11Y_AUDIT.md for this control.
         aria-controls={open ? SEARCH_DIALOG_ID : undefined}
@@ -62,7 +62,7 @@ export function SearchTrigger({ className }: { className?: string }) {
           // with the theme toggle and menu button; TOUCH_TARGET_CLASSES adds
           // the WCAG 2.5.5 44px hit area on a transparent `::after` without
           // growing the visible control. See IconButton.tsx for the full
-          // reasoning — this is the site's chrome standard, not an exception.
+          // reasoning, this is the site's chrome standard, not an exception.
           "inline-flex h-10 items-center gap-2 rounded-(--radius-tight) border border-border bg-surface px-3 text-sm text-muted-foreground transition-[color,border-color] duration-(--dur-fast) ease-instrument hover:border-border-strong hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           TOUCH_TARGET_CLASSES,
           className
@@ -80,7 +80,7 @@ export function SearchTrigger({ className }: { className?: string }) {
           <path strokeLinecap="round" d="m20 20-3.5-3.5" />
         </svg>
         <span className="hidden sm:inline">Search</span>
-        <kbd className="hidden rounded-[calc(var(--radius-tight)-2px)] border border-border bg-surface-muted px-1.5 py-0.5 font-tech text-[10px] font-medium text-muted-foreground sm:inline">
+        <kbd className="hidden rounded-[calc(var(--radius-tight)-2px)] border border-border bg-surface-muted px-1.5 py-0.5 font-tech text-micro font-medium text-muted-foreground sm:inline">
           {shortcutLabel}
         </kbd>
       </button>

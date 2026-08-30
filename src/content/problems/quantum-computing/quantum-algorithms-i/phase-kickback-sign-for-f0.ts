@@ -35,6 +35,7 @@ export const phaseKickbackSignForF0: NumericProblem = {
     value,
     tolerance: 0.01,
     incorrectFeedback: "(−1)^f(0) with f(0)=1 gives (−1)^1.",
+    nearMisses: [{ value: 1, feedback: "+1 is the f(x)=0 case. The exponent in (−1)^f(x) is f(x) itself, and here f(0)=1, so the exponent is odd." }],
   },
   hints: [
     { text: "The formula is (−1)^f(x)." },
@@ -48,6 +49,6 @@ export const phaseKickbackSignForF0: NumericProblem = {
   explanation: {
     correctIdea: "The kickback formula's exponent is f(x) itself, so f(x)=1 gives a minus sign directly.",
     whyCorrect: "Matches the direct algebraic derivation and the engine's own computed overlap.",
-    whyWrong: ["Answering +1 would be correct for f(0)=0, not f(0)=1 — check which case applies."],
+    whyWrong: ["Answering +1 would be right for f(0)=0. Check which case the question sets."],
   },
 };

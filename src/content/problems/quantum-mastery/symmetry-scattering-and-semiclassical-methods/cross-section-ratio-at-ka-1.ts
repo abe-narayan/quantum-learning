@@ -27,7 +27,8 @@ export const crossSectionRatioAtKa1: NumericProblem = {
     type: "numeric",
     value: ratio,
     tolerance: 0.005,
-    incorrectFeedback: "σ₀=(4π/k²)sin²(ka) and 4πa²=4π/(ka/a)²·(ka)² ... simplify directly: σ₀/(4πa²)=sin²(ka)/(ka)².",
+    incorrectFeedback:
+      "Start from σ₀=(4π/k²)sin²(ka) and divide by 4πa². The 4π cancels, and 1/(k²a²) is 1/(ka)², so the whole ratio collapses to sin²(ka)/(ka)². Evaluate that at ka=1, with the sine taken in radians, and square it.",
     nearMisses: [
       { value: Math.sin(1), tolerance: 0.005, feedback: "That is sin(1) without the square. The cross section depends on sin²δ₀." },
       { value: 1, feedback: "1 is the ka→0 limit, where the cross section saturates at 4πa². At ka=1 it has already fallen below that." },

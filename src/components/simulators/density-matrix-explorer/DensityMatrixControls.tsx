@@ -18,16 +18,44 @@ function ComponentPicker({
   angles: BlochAngles;
   onChange: (angles: BlochAngles) => void;
   /** True when this component's mixing coefficient is currently exactly 0, so ρ = p·ρ₁ + (1−p)·ρ₂
-   * has zeroed out its contribution entirely — every slider/preset click here is a real, valid edit
+   * has zeroed out its contribution entirely; every slider/preset click here is a real, valid edit
    * that nonetheless produces zero visible change until the weight is moved off that extreme. */
   isInert: boolean;
 }) {
   return (
-    <div className={cn("rounded-panel border border-border bg-surface p-3", isInert && "opacity-60")}>
+    // "Inert" used to be `opacity-60` on the whole panel. Everything inside it
+    // is `--muted-foreground` text plus live controls, and a group opacity
+    // fades the panel's own background by the same amount as the text, so it
+    // buys almost no separation while costing most of the contrast: measured
+    // with the repo's own compositing (src/lib/design/__tests__/color.ts, the
+    // method compositedContrast.test.ts uses), `--muted-foreground` on
+    // `--surface` at 60% reads 3.37:1 on dark and 2.64:1 on light, both under
+    // WCAG 1.4.3's 4.5:1 — and these controls remain fully operable, so they
+    // are not exempt as disabled. Worse, opacity was the *only* channel: an
+    // inert panel and an active one differed by alpha alone.
+    //
+    // Now the recede is two full-strength, non-alpha channels: the surface
+    // steps down to `--surface-muted` and the border goes dashed. The text
+    // keeps its own token, so `--muted-foreground` on `--surface-muted`
+    // measures 6.78:1 on dark and 5.76:1 on light. The sentence below already
+    // states the condition in words, which is the channel that actually
+    // carries the meaning.
+    //
+    // The two `bg-*` classes are branches of one ternary rather than a base
+    // plus an override: Tailwind resolves same-property utilities by their
+    // order in the generated stylesheet, not by their order in the class
+    // string, so `"bg-surface"` followed by `"bg-surface-muted"` is a coin
+    // flip rather than an override.
+    <div
+      className={cn(
+        "rounded-panel border border-border p-3",
+        isInert ? "border-dashed bg-surface-muted" : "bg-surface"
+      )}
+    >
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
       {isInert && (
-        <p className="mt-1 text-[11px] text-muted-foreground">
-          No visible effect right now — the mixing weight below is entirely on the other component.
+        <p className="mt-1 text-xs text-muted-foreground">
+          No visible effect right now: the mixing weight below is entirely on the other component.
         </p>
       )}
       <div className="mt-2 flex flex-wrap gap-1.5">
@@ -121,7 +149,7 @@ export function DensityMatrixControls({
       <ControlSection
         id="components"
         title="The two states being mixed"
-        description="Pick the two possibilities. The qubit really is one of them — you just don't know which."
+        description="Pick the two possibilities. The qubit really is one of them; you just don't know which."
       >
         <div className="grid gap-3 @sm:grid-cols-2">
           <ComponentPicker title="Possibility 1 (ρ₁)" angles={component1} onChange={onComponent1Change} isInert={weight === 0} />
@@ -140,14 +168,14 @@ export function DensityMatrixControls({
               symbol: "φ",
               name: "azimuthal angle",
               means:
-                "which way the state points once tilted — its relative phase. It never changes the odds of measuring 0 or 1, only how the state interferes.",
+                "which way the state points once tilted: its relative phase. It never changes the odds of measuring 0 or 1, only how the state interferes.",
               glossaryId: "global-relative-phase",
             },
             {
               symbol: "ρ",
               name: "density matrix",
               means:
-                "the full description of a qubit when you only know the odds, not the state — the two-by-two table of numbers in the panel to the left.",
+                "the full description of a qubit when you only know the odds, not the state: the two-by-two table of numbers in the panel to the left.",
               glossaryId: "mixed-state",
             },
           ]}

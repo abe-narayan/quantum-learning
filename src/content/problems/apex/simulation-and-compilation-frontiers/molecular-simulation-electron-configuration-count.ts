@@ -61,13 +61,13 @@ export const molecularSimulationElectronConfigurationCount: NumericProblem = {
     steps: [
       { description: `Each of the ${numSpinOrbitals} spin-orbitals is either occupied or empty, and exactly ${numElectrons} of them must be occupied, so a basis state of this sector is exactly a choice of which ${numElectrons} orbitals are occupied.` },
       { description: `The number of such choices is $\\binom{${numSpinOrbitals}}{${numElectrons}} = ${value}$.` },
-      { description: "This is the same combinatorial growth the lesson's Mathematical Development section describes: doubling the active space size grows this count combinatorially, not linearly, which is exactly why classical exact diagonalization (full configuration interaction) becomes intractable for larger active spaces." },
+      { description: "This is the growth that makes the classical problem hard: doubling the active space multiplies the count combinatorially rather than linearly, which is why exact diagonalization (full configuration interaction) stops being possible once the active space grows." },
     ],
     finalAnswer: `${value}`,
   },
   explanation: {
     correctIdea: `The fixed-particle-number sector of a ${numSpinOrbitals}-spin-orbital, ${numElectrons}-electron system has dimension $\\binom{${numSpinOrbitals}}{${numElectrons}}=${value}$, growing combinatorially in the active space size.`,
-    whyCorrect: "This combinatorial scaling is exactly the classical-hardness argument the lesson's Mathematical Development section makes precise: the antisymmetric many-electron Hilbert space grows as a binomial coefficient, not linearly, in the number of orbitals.",
+    whyCorrect: "The antisymmetric many-electron space is spanned by the ways of placing the electrons among the orbitals, so its dimension is a binomial coefficient rather than a linear function of the orbital count. That is the whole classical-hardness argument, and it is why a modest enlargement of the active space is not a modest increase in cost.",
     whyWrong: [`A count that treats the orbitals as ordered (a permutation count, ${numSpinOrbitals}!/${numSpinOrbitals - numElectrons}!) overcounts, since two orbital assignments that occupy the same set of orbitals in a different order are the same physical state.`],
   },
 };

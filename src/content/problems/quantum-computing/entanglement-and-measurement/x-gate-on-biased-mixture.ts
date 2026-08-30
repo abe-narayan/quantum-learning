@@ -39,11 +39,11 @@ export const xGateOnBiasedMixture: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "X is not the identity — it actively swaps |0⟩ and |1⟩, so it must change a state that treats them differently.",
-      c: "X⊗X† conjugation only ever permutes or rotates a density matrix's entries — it doesn't introduce off-diagonal terms out of nowhere for a diagonal input.",
-      d: "X is unitary but doesn't erase information the way a measurement or noise channel would — it just relabels which basis state has which probability.",
+      b: "X is not the identity; it swaps |0⟩ and |1⟩, so it must change a state that assigns them different probabilities.",
+      c: "Conjugation by X permutes a density matrix's entries; it cannot create off-diagonal terms from a diagonal input.",
+      d: "X is unitary, so it does not erase information the way a measurement or a noise channel would. It relabels which basis state carries which probability.",
     },
-    defaultIncorrectFeedback: "X swaps the roles of |0⟩ and |1⟩ — apply that directly to ρ's diagonal entries.",
+    defaultIncorrectFeedback: "X swaps the roles of |0⟩ and |1⟩. Apply that directly to ρ's diagonal entries.",
   },
   hints: [
     { text: "X swaps |0⟩ ↔ |1⟩, so it should swap the probabilities associated with each." },

@@ -34,6 +34,18 @@ import type { SearchEntry, SearchEntryType } from "./types";
  * doesn't tag) — its rank sorts after every real pillar so a kind group reads
  * curriculum-order-first, general-last.
  */
+/**
+ * How often the corpus links to this entry, most-linked first. Missing reads as 0.
+ *
+ * Only glossary terms carry a `linkCount`, so within every other kind
+ * group every entry gets 0 and this comparator is a no-op: the ordering of
+ * lessons, problems, simulators, courses and tracks is exactly what it was.
+ * Inside the term group it decides the pairs that score identically, where
+ * the alternative was the alphabet. See `linkCount` in ./types.ts.
+ */
+function weightOf(entry: SearchEntry): number {
+  return entry.linkCount ?? 0;
+}
 function pillarRank(pillar: Pillar | undefined): number {
   if (!pillar) return PILLAR_ORDER.length;
   const index = PILLAR_ORDER.indexOf(pillar);
@@ -53,9 +65,25 @@ export type RankedMatch = {
    * title, where it is safe to; inside the title bands it is not, because an
    * initialism match has no literal text to be contiguous in and would be
    * demoted for it. So it survives here as a tie-break, which cannot move a
-   * row past a better-scoring one and settles the case that made it necessary:
-   * `bra` puts "The Bra-Ket Formalism", "Calibration" and "Capstone: From
-   * Abstract Algebra…" all in band 2, and only one of them is about a bra.
+   * row past a better-scoring one.
+   *
+   * ## Why it is a tie-break and not the primary key
+   *
+   * A review proposed sorting on it first, so that a whole-term match always
+   * preceded a fragment. Measured against the real index, that breaks two of
+   * the pins in `__tests__/recoveryQueries.test.ts` and for exactly the reason
+   * this field's own note gives:
+   *
+   *  - `QFT` stops leading with the Quantum Fourier Transform. That entry is
+   *    reached through its initialism, which is not literal text anywhere in
+   *    it, so its `termRank` is 1 and a lesson that merely spells "QFT" out
+   *    goes first.
+   *  - `bell state` stops leading with the glossary's "Bell States", whose
+   *    title is the plural and so contains no contiguous "bell state" either.
+   *
+   * Both are entries the query *names*, demoted for a spelling detail. The
+   * substring noise that motivated the proposal is removed where it enters
+   * instead — see `containsToken` in ./match.ts.
    */
   termRank: number;
 };
@@ -107,6 +135,7 @@ function groupsFor(index: SearchableEntry[], tokens: string[]): RankedGroup[] {
       (a, b) =>
         a.score - b.score ||
         a.termRank - b.termRank ||
+        weightOf(b.entry) - weightOf(a.entry) ||
         pillarRank(a.entry.pillar) - pillarRank(b.entry.pillar) ||
         a.entry.title.localeCompare(b.entry.title)
     );

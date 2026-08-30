@@ -5,6 +5,11 @@ import { SectionTitle } from "@/components/ui/Typography";
 import { FadeRule } from "@/components/ui/Panel";
 import { PillarScope } from "@/components/field/PillarScope";
 import { PrerequisiteReadout } from "@/components/lessons/PrerequisiteReadout";
+import {
+  DISTANT_UPSTREAM_LESSONS,
+  chainLessonCount,
+  lessonPrerequisiteChain,
+} from "@/components/apex/readiness";
 import { ScrollableMathText } from "./ScrollableMathText";
 import { getCourse, getPillar } from "@/lib/content/curriculum";
 import { getCourseHref } from "@/components/curriculum/courseHref";
@@ -43,6 +48,20 @@ export function ProblemLayout({
 
   const course = getCourse(problem.meta.course);
   const pillar = course ? getPillar(course.pillar) : undefined;
+
+  // The same transitive-distance readout lesson pages now carry, computed by
+  // the same traversal so the two surfaces cannot disagree. A problem page has
+  // exactly the property that made this worth building for lessons: it is
+  // reachable directly from the catalog, from site search, from Google and
+  // from a shared link, without ever passing the track page that has the
+  // honest number. Before this, an Apex problem's readout said "0 / 1
+  // complete" to a reader who was a hundred lessons upstream of it, which
+  // understates the gap badly enough to be worse than saying nothing.
+  // `undefined` below the threshold, so a reader already in range sees the
+  // plain prerequisite chips and no lecture.
+  const upstreamChain = lessonPrerequisiteChain(course?.slug, allLessons);
+  const upstream =
+    chainLessonCount(upstreamChain) >= DISTANT_UPSTREAM_LESSONS ? upstreamChain : undefined;
 
   return (
     <PillarScope pillar={course?.pillar}>
@@ -114,7 +133,11 @@ export function ProblemLayout({
             readout rather than only near it — `scroll-mt` keeps it clear of
             the sticky chrome. */}
         <div id={PREREQUISITE_ANCHOR_ID} className="scroll-mt-24">
-          <PrerequisiteReadout prerequisites={prerequisites} />
+          <PrerequisiteReadout
+            prerequisites={prerequisites}
+            upstream={upstream}
+            distantAt={upstream ? DISTANT_UPSTREAM_LESSONS : undefined}
+          />
         </div>
 
         {/* `min-w-0` + `ScrollableMathText`: problem prompts are plain strings

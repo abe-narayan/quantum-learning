@@ -6,19 +6,20 @@ import { Eyebrow, Lede, Readouts, SectionTitle, TechLabel } from "@/components/u
 import { Panel, Instrument } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
-import { COURSES, PILLARS } from "@/lib/content/curriculum";
+import { COURSES, CURRICULUM_HOURS, PILLARS } from "@/lib/content/curriculum";
 import { GLOSSARY_TERMS } from "@/lib/content/glossary";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
 import { buildSearchIndex } from "@/lib/search";
 import { START_LEARNING_HREF } from "@/lib/nav";
+import { ENTRY_BAR } from "@/lib/entryBar";
 import { buildPageMetadata, BASE_URL } from "@/lib/pageMetadata";
 import { buildBreadcrumbSchema } from "@/lib/structuredData";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "About",
   description:
-    "What QuantumLearn is, who it's for, how its content and simulators are verified, and what it deliberately does not claim.",
+    "What StudyQuantum is, who it's for, how its content and simulators are verified, and what it deliberately does not claim.",
   path: "/about",
 });
 
@@ -30,8 +31,8 @@ const breadcrumbSchema = buildBreadcrumbSchema([
 /**
  * The simulator count, derived rather than hand-kept.
  *
- * There is no programmatic registry of simulators — `/simulators` is a page
- * of hand-written `<section id="...">` blocks — but `buildSearchIndex` in
+ * There is no programmatic registry of simulators, `/simulators` is a page
+ * of hand-written `<section id="...">` blocks, but `buildSearchIndex` in
  * `src/lib/search/index.ts` already carries one `type: "simulator"` entry per
  * real section on that page, and a test keeps that list honest. Counting
  * those entries is therefore the closest thing to a source of truth that
@@ -41,7 +42,7 @@ const breadcrumbSchema = buildBreadcrumbSchema([
  * exactly the kind of claim that goes quietly wrong.
  *
  * The empty arrays are positional, so a future parameter added to
- * `buildSearchIndex` has to be added here too — a compile error, not a silent
+ * `buildSearchIndex` has to be added here too, a compile error, not a silent
  * wrong number, which is the trade this file is making on purpose.
  */
 const SIMULATOR_COUNT = buildSearchIndex([], [], [], []).filter(
@@ -50,7 +51,7 @@ const SIMULATOR_COUNT = buildSearchIndex([], [], [], []).filter(
 
 /**
  * What this page is for: a visitor who has not decided whether to trust the
- * site yet. That reader is not served by adjectives — they are served by
+ * site yet. That reader is not served by adjectives, they are served by
  * specifics they can check (real counts, a named verification mechanism they
  * can go look at) and by an explicit statement of what the site does *not*
  * claim, which is the part almost no education site is willing to write down.
@@ -59,10 +60,18 @@ const SIMULATOR_COUNT = buildSearchIndex([], [], [], []).filter(
 export default async function AboutPage() {
   const lessons = await getAllLessonsMeta();
   const problemCount = getAllProblemMeta().length;
-  const totalHours = COURSES.reduce((sum, course) => sum + course.estimatedHours, 0);
+  // `CURRICULUM_HOURS`, not a local reduce. This page's footnote promises
+  // that every figure above it is counted from the site's own content, so a
+  // second derivation of the same quantity is exactly the thing that makes
+  // that promise false later. `/`, `/learn` and `/lessons` already read the
+  // constant; this used the same sum and so agreed today, but nothing kept
+  // it agreeing. The label stays "Curriculum hours": this is an
+  // explanatory stats block, not the filter chrome the short vocabulary is
+  // for.
+  const totalHours = CURRICULUM_HOURS;
 
   return (
-    // No single track — About describes the whole site — so it gets the
+    // No single track, About describes the whole site, so it gets the
     // neutral `atlas` reference environment rather than the homepage's
     // curriculum-order crossfade. See docs/UX_REVIEW.md P1-2.
     <PillarScope regime="atlas">
@@ -74,7 +83,7 @@ export default async function AboutPage() {
       {/* `tight`, not `className="pt-4 sm:pt-8"`: `Section` writes its
           vertical padding as an inline `style`, which always beats a class on
           the same element, so that override compiled fine and applied to
-          nothing — the page opened with the full `--rhythm-section` (72px at
+          nothing, the page opened with the full `--rhythm-section` (72px at
           320px, 136px on a wide desktop) where 16px was asked for. `tight` is
           the prop that actually reduces it. Same dead override as /learn's
           hero, error.tsx and not-found.tsx. */}
@@ -82,14 +91,14 @@ export default async function AboutPage() {
         <Reveal>
           <Eyebrow>About</Eyebrow>
           <SectionTitle level={1} size="xl" className="mt-4">
-            About QuantumLearn
+            About StudyQuantum
           </SectionTitle>
-          <Lede className="mt-5 max-w-[46rem]">
-            QuantumLearn is a written curriculum in quantum mechanics and quantum computing, from
+          <Lede width="reading" className="mt-5">
+            StudyQuantum is a written curriculum in quantum mechanics and quantum computing, from
             the linear algebra up to research-depth material, with a working physics engine behind
             every simulation on the site.
           </Lede>
-          <p className="mt-5 max-w-[46rem] text-base leading-relaxed text-muted-foreground">
+          <p className="mt-5 max-w-reading text-base leading-relaxed text-muted-foreground">
             It is one connected subject taught in{" "}
             <Link href="/learn" className="text-pillar-text hover:underline">
               {PILLARS.length} tracks
@@ -138,10 +147,18 @@ export default async function AboutPage() {
           <Panel className="p-6">
             <h2 className="font-display text-lg font-semibold text-foreground">Who it is for</h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              <span className="text-foreground">Starting from little or nothing:</span> comfort with
-              algebra and some calculus is enough. No prior quantum mechanics and no prior linear
-              algebra is assumed — the first course builds the linear algebra it needs from zero,
-              and any unfamiliar term is a{" "}
+              <span className="text-foreground">Starting from little or nothing:</span>{" "}
+              {/* `ENTRY_BAR` now carries the calculus clause itself, so the sentence that
+                  used to repeat it here has been replaced by the part /about has the room
+                  to add and the one-line bar does not: which course the boundary falls on,
+                  which calculus is actually used, and where to get it. */}
+              {ENTRY_BAR} The first course, Mathematical Foundations, builds the linear
+              algebra it needs from zero and stays calculus-free throughout; From Classical
+              to Quantum, the one after it, assumes derivatives, definite integrals and
+              first-order Taylor expansion, and no lesson on this site teaches them, so an
+              introductory single-variable calculus text is the one outside book this
+              curriculum expects you to have. The Computing track needs none of it. Any
+              unfamiliar term is a{" "}
               <Link href="/glossary" className="text-pillar-text hover:underline">
                 glossary
               </Link>{" "}
@@ -149,7 +166,7 @@ export default async function AboutPage() {
             </p>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               <span className="text-foreground">Coming in with a background:</span> Quantum Mastery
-              and Apex are graduate-level — spectral theory for unbounded operators, Lindblad
+              and Apex are graduate-level: spectral theory for unbounded operators, Lindblad
               dynamics, QSVT, surface-code decoding, resource estimation. If you already know the
               subject, start there and judge the site on that material rather than on the
               introduction.
@@ -174,11 +191,11 @@ export default async function AboutPage() {
               <li>
                 <span className="text-foreground">The simulators run real physics.</span> The Bloch
                 sphere, the wavefunction explorer, the density-matrix explorer and the rest are
-                driven by this platform&rsquo;s own quantum engine — complex linear algebra, a
-                split-operator Schrödinger solver, Kraus-operator noise channels — under unit test.
+                driven by this platform&rsquo;s own quantum engine (complex linear algebra, a
+                split-operator Schrödinger solver, Kraus-operator noise channels) under unit test.
                 None of them is a scripted animation.{" "}
                 <Link href="/simulators" className="text-pillar-text hover:underline">
-                  Open one
+                  Open a simulator
                 </Link>{" "}
                 and check the numbers against a textbook.
               </li>
@@ -189,8 +206,8 @@ export default async function AboutPage() {
               </li>
               <li>
                 <span className="text-foreground">External claims carry their source.</span> Every
-                Current Quantum entry links the primary source — the paper, the standards document,
-                or the lab&rsquo;s own announcement — and every external image carries its credit
+                Current Quantum entry links the primary source (the paper, the standards document,
+                or the lab&rsquo;s own announcement), and every external image carries its credit
                 and license.
               </li>
               <li>
@@ -220,7 +237,7 @@ export default async function AboutPage() {
               <li>
                 It does <span className="text-foreground">not run anything on real quantum
                 hardware</span>. Every simulation executes in your own browser, at the scale a
-                browser allows — which the Software track is explicit about, because that limit is
+                browser allows, which the Software track is explicit about, because that limit is
                 itself part of the subject.
               </li>
               <li>
@@ -246,7 +263,7 @@ export default async function AboutPage() {
             labelled "Start learning" goes to the on-ramp lesson
             (START_LEARNING_HREF), never to /learn. It pointed at /learn here,
             which meant the one loud button on the About page answered "start
-            learning" with another index to choose from — the exact failure
+            learning" with another index to choose from, the exact failure
             the shared constant exists to prevent (see its comment in
             src/lib/nav.ts). /learn is still one click away as the secondary
             action, under the label the rest of the site gives it. */}

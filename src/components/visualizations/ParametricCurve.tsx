@@ -1,375 +1,224 @@
-"use client";
+import { ParametricCurveView, type CurveFrame, type CurveSeries } from "./ParametricCurveView";
 
-import { useMemo } from "react";
-import { cn } from "@/lib/utils";
-import { useFrameIndex } from "./useFrameIndex";
-import { FrameSlider } from "./FrameSlider";
-
-export type CurveSeries = {
-  label: string;
-  color?: "brand" | "accent" | "muted" | "warning";
-  points: { x: number; y: number }[];
-};
-
-export type CurveFrame = {
-  /** Pre-formatted, e.g. "η = 0.30" — computed by the caller, not this component, so no function props cross the server/client boundary. */
-  paramLabel: string;
-  series: CurveSeries[];
-};
-
-const WIDTH = 480;
-const HEIGHT = 220;
-/**
- * Asymmetric padding (same idea as DecayCurve's PAD_LEFT/PAD_TOP/PAD_BOTTOM):
- * extra room on the left and bottom for the axis tick labels added below,
- * modest room on top/right since only the (pre-existing) referenceLines
- * text lives there, anchored inward. A few px larger than the old uniform
- * PAD=32 on the labeled sides so the plot area shrinks only slightly —
- * every frame still maps its own min/max to the new plot rect exactly, so
- * curve shapes are unaffected, they just gain a labeled margin.
- *
- * PAD_LEFT is no longer a constant: it is derived per-render from the
- * widest y-tick label (see `padLeft` below). At the old fixed 68 a
- * scientific-notation tick like "1.0×10⁻²⁷" — which `formatTick` genuinely
- * produces for path-integral amplitudes and ħ/2-scale domains — was ~108
- * units wide at the new type size and ran straight off the left edge of the
- * viewBox, silently clipped by the SVG. Sizing the gutter to the content
- * makes clipping structurally impossible while still giving short labels
- * like "0" or "1.5" their plot width back.
- */
-const PAD_RIGHT = 28;
-const PAD_TOP = 28;
-const PAD_BOTTOM = 44;
+export type { CurveFrame, CurveSeries };
 
 /**
- * Tick-label type size, in viewBox units.
+ * ============================================================
+ * ParametricCurve — the server half
+ * ============================================================
+ * `ParametricCurveView` is a Client Component, so every number in `frames`
+ * is serialized into the page's flight payload on the way into it. Lessons
+ * generate those frames with real arithmetic, and JavaScript prints a double
+ * with every digit it needs to round-trip: one sample of one curve arrives as
  *
- * This component renders `w-full`, so authored SVG type is scaled by
- * (rendered width / viewBox width). The narrowest real width is NOT the 288px
- * this note used to claim. The box is 254px, not 288px: 288 is the *page column* on a 320px phone
- * (320 less Container's `px-4` gutters), but this SVG renders inside
- * `panel-inset p-4`, and `panel-inset` (globals.css) supplies border,
- * radius and fill and no padding at all — the `p-4` does. Subtract
- * 2 x (16px padding + 1px border) = 34px.
- * The real box is 254px and the scale is 254/480 = 0.529.
+ *     {"x":3.8523489932885906,"y":-0.9880153329307066}
  *
- * Recomputed against it: the original `text-[9px]` painted at **4.76px**, not
- * 5.4px, and 18 units lands at **9.53px effective**, not 10.8px. 18 still
- * clears the ~9px floor, so the tick size itself stands — but the reference
- * labels below, which were authored as TICK_FONT - 3 = 15, painted at
- * **7.94px** and did not. They are TICK_FONT - 1 = 17 (9.00px) now; they name
- * the horizontal lines a reader is meant to compare the curve against, so they
- * are must-read, not annotation, and one step of hierarchy below the ticks is
- * all the differentiation they need.
+ * about 55 bytes for two numbers.
  *
- * On a full-width desktop figure (~700px) 18 units is ~26px, which is why the
- * surrounding chrome (legend, slider) is left at its existing DOM-pixel sizes:
- * only the SVG interior is subject to this scaling penalty.
+ * On
+ * `quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix`
+ * that was 34,630 numbers carrying eight or more decimal places — 608KB, 39%
+ * of a 1,565KB document, the heaviest page on the site by a factor of two and
+ * a half over the next lesson.
+ *
+ * **None of that precision is rendered.** The view writes its path as
+ * `px(p.x).toFixed(1)` in a 480 x 220 viewBox, and its tick labels with
+ * `toPrecision(3)`. Its own output is quantized to a tenth of a viewBox unit
+ * — about 0.15 CSS pixels on the widest desktop figure (~700px) — before a
+ * pixel is painted.
+ *
+ * So this wrapper rounds each coordinate to the last digit the view can
+ * distinguish, and does it *here*, on the server, because the cost is
+ * incurred crossing the boundary: rounding inside the view would shrink
+ * nothing.
+ *
+ * Measured on that page, against the rendered HTML: the coordinate text went
+ * from 611KB to 242.5KB (mean 17.1 characters a number to 6.8), the document
+ * from 1,610KB to 1,243KB raw, 264.3KB to 162.8KB gzip, 175.1KB to 88.9KB
+ * brotli. Every `<text>` element — tick labels, axis names, reference-line
+ * labels — is byte-identical, and one path coordinate out of 1,315 moved, by
+ * exactly the 0.1 viewBox units `toFixed(1)` already quantizes to.
+ * `__tests__/parametricCurvePrecision.test.ts` holds both halves of that.
+ *
+ * Registering another MDX component name would have cost one of the 30-entry
+ * budget in `src/mdx-components.tsx` (27 used). Splitting the existing one
+ * into a server shell and a client view costs none: the mapping still points
+ * at `ParametricCurve`, at the same path, with the same props, and every
+ * lesson in the corpus gets the reduction without being edited — which
+ * matters, because the second-heaviest page
+ * (`quantum-mechanics/the-hydrogen-atom/orbitals-and-quantum-numbers`) is a
+ * different author's file.
  */
-const TICK_FONT = 18;
+
+/** The view's viewBox. Used as an upper bound on the plot rect, which is
+ *  strictly smaller (the axis gutters take a bite out of it), so the
+ *  precision derived below is if anything finer than needed. */
+const VIEWBOX_WIDTH = 480;
+const VIEWBOX_HEIGHT = 220;
+
 /**
- * Advance width of one monospace digit at TICK_FONT, used only to size the
- * left gutter and to decide whether three x-ticks fit. Deliberately a rough
- * 0.6em estimate rather than a measurement: this runs during render on the
- * server as well as the client, so it cannot touch the DOM, and being a few
- * units generous only costs a sliver of plot width.
+ * How far a rounded point may move, in viewBox units.
+ *
+ * A hundredth of the view's own `toFixed(1)` step, which is the coarsest
+ * thing between the data and the screen. Concretely, at the widest the figure
+ * is ever drawn (~700px CSS for a 480-unit viewBox, so 1.46 CSS px per unit)
+ * this bounds the displacement at 0.0015 CSS pixels — 1/230th of a device
+ * pixel on a 3x display.
+ *
+ * That is deliberately far tighter than "the same rendered pixel" requires,
+ * and the reason is the interaction with `toFixed(1)` rather than the
+ * displacement itself: a point already sitting within this distance of a
+ * tenth-of-a-unit boundary can be rounded across it, and then the emitted
+ * path coordinate moves by a whole step (0.1 units, ~0.15 CSS px, under half
+ * a device pixel at 3x). The tolerance is what sets how often that happens —
+ * roughly `20 x tolerance` of vertices, so ~2% here — and each occurrence is
+ * the same sub-pixel motion the view already applies to the exact data. It is
+ * a fifth of a decimal digit's worth of payload to buy a factor of ten, so it
+ * is bought.
  */
-const TICK_CHAR_W = TICK_FONT * 0.6;
-/** Length of the small perpendicular tick marks now drawn at each labelled value. */
-const TICK_LEN = 5;
+const TOLERANCE_UNITS = 0.001;
 
-const COLOR_CLASSES: Record<NonNullable<CurveSeries["color"]>, string> = {
-  brand: "stroke-brand",
-  accent: "stroke-accent",
-  muted: "stroke-muted-foreground",
-  warning: "stroke-warning",
-};
+/**
+ * Significant digits kept regardless of the tolerance above.
+ *
+ * Purely defensive now that `roundInDomain` pins the axis endpoints, and
+ * cheap: it binds only on values so close to zero that the tolerance's own
+ * step has no digits left to hold, and it is what makes "no sample is ever
+ * quietly annihilated" true rather than merely likely — zero is the one value
+ * `formatTick` treats as a special case. Four, against the three
+ * `toPrecision(3)` consumes and the two `toExponential(1)` consumes, so a
+ * printed string could not turn on the last digit kept even if one of these
+ * values ever reached a label.
+ */
+const SIGNIFICANT_DIGIT_FLOOR = 4;
 
-const SUPERSCRIPT_DIGITS: Record<string, string> = {
-  "0": "⁰",
-  "1": "¹",
-  "2": "²",
-  "3": "³",
-  "4": "⁴",
-  "5": "⁵",
-  "6": "⁶",
-  "7": "⁷",
-  "8": "⁸",
-  "9": "⁹",
-  "-": "⁻",
-};
-
-function toSuperscript(text: string): string {
-  return text
-    .split("")
-    .map((ch) => SUPERSCRIPT_DIGITS[ch] ?? ch)
-    .join("");
+/**
+ * The largest step a coordinate may be moved by, in data units, for a plot of
+ * `extent` viewBox units showing a data range of `span`. Rounding to a step
+ * `q` has a worst-case error of `q / 2`, which the plot magnifies by
+ * `extent / span`, and that product is what `TOLERANCE_UNITS` bounds.
+ */
+function quantumFor(span: number, extent: number): number | null {
+  // A degenerate or non-finite span has no scale to reason about, and the
+  // view has its own handling for it. Round nothing.
+  if (!Number.isFinite(span) || span <= 0) return null;
+  return 2 * TOLERANCE_UNITS * (span / extent);
 }
 
 /**
- * Formats a single axis tick value to ~2-3 significant figures — same
- * precision-handling problem as `EnergyLevelDiagram.tsx`'s `formatEnergy()`,
- * generalized for an arbitrary (not just energy-scale) domain: values too
- * small to show without absurd precision (e.g. a ~10⁻²⁷ path-integral
- * amplitude, or the ħ/2-natural-units case) fall back to scientific
- * notation instead of collapsing to "0.000...".
- */
-function formatTick(value: number): string {
-  if (value === 0) return "0";
-  const abs = Math.abs(value);
-  if (abs < 0.001 || abs >= 100000) {
-    const [mantissa, exponent] = value.toExponential(1).split("e");
-    return `${mantissa}×10${toSuperscript(exponent.replace("+", ""))}`;
-  }
-  // Round to 3 significant figures, then round-trip through Number to drop
-  // trailing zeros (and any exponential form toPrecision might otherwise
-  // pick for this value) — abs is already confined above to a range where
-  // the plain decimal form is never unreasonably long.
-  return Number(value.toPrecision(3)).toString();
-}
-
-/** 2-4 evenly spaced tick values across [min, max], deduped for a collapsed (single-point) domain. */
-function tickValues(min: number, max: number): number[] {
-  const candidates = [min, min + (max - min) / 2, max];
-  return candidates.filter((v, i) => candidates.indexOf(v) === i);
-}
-
-/**
- * Drops the midpoint x-tick when the three labels would collide.
+ * `value`, rounded to a step of `quantum`.
  *
- * Three ticks is already this plot's floor — it is min / midpoint / max,
- * and the two endpoints must always be labelled or the reader cannot tell
- * what domain they are looking at — so "thin the ticks at narrow widths"
- * here means exactly one decision: keep the midpoint, or don't. The plot is
- * a fixed-aspect viewBox, so narrowness never changes the *layout*; what
- * changes is label WIDTH, and a domain formatted in scientific notation
- * ("1.0×10⁻²⁷", ~10 characters) produces labels three times wider than
- * "0.5". Keeping the midpoint in that case overlapped the endpoint labels
- * into an unreadable smear, which is strictly worse than one fewer
- * reference value.
+ * Expressed in *significant* digits rather than decimal places, which is the
+ * same rounding said in the units the number is actually stored in. Decimal
+ * places break down at both ends of the corpus's range: a fidelity curve
+ * covering 0.98446 to 1 needs six of them to keep its shape, and a
+ * path-integral amplitude around 1e-27 would need thirty-three, past the
+ * point where a double has digits to drop and past `toFixed`'s own limit.
+ * Significant digits are scale-free, so one rule covers both.
+ *
+ * `k = floor(log10|v|) + 1 + ceil(-log10 q)` is exactly the number of
+ * significant digits that rounding to a step of `q` would leave on a value of
+ * this magnitude, so this is a restatement, not an approximation.
  */
-function thinXTicks(ticks: number[], labels: string[], plotWidth: number): number[] {
-  if (ticks.length < 3) return ticks;
-  const widest = Math.max(...labels.map((l) => l.length)) * TICK_CHAR_W;
-  // Endpoint labels are anchored inward (start / end), the midpoint is
-  // centred, so the worst case is half the midpoint's width plus a full
-  // endpoint's width, twice over, plus a gap on each side.
-  const needed = widest * 2 + 12;
-  return plotWidth >= needed ? ticks : [ticks[0], ticks[ticks.length - 1]];
+function round(value: number, quantum: number | null): number {
+  if (quantum === null || value === 0 || !Number.isFinite(value)) return value;
+  const magnitude = Math.floor(Math.log10(Math.abs(value)));
+  const digits = magnitude + 1 + Math.ceil(-Math.log10(quantum));
+  if (!Number.isFinite(digits)) return value;
+  // `toPrecision` accepts 1..100. Past 100 digits there is nothing left of a
+  // double to round anyway, so clamping only makes the call legal.
+  return Number(value.toPrecision(Math.min(100, Math.max(SIGNIFICANT_DIGIT_FLOOR, digits))));
+}
+
+type Axis = { min: number; max: number; span: number };
+
+/** Min/max over `values`, or null if there is nothing finite to measure. */
+function extent(values: number[]): Axis | null {
+  const finite = values.filter((value) => Number.isFinite(value));
+  if (finite.length === 0) return null;
+  const min = Math.min(...finite);
+  const max = Math.max(...finite);
+  return { min, max, span: max - min };
 }
 
 /**
- * A slider-driven line plot over a set of precomputed frames — the same
- * "scrub through a precomputed array" pattern the Rabi and Noise explorers
- * already use, generalized into a reusable primitive. Every frame's data
- * must be computed by the LESSON itself (a plain module-scope `const`
- * calling real `@/lib/quantum/*` functions, exactly like this platform's
- * existing `QuantumStateDisplay` usage) — this component only draws
- * whatever points it's handed, and never computes physics itself. Frames
- * are required (not a live compute callback) because MDX lesson files are
- * Server Components by default; a function prop can't cross that boundary,
- * but a plain array of numbers can.
+ * The domain the *plot* is scaled to, which is not the extent of every point.
+ * `excludeFromDomain` series (a wall, a threshold rule) are drawn clamped and
+ * have no say in the axis, so counting them would overstate the range and
+ * under-round. Mirrors the view's own derivation, including its fallback to
+ * all points when every series opts out.
+ */
+function scalingSeries(frames: CurveFrame[]): CurveSeries[] {
+  const all: CurveSeries[] = frames.flatMap((frame) => frame.series);
+  const scaling = all.filter((series) => !series.excludeFromDomain);
+  return scaling.length > 0 ? scaling : all;
+}
+
+/**
+ * A coordinate of a series that sets the axis, rounded but pinned inside the
+ * domain it came from.
+ *
+ * **The axis is never rounded, only the samples inside it.** Everything the
+ * view computes from `min`/`max` is either typography or geometry that a
+ * fractional change would show: `formatTick` prints the endpoints and the
+ * midpoint, `padLeft` is sized from the *character length* of the widest of
+ * those labels, and `xOf`/`yOf` map the whole curve into what is left. On the
+ * hard-sphere lesson the free-wave figure runs y = -0.99999994 to 0.99999994,
+ * so its midpoint is a cancellation residue that `formatTick` prints as
+ * "3.7×10⁻⁸" — nine characters of gutter for a number that is zero. Rounding
+ * the endpoints to a five-figure -1 and 1 turns that label into "0", which
+ * hands the plot 58 viewBox units it did not have before: a better figure,
+ * and a different one. Keeping the extremes exact keeps every label, the
+ * gutter, and therefore the plot rect byte-identical, and costs four numbers
+ * per figure.
+ *
+ * The clamp is the other half of the same promise: a sample just inside an
+ * endpoint could otherwise round *past* it and become the new extreme.
+ */
+function roundInDomain(value: number, quantum: number | null, axis: Axis | null): number {
+  if (axis === null) return round(value, quantum);
+  if (value === axis.min || value === axis.max) return value;
+  return Math.min(axis.max, Math.max(axis.min, round(value, quantum)));
+}
+
+/** `frames`, with every coordinate rounded to the precision the view can
+ *  draw. Exported for the test that pins the rendered figure to the
+ *  unrounded one. */
+export function roundFrames(frames: CurveFrame[]): CurveFrame[] {
+  const scaling = new Set(scalingSeries(frames));
+  const points = [...scaling].flatMap((series) => series.points);
+  const xAxis = extent(points.map((point) => point.x));
+  const yAxis = extent(points.map((point) => point.y));
+  const xQuantum = quantumFor(xAxis?.span ?? 0, VIEWBOX_WIDTH);
+  const yQuantum = quantumFor(yAxis?.span ?? 0, VIEWBOX_HEIGHT);
+  if (xQuantum === null && yQuantum === null) return frames;
+
+  return frames.map((frame) => ({
+    ...frame,
+    series: frame.series.map((series) => {
+      // A series outside the domain is drawn clamped to the plot rect, so its
+      // values have no say in anything and need no pinning — but they still
+      // travel, so they still get rounded.
+      const sets = scaling.has(series);
+      return {
+        ...series,
+        points: series.points.map((point) => ({
+          x: sets ? roundInDomain(point.x, xQuantum, xAxis) : round(point.x, xQuantum),
+          y: sets ? roundInDomain(point.y, yQuantum, yAxis) : round(point.y, yQuantum),
+        })),
+      };
+    }),
+  }));
+}
+
+/**
+ * A slider-driven line plot over a set of precomputed frames. See
+ * `./ParametricCurveView.tsx` for what it draws and how; this file only
+ * decides how precisely the samples are worth sending.
  */
 export function ParametricCurve({
   frames,
-  sliderLabel = "",
-  referenceLines = [],
-  ariaLabel,
-  xAxisLabel,
-  yAxisLabel,
-}: {
-  frames: CurveFrame[];
-  /** Required when `frames.length > 1` (the slider needs a label); ignored for a single static frame. */
-  sliderLabel?: string;
-  referenceLines?: { y: number; label: string }[];
-  ariaLabel: string;
-  /**
-   * Name (and, where there is one, unit) of the horizontal quantity — e.g.
-   * "qubit count n" or "time t (ns)". Optional and unset at every existing
-   * call site, so nothing regresses, but a plot whose axes carry only bare
-   * numbers is asking the reader to infer what is being plotted from the
-   * surrounding prose. New call sites should pass both.
-   */
-  xAxisLabel?: string;
-  /** Name (and unit) of the vertical quantity. See `xAxisLabel`. */
-  yAxisLabel?: string;
-}) {
-  const { index, setIndex, frame } = useFrameIndex(frames);
-
-  const { xMin, xMax, yMin, yMax } = useMemo(() => {
-    const allPoints = frames.flatMap((f) => f.series.flatMap((s) => s.points));
-    const allY = [...allPoints.map((p) => p.y), ...referenceLines.map((r) => r.y)];
-    return {
-      xMin: Math.min(...allPoints.map((p) => p.x)),
-      xMax: Math.max(...allPoints.map((p) => p.x)),
-      yMin: Math.min(...allY),
-      yMax: Math.max(...allY),
-    };
-  }, [frames, referenceLines]);
-  const xSpan = xMax - xMin || 1;
-  const ySpan = yMax - yMin || 1;
-
-  const yTicks = tickValues(yMin, yMax);
-  const yTickLabels = yTicks.map(formatTick);
-  // Gutter = widest y label + the tick mark + breathing room, floored at 44
-  // so a single-character domain ("0" .. "1") still has a sane left margin.
-  const padLeft = Math.max(
-    44,
-    Math.ceil(Math.max(...yTickLabels.map((l) => l.length)) * TICK_CHAR_W) + TICK_LEN + 10
-  );
-  // A pathological domain could in principle demand more gutter than the
-  // viewBox has; clamp so the plot never inverts (negative width).
-  const plotW = Math.max(80, WIDTH - padLeft - PAD_RIGHT);
-  const plotH = HEIGHT - PAD_TOP - PAD_BOTTOM;
-  const xOf = (x: number) => padLeft + ((x - xMin) / xSpan) * plotW;
-  const yOf = (y: number) => PAD_TOP + (1 - (y - yMin) / ySpan) * plotH;
-  const allXTicks = tickValues(xMin, xMax);
-  const xTicks = thinXTicks(allXTicks, allXTicks.map(formatTick), plotW);
-  const axisY = HEIGHT - PAD_BOTTOM;
-
-  return (
-    <div className="not-prose space-y-3 panel-inset p-4">
-      <div className="overflow-x-auto">
-        <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
-          {/* Horizontal ruling at each labelled y value. `--axis-grid` on
-              purpose: this is the optional ruling that makes it easier to
-              read a curve's height off the axis, and it must stay quieter
-              than both the curve and the axis itself. */}
-          {yTicks.map((v, i) => (
-            <line
-              key={`ygrid-${i}`}
-              x1={padLeft}
-              y1={yOf(v)}
-              x2={WIDTH - PAD_RIGHT}
-              y2={yOf(v)}
-              className="stroke-axis-grid"
-              strokeWidth={1}
-            />
-          ))}
-
-          {/* Axes. Was `stroke-border` at strokeWidth 1 — `--border` is the
-              panel-edge token, measured at 1.41:1 on `--surface-muted`,
-              against the 3:1 WCAG 2.1 SC 1.4.11 floor for a graphical
-              object a reader must perceive. `--axis` clears 3:1 on every
-              panel depth in both themes; the extra quarter-unit of weight
-              keeps the axis distinguishable from the gridlines it now
-              shares a plot with. */}
-          <line
-            x1={padLeft}
-            y1={axisY}
-            x2={WIDTH - PAD_RIGHT}
-            y2={axisY}
-            className="stroke-axis"
-            strokeWidth={1.25}
-          />
-          <line x1={padLeft} y1={PAD_TOP} x2={padLeft} y2={axisY} className="stroke-axis" strokeWidth={1.25} />
-
-          {yTicks.map((v, i) => (
-            <g key={`y-${i}`}>
-              <line x1={padLeft - TICK_LEN} y1={yOf(v)} x2={padLeft} y2={yOf(v)} className="stroke-axis" strokeWidth={1.25} />
-              <text
-                x={padLeft - TICK_LEN - 4}
-                y={yOf(v) + TICK_FONT * 0.35}
-                textAnchor="end"
-                fontSize={TICK_FONT}
-                className="fill-axis font-mono"
-              >
-                {yTickLabels[i]}
-              </text>
-            </g>
-          ))}
-          {xTicks.map((v, i) => (
-            <g key={`x-${i}`}>
-              <line x1={xOf(v)} y1={axisY} x2={xOf(v)} y2={axisY + TICK_LEN} className="stroke-axis" strokeWidth={1.25} />
-              <text
-                x={xOf(v)}
-                y={axisY + TICK_LEN + TICK_FONT}
-                textAnchor={i === 0 ? "start" : i === xTicks.length - 1 ? "end" : "middle"}
-                fontSize={TICK_FONT}
-                className="fill-axis font-mono"
-              >
-                {formatTick(v)}
-              </text>
-            </g>
-          ))}
-
-          {/* Axis names, when the caller supplies them. Drawn in the plot's
-              own top corners rather than in the margins: the margins are
-              sized for the tick labels, and stealing more of them would eat
-              plot width on exactly the narrow screens this pass exists for. */}
-          {yAxisLabel ? (
-            <text x={padLeft + 4} y={PAD_TOP - 8} textAnchor="start" fontSize={TICK_FONT} className="fill-axis">
-              {yAxisLabel}
-            </text>
-          ) : null}
-          {xAxisLabel ? (
-            <text x={WIDTH - PAD_RIGHT} y={HEIGHT - 6} textAnchor="end" fontSize={TICK_FONT} className="fill-axis">
-              {xAxisLabel}
-            </text>
-          ) : null}
-
-          {referenceLines.map((ref, i) => (
-            <g key={i}>
-              {/* Left at `stroke-foreground/50` deliberately: a threshold
-                  line has to out-rank the axis it crosses, and half-alpha
-                  foreground already sits well above `--axis` in contrast.
-                  Converting it to `stroke-axis` for consistency's sake
-                  would have made this line dimmer, not clearer. */}
-              <line
-                x1={padLeft}
-                y1={yOf(ref.y)}
-                x2={WIDTH - PAD_RIGHT}
-                y2={yOf(ref.y)}
-                className="stroke-foreground/50"
-                strokeWidth={1.5}
-                strokeDasharray="4 3"
-              />
-              <text
-                x={WIDTH - PAD_RIGHT}
-                y={yOf(ref.y) - 5}
-                textAnchor="end"
-                fontSize={TICK_FONT - 1}
-                className="fill-foreground/80"
-              >
-                {ref.label}
-              </text>
-            </g>
-          ))}
-          {frame.series.map((series, i) => {
-            const path = series.points
-              .map((p, j) => `${j === 0 ? "M" : "L"}${xOf(p.x).toFixed(1)},${yOf(p.y).toFixed(1)}`)
-              .join(" ");
-            return <path key={i} d={path} fill="none" className={COLOR_CLASSES[series.color ?? "brand"]} strokeWidth={2} />;
-          })}
-        </svg>
-      </div>
-
-      {frame.series.length > 1 && (
-        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-          {frame.series.map((series, i) => (
-            <span key={i} className="flex items-center gap-1.5">
-              {/* Was `h-0.5 w-3` — a 2px × 12px hairline, small enough that
-                  telling two series' colours apart in the legend was harder
-                  than telling their curves apart in the plot, which defeats
-                  the point of having a legend. 4px × 20px matches the 2-unit
-                  curve stroke's on-screen weight at typical figure widths. */}
-              <span className={cn("h-1 w-5 rounded-full", COLOR_CLASSES[series.color ?? "brand"].replace("stroke-", "bg-"))} />
-              {series.label}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {frames.length > 1 && (
-        <FrameSlider
-          label={sliderLabel}
-          valueLabel={frame.paramLabel}
-          index={index}
-          max={frames.length - 1}
-          onChange={setIndex}
-          boxed={false}
-        />
-      )}
-    </div>
-  );
+  ...rest
+}: React.ComponentProps<typeof ParametricCurveView>) {
+  return <ParametricCurveView frames={roundFrames(frames)} {...rest} />;
 }

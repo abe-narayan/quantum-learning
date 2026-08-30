@@ -47,23 +47,23 @@ export const ghzCollapseAfterMeasuringQubitZero: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "This would mean only qubit 0 changed while qubits 1 and 2 stayed at $|0\\rangle$ — but the GHZ state's entanglement forces all three qubits to agree, not just qubit 0.",
-      c: "This treats qubits 1 and 2 as if they were still undetermined after measuring qubit 0 — but the GHZ state has zero amplitude on any outcome where the three qubits disagree, so this superposition can't be right.",
-      d: "Measurement is not the identity operation — it genuinely collapses the state onto the branch consistent with the observed outcome.",
+      b: "This changes only qubit 0 while qubits 1 and 2 stay at $|0\\rangle$. The GHZ state's entanglement forces all three qubits to agree.",
+      c: "This treats qubits 1 and 2 as still undetermined after qubit 0 is measured. The GHZ state has zero amplitude on any outcome where the three qubits disagree, so no such superposition can arise.",
+      d: "Measurement is not the identity operation; it collapses the state onto the branch consistent with the observed outcome.",
     },
-    defaultIncorrectFeedback: "Only one of the GHZ state's two nonzero terms is consistent with qubit 0 reading 1 — the state collapses onto that term alone.",
+    defaultIncorrectFeedback: "Only one of the GHZ state's two nonzero terms is consistent with qubit 0 reading 1, and the state collapses onto that term alone.",
   },
   hints: [
     { text: "The GHZ state has only two nonzero terms: $|000\\rangle$ and $|111\\rangle$." },
     { text: "Only one of those two terms has qubit 0 equal to 1." },
-    { text: "Measurement collapses the state onto the (renormalized) subspace consistent with the observed outcome — here, that's just the single surviving term." },
+    { text: "Measurement collapses the state onto the (renormalized) subspace consistent with the observed outcome, which here is a single surviving term." },
   ],
   solution: {
     steps: [
       { description: "Of the GHZ state's two nonzero terms, only $|111\\rangle$ has qubit 0 equal to 1; $|000\\rangle$ is eliminated." },
       { description: "The state collapses onto the single surviving term, renormalized (it's already normalized since it was the only survivor).", latex: `${ketLatex(measured.collapsed)}` },
     ],
-    finalAnswer: `$${ketLatex(measured.collapsed)}$ — all three qubits become exactly determined and equal.`,
+    finalAnswer: `$${ketLatex(measured.collapsed)}$. All three qubits become determined and equal.`,
   },
   explanation: {
     correctIdea: "Because the GHZ state's only two possibilities have all three qubits agreeing, measuring even one qubit instantly determines the definite state of all three.",

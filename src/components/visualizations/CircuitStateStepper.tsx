@@ -100,7 +100,7 @@ export function CircuitStateStepper({
     safeStep === 0
       ? "Initial state |0…0⟩, before any gate."
       : safeStep >= totalSteps
-        ? `Final state, after all ${totalSteps} gates${instructions[safeStep - 1] ? ` (last: ${instructions[safeStep - 1].gate})` : ""} — step back to watch it build up gate by gate.`
+        ? `Final state, after all ${totalSteps} gates${instructions[safeStep - 1] ? ` (last: ${instructions[safeStep - 1].gate})` : ""}. Step back to watch it build up gate by gate.`
         : `After gate ${safeStep} of ${totalSteps}${instructions[safeStep - 1] ? ` (${instructions[safeStep - 1].gate})` : ""}.`;
 
   const handlePlayPause = () => {
@@ -158,7 +158,20 @@ export function CircuitStateStepper({
             type="button"
             onClick={handlePlayPause}
             className="min-h-11 rounded-(--radius-tight) border border-brand bg-brand px-3 py-1.5 text-xs font-medium text-brand-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            aria-label={playing ? "Pause" : "Play through every gate"}
+            // Three visible states, so three names — WCAG 2.5.3 Label in
+            // Name. This read `playing ? "Pause" : "Play through every gate"`,
+            // two names for three labels: at the end of the circuit the button
+            // says "Replay" while being named "Play through every gate", and
+            // "Replay" is not a contiguous run of that name, so a speech-input
+            // user saying "click Replay" activated nothing at all. Each name
+            // now contains its own visible word as a contiguous run.
+            aria-label={
+              playing
+                ? "Pause"
+                : safeStep >= totalSteps
+                  ? "Replay from the first gate"
+                  : "Play through every gate"
+            }
           >
             {playing ? "Pause" : safeStep >= totalSteps ? "Replay" : "Play"}
           </button>
@@ -212,7 +225,16 @@ export function CircuitStateStepper({
       <div className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {currentLabel}
       </div>
-      <div aria-live="polite" className="sr-only">
+      {/* `role="status"`, the carrier every other live region in this
+          codebase uses (CurrentQuantumCatalog, LessonSearch, GlossaryFilter,
+          ConceptMapExplorer, EquationReveal). On a role-less div `aria-live`
+          alone leaves the region's role `generic`, which several screen
+          readers handle less reliably than a real `status`; the explicit
+          `aria-live`/`aria-atomic` below restate what `status` already
+          implies, and are kept because the atomic behaviour is
+          load-bearing — this sentence is replaced whole, and a
+          non-atomic region would announce only the words that changed. */}
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {playing ? "" : currentLabel}
       </div>
     </div>

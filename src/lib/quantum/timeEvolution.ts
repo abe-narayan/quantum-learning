@@ -100,3 +100,53 @@ export function probabilityLeftAndRightOf(psi: Wavefunction1D, boundary: number)
   }
   return { left, right };
 }
+
+/**
+ * The probability mass sitting within `edgeFraction` of either end of the
+ * grid.
+ *
+ * The split-operator method's FFT makes the box periodic: a packet that
+ * reaches an edge does not leave, it re-enters from the far side. Norm is
+ * still exactly preserved (this is a unitary method, and stays one), but
+ * every *position-space* quantity computed afterwards stops describing one
+ * packet. Measured on the Wavefunction Explorer's own free-particle preset
+ * at the ends of its sliders (centre 0, momentum 6), the wrap happens inside
+ * the instrument's automatic first playback: ⟨x⟩ jumps from +52.75 to
+ * -50.93, running backwards under a positive momentum in flat violation of
+ * Ehrenfest's d⟨x⟩/dt = ⟨p⟩/m, and the reported width spikes to 15x its
+ * starting value and then falls back. This is the check that lets a display
+ * notice and say so, instead of narrating a wrap-around as physical
+ * spreading.
+ */
+export function probabilityNearGridEdges(psi: Wavefunction1D, edgeFraction = 0.04): number {
+  const margin = psi.grid.length * edgeFraction;
+  const leftEdge = psi.grid.x[0] + margin;
+  const rightEdge = psi.grid.x[psi.grid.n - 1] - margin;
+  return probabilityWhere(psi, (i) => psi.grid.x[i] <= leftEdge || psi.grid.x[i] >= rightEdge);
+}
+
+/**
+ * The probability mass sitting where the potential is nonzero — for the
+ * tunneling setup, the packet's current overlap with the barrier. This is
+ * what distinguishes "the packet has not reached the barrier yet" from "the
+ * collision is happening right now" from "it is over", which a
+ * left/right probability split alone cannot: before the packet arrives, all
+ * of its probability is already on the left of the barrier, and calling that
+ * a reflection probability of 1 is not true of anything that has happened.
+ */
+export function probabilityInsideBarrier(psi: Wavefunction1D, potential: readonly number[]): number {
+  if (potential.length !== psi.grid.n) {
+    throw new Error("probabilityInsideBarrier: potential array must have grid.n entries.");
+  }
+  return probabilityWhere(psi, (i) => potential[i] !== 0);
+}
+
+/** Sums |psi|^2 dx over the grid points `include` selects — the one Riemann sum the two checks above share. */
+function probabilityWhere(psi: Wavefunction1D, include: (index: number) => boolean): number {
+  const density = psi.probabilityDensity();
+  let total = 0;
+  for (let i = 0; i < psi.grid.n; i++) {
+    if (include(i)) total += density[i] * psi.grid.dx;
+  }
+  return total;
+}

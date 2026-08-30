@@ -21,22 +21,34 @@ export const localityAssumptionNonlocalHv: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["factor", "factoring", "b(b,lambda)", "b(b,λ)", "depend only", "depends only", "own setting", "independent of a", "independent of alice", "single value", "same value", "one value"],
-      ["break", "no longer", "doesn't hold", "does not hold", "not valid", "invalid", "fails", "falls apart", "cannot group", "can't group"],
+      {
+        phrases: ["factor", "factoring", "b(b,lambda)", "b(b,λ)", "depend only", "depends only", "independent of a", "independent of alice", "single value", "same value", "one value"],
+        missingFeedback:
+          "You have said the proof breaks. Point at the line: which algebraic move in the derivation of |S(lambda)|=2 quietly needs Bob's outcome to be one fixed thing?",
+      },
+      {
+        phrases: ["no longer", "doesn't hold", "does not hold", "not valid", "invalid", "fails", "falls apart", "cannot group", "can't group", "can not group", "doesn't apply", "does not apply", "cannot be pulled out", "the step is invalid"],
+        missingFeedback:
+          "You have located the step. Now say what actually happens to it once Bob's function is allowed to see Alice's setting, and therefore what the inequality does or does not cover.",
+      },
     ],
-    incorrectFeedback: "Walk through the CHSH derivation line by line and find the one algebraic move that quietly makes an assumption about what Bob's outcome can see.",
+    incorrectFeedback: "You appealed to relativity or to a no faster-than-light signalling principle, which is a motivation for the assumption rather than the place it is used. The derivation makes one algebraic move that silently needs the far side's outcome to stand for the same number in two different terms; find that move.",
     partialFeedback: "You have identified the right step. Now say what it assumed about B, and what goes wrong with that assumption in your friend's model.",
+    modelAnswers: [
+      "The proof factors B out of the CHSH sum, and that step only works if B(b,lambda) is the same value whatever Alice picked. If Bob's outcome depends on a you cannot group the terms that way, so the factoring step is invalid and the bound never gets proved.",
+      "Locality enters at the factoring step: it assumes B depends only on b and lambda, independent of Alice's setting. A nonlocal model breaks exactly that, so the derivation of |S|=2 no longer holds for it.",
+    ],
   },
   hints: [
-    { text: "Write out the four-term combination S(λ) and try to pull A(a,λ) and A(a',λ) out in front of pairs of terms. What does that regrouping quietly require of B?" },
-    { text: "In the regrouped expression, the symbol B(b,λ) appears twice: once next to A(a,λ) and once next to A(a',λ). What must be true for both appearances to stand for one and the same number?" },
-    { text: "Suppose Bob's outcome could also see Alice's setting a. Are the two appearances of B(b,λ) still interchangeable?" },
+    { text: "Write out the four-term combination S(λ) and try to pull Alice's two outcome values out in front of pairs of terms. What does that regrouping quietly require of the far side's outcome?" },
+    { text: "In the regrouped expression, the far side's outcome for one setting appears twice, once next to each of Alice's. What must hold for the two appearances to stand for the very same number?" },
+    { text: "Suppose that outcome could also see Alice's setting. Are the two appearances still interchangeable, and what does that do to the regrouping?" },
   ],
   solution: {
     steps: [
       { description: "The proof's factoring step groups the four terms as A(a,λ)[B(b,λ)+B(b',λ)]+A(a',λ)[B(b,λ)-B(b',λ)]." },
       { description: "This requires B(b,λ) to be the exact same value whether paired with A(a,λ) or A(a',λ). In other words, B must be independent of Alice's setting." },
-      { description: "If Bob's outcome depends on a, there are really two different 'B(b,λ)' values, and the factoring (and hence |S(λ)|=2) breaks down." },
+      { description: "If Bob's outcome depends on a, there are two different 'B(b,λ)' values, and the factoring (and hence |S(λ)|=2) breaks down." },
     ],
     finalAnswer: "The factoring step assumes B(b,λ) doesn't depend on a; a nonlocal model violates exactly that assumption, so the proof doesn't apply to it.",
   },

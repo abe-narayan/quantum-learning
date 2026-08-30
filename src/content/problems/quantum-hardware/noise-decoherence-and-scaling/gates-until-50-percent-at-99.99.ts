@@ -9,22 +9,23 @@ export const gatesUntil50PercentAt9999: NumericProblem = {
     title: "How Many Gates at 99.99% Fidelity Before 50% Success?",
     course: "noise-decoherence-and-scaling",
     lesson: "quantum-hardware/noise-decoherence-and-scaling/scaling-challenges",
-    difficulty: "intermediate",
-    estimatedMinutes: 5,
+    difficulty: "advanced",
+    estimatedMinutes: 7,
     problemType: "numeric",
     tags: ["scaling"],
     prerequisites: ["quantum-hardware/noise-decoherence-and-scaling/scaling-challenges"],
   },
   question: {
     type: "numeric",
-    prompt: "Using N=ln(0.5)/ln(p), how many sequential gates at 99.99% per-gate fidelity can run before success probability drops below 50%?",
+    prompt:
+      "A device runs sequential gates at 99.99% per-gate fidelity, and the gates fail independently. Derive the depth at which the whole circuit's success probability first falls to 50%, and report that gate count. No formula is supplied: work out how per-gate survival compounds, then invert it.",
     inputHint: "as a number of gates",
   },
   answer: {
     type: "numeric",
     value,
-    tolerance: 50,
-    incorrectFeedback: "Take the ratio of the two logarithms, not of the probabilities themselves. If your answer is off by roughly a factor of ten, check whether you used the lesson example's 99.9% fidelity instead of 99.99%.",
+    tolerance: 5,
+    incorrectFeedback: "Survival compounds as a product of per-gate factors, so inverting it needs a logarithm rather than a division of probabilities. If your answer is off by roughly a factor of ten, check whether you used the lesson example's 99.9% fidelity instead of 99.99%.",
     nearMisses: [
       { value: Math.log(0.5) / Math.log(0.999), tolerance: 10, feedback: "That is the lesson's 99.9% answer. This device's per-gate error is ten times smaller, so its usable depth is about ten times longer." },
       { value: 5000, tolerance: 20, feedback: "5000 comes from 0.5/(1−p), a linear estimate. Survival compounds multiplicatively, so the depth is set by ln(0.5)/ln(p)." },
@@ -32,17 +33,17 @@ export const gatesUntil50PercentAt9999: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Success decays geometrically: each gate multiplies the survival probability by p. You want the depth at which the running product first dips below a half, and logarithms turn that product into a division." },
-    { text: "N = ln(0.5)/ln(0.9999), and ln(0.9999) is very close to -0.0001." },
-    { text: "Divide the two logarithms. Sanity check: the result should come out about ten times the lesson's 99.9% worked example, since the per-gate error dropped tenfold." },
+    { text: "Independent gates do not each subtract a fixed amount of success. Write down what N of them do to the probability that every one of them worked." },
+    { text: "You now have p raised to the Nth power on one side and the target on the other. Taking the logarithm of both sides brings N down from the exponent, where it can be solved for." },
+    { text: "Carry out that solve. Sanity check before trusting the number: it should land about ten times the lesson's 99.9% worked example, since the per-gate error fell tenfold." },
   ],
   solution: {
     steps: [{ description: "N = ln(0.5)/ln(0.9999) ≈ 6931 gates." }],
     finalAnswer: "≈6931 gates",
   },
   explanation: {
-    correctIdea: "This is exactly 10× the worked example's 693-gate result for 99.9% fidelity: a checkable illustration that a 10× reduction in per-gate error buys roughly a 10× increase in usable circuit depth.",
-    whyCorrect: "Matches the lesson's own worked-example methodology, extended to a higher fidelity target.",
+    correctIdea: "This is very nearly 10× the worked example's 693-gate result for 99.9% fidelity: a checkable illustration that a 10× reduction in per-gate error buys roughly a 10× increase in usable circuit depth.",
+    whyCorrect: "Success multiplies as p^N, so the half-life in gates is ln(0.5)/ln(p). Since ln(0.9999) ≈ −10⁻⁴, the count lands near 0.693 × 10⁴, and each additional nine of fidelity multiplies the budget by ten.",
     whyWrong: ["Assuming fidelity improvements give only marginal circuit-depth gains misses this roughly-proportional relationship near p≈1."],
   },
 };

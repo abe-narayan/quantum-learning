@@ -30,7 +30,7 @@ export const classifyIScaledPair: MultipleChoiceProblem = {
     options: [
       { id: "a", text: "Global phase" },
       { id: "b", text: "Relative phase" },
-      { id: "c", text: "Neither — they're physically different states with no simple phase relationship" },
+      { id: "c", text: "Neither; they are physically different states with no simple phase relationship" },
     ],
   },
   answer: {
@@ -44,21 +44,21 @@ export const classifyIScaledPair: MultipleChoiceProblem = {
   },
   hints: [
     { text: "Compare the ratio of |ψ₄⟩'s coefficients to |ψ₁⟩'s coefficients, term by term." },
-    { text: "0.6i / 0.6 = i, and 0.8i / 0.8 = i — the same factor both times." },
+    { text: "Divide each amplitude of the second state by the matching amplitude of the first, and see whether the two ratios agree." },
     { text: "A single common factor multiplying every coefficient equally is exactly the definition of a global phase." },
   ],
   solution: {
     steps: [
-      { description: "Compare coefficients: $\\frac{0.6i}{0.6}=i$ and $\\frac{0.8i}{0.8}=i$ — the same ratio for both." },
+      { description: "Compare coefficients: $\\frac{0.6i}{0.6}=i$ and $\\frac{0.8i}{0.8}=i$, the same ratio for both." },
       { description: "So $|\\psi_4\\rangle = i|\\psi_1\\rangle = e^{i\\pi/2}|\\psi_1\\rangle$: every amplitude scaled by the identical factor $e^{i\\pi/2}$." },
       {
-        description: `This is confirmed directly: both states land at the exact same Bloch point, ${sameBlochPoint ? "as expected for a global-phase pair" : "(unexpected — recheck)"}.`,
+        description: `This is confirmed directly: both states land at the exact same Bloch point, ${sameBlochPoint ? "as expected for a global-phase pair" : "(unexpected; recheck)"}.`,
       },
     ],
     finalAnswer: "Global phase ($\\gamma=\\pi/2$)",
   },
   explanation: {
-    correctIdea: "Global phase means multiplying the ENTIRE state by one common factor — both coefficients here got multiplied by the same i.",
+    correctIdea: "Global phase means multiplying the entire state by one common factor, and both coefficients here were multiplied by the same i.",
     whyCorrect: "Since both terms scale by the identical factor, this is exactly the pattern the lesson defines as global phase, unobservable in any basis.",
     whyWrong: [
       { optionId: "b", text: "A relative phase touches one coefficient and leaves the other alone. Here both picked up the same factor, which is what makes it global." },

@@ -14,10 +14,10 @@ import { ENTRY_IMAGE_ASPECT } from "./imageAspect";
 
 /**
  * One real, dated development, framed as an instrument reading rather than
- * a news card: a header strip carrying the category (icon + text — never
+ * a news card: a header strip carrying the category (icon + text, never
  * color alone) and the date/difficulty readouts, then the title, the
- * original summary, an optional real image, and — the point of this whole
- * page — a pillar-tinted "why this matters" block that links back to the
+ * original summary, an optional real image, and, the point of this whole
+ * page, a pillar-tinted "why this matters" block that links back to the
  * exact lesson this connects to.
  *
  * The wrapper carries `data-pillar` for the *curriculum area the linked
@@ -30,25 +30,25 @@ import { ENTRY_IMAGE_ASPECT } from "./imageAspect";
  * Reused as-is by both `CurrentQuantumCatalog` (the full timeline) and
  * `RelatedCurrentQuantum` (the lesson-embedded widget) so the two never
  * drift into rendering the same fields differently. On a lesson page,
- * `lessonTitle` is passed as `undefined` — the entry is already the one
+ * `lessonTitle` is passed as `undefined`, the entry is already the one
  * connected to *that* lesson, so a self-referential "explained in" link
  * would be redundant there.
  *
  * ------------------------------------------------------------
- * Click target — the whole instrument face, not just the link line
+ * Click target, the whole instrument face, not just the link line
  * ------------------------------------------------------------
  * There is no per-entry page, so the card's one real destination is the
  * lesson it connects to. That link used to be a single line of text near the
  * bottom of a tall card: everything above it looked interactive and wasn't.
- * The fix is the technique `CourseList` documents at length — the "Explained
+ * The fix is the technique `CourseList` documents at length, the "Explained
  * in" link is a real `<a>` whose `::after` is stretched (`absolute inset-0`)
  * to the `.instrument`, which is already `position: relative`, so a click
  * anywhere on the instrument's chrome activates it.
  *
  * That overlay is a *positioned* element, so per CSS 2.1 Appendix E it paints
  * (and hit-tests) above every non-positioned in-flow sibling. Each block of
- * real readable text — the title, the summary, the figure with its own credit
- * link, and the "why this matters" paragraph — therefore carries `relative
+ * real readable text, the title, the summary, the figure with its own credit
+ * link, and the "why this matters" paragraph, therefore carries `relative
  * z-10` so it stays selectable, and any link inside it stays independently
  * clickable rather than silently navigating to the lesson. `isolate` on the
  * instrument scopes those z-indices to one card.
@@ -58,7 +58,7 @@ import { ENTRY_IMAGE_ASPECT } from "./imageAspect";
  * "click the card" true. The `Source:` line lives outside the instrument
  * entirely, so it is never covered.
  *
- * When `lessonTitle` is undefined there is no link and none of this applies —
+ * When `lessonTitle` is undefined there is no link and none of this applies,
  * the card renders exactly as it did, with no phantom hover affordance
  * promising a click that does nothing.
  */
@@ -88,7 +88,7 @@ export function CurrentQuantumCard({
   return (
     <div id={id} data-pillar={pillar} className={cn("scroll-mt-24", className)}>
       {featured ? (
-        // Static "Most recent" label, not "Most recent · N weeks ago" — see
+        // Static "Most recent" label, not "Most recent · N weeks ago", see
         // docs/UX_REVIEW.md P0-2 and the comment in dateUtils.ts. This is a
         // Server Component and the site is statically generated with no
         // `export const revalidate`, so any string computed from `new
@@ -118,7 +118,7 @@ export function CurrentQuantumCard({
               {formatEntryDate(entry.date)}
             </time>
             {entry.difficulty ? (
-              // Ticks + text via the shared `DifficultyMark`, not bare text —
+              // Ticks + text via the shared `DifficultyMark`, not bare text,
               // see docs/UX_REVIEW.md P0-3, which names this exact bare
               // `TechLabel` readout (alongside `ApexCourseIndex`) as one of
               // five inconsistent difficulty encodings on the site. Using

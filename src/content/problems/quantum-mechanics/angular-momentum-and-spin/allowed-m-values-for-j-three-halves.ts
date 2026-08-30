@@ -42,7 +42,7 @@ export const allowedMValuesForJThreeHalves: MultipleChoiceProblem = {
     finalAnswer: "m = 3/2, 1/2, −1/2, −3/2: four rungs, stepping by 1 from j down to −j.",
   },
   explanation: {
-    correctIdea: "The step between rungs is always 1, whether j is an integer or a half-integer. Half-integer j simply means every rung is half-integer too.",
+    correctIdea: "The step between rungs is always 1, whether j is an integer or a half-integer. Half-integer j means every rung is half-integer too.",
     whyCorrect: "Matches angularMomentumZ(1.5), whose diagonal holds these four eigenvalues.",
     whyWrong: [
       { optionId: "b", text: "Steps by 1/2 and gets 7 rungs. J± move m by a full unit." },

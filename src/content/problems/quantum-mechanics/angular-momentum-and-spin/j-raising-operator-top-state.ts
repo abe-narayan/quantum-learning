@@ -28,12 +28,17 @@ export const jRaisingOperatorTopState: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
+    nearMisses: [
+      { value: 1.7320508075688772, tolerance: 0.01, feedback: "√3 is the raising coefficient one rung down, at m = 1/2. At the top rung the quantity under the root, j(j+1) − m(m+1), is what has to be evaluated." },
+      { value: 1.9364916731037085, tolerance: 0.01, feedback: "That is √(j(j+1)), the length of the total angular momentum vector. It is not what the raising operator produces from the top rung." },
+      { value: 1.5, tolerance: 0.01, feedback: "1.5 is m itself. The question asks for the length of the vector J+ returns, not the quantum number labelling the state it acted on." },
+    ],
     incorrectFeedback: "Think about what the boundedness derivation requires of the top rung: if J+ produced anything of nonzero length there, one more application would push m past its bound. Your numeric answer should reflect that requirement.",
   },
   hints: [
-    { text: "The top rung, m=j, is defined by J+ annihilating it." },
-    { text: "If J+ didn't annihilate it, applying J+ again would give m=j+1, violating m²≤j(j+1)." },
-    { text: "Combine the two previous hints: the algebra leaves J+ acting on the top rung only one consistent output. Report its magnitude." },
+    { text: "J+ raises m by one unit. Ask what state it would have to hand back here, and whether the spectrum of J_z contains such a state at all." },
+    { text: "The boundedness derivation gave m² ≤ j(j+1), which caps m at j. A state with m = j+1 would break that cap, so the algebra cannot let J+ produce one." },
+    { text: "The raising coefficient is √(j(j+1) − m(m+1)). Evaluate it at m = j = 3/2 and report the magnitude that leaves." },
   ],
   solution: {
     steps: [{ description: "By the boundedness argument, J+ must annihilate the top rung exactly, so the resulting magnitude is 0." }],

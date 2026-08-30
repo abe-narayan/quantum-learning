@@ -42,7 +42,7 @@ export const DIFFICULTY_HINT: Record<Difficulty, string> = {
   foundational: "No prior background needed",
   intermediate: "Builds directly on earlier courses",
   advanced: "College-level rigor",
-  master: "Graduate-level — proofs, not just results",
+  master: "Graduate-level rigor: proofs, not just results",
 };
 
 export function DifficultyMark({
@@ -79,7 +79,7 @@ export function DifficultyMark({
           />
         ))}
       </span>
-      <span className="font-tech text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+      <span className="tech-label text-muted-foreground">
         {DIFFICULTY_LABEL[difficulty]}
       </span>
       {withHint ? (

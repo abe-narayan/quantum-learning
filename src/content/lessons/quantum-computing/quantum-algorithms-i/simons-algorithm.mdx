@@ -48,7 +48,7 @@ export const simonFrames = simonHiddenStrings.map((s, i) => ({
 export const lessonMeta = {
   title: "Simon's Algorithm",
   description:
-    "A hidden XOR-mask string s recovered from measurements that always land orthogonal to s, derived from the same H-oracle-H structure as Deutsch-Jozsa but with a 2-to-1 oracle, then solved by linear algebra over F₂: the direct ancestor of Shor's period-finding.",
+    "A 2-to-1 oracle hiding an XOR mask s, attacked with the same H-oracle-H structure as Deutsch-Jozsa and finished off by linear algebra over F₂: an unconditional exponential separation from randomized classical query complexity, and the direct ancestor of Shor's period-finding.",
   course: "quantum-algorithms-i",
   module: "simons-algorithm",
   order: 1,
@@ -62,11 +62,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="No escape hatch this time">
 Deutsch-Jozsa's speedup settles a somewhat contrived promise that a classical computer can still solve with a single query if you're willing to accept a small probability of error. Simon's problem doesn't have that escape hatch.
 </LessonHook>
 
-## Motivation
+## The classical shortcut that closes here
 
 Deutsch-Jozsa's promise is constant versus balanced, and its classical
 escape hatch is concrete: guess a handful of random inputs, and if $f$ were
@@ -97,19 +97,19 @@ off something tied to a hidden algebraic object.
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## The promise, the circuit, and the linear algebra
 
 ### The oracle and the promise
 
 $f$ hides a nonzero string $s\in\{0,1\}^n$: $f(x)=f(x')$ if and only if
 $x'=x$ or $x'=x\oplus s$. This platform's `applySimonOracle(state,
-inputQubits, hiddenString)` implements exactly this, using
+inputQubits, hiddenString)` implements this, using
 $f(x)=\min(x,\,x\oplus s)$ as the concrete construction: since $s\neq0$,
 XOR-by-$s$ pairs up every $x$ with a distinct partner $x\oplus s\neq x$,
 partitioning all $2^n$ inputs into $2^{n-1}$ disjoint pairs
 $\{x,x\oplus s\}$, and taking the smaller element of each pair as that
 pair's shared output value is constant within a pair and different across
-pairs: genuinely 2-to-1, not just balanced.
+pairs, which is what genuine 2-to-1 structure means and balance alone does not.
 
 ### The circuit
 
@@ -118,6 +118,18 @@ at $|0\rangle$. Apply $H^{\otimes n}$ to the input register only, giving
 the uniform superposition there. Apply the oracle: $|x\rangle|0\rangle\to
 |x\rangle|f(x)\rangle$. Apply $H^{\otimes n}$ to the input register again.
 Measure the input register.
+
+<PredictBeforeReveal
+  question="For n=2, hidden string s=01, the circuit is run once and the input register measured. Which outcomes z can come up?"
+  options={[
+    { label: "Any of the 4 possible z, each with probability 1/4, since the Hadamards spread it evenly", value: "uniform" },
+    { label: "Only z=00, always", value: "only-zero" },
+    { label: "Every z except s itself", value: "except-s" },
+    { label: "Only the 2 values of z orthogonal to s, each with probability 1/2", value: "orthogonal" },
+  ]}
+  correctValue="orthogonal"
+  explanation="Only z with z·s ≡ 0 (mod 2) can come up, each with probability 1/2^(n-1). For n=2 that is 2 of the 4 possible strings at probability 1/2 each, and the other two at 0. The derivation just below shows why this is exact rather than a tendency: the two inputs in each pair {x, x⊕s} contribute amplitudes that cancel perfectly whenever z·s is odd, so a non-orthogonal z has probability zero, not 'unlikely but possible.' That exactness is what lets you treat each measured z as a hard linear constraint on s."
+/>
 
 ### Why every measured z is orthogonal to s
 
@@ -152,18 +164,6 @@ strings orthogonal to $s$, each with probability $1/2^{n-1}$, never on
 any string that isn't orthogonal to $s$, and never concentrated on just
 one of them.
 
-<PredictBeforeReveal
-  question="For n=2, hidden string s=01, the circuit is run once and the input register measured. Which outcomes z can actually come up?"
-  options={[
-    { label: "Any of the 4 possible z, each with probability 1/4", value: "uniform" },
-    { label: "Only z=00, always", value: "only-zero" },
-    { label: "Only the 2 values of z orthogonal to s, each with probability 1/2", value: "orthogonal" },
-    { label: "Every z except s itself", value: "except-s" },
-  ]}
-  correctValue="orthogonal"
-  explanation="Only z with z·s ≡ 0 (mod 2) can come up, each with probability 1/2^(n-1). For n=2 that is 2 of the 4 possible strings at probability 1/2 each, and the other two at 0. Note that this is the boxed result rather than a tendency: the destructive interference is exact, so a non-orthogonal z has probability zero, not 'unlikely but possible.' That exactness is what lets you treat each measured z as a hard linear constraint on s."
-/>
-
 Checked directly against the engine: for $n=2$, $s=01$,
 `simonInputDistribution(2, 1)` gives probability exactly $0.5$ at $z=00$
 and $z=10$ (both orthogonal to $s=01$), and exactly $0$ at $z=01$ and
@@ -180,13 +180,13 @@ $z=11$:
   maxValue={0.5}
 />
 
-This holds for every nonzero hidden string, not just this one. Sweeping
+This holds for every nonzero hidden string the promise allows. Sweeping
 $s$ over all seven nonzero 3-bit strings, run through the exact same
 circuit:
 
 <InteractiveSection
   title="Every hidden string, same orthogonal pattern"
-  description="Step through every nonzero 3-bit hidden string s. For each one, the bar chart shows the real measured distribution over the input register after H, the oracle, H again: exactly the four strings z orthogonal to s (z·s ≡ 0 mod 2, highlighted) get nonzero probability, each landing at exactly 1/4, and every non-orthogonal z reads exactly zero, no matter which s defines the oracle."
+  description="Step through every nonzero 3-bit hidden string s. For each one, the bar chart shows the real measured distribution over the input register after H, the oracle, H again. Read off which z get nonzero probability and at what height, then check that list against z·s ≡ 0 mod 2 (the highlighted strings). Whether the same pattern survives every choice of s is the reason to step through all seven rather than one."
 >
   <BarChartExplorer
     frames={simonFrames}
@@ -198,7 +198,7 @@ circuit:
 
 Every one of the seven sweeps lands probability exactly $1/4$ on exactly
 the four $z$'s orthogonal to that $s$, and exactly $0$ everywhere else.
-This is the boxed result above, not just for one convenient example.
+This is the boxed result above, now checked well past one convenient example.
 
 ### Solving for s: linear algebra over F₂
 
@@ -222,7 +222,7 @@ example below solves a small enough system by inspection instead, to keep
 the mechanism honest without reimplementing a standard linear-algebra
 routine.
 
-## Physical Interpretation
+## The same shape, with a bigger consequence
 
 The mechanism is identical in shape to Deutsch-Jozsa's: two Hadamard
 layers around one oracle call, interference doing all the work, nothing
@@ -239,7 +239,7 @@ classical linear algebra, exactly the same "quantum finds structure,
 classical post-processing finishes the job" division of labor Shor's
 algorithm uses next.
 
-## Worked Example
+## Two qubits, one hidden string, by hand
 
 **For $n=2$, hidden string $s=01$: list $f$, confirm the 2-to-1 property,
 and confirm the predicted measurement outcomes.**
@@ -250,17 +250,18 @@ values, $00$ and $10$, each hit by exactly two inputs
 ($\{00,01\}\to00$ and $\{10,11\}\to10$): genuinely 2-to-1, and $f(x)=f(x
 \oplus s)$ holds for all four $x$ by construction.
 
-Predicted measurement outcomes: $z$ orthogonal to $s=01$ means $z\cdot
-s=z_1\equiv0\pmod2$ (the second bit of $z$ is 0), so $z\in\{00,10\}$, each
-with probability $1/2^{n-1}=1/2$. This matches `simonInputDistribution(2,
-1)` exactly, shown above: $0.5$ at $z=00$ and $z=10$, $0$ elsewhere. With
-$n=2$, a single nonzero measured $z$ (here $z=10$, since $z=00$ is
-uninformative) already gives $n-1=1$ independent constraint,
-$z\cdot s=0$, i.e. $s_1=0$; combined with the promise that $s\neq00$, the
-only possibility left is $s=01$, recovering the hidden string from one
-useful run.
+Predicted measurement outcomes: $s=01$ has its low-order bit set and its
+high-order bit clear, so $z\cdot s$ reduces to $z$'s own low-order bit, and
+$z\cdot s\equiv0\pmod2$ picks out $z\in\{00,10\}$, each with probability
+$1/2^{n-1}=1/2$. This matches `simonInputDistribution(2, 1)` exactly,
+shown above: $0.5$ at $z=00$ and $z=10$, $0$ elsewhere. With $n=2$, a
+single nonzero measured $z$ (here $z=10$, since $z=00$ is uninformative)
+already gives $n-1=1$ independent constraint: $z\cdot s=0$ with $z=10$
+says $s$'s high-order bit is $0$. Combined with the promise that
+$s\neq00$, the only possibility left is $s=01$, recovering the hidden
+string from one useful run.
 
-## Common Mistakes
+## Not simply Deutsch-Jozsa at larger scale
 
 <Callout type="note">
 **Treating Simon's separation as "the same kind of speedup as
@@ -286,20 +287,212 @@ doesn't hand you the answer directly.
 1. For $n=2$, $s=10$: compute $f(x)=\min(x,x\oplus s)$ for all four
    inputs and confirm the 2-to-1 property directly, the same way the
    worked example did for $s=01$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Here $s=10_2=2$, so $x\oplus s$ flips the leading bit. Taking the
+   minimum of each pair:
+
+   $f(00) = \min(0,2) = 0$. $f(01) = \min(1,3) = 1$.
+   $f(10) = \min(2,0) = 0$. $f(11) = \min(3,1) = 1$.
+
+   The engine returns exactly these four values. So $f$ maps
+   $\{00,10\}\mapsto0$ and $\{01,11\}\mapsto1$: two inputs per output,
+   two outputs used, every input covered. That is the 2-to-1 property, and
+   the colliding pairs are exactly $\{x, x\oplus s\}$ as the promise
+   requires: $00\oplus10 = 10$ and $01\oplus10 = 11$.
+
+   Notice the construction does the work automatically. Since $s\neq0$,
+   XOR-by-$s$ is a fixed-point-free involution, so it partitions all $2^n$
+   inputs into $2^{n-1}$ disjoint pairs, and taking the smaller member of
+   each pair as the shared output is constant within a pair and distinct
+   across pairs. No case analysis is needed and no $s$ is special.
+
+   Contrast this with $s=01$, where the pairs are $\{00,01\}$ and
+   $\{10,11\}$ and $f$ is $0,0,2,2$. Same 2-to-1 structure, different
+   pairing, and the pairing is precisely what encodes $s$.
+
+   The wrong turn is checking only that $f$ takes each of its values twice
+   and calling that the promise. Balanced would give that too, and Simon's
+   promise is stronger: the two inputs sharing a value must differ by the
+   *same* $s$ for every pair. A function that collided $00$ with $01$ and
+   $10$ with $11$ using two different offsets would be 2-to-1 and would not
+   satisfy Simon's promise, and the algorithm would return nothing
+   coherent.
+
+   </details>
+
 2. Using that same $s=10$, determine which of $z\in\{00,01,10,11\}$
    satisfy $z\cdot s\equiv0\pmod2$, and predict which entries of
-   `simonInputDistribution(2, 2)` should be nonzero.
+   `simonInputDistribution(2, 2)` should be nonzero. Then say how many
+   runs of the circuit you would expect to need before the measured $z$'s
+   pin $s$ down, and why "$n-1$ independent constraints" is not the same
+   as "$n-1$ runs".
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $s=10$, the dot product $z\cdot s = z_1\cdot1 + z_2\cdot0 = z_1$,
+   so the condition $z\cdot s\equiv0$ is simply $z_1=0$. That admits
+   $z\in\{00, 01\}$ and excludes $\{10, 11\}$.
+
+   So `simonInputDistribution(2, 2)` should be nonzero on the first two
+   entries and exactly zero on the last two. It is: the engine returns
+   $[0.5, 0.5, 0, 0]$, each admissible $z$ at $1/2^{n-1} = 1/2$ and each
+   inadmissible one at exactly zero, not merely small.
+
+   For runs: $n-1 = 1$ constraint is needed here, and a run that returns
+   $z=00$ supplies none, since $00\cdot s=0$ holds for every $s$ and rules
+   nothing out. Half the runs are wasted that way, so the expected number
+   of runs is $2$, not $1$. In general the useless all-zeros outcome has
+   probability $1/2^{n-1}$, and beyond that a new $z$ can also be linearly
+   dependent on the ones already collected, which is likelier the more you
+   have. The probability that $n-1$ draws happen to be independent is
+   $\prod_{i=1}^{n-1}\left(1-2^{i-1}/2^{n-1}\right)$, which is about $0.29$
+   for large $n$, so roughly three or four extra runs on top of $n-1$ is
+   the realistic budget. The algorithm is still $O(n)$ queries, with a
+   constant factor that repetition handles cheaply.
+
+   The wrong turn is treating "$n-1$ independent equations determine $s$"
+   as "$n-1$ runs determine $s$". The circuit samples uniformly from the
+   orthogonal subspace and cannot be asked for an independent vector, so
+   the count of runs is a random variable and the algorithm has to check
+   independence as it goes. This is also why Simon's is a bounded-error
+   algorithm rather than a certain one, unlike Deutsch-Jozsa.
+
+   </details>
+
 3. Why does measuring $z=0\cdots0$ (the all-zeros string) never provide
-   any information about $s$, no matter what $s$ is?
+   any information about $s$, no matter what $s$ is? What is the
+   probability of that outcome, and how does it behave as $n$ grows?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the constraint it yields, $0\cdot s \equiv 0 \pmod 2$, is
+   satisfied by every string $s$ whatsoever. It is a true statement that
+   excludes nothing, so the set of candidates for $s$ is exactly as large
+   after the run as before it. In linear-algebra terms, the all-zeros
+   vector is in the span of the empty set and cannot enlarge the span of
+   anything, so it can never be one of the $n-1$ independent constraints
+   the algorithm needs.
+
+   Its probability is $1/2^{n-1}$, the same as every other admissible $z$,
+   because the derivation gives a flat distribution over the $2^{n-1}$
+   strings orthogonal to $s$ and $0$ is always one of them. At $n=2$ that
+   is $1/2$, which is why the previous question's expected run count
+   doubled. At $n=10$ it is $1/512$, and at $n=20$ about one in half a
+   million.
+
+   So the nuisance disappears fast. The all-zeros outcome is a serious
+   inefficiency only at the small $n$ where you can see the whole
+   distribution by hand, and it is negligible at any size where the
+   algorithm's exponential advantage matters. What does not disappear is
+   the linear-dependence problem from question 2, which persists at every
+   $n$.
+
+   The wrong turn is reading "$z=0$ carries no information" as a defect in
+   the circuit, something a better oracle or a better measurement could
+   avoid. It cannot be avoided: the derivation shows the output
+   distribution is exactly uniform over the orthogonal subspace, and that
+   subspace always contains $0$. The right response is to discard the run
+   and try again, which costs one query.
+
+   </details>
+
 4. Once you've collected $n-1$ linearly independent nonzero measured
    $z_i$'s, describe in words (no need for full Gaussian elimination) why
    their orthogonal complement in $\mathbb{F}_2^n$ contains exactly one
-   nonzero vector, and why that vector must be $s$.
+   nonzero vector, and why that vector must be $s$. Then say what goes
+   wrong if one of the collected $z_i$ turns out to be dependent on the
+   others.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Each independent $z_i$ imposes one linear equation $z_i\cdot v = 0$ on
+   an unknown $v\in\mathbb{F}_2^n$. Over $\mathbb{F}_2$, as over any field,
+   $n-1$ independent linear constraints on an $n$-dimensional space cut the
+   solution space down to dimension $n-(n-1)=1$. A one-dimensional subspace
+   of $\mathbb{F}_2^n$ has exactly $2^1 = 2$ elements, namely $0$ and one
+   nonzero vector, because the only scalars available are $0$ and $1$.
+
+   That nonzero vector has to be $s$. Every measured $z_i$ satisfies
+   $z_i\cdot s = 0$ by the derivation, so $s$ lies in the solution space,
+   and $s\neq0$ by the promise. The space has only one nonzero element, so
+   $s$ is it. No search is needed; solving the system by Gaussian
+   elimination over $\mathbb{F}_2$ hands it back directly, in $O(n^3)$
+   classical time.
+
+   The counting is worth appreciating on its own. Over the reals, $n-1$
+   equations would leave a whole line of solutions and you would still not
+   know which point on it was the answer. Over $\mathbb{F}_2$ a line has
+   two points and one of them is disqualified, so the same information
+   determines the answer completely. Simon's algorithm is exploiting the
+   smallness of the field as much as the interference.
+
+   If one collected $z_i$ is dependent on the others, the constraints are
+   effectively $n-2$ or fewer, the solution space has dimension at least
+   $2$, and it contains at least three nonzero vectors with no way to tell
+   which is $s$. The algorithm has not failed, it has simply not finished:
+   run the circuit again and add another $z$ until the rank reaches $n-1$.
+
+   The wrong turn is expecting the $z_i$ to determine $s$ by some direct
+   pattern, for instance by XORing them together. They determine $s$ only
+   through the orthogonality condition, and the XOR of two vectors
+   orthogonal to $s$ is again orthogonal to $s$, so combining them that way
+   produces more constraints of the same kind rather than the answer.
+
+   </details>
+
 5. Deutsch-Jozsa's classical query complexity is $2^{n-1}+1$ in the
    worst case but $O(1)$ with randomization and bounded error. Simon's is
    $\Theta(2^{n/2})$ even with randomization. Explain, in your own words,
    why this makes Simon's quantum-classical gap a different *kind* of
-   result, not just a bigger number.
+   result, where a bigger number alone would not be.
+
+   <details className="answer-reveal">
+   <summary>A defensible answer</summary>
+
+   Marked on the argument. One version in full, then alternatives, then
+   what fails.
+
+   A worked version: Deutsch-Jozsa's exponential gap is against
+   *deterministic* classical algorithms, and that reference class is the
+   wrong one, because nobody insists on certainty in practice. Allow a
+   one-in-a-billion error and a classical machine queries thirty random
+   inputs, answers "constant" if they all agree, and is essentially never
+   wrong, regardless of $n$. The gap is an artefact of demanding certainty
+   from one side and not the other. Simon's problem admits no such
+   shortcut: the $\Theta(2^{n/2})$ bound is a birthday-paradox bound that
+   already assumes randomization and bounded error, so the quantum
+   algorithm's $O(n)$ beats the best classical algorithm on the same terms.
+   That is why it counts as the first unconditional exponential separation
+   in query complexity, and why a merely larger number would not have.
+
+   Equally defensible. You can put it as a question of what the benchmark
+   is: a speedup claim is only meaningful relative to the best classical
+   algorithm allowed to use the same resources, and randomness is a
+   resource classical computers have. You can put it structurally: Simon's
+   hardness comes from needing a *collision*, which no amount of clever
+   sampling avoids, whereas Deutsch-Jozsa's hardness comes from an
+   adversary that random sampling defeats immediately. You can also note
+   what "unconditional" is doing: the bound is proved in the query model
+   rather than resting on an unproven assumption like $P \neq NP$, which
+   is more than can be said for Shor's algorithm's practical significance.
+
+   What a bad answer looks like: "Simon's speedup is bigger". It is not
+   obviously bigger, and size is not the issue; both are exponential
+   against their respective classical baselines. Also wrong is treating
+   randomization as a technicality that "only" costs a small error
+   probability, without noticing that it changes the classical cost from
+   exponential to constant, which is the entire point. And any answer
+   claiming Simon's algorithm is practically useful overshoots: it solves a
+   promise problem nobody has, and its real importance is that Shor built
+   the same circuit shape into an algorithm that factors.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -319,14 +512,14 @@ doesn't hand you the answer directly.
 - This is a genuine, unconditional exponential separation from randomized
   classical query complexity ($\Theta(2^{n/2})$ vs. $O(n)$), not merely
   an exact-vs-probabilistic distinction like Deutsch-Jozsa's.
-- The same shape is exactly what Shor's algorithm scales up next:
+- The same shape is what Shor's algorithm scales up next:
   Hadamards around an oracle revealing a hidden algebraic structure via
   interference, finished off by classical post-processing, generalizing
   from XOR-periodicity over $\mathbb{F}_2^n$ (a hidden *additive* shift,
   found via ordinary Hadamards) to genuine modular periodicity (a hidden
   *multiplicative* period, found via the <Term id="quantum-fourier-transform">QFT</Term>).
 
-## Further Exploration
+## Where the same structure factors integers
 
 <NextDiscovery>
 Next, in Quantum Algorithms II: [Shor's Algorithm: Factoring via Period

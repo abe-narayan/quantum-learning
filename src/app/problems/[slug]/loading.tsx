@@ -8,8 +8,8 @@ import { Section } from "@/components/ui/Section";
 //
 // It lives in the `[slug]` segment, not in `/problems`. A `loading.tsx` wraps
 // its own segment's page as well as everything nested under it, so from
-// `/problems` this single-problem silhouette — breadcrumb, readouts strip,
-// prompt panel, answer widget — was also what a reader saw on the way to the
+// `/problems` this single-problem silhouette, breadcrumb, readouts strip,
+// prompt panel, answer widget, was also what a reader saw on the way to the
 // *catalog*, which is an intro column above a filter panel and a grid of
 // cards. The catalog has its own skeleton now and this one covers only
 // individual problems.

@@ -15,7 +15,7 @@ export const postMeasurementStateComponent: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "For N = diag(1,1,2) and |psi> = (1/sqrt(3))(|0> + |1> + |2>), measuring N gives outcome 1. Find the |0> amplitude of the resulting, renormalized state.",
-    inputHint: "a decimal",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -29,8 +29,9 @@ export const postMeasurementStateComponent: NumericProblem = {
     ],
   },
   hints: [
-    { text: "P_1|psi> keeps only the |0> and |1> components of |psi>, both 1/sqrt(3)." },
-    { text: "Renormalize (1/sqrt(3), 1/sqrt(3)) to unit length." },
+    { text: "Measurement does two things here: it deletes the components outside the observed eigenspace, and it renormalizes what is left. Both steps matter." },
+    { text: "Apply the projector for outcome 1 to get the unnormalized surviving vector, then compute that vector's norm." },
+    { text: "Divide by that norm. The two surviving components were equal before the projection, so they are still equal after it, and there are only two of them left." },
   ],
   solution: {
     steps: [
@@ -40,7 +41,7 @@ export const postMeasurementStateComponent: NumericProblem = {
     finalAnswer: "$\\approx 0.7071$",
   },
   explanation: {
-    correctIdea: "Collapse means projecting then renormalizing — not just projecting.",
+    correctIdea: "Collapse means projecting and then renormalizing, not projecting alone.",
     whyCorrect: "The projected (but not yet renormalized) amplitude 1/sqrt(3) is not itself a valid quantum amplitude, since the projected state isn't normalized.",
     whyWrong: ["Reporting 1/sqrt(3) (≈0.577) instead of the renormalized 1/sqrt(2) forgets the renormalization step entirely."],
   },

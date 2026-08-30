@@ -5,14 +5,17 @@ import { Section, SplitFigure } from "@/components/ui/Section";
 import { Instrument, FadeRule } from "@/components/ui/Panel";
 import { Eyebrow, SectionTitle, Lede, TechLabel, Readouts } from "@/components/ui/Typography";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { MasteryResultsIndex } from "@/components/mastery/MasteryResultsIndex";
+import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
 import { ReadinessReadout } from "@/components/apex/ReadinessReadout";
 import {
   directPrerequisites,
   firstAuthoredLessonSlug,
   prerequisiteChain,
 } from "@/components/apex/readiness";
+import { TierLadder } from "@/components/pillar/TierLadder";
 import { getCourseHref } from "@/components/curriculum/courseHref";
 import { COURSES, PILLARS, getCoursesByPillar, getCourse, getPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
@@ -39,7 +42,7 @@ function toBinaryLabel(value: number, bits: number): string {
 /**
  * The real |U_jk| / arg(U_jk) structure of the N-dimensional quantum Fourier
  * transform, computed by feeding each computational basis state through this
- * platform's own tested `quantumFourierTransform` (src/lib/quantum/qft.ts) —
+ * platform's own tested `quantumFourierTransform` (src/lib/quantum/qft.ts),
  * not a hand-picked formula. Every entry of a QFT matrix has identical
  * magnitude 1/sqrt(N); the phase is where all of the structure lives, which
  * is exactly what the figure on this page plots.
@@ -86,7 +89,7 @@ export default async function MasteryPage() {
   const trackTotal = PILLAR_ORDER.length;
 
   // Real dependency structure, derived entirely from the curriculum's own
-  // `prerequisites` arrays — nothing below is asserted independently of that
+  // `prerequisites` arrays, nothing below is asserted independently of that
   // data. Three edges per Mastery course: what feeds it from an earlier
   // pillar, whether another Mastery course feeds it, and which Apex courses
   // (if any) list it as a direct prerequisite in turn.
@@ -111,7 +114,7 @@ export default async function MasteryPage() {
 
   // The same prerequisite data the dependency structure above renders, walked
   // transitively so `ReadinessReadout` can name the specific first course a
-  // reader who arrives early hasn't finished — see that component's own note
+  // reader who arrives early hasn't finished, see that component's own note
   // on why this is a status readout and not a gate.
   const directPrereqs = directPrerequisites(courses, lessons);
   const prereqChain = prerequisiteChain(courses, lessons);
@@ -129,6 +132,50 @@ export default async function MasteryPage() {
 
   const apexInfo = getPillar("apex");
 
+  // -------------------------------------------------------------------
+  // The primary action this page did not have.
+  //
+  // `HowItWorks` on the homepage sends the already-expert reader straight
+  // here ("skip ahead to Quantum Mastery or Apex and judge the site on that
+  // material"), and the page then offered no way to start: none of the three
+  // controls every core track page shares (`Button href={heroHref}`,
+  // `PillarLessonStrip`, `PillarNext`), and the only button-shaped thing on it
+  // was "Continue to Apex →" at the very bottom, which forwards the reader
+  // past the page they were just sent to. Real lesson titles existed, 300 to
+  // 400px down inside `MasteryResultsIndex`.
+  //
+  // Not solved by importing the core pages' components: this page's
+  // composition is deliberately its own, and five parallel entry courses is a
+  // genuinely different shape from one on-ramp. So it gets a control in its
+  // own register, and the choice of which course to name is derived from the
+  // same graph the "Curriculum position" table below renders: the one with the
+  // fewest courses behind it. Ties break on curriculum order, which is the
+  // rule the four core track pages already use for their hero CTA.
+  const entryCourses = courses
+    .map((course) => {
+      const seen = new Set<string>();
+      const queue = [...course.prerequisites];
+      while (queue.length > 0) {
+        const slug = queue.pop()!;
+        if (seen.has(slug)) continue;
+        seen.add(slug);
+        const prerequisite = getCourse(slug);
+        if (prerequisite) queue.push(...prerequisite.prerequisites);
+      }
+      return { course, behind: seen.size, lessonSlug: firstAuthoredLessonSlug(course.slug, lessons) };
+    })
+    .filter((entry) => Boolean(entry.lessonSlug));
+  const shallowestEntry = entryCourses.reduce<(typeof entryCourses)[number] | undefined>(
+    (best, entry) => (best === undefined || entry.behind < best.behind ? entry : best),
+    undefined
+  );
+  const otherEntries = shallowestEntry
+    ? entryCourses.filter((entry) => entry.course.slug !== shallowestEntry.course.slug)
+    : [];
+  const entryLesson = shallowestEntry
+    ? lessons.find((lesson) => lesson.slug === shallowestEntry.lessonSlug)
+    : undefined;
+
   return (
     <PillarScope pillar="quantum-mastery">
       <script
@@ -142,12 +189,12 @@ export default async function MasteryPage() {
       {/* `tight`, not `className="pt-4 sm:pt-8"`: `Section` writes its
           vertical padding as an inline `style`, which always beats a class on
           the same element, so that override compiled fine and applied to
-          nothing — the page opened with the full `--rhythm-section` (72px at
+          nothing, the page opened with the full `--rhythm-section` (72px at
           320px, 136px on a wide desktop) where 16px was asked for. `tight` is
           the prop that actually reduces it. Same dead override as /learn's
           hero, error.tsx and not-found.tsx. */}
       <Section width="reading" tight>
-        {/* The h1 renders immediately rather than inside a Reveal — an
+        {/* The h1 renders immediately rather than inside a Reveal, an
             above-the-fold page title must not depend on JS/observer timing
             to become visible, matching Hero and ApexHero on the other two
             pillar-less/terminal pages. */}
@@ -157,9 +204,9 @@ export default async function MasteryPage() {
         <SectionTitle level={1} size="xl" className="mt-4">
           Where the notation becomes the object
         </SectionTitle>
-        <Lede className="mt-5 max-w-[46rem]">{PILLAR_INFO.description}</Lede>
+        <Lede width="reading" className="mt-5">{PILLAR_INFO.description}</Lede>
         <Reveal delay={60}>
-          <p className="mt-4 max-w-[46rem] text-base leading-relaxed text-muted-foreground">
+          <p className="mt-4 max-w-reading text-base leading-relaxed text-muted-foreground">
             Five self-contained structures, each making rigorous what the
             core curriculum used but never proved: the spectral theorem
             beyond bounded self-adjoint operators, the general
@@ -176,24 +223,94 @@ export default async function MasteryPage() {
             items={[
               { label: "Courses", value: courses.length },
               { label: "Total depth", value: totalHours, unit: "hrs" },
-              { label: "Lessons authored", value: `${authoredModules}/${totalModules}` },
-              { label: "Level", value: "Master", unit: "graduate" },
+              // "31/31" read as a progress bar stuck at the end rather than
+              // as a finished track. Same rule as `pillarReadoutItems` and
+              // /learn: the fraction is a hedge against an authoring gap, so
+              // it appears only while there is a gap.
+              authoredModules === totalModules
+                ? { label: "Lessons", value: authoredModules }
+                : { label: "Lessons authored", value: `${authoredModules}/${totalModules}` },
+              { label: "Difficulty", value: "Master", unit: "graduate" },
             ]}
           />
         </Reveal>
+        {/* The same four-rung ladder every pillar page carries, in the same
+            place. Mastery is tier 3: the rigorous second pass, one rung below
+            Apex and one above the core tracks, and before this element existed
+            nothing on the page said so in a form a reader could take in at a
+            glance. */}
+        <Reveal delay={105}>
+          <TierLadder pillar="quantum-mastery" className="mt-8" />
+        </Reveal>
         <Reveal delay={120}>
           <ReadinessReadout
-            className="mt-8 max-w-[46rem]"
+            className="mt-8 max-w-reading"
             label="Prerequisites assumed"
             pillarLabel="Quantum Mastery"
             direct={directPrereqs}
             chain={prereqChain}
           />
         </Reveal>
+
+        {/* Five doors, one named. The other four are real links on the same
+            line rather than a second control, because this track genuinely
+            has no single on-ramp and a page that pretended otherwise would be
+            lying about the structure its own dependency table draws. */}
+        {shallowestEntry ? (
+          <Reveal delay={140} className="mt-8 block">
+            <div className="border-l-2 border-pillar-edge pl-5">
+              <TechLabel as="p" className="text-pillar-text">
+                Start here
+              </TechLabel>
+              <p className="mt-2 max-w-reading text-sm leading-relaxed text-muted-foreground">
+                Of the {entryCourses.length} entry courses, {shallowestEntry.course.title} has the
+                fewest behind it: {shallowestEntry.behind} earlier courses, against up to{" "}
+                {Math.max(...entryCourses.map((entry) => entry.behind))} for the others.
+              </p>
+              <Button
+                href={getCourseHref(shallowestEntry.course.slug, shallowestEntry.lessonSlug)}
+                size="lg"
+                className="mt-4"
+              >
+                Start: {shallowestEntry.course.title} →
+              </Button>
+              <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
+                <span>
+                  {lessons.filter((lesson) => lesson.course === shallowestEntry.course.slug).length}{" "}
+                  lessons
+                  {entryLesson ? (
+                    <> &middot; begins with &ldquo;{entryLesson.title}&rdquo;</>
+                  ) : null}
+                </span>
+              </p>
+              {otherEntries.length > 0 ? (
+                <p className="mt-4 max-w-reading text-sm leading-relaxed text-muted-foreground">
+                  Or open any of the other {otherEntries.length} directly:{" "}
+                  {otherEntries.map((entry, index) => (
+                    <span key={entry.course.slug}>
+                      {index > 0
+                        ? index === otherEntries.length - 1
+                          ? " and "
+                          : ", "
+                        : null}
+                      <Link
+                        href={getCourseHref(entry.course.slug, entry.lessonSlug)}
+                        className="text-foreground underline decoration-border-strong underline-offset-2 transition-colors hover:text-pillar-text hover:decoration-pillar-edge focus-visible:text-pillar-text"
+                      >
+                        {entry.course.title}
+                      </Link>
+                    </span>
+                  ))}
+                  .
+                </p>
+              ) : null}
+            </div>
+          </Reveal>
+        ) : null}
       </Section>
 
       {/* -------------------------------------------------------------
-          Curriculum position — a real dependency structure, not a card
+          Curriculum position, a real dependency structure, not a card
           grid: what feeds each course, whether one Mastery course feeds
           another, and which Apex course(s) require it in turn.
           ------------------------------------------------------------- */}
@@ -203,9 +320,9 @@ export default async function MasteryPage() {
           <SectionTitle level={2} size="lg" className="mt-3">
             Five entry points, one exit
           </SectionTitle>
-          <p className="mt-3 max-w-[46rem] text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-3 max-w-reading text-sm leading-relaxed text-muted-foreground">
             Mastery does not have a single on-ramp. Each course below opens once its own real
-            prerequisites — drawn from the four core tracks — are complete, and each links forward
+            prerequisites (drawn from the four core tracks) are complete, and each links forward
             to whichever Apex course actually lists it as a requirement. Nothing here is asserted
             independently of that data.
           </p>
@@ -252,7 +369,12 @@ export default async function MasteryPage() {
                   </span>
 
                   <div>
-                    <TechLabel>{course.difficulty}</TechLabel>
+                    {/* Was `<TechLabel>{course.difficulty}</TechLabel>`, which
+                        printed the raw enum slug ("master") instead of
+                        `DIFFICULTY_LABEL["master"]`, and dropped the redundant
+                        shape channel every other difficulty readout on the
+                        site carries. `DifficultyMark` is that readout. */}
+                    <DifficultyMark difficulty={course.difficulty} />
                     <p className="mt-1 font-display text-lg font-semibold leading-snug">
                       <Link
                         href={getCourseHref(course.slug, firstAuthoredLessonSlug(course.slug, lessons))}
@@ -296,7 +418,7 @@ export default async function MasteryPage() {
       </Section>
 
       {/* -------------------------------------------------------------
-          The operator, computed — a real 8x8 QFT matrix, not a stylized
+          The operator, computed, a real 8x8 QFT matrix, not a stylized
           approximation, echoing (and grounding) the background field's
           own "operator" regime.
           ------------------------------------------------------------- */}
@@ -317,7 +439,7 @@ export default async function MasteryPage() {
                 rather than a formula picked for looks.
               </p>
               <p className="mt-3 leading-relaxed text-muted-foreground">
-                A genuine unitary has flat magnitude — every one of the {qft.dimension * qft.dimension}{" "}
+                A genuine unitary has flat magnitude: every one of the {qft.dimension * qft.dimension}{" "}
                 entries below has magnitude 1/&radic;{qft.dimension}, to numerical precision. All of
                 the structure is in the phase, which is what the grid actually plots.
                 {qftModule ? (
@@ -343,7 +465,7 @@ export default async function MasteryPage() {
             <Reveal delay={100}>
               <Instrument
                 label={`QFT · N = ${qft.dimension}`}
-                footnote="Cell opacity tracks |cos(arg(U_jk))| — the same visual grammar the background field uses, but read off a real computed matrix."
+                footnote="Cell opacity tracks |cos(arg(U_jk))|, the same visual grammar the background field uses, but read off a real computed matrix."
               >
                 <figure>
                   <svg
@@ -408,7 +530,7 @@ export default async function MasteryPage() {
       </Section>
 
       {/* -------------------------------------------------------------
-          The five structures — a bespoke results index in Mastery's own
+          The five structures, a bespoke results index in Mastery's own
           register (see MasteryResultsIndex's own doc comment), replacing
           the generic CourseTimeline + CourseList every core pillar shares.
           Deliberately distinct from ApexCourseIndex: roman numerals rather
@@ -421,8 +543,8 @@ export default async function MasteryPage() {
           <SectionTitle id="results-index-heading" level={2} size="lg" className="mt-3">
             Where the curriculum&rsquo;s results get proved
           </SectionTitle>
-          <p className="mt-3 max-w-[46rem] text-sm leading-relaxed text-muted-foreground">
-            Five independent entry points, not a single track — see &ldquo;Curriculum
+          <p className="mt-3 max-w-reading text-sm leading-relaxed text-muted-foreground">
+            Five independent entry points, not a single track. See &ldquo;Curriculum
             position&rdquo; above for exactly what each one requires. Every statement
             below traces to that course&rsquo;s own module list.
           </p>
@@ -435,14 +557,17 @@ export default async function MasteryPage() {
       {/* -------------------------------------------------------------
           Then: Apex
           ------------------------------------------------------------- */}
-      <Section width="reading" className="pb-4">
+      {/* No `pb-4`: `Section`'s vertical padding is an inline `style`, which
+          beats a class on the same element, so this override was dead. The
+          rendering is unchanged by removing it. */}
+      <Section width="reading">
         <Reveal>
           <FadeRule />
           <div className="mt-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <Eyebrow>Then</Eyebrow>
               {/* Deliberately one size below this page's other section
-                  headings (`size="lg"` above) — this isn't a peer section,
+                  headings (`size="lg"` above), this isn't a peer section,
                   it's a closing forward-pointer to the next pillar, the one
                   spot on the site where that transition exists. Per
                   docs/UX_REVIEW.md P2-3: comment the density choice rather

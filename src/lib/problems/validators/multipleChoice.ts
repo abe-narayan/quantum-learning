@@ -17,7 +17,13 @@ export function validateMultipleChoice(
   }
 
   if (rawAnswer === answer.correctOptionId) {
-    return { status: "correct", message: "Correct." };
+    // Not "Correct.": `Feedback` already prints "Correct" as the heading, so
+    // that made the entire success screen the same word twice while a wrong
+    // option got a sentence naming its specific mistake. `validateAnswer`
+    // replaces this with the problem's authored `explanation.correctIdea`,
+    // which every problem in the corpus has; this is the fallback for a
+    // problem authored without one.
+    return { status: "correct", message: "That is the right option." };
   }
 
   return {

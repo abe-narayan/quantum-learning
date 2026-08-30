@@ -62,9 +62,9 @@ export function PeriodFindingExplorer() {
 
   return (
     <SimulatorInstrument
-      label="Period finding — Shor&rsquo;s subroutine"
+      label="Period finding: Shor&rsquo;s subroutine"
       readout={<Readout label="r" value={order} />}
-      footnote="Next: this distribution is what Shor's algorithm classically post-processes (continued fractions) to recover r — see that step worked through in the lesson."
+      footnote="Next: this distribution is what Shor's algorithm classically post-processes (continued fractions) to recover r; see that step worked through in the lesson."
       // Up to 2^7 = 128 bars at the highest counting-qubit count; splitting
       // against a 320px rail leaves each bar too thin to read even when the
       // container query says there's technically room. Full-width stage.
@@ -73,7 +73,7 @@ export function PeriodFindingExplorer() {
       stage={
         <>
           <p className="text-sm text-muted-foreground">
-            Factoring a big number is hard; finding how often a repeating pattern repeats is not — and the
+            Factoring a big number is hard; finding how often a repeating pattern repeats is not, and the
             two turn out to be the same problem. Multiply a by itself over and over, always keeping the
             remainder after dividing by N, and the answers eventually loop. How long that loop is, is
             r. This is the quantum subroutine that finds r, and it is the whole reason Shor&rsquo;s
@@ -106,7 +106,7 @@ export function PeriodFindingExplorer() {
           {/* No `overflow-x-auto` here: the only child is a block-level
               `.katex-display`, which fills this content box and carries its own
               horizontal scroll (globals.css §6), so this box never had anything to
-              scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+              scroll, and `overflow-x: auto` with `overflow-y: visible` computes the
               y axis to `auto` too, which would silently clip a tall equation. The tab
               stop the slab needs now lives on `.katex-display` itself; see
               `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
@@ -118,13 +118,13 @@ export function PeriodFindingExplorer() {
           </div>
 
           <SimulatorFraming
-            shows="This is the actual quantum subroutine behind Shor's algorithm — measuring reveals a distribution whose peak spacing exposes the hidden period r, without ever computing r directly."
+            shows="This is the actual quantum subroutine behind Shor's algorithm: measuring reveals a distribution whose peak spacing exposes the hidden period r, without ever computing r directly."
             watchFor="Nothing here ever computes r and then draws peaks around it. The peaks come out of the circuit; r is what you read back off their spacing. That inversion is the entire trick."
             tryThis={
               <ul>
                 <li>
                   Fix N=21, a=2 (see the smearing demo in the main lesson) and increase counting qubits from 4 to
-                  7 — watch the smeared peaks sharpen as 2^t/r gets closer to an integer.
+                  7, and watch the smeared peaks sharpen as 2^t/r gets closer to an integer.
                 </li>
                 <li>Try N=21 with a few different coprime bases and compare how many distinct peaks appear each time.</li>
               </ul>

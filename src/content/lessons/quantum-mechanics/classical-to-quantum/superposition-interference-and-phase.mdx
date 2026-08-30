@@ -25,11 +25,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="About bases, not about paths">
 Interference is a statement about measurement bases, not about paths. The formula that produced the double-slit fringe pattern is character-for-character the one that produced the Time Evolution lesson's precession result.
 </LessonHook>
 
-## Motivation
+## Interference in a system with no paths at all
 
 Early in this course, interference appeared as a fact about two physical
 paths to a screen, and the slits did most of the explanatory work. That
@@ -41,7 +41,7 @@ geometry. The short version is that it is a mismatch between how a state
 is written and which question you ask of it, and everything else in this
 lesson is the consequence of taking that seriously.
 
-## Intuition
+## The phase stays invisible until you change basis
 
 A superposition $|\psi\rangle = c_a|a\rangle+c_b|b\rangle$ has a relative
 phase between $c_a$ and $c_b$. Measure in the $\{|a\rangle,|b\rangle\}$
@@ -61,7 +61,7 @@ way the state happens to be written.
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## Two measurements, two different answers
 
 ### The superposition principle
 
@@ -109,9 +109,9 @@ completely takes a second measurement in a third basis, the eigenbasis of
 $Y$, whose probability comes out proportional to $1+\sin\varphi$ instead.
 One basis reveals that a phase exists; two are needed to read it off.
 That is the first step of state tomography, which the Quantum Computing
-pillar builds out in full.
+track builds out in full.
 
-<InteractiveSection title="Where the fringe shape comes from" description={`The phrase "double-slit fringe shape" is not a metaphor here. Below, S₁ and S₂ emit identical waves and S₂'s carries an extra relative phase φ, playing the role of the e^{iφ} sitting between the two terms of |ψ⟩ above. The central fringe's intensity is computed as the squared magnitude of the two waves' complex sum, and it traces 4A²cos²(φ/2): the (1+cosφ)/2 shape of the P(+) formula, rescaled by the wave amplitude.`}>
+<InteractiveSection title="Where the fringe shape comes from" description={`The phrase "double-slit fringe shape" is not a metaphor here. Below, S₁ and S₂ emit identical waves and S₂'s carries an extra relative phase φ, playing the role of the factor e^(iφ) sitting between the two terms of |ψ⟩ above. The central fringe's intensity is computed as the squared magnitude of the two waves' complex sum, and it traces 4A²cos²(φ/2): the (1+cosφ)/2 shape of the P(+) formula, rescaled by the wave amplitude.`}>
   <LazyWaveInterference />
 </InteractiveSection>
 
@@ -127,7 +127,7 @@ each other; they are one statement, $\tfrac{1+\cos(\text{phase})}{2}$,
 reached once by letting a phase accumulate and once by choosing where to
 look. The only difference is what supplied the phase.
 
-## Physical Interpretation
+## What which-path information actually destroys
 
 This reframes what "which-path information destroys interference" (from
 the earlier lesson) really means: detecting which path a particle took
@@ -149,14 +149,14 @@ sitting in the algebra.
     { label: "Only P(1) changes, P(0) stays fixed", value: "asymmetric" },
   ]}
   correctValue="fixed"
-  explanation="P(0)=|c₀|² and P(1)=|c₁|² depend only on the amplitudes' magnitudes, and multiplying by e^{iφ} changes neither magnitude. The bars therefore hold still wherever you drag φ, which is the 'no interference in the natural basis' result derived above. Only the P(+)/P(−) pair beneath, measured in the {|+⟩,|−⟩} basis, traces the (1+cos φ)/2 curve as φ sweeps."
+  explanation="P(0)=|c₀|² and P(1)=|c₁|² depend only on the amplitudes' magnitudes, and multiplying by a phase factor e^(iφ) changes neither magnitude. The bars therefore hold still wherever you drag φ, which is the 'no interference in the natural basis' result derived above. Only the P(+)/P(−) pair beneath, measured in the {|+⟩,|−⟩} basis, traces the (1+cos φ)/2 curve as φ sweeps."
 />
 
 <InteractiveSection title="Same state, two bases" description={`Switch the explorer below to two-amplitude mode. The bars for P(0)=|α|² and P(1)=|β|² measure in the state's own basis and hold still as you drag the relative-phase slider, which is the "no interference in the natural basis" result above. The P(+) and P(−) bars beneath perform the {|+⟩,|-⟩} cross-basis measurement this lesson derived: P(+) traces the (1+cos φ)/2 shape as you sweep a full turn, with P(−) taking up the remainder so the two always sum to 1. One state, two questions, two entirely different answers.`}>
   <LazyComplexAmplitudeExplorer twoAmplitudeVariant="basis-change" />
 </InteractiveSection>
 
-## Worked Example
+## One probability at a phase of two-thirds pi
 
 **For $\varphi=2\pi/3$, find $P(+)$ using the derived formula.**
 
@@ -170,7 +170,7 @@ $e^{i2\pi/3}=-\tfrac12+\tfrac{\sqrt3}{2}i$, so
 $1+e^{i2\pi/3}=\tfrac12+\tfrac{\sqrt3}{2}i$, with squared magnitude
 $\tfrac14+\tfrac34=1$; then $P(+)=\tfrac14\cdot1=\tfrac14$ ✓, matching.
 
-## Common Mistakes
+## Phase does not show up in every basis
 
 <Callout type="warning">
 **Assuming relative phase always shows up in probabilities, in every
@@ -191,11 +191,147 @@ other.
 
 1. For $\varphi=\pi/2$, compute $P(+)$ using the derived formula, and
    compare to $P(-)=1-P(+)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $P(+)=P(-)=\tfrac12$.
+
+   Straight substitution into the derived formula, using
+   $\cos(\pi/2)=0$:
+
+   $$
+   P(+) = \frac{1+\cos(\pi/2)}{2} = \frac{1+0}{2} = \frac12
+   $$
+
+   and therefore $P(-)=1-\tfrac12=\tfrac12$. Confirming it from the
+   amplitude instead of the formula: with $\varphi=\pi/2$ the state is
+   $\tfrac{1}{\sqrt2}(|0\rangle+i|1\rangle)$, so $\langle+|\psi\rangle =
+   \tfrac12(1+i)$, whose squared magnitude is
+   $\tfrac14(1+1)=\tfrac12$.
+
+   The interesting part is what this coin flip does *not* mean. At
+   $\varphi=\pi/2$ the $X$-basis measurement is maximally uninformative,
+   and so is the $Z$-basis measurement, which sits at
+   $P(0)=P(1)=\tfrac12$ for every $\varphi$. Two fair coins in a row, and
+   a reader could conclude the phase is simply not there.
+
+   It is there, and a third measurement finds it. As the lesson notes, the
+   $Y$-eigenbasis probability goes as $\tfrac{1+\sin\varphi}{2}$, which at
+   $\varphi=\pi/2$ equals $1$: the outcome is *certain* in that basis. So
+   $\varphi=\pi/2$ is not a state of maximal ignorance at all. It is a
+   state whose information has been rotated entirely out of the two bases
+   being looked at and entirely into a third.
+
+   This is the concrete reason the lesson says one basis shows a phase
+   exists and two are needed to read it. A single cross-basis measurement
+   returning $\tfrac12$ is consistent with $\varphi=\pi/2$ and with
+   $\varphi=-\pi/2$, since $\cos$ cannot tell them apart. The $Y$
+   measurement separates them, returning $1$ for the first and $0$ for
+   the second.
+
+   </details>
+
 2. Show that $P(+)+P(-)=1$ for any $\varphi$, directly from
-   $P(+)=\tfrac{1+\cos\varphi}{2}$ (you'll need $P(-)$'s analogous
+   $P(+)=\tfrac{1}{2}(1+\cos\varphi)$ (you'll need $P(-)$'s analogous
    formula, which has a minus sign in place of the plus).
-3. At what value(s) of $\varphi$ in $[0,2\pi)$ is $P(+)$ minimized, and
-   what is that minimum value?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $P(-) = \tfrac{1}{2}(1-\cos\varphi)$, and the two add to $1$ with the
+   cosines cancelling.
+
+   Derive $P(-)$ the same way the lesson derived $P(+)$, with
+   $|-\rangle=\tfrac{1}{\sqrt2}(|0\rangle-|1\rangle)$, so the bra
+   contributes a minus sign on the $|1\rangle$ term:
+
+   $$
+   \langle-|\psi\rangle = \frac12\left(\langle0|-\langle1|\right)\left(|0\rangle+e^{i\varphi}|1\rangle\right) = \frac12\left(1-e^{i\varphi}\right)
+   $$
+
+   $$
+   P(-) = \frac14\left(1-e^{i\varphi}\right)\left(1-e^{-i\varphi}\right) = \frac14\left(2-e^{i\varphi}-e^{-i\varphi}\right) = \frac{1-\cos\varphi}{2}
+   $$
+
+   Adding:
+
+   $$
+   P(+)+P(-) = \frac{1+\cos\varphi}{2}+\frac{1-\cos\varphi}{2} = \frac{2}{2} = 1
+   $$
+
+   The $\cos\varphi$ terms are equal and opposite, so they cancel for
+   every $\varphi$ at once, with no special angles involved.
+
+   That cancellation is the whole story of where interference goes.
+   Probability is never created or destroyed by the relative phase; it is
+   *moved* between the two outcomes. When $\varphi$ takes a quarter of the
+   probability away from $|+\rangle$, that quarter arrives at $|-\rangle$
+   in the same instant. The cross term appears with one sign in $P(+)$ and
+   the opposite sign in $P(-)$ precisely because the two basis vectors
+   differ by a sign on the $|1\rangle$ component, and that is the
+   algebraic reason the sum is protected.
+
+   The wrong turn is to treat $P(-)=1-P(+)$ as the *proof* rather than as
+   the thing being proved. Writing $P(-)$ that way assumes completeness
+   already and makes the exercise circular. The content here is that the
+   two independently computed Born-rule numbers happen to sum to one,
+   which they do because $\{|+\rangle,|-\rangle\}$ is an orthonormal basis
+   and the completeness relation $|+\rangle\langle+| +
+   |-\rangle\langle-| = I$ holds. Compute each from its own overlap, then
+   check.
+
+   </details>
+
+3. At what value(s) of $\varphi$ in $[0,2\pi)$ is $P(+)$ minimized, what
+   is that minimum, and what would a measurement in the
+   $\{|0\rangle,|1\rangle\}$ basis report about the very same state at
+   that $\varphi$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   At $\varphi=\pi$ only, where $P(+)=0$. The computational-basis
+   measurement at that same $\varphi$ reports $P(0)=P(1)=\tfrac12$,
+   exactly as it does at every other $\varphi$.
+
+   For the minimum, $P(+)=\tfrac{1}{2}(1+\cos\varphi)$ is smallest where
+   $\cos\varphi$ is smallest, and $\cos\varphi=-1$ exactly once on
+   $[0,2\pi)$, at $\varphi=\pi$. There
+
+   $$
+   P(+) = \frac{1+(-1)}{2} = 0
+   $$
+
+   Uniqueness matters and is easy to miss: unlike the *agreement* angles
+   in the earlier lesson, which came in pairs because $\cos\varphi=0$ has
+   two solutions per turn, $\cos\varphi=-1$ has only one. Fully
+   destructive interference happens at a single point of the turn.
+
+   Confirm it from the amplitude: at $\varphi=\pi$ the state is
+   $\tfrac{1}{\sqrt2}(|0\rangle-|1\rangle)$, which is $|-\rangle$ itself.
+   An outcome of $|+\rangle$ is then impossible because $|+\rangle$ and
+   $|-\rangle$ are orthogonal, not merely unlikely. This is the strongest
+   form of the double-slit dark fringe, reproduced in a system with no
+   slits: two contributions that are each individually possible combine to
+   an outcome that never occurs.
+
+   Now the second half, which is the point of the lesson. That same state,
+   measured in $\{|0\rangle,|1\rangle\}$, gives
+   $P(0)=|\tfrac{1}{\sqrt2}|^2=\tfrac12$ and $P(1)=\tfrac12$: an even
+   split, identical to what $\varphi=0$ would have given, where $P(+)$ was
+   at its *maximum* of $1$. The computational-basis measurement cannot
+   distinguish the most constructive case from the most destructive one.
+
+   So "interference is at its strongest here" and "this measurement sees
+   nothing" are simultaneously true of the same state, and which one you
+   observe is settled entirely by the basis you choose. A student who
+   concludes from the flat $Z$-basis bars that the phase gate did nothing
+   has made the error the lesson names, and it is the same error as
+   believing which-path detection is passive bookkeeping: the path basis
+   is precisely the basis in which the phase contributes nothing.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -213,10 +349,10 @@ other.
 - A single cross-basis measurement shows that a phase is present but
   cannot resolve its sign; a second basis is needed to determine it.
 
-## Further Exploration
+## Where this course meets the computing track
 
 <NextDiscovery>
 [From Postulates to Quantum Computing](/lessons/quantum-mechanics/classical-to-quantum/from-postulates-to-quantum-computing) is the capstone connecting
-every idea in this course directly to the Quantum Computing pillar's
+every idea in this course directly to the Quantum Computing track's
 treatment of qubits, gates, and circuits.
 </NextDiscovery>

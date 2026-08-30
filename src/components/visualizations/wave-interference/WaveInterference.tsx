@@ -178,7 +178,7 @@ export function WaveInterference({ tryThisHint = DEFAULT_TRY_THIS_HINT }: WaveIn
             aria-valuetext={`phi = ${phaseOverPi.toFixed(2)} pi radians, central fringe intensity I over 4 A squared = ${normalized.toFixed(3)}`}
             className="mt-2 h-11 w-full accent-brand"
           />
-          <div className="mt-1 flex justify-between text-[10px] font-mono text-muted-foreground">
+          <div className="mt-1 flex justify-between text-micro font-mono text-muted-foreground">
             <span>0</span>
             <span>π/2</span>
             <span>π</span>
@@ -189,7 +189,7 @@ export function WaveInterference({ tryThisHint = DEFAULT_TRY_THIS_HINT }: WaveIn
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {prefersReducedMotion ? (
-            <Badge tone="neutral">Reduced motion — drag the slider above to scrub</Badge>
+            <Badge tone="neutral">Reduced motion: drag the slider above to scrub</Badge>
           ) : (
             <Button variant="primary" size="sm" className="min-h-11" onClick={handlePlayToggle}>
               {isPlaying ? "Pause" : "Play"}
@@ -206,10 +206,10 @@ export function WaveInterference({ tryThisHint = DEFAULT_TRY_THIS_HINT }: WaveIn
         <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm text-foreground">
           <li>
             Set φ = 0: the two sources are perfectly in step, the central fringe reads 100%, and
-            I(φ) = 4A² — fully constructive interference.
+            I(φ) = 4A²: fully constructive interference.
           </li>
           <li>
-            Drag to φ = π: the central fringe goes fully dark (0%) — the two waves are exactly out of
+            Drag to φ = π: the central fringe goes fully dark (0%) because the two waves are exactly out of
             step and cancel completely, I(φ) = 0.
           </li>
           <li>{tryThisHint}</li>

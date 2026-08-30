@@ -43,7 +43,7 @@ export const tweezersVsGateLasers: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Trapping light and gate light are both light, but a trap is built from detuning and a gate is built from resonance, so one beam cannot serve both roles.",
-    whyCorrect: "Matches the lesson's Common Mistakes point distinguishing trapping light from manipulation light.",
+    whyCorrect: "The two jobs want opposite detunings. A trap has to sit far off resonance so it shifts the atom's energy without exciting it, while a gate has to sit on resonance to drive a transition. One beam cannot be both at once.",
     whyWrong: [
       { optionId: "b", text: "Treats light as one undifferentiated tool, missing that the two roles need opposite detunings." },
       { optionId: "c", text: "Gets the trap right and the drive wrong. Rydberg transitions are optical, not microwave." },

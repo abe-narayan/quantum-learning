@@ -16,14 +16,14 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  * ============================================================
  * Every other pillar page renders its five-ish courses through the shared
  * `CourseTimeline` + `CourseList` (a horizontal progress rail over a stack
- * of cards). The brief asks Apex not to use that pattern at all — a
+ * of cards). The brief asks Apex not to use that pattern at all, a
  * research-index feel instead: a numbered table of contents, dense module
  * listings with dotted leaders, hairline rules doing the separating work
  * cards normally do.
  *
- * It still has to expose everything `CourseList`/`CourseTimeline` do —
+ * It still has to expose everything `CourseList`/`CourseTimeline` do,
  * title, description, difficulty, hours, prerequisites, the module list
- * linking to lessons, and completion state — so completion is read from
+ * linking to lessons, and completion state, so completion is read from
  * exactly the same components those use (`CourseProgressBadge`,
  * `LessonCompletionMark`), imported rather than reimplemented, so there is
  * only ever one definition of "what counts as complete."
@@ -34,22 +34,22 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  * the site instead of being its own unlabeled convention here.
  *
  * The course title and each "Requires" entry route through `getCourseHref`
- * (`src/components/curriculum/courseHref.ts`) — the single place that
+ * (`src/components/curriculum/courseHref.ts`), the single place that
  * decides where a course link goes, now `/courses/<slug>` for every course
- * on the site — with a real authored-lesson fallback rather than a
+ * on the site, with a real authored-lesson fallback rather than a
  * hardcoded path.
  *
  * ------------------------------------------------------------
- * Click targets — the whole row, not just the title
+ * Click targets, the whole row, not just the title
  * ------------------------------------------------------------
  * Same technique and same reasoning as `CourseList` (see its header comment
  * for the full CSS 2.1 Appendix E paint-order argument): an entry here has
- * two kinds of real destination — the course, and each of its lessons — so
+ * two kinds of real destination, the course, and each of its lessons, so
  * it cannot be one big `<a>` without nesting links, which is invalid HTML.
  * Instead the course title is a real `<a>` whose `::after` is stretched over
  * the whole `<li>` (`relative isolate`), and every block of genuinely
- * readable text — the description, the "Requires" line, the stats, the
- * module rows — carries `relative z-10`, so it stays selectable and the
+ * readable text, the description, the "Requires" line, the stats, the
+ * module rows, carries `relative z-10`, so it stays selectable and the
  * links inside it reach their own destinations rather than the course.
  * There is deliberately no separate "View course →" affordance; the row is
  * the way in.
@@ -58,13 +58,13 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  * `Reveal` sits between the `<li>` and the title link. A transformed element
  * is a containing block for absolutely-positioned descendants, so if that
  * wrapper held a transform the stretched `::after` would size to the wrapper
- * instead of the row. It doesn't in any steady state — globals.css §11 sets
+ * instead of the row. It doesn't in any steady state, globals.css §11 sets
  * `transform: none` on `[data-reveal][data-revealed="true"]` and again,
- * `!important`, under `prefers-reduced-motion` — so the overlay resolves
+ * `!important`, under `prefers-reduced-motion`, so the overlay resolves
  * against the `relative` `<li>`. Do not add a transform to that wrapper.
  */
 
-/* `firstAuthoredLessonSlug` lives in ./readiness now — one definition shared
+/* `firstAuthoredLessonSlug` lives in ./readiness now, one definition shared
    by /apex and /mastery instead of a copy per component. */
 
 /**
@@ -73,13 +73,13 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  * real prerequisite data (a course is "the synthesis" if more than one of
  * its prerequisites is itself an Apex course) rather than hardcoded slugs,
  * so it can't silently go stale if the curriculum changes. Decorative at
- * every width — the numbered index below is the authoritative, fully
+ * every width, the numbered index below is the authoritative, fully
  * accessible version of the same information (each entry's own "Requires"
  * line), so this is presented as pure enhancement with an `sr-only` summary
  * standing in for it for assistive tech regardless of width. Below `lg`
  * there isn't room for the four-column converge-diagram, so a stacked
  * variant (threads top to bottom, funnelling into one capstone row) carries
- * the same shape at `sm`/`md` widths instead of disappearing — a sighted
+ * the same shape at `sm`/`md` widths instead of disappearing, a sighted
  * reader on a phone gets a real diagram, not just the `sr-only` fallback.
  */
 function ApexStructure({ courses }: { courses: Course[] }) {
@@ -98,7 +98,7 @@ function ApexStructure({ courses }: { courses: Course[] }) {
         them, converging the track into a single closing capstone.
       </p>
 
-      {/* Stacked convergence — sm/md, and the fallback below lg on larger
+      {/* Stacked convergence, sm/md, and the fallback below lg on larger
           screens too. Same information as the desktop diagram, read top to
           bottom instead of left to right: no horizontal grid to overflow at
           320px. */}
@@ -122,7 +122,7 @@ function ApexStructure({ courses }: { courses: Course[] }) {
         </div>
       </div>
 
-      {/* Four-column converge — lg and up, room for the wide layout. */}
+      {/* Four-column converge, lg and up, room for the wide layout. */}
       <div aria-hidden="true" data-decorative="" className="hidden lg:block">
         <div className="grid grid-cols-4 gap-4">
           {threads.map((thread) => (
@@ -192,7 +192,7 @@ export function ApexCourseIndex({
                 // `pillar`, not `pillar-accent`: the ramp is exposed to
                 // Tailwind as `pillar`/`pillar-edge`/`pillar-wash`
                 // (globals.css §"Pillar ramp"), and `pillar-accent` is not a
-                // registered color — it would compile to nothing and the
+                // registered color, it would compile to nothing and the
                 // whole-row hover affordance would silently not exist.
                 "has-[a[data-course-link]:hover]:bg-pillar-wash",
                 "has-[a[data-course-link]:focus-visible]:bg-pillar-wash"
@@ -234,14 +234,14 @@ export function ApexCourseIndex({
                       </div>
                     </div>
 
-                    <p className="relative z-10 mt-3 max-w-[46rem] text-sm leading-relaxed text-muted-foreground">
+                    <p className="relative z-10 mt-3 max-w-reading text-sm leading-relaxed text-muted-foreground">
                       {course.description}
                     </p>
 
                     {prerequisiteCourses.length > 0 ? (
-                      // `relative z-10` raises the whole line — and the links
+                      // `relative z-10` raises the whole line, and the links
                       // inside it, which paint in this element's own stacking
-                      // context — clear of the stretched `::after`. Without
+                      // context, clear of the stretched `::after`. Without
                       // it every one of them would silently navigate to *this*
                       // course. They are inline links inside a sentence, so
                       // WCAG 2.5.8's inline exception applies and inflating
@@ -262,7 +262,19 @@ export function ApexCourseIndex({
                       </p>
                     ) : null}
 
-                    <ol className="mt-5 grid gap-x-8 sm:grid-cols-2">
+                    {/* `lg:grid-cols-2`, not `sm:`. The split used to happen at
+                        the same breakpoint that only adds 320px of page, so a
+                        module title's budget *shrank* from 232px at 320 to
+                        176px at 640 and was still only 240px at 768: the row
+                        title got worse as the window got wider, which is the
+                        one direction a layout may never move. One column until
+                        `lg` gives roughly 440px between 640 and 1023, and the
+                        two-column layout returns at 1024 where each column is
+                        ~360px. Measured against the real corpus: the longest
+                        Apex module title is 52 characters (~328px at text-sm),
+                        so nothing wraps at or above 640, and the 14 titles over
+                        35 characters wrap to two lines only at 320. */}
+                    <ol className="mt-5 grid gap-x-8 lg:grid-cols-2">
                       {course.modules.map((module, moduleIndex) => {
                         const lesson = lessonByModule.get(module.slug);
                         const mn = `${n}.${moduleIndex + 1}`;
@@ -286,7 +298,20 @@ export function ApexCourseIndex({
                                   "hover:text-pillar-text focus-visible:text-pillar-text"
                                 )}
                               >
-                                <span className="min-w-0 truncate">{module.title}</span>
+                                {/* Wraps; never truncates. Same principle
+                                    `ProblemCard` states for a problem title:
+                                    an ellipsis is right for a secondary
+                                    reference whose full text lives in the
+                                    link's `aria-label`, and wrong on the row's
+                                    own name, because this title *is* the thing
+                                    the reader is choosing between and the
+                                    anchor carries no other copy of it. Half a
+                                    research title reads as broken, not dense.
+                                    `min-h-11` on the link already guarantees
+                                    the 44px target and `items-center` keeps a
+                                    two-line title aligned with the mark beside
+                                    it, so wrapping costs the row nothing. */}
+                                <span className="min-w-0">{module.title}</span>
                                 <span className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
                                   <LessonCompletionMark slug={lesson.slug} />
                                   <span
@@ -301,7 +326,7 @@ export function ApexCourseIndex({
                             ) : (
                               <span className="flex min-h-11 flex-1 items-center py-2 text-muted-foreground">
                                 {module.title}
-                                <span className="ml-1 text-xs text-subtle-foreground">— not yet authored</span>
+                                <span className="ml-1 text-xs text-subtle-foreground">(not yet authored)</span>
                               </span>
                             )}
                           </li>

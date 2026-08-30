@@ -25,29 +25,29 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="The failure mode with no alarm">
-A gate computed from a stale Ω value silently implements the wrong rotation angle — no error message, no crash, just a systematic bias baked into every gate until the next recalibration catches it.
+A gate computed from a stale Ω value silently implements the wrong rotation angle: no error message, no crash, just a systematic bias baked into every gate until the next recalibration catches it.
 </LessonHook>
 
-## Motivation
+## The Number the Derivation Assumed
 
 Control Electronics derived $t=\theta/(2\Omega)$ assuming $\Omega$ is
 already known. In a real lab, it isn't: every device's actual <Term id="rabi-oscillation">Rabi
 frequency</Term> depends on the specific hardware (drive line attenuation,
 qubit-drive coupling strength, exact resonance frequency), and <Term id="calibration-drift">drifts
 over time</Term> with temperature and other conditions. **Calibration** is the
-experimental process of measuring these parameters directly, rather than
-assuming a datasheet value.
+experimental process of measuring these parameters directly on the
+device in front of you, instead of trusting a datasheet value.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/0b/DEFENSE_%2854394239497%29.jpg"
   alt="The central vacuum chamber and optics of Sandia National Laboratories' neutral-atom quantum computing apparatus, used to test a new method for detecting qubit errors"
-  caption="Sandia National Laboratories' neutral-atom apparatus, photographed during work on a new technique for detecting qubit errors. Calibration is this kind of work: sweep a parameter, measure carefully at each setting, and read a device constant back out of the curve — the same discipline a Rabi scan requires."
+  caption="Sandia National Laboratories' neutral-atom apparatus, photographed during work on a new technique for detecting qubit errors. Calibration is this kind of work: sweep a parameter, measure carefully at each setting, and read a device constant back out of the curve, the same discipline a Rabi scan requires."
   credit="Craig Fritz / Sandia National Laboratories, U.S. Department of Energy"
   creditUrl="https://commons.wikimedia.org/wiki/File:DEFENSE_(54394239497).jpg"
-  license="Public Domain (U.S. Government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Engineering Development
+## Rabi and Ramsey, as Measurements
 
 ### The Rabi calibration experiment
 
@@ -60,7 +60,7 @@ gives $t_\pi=\pi/(2\Omega)$, from which $\Omega=\pi/(2t_\pi)$ follows
 immediately.
 
 <Callout type="warning">
-**Two Rabi conventions coexist in the wild.** This pillar's convention
+**Two Rabi conventions coexist in the wild.** This track's convention
 is $P_1(t)=\sin^2(\Omega t)$ with $t_\pi=\pi/(2\Omega)$; most published
 work defines $\Omega$ via $P_1(t)=\sin^2(\Omega t/2)$, making
 $t_\pi=\pi/\Omega$. A calibration scan itself is immune (the peak sits
@@ -74,19 +74,18 @@ a factor of 2 even for a perfectly calibrated device.
 
 Suppose the true (unknown to the calibration procedure) Rabi frequency
 is $\Omega_{\text{true}}=2\pi\times18\text{ MHz}$. Scanning
-`exactTwoLevelTransitionProbability(0,0,\Omega_{\text{true}},t)` over
+`exactTwoLevelTransitionProbability(0, 0, Omega_true, t)` over
 $t\in[0,20]\text{ ns}$ (scoped to just past the expected first peak; a
 real calibration scan doesn't need to sweep multiple oscillation
 periods) in fine steps and finding the duration of maximum
 $P_1$ gives $t_\pi\approx13.89\text{ ns}$. Inverting,
 $\Omega_{\text{recovered}}=\pi/(2\times13.89\text{ ns})\approx2\pi\times18.0\text{ MHz}$,
 matching the true (hidden) value to within the scan's resolution. This
-is exactly the procedure a real lab runs, except with actual noisy
-hardware measurements standing in for this platform's exact engine
-calls.
+is the procedure a real lab runs, except with noisy hardware
+measurements standing in for this platform's exact engine calls.
 
 <PredictBeforeReveal
-  question="If you run a calibration scan at the WRONG drive frequency (nonzero detuning) instead of exactly on resonance, what Ω do you recover?"
+  question="If you run a calibration scan at the WRONG drive frequency (nonzero detuning) instead of on resonance, what Ω do you recover?"
   options={[
     { label: "The correct Ω, just found more slowly", value: "correct-slow" },
     { label: "A lower-than-true Ω", value: "lower" },
@@ -94,7 +93,7 @@ calls.
     { label: "No peak forms, so nothing is recovered", value: "no-peak" },
   ]}
   correctValue="higher"
-  explanation="Detuning drives the system at the generalized Rabi frequency Ω_R=√(Δ²+Ω²), which is always larger than the true Ω — and reaches its (suppressed, never-reaching-1) first peak sooner than the on-resonance t_π would. Inverting t_π=π/(2Ω) from that earlier peak recovers Ω_R, a higher-than-true Ω — a real miscalibration hazard: a scan run slightly off the qubit's actual resonance silently reports the wrong (inflated) frequency. Set a nonzero detuning in the Explorer below and check the recovered value against the slider's true setting."
+  explanation="Detuning drives the system at the generalized Rabi frequency Ω_R=√(Ω²+(Δ/2)²), which is always larger than the true Ω, and reaches its (suppressed, never-reaching-1) first peak sooner than the on-resonance t_π would. Inverting t_π=π/(2Ω) from that earlier peak recovers Ω_R, a higher-than-true Ω. That is a real miscalibration hazard: a scan run slightly off the qubit's resonance silently reports an inflated frequency. Set a nonzero detuning in the Explorer below and check the recovered value against the slider's true setting."
 />
 
 <InteractiveSection title="Recover Ω from a scan" description={`Try running a calibration scan yourself: pick a coupling strength V below, step through time, and find where P(1) first peaks. Recompute Ω from that peak time using t_π=π/(2V), then compare it to the slider's actual V value to check your recovered number. Then set a nonzero detuning and see why a calibration scan run at the wrong drive frequency would recover the wrong (and higher-than-true) Rabi frequency entirely.`}>
@@ -126,7 +125,7 @@ resonance. Run the Ramsey calibration first, zero the detuning, and
 only then run the Rabi scan; that ordering is what protects the scan
 from recovering the wrong, inflated generalized Rabi frequency
 $\Omega_R=\sqrt{\Omega^2+(\Delta/2)^2}$ the prediction above warned
-about. (That $\Delta/2$ is this pillar's $P_1=\sin^2(\Omega t)$
+about. (That $\Delta/2$ is this track's $P_1=\sin^2(\Omega t)$
 convention showing through: in the literature's
 $P_1=\sin^2(\Omega t/2)$ convention the same quantity is written
 $\sqrt{\Omega^2+\Delta^2}$, with an $\Omega$ twice as large. The box
@@ -134,17 +133,17 @@ above is not a pedantic aside.)
 
 ### Calibration must be repeated
 
-Because the actual physical parameters drift (temperature fluctuations,
+Because the physical parameters drift (temperature fluctuations,
 slow electronic drift, occasional hardware changes), this calibration
 procedure isn't a one-time setup step: real devices re-run calibration
-routines regularly, full sweeps every few hours on many superconducting
-processors, with quicker single-parameter checks (a short Rabi scan,
-say) run even more often between the full sweeps. A gate computed from a
+routines on a schedule, with a full sweep at least daily on many
+superconducting processors and quicker single-parameter checks (a short
+Rabi scan, say) run more often than that between the full sweeps. A gate computed from a
 stale $\Omega$ value silently implements the *wrong* rotation angle,
 with no error message, no crash, just a systematic bias baked into every
 gate until the next recalibration catches it.
 
-## Physical Interpretation
+## The Unglamorous Link
 
 Calibration is the unglamorous but unavoidable link between "the physics
 works" (verified throughout this platform's engine) and "the specific
@@ -152,7 +151,7 @@ device in the lab today behaves as assumed." Every hardware course
 lesson so far implicitly depends on accurate calibration; none of
 Control Electronics' formulas are useful with a wrong $\Omega$.
 
-## Worked Example
+## Inverting a Measured Rabi Peak
 
 **If a Rabi scan's peak is found at $t=20\text{ ns}$ instead of the
 expected $13.89\text{ ns}$, what does this imply about the actual
@@ -167,7 +166,7 @@ frequency is about $12.5/18\approx0.69\times$ the assumed value (roughly
 31% lower). Any gate computed using the wrong, assumed $\Omega$ would
 implement a systematically incorrect rotation angle until recalibrated.
 
-## Common Mistakes
+## Calibrating Once and Trusting It
 
 <Callout type="warning">
 **Treating calibration as a one-time setup step.** Real hardware drifts;
@@ -186,14 +185,240 @@ gate.
 
 1. Explain, in your own words, why scanning pulse duration and finding
    the first population peak recovers $\Omega$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because on resonance the curve's *shape* is already known and
+   $\Omega$ is the only thing left to fix: the horizontal scale.
+
+   $P_1(t)=\sin^2(\Omega t)$ has exactly one free parameter, and it
+   enters only as a stretch of the time axis. Nothing about the curve's
+   form is in question. So the whole calibration reduces to identifying
+   one landmark on the curve and reading off where it fell. The first
+   maximum is the landmark of choice: it is the first $t$ at which
+   $\Omega t=\pi/2$, so
+
+   $$
+   t_\pi = \frac{\pi}{2\Omega} \implies \Omega = \frac{\pi}{2t_\pi}.
+   $$
+
+   Three reasons the *first peak* rather than any other feature.
+
+   It is unambiguous. Later maxima are equally valid landmarks but
+   require knowing how many periods you have crossed, and a scan that
+   sweeps far enough to see several peaks costs more measurement time for
+   no extra information.
+
+   It is the largest signal. $P_1$ runs from 0 to 1, and the peak is the
+   point furthest from the baseline, so it is where the measurement sits
+   best above readout noise.
+
+   It does not require the readout to be absolutely calibrated. This one
+   matters more than it looks. To read $\Omega$ off a single measured
+   *value* of $P_1$ you would need to know exactly what signal level
+   corresponds to $P_1=1$, which is itself a separate calibration you may
+   not yet have. The *position* of a maximum along the time axis is
+   unchanged by any scaling or offset of the vertical axis. The scan
+   deliberately extracts an $x$-coordinate, not a $y$-value.
+
+   That last point also names the tempting wrong turn: fire a pulse of
+   some convenient duration, measure $P_1$, and solve $\sin^2(\Omega
+   t)=P_1$ for $\Omega$. Three things go wrong. The inverse is
+   multivalued, since $\Omega t$ and $\pi-\Omega t$ and every $+n\pi$
+   shift give the same population. It needs the absolute readout scale
+   just discussed. And near the peak the population is stationary in
+   $\Omega t$, so a measurement taken anywhere close to the peak carries
+   almost no information about $\Omega$ at all.
+
+   One blind spot to carry forward, since the lesson makes it the reason
+   Ramsey exists. The scan assumes the drive is already on resonance. Run
+   it detuned and the system oscillates at the *generalized* Rabi
+   frequency $\Omega_R=\sqrt{\Omega^2+(\Delta/2)^2}$, which is always
+   larger than $\Omega$, so the peak arrives early and inverting
+   $t_\pi=\pi/(2\Omega)$ reports an inflated value. With $\Delta=\Omega$
+   on a true $2\pi\times18$ MHz drive, the engine puts the peak at 12.42
+   ns instead of 13.89 and the scan would report $2\pi\times20.1$ MHz.
+   There is a visible tell, though: that peak only reaches $P_1=0.80$
+   instead of 1.00. A first peak that does not come close to full
+   population transfer is the signature of a detuned scan, and the cure
+   is to run Ramsey first and zero $\Delta$.
+
+   </details>
+
 2. If a calibration scan finds $t_\pi=10\text{ ns}$, what is the
    corresponding $\Omega$ (in the form $2\pi\times f$, solving for $f$
    in Hz)?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \Omega = \frac{\pi}{2t_\pi} = \frac{\pi}{2(10\times10^{-9})} \approx 1.5708\times10^{8}\ \text{rad/s}.
+   $$
+
+   To put that in the requested form, divide by $2\pi$:
+
+   $$
+   f = \frac{\Omega}{2\pi} = \frac{1}{4t_\pi} = \frac{1}{4\times10\times10^{-9}} = 2.5\times10^{7}\ \text{Hz} = 25\text{ MHz},
+   $$
+
+   so $\Omega=2\pi\times25\text{ MHz}$. Verified: the engine at this
+   $\Omega$ and $t=10$ ns returns $P_1=1.0000000000000004$, a full
+   $\pi$-pulse, which is what a scan peak at 10 ns means. It is also
+   exactly the device in the Superconducting Qubits worked example, now
+   arrived at from the measurement rather than assumed.
+
+   The shortcut worth keeping is the middle line: $f=1/(4t_\pi)$ in this
+   text's convention. Everything with a $\pi$ in it cancels, which is
+   both convenient and a useful check that you inverted the right
+   formula.
+
+   Two wrong turns.
+
+   Reporting "$1.57\times10^{8}$" when the question asked for the form
+   $2\pi\times f$. Those are the same quantity, and the factor of $2\pi$
+   between rad/s and Hz is precisely the one that goes missing when a
+   number is moved between a datasheet and a formula. Say which you mean.
+
+   And the convention trap. In the more common literature convention,
+   where $t_\pi=\pi/\Omega$, the same 10 ns peak would be reported as
+   $\Omega=2\pi\times50$ MHz. Both numbers describe the identical
+   physical device with the identical measured peak; they label different
+   quantities with the same symbol. The scan itself is immune, since the
+   peak sits where it sits, but the number you write down is not.
+
+   </details>
+
 3. Why must calibration be repeated periodically, rather than performed
    once when a device is built?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the quantities being calibrated are not device constants. They
+   drift, on timescales of hours.
+
+   What drifts, and why:
+
+   **The qubit's own frequency.** In a superconducting device the
+   dominant cause is two-level-system defects in the amorphous oxides in
+   and around the junction. These couple to the qubit and move around
+   over hours, which is the same mechanism that makes $T_1$ a median over
+   a chip and a time window rather than a fixed number. Stray magnetic
+   flux does the same job for flux-tunable qubits.
+
+   **The delivered drive strength.** $\Omega$ depends on how much
+   microwave power actually arrives at the qubit, which depends on the
+   whole chain: amplifier gain, mixer offsets and IQ imbalance, cable
+   loss, and the attenuators at each fridge stage. Room-temperature
+   electronics drift with ambient temperature; the fridge's own stage
+   temperatures move as its heat load changes.
+
+   **The resonance the drive is compared against.** Since $\Omega$ is
+   only recoverable correctly on resonance, any drift in the qubit
+   frequency also corrupts the Rabi calibration, even if nothing about
+   the drive changed.
+
+   In practice that means a full parameter sweep at least daily on many
+   superconducting processors, with quicker single-parameter checks, a
+   short Rabi scan for instance, run more frequently between the full
+   sweeps.
+
+   The reason this cannot be handled by exception rather than by schedule
+   is the point the lesson opens on: a stale $\Omega$ does not announce
+   itself. There is no error, no crash, and no obviously broken gate,
+   just a rotation angle that is quietly wrong. The calibration schedule
+   *is* the alarm. Nothing else in the stack is watching.
+
+   The wrong turn is treating drift as decoherence's cousin and
+   concluding that better isolation would fix it. Drift and decoherence
+   are different categories, which is exactly the distinction the Sources
+   of Noise lesson draws next: drift is a systematic shift in a classical
+   control parameter, undone completely by remeasuring it, while
+   decoherence is information lost to an environment and no amount of
+   retuning brings it back.
+
+   </details>
+
 4. Explain why a miscalibrated $\Omega$ produces a systematic (not
    random) error, and why this makes it especially important to catch
    via a deliberate calibration routine.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Why systematic.** The pulse duration is computed once, from the
+   assumed $\Omega$, and then used for every gate. If the true drive
+   strength is $\Omega_{\text{true}}$ and the assumed one is
+   $\Omega_{\text{assumed}}$, every requested angle comes out scaled by
+   the same factor:
+
+   $$
+   \theta_{\text{actual}} = \frac{\Omega_{\text{true}}}{\Omega_{\text{assumed}}}\,\theta_{\text{requested}}.
+   $$
+
+   That is a deterministic, repeatable, same-direction offset, not a
+   fluctuation. Run the identical circuit a thousand times and it is
+   wrong the same way a thousand times.
+
+   **Why that is worse than it sounds, quantitatively.** Averaging is the
+   standard defence against error, and it does nothing here, because
+   averaging removes zero-mean noise and this has a mean. Worse, a
+   coherent error *accumulates in amplitude* rather than in probability.
+   Stochastic errors add up roughly linearly in the number of gates;
+   coherent ones add up in the rotation angle, and infidelity goes as the
+   square of that accumulated angle.
+
+   The numbers make the point better than the scaling law does. Take a
+   drive miscalibrated by 1%, so each $\pi$-pulse over-rotates to
+   $1.01\pi$. A single gate has $P_1=0.999753$, an infidelity of
+   $2.5\times10^{-4}$, which on any reasonable test looks like a working
+   gate. Now apply it repeatedly, where a perfect X gate would return the
+   qubit to $|0\rangle$ after an even number of applications:
+
+   after 10 gates, $P_1=0.024$ where it should be 0, still small;
+
+   after 50 gates, $P_1=0.500$, which is no information at all;
+
+   after 100 gates, $P_1=1.000$ where it should be 0, the exact opposite
+   of the right answer.
+
+   A 0.025% per-gate error has become a complete inversion in a hundred
+   gates. That is what "systematic" costs.
+
+   **Why a deliberate routine is the answer.** Three reasons stack.
+
+   It is silent. There is no crash and no obviously broken gate; the
+   symptom is a plausible-looking wrong answer, which reads as an
+   algorithm bug rather than a hardware fault and can burn a great deal
+   of debugging time in the wrong place.
+
+   The obvious spot check does not catch it. The natural test, "fire an X
+   gate and confirm the qubit flipped," is exactly the least sensitive
+   measurement available: at the $\pi$ pulse the population is stationary
+   in $\Omega t$, so a small $\Omega$ error moves $P_1$ only at second
+   order. The 0.999753 above is that insensitivity in action. Sensitivity
+   is maximal at a $\pi/2$ pulse, or is obtained by repeating a pulse
+   many times so the error amplifies into view, which is precisely what
+   the 100-gate sequence above is.
+
+   And it is completely fixable, unlike the alternative. A systematic
+   error is one measurement away from being gone. Remeasure $\Omega$,
+   recompute the durations, and the bias disappears with no hardware
+   change and no error-correction overhead. Decoherence offers no such
+   deal. Of everything on a device's error budget, this is the cheapest
+   thing to repair and the most expensive thing to ignore.
+
+   One caveat worth knowing. Randomized benchmarking, the standard way of
+   quoting a gate fidelity, applies random gate sequences, and randomness
+   partly scrambles a coherent error into an effective stochastic
+   average. So a benchmarked error rate can look reassuring while a
+   structured circuit, which repeats the same gate in the same direction,
+   suffers the quadratic accumulation shown above. A good RB number is
+   not by itself evidence that calibration is current.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -208,13 +433,13 @@ gate.
   zeroing it protects the Rabi scan from recovering an inflated
   $\Omega$.
 - Demonstrated numerically: recovering a hidden $\Omega=2\pi\times18\text{ MHz}$
-  to within scan resolution purely from scanned `exactTwoLevelTransitionProbability`
-  data.
+  to within scan resolution purely from scanned
+  `exactTwoLevelTransitionProbability` data.
 - Calibration must be repeated regularly, since real hardware parameters
   drift. A miscalibrated device fails silently (wrong rotation angle),
   not with an obvious error.
 
-## Further Exploration
+## What Drifts, and How Fast
 
 <NextDiscovery>
 This closes **Control & Readout**. The next course, **Noise, Decoherence

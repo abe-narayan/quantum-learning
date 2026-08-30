@@ -11,7 +11,7 @@ function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
 }
 
-/** Every integer a with 1 < a < N and gcd(a, N) = 1 — the valid bases for order-finding mod N. */
+/** Every integer a with 1 < a < N and gcd(a, N) = 1: the valid bases for order-finding mod N. */
 export function coprimeBases(N: number): number[] {
   const bases: number[] = [];
   for (let a = 2; a < N; a++) {
@@ -45,7 +45,7 @@ export function PeriodFindingControls({
     <div className="space-y-8">
       <ControlSection
         id="pf-n"
-        title="N — the number to factor"
+        title="N: the number to factor"
         description="Changing N picks a fresh set of valid bases a."
       >
         <PresetToggle
@@ -56,22 +56,22 @@ export function PeriodFindingControls({
           // group" it says nothing about what choosing 15 over 21 does. The
           // section heading beside it is a section boundary, not part of the
           // group's accessible name.
-          ariaLabel="N — the number to factor"
+          ariaLabel="N: the number to factor"
         />
       </ControlSection>
 
       <ControlSection
         id="pf-a"
-        title="a — the number you repeatedly multiply by"
+        title="a: the number you repeatedly multiply by"
         description="Any a sharing no factor with N will do. Every value listed is checked for that directly, not curated by hand."
       >
         <select
           value={a}
-          aria-label="a — the base you repeatedly multiply by, mod N"
+          aria-label="a: the base you repeatedly multiply by, mod N"
           onChange={(e) => onAChange(Number(e.target.value))}
           className={
             // text-base below sm keeps the effective font size at 16px on
-            // phones — iOS Safari auto-zooms the page on focusing any form
+            // phones; iOS Safari auto-zooms the page on focusing any form
             // control whose font is smaller than that.
             "min-h-11 w-full rounded-(--radius-tight) border border-border bg-surface px-2 py-1.5 font-mono text-base text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-sm"
           }
@@ -88,7 +88,7 @@ export function PeriodFindingControls({
               symbol: "r",
               name: "the period (order)",
               means:
-                "how many times you have to multiply by a before the remainders start repeating. Find r and simple arithmetic hands you N's factors — that's Shor's algorithm in one line.",
+                "how many times you have to multiply by a before the remainders start repeating. Find r and simple arithmetic hands you N's factors; that's Shor's algorithm in one line.",
             },
             {
               symbol: "gcd",
@@ -102,14 +102,14 @@ export function PeriodFindingControls({
 
       <ControlSection
         id="pf-t"
-        title="t — how precisely to measure"
-        description="Counting qubits. Each one you add doubles the number of possible readouts, which sharpens the peaks — and doubles the work for a real machine."
+        title="t: how precisely to measure"
+        description="Counting qubits. Each one you add doubles the number of possible readouts, which sharpens the peaks, and doubles the work for a real machine."
       >
         <PresetToggle
           options={X_BITS_TOGGLE_OPTIONS}
           index={X_BITS_TOGGLE_OPTIONS.findIndex((o) => o.bits === xBits)}
           onChange={(i) => onXBitsChange(X_BITS_TOGGLE_OPTIONS[i].bits)}
-          ariaLabel="t — how many counting qubits to measure with"
+          ariaLabel="t: how many counting qubits to measure with"
         />
         <SymbolGloss
           items={[

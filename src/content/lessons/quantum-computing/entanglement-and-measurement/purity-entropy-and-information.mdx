@@ -28,11 +28,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Still not the number physicists reach for">
 Purity, Tr(ρ²), has done real work in the last two lessons: it detects mixedness and ties directly to entanglement. It is still not the measure physicists reach for first.
 </LessonHook>
 
-## Motivation
+## A scale with no interpretation attached
 
 Purity's tie to entanglement holds for 2-qubit pure states, and its scale
 is arbitrary: 1 down to 1/d, with no interpretation attached to the
@@ -55,13 +55,15 @@ distribution to plug in.
   license="CC BY-SA 2.0 DE"
 />
 
-## Mathematical Development
+## Eigenvalues in closed form, then entropy from them
 
 ### Eigenvalues of a density matrix
 
-A <Term id="hermitian-operator">Hermitian</Term> matrix has real eigenvalues and an orthonormal eigenbasis,
-a fact proved back in Hermitian Operators (Mathematical Foundations) and
-in constant use since.
+A <Term id="hermitian-operator">Hermitian</Term> matrix has real eigenvalues and an orthonormal eigenbasis.
+Hermitian Operators, in Mathematical Foundations, proves that in general;
+this course has not needed it before, and does not need to take it on
+trust now either, because the $2\times2$ closed form below shows the
+reality of both eigenvalues on its face.
 For a $2\times2$ Hermitian matrix
 $\rho=\begin{pmatrix}a&z\\z^*&d\end{pmatrix}$, the characteristic
 polynomial $\lambda^2-(a+d)\lambda+(ad-|z|^2)=0$ has the closed-form
@@ -73,7 +75,7 @@ $$
 
 That is the ordinary quadratic formula and nothing more exotic, and it is
 what `eigenvaluesHermitian2x2` computes. Scope matters here: this is a
-closed-form solver for the $2\times2$ case, not a general eigensolver.
+closed-form solver for the $2\times2$ case, which is all this needs.
 Eigenvalues of an arbitrary $N\times N$ Hermitian matrix need iterative
 numerical methods this engine does not implement. Every density matrix
 this course needs (single-qubit reduced states) is $2\times2$, so the
@@ -140,7 +142,7 @@ Sweep the diagonal family $\rho(p)=\text{diag}(p,1-p)$ across every
 $p\in[0,1]$, not merely $p=1$ and $p=0.5$, and plot both
 $\text{Tr}(\rho(p)^2)$ and $S(\rho(p))$, computed directly by `purity`
 and `vonNeumannEntropy` (the same engine functions used everywhere
-else in this lesson, not a re-derived formula) at each point:
+else in this lesson, with nothing re-derived by hand) at each point:
 
 <ParametricCurve
   frames={[
@@ -160,7 +162,9 @@ else in this lesson, not a re-derived formula) at each point:
       ]
     }
   ]}
-  referenceLines={[{ y: 1, label: "p=0.5, maximally mixed: purity 0.5, entropy 1 bit" }]}
+  referenceLines={[{ y: 1, label: "y=1: purity's ceiling, at p=0 and p=1; entropy's ceiling of 1 bit, at p=0.5" }]}
+  xAxisLabel="p, the first diagonal entry of diag(p, 1−p)"
+  yAxisLabel="Purity (unitless) and entropy (bits)"
   ariaLabel="Purity and von Neumann entropy plotted as functions of p for the diagonal family diag(p, 1-p) from p=0 to p=1: purity traces a U shape from 1 down to 0.5 at p=0.5 and back to 1, while entropy traces the mirrored inverted peak from 0 up to 1 bit at p=0.5 and back to 0"
 />
 
@@ -180,13 +184,15 @@ $\rho_2=\begin{pmatrix}0.9&0.3\\0.3&0.1\end{pmatrix}$: same diagonal
 entries, different off-diagonal term.
 
 <PredictBeforeReveal
-  question="ρ₁=diag(0.9,0.1) and ρ₂ (same diagonal, off-diagonal entries ±0.3) have identical P(0)=0.9, P(1)=0.1 in the computational basis. Do they have the same von Neumann entropy?"
+  question="S(ρ₁) works out to about 0.469 bits. ρ₂ has the same diagonal but carries off-diagonal entries of 0.3. What is S(ρ₂)?"
   options={[
-    { label: "Yes: entropy depends only on the diagonal", value: "same" },
-    { label: "No: ρ₂'s off-diagonal term changes its eigenvalues", value: "different" },
+    { label: "Higher than S(ρ₁), since the off-diagonal term adds structure the diagonal did not capture", value: "higher" },
+    { label: "The same 0.469 bits, because the diagonal is what the formula reads", value: "same" },
+    { label: "Lower than S(ρ₁), somewhere around 0.2 bits", value: "lower" },
+    { label: "Exactly 0: ρ₂ is a pure state wearing ρ₁'s diagonal", value: "zero" },
   ]}
-  correctValue="different"
-  explanation="ρ₂'s eigenvalues, from the quadratic formula with a=0.9, d=0.1, z=0.3, come out to 1 and 0. ρ₂ is a pure state in disguise, so S(ρ₂)=0, while S(ρ₁)≈0.469 bits, worked out below. Identical diagonals, opposite entropies. Entropy is a property of the eigenvalues, and the diagonal is not a shortcut to it."
+  correctValue="zero"
+  explanation="Feed a=0.9, d=0.1, z=0.3 into the quadratic formula above: the discriminant is √(0.4² + 0.3²) = 0.5, and the mean is 0.5, so the eigenvalues are exactly 1 and 0. Adding coherence did not add uncertainty; it removed all of it. Identical diagonals, opposite entropies, and no warning sign in the diagonal that anything is different."
 />
 
 $\rho_1$'s eigenvalues are just its
@@ -204,7 +210,7 @@ Entropy is a property of the whole matrix through its eigenvalues.
   <LazyDensityMatrixExplorer />
 </InteractiveSection>
 
-## Physical Interpretation
+## Uncertainty, measured in bits
 
 Entropy quantifies, in bits, how much uncertainty remains about which
 definite state a system is in. Zero for a pure state, where the system is
@@ -212,11 +218,13 @@ unambiguously in one specific quantum state, rising toward its maximum as
 the mixture spreads evenly across more distinguishable possibilities.
 
 Because it is built from eigenvalues, it does not change when you
-re-describe $\rho$ in another basis. That basis independence is the
-property any honest measure of mixedness needs, and it is what purity's
-raw number lacks an interpretation for.
+re-describe $\rho$ in another basis. Purity is basis-independent for the
+same reason, so that is not what separates them. What entropy adds is a
+unit. Purity $0.82$ says a state is somewhat mixed without saying how
+much of what; entropy $0.469$ bits says how many bits of information you
+are missing, on the same scale a classical channel is measured in.
 
-## Worked Example
+## Entropy of a three-quarters mixture
 
 **A qubit is prepared as $|0\rangle$ with probability $0.75$ and
 $|1\rangle$ with probability $0.25$. Find its von Neumann entropy.**
@@ -229,7 +237,7 @@ $S\approx-0.75(-0.415)-0.25(-2)=0.311+0.5=0.811$ bits, noticeably less
 than the maximally mixed qubit's 1 bit (since $0.75/0.25$ is less
 "balanced" than $0.5/0.5$), but well above the pure-state minimum of 0.
 
-## Common Mistakes
+## The diagonal is not the spectrum
 
 <Callout type="warning">
 **Reading entropy off ρ's diagonal entries directly.** As the
@@ -247,7 +255,52 @@ knowledge.
 
 ## Practice Questions
 
-1. Find the von Neumann entropy of $\rho=\text{diag}(0.6,0.4)$.
+1. Find the von Neumann entropy of $\rho=\text{diag}(0.6,0.4)$. Then
+   compute the same state's purity, and say which of the two numbers you
+   would quote to a colleague as "this qubit carries so much uncertainty",
+   and why.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The matrix is already diagonal, so its eigenvalues are its diagonal
+   entries and the von Neumann entropy is the Shannon entropy of
+   $(0.6, 0.4)$:
+
+   $$
+   S = -0.6\log_2 0.6 - 0.4\log_2 0.4 = 0.6(0.7370) + 0.4(1.3219) = 0.9710 \text{ bits}
+   $$
+
+   The engine returns $0.9709505944546686$. Purity is
+   $\text{Tr}(\rho^2)=0.36+0.16=0.52$.
+
+   Quote the entropy. Its units are bits and they mean what bits usually
+   mean: $0.971$ bits is the average number of yes-or-no answers needed to
+   pin down which eigenstate the qubit is in, and it is directly comparable
+   to a classical channel's capacity or to a compression rate. Purity's
+   $0.52$ is a real number on a scale running from $1$ down to $\tfrac12$
+   for a qubit, with no interpretation attached to any value in between.
+   It is an excellent detector, since $\text{Tr}(\rho^2)=1$ exactly
+   characterizes purity, and a poor measure.
+
+   The two are not independent, which is worth seeing. For a qubit both
+   are functions of the eigenvalue pair, so each determines the other, and
+   the engine's own `vonNeumannEntropy` computes the eigenvalues first for
+   exactly that reason. The information is the same; the scale is not, and
+   choosing a scale with an operational meaning is most of what makes a
+   quantity useful.
+
+   A close call worth noticing: $0.971$ bits is nearly the maximum of $1$,
+   even though the state is a $60/40$ split rather than $50/50$. Entropy is
+   flat near its peak, so a fairly lopsided distribution still carries
+   almost maximal uncertainty. The slip is reading $0.971$ as "almost
+   completely uncertain, so almost $I/2$": the purity of $0.52$, against
+   $I/2$'s $0.5$, says the same thing more bluntly, but a state can be a
+   long way from $I/2$ in the Bloch ball while its entropy is barely
+   distinguishable.
+
+   </details>
+
 2. A qubit has density matrix $\begin{pmatrix}0.6&0.48\\0.48&0.4\end{pmatrix}$
    (Hermitian, trace 1, and positive semidefinite since
    $0.6\times0.4-0.48^2=0.0096\geq0$). Use `eigenvaluesHermitian2x2`'s
@@ -255,14 +308,138 @@ knowledge.
    to, but not exactly, 0. (Compare $0.48$ to the largest off-diagonal
    magnitude a *pure* state with this diagonal could have,
    $\sqrt{0.6\times0.4}\approx0.490$.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Apply the closed form with $a=0.6$, $d=0.4$, $|z|=0.48$:
+
+   $$
+   \lambda_\pm = \frac{0.6+0.4}{2} \pm \sqrt{\left(\frac{0.6-0.4}{2}\right)^2 + 0.48^2} = 0.5 \pm \sqrt{0.01 + 0.2304} = 0.5 \pm 0.49031
+   $$
+
+   so $\lambda_+ = 0.99031$ and $\lambda_- = 0.00969$, matching
+   `eigenvaluesHermitian2x2` exactly. The entropy is
+
+   $$
+   S = -0.99031\log_2 0.99031 - 0.00969\log_2 0.00969 = 0.0139 + 0.0648 = 0.0788 \text{ bits},
+   $$
+
+   and the engine returns $0.07875748$.
+
+   Small but nonzero, and the comparison in the hint says why. A pure state
+   with diagonal $(0.6,0.4)$ would be
+   $\sqrt{0.6}|0\rangle+\sqrt{0.4}|1\rangle$, whose coherence has magnitude
+   $\sqrt{0.6\times0.4}=0.48990$. This state's coherence is $0.48$, about
+   $2\%$ short. Coherence is what a pure state has the maximum of, so
+   falling a little short of the maximum makes the state a little mixed,
+   and $0.0788$ bits is that little. Its purity is $0.9808$, likewise just
+   under $1$.
+
+   The determinant is the cleanest way to see it. $\det\rho = \lambda_+\lambda_-$,
+   and a pure state has $\lambda_-=0$, hence determinant zero. Here
+   $\det\rho = 0.24-0.2304 = 0.0096$, small and positive, which is exactly
+   what forces $\lambda_-$ to be small and positive rather than zero. The
+   positivity condition the question quotes and the near-purity are the
+   same inequality, read at different distances from its boundary.
+
+   The wrong turn is to plug the diagonal $(0.6,0.4)$ into the entropy
+   formula and report $0.971$ bits. That is question 1's answer, and it is
+   more than twelve times too large. Von Neumann entropy needs the
+   *eigenvalues*, and for a non-diagonal $\rho$ those are not the diagonal
+   entries. The trap exists because the two coincide whenever $\rho$ is
+   diagonal, which is most of the examples a course can show quickly.
+
+   </details>
+
 3. Explain in one sentence why $S(\rho)=1$ bit is the *maximum* possible
    entropy for a single qubit, using the constraint that both
-   eigenvalues are nonnegative and sum to 1.
+   eigenvalues are nonnegative and sum to 1. Then say what the maximum is
+   for a two-qubit density matrix, and which state reaches it.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The two eigenvalues form a probability distribution over two outcomes,
+   and the Shannon entropy of a two-outcome distribution is maximized at
+   the uniform one, $\lambda_1=\lambda_2=\tfrac12$, giving
+   $S=-2\left(\tfrac12\log_2\tfrac12\right)=1$ bit; every other admissible
+   pair is less uniform and gives less.
+
+   The engine agrees: $S(I/2)=1$ exactly, and pushing the eigenvalues apart
+   in either direction lowers it, to $0.971$ at $(0.6,0.4)$, to $0.722$ at
+   $(0.8,0.2)$, and to $0$ at $(1,0)$.
+
+   For $n$ qubits the same argument gives $\log_2 d$ with $d=2^n$, so a
+   two-qubit density matrix maxes out at $2$ bits, reached uniquely by
+   $I/4$: four eigenvalues, all equal to $\tfrac14$, and
+   $-4\left(\tfrac14\log_2\tfrac14\right)=2$. In general an $n$-qubit state
+   caps at $n$ bits, which is the reassuring statement that $n$ qubits
+   cannot hide more than $n$ bits of this kind of uncertainty.
+
+   That cap is what makes the entanglement-entropy convention sensible.
+   $E(|\Phi^+\rangle)=1$ bit is a full unit because $S(\rho_A)$ is a single
+   qubit's entropy and $1$ is its ceiling, so "one ebit" and "maximally
+   entangled pair" are the same statement. And it is why a two-qubit
+   reduced entropy of $2$ bits, which $I/4$ has, cannot be read as
+   entanglement at all: the next lesson's counterexample turns on exactly
+   this.
+
+   The slip is arguing that $1$ bit is the maximum "because a qubit stores
+   one bit". The two facts are related but the reasoning is backwards, and
+   it gives the wrong answer as soon as the eigenvalues are not the object
+   being counted. What the argument needs is that $S$ is the entropy of the
+   eigenvalue distribution, that there are exactly $d$ eigenvalues, and
+   that a distribution over $d$ outcomes cannot beat $\log_2 d$.
+
+   </details>
+
 4. Two different qubit density matrices could, in principle, have the
    same von Neumann entropy without being the same matrix. Give an
    example of two different $\rho$'s with the same entropy (Hint: entropy
    only depends on the *eigenvalues*, not on which basis they're
    eigenvalues in).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Take
+
+   $$
+   \rho_1 = \begin{pmatrix}0.6&0\\0&0.4\end{pmatrix}, \qquad \rho_2 = \begin{pmatrix}0.5&0.1\\0.1&0.5\end{pmatrix}.
+   $$
+
+   These are visibly different matrices, disagreeing in every entry, and
+   the engine confirms they are not equal to any tolerance. Yet
+   $\rho_2$'s eigenvalues, from the closed form with $a=d=0.5$ and
+   $|z|=0.1$, are $0.5\pm0.1$, that is $0.6$ and $0.4$. The same pair as
+   $\rho_1$'s. So both have entropy $0.9709505944546686$, identical to the
+   last digit the engine prints, and both have purity $0.52$.
+
+   The recipe generalizes, and it is worth having. $\rho_2$ is the mixture
+   "$|+\rangle$ with probability $0.6$, $|-\rangle$ with probability
+   $0.4$", which is $\rho_1$'s recipe rewritten in the $X$ basis instead of
+   the $Z$ basis. More generally $\rho_2 = U\rho_1U^\dagger$ for a unitary
+   $U$, here the Hadamard, and conjugating by a unitary permutes nothing
+   about the eigenvalues, only the eigenvectors they belong to. Every
+   density matrix therefore sits in a whole family of states sharing its
+   entropy: one for every choice of orthonormal eigenbasis.
+
+   Physically, entropy measures *how much* uncertainty there is and is
+   deliberately silent about *what* the uncertainty is about. $\rho_1$ is
+   uncertain between $|0\rangle$ and $|1\rangle$; $\rho_2$ is uncertain
+   between $|+\rangle$ and $|-\rangle$; the amounts match and the
+   directions do not. On the Bloch ball the two points sit at the same
+   radius, $|\vec r|=0.2$, on different axes, and entropy is a function of
+   the radius alone.
+
+   This is also why unitary evolution cannot change entropy, a fact the
+   next-but-one lesson proves directly: a gate rotates the Bloch ball and
+   leaves radii alone. If you want to raise a state's entropy you must do
+   something that is not a unitary on that system, such as entangling it
+   with something else and looking away.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -278,7 +455,7 @@ knowledge.
 - Entropy must be computed from eigenvalues, not diagonal entries. Two
   matrices with identical diagonals can have opposite entropies.
 
-## Further Exploration
+## Turning this measure on a reduced state
 
 <NextDiscovery>
 Up next, [Entanglement Entropy for Pure Bipartite States](/lessons/quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states) applies

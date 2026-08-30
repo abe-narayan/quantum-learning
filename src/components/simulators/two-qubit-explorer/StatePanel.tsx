@@ -31,7 +31,7 @@ export function StatePanel({ state }: { state: StateVector }) {
       {/* No `overflow-x-auto` here: the only child is a block-level
           `.katex-display`, which fills this content box and carries its own
           horizontal scroll (globals.css §6), so this box never had anything to
-          scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+          scroll, and `overflow-x: auto` with `overflow-y: visible` computes the
           y axis to `auto` too, which would silently clip a tall equation. The tab
           stop the slab needs now lives on `.katex-display` itself; see
           `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
@@ -41,16 +41,16 @@ export function StatePanel({ state }: { state: StateVector }) {
 
       <p className="text-xs text-muted-foreground">
         {separability.separable
-          ? "This state factors into two independent single-qubit states — qubit 0 and qubit 1 don't depend on each other."
-          : "This state cannot be written as any single-qubit state ⊗ single-qubit state — the qubits are entangled."}
+          ? "This state factors into two independent single-qubit states: qubit 0 and qubit 1 don't depend on each other."
+          : "This state cannot be written as any single-qubit state ⊗ single-qubit state: the qubits are entangled."}
       </p>
 
       {/* `tabIndex={0}` + `role="group"` on the table's scroll container, the
           same remedy `BB84RoundTable` and `mdx-components.tsx`'s `Table`
           wrapper apply. `w-full` on a table is not a promise that it fits: the
-          three columns have real min-content widths — a `|11⟩` ket, a
+          three columns have real min-content widths: a `|11⟩` ket, a
           formatted complex amplitude like `0.354 + 0.354i`, and a probability
-          cell holding a `w-16` meter beside a `w-10` percentage — which floor
+          cell holding a `w-16` meter beside a `w-10` percentage, which floor
           this table near 300px, against a ~256px content box on a 320px phone.
           An `overflow-x-auto` div is focusable by default in no browser except
           Firefox, so a keyboard-only reader could see the basis labels and had

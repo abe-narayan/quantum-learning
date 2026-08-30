@@ -38,9 +38,9 @@ export type PresetSetup = {
   psi0: Wavefunction1D;
   dt: number;
   stepsPerFrame: number;
-  /** The known closed-form energy this state should have, if it's an energy eigenstate — undefined otherwise. */
+  /** The known closed-form energy this state should have, if it's an energy eigenstate; undefined otherwise. */
   analyticalEnergy?: number;
-  /** Whether |psi(x)|^2 is expected to stay fixed under time evolution (an eigenstate) — drives the comparison UI. */
+  /** Whether |psi(x)|^2 is expected to stay fixed under time evolution (an eigenstate); drives the comparison UI. */
   isStationary: boolean;
   /** For the tunneling preset: the x value separating "reflected" from "transmitted" probability. */
   boundary?: number;
@@ -55,13 +55,13 @@ export type PresetDefinition = {
 };
 
 /**
- * A finite wall height for the "infinite" well presets — see
+ * A finite wall height for the "infinite" well presets; see
  * infiniteSquareWellPotential's doc comment for why a literal infinity
  * isn't used. This value is a deliberate balance, not an arbitrary one:
  * tall enough (thousands of times the confined states' energies, for every
  * n and half-width this simulator's sliders allow) that tunneling leakage
  * is astronomically negligible, but small enough that dt * wallHeight stays
- * well under 1 — the split-operator method's per-step Trotter error scales
+ * well under 1: the split-operator method's per-step Trotter error scales
  * with the potential step's phase angle (V*dt), so a wall of 1e6 with the
  * dt these presets otherwise use produces a numerically well-behaved
  * *state* (norm and shape are unconditionally preserved) but a wildly
@@ -82,7 +82,7 @@ export function defaultParamValues(preset: PresetDefinition): Record<string, num
 const FREE_GAUSSIAN: PresetDefinition = {
   id: "free-gaussian",
   label: "Free Gaussian Packet",
-  description: "A localized wave packet with no potential — watch it drift at its group velocity and spread (disperse) over time.",
+  description: "A localized wave packet with no potential. Watch it drift at its group velocity and spread (disperse) over time.",
   params: [
     { key: "center", label: "Starting position", min: -30, max: 0, step: 0.5, default: -15 },
     { key: "width", label: "Packet width (σ)", min: 0.5, max: 4, step: 0.1, default: 1.5 },
@@ -98,8 +98,8 @@ const FREE_GAUSSIAN: PresetDefinition = {
 
 const INFINITE_WELL_GROUND: PresetDefinition = {
   id: "infinite-well-ground",
-  label: "Infinite Well — Ground State",
-  description: "The lowest-energy standing wave in an infinite square well — a true energy eigenstate, so its probability density should stay perfectly fixed as it evolves.",
+  label: "Infinite Well: Ground State",
+  description: "The lowest-energy standing wave in an infinite square well: a true energy eigenstate, so its probability density should stay perfectly fixed as it evolves.",
   params: [{ key: "halfWidth", label: "Well half-width", min: 2, max: 7, step: 0.5, default: 5 }],
   build: (p) => {
     const grid = createGrid(512, 0.03);
@@ -119,8 +119,8 @@ const INFINITE_WELL_GROUND: PresetDefinition = {
 
 const INFINITE_WELL_EXCITED: PresetDefinition = {
   id: "infinite-well-excited",
-  label: "Infinite Well — Excited State",
-  description: "A higher energy level in the same well — still perfectly stationary, but with more nodes (points where the probability density touches zero).",
+  label: "Infinite Well: Excited State",
+  description: "A higher energy level in the same well: still perfectly stationary, but with more nodes (points where the probability density touches zero).",
   params: [
     { key: "halfWidth", label: "Well half-width", min: 2, max: 7, step: 0.5, default: 5 },
     { key: "n", label: "Energy level n", min: 1, max: 4, step: 1, default: 3 },
@@ -144,8 +144,8 @@ const INFINITE_WELL_EXCITED: PresetDefinition = {
 
 const HARMONIC_GROUND: PresetDefinition = {
   id: "harmonic-ground",
-  label: "Harmonic Oscillator — Ground State",
-  description: "The Gaussian ground state of a parabolic potential well — the same zero-point-energy state derived algebraically with ladder operators in the last course, now as an actual position-space wavefunction.",
+  label: "Harmonic Oscillator: Ground State",
+  description: "The Gaussian ground state of a parabolic potential well: the same zero-point-energy state derived algebraically with ladder operators in the last course, now as an actual position-space wavefunction.",
   params: [{ key: "omega", label: "Angular frequency ω", min: 0.5, max: 3, step: 0.1, default: 1 }],
   build: (p) => {
     const grid = createGrid(512, 0.05);
@@ -165,8 +165,8 @@ const HARMONIC_GROUND: PresetDefinition = {
 
 const HARMONIC_EXCITED: PresetDefinition = {
   id: "harmonic-excited",
-  label: "Harmonic Oscillator — Excited State",
-  description: "A higher rung on the harmonic oscillator's ladder — energy hbar*omega above the one below it, exactly as derived algebraically, now visualized as a wavefunction with an extra node.",
+  label: "Harmonic Oscillator: Excited State",
+  description: "A higher rung on the harmonic oscillator's ladder: energy hbar*omega above the one below it, exactly as derived algebraically, now visualized as a wavefunction with an extra node.",
   params: [
     { key: "omega", label: "Angular frequency ω", min: 0.5, max: 3, step: 0.1, default: 1 },
     { key: "n", label: "Energy level n", min: 1, max: 3, step: 1, default: 1 },
@@ -190,8 +190,8 @@ const HARMONIC_EXCITED: PresetDefinition = {
 
 const HARMONIC_SUPERPOSITION: PresetDefinition = {
   id: "harmonic-superposition",
-  label: "Harmonic Oscillator — Superposition",
-  description: "An equal superposition of the ground and first-excited harmonic-oscillator states is not itself an energy eigenstate — unlike either state alone, its probability density visibly sloshes back and forth at the classical oscillation frequency omega, a direct quantum echo of a classical mass on a spring.",
+  label: "Harmonic Oscillator: Superposition",
+  description: "An equal superposition of the ground and first-excited harmonic-oscillator states is not itself an energy eigenstate: unlike either state alone, its probability density visibly sloshes back and forth at the classical oscillation frequency omega, a direct quantum echo of a classical mass on a spring.",
   params: [{ key: "omega", label: "Angular frequency ω", min: 0.5, max: 3, step: 0.1, default: 1 }],
   build: (p) => {
     const grid = createGrid(512, 0.05);
@@ -209,7 +209,7 @@ const HARMONIC_SUPERPOSITION: PresetDefinition = {
 const SUPERPOSITION: PresetDefinition = {
   id: "superposition",
   label: "Superposition of Two Eigenstates",
-  description: "An equal superposition of two well eigenstates is not itself an eigenstate — its probability density visibly oscillates (\"beats\") at a frequency set exactly by the energy difference between the two levels.",
+  description: "An equal superposition of two well eigenstates is not itself an eigenstate: its probability density visibly oscillates (\"beats\") at a frequency set exactly by the energy difference between the two levels.",
   params: [
     { key: "halfWidth", label: "Well half-width", min: 2, max: 7, step: 0.5, default: 5 },
     { key: "n2", label: "Second level n", min: 2, max: 4, step: 1, default: 2 },
@@ -231,7 +231,7 @@ const SUPERPOSITION: PresetDefinition = {
 const TUNNELING: PresetDefinition = {
   id: "tunneling",
   label: "Tunneling Through a Barrier",
-  description: "A wave packet aimed at a rectangular energy barrier. Classically, if the packet's energy is below the barrier height it could never cross — quantum mechanically, part of it always does.",
+  description: "A wave packet aimed at a rectangular energy barrier. Classically, if the packet's energy is below the barrier height it could never cross; quantum mechanically, part of it always does.",
   params: [
     // Default momentum=2, barrierHeight=3 keeps the packet's kinetic energy
     // (p^2/2m = 2, hbar=m=1 as elsewhere in this file) below the barrier
@@ -239,7 +239,7 @@ const TUNNELING: PresetDefinition = {
     // sub-barrier tunneling out of the box rather than ordinary classical
     // transmission (E > V). The slider ranges are untouched, so raising
     // momentum or lowering barrier height still lets a user cross into the
-    // classical-transmission regime to contrast the two — see the "Try
+    // classical-transmission regime to contrast the two; see the "Try
     // this" copy in WavefunctionExplorer.tsx.
     { key: "momentum", label: "Momentum", min: 1, max: 6, step: 0.2, default: 2 },
     { key: "barrierHeight", label: "Barrier height", min: 0.5, max: 8, step: 0.25, default: 3 },

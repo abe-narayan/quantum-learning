@@ -1,28 +1,23 @@
 import Link from "next/link";
 import { Section, SplitFigure } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
-import { Eyebrow, SectionTitle, Lede, Readouts, TechLabel } from "@/components/ui/Typography";
+import { Eyebrow, SectionTitle, Lede } from "@/components/ui/Typography";
 import { Instrument } from "@/components/ui/Panel";
 import { Reveal } from "@/components/motion/Reveal";
 import { PillarBand } from "@/components/home/PillarBand";
+import { PillarFooter } from "@/components/home/PillarFooter";
 import { LazyBlochSphereHeroExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereHeroExplorer";
-import { getCoursesByPillar } from "@/lib/content/curriculum";
-import { PILLAR_VISUALS } from "@/lib/design/pillars";
 
 const PILLAR = "quantum-computing" as const;
 
 /**
- * Pillar 2 of 6 — where the field's `journey` crossfade is dominated by
- * `state` (Bloch-sphere precession). Composition: a full-bleed, pillar-tinted
- * band housing the same live qubit explorer the field is drawing an
- * abstraction of — text and instrument, edge to edge, a deliberate break
- * from Mechanics' quiet reading column.
+ * Track 2 of 6, the second stop in the field's `journey` crossfade, where the
+ * environment hands over to `state` (Bloch-sphere precession). Composition: a
+ * full-bleed, pillar-tinted band housing the same live qubit explorer the
+ * field is drawing an abstraction of, text and instrument edge to edge, a
+ * deliberate break from Mechanics' quiet reading column.
  */
 export function ComputingSection() {
-  const courses = getCoursesByPillar(PILLAR);
-  const hours = courses.reduce((sum, course) => sum + course.estimatedHours, 0);
-  const visual = PILLAR_VISUALS[PILLAR];
-
   return (
     <PillarBand pillar={PILLAR}>
       <Section bleed aria-labelledby="computing-heading" className="border-y border-border bg-pillar-wash">
@@ -32,17 +27,17 @@ export function ComputingSection() {
               <div>
                 <Reveal>
                   <Eyebrow>02 · Quantum Computing</Eyebrow>
-                  <SectionTitle id="computing-heading" className="mt-3">
+                  <SectionTitle id="computing-heading" level={3} className="mt-3">
                     Build the machines, then run the algorithms
                   </SectionTitle>
                   {/* First occurrence of "Bloch sphere" on the page, so it is
-                      glossed in plain speech at first use — same first-use
-                      rule as MechanicsSection's Notation block — and the live
+                      glossed in plain speech at first use, same first-use
+                      rule as MechanicsSection's Notation block, and the live
                       explorer beside this text is the thing being described.
                       "Classical shared randomness" was accurate but alien;
                       "prearranged answers" is the same physical claim (no
                       local hidden variables) said plainly. */}
-                  <Lede className="mt-4 max-w-none">
+                  <Lede width="none" className="mt-4">
                     A single qubit&rsquo;s state lives on the Bloch sphere, the globe the live
                     explorer here draws: north pole |0⟩, south pole |1⟩, every other point a
                     superposition of both. Then come multi-qubit circuits, wired together and
@@ -62,33 +57,18 @@ export function ComputingSection() {
                   </Link>
                 </Reveal>
 
-                <Reveal
-                  delay={160}
-                  className="mt-10 flex flex-wrap items-end justify-between gap-6 border-t border-border pt-6"
-                >
-                  <Readouts
-                    items={[
-                      { label: "Courses", value: courses.length },
-                      { label: "Est. time", value: hours, unit: "hrs" },
-                    ]}
-                  />
-                  <Link
-                    href={visual.route}
-                    className="inline-flex min-h-11 items-center text-sm font-semibold text-pillar hover:underline"
-                  >
-                    Enter {visual.short} →
-                  </Link>
-                </Reveal>
-
-                <p className="mt-6 flex items-baseline gap-2">
-                  <TechLabel>Field</TechLabel>
-                  <span className="text-xs text-subtle-foreground">{visual.fieldCaption}</span>
-                </p>
+                <PillarFooter pillar={PILLAR} />
               </div>
             }
             figure={
               <Reveal y={18} delay={80}>
-                <Instrument bodyClassName="p-0">
+                {/* No `bodyClassName="p-0"`; see the note in Hero.tsx. It
+                    compiled to a padding the body never took (`.p-0` is
+                    emitted before `.p-4`, and `.sm:p-5` after both), and
+                    `BlochSphereHeroExplorer` self-frames with its own
+                    `rounded-panel border` root, so flushing this body would
+                    double the hairline rather than remove it. */}
+                <Instrument>
                   <LazyBlochSphereHeroExplorer />
                 </Instrument>
               </Reveal>

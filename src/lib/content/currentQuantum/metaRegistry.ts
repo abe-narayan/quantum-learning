@@ -4,7 +4,7 @@ export type { CurrentQuantumEntryMeta, CurrentQuantumCategory } from "./types";
 
 /**
  * Meta-only view of the "Current Quantum" collection: every entry's slug,
- * date, title, category and related lesson slug — and nothing else.
+ * date, title, category and related lesson slug, and nothing else.
  *
  * WHY THIS EXISTS (do not re-merge this file into `data.ts`):
  * `ConceptDetailPanel` is a `"use client"` component. It reverse-looks-up
@@ -14,7 +14,7 @@ export type { CurrentQuantumEntryMeta, CurrentQuantumCategory } from "./types";
  * of summary prose, "why this matters" prose, source citations, image URLs,
  * alt text, captions and licence attribution, plus the editorial provenance
  * comments above each one. It reached **21.3 KB gzipped of source shipped to
- * the browser so that a panel could print a title and a date** — and it grew
+ * the browser so that a panel could print a title and a date**, and it grew
  * every time an entry was added, which is how it blew its budget in
  * `src/lib/design/__tests__/clientBoundary.test.ts` and prompted this split.
  *
@@ -31,20 +31,20 @@ export type { CurrentQuantumEntryMeta, CurrentQuantumCategory } from "./types";
  * WHAT BREAKS IF SOMEONE RE-MERGES THEM: nothing visibly, which is the
  * problem. `tsc` stays happy, every page renders identically, and the only
  * symptom is that the concept map's client chunk quietly carries the entire
- * collection again — exactly the failure mode `clientBoundary.test.ts`
+ * collection again: exactly the failure mode `clientBoundary.test.ts`
  * documents for `DailyPuzzle` and the problem corpus. The test suite is what
  * notices: `data.ts` is listed as SERVER_ONLY there, and this file has its
  * own size budget.
  *
  * ADDING AN ENTRY means editing two files: append the meta here and the body
  * (with its citation comment) to `CURRENT_QUANTUM_BODIES` in `data.ts`. You
- * cannot forget the second half — `CURRENT_QUANTUM_BODIES` is typed
+ * cannot forget the second half: `CURRENT_QUANTUM_BODIES` is typed
  * `Record<CurrentQuantumSlug, ...>` against the slugs below, so a missing or
  * misspelled body is a compile error, and `__tests__/registry.test.ts`
  * checks the pairing again at runtime.
  *
  * ORDERING: kept roughly chronological (oldest first) for ease of
- * hand-editing, and only roughly — `getAllCurrentQuantumMeta()` re-sorts
+ * hand-editing, and only roughly, since `getAllCurrentQuantumMeta()` re-sorts
  * newest-first for display, so the literal order here is not authoritative.
  *
  * `as const` is load-bearing: it is what gives `CurrentQuantumSlug` below a
@@ -283,7 +283,7 @@ export type CurrentQuantumSlug = (typeof CURRENT_QUANTUM_META)[number]["slug"];
 /**
  * Every entry's meta, newest first.
  *
- * This is the one place the collection's public ordering is decided —
+ * This is the one place the collection's public ordering is decided,
  * mirroring how `getAllProblemMeta()` / `getAllLessonsMeta()` each own their
  * catalog's ordering rather than leaving it to call sites. `registry.ts`'s
  * full-entry twin is built on top of this, so the two can never disagree.
@@ -293,7 +293,7 @@ export function getAllCurrentQuantumMeta(): CurrentQuantumEntryMeta[] {
 }
 
 /**
- * Every entry that links back to a given lesson slug, newest first — the
+ * Every entry that links back to a given lesson slug, newest first: the
  * meta-only twin of `getEntriesForLesson` in `registry.ts`.
  *
  * This is the function the concept map's client panel calls. If you need the

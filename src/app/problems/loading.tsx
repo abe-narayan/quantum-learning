@@ -1,6 +1,6 @@
 import { Section } from "@/components/ui/Section";
 
-// Static skeleton for `/problems` — the catalog — shown for the brief window
+// Static skeleton for `/problems`, the catalog, shown for the brief window
 // while Next.js fetches its RSC payload. The page is fully static, so this is
 // purely a perceived-performance nicety.
 //
@@ -10,7 +10,7 @@ import { Section } from "@/components/ui/Section";
 // in `[slug]/loading.tsx` where it belongs, and this one mirrors what
 // actually loads: the measured intro column (eyebrow, title, lede, the
 // counts line), then `ProblemsCatalog`'s "New here?" instrument, its filter
-// panel — a label-and-count header row above four chip rails — and the card
+// panel, a label-and-count header row above four chip rails, and the card
 // grid.
 //
 // The "New here?" block is drawn because it is what a *first* visit renders
@@ -20,7 +20,17 @@ import { Section } from "@/components/ui/Section";
 export default function ProblemsIndexLoading() {
   return (
     <>
-      <Section width="reading" className="animate-pulse pt-4 sm:pt-8">
+      {/* `tight`, matching `page.tsx`'s own `<Section width="reading" tight>`.
+          It used to say `className="animate-pulse pt-4 sm:pt-8"`, which is the
+          exact dead override the page file documents: `Section` writes its
+          vertical padding as an inline `style`, and an inline style always
+          beats a class on the same element. So the class compiled fine, applied
+          to nothing, and the skeleton rendered at the full `--rhythm-section`
+          (72px at 320px, 136px on a wide desktop) while the real page rendered
+          at `--rhythm-block`. Every /problems navigation therefore jumped by
+          roughly 72px top and bottom at the moment the payload landed, which is
+          the one thing a skeleton exists to prevent. */}
+      <Section width="reading" tight className="animate-pulse">
         {/* The skeleton is a wall of empty boxes: it announces nothing, so a
             screen-reader user got silence for the whole navigation while a
             sighted one got a clear "something is coming" signal. Same pattern

@@ -16,14 +16,14 @@ export const sequentialSgJointProbability: NumericProblem = {
   },
   question: {
     type: "numeric",
-    prompt: "For the sequence 'up' (z), '−' (x), 'down' (z), what is the joint probability, using the same reasoning as the lesson's worked example?",
+    prompt: "An unpolarized beam passes through a z-oriented Stern-Gerlach magnet, then an x-oriented one, then a second z-oriented one, with nothing else in between. What is the joint probability of the outcome sequence 'up' (z), '−' (x), 'down' (z)?",
     inputHint: "as a decimal",
   },
   answer: {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "Each of the three stages is independently 50/50, just like the lesson's worked example — multiply all three.",
+    incorrectFeedback: "Each of the three stages is independently 50/50, just like the lesson's worked example. Multiply all three.",
     nearMisses: [
       { value: 0.25, feedback: "0.25 multiplies only two stages. All three measurements are 50/50, so three factors of a half are needed." },
       { value: 0.5, feedback: "0.5 is one stage's probability. The joint probability of a specific three-outcome sequence multiplies all three." },
@@ -41,7 +41,7 @@ export const sequentialSgJointProbability: NumericProblem = {
   },
   explanation: {
     correctIdea: "Every specific 3-outcome sequence in this experiment has the same 1/8 probability, regardless of which specific outcomes are chosen.",
-    whyCorrect: "This follows directly from each stage being an independent 50/50 measurement, exactly as derived in the lesson.",
-    whyWrong: ["Any answer other than 1/8 would imply some sequences are more likely than others, which isn't the case here — every one of the 8 possible sequences is equally likely."],
+    whyCorrect: "This follows from each stage being an independent 50/50 measurement, as derived in the lesson.",
+    whyWrong: ["Any answer other than 1/8 would imply some sequences are more likely than others. All 8 possible sequences are equally likely here."],
   },
 };

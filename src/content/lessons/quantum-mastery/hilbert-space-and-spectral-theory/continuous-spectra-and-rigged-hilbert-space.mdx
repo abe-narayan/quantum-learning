@@ -1,6 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { ParametricCurve } from "@/components/visualizations/ParametricCurve";
+import { ScrollableFigure } from "@/components/mdx/ScrollableFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space"
@@ -15,7 +16,7 @@ export const sincFrames = sincLValues.map((L) => ({
     {
       label: "D_L(q) = sin(qL)/(πq)",
       color: "brand",
-      points: qValues.map((q) => ({ x: q, y: Math.min(dirichletKernel(q, L), 26) })),
+      points: qValues.map((q) => ({ x: q, y: dirichletKernel(q, L) })),
     },
   ],
 }));
@@ -51,14 +52,14 @@ export const lessonMeta = {
     "quantum-mechanics/wave-mechanics/momentum-space-and-the-fourier-transform",
   ],
   objectives: [
-    "Derive directly that the momentum eigenfunction φ_p(x)=e^{ipx/ħ} has infinite L² norm, hence is not a Hilbert-space vector",
+    "Derive directly that the momentum eigenfunction φₚ(x)=exp(ipx/ħ) has infinite L² norm, hence is not a Hilbert-space vector",
     "Build the Gelfand triple Φ ⊂ H ⊂ Φ′ and state precisely what kind of object |p⟩ actually is",
     "Verify ⟨p|p′⟩=δ(p−p′) as a delta-sequence limit, not an asserted identity",
   ],
   related: [
     {
       slug: "quantum-mechanics/wave-mechanics/momentum-space-and-the-fourier-transform",
-      note: "Every plane-wave manipulation in that lesson is made rigorous here: the Gelfand triple is precisely what |p⟩ and ∫|p⟩⟨p|dp=I mean, once 'vector in H' is no longer available as the reading.",
+      note: "Every plane-wave manipulation in that lesson is made rigorous here: the Gelfand triple is what |p⟩ and ∫|p⟩⟨p|dp=I mean, once 'vector in H' is no longer available as the reading.",
     },
   ],
 };
@@ -70,7 +71,7 @@ export const lessonMeta = {
   a fully legitimate object anyway, of a different kind entirely.
 </LessonHook>
 
-## Motivation
+## A Plane Wave That Is Not a State
 
 Momentum Space and the Fourier Transform used $\phi_p(x)=e^{ipx/\hbar}$
 as "the momentum eigenstate," expanded arbitrary states in it, and
@@ -90,7 +91,7 @@ $\mathcal H$ itself.
   license="CC BY-SA 2.0 DE"
 />
 
-## Intuition
+## Three Nested Spaces, Not One
 
 Picture three nested spaces instead of one: a small, extremely
 well-behaved space $\Phi$ of "nice" test functions (smooth, rapidly
@@ -106,12 +107,12 @@ functions in $\Phi$.
 The picture below makes that nesting concrete, with one example object
 anchored in each of the three spaces, drawn directly from this lesson:
 a smooth, rapidly-decaying test function innermost in $\Phi$, the
-normalizable wave packet from the Worked Example in $\mathcal H$, and
+normalizable wave packet $\psi(x)=\int c(p)\phi_p(x)\,dp$ in $\mathcal H$, and
 the plane wave $|p\rangle$ (together with $\delta(p-p')$ itself)
 outermost in $\Phi'$, too rough to ever join $\mathcal H$.
 
-<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-  <svg width={620} height={340} viewBox="0 0 620 340" className="w-full" role="img" aria-label="Three concentric regions showing the Gelfand triple. Outermost: Phi-prime, the space of distributions, containing the plane wave phi sub p of x equals e to the i p x over h-bar, that is the momentum eigenstate ket p, together with the delta function delta of p minus p-prime. Middle: the Hilbert space H equals L-two of the reals, containing the normalizable wave packet psi of x equals the integral of c of p times phi sub p of x d p, which has finite norm even though no single phi sub p does. Innermost: Phi, the Schwartz space of smooth, rapidly-decaying test functions.">
+<ScrollableFigure label="The Gelfand triple drawn as three nested regions">
+  <svg width={620} height={340} viewBox="0 0 620 340" role="img" aria-label="Three concentric regions showing the Gelfand triple. Outermost: Phi-prime, the space of distributions, containing the plane wave phi sub p of x equals e to the i p x over h-bar, that is the momentum eigenstate ket p, together with the delta function delta of p minus p-prime. Middle: the Hilbert space H equals L-two of the reals, containing the normalizable wave packet psi of x equals the integral of c of p times phi sub p of x d p, which has finite norm even though no single phi sub p does. Innermost: Phi, the Schwartz space of smooth, rapidly-decaying test functions.">
     <text x={170} y={22} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">
       The Gelfand triple: three nested spaces
     </text>
@@ -126,7 +127,7 @@ outermost in $\Phi'$, too rough to ever join $\mathcal H$.
 
     <line x1={302} y1={72} x2={215} y2={90} className="stroke-muted-foreground" strokeWidth={1} />
     <text x={310} y={68} className="fill-muted-foreground text-[11px] font-semibold">
-      Φ′ — distributions (generalized functions)
+      Φ′ (distributions / generalized functions)
     </text>
     <text x={310} y={84} className="fill-foreground text-[9.5px] font-mono">
       φ_p(x) = e^(ipx/ħ) ≡ |p⟩,  δ(p−p′)
@@ -134,7 +135,7 @@ outermost in $\Phi'$, too rough to ever join $\mathcal H$.
 
     <line x1={302} y1={135} x2={230} y2={140} className="stroke-accent" strokeWidth={1} />
     <text x={310} y={131} className="fill-accent text-[11px] font-semibold">
-      H = L²(ℝ) — square-integrable functions
+      H = L²(ℝ) (square-integrable functions)
     </text>
     <text x={310} y={147} className="fill-foreground text-[9.5px] font-mono">
       ψ(x) = ∫ c(p) φ_p(x) dp  (finite norm)
@@ -142,15 +143,15 @@ outermost in $\Phi'$, too rough to ever join $\mathcal H$.
 
     <line x1={302} y1={198} x2={200} y2={190} className="stroke-brand" strokeWidth={1} />
     <text x={310} y={194} className="fill-brand text-[11px] font-semibold">
-      Φ — Schwartz space (test functions)
+      Φ (Schwartz space of test functions)
     </text>
     <text x={310} y={210} className="fill-foreground text-[9.5px] font-mono">
       ψ: smooth, rapidly-decaying
     </text>
   </svg>
-</div>
+</ScrollableFigure>
 
-## Mathematical Development
+## The Gelfand Triple, Built
 
 ### $|p\rangle$ is not in $L^2(\mathbb R)$
 
@@ -170,7 +171,8 @@ nonzero constant everywhere on the line.
 So $\hat p$ has no eigenvectors, and yet the previous lesson's PVM
 assigns it a spectrum filling all of $\mathbb R$. Both statements are
 true, which means "spectrum" cannot mean "set of eigenvalues" here. It
-is worth having the actual definition before going further.
+is worth having the definition of the spectrum in full before going
+further.
 
 <DefinitionBox title="Spectrum, and its three parts">
 
@@ -186,8 +188,9 @@ fails:
 - **Continuous spectrum** $\sigma_c$: $A-\lambda$ is injective with dense
   range, but the inverse is unbounded. No eigenvector exists in
   $\mathcal H$, yet one can find unit vectors $\psi_n\in D(A)$ with
-  $\|(A-\lambda)\psi_n\|\to0$ — approximate eigenvectors, arbitrarily
-  close to being eigenvectors, converging to nothing in $\mathcal H$.
+  $\|(A-\lambda)\psi_n\|\to0$. These are approximate eigenvectors:
+  arbitrarily close to satisfying the eigenvalue equation, and converging
+  to nothing in $\mathcal H$.
 - **Residual spectrum** $\sigma_r$: $A-\lambda$ is injective but its range
   is not dense. For a self-adjoint $A$ this set is **empty**, which is
   one of the quieter dividends of self-adjointness.
@@ -222,11 +225,10 @@ $$
 
 a fully elementary antiderivative computation. $D_L(q)\equiv\sin(qL)/(\pi
 q)$ (with $D_L(0)=L/\pi$, the removable-singularity value) is the
-**Dirichlet kernel**, and it is a delta-sequence: $\int_{-\infty}^\infty
-D_L(q)\,dq=1$ for *every* $L$ (a standard, exact identity, cited here),
-while its peak height $L/\pi$ grows and its main lobe's width shrinks
-like $1/L$ as $L\to\infty$, concentrating all its area into an
-ever-narrower spike at $q=0$:
+**Dirichlet kernel**. Its peak height $L/\pi$ grows and its main lobe's
+width shrinks like $1/L$ as $L\to\infty$, so the whole kernel piles up
+into an ever-narrower spike at $q=0$. What that piling-up does to the
+total area is the question the whole delta-sequence claim turns on:
 
 <PredictBeforeReveal
   question="As L grows and the Dirichlet kernel's peak shoots up toward L/π while its width shrinks like 1/L, what happens to the total area under the curve?"
@@ -241,18 +243,27 @@ ever-narrower spike at $q=0$:
 
 <ParametricCurve
   frames={sincFrames}
+  xAxisLabel="q"
+  yAxisLabel="D_L(q)"
   sliderLabel="Truncation half-width L"
-  ariaLabel="The Dirichlet kernel sin(qL) over pi q, sharpening into a delta function as the truncation half-width L grows"
+  ariaLabel="The Dirichlet kernel sin(qL) over pi q at truncation half-widths L=5, 20 and 80, sharpening into a delta function as L grows. All three frames share one vertical scale set by the tallest peak, 80/pi which is about 25.5, so the L=5 curve is a low ripple near the axis and the L=80 curve is a tall narrow spike"
 />
 
+The three frames share a single vertical scale, fixed by the tallest peak
+across all of them, so the growth in height is a real comparison and not
+an artifact of each frame being restretched to fill the box. The price is
+that the $L=5$ frame reads as a low ripple: its peak of $1.59$ really is
+one sixteenth of the $L=80$ frame's $25.5$, and that is the
+point of the figure. Nothing is clipped at any $L$ shown.
+
 Simpson quadrature of $D_L(q)$ across the plotted range, computed at
-module scope rather than quoted, gives areas
+module scope, gives areas
 {sincAreas.map((area) => area.toFixed(4)).join(", ")} at
 $L=5,20,80$: within {maxAreaDeviationPercent.toFixed(2)}% of $1$ in the
 worst case, with the residual coming from truncating at $|q|=6$ rather
 than integrating the whole line. Over the same three values the peak
 height climbs as
-$L/\pi={sincPeaks.map((peak) => peak.toFixed(2)).join(", ")}$. Fixed
+$L/\pi=$ {sincPeaks.map((peak) => peak.toFixed(2)).join(", ")}. Fixed
 area, rising peak, narrowing lobe: that is what $D_L\to\delta$ means, and
 it is what makes $\langle p|p'\rangle=\delta(p-p')$ a limit statement
 rather than a hand-wave.
@@ -331,7 +342,7 @@ This is the rigorous content of "$\int|p\rangle\langle p|\,dp=I$": not a
 completeness relation in $\mathcal H$, but a decomposition valid whenever
 both sides are paired against a test function.
 
-## Physical Interpretation
+## A Contradiction, Not an Inconvenience
 
 Insisting $|p\rangle\in\mathcal H$ leads to a direct contradiction, not
 just an inconvenience: normalization in $\mathcal H$ would require
@@ -347,7 +358,7 @@ landing back in $\mathcal H$ every time. $|p\rangle$ itself is the
 idealized limit those packets approach, never a state any real
 experiment prepares.
 
-## Worked Example
+## The Delta Normalization as a Limit
 
 **Confirm the Dirichlet kernel's total area is exactly $1$ for every
 $L$, directly.**
@@ -366,13 +377,13 @@ grows, but is *exactly* $1$ for every finite $L$ already. Only the
 kernel's *shape* (narrowing, sharpening) changes with $L$, not its total
 area, which is the precise mathematical content of "$D_L\to\delta$."
 
-## Common Mistakes
+## Treating a Plane Wave as a Lesser Vector
 
 <Callout type="mistake">
 **Saying "$|p\rangle$ is in $\mathcal H$, just with infinite norm."**
 That's a contradiction in terms: $\mathcal H$'s defining condition is
 finite norm; an object with undefined/infinite norm is not a
-lower-quality $\mathcal H$-vector, it's a different *kind* of object
+lower-quality $\mathcal H$-vector; it's a different *kind* of object
 entirely (an element of $\Phi'$), and needs the different mathematical
 treatment this lesson builds.
 </Callout>
@@ -392,16 +403,198 @@ finite- or even infinite-dimensional Hilbert-space identity by itself.
    momentum-eigenstate overlap integral to a finite box is what turns an
    undefined (divergent) expression into a well-defined function
    $D_L(q)$ of $L$ and $q$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Start by being precise about what is wrong with the untruncated
+   integral, because "divergent" is the wrong word for it and the wrong
+   word points at the wrong fix. The antiderivative is
+   $e^{iqx}/(iq)$, and as $x\to+\infty$ that expression does not grow: it
+   has constant modulus $1/|q|$ and simply circles the same circle
+   forever. So $\int_{-\infty}^{\infty}e^{iqx}dx$ is not infinite, it is
+   *undefined*. There is no limit to take, in either direction, and no
+   amount of rescaling produces one.
+
+   Truncation removes exactly that step. Evaluating the antiderivative at
+   the finite points $\pm L$ instead of at $\pm\infty$ asks it only for
+   values it actually has:
+
+   $$
+   D_L(q)=\frac{1}{2\pi}\left[\frac{e^{iqx}}{iq}\right]_{-L}^{L}=\frac{e^{iqL}-e^{-iqL}}{2\pi iq}=\frac{\sin(qL)}{\pi q}.
+   $$
+
+   What comes out is an ordinary real-valued function of two finite
+   arguments, and every question one wants to ask can now be asked of it
+   and answered: peak height $D_L(0)=L/\pi$, main lobe half-width $\pi/L$,
+   total area exactly $1$ at every $L$ by the substitution $u=qL$.
+
+   The delta is then *defined* as the limit of this family, and the limit
+   is taken in the pairing, not pointwise:
+   $\lim_{L\to\infty}\int D_L(q)f(q)\,dq=f(0)$ for every test function
+   $f$. That distinction is not pedantry. At any fixed $q\ne0$,
+   $\sin(qL)/(\pi q)$ oscillates forever between $\pm1/(\pi|q|)$ as $L$
+   grows and has no pointwise limit either, while at $q=0$ it runs off to
+   infinity. The family converges nowhere as functions, and everywhere as
+   functionals. That is precisely why $\delta$ has to live in $\Phi'$
+   rather than in any space of functions.
+
+   The wrong turn is treating $L$ as an error parameter, reading $D_L$ as
+   an approximation to $\delta$ that gets better and would be exact at
+   $L=\infty$. The area is $1$ at every finite $L$ already, exactly and
+   not approximately, so there is no error being driven down; only the
+   shape changes. $L$ is not an approximation knob, it is the thing that
+   makes the object exist.
+
+   A second wrong turn is suspecting the answer depends on the regulator,
+   as if a box cutoff were an arbitrary choice smuggling itself into the
+   result. Regulate instead with $e^{-\varepsilon|x|}$ and you get
+   $\frac{1}{2\pi}\int e^{iqx-\varepsilon|x|}dx=\frac{\varepsilon}{\pi(q^2+\varepsilon^2)}$,
+   a Lorentzian rather than a sinc, with a completely different shape and
+   the same total area $1$ and the same distributional limit. That
+   Lorentzian is the delta-sequence the next lesson's Sokhotski-Plemelj
+   identity runs on. Two regulators, two families, one limit: the check
+   that the limit means something.
+
+   </details>
+
 2. The Schwartz space $\mathcal S(\mathbb R)$ is closed under both the
    Fourier transform and multiplication by $x$. Why is *both* of these
    properties necessary for $\Phi$ to be a sensible "test function"
    space for a theory that uses both $\hat x$ and $\hat p$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The Gelfand-Maurin hypothesis names the requirement exactly:
+   $A\Phi\subseteq\Phi$, invariance under the operator. A test space is
+   only useful if applying the theory's operators never throws you out of
+   it, because otherwise a matrix element can be defined and its
+   continuation undefined.
+
+   Take the two failures one at a time.
+
+   Closed under Fourier but not under multiplication by $x$: then
+   $\hat x\psi=x\psi(x)$ leaves $\Phi$. Immediately
+   $\langle p|\hat x|\psi\rangle$ has no meaning, because $|p\rangle$ is
+   defined only by its pairing against elements of $\Phi$ and
+   $\hat x\psi$ is no longer one. Every expectation value
+   $\langle\psi|\hat x^n|\psi\rangle$ becomes a separate question of
+   whether it happens to survive, and the harmonic oscillator's
+   $V(\hat x)=\tfrac12m\omega^2\hat x^2$ is already outside the
+   framework.
+
+   Closed under multiplication by $x$ but not under Fourier: then
+   $\Phi$ works in the position representation and collapses in the
+   momentum one. The Fourier transform $\tilde\psi$ is not some auxiliary
+   object here; by the definition given above, $\langle p|\psi\rangle
+   =\tilde\psi(p)$ *is* the pairing. If $\tilde\psi\notin\Phi$ then the
+   momentum-space wavefunction is not a test function, so the same
+   construction cannot be run a second time in the $p$ representation,
+   and $\hat p$ has no invariant test space of its own.
+
+   The deeper point is that these are not two independent conditions
+   bolted together. The Fourier transform trades decay for smoothness:
+   $\widehat{x\psi}\propto d\tilde\psi/dp$ and
+   $\widehat{\psi'}\propto p\tilde\psi$. So "closed under multiplication
+   by $x$" in one representation *is* "closed under differentiation" in
+   the other. Schwartz space is defined by demanding decay faster than
+   every power together with derivatives of every order, which is exactly
+   the self-dual pair of conditions, and that self-duality is why
+   $\mathcal S$ is Fourier-invariant at all. One requirement, seen from
+   two sides.
+
+   The wrong turn is answering "we use both $\hat x$ and $\hat p$, so we
+   need both properties," which restates the question without saying what
+   breaks. The sharper way to see the point is to try the most natural
+   competitor. $C_c^\infty(\mathbb R)$, the smooth compactly supported
+   functions, is dense in $L^2$, nuclear, and closed under both
+   differentiation and multiplication by $x$, so it passes every test
+   except one: a nonzero compactly supported function has a Fourier
+   transform that extends to an entire function, and an entire function
+   cannot vanish on an open set without vanishing identically, so
+   $\tilde\psi$ is never compactly supported. $C_c^\infty$ is not
+   Fourier-invariant, and that single failure is what disqualifies it. It
+   is the cleanest evidence that the property the question isolates is
+   doing real work rather than being listed for symmetry.
+
+   </details>
+
 3. A physically prepared wave packet $\psi(x)=\int c(p)\phi_p(x)\,dp$
    with $c(p)$ a smooth, compactly-supported function is an honest
    $L^2(\mathbb R)$ vector, even though each individual $\phi_p$ isn't.
    Explain, in terms of the Dirichlet-kernel worked example, why
    integrating over many $|p\rangle$'s can land back in $\mathcal H$ even
    though no single one of them does.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The mechanism is interference, and the Dirichlet kernel is that
+   interference in its purest form. Better still, it is not merely
+   analogous to this question: it is literally an instance of it.
+
+   Take the crudest possible weight, $c(p)=\mathbf1_{[-L,L]}(p)/\sqrt{2\pi}$,
+   with the lesson's normalization $\phi_p(x)=e^{ipx}/\sqrt{2\pi}$ in
+   natural units. Then
+
+   $$
+   \psi(x)=\int c(p)\,\phi_p(x)\,dp=\frac{1}{2\pi}\int_{-L}^{L}e^{ipx}\,dp=\frac{\sin(Lx)}{\pi x}=D_L(x).
+   $$
+
+   That is the same integral the lesson evaluated for the truncated
+   overlap, with $x$ and $q$ trading places, because $e^{ipx}$ does not
+   care which of its two arguments is being integrated. The truncated
+   overlap and the box-weighted wave packet are the same function.
+
+   Now compare norms. A single $\phi_p$ has $|\phi_p(x)|^2=1/(2\pi)$ at
+   every $x$: it never decays, nothing anywhere ever cancels, and the
+   mass integral is infinite. The superposition decays like $1/|x|$, and
+
+   $$
+   \|D_L\|^2=\int_{-\infty}^{\infty}\frac{\sin^2(Lx)}{\pi^2x^2}\,dx=\frac{L}{\pi},
+   $$
+
+   finite for every finite $L$. Dense midpoint quadrature over
+   $|x|\le4000$ returns $0.31828$, $0.63659$ and $1.59152$ at $L=1,2,5$,
+   against $L/\pi=0.31831$, $0.63662$, $1.59155$. The same number arrives
+   independently from Plancherel, since the transform in this
+   normalization is unitary and
+   $\|c\|^2=\int_{-L}^{L}\frac{dp}{2\pi}=\frac{L}{\pi}$, which is the
+   general statement: $\|\psi\|_{L^2(dx)}=\|c\|_{L^2(dp)}$, so the packet
+   is in $\mathcal H$ precisely when the weight is, and $c$ smooth with
+   compact support is very comfortably in $L^2(dp)$.
+
+   What bought the decay was giving up on a single $p$. Different $p$'s
+   rotate their phases at different rates in $x$, so once $|x|$ is large
+   enough that $px$ varies by many radians across the support of $c$, the
+   integral over $p$ cancels against itself. The width of the support sets
+   how fast that happens. Compact support alone already buys enough decay
+   for $L^2$ membership, and it is only just enough: the box weight decays
+   like $1/|x|$, which is square-integrable and not integrable. Making
+   $c$ additionally *smooth* upgrades the decay to faster than every
+   power, landing $\psi$ in $\Phi$ rather than merely in $\mathcal H$.
+
+   The wrong turn is the triangle inequality:
+   $\|\psi\|\le\int|c(p)|\,\|\phi_p\|\,dp$, which is $\infty$ because
+   every $\|\phi_p\|$ is, and concluding that the packet cannot be
+   normalizable. The inequality is true and the conclusion does not
+   follow, because $\infty$ is an upper bound and upper bounds do not
+   forbid anything. It fails to be tight for a specific and instructive
+   reason: taking absolute values inside the integral discards every
+   phase, and phase cancellation was the entire mechanism.
+
+   A second thing worth getting right rather than avoiding: computing
+   $\|\psi\|^2=\iint c^*(p)c(p')\langle p|p'\rangle\,dp\,dp'=\int|c(p)|^2dp$
+   using $\langle p|p'\rangle=\delta(p-p')$ is legitimate, and it
+   reproduces Plancherel. The delta appears there paired against the nice
+   function $c$, which is exactly the $\Phi,\Phi'$ pairing it is defined
+   by. What is illegitimate is the same move with $c$ concentrated on a
+   single $p$, which asks for $\delta(0)$. The delta is safe against test
+   functions and undefined against itself, and that one sentence is most
+   of what the rigged Hilbert space is for.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -421,7 +614,7 @@ finite- or even infinite-dimensional Hilbert-space identity by itself.
   $\int|p\rangle\langle p|\,dp=I$ fully rigorous, as a $\Phi,\Phi'$
   pairing identity.
 
-## Further Exploration
+## The Spectrum, Read Off a Resolvent
 
 <NextDiscovery>
   [Green's Functions and Resolvents](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/greens-functions-and-resolvents)

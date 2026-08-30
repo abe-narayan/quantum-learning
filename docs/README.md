@@ -1,9 +1,25 @@
-# QuantumLearn documentation
+# StudyQuantum documentation
 
-Start here. Two of these are **standards you must follow**; the rest are
-records of what was checked and what was found.
+Start here. Every file in this directory is exactly one of two things, and
+each one says which it is in its own first paragraph:
 
-## Standards — read before writing code
+- A **guide**: rules that bind now. It contains no findings. Where a rule
+  carries the story of the failure that produced it, the story is kept on
+  purpose: those explanations are the most load-bearing content here, and
+  several of them have prevented a repeat. What a guide must never contain is
+  a *resolved* finding, or a sentence describing a state of the code rather
+  than instructing the reader.
+- A **findings log**: what was found, on what date, against what tree, and
+  whether it has since been resolved. Findings in a log are preserved as
+  originally written even where the code has moved, because a finding
+  rewritten after the fact stops being evidence; resolution is recorded as a
+  dated note appended to it. **Nothing in a log is a rule**, and line numbers
+  in one should be assumed stale.
+
+If a doc reads as a mixture, that is a defect in the doc. Fix it in the
+direction its header claims.
+
+## Guides, to read before writing code
 
 | Doc | What it is |
 | --- | --- |
@@ -12,28 +28,63 @@ records of what was checked and what was found.
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | The product/engineering blueprint: information architecture, the curriculum's six pillars and their course structure, content pipelines, the problems system (§7b), and the session-by-session changelog. Update it when the architecture changes — it is meant to be the source of truth, not a snapshot. |
 | [`DEPLOYMENT.md`](DEPLOYMENT.md) | The build's memory profile and the Vercel settings that keep it inside an 8GB container. Read it before changing the build pipeline, the math pipeline, or any "load the whole corpus" convenience. |
 
-## Working documents
+## A brief from an earlier sprint
 
 | Doc | What it is |
 | --- | --- |
-| [`SPRINT_BRIEF.md`](SPRINT_BRIEF.md) | The multi-agent sprint brief: scope discipline, the shared-file off-limits list, and the MDX authoring hazards that have bitten this repo. Point-in-time, but its content rules and hazard list are still current. |
+| [`SPRINT_BRIEF.md`](SPRINT_BRIEF.md) | Wave 3's multi-agent brief (beginner experience / accessibility / engagement). **That sprint is finished, and at least one later one has run on top of it**, so its scope lists and its shared-file off-limits list are historical. Its **content rules and MDX authoring hazards are still live**, and are the reason to keep it. |
 
-## Audits and reviews — records, not standards
+## Findings logs: records, not rules
 
-These were produced at a point in time. Treat their *findings* as historical
-and re-verify against the code before acting on any specific line reference.
+Each was produced at a point in time and is dated. Treat every finding as
+historical and re-verify against the code before acting on a line reference.
+Where a finding has been resolved, a dated note says so; where it has not
+been re-checked, the file says that too.
 
-| Doc | What it found |
+| Doc | What it found | Live threads |
+| --- | --- | --- |
+| [`UX_REVIEW.md`](UX_REVIEW.md) | First adversarial design review: 3 P0, 13 P1, 12 P2, with a verdict on whether the redesign reached the content or only the chrome. | Read `UX_REVIEW_2.md` first; it re-judges every P0 and P1 here. |
+| [`UX_REVIEW_2.md`](UX_REVIEW_2.md) | Second-round review, re-judging the site after the first review's punch list was worked, and re-verifying each earlier finding against the code. | All four of its own new findings are now resolved, each with a dated note. |
+| [`A11Y_AUDIT.md`](A11Y_AUDIT.md) | Accessibility audit: keyboard, focus, semantics, contrast and screen-reader findings, page by page. | Top five plus four more resolved. The remaining Serious/Polish items are **not** individually re-verified. |
+| [`BEGINNER_REVIEW.md`](BEGINNER_REVIEW.md) | Beginner-usability review from a quantum-naive persona. | Blocker 2 (`<Term>` installed and unused) resolved. Blockers 1, 3, 4 and 5 are content/editorial and still open. |
+| [`LOSS_AUDIT.md`](LOSS_AUDIT.md) | What the visual redesign removed or weakened, checked against the pre-redesign tree. Verdict: nothing lost. | Its stated blind spot (a claim reworded subtly weaker while keeping the same symbols) is still uncovered by any test. |
+| [`SCIENCE_AUDIT.md`](SCIENCE_AUDIT.md) | Verification that the visual redesign altered no scientific or mathematical content, including a mechanical multiset comparison of every LaTeX span across the whole diff. | Covers one diff only. Its **Method** section is the reusable part. |
+| [`CITATION_AUDIT.md`](CITATION_AUDIT.md) | Every research citation and dated historical claim in the corpus, checked against the actual literature. 44 of 45 accurate; one date corrected. | Re-run 2026-08-30 over all 51 `<ResearchConnection>`, 19 `<HistoricalMoment>` and 141 figure credits; 8 corrections made, all logged. Coverage is current. |
+| [`PRELAUNCH_AUDIT.md`](PRELAUNCH_AUDIT.md) | The 2026-08-30 pre-launch sprint: recovery from an interrupted session, the defect classes that actually cost something (derived-vs-typed counts, contradictions between surfaces, silently unrendered math, content clipped rather than overflowing), the practice-answer gap closed from 140/218 to 218/218, and the rendered-page audit harnesses in `scripts/audit/`. | Its §6 lists what is still open. The `/about` authorship gap needs the owner, not an agent. |
+| [`PERF_AUDIT.md`](PERF_AUDIT.md) | Measured production-build numbers, the client-boundary findings, and the remaining performance punch list. | Measurement sections are appended to over time. §G carries a dated status per open item. |
+| [`LESSON_ENRICHMENT.md`](LESSON_ENRICHMENT.md) | Corpus survey: per-lesson visual and interaction density, and named intervention opportunities. | **Its central premise is overturned.** The narrative components it found unused are now used 691 times across all 219 lessons. The census tables are stale; the method is not. |
+
+## Audits that need a rendered page
+
+Some rules cannot be a vitest assertion, because they are claims about a
+**rendered page at a given viewport**: does this overflow at 320px, is that tap
+target reachable, did the console throw during hydration, what is the
+accessible name of a rendered formula. jsdom does not lay out, and the site
+correctly sets `X-Frame-Options: DENY`, which closes the narrow-iframe
+shortcut too.
+
+`scripts/audit/` holds a dependency-free Chrome DevTools Protocol client
+(`cdp.mjs`) and four harnesses on top of it. No new dependency: Chrome is
+already installed and Node 22+ ships a global `WebSocket`.
+
+| Script | What it answers |
 | --- | --- |
-| [`UX_REVIEW.md`](UX_REVIEW.md) | First adversarial design review: 3 P0, 13 P1, 12 P2, with a verdict on whether the redesign reached the content or only the chrome. |
-| [`A11Y_AUDIT.md`](A11Y_AUDIT.md) | Accessibility audit — keyboard, focus, semantics, contrast and screen-reader findings, page by page. |
-| [`BEGINNER_REVIEW.md`](BEGINNER_REVIEW.md) | Beginner-usability review from a quantum-naive persona. Its Blocker 2 (`<Term>` installed and unused) has since been fixed; the note in place records that. |
-| [`LOSS_AUDIT.md`](LOSS_AUDIT.md) | What the visual redesign removed or weakened, checked against the pre-redesign tree. |
-| [`UX_REVIEW_2.md`](UX_REVIEW_2.md) | Second-round review, re-judging the site after the first review's punch list was worked, and re-verifying each earlier finding against the code. |
-| [`SCIENCE_AUDIT.md`](SCIENCE_AUDIT.md) | Verification that the visual redesign altered no scientific or mathematical content — including a mechanical multiset comparison of every LaTeX span across the whole diff. |
-| [`CITATION_AUDIT.md`](CITATION_AUDIT.md) | Every research citation and dated historical claim in the corpus, checked against the actual literature. |
-| [`PERF_AUDIT.md`](PERF_AUDIT.md) | Measured production-build numbers, the client-boundary findings, and the remaining performance punch list. |
-| [`LESSON_ENRICHMENT.md`](LESSON_ENRICHMENT.md) | Corpus survey: per-lesson visual and interaction density, and named intervention opportunities. |
+| `responsive.mjs` | Horizontal overflow, tap targets under 44px, text under 12px, console errors and uncaught exceptions, and WCAG contrast of every text node against its **actually painted** background. `--widths`, `--routes`. |
+| `a11y.mjs` | Semantics and keyboard, from Chrome's computed accessibility tree and **real dispatched key events** rather than a guess at tab order from DOM order. `--theme`, `--checks`. |
+| `field.mjs` | How loud the background field actually paints, against the ceiling `regimes.ts` declares. |
+| `build-memory.mjs` | A real cold production build and its peak memory, sampled over the build's own process tree. See [`DEPLOYMENT.md`](DEPLOYMENT.md). |
+
+**Read the header of one before extending it.** Four bugs have been found in
+these harnesses, and all four were the same mistake: substituting a proxy for
+what the browser actually does. An `rgba()` regex silently fails on a design
+system authored in oklch. `getImageData` already returns unpremultiplied RGBA,
+so dividing by alpha a second time overshoots hugely at low alpha. Measuring an
+anchor's own box misses a hit area stretched by `after:absolute after:inset-0`.
+Testing `position` on a link misses a lift that comes from an ancestor's
+stacking context. Each produced confident, wrong blockers, and **a checker that
+cries wolf is worse than none**, because the tempting response is to relax the
+threshold that would have caught the real one. Where the browser can be asked
+directly (paint the colour, call `elementFromPoint`, press the key), ask it.
 
 ## The checks that enforce all of this
 
@@ -55,7 +106,13 @@ fail loudly:
   where the glow pool is densest, which is exactly where a hero's readouts
   sit.
 - `src/lib/design/__tests__/cascadeLayers.test.ts` — no unreviewed unlayered
-  class rule.
+  rule. It keys its allowlist by normalized **selector text**, not by class
+  name, so element, attribute and pseudo-class selectors are in scope; it
+  exempts custom-property-only blocks by construction rather than by
+  allowlist; and it descends into top-level at-rules, because a rule inside
+  an unlayered `@media` is unlayered too. The class-only version it replaced
+  let four live bugs through, and could not see the first rule in the file at
+  all.
 - `src/lib/design/__tests__/utilitySyntax.test.ts` — no utility class that
   compiles to nothing: Tailwind v3's `rounded-[--var]` (v4 wants
   `rounded-(--var)`) and `*-pillar-accent` (the registered color is
@@ -127,6 +184,20 @@ fail loudly:
   populated, and every `<Term id>` in the corpus resolves. `Term` throws at
   render on an unknown id, so one typo otherwise breaks `next build` for
   the whole site.
+- `src/lib/problems/__tests__/crossSurfaceConsistency.test.ts` — the defect
+  class no other test can see: **a problem and its own lesson disagreeing**.
+  Each is internally correct, each compiles, each renders, and every other test
+  passes. The shape both known instances shared was an unqualified absolute on
+  the problem side of a claim the lesson side qualifies (a problem asserting
+  the 3-qubit bit-flip code is `[[3,1,3]]` while its lesson says distance 1
+  under the full Pauli model; a problem saying a vertex stabilizer "always
+  touches exactly 4 qubits" after the lesson gained its boundary caveat). Four
+  sentence-scoped rules, each carrying the lesson text that is its authority.
+  Its own non-vacuity is asserted rather than assumed: one test feeds each rule
+  the unqualified sentence it exists to reject, another feeds it the qualified
+  form, so a rule cannot be defeated by a rewording. Multiple-choice distractors
+  are exempt, because the problems that teach a qualification best are the ones
+  that offer the unqualified claim as a wrong answer.
 - `src/lib/problems/__tests__/optionLetterReferences.test.ts` — no solution
   or explanation prose names a multiple-choice option by letter. Display
   order is a seeded shuffle, so an authored "Option b" points at a
@@ -134,16 +205,106 @@ fail loudly:
 - `src/lib/problems/__tests__/metaRegistry.test.ts` — the meta-only and
   full problem registries agree, including the difficulty ordering of a
   lesson's practice list.
-- `src/components/layout/__tests__/problemPillarIndex.test.ts` — the
-  hand-regenerated problem→pillar table still matches the real problem
-  tree, so the navbar can't quietly lose a pillar badge.
+- `src/lib/__tests__/problemCount.test.ts` — "how many problems are there"
+  has exactly one derivation, and every surface that prints it agrees with a
+  fresh count of the content directory on disk. `lib/nav.ts` once carried a
+  hand-typed 549 against a corpus of 556, on every route. The
+  client-side `problemPillarIndex.ts` table that first fixed it, and its own
+  test, are both gone: two derivations of one quantity was the defect, and
+  that one cost 7.2KB gzip on every route to state a three-digit number.
+- `src/lib/content/__tests__/predictionCount.test.ts` — the homepage's
+  "N of the M lessons stop and ask you the same way" is derived, not typed.
+  Both figures come from `scripts/generate-lesson-registry.mjs`, and this
+  re-scans the corpus from disk independently of the generator's own matcher.
+  The pair was hand-kept until 2026-08-30, under a source comment asking the
+  next person to re-grep when the corpus moved; the corpus moved and the
+  sentence did not, so the page shipped "213 of the 219" against a real 218.
+  Same failure as the hand-typed problem total above.
+- `src/lib/content/__tests__/readerFacingDashes.test.ts` — **zero em dashes in
+  reader-facing prose**, the house rule that until now was enforced by nothing
+  but grep, which is how it failed the first time (two rounds and 386
+  corrections, because a fork's "none remaining" self-report was wrong for 22
+  files). Covers all of `src/content` plus every `.tsx` outside tests with
+  comments stripped. En dashes are deliberately left alone: the corpus uses
+  about 111 and they are correct typography (Cauchy-Schwarz, 119-130, the x-z
+  cross-section).
+- `src/lib/content/__tests__/answerReveals.test.ts` — structural integrity of
+  every `<details className="answer-reveal">`. Added when the corpus went from
+  140 lessons with worked answers to nearly all of them in one sprint. The
+  three ways to break one are all silent: a missing `<summary>` renders as a
+  widget labelled "Details", under-indentation moves the answer out of its own
+  list item and renumbers the questions after it, and a stub body teaches
+  readers that opening a reveal is not worth the tap. It also asserts coverage
+  in the one form padding cannot satisfy: **a lesson that asks practice
+  questions must answer them.** That became assertable on 2026-08-30, when the
+  corpus went from 140 of 218 to 218 of 218; the old gap fell at the end of
+  five Mechanics courses and across almost all of Mastery and Apex, which is
+  exactly where a reader is most alone.
+- `src/lib/content/__tests__/lessonOrdering.test.ts` — every `(course, module)`
+  pair holds exactly one lesson today, so `LessonMeta.order` never actually
+  decides anything and 175 of 219 lessons carry an inherited `order: 1`. This
+  does not forbid a module holding two lessons; it requires that when one does,
+  the `order` values distinguish them, so the reading sequence cannot silently
+  fall back to registry insertion order.
+- `src/lib/design/__tests__/routeInventory.test.ts` — every route visited by
+  `scripts/audit/responsive.mjs` resolves to a real page. Guards a failure that
+  looks like success: a route that 404s makes the audit measure the not-found
+  page instead, which has no overflow and no contrast failures at any width and
+  reports clean. `/problems/bell-state-measurement-correlations` was in that
+  list and had never existed.
 - `src/lib/content/__tests__/lessonRender.test.ts` — every lesson actually
   *renders*, not just compiles. Two build-breaking bugs (a dimension mismatch
   inside a visualization, and `e^{iφ}` in bare prose being parsed as a JSX
   expression) were caught only by a full `next build` before this existed.
 - `src/lib/design/__tests__/printAndReducedMotionSelectors.test.ts` — every
   selector in the print and reduced-motion blocks still matches real markup,
-  so a component rewrite can't silently kill the print stylesheet.
+  so a component rewrite can't silently kill the print stylesheet. Its scan
+  covers `src/content` as well as `src/components`, because lessons now
+  author structural hooks (`data-mdx`, `data-callout`) directly in MDX, and a
+  selector matched only from a lesson file would otherwise read as dead.
+- `src/lib/design/__tests__/figureLegibility.test.ts` — hand-rolled SVG type
+  stays readable at the narrowest box the layout produces. The arithmetic is
+  the point: a figure in a lesson is drawn in a **254px** box at a 320px
+  viewport (320, less `Container`'s `px-4`, less one panel inset of 16px
+  padding plus a 1px border on each side), so effective type size is
+  `fontSize × 254 ÷ viewBox width`. A sprint-wide legibility pass computed
+  against 288px instead and wrote that into a dozen files' justifying
+  comments, leaving every claimed size 13% optimistic. Text that overflows a
+  `viewBox` is silently clipped, not scrolled, so raising a size means
+  recomputing label positions too.
+- `src/components/visualizations/__tests__/figureDomains.test.ts` — a
+  figure's axis comes from its data, never from its annotations.
+- `src/components/simulators/__tests__/simulatorClaims.test.ts` — one test per
+  simulator, for the single physical claim a reader takes away from driving
+  it, checked against closed-form physics (Grover's sin²((2k+1)θ), the Rabi
+  ceiling, CHSH's cos(a−b) correlations) rather than against the engine that
+  drew the screen. Comparing a simulator against the engine it calls proves
+  only that the call happened.
+- `src/components/simulators/__tests__/blochAnimation.test.ts` — the Bloch
+  animation obeys the same physical invariant the engine does: the vector
+  never leaves the ball, and a noise channel never lengthens it.
+- `src/lib/problems/__tests__/conceptualCorpus.test.ts`,
+  `conceptualAdversarial.test.ts` and `conceptualRegression.test.ts` — the
+  keyword grader for conceptual problems, measured against every authored
+  conceptual problem rather than a fixture, in both directions: it must not
+  be beatable by pasting a problem's own teaching text back into the box,
+  and it must not mark a good-faith correct answer wrong. Both defects were
+  invisible at fixture scale.
+- `src/lib/problems/__tests__/numeric.test.ts` — numeric answer validation,
+  absolute and relative tolerance.
+- `src/components/problems/__tests__/optionOrder.test.ts` — the seeded
+  multiple-choice shuffle. It lives beside the component now, not under
+  `src/lib/problems/__tests__/`.
+- `src/lib/content/progress/renameMigration.test.ts` — the StudyQuantum
+  rename moved every `localStorage` key from a `quantumlearn:` prefix to a
+  `studyquantum:` one, and both progress stores copy the old namespace
+  forward on first read. There are no accounts here, so the browser is the
+  record of what a reader has finished; the migration runs once per returning
+  reader, with no way to notice it failed. Any surviving `quantumlearn`
+  string in `src/` should be one of these legacy-key fallbacks.
+- `src/components/layout/__tests__/themeStore.test.ts` — the theme toggle
+  still works when `localStorage.setItem` throws (private browsing, blocked
+  site data, a full quota), where it used to be a silently dead control.
 - `src/lib/design/__tests__/fieldScope.test.ts` — every route declares a
   background regime, and `journey` stays exclusive to the homepage.
 - `src/lib/design/__tests__/pillarContrast.test.ts` — resolves the OKLCH

@@ -30,6 +30,13 @@ export function BlochSphereControls({
   onMeasure: () => void;
   onReset: () => void;
 }) {
+  // sin θ is the length of the arrow's shadow on the equatorial plane, and it
+  // is exactly the factor φ acts through: at sin θ = 0 the arrow is on the
+  // axis φ rotates about, so φ has nothing to turn. The threshold is loose
+  // (θ within ~2.6° of a pole) because the point is "you will not see this
+  // move", not an exact equality.
+  const phiIsDegenerate = Math.abs(Math.sin(angles.theta)) < 0.045;
+
   return (
     <div className="space-y-8">
       <ControlSection id="presets" title="State presets">
@@ -54,7 +61,7 @@ export function BlochSphereControls({
             disabled={disabled}
             formatValue={(v) => `${Math.round((v * 180) / Math.PI)}°`}
             // A bare "60 degrees" tells a screen-reader user nothing about
-            // what moved — the whole reason θ matters is the probability it
+            // what moved. The whole reason θ matters is the probability it
             // sets, and that lives in a bar chart they cannot see while
             // dragging. P(0) = cos²(θ/2) is the Born rule for the canonical
             // Bloch state (see `blochStateFromAngles` in lib/quantum/bloch.ts),
@@ -67,16 +74,38 @@ export function BlochSphereControls({
             }
             onChange={(theta) => onManualAngles({ theta, phi: angles.phi })}
           />
+          {/* φ is genuinely inert at the poles, and this instrument opens on
+              one. At θ=0 the state is exactly |0⟩: there is only one nonzero
+              amplitude, so there is nothing for a phase to be relative *to*,
+              and dragging φ moves the arrow not at all, the bars not at all,
+              and the state panel not at all. Five lessons instruct the reader
+              to start from |0⟩ (see `quantum-gates.mdx`, `building-qubit-
+              circuits.mdx` and siblings), so the opening state is not the
+              thing to change here. What was wrong is that the control said
+              nothing about it: a slider that answers a drag with no visible
+              consequence and no stated one reads as broken rather than as
+              degenerate. The hint now names the condition and says which
+              control to move to leave it, and because `SimulatorSlider` wires
+              `hint` to `aria-describedby`, a screen-reader user hears the same
+              explanation on focus rather than dragging a silent control. */}
           <SimulatorSlider
             label="φ (azimuthal angle)"
-            hint="The relative phase between |0⟩ and |1⟩."
+            hint={
+              phiIsDegenerate
+                ? "The relative phase between |0⟩ and |1⟩. At the poles one amplitude is zero, so there is nothing for a phase to be relative to and this slider changes nothing you can see. Move θ off 0° and 180° and it starts swinging the arrow around the vertical axis."
+                : "The relative phase between |0⟩ and |1⟩. It swings the arrow around the vertical axis and never changes P(0) or P(1)."
+            }
             value={angles.phi}
             min={0}
             max={2 * Math.PI}
             step={0.005}
             disabled={disabled}
             formatValue={(v) => `${Math.round((v * 180) / Math.PI)}°`}
-            valueText={(v) => `${Math.round((v * 180) / Math.PI)} degrees`}
+            valueText={(v) =>
+              phiIsDegenerate
+                ? `${Math.round((v * 180) / Math.PI)} degrees, no effect at the poles`
+                : `${Math.round((v * 180) / Math.PI)} degrees of relative phase`
+            }
             onChange={(phi) => onManualAngles({ theta: angles.theta, phi })}
           />
         </div>
@@ -85,11 +114,11 @@ export function BlochSphereControls({
       <ControlSection
         id="gates"
         title="Gates"
-        description="A gate is a rotation of the arrow — nothing more. It is reversible, it never involves chance, and it never collapses anything. Only Measure does that."
+        description="A gate is a rotation of the arrow, nothing more. It is reversible, it never involves chance, and it never collapses anything. Only Measure does that."
       >
         {/* `@sm:` (container query, not viewport): this grid is only ever
             wide enough for 6 columns when its own box is, which is not the
-            same thing as the viewport — see SimulatorInstrument.tsx. Inside
+            same thing as the viewport; see SimulatorInstrument.tsx. Inside
             a 320px split-layout rail this stays 4-up; full-width (stacked,
             or the /simulators lab bench) it opens to 6. */}
         <div className="grid grid-cols-4 gap-2 @sm:grid-cols-6">
@@ -102,7 +131,7 @@ export function BlochSphereControls({
               onClick={() => onApplyGate(gate)}
               title={gate.explanation}
               // Without this the six buttons announce as "X", "Y", "Z", "H",
-              // "S", "T" — six single letters with no hint that they are
+              // "S", "T": six single letters with no hint that they are
               // gates or that pressing one rotates the sphere. `title` only
               // supplies the accessible *description*, which many screen
               // readers do not read by default.
@@ -126,7 +155,7 @@ export function BlochSphereControls({
               symbol: "H",
               name: "Hadamard",
               means:
-                "the superposition-maker. Takes a definite |0⟩ or |1⟩ to the equator, where a measurement is a genuine 50/50 — and takes it straight back again if applied twice.",
+                "the superposition-maker. Takes a definite |0⟩ or |1⟩ to the equator, where a measurement is a genuine 50/50, and takes it straight back again if applied twice.",
               glossaryId: "hadamard-gate",
             },
             {
@@ -139,7 +168,7 @@ export function BlochSphereControls({
               symbol: "S, T",
               name: "phase gates",
               means:
-                "quarter and eighth turns about the vertical axis. They change nothing about the odds of 0 or 1 — watch P(0) and P(1) hold still — and everything about interference.",
+                "quarter and eighth turns about the vertical axis. They change nothing about the odds of 0 or 1 (watch P(0) and P(1) hold still) and everything about interference.",
               glossaryId: "single-qubit-gates",
             },
             {
@@ -211,7 +240,7 @@ function RotationRow({
         onClick={() => onApply(axisId, (degrees * Math.PI) / 180)}
         // Three of these rows stack here, so a screen reader's button list
         // used to read "Apply, Apply, Apply" with nothing to tell them apart.
-        // The visible word stays "Apply" — the row's own slider label is what
+        // The visible word stays "Apply"; the row's own slider label is what
         // identifies it on screen.
         aria-label={`Apply ${label} rotation of ${degrees} degrees`}
       >

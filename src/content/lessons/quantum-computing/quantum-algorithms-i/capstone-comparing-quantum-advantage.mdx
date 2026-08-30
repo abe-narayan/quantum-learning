@@ -27,7 +27,7 @@ export const lessonMeta = {
 Deutsch-Jozsa needs exactly one query, ever, no matter how large the problem grows. Grover needs roughly √N queries where a classical computer needs N. Both get called "quantum speedup." They're not the same kind.
 </LessonHook>
 
-## Motivation
+## Putting a number on each claim
 
 Put a number on each claim before comparing them. At $n=20$,
 Deutsch-Jozsa replaces $2^{19}+1 = 524{,}289$ worst-case classical
@@ -42,7 +42,7 @@ specific than "quantum computers win."
 Google announces that its 53-qubit Sycamore processor has sampled the output of random circuits faster than a classical supercomputer could simulate them. IBM disputes the classical cost estimate within days. The claim that survives the argument is narrow and real: one engineered sampling task, on one device, with nothing promised about useful problems. Read every "advantage" claim in this lesson with that same fine print in mind.
 </HistoricalMoment>
 
-## Mathematical Development
+## The two separations, precisely stated
 
 ### The comparison, precisely
 
@@ -92,7 +92,7 @@ rate, which this axis cannot show.
     { label: "A flat line near zero, like it looked next to 2^n", value: "flat" },
     { label: "A straight line through the origin", value: "linear" },
     { label: "A concave curve that keeps rising, just more and more slowly", value: "concave" },
-    { label: "An exponential curve, just with a smaller base", value: "exponential-shape" },
+    { label: "An exponential curve of the same kind as 2^n, only with a smaller base", value: "exponential-shape" },
   ]}
   correctValue="concave"
   explanation="On its own scale, π/4·√N is visibly a square-root curve: rising, concave, ever-slowing, never flat and never exponential. It only looked flat a moment ago because it was being compared directly against 2^n on the same axis. A growth curve can still look negligible next to a big enough neighbor."
@@ -162,7 +162,7 @@ unless an efficient oracle exists for it. The gap between "provably fewer
 queries" and "useful today" is where most of the difficulty in quantum
 algorithm design still lives.
 
-## Physical Interpretation
+## Interference as the resource
 
 <Term id="phase-interference">Interference</Term> is the entire mechanism behind both results: Deutsch-Jozsa's
 amplitude on $|0\rangle^{\otimes n}$ collapsing to exactly $0$ or $\pm1$,
@@ -179,7 +179,7 @@ bends but never flattens the way Deutsch-Jozsa's constant, single-query
 line does, because unstructured search leaves interference less to work
 with, not because Grover's algorithm is doing anything wrong.
 
-## Worked Example
+## Both algorithms at ten qubits
 
 **For $n=10$ ($N=1024$), compare Deutsch-Jozsa's and Grover's query
 counts to the corresponding classical worst case.**
@@ -187,17 +187,18 @@ counts to the corresponding classical worst case.**
 Deutsch-Jozsa: classical $2^9+1=513$ queries vs. quantum $1$, a
 $513\times$ reduction.
 
-Grover: classical $1024$ queries (average case $\approx512$) vs. quantum
+Grover: classical $1024$ queries vs. quantum
 $\approx\frac{\pi}{4}\sqrt{1024}=\frac{\pi}{4}(32)\approx25$ queries,
-about a $20\times$ reduction, not the $513\times$ Deutsch-Jozsa achieves
-at the same $n$.
+about a $41\times$ reduction against the same worst case the table uses
+(about $20\times$ against the classical average case of $\approx512$).
+Deutsch-Jozsa manages $513\times$ at the same $n$.
 
 $n=10$ sits near the left edge of the charts plotted earlier, where both
 algorithms' query counts are still small in absolute terms. Even here the
 gap between "exponential" and "quadratic" is not a small difference, and
 it only widens as $n$ grows further.
 
-## Common Mistakes
+## Exponentially faster is not a general fact
 
 <Callout type="mistake">
 **Treating "quantum computers are exponentially faster" as a general
@@ -220,15 +221,177 @@ sidestepped by construction.
 1. For $n=20$, compute Deutsch-Jozsa's classical query bound and Grover's
    approximate optimal quantum query count, and compare their respective
    speedup factors.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Deutsch-Jozsa: the classical worst case is $2^{n-1}+1 = 2^{19}+1 = 524{,}289$
+   queries against the quantum algorithm's $1$, a speedup factor of
+   $524{,}289$.
+
+   Grover: $N = 2^{20} = 1{,}048{,}576$ classical queries in the worst case
+   against about $\frac{\pi}{4}\sqrt N = \frac{\pi}{4}(1024) \approx 804.2$
+   quantum queries. `optimalGroverIterations(20)` returns $804$ exactly. The
+   speedup factor is $1{,}048{,}576/804 \approx 1{,}304$.
+
+   So at this one problem size Deutsch-Jozsa's factor is about $400$ times
+   larger than Grover's. What matters is not that ratio but how the two
+   behave as $n$ grows: Deutsch-Jozsa's factor is $2^{n-1}+1$, doubling with
+   every added qubit, while Grover's is $\sqrt N \cdot 4/\pi$, growing by
+   only $\sqrt2 \approx 1.41$ per qubit. Twenty more qubits multiplies
+   Deutsch-Jozsa's advantage by a million and Grover's by a thousand. One
+   advantage compounds, the other merely grows.
+
+   The comparison is nevertheless unfair in the direction that flatters
+   Deutsch-Jozsa, which the next question is about. Its $524{,}289$ is the
+   cost of *certainty* for a deterministic classical algorithm; a
+   randomized one answers correctly with overwhelming probability in about
+   thirty queries at any $n$, so the honest factor is closer to $30$ and
+   does not grow at all. Grover's $N$ is the real cost for any classical
+   algorithm, randomized or not, and its factor of $1{,}304$ survives every
+   objection.
+
+   The wrong turn is comparing the two speedups as though the numerators
+   were commensurable. They are counts of queries to different oracles
+   solving different problems, and the useful comparison is between each
+   algorithm and its own best classical rival, not between the two factors.
+
+   </details>
+
 2. Explain, in your own words, why "provably optimal" (Grover) is a
    stronger claim than "exponential separation for one engineered problem"
-   (Deutsch-Jozsa), even though the numerical speedup is smaller.
+   (Deutsch-Jozsa), even though the numerical speedup is smaller. Then
+   name a place where Grover's guarantee has already changed a real-world
+   recommendation.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the two claims quantify over different things. Deutsch-Jozsa's
+   separation says: *there exists* a problem on which a quantum algorithm
+   beats every deterministic classical one exponentially. That is a
+   statement about one engineered promise, and it collapses when the
+   classical side is allowed randomness. Grover's optimality says: *for all*
+   quantum algorithms, unstructured search costs $\Omega(\sqrt N)$ queries.
+   It is a lower bound, proved against every algorithm anyone will ever
+   write, so the $\sqrt N$ is not a current best effort waiting on someone
+   cleverer. Existence claims are cheap to improve on and easy to
+   over-read; universal claims are the ones you can build on.
+
+   The practical consequence is planning. If a quadratic speedup is
+   provably the ceiling for unstructured search, then any future algorithm
+   promising more must be exploiting structure, and the honest question
+   about a candidate problem becomes "what structure does it have" rather
+   than "how fast can search get". That reframing is worth more than a
+   larger number for a problem nobody has.
+
+   Cryptography is where the guarantee has already changed a
+   recommendation. Brute-forcing a symmetric key is exactly unstructured
+   search, so Grover halves the effective key length: a $128$-bit key
+   offers about $64$ bits of security against a quantum attacker, and
+   standards bodies now recommend $256$-bit keys for anything needing
+   long-term confidentiality. Note what the optimality proof buys here.
+   Without it, doubling the key length would be a guess; with it, doubling
+   is known to be enough, because no quantum algorithm can do better than
+   the square root.
+
+   The wrong turn is reading "provably optimal" as "provably useful".
+   Grover's bound is in the query model, which charges nothing for
+   implementing the oracle, and a real search problem has to build that
+   oracle as a circuit. That cost is invisible to the theorem and is
+   frequently what decides whether the speedup survives, which is the next
+   question but one.
+
+   </details>
+
 3. Why doesn't Deutsch-Jozsa's algorithm work at all once the
    constant-or-balanced promise is dropped? Point to the specific step in
    its derivation that relied on the promise.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The step is the interpretation of the boxed amplitude
+
+   $$
+   \text{amplitude on }|0\rangle^{\otimes n} = \frac{1}{2^n}\sum_x(-1)^{f(x)} .
+   $$
+
+   The derivation up to here is valid for every $f$; nothing about the
+   promise is used in getting it. The promise enters immediately
+   afterwards, when the sum is declared to be either $\pm2^n$ (constant, so
+   $P(0)=1$) or $0$ (balanced, so $P(0)=0$). Only those two cases exist
+   because the promise says the number of $1$-outputs is either $0$, or
+   $2^n$, or exactly $2^{n-1}$.
+
+   Drop the promise and the sum can be anything in between. A function with
+   $2^{n-1}+1$ ones on $n=3$ gives $\sum_x(-1)^{f(x)} = 8 - 2(5) = -2$, so
+   the amplitude is $-2/8$ and $P(0) = 1/16$: small, nonzero, and
+   compatible with neither of the two verdicts. A single run returning "not
+   all zeros" now tells you almost nothing, because both a balanced
+   function and a nearly balanced one produce that outcome with high
+   probability, and one measurement cannot separate $P(0)=0$ from
+   $P(0)=1/16$.
+
+   Read positively, the circuit measures whether the $\pm1$ pattern of
+   $f$ sums to zero. The promise is what turns that one bit into a complete
+   answer, by guaranteeing there is nothing between "sums to zero" and
+   "sums to everything". Without it you would need many runs to estimate
+   $P(0)$, and estimating a probability to precision $\varepsilon$ takes
+   $O(1/\varepsilon^2)$ runs, which destroys the one-query claim
+   completely.
+
+   The wrong turn is expecting a graceful degradation, where the algorithm
+   returns "roughly balanced" for a roughly balanced function. It does not
+   degrade gracefully in the sense that matters: certainty is lost at the
+   first departure from the promise, and $P(0)=1/16$ is much closer to the
+   balanced answer than the function is to being balanced.
+
+   </details>
+
 4. Name one thing a real quantum algorithm needs, beyond a good query
    complexity bound, before it can outperform a classical computer on an
-   actual task.
+   actual task. Then say which of those costs the oracle model
+   deliberately hides.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The one to name, because it is the one the model hides: **the cost of
+   implementing the oracle as an actual circuit**. Query complexity counts
+   calls to $U_f$ and charges nothing for building it. In a real search
+   problem $U_f$ is a reversible circuit that evaluates the predicate you
+   are searching for, and it may take thousands of gates per call. Grover's
+   $804$ queries at $n=20$ become $804$ times that gate count, and if the
+   classical alternative can test an item in a handful of instructions, the
+   quadratic query advantage can be entirely eaten by the per-query
+   constant.
+
+   Several other requirements matter and are worth listing, since any of
+   them can be the binding constraint. Enough logical qubits, which after
+   error correction means a far larger number of physical ones. A circuit
+   depth that fits inside the machine's coherence time, or a
+   fault-tolerant architecture, whose $T$-gate cost is the real currency.
+   A problem where the input can be loaded into a quantum state at all,
+   which for a database search is often the killer, since writing $N$
+   classical items into amplitudes already costs $O(N)$. And a classical
+   competitor measured honestly, at its own best algorithm on modern
+   hardware, rather than at the textbook worst case.
+
+   The oracle model hides all of the first kind by construction, and it is
+   not a flaw: abstracting the oracle is what makes a lower bound provable
+   at all, and Grover's $\Omega(\sqrt N)$ would not exist without it. The
+   error is in reading a query bound as a runtime, or a runtime as a
+   wall-clock win.
+
+   The wrong turn is to conclude from this that query complexity is
+   academic. It is the right tool for the question it answers, which is
+   whether a speedup is possible in principle and how large it can be. What
+   it never answers is whether a speedup will be realized, and the honest
+   reading of every "quantum advantage" headline starts by asking which of
+   the two claims is being made.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -245,7 +408,7 @@ sidestepped by construction.
 - Interference is the shared mechanism; how much of it a problem allows
   depends on how much structure the problem itself offers.
 
-## Further Exploration
+## The nearest test case
 
 <NextDiscovery>
 Every algorithm ahead inherits the opening question, not the answer:

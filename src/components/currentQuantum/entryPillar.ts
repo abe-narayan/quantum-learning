@@ -5,7 +5,7 @@ import { PILLAR_ORDER } from "@/lib/design/pillars";
 const PILLAR_SET = new Set<string>(PILLAR_ORDER);
 
 /**
- * The curriculum pillar an entry connects back to — read directly off its
+ * The curriculum pillar an entry connects back to, read directly off its
  * `relatedLessonSlug` rather than a second, hand-maintained mapping that
  * could drift out of sync with the data. Lesson slugs are always
  * `${pillar}/${module}/${lesson}` (see `src/content/lessons/*`, whose six

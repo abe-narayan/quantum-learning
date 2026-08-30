@@ -13,7 +13,7 @@ import { SimulatorInstrument } from "../shared/SimulatorInstrument";
 import { SimulatorFraming } from "../shared/Framing";
 
 const DEFAULT_WHAT_TO_NOTICE =
-  "Watch the StateInspector panel below — the moment the state stops being writable as a simple product of two separate qubits is the moment CNOT actually did something CNOT-specific.";
+  "Watch the StateInspector panel below. The moment the state stops being writable as a simple product of two separate qubits is the moment CNOT actually did something CNOT-specific.";
 
 /**
  * The canonical two-gate Bell circuit, loaded on mount. An empty canvas is
@@ -21,7 +21,7 @@ const DEFAULT_WHAT_TO_NOTICE =
  * blank, the step slider is absent, and the state inspector shows |00⟩ with
  * nothing to inspect. Opening with H then CNOT already applied means the
  * instrument mounts showing a real entangled state, a scrubable two-step
- * history, and the live "this step just entangled qubits 0 and 1" note — per
+ * history, and the live "this step just entangled qubits 0 and 1" note, per
  * the bench's "open mid-phenomenon" rule. Clear empties it in one click for
  * anyone who wants to build from scratch, and switching the qubit count
  * (which the lessons' GHZ exercise does) resets to empty anyway.
@@ -50,7 +50,7 @@ export function CircuitBuilder() {
   );
 
   // If the gate that just ran (at this step) turned a fully-product state
-  // into an entangled one, name the qubits it entangled — a concrete,
+  // into an entangled one, name the qubits it entangled: a concrete,
   // step-specific payoff on top of the static "what to notice" copy.
   const entanglementNote = useMemo(() => {
     const appliedInstruction = step > 0 ? instructions[step - 1] : undefined;
@@ -102,7 +102,7 @@ export function CircuitBuilder() {
   /**
    * Puts the mounting circuit back. It also forces the qubit count to 2,
    * because `STARTING_CIRCUIT`'s CNOT targets qubits 0 and 1 and the reader
-   * may well be on the 3-qubit GHZ exercise when they reach for this — a
+   * may well be on the 3-qubit GHZ exercise when they reach for this. A
    * "load the example" button that silently left three wires with a two-wire
    * circuit on them would be the confusing outcome, not the helpful one.
    */
@@ -117,19 +117,19 @@ export function CircuitBuilder() {
 
   return (
     <SimulatorInstrument
-      label="Circuit builder — build then run"
+      label="Circuit builder: build then run"
       readout={<Readout label="Step" value={`${step} / ${instructions.length}`} />}
       // The diagram widens with every qubit/gate added; splitting it against
       // a 320px control rail (even once there's technically room per the
       // container query) leaves less width for it than it can use. Full-width
-      // stage, controls in a band underneath — see SimulatorInstrument.tsx.
+      // stage, controls in a band underneath; see SimulatorInstrument.tsx.
       layout="stacked"
       stageClassName="space-y-6"
       stage={
         <>
           <p className="text-sm text-muted-foreground">
             A quantum circuit is read left to right: each horizontal line is one qubit, and each box is an
-            operation applied to it. Loaded here is the two-gate circuit that produces a Bell pair — the
+            operation applied to it. Loaded here is the two-gate circuit that produces a Bell pair, the
             standard way to entangle two qubits. Drag the step slider to run it forwards and backwards, add
             your own gates from the controls, or Clear and start from nothing. Load Bell circuit brings this
             example back whenever you want it.
@@ -147,7 +147,11 @@ export function CircuitBuilder() {
             />
           )}
 
-          <div aria-live="polite" className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+          {/* `role="status"` + `aria-atomic="true"`: a role-less live region's
+              implicit `aria-atomic` is `false`, so an update announces only
+              the text nodes that actually changed. This one swaps a whole
+              sentence, so it was safe in practice but not by construction. */}
+          <div role="status" aria-live="polite" aria-atomic="true" className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {entanglementNote ?? DEFAULT_WHAT_TO_NOTICE}
           </div>
 
@@ -155,11 +159,11 @@ export function CircuitBuilder() {
 
           <SimulatorFraming
             shows="The same build-then-run workflow real quantum SDKs use: stack gates, then scrub through the step slider to see the state vector evolve one gate at a time."
-            watchFor="Scrub the step slider back to 1. After H alone, the state inspector still calls this a product state — H on one qubit cannot entangle anything. Only the CNOT at step 2 flips that verdict."
+            watchFor="Scrub the step slider back to 1. After H alone, the state inspector still calls this a product state: H on one qubit cannot entangle anything. Only the CNOT at step 2 flips that verdict."
             tryThis={
               <ul>
                 <li>
-                  On 2 qubits: add H to qubit 0, then CNOT(0→1) — scrub the step slider back and forth and
+                  On 2 qubits: add H to qubit 0, then CNOT(0→1), then scrub the step slider back and forth and
                   watch the state go from a simple product state to an entangled one at the CNOT step.
                 </li>
                 <li>On 3 qubits, build a GHZ state: H on qubit 0, then CNOT(0→1), then CNOT(0→2).</li>

@@ -30,7 +30,7 @@ export const minusStateXExpectationViaRho: NumericProblem = {
     type: "numeric",
     value: expectation,
     tolerance: 0.01,
-    incorrectFeedback: "Recall |−⟩ is an eigenstate of X — which eigenvalue?",
+    incorrectFeedback: "Recall that |−⟩ is an eigenstate of X. With which eigenvalue?",
     nearMisses: [
       { value: 1, feedback: "+1 is ⟨X⟩ for |+⟩. The minus sign between |0⟩ and |1⟩ flips the eigenvalue: X|−⟩ = −|−⟩." },
       { value: 0, feedback: "⟨X⟩ = 0 belongs to a state with no X-coherence, such as |0⟩ or |1⟩. |−⟩ is an X eigenstate, so its ⟨X⟩ sits at an extreme of the range." },

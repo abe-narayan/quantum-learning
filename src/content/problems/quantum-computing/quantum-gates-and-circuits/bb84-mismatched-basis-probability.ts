@@ -23,7 +23,7 @@ export const bb84MismatchedBasisProbability: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "Alice encodes bit $0$ in the Z basis, i.e. $|0\\rangle$. Bob measures in the X basis (applies $H$ first, then reads off computational-basis probabilities) — a mismatched-basis case. What is Bob's probability of reading $1$?",
+      "Alice encodes bit $0$ in the Z basis, i.e. $|0\\rangle$. Bob measures in the X basis (applies $H$ first, then reads off computational-basis probabilities), a mismatched-basis case. What is Bob's probability of reading $1$?",
     inputHint: "as a decimal between 0 and 1",
   },
   answer: {
@@ -31,7 +31,7 @@ export const bb84MismatchedBasisProbability: NumericProblem = {
     value: probabilityBobReadsOne,
     tolerance: 0.01,
     incorrectFeedback:
-      "Apply $H$ to $|0\\rangle$ first (Bob's X-basis measurement), then read off the computational-basis probabilities of the result — don't skip the basis-change step.",
+      "Apply $H$ to $|0\\rangle$ first (Bob's X-basis measurement), then read off the computational-basis probabilities of the result. The basis-change step cannot be skipped.",
     nearMisses: [
       {
         value: 0,
@@ -52,13 +52,13 @@ export const bb84MismatchedBasisProbability: NumericProblem = {
       { description: "Bob's X-basis measurement applies $H$ first.", latex: "H|0\\rangle = |+\\rangle = \\tfrac{1}{\\sqrt2}(|0\\rangle+|1\\rangle)" },
       { description: "Reading off computational-basis probabilities of $|+\\rangle$ gives an even split.", latex: `P(1) = ${probabilityBobReadsOne.toFixed(2)}` },
     ],
-    finalAnswer: `$P(1) = ${probabilityBobReadsOne.toFixed(2)}$ — a mismatched basis destroys all information about Alice's bit, exactly as the lesson's mismatch case derives.`,
+    finalAnswer: `$P(1) = ${probabilityBobReadsOne.toFixed(2)}$. A mismatched basis destroys all information about Alice's bit, as the lesson's mismatch case derives.`,
   },
   explanation: {
     correctIdea: "A mismatched basis always gives a uniformly random result (probability 1/2 on each outcome), regardless of which specific bit Alice encoded.",
     whyCorrect: "This is the same mismatch mechanism the lesson derives for bit 1 (Z/X and X/Z combinations), just rerun independently for bit 0 through the real engine.",
     whyWrong: [
-      "Answering 0 or 1 (certainty) confuses this with the matching-basis case — Bob's basis here (X) does not match Alice's encoding basis (Z).",
+      "Answering 0 or 1 confuses this with the matching-basis case. Bob's basis here is X, and Alice encoded in Z.",
     ],
   },
 };

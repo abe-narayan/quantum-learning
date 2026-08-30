@@ -46,10 +46,10 @@ export const dirichletKernelPeakHeight: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "The Dirichlet kernel's peak height grows linearly with the truncation half-width L, while its total area stays exactly 1 for every L — the two facts together are exactly what makes D_L→δ as L→∞.",
+      "The Dirichlet kernel's peak height grows linearly with the truncation half-width L, while its total area stays exactly 1 for every L. Those two facts together are what make D_L→δ as L→∞.",
     whyCorrect: "Direct evaluation of the lesson's derived closed form D_L(q)=sin(qL)/(πq) at its q=0 limit.",
     whyWrong: [
-      "Using D_L(0)=L (forgetting the 1/π factor) misses that the kernel's normalization (total area 1 for every L) is what fixes the 1/π specifically — it isn't a free constant.",
+      "Using D_L(0)=L (forgetting the 1/π factor) misses that the kernel's normalization, total area 1 for every L, is what fixes the 1/π. It is not a free constant.",
     ],
   },
 };

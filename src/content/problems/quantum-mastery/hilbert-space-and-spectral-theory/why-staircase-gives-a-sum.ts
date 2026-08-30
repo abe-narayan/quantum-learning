@@ -21,33 +21,49 @@ export const whyStaircaseGivesASum: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["staircase", "jump", "constant except", "step function"],
-      ["Riemann-Stieltjes", "sum over", "jump size", "value at each jump"],
-      ["position", "continuous", "no jumps", "not a staircase"],
+      {
+        phrases: ["staircase", "jump", "constant except", "step function"],
+        missingFeedback:
+          "Describe the shape of the spectral family E(lambda) when the spectrum is discrete. That shape is doing all the work.",
+      },
+      {
+        phrases: ["Riemann-Stieltjes", "sum over", "is a sum", "becomes a sum", "sum by definition", "reduces to a sum", "collapses into a sum", "turns into a sum"],
+        missingFeedback:
+          "You have the shape. Now say what kind of integral you are computing against it, and what such an integral comes out to when the integrator only moves at isolated points.",
+      },
+      {
+        phrases: ["position", "continuous", "continuously", "smoothly", "absolutely continuous"],
+        missingFeedback:
+          "You have the discrete case. The question also asks about an operator whose PVM is not a staircase: say how its spectral family behaves instead, and why that blocks the same step.",
+      },
     ],
     incorrectFeedback:
-      "Address all three ideas: what makes the discrete-spectrum E(λ) a staircase, why a Riemann-Stieltjes integral against a staircase becomes a plain sum over its jumps, and what's different for position's E(λ).",
+      "Three separate facts are needed and the argument collapses without any one of them. First, describe the shape of E(λ) when the spectrum is discrete: where it changes and where it does not. Second, say what an integral against a function of that shape reduces to, and why that reduction is a definition rather than an approximation. Third, describe the shape of E(λ) for the observable whose spectrum fills the real line, and say why the same reduction is unavailable there.",
     partialFeedback:
-      "Good — now also explain what's different about position's PVM that keeps its ∫λdE(λ) from ever collapsing into a discrete sum.",
+      "Good. The remaining piece is the contrast. Describe the shape of E(λ) for the operator whose spectrum fills the real line, and say what feature it lacks that the discrete case relied on.",
+    modelAnswers: [
+      "For a discrete spectrum, E(lambda) is literally a staircase: constant except at the eigenvalues, where it jumps by the corresponding projector. A Riemann-Stieltjes integral against a staircase picks up only the jumps, so it is a sum by definition. Position's PVM is continuous with no jumps at all, so nothing collapses into a sum there.",
+      "The measure only puts weight where E(lambda) jumps, so the integral becomes a sum over those jumps. For position the spectral family increases continuously, so there are no jumps to pick out and the integral stays an integral.",
+    ],
   },
   hints: [
-    { text: "For a discrete spectrum, E(λ)=Σ_{λᵢ≤λ}Pᵢ jumps by Pᵢ exactly at each eigenvalue and is constant everywhere else." },
-    { text: "A Riemann-Stieltjes integral ∫f dG against a pure staircase G is, by definition, the sum over G's jump points of f(jump point) × (jump size)." },
-    { text: "Position's E(Δ) (multiplication by an indicator function) changes continuously as Δ grows — there's no isolated jump to point to, so the integral genuinely stays an integral, not a sum." },
+    { text: "For a discrete spectrum, E(λ)=Σ_{λᵢ≤λ}Pᵢ. Ask what it does at each eigenvalue, and what it does between them." },
+    { text: "The integral ∫f dG is built out of increments of G. If G only ever changes at isolated points, ask which increments survive." },
+    { text: "Now do the same for the operator that multiplies by an indicator function on an interval. As the interval grows, does E(Δ) ever change abruptly, or only smoothly?" },
   ],
   solution: {
     steps: [
       {
         description:
-          "E(λ)=Σ_{λᵢ≤λ}Pᵢ is constant except for a jump of size Pᵢ exactly at each eigenvalue λᵢ — a genuine staircase function of λ.",
+          "E(λ)=Σ_{λᵢ≤λ}Pᵢ is constant except for a jump of size Pᵢ exactly at each eigenvalue λᵢ: a staircase function of λ.",
       },
       {
         description:
-          "A Riemann-Stieltjes integral against a staircase function is, by the definition of that integral, exactly the sum over the staircase's jump points of (integrand value there) × (jump size) — so ∫λ dE(λ) becomes Σᵢλᵢ Pᵢ with no approximation involved.",
+          "A Riemann-Stieltjes integral against a staircase function is, by the definition of that integral, the sum over the staircase's jump points of (integrand value there) × (jump size), so ∫λ dE(λ) becomes Σᵢλᵢ Pᵢ with no approximation involved.",
       },
       {
         description:
-          "Position's spectral measure E(Δ) = multiplication by the indicator function 1_Δ(x) changes smoothly as Δ is enlarged continuously — there is no isolated jump anywhere, so ⟨ψ|E(λ)ψ⟩ is a continuous (not staircase) function of λ, and ∫x dE(x) genuinely stays an integral over the whole real line.",
+          "Position's spectral measure E(Δ) = multiplication by the indicator function 1_Δ(x) changes smoothly as Δ is enlarged continuously. There is no isolated jump anywhere, so ⟨ψ|E(λ)ψ⟩ is a continuous rather than staircase function of λ, and ∫x dE(x) stays an integral over the whole real line.",
       },
     ],
     finalAnswer:
@@ -55,8 +71,8 @@ export const whyStaircaseGivesASum: ConceptualProblem = {
   },
   explanation: {
     correctIdea:
-      "This is the lesson's central derived fact: the finite-dimensional spectral decomposition isn't a separate theorem, it's what the general PVM integral does automatically whenever the measure happens to be a staircase.",
-    whyCorrect: "Matches the lesson's explicit Riemann-Stieltjes derivation and its contrast with position's continuous PVM.",
+      "This is the lesson's central derived fact: the finite-dimensional spectral decomposition is not a separate theorem. It is what the general PVM integral does whenever the measure happens to be a staircase.",
+    whyCorrect: "A Stieltjes integral picks up contributions only where its integrator moves. A discrete-spectrum E(λ) moves only at the eigenvalues, so the integral is a sum over those points by definition rather than by approximation. Position's E(Δ) moves everywhere, so nothing isolates a term to collect.",
     whyWrong: [
       "Claiming the discrete case is 'simpler physics' rather than a mathematical special case of the same measure-theoretic object misses the actual mechanism (staircase vs. continuous measure).",
     ],

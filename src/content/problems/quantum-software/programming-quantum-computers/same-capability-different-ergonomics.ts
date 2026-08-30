@@ -16,10 +16,10 @@ export const sameCapabilityDifferentErgonomics: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "Per this lesson, do Qiskit, Cirq, and PennyLane differ in what they can compute, or in how it feels to write?",
     options: [
-      { id: "a", text: "In how it feels: each expresses the same circuits and reaches the same backends, and they differ in ergonomics and ecosystem" },
-      { id: "b", text: "In what they compute: each is tied to its own vendor's hardware, so a circuit written in one cannot run on another's device" },
-      { id: "c", text: "In what they compute: only PennyLane can differentiate a circuit, so gradient-based algorithms are out of reach for the others" },
-      { id: "d", text: "In what they compute: Qiskit's transpiler reaches native gate sets the others cannot target, so only Qiskit runs on real hardware" },
+      { id: "a", text: "In how it feels: all three express the same circuits and reach the same backends, differing in ergonomics" },
+      { id: "b", text: "In what they compute: each is tied to its own vendor's hardware, so a circuit does not port between them" },
+      { id: "c", text: "In how it feels, except for gradients: only PennyLane can differentiate a circuit, which the others cannot" },
+      { id: "d", text: "In what they compute: only Qiskit's transpiler reaches hardware-native gate sets, so only it runs on devices" },
     ],
   },
   answer: {
@@ -27,7 +27,7 @@ export const sameCapabilityDifferentErgonomics: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "Each SDK has a home vendor, but all three target multiple providers, and a circuit is portable through OpenQASM in any case. Vendor affinity is an ecosystem fact, not a capability wall.",
-      c: "The parameter-shift rule is implemented across the major SDKs. PennyLane makes gradients more ergonomic; it does not hold a monopoly on them.",
+      c: "Half right, and the half it gets wrong is the important one. The parameter-shift rule is implemented across the major SDKs, so gradients are an ergonomics difference like all the others, not the one exception to the rule.",
       d: "Every major SDK transpiles to hardware-native gate sets and submits to real devices. Transpiler maturity differs; access does not.",
     },
     defaultIncorrectFeedback: "Ask whether anything named is something the other SDKs cannot do, or something they make you work harder to do.",
@@ -43,10 +43,10 @@ export const sameCapabilityDifferentErgonomics: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Framework choice here is a question of fit, not of reach. Every one of these SDKs can express what the others can.",
-    whyCorrect: "Matches the lesson's Common Mistakes section on overstating SDK differences.",
+    whyCorrect: "All three describe the same gate model, transpile to hardware-native gate sets, and reach multiple providers, so nothing here is computable in one and not another. What differs is the shape of the API and the ecosystem around it.",
     whyWrong: [
       { optionId: "b", text: "Turns vendor affinity into a hard restriction. All three target multiple providers." },
-      { optionId: "c", text: "Turns an ergonomics advantage into an exclusive feature." },
+      { optionId: "c", text: "Gets the shape right and then carves out one exception that is not there. Every major SDK implements the parameter-shift rule." },
       { optionId: "d", text: "Turns transpiler maturity into a monopoly on hardware access." },
     ],
   },

@@ -49,10 +49,10 @@ export const freeParticleGreensFunctionMagnitude: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "The free-particle Green's function's magnitude depends only on E (through k), never on the specific positions — only its phase carries position information.",
+      "The free-particle Green's function's magnitude depends only on E (through k), never on the specific positions. Only its phase carries position information.",
     whyCorrect: "Direct consequence of |e^{iθ}|=1 for any real phase θ=k|x-x'|, applied to the boxed closed form derived in the lesson.",
     whyWrong: [
-      "Computing |G₀| as 1/k² (squaring k rather than taking the reciprocal of k itself) confuses the Green's function's magnitude with a probability-density-like quantity — |G₀| is a magnitude, not a squared magnitude.",
+      "Computing |G₀| as 1/k² (squaring k rather than taking the reciprocal of k itself) confuses the Green's function's magnitude with a probability-density-like quantity. |G₀| is a magnitude, not a squared magnitude.",
     ],
   },
 };

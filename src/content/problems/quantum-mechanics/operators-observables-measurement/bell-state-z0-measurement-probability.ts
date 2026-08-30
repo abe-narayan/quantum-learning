@@ -28,8 +28,9 @@ export const bellStateZ0MeasurementProbability: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Z_0's +1-eigenspace is span{|00>, |01>}." },
-    { text: "The Bell state has amplitude 1/sqrt(2) on |00> and 0 on |01>." },
+    { text: "Z_0 acts on the first qubit only, so its +1 eigenspace is not a single basis state. It contains every two-qubit basis state whose first label is 0." },
+    { text: "List the basis states in that eigenspace, then read off the Bell state's amplitude on each of them." },
+    { text: "Add the squared moduli of those amplitudes. One of the two contributions vanishes, so only the other survives into the answer." },
   ],
   solution: {
     steps: [

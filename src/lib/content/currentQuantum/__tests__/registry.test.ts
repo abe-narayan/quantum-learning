@@ -20,14 +20,14 @@ import {
  * `data.ts` holds the summary, "why this matters", citation, difficulty and
  * figure, keyed by slug, and is server-only. `registry.ts` rejoins them.
  * `src/lib/design/__tests__/clientBoundary.test.ts` enforces the boundary
- * itself — its size budget and its SERVER_ONLY list. This file enforces that
+ * itself: its size budget and its SERVER_ONLY list. This file enforces that
  * the split stayed *lossless*: every entry still has both halves, the join
  * puts them back together intact, and the meta-only lookups agree with their
  * full-entry twins about which entries exist and in what order.
  *
- * Unlike `src/lib/problems/__tests__/metaRegistry.test.ts` — where the metas
+ * Unlike `src/lib/problems/__tests__/metaRegistry.test.ts`, where the metas
  * are text-extracted from the real problem modules by a generator and can
- * drift from them — nothing here is duplicated between the two files, so
+ * drift from them, nothing here is duplicated between the two files, so
  * there is no field-level drift to catch. What can go wrong is a *missing or
  * orphaned half* (mostly caught at compile time by
  * `Record<CurrentQuantumSlug, CurrentQuantumEntryBody>`, re-checked here so

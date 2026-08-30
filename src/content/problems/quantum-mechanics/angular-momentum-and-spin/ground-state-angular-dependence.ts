@@ -20,11 +20,23 @@ export const groundStateAngularDependence: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["y_0^0", "y00", "y_00", "y zero zero", "only one m value", "single m value", "one allowed m", "only m=0", "m=0 only", "m must be 0", "m can only be 0", "l=0 has m=0"],
-      ["constant", "no theta", "no phi", "independent of theta", "independent of angle", "independent of direction", "angle-independent", "spherically symmetric", "same in all directions", "same in every direction", "no preferred direction", "does not depend on theta", "doesn't depend on theta", "does not depend on angle", "doesn't depend on angle", "no angular"],
+      {
+        phrases: ["y_0^0", "y00", "y_00", "y zero zero", "only one m value", "single m value", "one allowed m", "only m=0", "m=0 only", "m must be 0", "m can only be 0", "l=0 has m=0"],
+        missingFeedback:
+          "Start from l=0 and say what the general angular-momentum results leave available for m, and which single spherical harmonic that picks out.",
+      },
+      {
+        phrases: ["constant", "no theta", "no phi", "independent of theta", "independent of angle", "independent of direction", "angle-independent", "spherically symmetric", "same in all directions", "same in every direction", "no preferred direction", "does not depend on theta", "doesn't depend on theta", "does not depend on angle", "doesn't depend on angle", "no angular"],
+        missingFeedback:
+          "You have the harmonic. Now say what that function looks like as you move around the sphere, and what that means for the shape of the state.",
+      },
     ],
     incorrectFeedback: "Two steps are needed: which single angular function l=0 leaves available, and what is special about that function's formula.",
-    partialFeedback: "Good. Now state explicitly what that formula's behavior as the angles vary implies physically.",
+    partialFeedback: "Now state what that formula's behavior as the angles vary implies physically.",
+    modelAnswers: [
+      "l=0 forces m=0, and the only spherical harmonic with l=0 is Y_0^0, which is a constant. So the angular part carries no theta or phi dependence at all and the state is spherically symmetric.",
+      "For l=0 there is only one allowed m, and Y_00 is just a number. The wavefunction therefore does not depend on angle: it looks the same in every direction.",
+    ],
   },
   hints: [
     { text: "How many m values does l=0 allow? Which spherical harmonic is left?" },
@@ -41,7 +53,7 @@ export const groundStateAngularDependence: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "This prediction requires zero hydrogen-specific calculation. It follows entirely from this course's general angular momentum results.",
-    whyCorrect: "This is exactly the capstone's worked example, generalized to an explanation in your own words.",
-    whyWrong: ["Appealing to 'hydrogen is simple' without citing the specific Y₀⁰ formula and its l=0 origin doesn't demonstrate the actual chain of reasoning."],
+    whyCorrect: "This is the capstone's worked example, restated as an explanation in your own words.",
+    whyWrong: ["Appealing to 'hydrogen is simple' without citing the Y₀⁰ formula and its l=0 origin does not demonstrate the chain of reasoning."],
   },
 };

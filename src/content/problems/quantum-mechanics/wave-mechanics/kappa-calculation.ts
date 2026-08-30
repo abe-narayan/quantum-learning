@@ -14,8 +14,8 @@ export const kappaCalculation: NumericProblem = {
   },
   question: {
     type: "numeric",
-    prompt: "A particle with energy E = 6 approaches a barrier of height V0 = 10 (natural units, hbar = m = 1). Find the decay constant kappa = sqrt(2*(V0-E)).",
-    inputHint: "a decimal",
+    prompt: "A particle with energy E = 6 approaches a barrier of height V0 = 10 (natural units, hbar = m = 1). Find the decay constant kappa that governs the wavefunction's exponential decay inside the barrier.",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -29,8 +29,9 @@ export const kappaCalculation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "First compute V0-E, the energy deficit." },
-    { text: "kappa = sqrt(2*(V0-E)) in natural units." },
+    { text: "Inside the barrier the kinetic energy would have to be negative, so the wavenumber turns imaginary and the oscillation becomes a decay." },
+    { text: "Take the free-particle relation between wavenumber and energy and put the energy deficit V0 minus E where the kinetic energy used to sit." },
+    { text: "Work the deficit out first, then the factor of 2, then the root. Stopping before the root leaves kappa squared rather than kappa." },
   ],
   solution: {
     steps: [

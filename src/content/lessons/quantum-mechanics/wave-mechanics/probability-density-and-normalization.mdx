@@ -24,11 +24,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Imposed once, and it never slips">
 The last lesson derived ∫|ψ(x)|²dx = 1 from a continuum limit. This lesson treats that condition as a working tool: normalizing wavefunctions, computing region probabilities, and understanding why a correctly-evolving quantum state can never drift out of normalization.
 </LessonHook>
 
-## Motivation
+## A condition you impose once and never again
 
 Normalization is a condition you impose once, at $t=0$. Nothing after
 that moment re-imposes it: the dynamics keep the total probability at 1
@@ -45,7 +45,7 @@ into a working tool, then watches the norm hold under real evolution.
   license="CC BY-SA 3.0"
 />
 
-## Intuition
+## Density, in the same sense as mass density
 
 $|\psi(x)|^2$ is a probability density in the same sense as a mass density or a
 population density: to get an actual probability (a plain number between
@@ -53,7 +53,7 @@ population density: to get an actual probability (a plain number between
 integrated over all of space must be exactly 1, because the particle is
 *somewhere* with certainty.
 
-## Mathematical Development
+## Rescaling, regions, and why the norm holds
 
 ### Normalization
 
@@ -107,7 +107,7 @@ floating-point precision.
   <LazyWavefunctionExplorer />
 </InteractiveSection>
 
-## Physical Interpretation
+## Norm conservation is particle conservation
 
 Norm conservation is probability conservation: the particle doesn't
 appear or disappear, get created or destroyed, as time passes. Any
@@ -116,7 +116,7 @@ of the reasons the split-operator method, built from exact-phase factors,
 is the right tool here. A naive explicit finite-difference scheme does not
 preserve the norm on its own, and can diverge outright.
 
-## Worked Example
+## A Gaussian, normalized and then integrated
 
 **$\psi(x) = A\,e^{-x^2/(2\sigma^2)}$ for a real constant $\sigma$. Find
 $A$, and find $P(-\sigma \le x \le \sigma)$.**
@@ -153,7 +153,7 @@ familiar $68\%$ figure evaluated at $\sqrt2$ rather than at $1$.
   <RegionProbability />
 </InteractiveSection>
 
-## Common Mistakes
+## What squaring is for, and what cannot be normalized
 
 <Callout type="warning">
 **Forgetting to square before integrating.** Normalization uses
@@ -171,12 +171,130 @@ handling (briefly touched on in the Free-Particle Wave Packets lesson).
 ## Practice Questions
 
 1. For $\psi(x) = A$ on $[-2,3]$ and $0$ elsewhere, find $A$.
-2. Explain in one sentence how $U^\dagger U = I$
-   guarantees norm preservation.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $A = 1/\sqrt5 \approx 0.447$.
+
+   The only thing the normalization integral sees is the *length* of the
+   support, not where it sits:
+
+   $$
+   \int_{-2}^{3}|A|^2\,dx = |A|^2\,\big(3-(-2)\big) = 5|A|^2 = 1 \quad\Longrightarrow\quad A = \frac{1}{\sqrt5}
+   $$
+
+   taking $A$ real and positive.
+
+   The error this question is built to catch is treating the interval as
+   having length $3$, reading the upper limit as the width and getting
+   $A=1/\sqrt3\approx0.577$. The interval runs from $-2$, not from $0$, and
+   its width is $b-a=5$. Translating the same top-hat anywhere along the
+   line changes nothing about $A$: $[0,5]$, $[-2,3]$ and $[100,105]$ all
+   give $1/\sqrt5$, because probability does not care where the origin was
+   put.
+
+   A second check: $|\psi|^2 = 1/5 = 0.2$ everywhere on the support, and
+   $0.2\times5 = 1$. The density is a flat $0.2$ per unit length, and it
+   is the area under it, not its height, that is a probability.
+
+   </details>
+
+2. Write out the chain
+   $\langle\psi(t)|\psi(t)\rangle=\langle\psi(0)|U^\dagger U|\psi(0)\rangle=1$
+   in this lesson's position-space integral notation, and say precisely
+   which equality in it is the one $U^\dagger U=I$ licenses.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   In integrals, the chain reads
+
+   $$
+   \int|\psi(x,t)|^2\,dx = \langle\psi(t)|\psi(t)\rangle = \langle\psi(0)|U^\dagger(t)U(t)|\psi(0)\rangle = \langle\psi(0)|\psi(0)\rangle = \int|\psi(x,0)|^2\,dx = 1
+   $$
+
+   and the equality $U^\dagger U=I$ licenses is the *third* one, the step
+   from $\langle\psi(0)|U^\dagger U|\psi(0)\rangle$ to
+   $\langle\psi(0)|\psi(0)\rangle$. Everything else in the chain is
+   definition or bookkeeping.
+
+   Worth separating out what each of the other steps is doing, because
+   only one of them is a theorem.
+
+   The first equality is the definition of the inner product in position
+   space: $\langle\phi|\psi\rangle=\int\phi(x)^*\psi(x)\,dx$, so
+   $\langle\psi|\psi\rangle$ is $\int\psi^*\psi\,dx = \int|\psi|^2dx$. No
+   physics, just what the bracket means once the basis is a continuum.
+
+   The second is the substitution $|\psi(t)\rangle = U(t)|\psi(0)\rangle$
+   together with the adjoint rule $\langle U\phi| = \langle\phi|U^\dagger$.
+   Again no physics: this is how adjoints are defined.
+
+   The third is the only place a property of $U$ enters, and it is the
+   whole argument. The last is the initial condition, imposed by hand at
+   $t=0$ and never again.
+
+   The instructive slip is to think unitarity has to be re-checked at each
+   instant, or that "the norm is conserved" is an approximate statement
+   about slowly varying states. It is neither. The chain has no $t$-
+   dependence left in it once the third step is taken, so
+   $\int|\psi(x,t)|^2dx = 1$ holds identically, at every real $t$, for
+   every initial state, with no smallness assumption anywhere. That is why
+   the simulator's norm readout sitting at $1.0000$ indefinitely is not
+   evidence of a well-behaved run: it is a consequence the method was built
+   to guarantee, which is exactly why the next question's scenario is
+   diagnostic.
+
+   </details>
+
 3. If a numerical simulation of a normalized state showed
    $\|\psi(t)\|=0.998$ after some evolution, what would that most likely
    indicate about the *method* used, given the exact-unitarity argument
    above?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   That the numerical evolution operator being applied is not unitary. The
+   physics cannot lose $0.2\%$ of a particle, so the loss belongs to the
+   integrator, not to the state.
+
+   The argument above leaves no room for a physical explanation. Exact
+   Schrödinger evolution preserves the norm identically, so a drift is a
+   discrepancy between the discrete map the computer applies and the
+   continuous map the equation specifies. Three concrete causes account for
+   nearly every real instance.
+
+   The scheme is not norm-preserving by construction. A naive explicit
+   finite-difference or forward-Euler step is $I-\tfrac{i}{\hbar}H\Delta t$
+   truncated, which is not unitary for any finite $\Delta t$; its norm
+   drifts every step and the drift compounds. The split-operator method
+   this platform uses avoids this by being built from three factors that
+   are each exactly a pure phase, so its norm is preserved regardless of
+   $\Delta t$.
+
+   Probability has run off the edge of the grid. A finite grid is not the
+   infinite line, and a spreading or travelling packet that reaches the
+   boundary either wraps around or is clipped, depending on the boundary
+   condition. The norm computed over the retained region then falls
+   honestly, and the fix is a wider grid or a shorter run, not a better
+   integrator.
+
+   The non-unitarity was put in deliberately. Absorbing boundary layers and
+   complex "optical" potentials are standard tools for simulating a
+   particle leaving the region of interest, and they work precisely by
+   making $H$ non-Hermitian so that norm is lost on purpose. A drift then
+   means the model is behaving as designed.
+
+   What the number does *not* tell you is how accurate the run was. The
+   lesson on numerical evolution makes the point in the opposite direction:
+   a method can hold the norm at exactly $1.0000$ while getting the energy
+   wrong by a factor of thirty. Norm conservation and accuracy are separate
+   guarantees, so $0.998$ is evidence of one specific defect, and $1.0000$
+   is evidence of the absence of that one specific defect and nothing more.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -191,7 +309,7 @@ handling (briefly touched on in the Free-Particle Wave Packets lesson).
   approximation, and one the simulator's exact norm conservation
   demonstrates directly.
 
-## Further Exploration
+## From the density to concrete predictions
 
 <NextDiscovery>
 [Expectation Values in Position Space](/lessons/quantum-mechanics/wave-mechanics/expectation-values-in-position-space) turns $|\psi(x)|^2$ into

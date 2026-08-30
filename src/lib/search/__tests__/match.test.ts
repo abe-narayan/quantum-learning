@@ -49,6 +49,19 @@ describe("foldForSearch", () => {
     // "A 50/50 Mixture of |+⟩ and |−⟩" is authored with U+2212.
     expect(foldForSearch("|−⟩")).toBe("|->");
   });
+
+  it("folds every typographic dash onto the hyphen a keyboard produces", () => {
+    // U+2010 hyphen through U+2015 horizontal bar. Two glossary titles were
+    // spelled with the en dash (U+2013) while the whole rest of the corpus
+    // writes those same names with an ASCII hyphen, so `eastin-knill` reached
+    // every entry that mentions the theorem and not the theorem's own entry.
+    for (let codePoint = 0x2010; codePoint <= 0x2015; codePoint += 1) {
+      const dash = String.fromCharCode(codePoint);
+      expect(foldForSearch(`Eastin${dash}Knill`), `U+${codePoint.toString(16)} is not folded`).toBe(
+        "eastin-knill"
+      );
+    }
+  });
 });
 
 describe("acronymOf", () => {
@@ -118,6 +131,27 @@ describe("matchesAllTokens", () => {
     expect(matchesAllTokens(bellState, tokenizeQuery(""))).toBe(false);
     expect(matchesAllTokens(bellState, tokenizeQuery("   "))).toBe(false);
   });
+
+  it("matches the start of a longer word, never the middle of one", () => {
+    // The rule `containsToken` states, in its two halves. A reader types the
+    // singular of a term the corpus pluralizes, so a token must be allowed to
+    // finish inside a word; a reader typing `bra` is not asking about
+    // calibration, so it must not be allowed to *start* inside one.
+    const bellStates = prepare("Bell States", "Four maximally entangled two-qubit pairs.");
+    const calibration = prepare("Calibration Drift", "Slow drift of a control parameter.");
+    expect(matches(bellStates, "state")).toBe(true);
+    expect(matches(calibration, "cali")).toBe(true);
+    expect(matches(calibration, "bra")).toBe(false);
+    expect(matches(prepare("Abstract Algebra", "Groups and rings."), "bra")).toBe(false);
+  });
+
+  it("keeps notation queries literal, since a boundary means nothing to a ket", () => {
+    // "|+>" sits against a digit on its left in "⟨0|+⟩". A token that does not
+    // begin with a letter or digit is matched as a plain substring, which is
+    // the whole reason a reader can type a ket on an ordinary keyboard.
+    const innerProduct = prepare("Computing ⟨0|+⟩", "An inner product on one qubit.");
+    expect(matches(innerProduct, "|+>")).toBe(true);
+  });
 });
 
 describe("matchScore", () => {
@@ -153,6 +187,23 @@ describe("matchScore", () => {
     const schrodinger = prepare("Schrödinger equation", "Evolution of the state.");
     expect(score(schrodinger, "schrodinger equation")).toBe(0);
     expect(score(schrodinger, "schrodinger")).toBe(1);
+  });
+
+  it("scores a spaced query against a closed-up title as if the space were not there", () => {
+    // The corpus writes "wavefunction"; Griffiths and Shankar write "wave
+    // function", and so does the reader who learned it from them. Before this
+    // the entry the query names scored 3 (its description contains "function")
+    // and lost to two lessons that merely hold both words.
+    const wavefunction = prepare("Wavefunction", "The state written as a function of position.");
+    expect(score(wavefunction, "wave function")).toBe(0);
+    expect(score(prepare("Wavefunction collapse", "The update on measurement."), "wave function")).toBe(1);
+  });
+
+  it("leaves single-token scoring exactly as it was", () => {
+    // The closed-up spelling is only tried for a multi-token query, so nothing
+    // one word long can be reordered by it.
+    expect(score(prepare("Qubit", "The basic unit."), "qubit")).toBe(0);
+    expect(score(prepare("Bloch sphere", "Visualizes a qubit."), "qubit")).toBe(3);
   });
 });
 

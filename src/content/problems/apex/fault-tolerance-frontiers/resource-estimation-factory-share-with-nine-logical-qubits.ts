@@ -20,7 +20,7 @@ export const resourceEstimationFactoryShareWithNineLogicalQubits: NumericProblem
     type: "numeric",
     prompt:
       "The capstone showed that when the magic-state factory and the compute register share the same code distance, the factory's share of the total physical qubit count is exactly 15/(15+L), where L is the number of logical qubits and 15 is the 15-to-1 distillation protocol's input-state count, independent of the code distance. If the toy algorithm needed L=9 logical qubits instead of the lesson's 6, what fraction of the total physical qubits would the factory occupy?",
-    inputHint: "as a decimal between 0 and 1",
+    inputHint: "as a decimal between 0 and 1, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -59,7 +59,7 @@ export const resourceEstimationFactoryShareWithNineLogicalQubits: NumericProblem
   },
   explanation: {
     correctIdea:
-      "The factory's share of total qubits depends only on the ratio of the distillation protocol's input-state count to the number of logical qubits, not on the code distance itself, exactly as the capstone's algebra shows.",
+      "The factory's share of total qubits depends only on the ratio of the distillation protocol's input-state count to the number of logical qubits, not on the code distance itself, as the capstone's algebra shows.",
     whyCorrect:
       "This directly reuses the capstone's own derived invariant 15/(15+L) rather than re-deriving the qubit counts from scratch, and correctly predicts that a larger logical-qubit count shrinks the factory's relative share even though the factory's absolute qubit cost hasn't changed.",
     whyWrong: [

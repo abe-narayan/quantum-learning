@@ -24,11 +24,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Three codes, one loop underneath">
 Bit-flip code, phase-flip code, Shor code: three different constructions this course has built, running the exact same four-step recovery loop underneath, just dressed differently each time.
 </LessonHook>
 
-## Motivation
+## Naming the procedure, then the notation
 
 Every code this course has built follows the same four-step procedure. This
 lesson names that procedure in general terms and then gives the standard
@@ -48,7 +48,7 @@ distance 1 as a general quantum code. The parameters say so out loud.
   license="CC BY 2.0"
 />
 
-## Mathematical Development
+## Four steps, and the numbers that summarize a code
 
 ### The recovery procedure, in general
 
@@ -69,13 +69,55 @@ This is `runBitFlipCorrectionCycle`'s four steps (extract
 syndrome via ancilla CNOTs and measurement, `decodeBitFlipSyndrome` looks
 up the table, apply $X$ to the identified qubit, return the corrected
 3-qubit state), described here in the vocabulary that generalizes to any
-stabilizer code, not just this one.
+stabilizer code, this one included.
+
+### Step 1 is what makes continuous errors correctable
+
+Lesson 1 promised this argument and deferred it to here. The procedure
+above only ever names Pauli corrections, and real noise is not Pauli: it
+is some small unwanted rotation, drawn from a continuum. Nothing in
+steps 2 to 4 can undo a rotation by $0.037$ radians, because the decode
+table has no entry for it. The resolution is that step 4 never sees one.
+
+Write an arbitrary single-qubit error on qubit $j$ in the Pauli basis,
+$E=c_0I+c_1X_j+c_2Y_j+c_3Z_j$, with continuous complex $c_a$. Acting on
+an encoded state it gives a superposition of four branches:
+
+$$
+E|\psi_L\rangle = c_0|\psi_L\rangle + c_1X_j|\psi_L\rangle + c_2Y_j|\psi_L\rangle + c_3Z_j|\psi_L\rangle
+$$
+
+Each branch is a simultaneous eigenstate of every generator, with
+eigenvalues fixed entirely by which generators that Pauli anticommutes
+with (Lesson 5). So each branch carries one definite syndrome, and the
+four syndromes are different from each other whenever the code can
+distinguish those four errors at all. Step 1 measures those generators.
+A measurement of an observable on a superposition of its eigenstates
+returns one eigenvalue and projects onto the matching eigenspace, so the
+outcome is one syndrome $s$, drawn with probability $|c_a|^2$, and the
+register is left in that single branch $P_a|\psi_L\rangle$ with the
+continuous coefficients gone. Applying $P_a$ again (every Pauli is its
+own inverse) restores $|\psi_L\rangle$ exactly, not approximately.
+
+That is **error discretization**. The continuum never has to be handled,
+because measuring the syndrome is what converts it into one of four
+discrete cases. It is the reason a table with four entries defends
+against infinitely many errors, and it generalizes: the argument used
+nothing about this code beyond "the branches carry distinct syndromes."
+Where two Paulis do share a syndrome, as $Z_0$, $Z_1$ and $Z_2$ do
+within one Shor-code group, the projection leaves a superposition of
+those branches rather than a single one, and the code still works
+because every branch in it is undone by the same correction.
 
 ### Code parameters: [[n,k,d]]
 
 A quantum code is described by three numbers: $n$ (physical qubits used),
 $k$ (logical qubits protected), and $d$ (the code's **<Term id="code-distance">distance</Term>**, the
-minimum number of physical qubits an *undetectable* error must act on).
+smallest number of physical qubits an error can act on while both
+escaping detection *and* changing the logical state). Both halves matter.
+A stabilizer such as $Z_0Z_1$ is undetectable by construction, since the
+codewords are its $+1$ eigenstates, but it does nothing to the encoded
+information either, so it does not count.
 Against bit-flip errors alone, the 3-qubit code earns distance $3$: $3$
 physical qubits, $1$ logical qubit, and the cheapest undetectable $X$-type
 error has weight 3 ($X$ on all three qubits maps
@@ -97,12 +139,14 @@ cost.
     { label: "n=3, bit-flip", value: 3, caption: "3 physical qubits" },
     { label: "n=9, Shor", value: 9, caption: "9 physical qubits", highlight: true }
   ]}
+  maxValue={9}
   ariaLabel="Physical qubit count for the 3-qubit bit-flip code, distance 3 against bit flips only, versus the 9,1,3 Shor code, distance 3 against every Pauli error"
 />
 
 Distance $3$ against one error type versus distance $3$ against all of
-them, at $3\times$ the qubits: $n$ is a cost paid for broader error
-coverage, not a benefit that scales with the number itself.
+them, at $3\times$ the qubits: the extra six qubits bought coverage of a
+second error type, not a larger distance. $n$ is what broader coverage
+cost, not a measure of how good the code is.
 
 ### Distance and correctable error count
 
@@ -115,7 +159,7 @@ Lessons 2 and 3 verified directly. A two-qubit error is not guaranteed
 correctable by a distance-3 code (consistent with the practice question,
 several lessons back, about simultaneous errors on two data qubits).
 
-## Physical Interpretation
+## The tradeoff, made explicit
 
 $[[n,k,d]]$ makes the fundamental tradeoff of quantum error correction
 explicit: larger $d$ (more error-correcting power) generally costs more
@@ -133,14 +177,14 @@ measurement rate: a real-time computing problem sitting on top of the
 decode-table lookup this lesson builds, and one that gets harder as $n$
 grows and the lookup table stops being a table at all.
 
-## Interactive Experiment
+## Step through a real correction cycle
 
 The four-step recovery procedure above is what the simulator's
 real `runBitFlipCorrectionCycle` executes: measure every generator,
 decode the syndrome, apply the correction. Step through it yourself on
 the same 3-qubit bit-flip code whose parameters this lesson pinned down.
 
-<InteractiveSection title="Run the general recovery procedure" description="Check a single qubit (0, 1, or 2) and read off the syndrome (s1, s2). Confirm it matches Lesson 2's decode table, then check the recovered state's amplitude table against the uncorrupted encoded state: step 4's exact-recovery guarantee holds for every qubit you try. Then check two qubits at once, say 0 and 1, to drive the weight-2 scenario the Worked Example derives by hand, and watch the amplitude table swap α and β as predicted.">
+<InteractiveSection title="Run the general recovery procedure" description="Check a single qubit (0, 1, or 2) and read off the syndrome (s1, s2). Confirm it matches Lesson 2's decode table, then check the recovered state's amplitude table against the uncorrupted encoded state: step 4's exact-recovery guarantee holds for every qubit you try. Then check two qubits at once, say 0 and 1, to drive the weight-2 scenario the prediction below and the distance-3 walkthrough both take apart, and read the recovered amplitudes carefully against the ones you started with.">
   <LazySyndromeExplorer mode="bit-flip" />
 </InteractiveSection>
 
@@ -157,15 +201,15 @@ demonstrated for one of the two:
   question="An X error hits two qubits at once, qubit 0 and qubit 1. The code is only rated to correct one-qubit errors. What happens when you run the standard recovery procedure on it anyway?"
   options={[
     { label: "It correctly recovers the original state anyway", value: "recovers" },
-    { label: "It detects the problem and leaves the state alone", value: "leaves" },
+    { label: "It detects that something is wrong, declines to guess, and leaves the state untouched", value: "leaves" },
     { label: "It applies the wrong fix and turns two errors into a full logical bit flip", value: "worsens" },
     { label: "The syndrome comes out (0,0), so nothing happens at all", value: "silent" },
   ]}
   correctValue="worsens"
-  explanation="The syndrome for X0X1 is (0,1), which the decode table reads as a single X error on qubit 2, a qubit the actual error never touched. Applying the prescribed fix, X on qubit 2, doesn't undo anything: it adds a third error on top of the two already there, and X0X1X2 is the undetectable weight-3 X error that swaps the logical alpha and beta outright. A distance-3 code doesn't just fail to help above its rated weight, it can actively convert a survivable-looking situation into a full logical error, worked out below."
+  explanation="The syndrome for X0X1 is (0,1), which the decode table reads as a single X error on qubit 2, a qubit the actual error never touched. Applying the prescribed fix, X on qubit 2, doesn't undo anything: it adds a third error on top of the two already there, and X0X1X2 is the undetectable weight-3 X error that swaps the logical alpha and beta outright. A distance-3 code doesn't just fail to help above its rated weight; it can actively convert a survivable-looking situation into a full logical error, worked out below."
 />
 
-## Worked Example
+## Distance three, checked at weight one and two
 
 **Confirm the bit-flip code's distance against $X$ errors is exactly 3,
 not less, by checking what happens for a weight-1 and a weight-2 $X$
@@ -192,21 +236,20 @@ that leaves no trace in the syndrome at all, confirming $d=3$ within
 the bit-flip error model. (For the full-Pauli distance, remember the
 single-$Z$ error from the parameters section: undetected, weight 1.)
 
-## Common Mistakes
+## Detected is not the same as handled
 
 <Callout type="warning">
 **Confusing "detected" with "safely handled."** The worked example's
-weight-2 case *does* trigger a nonzero syndrome, but running the
-recovery procedure on it doesn't just fail to help, it actively converts
-the 2-qubit error into a full logical bit flip. A distance-3 code is only
-guaranteed correct for weight-1 errors; running its recovery procedure on
-a weight-2 error can make things categorically worse, not merely
-"not better."
+weight-2 case *does* trigger a nonzero syndrome, and the recovery
+procedure then converts the 2-qubit physical error into a full logical
+bit flip. A distance-3 code is only guaranteed correct for weight-1
+errors. Above that weight, running its recovery procedure can leave the
+logical state categorically worse off than doing nothing.
 </Callout>
 
 <Callout type="warning">
-**Assuming bigger n always means a better code.** $n$ is a *cost*
-(physical qubits spent), not a benefit. The meaningful comparison is the
+**Assuming bigger n always means a better code.** $n$ counts physical
+qubits spent, which is a cost rather than a capability. The meaningful comparison is the
 ratio of $d$ (or correctable error count) to $n$, which is what makes
 $[[9,1,3]]$ (Shor) less resource-efficient than later codes with the same
 distance but fewer physical qubits (not covered in this course, but named
@@ -219,16 +262,189 @@ here as a real, active research area).
    its target errors, using the same argument with $X_0X_1X_2$ replaced
    by $Z_0Z_1Z_2$. Then find the weight-1 error its stabilizers cannot
    see, mirroring the bit-flip code's single-$Z$ blind spot.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Distance 3 against $Z$ errors, with $Z_0Z_1Z_2$ as the cheapest
+   undetectable-and-harmful one; and the blind spot is a single $X$ on
+   any qubit.
+
+   The generators are $X_0X_1$ and $X_1X_2$ (question 3 of the last
+   lesson), so every commutation question reduces to counting how many
+   qubits an error shares a *different* Pauli with.
+
+   Weight 1. $Z_0$ meets an $X$ on qubit 0 in the first generator only,
+   so it flips one bit: syndrome $(1,0)$. $Z_1$ appears in both, so
+   $(1,1)$. $Z_2$ appears in the second only, so $(0,1)$. Three errors,
+   three distinct nonzero syndromes, all correctable.
+
+   Weight 2. $Z_0Z_1$ overlaps $X_0X_1$ on both of its qubits, an even
+   count, so that bit stays $0$; it overlaps $X_1X_2$ on qubit 1 alone,
+   so that bit flips. Syndrome $(0,1)$, which is $Z_2$'s syndrome. The
+   decoder applies $Z_2$ and the register is left with $Z_0Z_1Z_2$: a
+   full logical error, the exact mirror of the $X_0X_1$ case above.
+
+   Weight 3. $Z_0Z_1Z_2$ overlaps each generator on two qubits, both even
+   counts, so the syndrome is $(0,0)$: undetectable. And it is not
+   harmless. $Z|+\rangle=|-\rangle$ and $Z|-\rangle=|+\rangle$, so
+   $Z_0Z_1Z_2$ exchanges $|+++\rangle$ and $|---\rangle$, swapping
+   $\alpha$ and $\beta$. Undetectable and logical at weight 3, nothing
+   smaller: $d=3$ against $Z$ errors.
+
+   The blind spot is $X_0$ (or $X_1$, or $X_2$). It shares qubit 0 with
+   $X_0X_1$, where both operators are $X$, so they commute; it is
+   disjoint from $X_1X_2$, so they commute too. Syndrome $(0,0)$. Yet
+   $X|+\rangle=+|+\rangle$ and $X|-\rangle=-|-\rangle$, so
+
+   $$
+   \alpha|+++\rangle+\beta|---\rangle
+   \;\xrightarrow{\;X_0\;}\;
+   \alpha|+++\rangle-\beta|---\rangle,
+   $$
+
+   a logical $Z$ on the encoded qubit. Weight 1, undetectable, and it
+   changes the logical state, so as a *general* quantum code the
+   phase-flip code is $[[3,1,1]]$, exactly like its dual. The two codes
+   are the same object seen in two bases, and that includes their
+   weaknesses.
+
+   </details>
+
 2. Using the "$d/2$" rule, how many simultaneous single-qubit errors
    could a hypothetical $[[5,1,5]]$ code correct?
-3. Explain why the weight-2 error $X_0X_1$ in the worked example is
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Two. The rule corrects any error touching fewer than $d/2=2.5$
+   qubits, and the largest whole number below $2.5$ is $2$. The standard
+   way to write it is $t=\lfloor (d-1)/2\rfloor$, which gives
+   $\lfloor 2\rfloor=2$.
+
+   Two things are worth adding, because "two errors" understates and the
+   question's premise overstates.
+
+   The understatement first. Those two errors may sit on any two of the
+   five qubits, need not be Pauli, and need not be the same kind: an
+   arbitrary rotation on one qubit and a partial dephasing on another is
+   covered, because Lesson 1's discretization argument applies to the
+   pair exactly as it applies to one. The correctable set is every
+   operator supported on at most 2 qubits, which is a large continuum,
+   not ten cases.
+
+   Now the overstatement. No $[[5,1,5]]$ code exists. The quantum
+   Singleton bound requires $n-k\ge 2(d-1)$, and here that reads
+   $5-1\ge 2(5-1)$, or $4\ge8$, which is false. Distance 5 on five
+   qubits is not a code nobody has found; it is arithmetically ruled out.
+   The familiar five-qubit code is $[[5,1,3]]$, which corrects one error
+   and is optimal at that distance, while the standard distance-5 code
+   protecting a single logical qubit is $[[11,1,5]]$. Doubling the
+   correctable weight roughly doubles the qubit budget, and that is the
+   shape of the overhead curve the capstone puts numbers on.
+
+   </details>
+
+3. Explain why the weight-2 error $X_0X_1$ in the walkthrough above is
    *detected* (a nonzero syndrome appears) yet running the recovery
    procedure on it produces a full logical error rather than a partial
    fix. Point to exactly which step turns a 2-qubit physical error into
    a 1-bit logical one.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Step 2, the table lookup. Step 1 does its job honestly and step 3
+   executes faithfully; the information is destroyed in between, when a
+   syndrome that is consistent with several errors is mapped to exactly
+   one of them.
+
+   Follow it through. Step 1 measures $Z_0Z_1$ and $Z_1Z_2$ and returns
+   $(0,1)$, which is genuinely nonzero and genuinely informative:
+   something is wrong. What it cannot say is *what*, because a syndrome
+   does not determine an error. It determines only the error's coset:
+   every operator differing from $X_2$ by a stabilizer or by a logical
+   operator produces the same $(0,1)$. Both $X_2$ and $X_0X_1$ live in
+   that coset. Step 2 must return a single Pauli, so it returns the more
+   probable one, $X_2$, and in doing so discards the possibility it did
+   not choose. Step 3 applies $X_2$, step 4's guarantee was explicitly
+   scoped to errors the code was designed for, and the register ends up
+   under $X_0X_1X_2$.
+
+   The precise algebraic line between a harmless ambiguity and a fatal
+   one is worth stating, because both look identical at step 1. Two
+   errors $E$ and $E'$ share a syndrome when $E^\dagger E'$ commutes with
+   every generator. If that product is *in* the stabilizer group, the
+   ambiguity costs nothing: either error is undone by the same
+   correction, which is the degeneracy the Shor code exploits. If it is
+   outside the group, the product is a logical operator and picking wrong
+   applies it. Here $X_2^\dagger\,X_0X_1 = X_0X_1X_2$, the logical $X$.
+   That is why this particular confusion is maximally expensive.
+
+   The tempting reading is that step 2 is badly designed and should
+   decline to guess when the evidence is ambiguous. It could, and some
+   architectures do flag rather than correct. But declining is not
+   neutral: it leaves $X_0X_1$ sitting on the register, which is also a
+   corrupted state, merely one that has been labelled. And the table's
+   choice is the right one under the noise model it assumes, since a
+   single flip is far likelier than two whenever $p$ is small. Step 2 is
+   a maximum-likelihood decoder doing its job correctly and being wrong
+   occasionally, which is a different thing from a bug.
+
+   </details>
+
 4. Why does the Shor code's distance stay at $3$ (not increase) despite
    using $9$ qubits instead of $3$? What did the extra 6 qubits actually
    buy, if not a larger distance?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because distance is a *minimum* over all undetectable operators, and
+   the Shor code still has some of weight 3. Adding qubits raised the
+   floor from 1 to 3 and then stopped, because the outer layer
+   manufactures weight-3 logical operators of its own.
+
+   Exhibit them. The Shor code's eight generators are the six inner
+   parities $Z_0Z_1,Z_1Z_2$ and their counterparts in the other two
+   blocks, plus the two outer strings $X_0\cdots X_5$ and
+   $X_3\cdots X_8$. Now consider $Z_0Z_3Z_6$, one $Z$ per block. It
+   commutes with every inner generator, since $Z$ commutes with $Z$, and
+   it overlaps each outer $X$ string on exactly two qubits, an even
+   count, so it commutes with those too. It is undetectable. It is also
+   not a stabilizer, and it acts: it flips the sign inside all three
+   blocks at once, exchanging $|0_L\rangle$ and $|1_L\rangle$. That is
+   the logical $X$, at weight 3. The logical $Z$ is $X_0X_1X_2$, one
+   whole block, also weight 3. Distance is the smallest such weight, so
+   $d=3$, and no rearrangement of these nine qubits will do better.
+
+   What the extra six bought is coverage, not depth. The 3-qubit code's
+   shortest undetectable-and-harmful operator was a single $Z$: weight
+   $1$, so $[[3,1,1]]$ as a general quantum code and $d=3$ only if you
+   promise it will never see a phase error. Shor's construction
+   eliminates every weight-1 and weight-2 operator of that kind, for
+   every Pauli type, giving a genuine $[[9,1,3]]$. The purchase was the
+   removal of a promise, which is worth more than it sounds: a code whose
+   distance figure carries an asterisk about the error model is not a
+   code you can build a fault-tolerant architecture on.
+
+   The extra qubits bought one further thing with no classical
+   counterpart, and the lesson names it in passing. $Z_0$, $Z_1$ and
+   $Z_2$ within a block produce the same syndrome *and* are repaired by
+   the same correction, because they differ by stabilizers. The code
+   never has to determine which of the three was hit. That is
+   degeneracy, and it is why the Shor code beats the naive counting a
+   classical intuition would predict.
+
+   Getting to $d=5$ is a different kind of work, not more of the same.
+   You would need every logical operator to have weight at least 5, and
+   stacking repetition codes cannot deliver that, since each layer's
+   logical operator is only as heavy as one block. It takes either a
+   better-designed code, such as $[[11,1,5]]$, or a code family with a
+   size dial, which is exactly what the surface code provides in the next
+   lesson.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -246,7 +462,7 @@ here as a real, active research area).
   code's weight-1 (corrected), weight-2 (detected but miscorrected), and
   weight-3 (undetectable) $X$-error cases.
 
-## Further Exploration
+## The family real hardware is building
 
 <NextDiscovery>
 [Surface Codes: A Conceptual Introduction](/lessons/quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction) is the family of codes

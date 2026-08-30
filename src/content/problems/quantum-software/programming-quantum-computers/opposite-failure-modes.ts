@@ -16,10 +16,10 @@ export const oppositeFailureModes: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "Per this lesson, how do simulators and real hardware fail in 'opposite' ways?",
     options: [
-      { id: "a", text: "Simulators are exact but pay exponential memory; hardware has no memory wall but carries real physical error" },
-      { id: "b", text: "Simulators approximate the physics to stay fast; hardware is exact because it is the physics" },
-      { id: "c", text: "Both run out at the same place: qubit count is the binding limit for either one" },
-      { id: "d", text: "Simulators carry accumulated floating-point error; hardware pays the exponential memory cost of holding 2ⁿ amplitudes" },
+      { id: "a", text: "Simulators are exact but pay exponential memory; hardware has no memory wall but has real physical error" },
+      { id: "b", text: "Simulators approximate the physics to stay fast; hardware is exact because it is the physics, not a model" },
+      { id: "c", text: "Both run out at the same place: qubit count is the binding limit for a simulator and a device alike" },
+      { id: "d", text: "Simulators carry accumulated floating-point error; hardware pays the memory cost of holding 2ⁿ amplitudes" },
     ],
   },
   answer: {
@@ -43,7 +43,7 @@ export const oppositeFailureModes: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "The two limits are complementary rather than shared: exactness at the cost of memory on one side, unlimited state size at the cost of noise on the other. That is why the choice between them depends on what a given experiment needs.",
-    whyCorrect: "Matches the lesson's Physical Interpretation section.",
+    whyCorrect: "Each one's strength is what causes the other's weakness. Exact amplitudes have to be stored, and storage doubles per qubit; a physical register stores nothing but is subject to real gate error. Neither failure mode is a version of the other.",
     whyWrong: [
       { optionId: "b", text: "Reverses which system is exact. The simulator's exactness is what makes it expensive." },
       { optionId: "c", text: "Collapses two different limits into one. Qubit count binds the simulator; depth against error rate binds the device." },

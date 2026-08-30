@@ -30,18 +30,18 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Every tool at once, on a Bell state">
 Spectral decomposition, compatible observables, complete sets, the generalized measurement postulate: every tool this course has built is about to be applied at once, to a system you already know. A Bell state.
 </LessonHook>
 
-## Motivation
+## Running the machinery end to end
 
 The target is a Bell state, built originally in the Quantum Gates &
 Circuits course. There is no new physics in this lesson. It runs this
 course's machinery end to end on a system you already know, which is the
 best way to find out whether the machinery makes sense to you.
 
-## Intuition
+## Look at one qubit and degeneracy appears
 
 $\hat Z$ on a single qubit has two nondegenerate eigenvalues, no
 degeneracy to worry about. Move to *two* qubits, and an <Term id="observable">observable</Term> that
@@ -52,7 +52,7 @@ degeneracy arises here for the most ordinary reason there is, an
 observable that ignores part of the system, rather than from a contrived
 construction.
 
-## Mathematical Development
+## Two observables, then two measurements in turn
 
 ### Building the observables
 
@@ -120,16 +120,18 @@ $$
 
 Suppose the outcome is $+1$. $P_+|\Phi^+\rangle$ keeps only the
 $|00\rangle,|01\rangle$ components: $\left(\tfrac1{\sqrt2},0,0,0\right)$,
-which, already <Term id="normalization">normalized</Term>, collapses to exactly $|00\rangle$.
+whose norm is $1/\sqrt2$ rather than $1$, since half the probability
+belonged to the outcome that did not occur. Dividing through by that norm
+<Term id="normalization">renormalizes</Term> the state to exactly $|00\rangle$.
 
 ### Then measuring $Z_1$
 
 <PredictBeforeReveal
   question="Z₀ has just been measured on |Φ+⟩ and returned +1, collapsing the state. Qubit 1 has not been touched. What does a subsequent Z₁ measurement give?"
   options={[
-    { label: "+1 or −1, still a 50/50 coin flip", value: "random" },
     { label: "+1, with certainty", value: "certain-plus" },
     { label: "−1, with certainty", value: "certain-minus" },
+    { label: "+1 or −1, still a 50/50 coin flip", value: "random" },
     { label: "Undefined until qubit 1 is measured in some basis", value: "undefined" },
   ]}
   correctValue="certain-plus"
@@ -143,12 +145,12 @@ which is the CSCO machinery of this course doing on a real two-qubit
 state what the abstract argument said it would.
 
 <InteractiveSection
-  title="Measure qubit 0, watch qubit 1 fall in line"
-  description="Prepare |Φ+⟩ and measure qubit 0. Confirm that qubit 1's outcome is forced to match, as this lesson's Z₀/Z₁ collapse calculation predicts. Repeat it several times: the individual outcomes are random, the agreement between them never is.">
+  title="Measure qubit 0, then read qubit 1"
+  description="Prepare |Φ+⟩ and measure qubit 0, then read qubit 1. Repeat it a dozen times, keeping a tally of both columns. How random each column is on its own and how the two columns relate to each other are two separate questions, and this lesson's Z₀/Z₁ collapse calculation answers only the second.">
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
-## Physical Interpretation
+## Perfect correlation, seen through the formalism
 
 This *is* the Bell state's famous perfect correlation, seen through this
 course's formalism instead of asserted as a special fact: measuring
@@ -159,19 +161,20 @@ There is no $|01\rangle$ component in $|\Phi^+\rangle$ at all. The
 projector-and-collapse mechanics applied to an entangled input, with no
 extra ingredient.
 
-## Worked Example
+## The same measurement with the other outcome
 
 **Suppose the $Z_0$ outcome had instead been $-1$. What state results,
 and what does $Z_1$ then give with certainty?**
 
 $P_-$ keeps the $|10\rangle,|11\rangle$ components of $|\Phi^+\rangle$:
 only $|11\rangle$ is present, so the state collapses to $|11\rangle$
-directly. Measuring $Z_1$ on $|11\rangle$ then gives $-1$ with certainty,
-the two qubits are again perfectly correlated ($Z_0=Z_1=-1$ this time),
-consistent with $|\Phi^+\rangle$ containing only the $|00\rangle$ and
-$|11\rangle$ terms.
+directly. Measuring $Z_1$ on $|11\rangle$ then gives $-1$ with certainty.
+The two qubits are perfectly correlated again, at $Z_0=Z_1=-1$ this time,
+which is what $|\Phi^+\rangle$ containing only the $|00\rangle$ and
+$|11\rangle$ terms amounts to: whichever branch the first measurement
+selects, the second one is already decided.
 
-## Common Mistakes
+## Commuting is a fact about operators, not states
 
 <Callout type="note">
 **Thinking $Z_0$ and $Z_1$ commuting is special to the Bell state.**
@@ -192,11 +195,140 @@ $(Z_0,Z_1)$ is a complete set here.
 1. Confirm $Z_0$'s $-1$-eigenspace projector, applied to
    $|\Phi^+\rangle$, gives exactly $|11\rangle$ after normalizing (redo
    the calculation from the worked example explicitly).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $Z_0$'s $-1$ eigenspace is spanned by $|10\rangle$ and $|11\rangle$,
+   the two basis states with qubit 0 in $|1\rangle$, so
+
+   $$
+   P_- = |10\rangle\langle10| + |11\rangle\langle11|
+   $$
+
+   In amplitude order $(|00\rangle,|01\rangle,|10\rangle,|11\rangle)$ the
+   Bell state is $\left(\tfrac1{\sqrt2},0,0,\tfrac1{\sqrt2}\right)$, and
+   $P_-$ keeps only the last two entries:
+
+   $$
+   P_-|\Phi^+\rangle = \left(0,\,0,\,0,\,\tfrac1{\sqrt2}\right) = \frac{1}{\sqrt2}|11\rangle
+   $$
+
+   $$
+   P(Z_0{=}{-}1) = \left\|P_-|\Phi^+\rangle\right\|^2 = \frac12, \qquad \frac{P_-|\Phi^+\rangle}{\|P_-|\Phi^+\rangle\|} = \frac{(1/\sqrt2)|11\rangle}{1/\sqrt2} = |11\rangle
+   $$
+
+   confirmed against the platform's `projectorOntoSubspace` applied to
+   $\{|10\rangle,|11\rangle\}$.
+
+   Notice that the projector is rank $2$, so the outcome is degenerate and
+   nothing in the general rule promises a single basis state at the end.
+   What produced one is a property of $|\Phi^+\rangle$ rather than of the
+   measurement: the state simply has no $|10\rangle$ component to keep. A
+   rank-2 projector applied to a state with weight on both of its
+   directions would leave a genuine superposition, exactly as the previous
+   lesson's $N{=}1$ outcome did.
+
+   The renormalization is the step most often skipped, and here it is
+   doing something visible. $P_-|\Phi^+\rangle$ has norm $1/\sqrt2$, not
+   $1$, because half the probability belonged to the outcome that did not
+   occur. Dividing restores a unit vector, and the amplitude on
+   $|11\rangle$ goes from $1/\sqrt2$ to $1$: from "half likely" to
+   "certain," which is precisely the information the measurement supplied.
+
+   </details>
+
 2. For the *other* Bell state $|\Psi^+\rangle=\tfrac1{\sqrt2}
    (|01\rangle+|10\rangle)$, find $P(Z_0{=}{+}1)$ and the resulting
    collapsed state.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $P(Z_0{=}{+}1)=\tfrac12$, and the state collapses to $|01\rangle$.
+
+   In amplitude order, $|\Psi^+\rangle =
+   \left(0,\tfrac1{\sqrt2},\tfrac1{\sqrt2},0\right)$. The $+1$ projector
+   $P_+=|00\rangle\langle00|+|01\rangle\langle01|$ keeps the first two
+   entries:
+
+   $$
+   P_+|\Psi^+\rangle = \left(0,\,\tfrac1{\sqrt2},\,0,\,0\right), \qquad P(Z_0{=}{+}1) = \left|\tfrac1{\sqrt2}\right|^2 = \frac12
+   $$
+
+   and normalizing gives $|01\rangle$. Measuring $Z_1$ afterwards then
+   returns $-1$ with certainty, since $|01\rangle$ is a $Z_1$-eigenstate
+   with qubit 1 in $|1\rangle$.
+
+   The comparison with $|\Phi^+\rangle$ is the substance. The single-qubit
+   statistics are identical: both Bell states give $P(Z_0{=}{+}1)=\tfrac12$,
+   so measuring qubit 0 alone cannot tell them apart, and neither can
+   measuring qubit 1 alone. What differs is the *correlation*.
+   $|\Phi^+\rangle$ collapses to $|00\rangle$ or $|11\rangle$, so the two
+   readings always agree; $|\Psi^+\rangle$ collapses to $|01\rangle$ or
+   $|10\rangle$, so they always disagree. Perfect correlation against
+   perfect anticorrelation, invisible in either qubit's own marginal
+   distribution.
+
+   That is worth holding onto because it is what "entanglement is not in
+   either part" means concretely. Both states look maximally random from
+   qubit 0's point of view, and the difference between them lives entirely
+   in the joint outcomes. The $(Z_0,Z_1)$ pair is a CSCO for this space, so
+   its joint eigenvalues do distinguish the four basis states; what a
+   single member of the set cannot do is distinguish the two entangled
+   *superpositions* built from them.
+
+   </details>
+
 3. Explain briefly why $X_0=X\otimes I$ and $Z_1=I\otimes Z$ commute even
-   though $X$ and $Z$ individually do not (from earlier in this course).
+   though $X$ and $Z$ individually do not. Then decide whether
+   $\{X_0,Z_1\}$ is a CSCO for this four-dimensional space, and if it is,
+   name the shared eigenbasis it selects.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   They commute because they act on *different* tensor factors, and yes,
+   $\{X_0,Z_1\}$ is a CSCO, selecting the basis
+   $\{|+\rangle|0\rangle,\,|+\rangle|1\rangle,\,|-\rangle|0\rangle,\,
+   |-\rangle|1\rangle\}$.
+
+   **Why they commute.** Use $(A\otimes B)(C\otimes D)=(AC)\otimes(BD)$,
+   which multiplies the two factors independently:
+
+   $$
+   X_0Z_1 = (X\otimes I)(I\otimes Z) = (XI)\otimes(IZ) = X\otimes Z = (IX)\otimes(ZI) = (I\otimes Z)(X\otimes I) = Z_1X_0
+   $$
+
+   The awkward pair $X$ and $Z$ never meet. On qubit 0 the product is
+   $X$ against $I$, and on qubit 1 it is $I$ against $Z$; multiplying by
+   the identity commutes with everything. Their failure to commute is a
+   fact about two operators acting on the *same* factor, which is a
+   situation this construction never creates. The engine's commutator
+   confirms $[X_0,Z_1]=0$ and $[X_0,Z_0]\ne0$, the second being the same
+   two matrices reunited on one qubit.
+
+   **Why the pair is complete.** $X_0$ has eigenvalues $\pm1$, with
+   eigenvectors $|\pm\rangle$ on qubit 0 and qubit 1 unconstrained, so each
+   eigenspace is two-dimensional and $X_0$ alone is degenerate. $Z_1$ is
+   degenerate in the same way, splitting on qubit 1 instead. Take the joint
+   labels:
+
+   $|+\rangle|0\rangle$ carries $(+1,+1)$; $|+\rangle|1\rangle$ carries
+   $(+1,-1)$; $|-\rangle|0\rangle$ carries $(-1,+1)$; $|-\rangle|1\rangle$
+   carries $(-1,-1)$. Four distinct pairs across four basis states, so no
+   degeneracy survives and the set is complete.
+
+   The general lesson is that the tensor structure supplies compatible
+   observables for free, one per subsystem, and each is automatically
+   degenerate on the whole space because it ignores the rest of it. That is
+   the most ordinary source of degeneracy there is, and assembling one
+   observable per factor into a CSCO is the standard cure. It is also why
+   $\{X_0,Z_1\}$ selects a *different* basis from $\{Z_0,Z_1\}$: the
+   observables you choose to measure decide which basis the labels refer
+   to, and both are legitimate complete sets for the same space.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -211,7 +343,7 @@ $(Z_0,Z_1)$ is a complete set here.
   described qualitatively, now derived from this course's own
   machinery.
 
-## Further Exploration
+## The capstone this course has been building to
 
 <NextDiscovery>
 The [Operators, Observables & Measurement Challenge](/lessons/quantum-mechanics/operators-observables-measurement/operators-observables-measurement-challenge) is a capstone

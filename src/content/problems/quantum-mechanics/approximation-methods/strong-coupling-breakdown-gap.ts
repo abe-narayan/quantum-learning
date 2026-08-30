@@ -26,20 +26,25 @@ export const strongCouplingBreakdownGap: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.02,
-    incorrectFeedback: "Use the lesson's table: perturbative ≈0.995, exact ≈0.363 for this (V,t) pair.",
+    incorrectFeedback: "You reported one of the two probabilities rather than the distance between them, or subtracted them in the opposite order. The first-order formula has no upper bound built into it and overshoots badly here, while the exact Rabi solution keeps sharing its weight between the two levels.",
+    nearMisses: [
+      { value: pert, tolerance: 0.02, feedback: "That is the perturbative estimate on its own. The question asks how far it sits from the exact result, so the exact value still has to be subtracted from it." },
+      { value: exact, tolerance: 0.02, feedback: "That is the exact result on its own, not the gap between the two methods." },
+      { value: -value, tolerance: 0.02, feedback: "The subtraction went the other way round. The prompt asks for perturbative minus exact, and here it is the perturbative estimate that is the larger of the two." },
+    ],
   },
   hints: [
     { text: "The first-order formula P = 4|V|²sin²(ωt/2)/ω² has no upper bound built into it, so at V=0.5 it can climb close to 1. The exact two-level solution is a Rabi oscillation, which shares its weight between the two levels." },
-    { text: "From the lesson's worked-example table: perturbative ≈0.995, exact ≈0.363." },
-    { text: "Subtract in the order the prompt states, perturbative minus exact. Expect a gap of over half a probability unit: the size of it is what marks this as a breakdown rather than a small correction." },
+    { text: "Evaluate both quantities at these parameters: the first-order formula directly, and the exact two-level solution from the lesson's worked example." },
+    { text: "Subtract in the order the prompt states, perturbative minus exact. The sign tells you which method overshoots, and the size is what marks this as a breakdown rather than a small correction." },
   ],
   solution: {
-    steps: [{ description: "0.995 - 0.363 ≈ 0.632, a large discrepancy — well outside what should be trusted as a small correction." }],
+    steps: [{ description: "0.995 - 0.363 ≈ 0.632, a discrepancy far outside what could be trusted as a small correction." }],
     finalAnswer: "≈0.63",
   },
   explanation: {
-    correctIdea: "The SIZE of this gap (over half a probability unit) is itself the point: it's not a small correction to distrust slightly, it's a qualitative failure of the approximation.",
+    correctIdea: "The SIZE of this gap (over half a probability unit) is itself the point: it is not a small correction to distrust slightly, it is a qualitative failure of the approximation.",
     whyCorrect: "Matches the difference between the engine's firstOrderTransitionProbability and exactTwoLevelTransitionProbability for this (V,t) pair.",
-    whyWrong: ["A small computed gap here would actually be inconsistent with the lesson's own worked-example table, which explicitly documents this as the strong-coupling breakdown case."],
+    whyWrong: ["A small computed gap here would be inconsistent with the lesson's own worked-example table, which documents this as the strong-coupling breakdown case."],
   },
 };

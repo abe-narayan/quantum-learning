@@ -30,19 +30,20 @@ export const lessonMeta = {
 export const zeroState = StateVector.zero(1);
 export const plusState = new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)]);
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The wrong object for the job">
 For an entangled pair like the Bell state, "what is qubit 0's state, on its own?" has no good answer. No single-qubit ket describes it. That is not a gap in the notation to be patched; it means the state vector is the wrong object for the job.
 </LessonHook>
 
-## Motivation
+## A question no ket can answer
 
 Multi-Qubit State Vectors left a question open. Hand someone half of a
 Bell pair and ask them to write down the state of the qubit they are
 holding, and they cannot. Every ket $\alpha|0\rangle+\beta|1\rangle$ makes
 predictions their qubit does not obey.
 
-That is not a failure of imagination. This course builds the object that
-answers the question, and this lesson is the first step: a state vector's
+No amount of cleverness rescues the ket here; the question needs a
+different object. This course builds it, and this lesson is the first
+step: a state vector's
 whole physical content, repackaged as an operator instead of a list of
 amplitudes. Every prediction survives the repackaging, so nothing is
 gained yet. What is gained arrives over the next few lessons, when the new
@@ -54,12 +55,12 @@ object turns out to describe situations no ket can.
   caption="John von Neumann, who introduced the density matrix ρ=|ψ⟩⟨ψ| into quantum mechanics in 1927, giving the state-vector formalism the rigorous operator foundation this lesson derives."
   credit="Los Alamos National Laboratory"
   creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.jpg"
-  license="Public domain"
+  license="Attribution (LANL)"
 />
 
-## Mathematical Development
+## An outer product, and two properties that follow
 
-### The definition
+### Defining the density matrix
 
 For a normalized state $|\psi\rangle$, define its **<Term id="density-matrices">density matrix</Term>**:
 
@@ -67,8 +68,9 @@ $$
 \rho = |\psi\rangle\langle\psi|
 $$
 
-This is an outer product, not an inner product: $|\psi\rangle\langle\psi|$
-is a $d\times d$ matrix (for a $d$-dimensional system), not a number.
+Watch the order. Ket first, bra second, which makes $|\psi\rangle\langle\psi|$
+an outer product: a $d\times d$ matrix for a $d$-dimensional system, where
+the reversed order $\langle\psi|\psi\rangle$ would give a single number.
 Concretely, if $|\psi\rangle = \sum_i c_i |i\rangle$, then $\rho$'s
 entry in row $i$, column $j$ is $\rho_{ij} = c_i c_j^*$.
 
@@ -101,10 +103,10 @@ concrete before the algebra below generalizes it:
     { label: "Depends on the phase, not just the angle", value: "phase" },
   ]}
   correctValue="surface"
-  explanation="Every pure state has Tr(ρ²)=1, the maximum purity, and that corresponds geometrically to sitting on the sphere's surface, whichever pure state you pick. The point only pulls inward once you mix states with weight strictly between 0 and 1, which is next lesson's subject."
+  explanation="Always the surface. With weight 1 the explorer is building ρ=|ψ⟩⟨ψ| from a single normalized ket, and the Bloch-sphere lesson already showed that any normalized (α, β) gives x²+y²+z² = 4|α*β|² + (|α|²−|β|²)² = (|α|²+|β|²)² = 1: a pure state's Bloch vector has length exactly 1, whichever pure state you pick. The point only pulls inward once the explorer mixes two states with weight strictly between 0 and 1, which is the next lesson's subject, and where the inside of the ball gets its own derivation."
 />
 
-<InteractiveSection title="Build ρ=|ψ⟩⟨ψ| from a single point" description="Set the mixing weight to 1 so only one component contributes: that's exactly ρ=|ψ⟩⟨ψ⟩ for whichever single Bloch point you pick, not a mixture yet. Try |0⟩, then |+⟩, then an arbitrary angle, and watch ρ change with it. The point stays exactly on the sphere's surface every time, matching Tr(ρ²)=1.">
+<InteractiveSection title="Build ρ=|ψ⟩⟨ψ| from a single point" description="Set the mixing weight to 1 so only one component contributes: what you get is ρ=|ψ⟩⟨ψ| for whichever single Bloch point you pick, not a mixture yet. Try |0⟩, then |+⟩, then an arbitrary angle, and watch ρ change with it. The point stays on the sphere's surface every time, which is what a normalized ket's unit-length Bloch vector requires.">
   <LazyDensityMatrixExplorer />
 </InteractiveSection>
 
@@ -119,7 +121,9 @@ product reverses and conjugates: $(|a\rangle\langle b|)^\dagger =
 |b\rangle\langle a|$. Here $|a\rangle=|b\rangle=|\psi\rangle$, so
 nothing changes.
 
-**Trace 1.** Writing $|\psi\rangle=\sum_i c_i|i\rangle$, the diagonal
+**Trace 1.** The trace of a square matrix is the sum of its diagonal
+entries, $\text{Tr}(M)=\sum_i M_{ii}$. Writing
+$|\psi\rangle=\sum_i c_i|i\rangle$, the diagonal
 entries are $\rho_{ii}=c_ic_i^*=|c_i|^2$, so
 $\text{Tr}(\rho)=\sum_i|c_i|^2$, exactly the <Term id="normalization">normalization</Term> condition
 $\langle\psi|\psi\rangle=1$ this platform has enforced on every state
@@ -140,8 +144,18 @@ $$
 \text{Tr}(\rho A) = \text{Tr}(|\psi\rangle\langle\psi|A)
 $$
 
-Using the cyclic property of trace, $\text{Tr}(|\psi\rangle\langle\psi|A)
-=\text{Tr}(\langle\psi|A|\psi\rangle)$. But $\langle\psi|A|\psi\rangle$
+The one fact this needs is the **cyclic property of the trace**:
+$\text{Tr}(MN)=\text{Tr}(NM)$ for any two matrices whose product is
+square either way round. It comes straight out of the definition,
+$\text{Tr}(MN)=\sum_i\sum_j M_{ij}N_{ji}$, which is symmetric under
+swapping the two factors. Apply it with $M=|\psi\rangle$ and
+$N=\langle\psi|A$, moving the ket from the front to the back:
+
+$$
+\text{Tr}(|\psi\rangle\langle\psi|A)=\text{Tr}(\langle\psi|A|\psi\rangle)
+$$
+
+But $\langle\psi|A|\psi\rangle$
 is already a $1\times1$ matrix (a plain number), and the trace of a
 number is itself:
 
@@ -160,13 +174,13 @@ $$
 using $\rho_{|+\rangle}Z=\begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}\begin{pmatrix}1&0\\0&-1\end{pmatrix}$.
 `densityMatrixExpectationValue` and `observables.ts`'s `expectationValue`
 agree to numerical precision for every observable, enforced as a
-regression test (`densityMatrix.test.ts`), not just checked once here.
+regression test (`densityMatrix.test.ts`), so it stays checked.
 
-## Physical Interpretation
+## No new physics yet, and that is the point
 
-$\rho=|\psi\rangle\langle\psi|$ is not a new theory of quantum states.
-It is the *same* state vector, viewed as an operator instead of a list of
-numbers. Every probability and every expectation value computed from
+So far $\rho=|\psi\rangle\langle\psi|$ has bought no new physics. It is
+the same state vector viewed as an operator instead of a list of
+numbers, and every probability and every expectation value computed from
 $\rho$ agrees with the one computed from $|\psi\rangle$ directly.
 
 What changes is what the object *can express*. Operators can be built in
@@ -174,7 +188,7 @@ ways normalized vectors cannot: added together, weighted by probabilities,
 restricted to part of a larger system. Those three constructions are the
 rest of this course.
 
-## Worked Example
+## One density matrix, and one expectation from it
 
 **Compute the density matrix of $|1\rangle$, and use it to find
 $\langle Z\rangle$ via $\text{Tr}(\rho Z)$.**
@@ -187,12 +201,12 @@ so $\text{Tr}(\rho Z)=0+(-1)=-1$. This matches the direct calculation
 $\langle1|Z|1\rangle=-1$, $Z$'s eigenvalue on $|1\rangle$, as expected
 since $|1\rangle$ is a $Z$-eigenstate.
 
-## Common Mistakes
+## Which kind of object rho actually is
 
 <Callout type="warning">
 **Writing ρ as if it were a ket.** $\rho=|\psi\rangle\langle\psi|$ is a
-matrix (an operator), not a vector: it has a bra *and* a ket, multiplied
-as an outer product. $\langle\psi|\psi\rangle$ (inner product, a number)
+matrix, an operator: it carries a bra *and* a ket, multiplied as an outer
+product. $\langle\psi|\psi\rangle$ (inner product, a number)
 and $|\psi\rangle\langle\psi|$ (outer product, a matrix) look similar but
 are entirely different objects.
 </Callout>
@@ -207,16 +221,163 @@ states is the subject of the next lesson.
 ## Practice Questions
 
 1. Compute the density matrix of $|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Ket times bra, in that order:
+
+   $$
+   \rho_{|-\rangle} = |-\rangle\langle-| = \frac{1}{2}\begin{pmatrix}1\\-1\end{pmatrix}\begin{pmatrix}1&-1\end{pmatrix} = \begin{pmatrix}0.5&-0.5\\-0.5&0.5\end{pmatrix}
+   $$
+
+   The engine's `pureStateDensityMatrix` returns exactly this. Check the
+   two structural properties: the matrix is real and symmetric, hence
+   Hermitian, and its diagonal sums to $0.5+0.5=1$. `validateDensityMatrix`
+   confirms all three conditions including positivity, and `purity` returns
+   $1$, as it must for any state built from a single ket.
+
+   Set it beside $\rho_{|+\rangle}=\begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}$
+   from the lesson. Identical diagonals, opposite off-diagonals. The
+   diagonal is what a computational-basis measurement sees, so $|+\rangle$
+   and $|-\rangle$ are indistinguishable in the $Z$ basis, exactly as their
+   amplitudes say. Everything that separates them lives in the sign of the
+   coherences, and the next question turns that sign into a measurable
+   number.
+
+   The slip to avoid is computing $\langle-|-\rangle$ instead. That is the
+   inner product, bra first, and it returns the number $1$ rather than a
+   matrix. Both expressions use the same two symbols; only the order
+   decides whether you get a $2\times2$ operator or a scalar.
+
+   </details>
+
 2. Verify by direct matrix multiplication that $\text{Tr}(\rho_{|-\rangle}X)$
    matches $\langle-|X|-\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Multiply first:
+
+   $$
+   \rho_{|-\rangle}X = \begin{pmatrix}0.5&-0.5\\-0.5&0.5\end{pmatrix}\begin{pmatrix}0&1\\1&0\end{pmatrix} = \begin{pmatrix}-0.5&0.5\\0.5&-0.5\end{pmatrix}
+   $$
+
+   so $\text{Tr}(\rho_{|-\rangle}X) = -0.5 + (-0.5) = -1$.
+
+   The direct route agrees. $X|-\rangle = -|-\rangle$, since $|-\rangle$ is
+   $X$'s eigenvector with eigenvalue $-1$, so
+   $\langle-|X|-\rangle = -\langle-|-\rangle = -1$. The engine's
+   `densityMatrixExpectationValue` returns $-1$ and `observables.ts`'s
+   `expectationValue` returns the same.
+
+   Nothing about this example is special, which is the point. The lesson's
+   derivation showed $\text{Tr}(\rho A)=\langle\psi|A|\psi\rangle$ for every
+   $\rho$ built from a ket and every observable $A$, using only the cyclic
+   property of the trace. So a worked case like this one is a check on the
+   arithmetic, not evidence for the formula. What the formula buys is
+   reach: $\text{Tr}(\rho A)$ still makes sense when $\rho$ is not built
+   from any ket at all, and that is where the rest of the course goes.
+
+   Two slips are worth naming. Computing $\text{Tr}(X\rho)$ instead of
+   $\text{Tr}(\rho X)$ is harmless here and in general, since the cyclic
+   property makes them equal, but writing $\text{Tr}(\rho)\,\text{Tr}(X)$
+   is not: that would be $1 \times 0 = 0$, and the trace of a product is
+   not the product of traces. The other is expecting $-1$ to look like a
+   probability. It is an expectation value of an observable whose
+   eigenvalues are $\pm1$, so $-1$ means the outcome is $-1$ with
+   certainty, which is exactly right for an eigenstate.
+
+   </details>
+
 3. Explain, in one or two sentences, why $\rho^\dagger=\rho$ follows
    automatically from $\rho=|\psi\rangle\langle\psi|$ for *any* $|\psi\rangle$,
-   without needing $|\psi\rangle$ to have any special property.
+   without needing $|\psi\rangle$ to have any special property. Then say
+   which of $\rho$'s three defining properties would break if $|\psi\rangle$
+   were *not* normalized, and whether Hermiticity is one of them.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Taking the dagger of an outer product reverses the two factors and
+   conjugates each: $(|a\rangle\langle b|)^\dagger = |b\rangle\langle a|$.
+   Here $|a\rangle$ and $|b\rangle$ are the same vector, so the reversal
+   returns the same object and $\rho^\dagger=\rho$. Nothing about
+   $|\psi\rangle$ enters the argument beyond its being a vector.
+
+   Now drop normalization and check the three conditions one at a time,
+   taking $|\psi\rangle$ with $\langle\psi|\psi\rangle = N \neq 1$.
+
+   Hermiticity survives untouched, for the reason just given: the argument
+   never used the norm. Positivity survives too, since
+   $\langle v|\rho|v\rangle = |\langle\psi|v\rangle|^2 \geq 0$ for every
+   $|v\rangle$, and a squared magnitude is nonnegative whatever the norm.
+   Trace is the one that breaks:
+   $\text{Tr}(|\psi\rangle\langle\psi|) = \langle\psi|\psi\rangle = N$, so
+   the trace equals the squared norm rather than $1$. Every probability
+   read out of $\rho$ would be scaled by $N$, and $\text{Tr}(\rho A)$ would
+   return $N\langle A\rangle$ instead of $\langle A\rangle$.
+
+   That the failure is confined to one property, and is a single overall
+   factor, is worth noticing. It means an unnormalized $\rho$ is repaired
+   by dividing by its own trace, which is exactly the renormalization step
+   in the collapse rule later in this course.
+
+   The wrong turn is answering "because $\rho$ is real and symmetric here".
+   It is, for $|+\rangle$ and $|-\rangle$, and that is an accident of those
+   states having real amplitudes. Take $|{+i}\rangle=\tfrac{1}{\sqrt2}(|0\rangle+i|1\rangle)$
+   and $\rho$ has complex off-diagonal entries $\mp i/2$; it is still
+   Hermitian, because Hermitian means equal to its conjugate transpose, not
+   equal to its transpose. Reasoning from a real example gives the right
+   verdict for the wrong reason and fails on the first complex state.
+
+   </details>
+
 4. A global phase $e^{i\theta}|\psi\rangle$ gives the exact same physical
    state as $|\psi\rangle$. Show that its density matrix
    $(e^{i\theta}|\psi\rangle)(e^{i\theta}|\psi\rangle)^\dagger$ equals
    $\rho=|\psi\rangle\langle\psi|$ exactly: global phase disappears
    entirely in the density-matrix picture.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The dagger conjugates the scalar, so the two phases meet and cancel:
+
+   $$
+   (e^{i\theta}|\psi\rangle)(e^{i\theta}|\psi\rangle)^\dagger = e^{i\theta}|\psi\rangle\langle\psi|e^{-i\theta} = e^{i\theta}e^{-i\theta}\,|\psi\rangle\langle\psi| = \rho
+   $$
+
+   using $e^{i\theta}e^{-i\theta}=e^0=1$. As a numerical check, the engine
+   builds $\rho$ for $e^{1.1i}|-\rangle$ and returns
+   $\begin{pmatrix}0.5&-0.5\\-0.5&0.5\end{pmatrix}$, the same matrix as for
+   $|-\rangle$ itself, entry for entry.
+
+   This is a genuine improvement in the formalism, not a technicality. In
+   the state-vector picture, global phase is a redundancy you have to
+   remember to quotient out by hand: two different vectors describe one
+   physical state, which is why the Bloch sphere had to discard $\varphi_0$
+   and why "equal up to global phase" needed saying at all. The density
+   matrix has no such redundancy. Physically identical states get literally
+   identical matrices, so the map from physical states to density matrices
+   is one-to-one where the map from physical states to kets was not.
+
+   Relative phase is untouched, and the contrast is the thing to hold onto.
+   Multiplying only the $|1\rangle$ amplitude by $e^{i\theta}$ leaves
+   $\rho$'s diagonal alone but rotates its off-diagonal entries by the same
+   phase, which is why $\rho_{|+\rangle}$ and $\rho_{|-\rangle}$ differ.
+   Global phase multiplies the whole vector and cancels; relative phase
+   multiplies part of it and survives as a coherence. The density matrix
+   keeps exactly the phase information that is physical and discards
+   exactly the phase information that is not.
+
+   The wrong turn is concluding that $\rho$ has thrown phase away and is
+   therefore a lossy description. It has thrown away one unobservable real
+   parameter, which is the parameter that made the ket description
+   redundant in the first place.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -229,11 +390,11 @@ states is the subject of the next lesson.
   not extra assumptions.
 - $\langle A\rangle=\text{Tr}(\rho A)$ is the same expectation-value
   formula as $\langle\psi|A|\psi\rangle$, re-derived using the cyclic
-  property of trace, not a new postulate.
+  property of trace, with no new postulate needed anywhere.
 - Global phase, which was always physically invisible, does not appear in
   the density-matrix description at all.
 
-## Further Exploration
+## Where it starts doing something new
 
 <NextDiscovery>
 Up next, [Pure States and Mixed States](/lessons/quantum-computing/entanglement-and-measurement/pure-states-and-mixed-states): the density matrix finally

@@ -4,9 +4,10 @@ import { describe, expect, it } from "vitest";
 
 /**
  * ============================================================
- * Horizontally scrollable regions must be reachable by keyboard
+ * Scrollable regions must be reachable by keyboard
  * ============================================================
- * A `div` with `overflow-x: auto` is NOT focusable by default in any browser
+ * A `div` with `overflow-x: auto` (or `overflow-y: auto`, since the 2026-08-29
+ * widening below) is NOT focusable by default in any browser
  * except Firefox. When its content overflows, a keyboard-only or
  * screen-reader user can see the left edge of a wide table, circuit diagram,
  * matrix or equation and has no way whatsoever to reach the rest of it — the
@@ -48,8 +49,40 @@ import { describe, expect, it } from "vitest";
 
 const SRC = path.resolve(import.meta.dirname, "../../..");
 
-/** Tailwind classes that create a horizontal scroll container. */
-const SCROLL_CLASS = /\boverflow-(?:x-)?(?:auto|scroll)\b/g;
+/**
+ * Tailwind classes that create a scroll container, on either axis.
+ *
+ * WIDENED 2026-08-29 from `/\boverflow-(?:x-)?(?:auto|scroll)\b/`, which was
+ * documented here as a known blind spot: it did not match `overflow-y-auto`,
+ * and six live containers were therefore invisible to the guard. The note it
+ * replaces said the widening had to land together with a re-key of every
+ * affected entry, because both maps below are keyed by `<path>#<0-based index
+ * of the scroll container in that file>` and matching one more container in a
+ * file shifts every later index in it. That re-key is part of this change:
+ * exactly one key moved, `GlossaryFilter.tsx#0` (the phone A-Z strip) to
+ * `#1`, because the desktop rail above it now matches and takes index 0.
+ *
+ * The six newly visible containers all hold focusable children, so no WCAG
+ * 2.1.1 failure was hiding behind the blind spot — but they are now counted,
+ * named and measured instead of merely believed, which is the point.
+ *
+ * Note what neither axis catches: `overflow: hidden` clipping a focus ring.
+ * The site's `:focus-visible` outline paints 2px to 4px OUTSIDE the border
+ * box, and outlines contribute nothing to scrollable overflow, so a child
+ * that fills an unpadded clipping ancestor loses its indicator with nothing
+ * to scroll back to. That is a different defect from an unreachable scroll
+ * container and needs its own check.
+ */
+const SCROLL_CLASS = /\boverflow-(?:[xy]-)?(?:auto|scroll)\b/g;
+
+/**
+ * Which axis a container's class named, read off the matched class itself.
+ * `overflow-auto` scrolls both, so it counts as "x" for the ratchet below —
+ * it was already inside the pre-widening population.
+ */
+function axisOf(matched: string): "x" | "y" {
+  return /overflow-y-/.test(matched) ? "y" : "x";
+}
 
 /** `tabIndex={0}` in JSX, or `tabindex="0"` in raw HTML strings. */
 const KEYBOARD_AFFORDANCE = /\btabIndex\b|\btabindex=/;
@@ -113,13 +146,77 @@ const EXCUSED_NO_OVERFLOW: Record<string, string> = {
     "every gate inside is an exposed role=button tabIndex=0 group (the svg is role=group, not role=img); tabbing the circuit scrolls it, so a container stop would be redundant",
   "components/simulators/qaoa-explorer/QAOAExplorer.tsx#0":
     "wraps <GraphDiagram>, which brings its own overflow-x-auto wrapper (now with the tab stop); the outer box has nothing left to scroll",
+  // Triaged 2026-08-29, off BACKLOG_UNTRIAGED, where the note read "focusable
+  // children already scroll it, likely needs nothing". Confirmed, and the
+  // "likely" is what the measurement settles.
+  //
+  // This is the phone-width A-Z jump strip on /glossary: a <nav aria-label="Jump
+  // to letter"> holding 26 fixed-size letters, 32px wide with a 2px gap, so it is
+  // 26 x 32 + 25 x 2 = 882px against the 288px a 320px viewport leaves inside the
+  // page gutters. It genuinely overflows, at every width it is displayed at, and
+  // it is `lg:hidden` so it is never drawn wide enough not to.
+  //
+  // It still needs no tab stop, for two reasons that between them cover every
+  // state it has. Where a letter has matches it is a real <a href="#glossary-X">,
+  // so Tab walks the strip and each stop scrolls itself into view: the content is
+  // reachable by the one mechanism a container tabIndex would be standing in for,
+  // and adding the container stop would put a 27th stop in front of them that
+  // lands on nothing. Where a letter has no matches it is a <span aria-hidden>,
+  // inert by construction. In the one state where every letter is a span (a
+  // filter matching zero terms) the strip is entirely aria-hidden decoration with
+  // nothing in it to reach, and the zero-result panel below it carries the real
+  // way out. So there is no state in which a keyboard user is shut out of
+  // content here, which is the thing WCAG 2.1.1 is asking about.
+  // Re-keyed from `#0` to `#1` on 2026-08-29 when SCROLL_CLASS widened to the
+  // y axis: the desktop rail in the same file is now matched and takes index
+  // 0. The entry below still names the phone strip, unchanged in substance.
+  "components/glossary/GlossaryFilter.tsx#1":
+    "phone-width A-Z jump strip; it does overflow (882px of letters in 288px), but every letter with matches is a focusable in-page <a> that scrolls itself into view on Tab, and the rest are aria-hidden spans, so a container stop would add a tab stop that reaches nothing already reachable",
+
+  // ---- Newly visible on the y axis (2026-08-29 widening) ------------------
+  // These six are what the old regex's documented blind spot was hiding. None
+  // is a WCAG 2.1.1 failure: every one is a list or panel of real links and
+  // buttons, so Tab walks the content and each stop scrolls itself into view,
+  // which is the mechanism a container `tabIndex` would be standing in for. A
+  // container stop on top of that lands on nothing and costs every keyboard
+  // user a keystroke on every visit. They are excused, not fixed — but they
+  // are now counted and named rather than invisible, and the ratchet below
+  // holds this set separately so it cannot quietly grow.
+  "components/glossary/GlossaryFilter.tsx#0":
+    "desktop A-Z rail (`lg:flex`), a column of in-page <a> letters; Tab walks them and each scrolls itself into view",
+  "components/layout/Navbar.tsx#0":
+    "mobile nav drawer body; every row in it is a <Link> or <button>, so tabbing the drawer scrolls it",
+  "components/lessons/TableOfContents.tsx#0":
+    "desktop on-this-page rail; a <nav> of in-page heading links, each a tab stop that scrolls itself into view",
+  "components/map/ConceptDetailPanel.tsx#0":
+    "concept detail panel; holds the close button, prerequisite links and the lesson link, all focusable",
+  "components/map/ConceptListView.tsx#0":
+    "concept list; every row is a focusable control, so the list scrolls as it is tabbed",
+  "components/search/SearchOverlay.tsx#0":
+    "search results list; every result is a focusable <a>, and the input above it is the first stop",
 
   // ---- Responsive SVG: `w-full`/`max-w-*` means it shrinks, never overflows
+  //
+  // Three entries left this block on 2026-08-29 rather than being re-worded:
+  // ClassicalSimulabilityMap (viewBox 480), ComplexityClassDiagram (480) and
+  // LogicalQubitPatchDiagram (420). Their `w-full` was what made them illegible,
+  // not what made them safe. A `w-full` SVG paints its authored units at
+  // box / viewBoxWidth CSS pixels, and the box on a 320px viewport is
+  // 320 - 32 (Container `px-4`) - 2 x (16px `p-4` + 1px `panel-inset` border)
+  // = 254px, so the scales were 254/480 = 0.529 and 254/420 = 0.605 and the
+  // authored 11-13 unit labels painted at 5.8px to 7.9px. Every one of those
+  // three figures is made of labels: complexity-class names, circuit names on
+  // plotted dots, a legend saying which glyph is a data qubit. No size that
+  // fits their viewBoxes horizontally clears ~9px at those scales
+  // (ClassicalSimulabilityMap would need 9 x 480/254 = 17 units for a
+  // 34-character label inside a 259-unit band), so the `w-full` came off and
+  // the intrinsic `width={N}` now stands: one unit, one CSS pixel. They
+  // overflow a 254px box by 226px, 226px and 166px respectively, the wrapper's
+  // `overflow-x-auto` is live for the first time, and each carries a real
+  // `tabIndex={0}`. Same trade as EnergyLevelDiagram and LevelSplittingDiagram.
   // A `width={N}` attribute is only an intrinsic size; `className=\"w-full\"`
   // sets `width: 100%`, which wins, so these figures scale down to the column
   // instead of overflowing it. The wrapper is belt-and-braces.
-  "components/visualizations/ClassicalSimulabilityMap.tsx#0": "svg is mx-auto w-full max-w-lg — scales down, never overflows",
-  "components/visualizations/ComplexityClassDiagram.tsx#0": "svg is mx-auto w-full max-w-lg — scales down, never overflows",
   "components/visualizations/ControlSignalChainDiagram.tsx#0": "svg is w-full — scales down, never overflows",
   "components/visualizations/CrosstalkDiagram.tsx#0": "svg is w-full — scales down, never overflows",
   "components/visualizations/DilutionRefrigeratorDiagram.tsx#0": "svg is w-full — scales down, never overflows",
@@ -127,10 +224,27 @@ const EXCUSED_NO_OVERFLOW: Record<string, string> = {
   "components/visualizations/DispersiveReadoutDiagram.tsx#0": "svg is w-full — scales down, never overflows",
   "components/visualizations/ExpectationTrace.tsx#0": "svg is w-full — scales down, never overflows",
   "components/visualizations/LinewidthDiagram.tsx#0": "svg is w-full — scales down, never overflows",
-  "components/visualizations/LogicalQubitPatchDiagram.tsx#0": "svg is w-full — scales down, never overflows",
   "components/visualizations/LossVsDecoherence.tsx#0": "svg is w-full — scales down, never overflows",
   "components/visualizations/NestedCodeDiagram.tsx#0": "svg is w-full — scales down, never overflows",
-  "components/visualizations/ParametricCurve.tsx#0": "svg is w-full — scales down, never overflows",
+  // Re-keyed from `ParametricCurve.tsx#0` when that component was split into
+  // a server shell (which rounds `frames` before they cross the client
+  // boundary) and this client view, which is where the container moved. The
+  // measurement was re-taken rather than carried over, because the figure box
+  // changed under it: an embedded figure gets 254px of content at a 320px
+  // viewport, not the 220px an earlier pass assumed.
+  //
+  // It does not depend on that number. The svg is `width={480} height={220}
+  // viewBox="0 0 480 220" className="w-full"`, and `w-full` is `width: 100%`,
+  // which beats the presentation attribute — so the svg's used width IS the
+  // wrapper's content box, 254px at 320px and whatever the column is at any
+  // other width. A box exactly as wide as its container has zero scrollable
+  // overflow by construction, and `viewBox` scales the 480 authored units into
+  // it (0.529 at 254px) rather than spilling them. Nothing inside the svg can
+  // change that: svg content is clipped to the viewport the viewBox defines,
+  // so an over-long tick label paints outside the *viewBox* and never widens
+  // the element. The wrapper is belt-and-braces, same as its siblings above.
+  "components/visualizations/ParametricCurveView.tsx#0":
+    "svg is w-full — width:100% beats width={480}, so it is exactly the 254px box, never wider",
   "components/visualizations/PhaseSpacePanel.tsx#0": "svg is w-full — scales down, never overflows",
   "components/visualizations/PhaseSpacePanel.tsx#1": "svg is w-full — scales down, never overflows",
   "components/visualizations/ReadoutScatter.tsx#0": "svg is w-full — scales down, never overflows",
@@ -164,60 +278,71 @@ const EXCUSED_NO_OVERFLOW: Record<string, string> = {
  * deleted as it is triaged (fixed, or moved into EXCUSED_NO_OVERFLOW with a
  * measurement). This list exists to be emptied.
  *
- * Two clusters are worth knowing about when picking them up:
- *  - The `.mdx` entries are lesson-authored figure frames. Most wrap an SVG
- *    that is already `w-full`/`max-w-full` and so belong in the excused list;
- *    the exceptions are the ones wrapping a `min-w-full` circuit SVG with a
- *    hard `width` (e.g. quantum-phase-estimation.mdx's 492px diagram), which
- *    are real WCAG 2.1.1 failures.
+ * Three clusters are worth knowing about when picking them up:
+ *  - The eighteen `.mdx` entries were lesson-authored figure frames, each one
+ *    a hand-written `<div className="not-prose overflow-x-auto rounded-panel
+ *    …">`. All eighteen are gone as of 2026-08-29 and none was excused: the
+ *    twelve that genuinely overflow ~254px of reading column (circuits at 492
+ *    and 600 intrinsic px, flowcharts and maps at 620 to 1000, a lattice at
+ *    300) now go through `src/components/mdx/ScrollableFigure.tsx`, which
+ *    cannot be written without its `tabIndex={0}` and requires a `label`; the
+ *    other six could never overflow (a responsive card grid that is one column
+ *    at every width where the class mattered, a `max-w-full` 236px Bloch
+ *    cross-section, a two-column list that now stacks below `sm` instead of
+ *    holding a 560px floor inside a 254px box) and had the useless
+ *    `overflow-x-auto` deleted rather than being given a tab stop that would
+ *    land on a box with nothing to scroll. The one surviving lesson frame,
+ *    `the-quantum-singular-value-transformation.mdx`, is off this list because
+ *    it is already correct by the other valid pattern: a `role="img"` frame
+ *    with the whole description on it and `tabIndex={0}` beside it.
  *  - `QuantumStateDisplay.tsx` was the server-rendered twin of the KaTeX
  *    problem described in EXCUSED_NO_OVERFLOW above. Triaged and deleted on
  *    2026-08-29: its inner `.katex-display` now gets `tabindex="0"` from
  *    `focusableDisplayHtml`, and the outer `overflow-x-auto` (which could
  *    never scroll, and which forced `overflow-y: auto` onto a box holding a
  *    tall ket) is gone, so the file has no scroll container left to track.
+ *  - `DerivationSteps.tsx` was the same shape and was triaged the same way on
+ *    2026-08-29. Its wrapper held compiled display math, which is block-level,
+ *    fills the box, and carries its own `overflow-x: auto` plus a `tabindex`,
+ *    so the outer box never had anything to scroll while `overflow-y` computed
+ *    to `auto` behind its back and could silently clip a tall derivation step.
+ *    Wrapper removed at the source; no scroll container left to track.
  */
 const BACKLOG_UNTRIAGED: Record<string, string> = {
-  "app/software/page.tsx#0": "flex-nowrap shrink-0 card strip with no focusable children — reads as a real failure",
   "components/curriculum/CourseTimeline.tsx#0": "sm:min-w-max rail; likely reachable via the course links inside, needs confirming",
-  "components/glossary/GlossaryFilter.tsx#0": "<nav> of letter links — focusable children already scroll it, likely needs nothing",
-  "components/narrative/DerivationSteps.tsx#0": "wraps compiled display math, which already carries its own tabindex",
-  "content/lessons/apex/algorithmic-frontiers/the-quantum-singular-value-transformation.mdx#0": "lesson-authored figure frame",
-  "content/lessons/apex/fault-tolerance-frontiers/decoding-surface-codes.mdx#0": "lesson-authored figure frame",
-  "content/lessons/apex/fault-tolerance-frontiers/magic-states-and-distillation.mdx#0": "lesson-authored figure frame",
-  "content/lessons/apex/quantum-complexity-theory/capstone-what-we-know-and-dont.mdx#0": "lesson-authored figure frame",
-  "content/lessons/apex/quantum-complexity-theory/qma-and-quantum-verification.mdx#0": "lesson-authored figure frame",
-  "content/lessons/apex/quantum-complexity-theory/the-local-hamiltonian-problem.mdx#0": "lesson-authored figure frame",
-  "content/lessons/apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today.mdx#0": "lesson-authored figure frame",
-  "content/lessons/apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic.mdx#0": "lesson-authored figure frame",
-  "content/lessons/apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic.mdx#1": "lesson-authored figure frame",
-  "content/lessons/apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims.mdx#0": "lesson-authored figure frame",
-  "content/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper.mdx#0": "lesson-authored figure frame",
-  "content/lessons/quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction.mdx#0":
-    "lesson-authored figure frame",
-  "content/lessons/quantum-computing/quantum-algorithms-i/quantum-phase-estimation.mdx#0":
-    "wraps a 492px min-w-full circuit SVG — a real WCAG 2.1.1 failure, fix first",
-  "content/lessons/quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform.mdx#0": "lesson-authored figure frame",
-  "content/lessons/quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space.mdx#0":
-    "lesson-authored figure frame",
-  "content/lessons/quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness.mdx#0":
-    "lesson-authored figure frame",
-  "content/lessons/quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi.mdx#0": "lesson-authored figure frame",
-  "content/lessons/quantum-mastery/quantum-information-theory/trace-distance-and-fidelity.mdx#0": "lesson-authored figure frame",
 };
 
 /**
- * The ratchet. The number of scroll containers standing without a keyboard
- * affordance, excused or backlogged. It may go down and never up: a new scroll
- * container either gets its tab stop or it fails the main test, and it cannot
- * be waved through by appending to a list, because doing so trips this bound.
+ * The ratchet, held per axis. The number of scroll containers standing
+ * without a keyboard affordance, excused or backlogged. Each bound may go
+ * down and never up: a new scroll container either gets its tab stop or it
+ * fails the main test, and it cannot be waved through by appending to a list,
+ * because doing so trips its bound.
  *
- * 64 at the 2026-08-29 audit; 52 after the KaTeX pass later the same day
- * retired 11 excused wrappers and the QuantumStateDisplay backlog entry. The
- * number is re-tightened on every reduction — a ratchet left slack by 12 is a
- * ratchet with 12 free slots in it.
+ * X AXIS — 64 at the 2026-08-29 audit; 52 after the KaTeX pass later the same
+ * day retired 11 excused wrappers and the QuantumStateDisplay backlog entry.
+ * **It stayed at 52 through the y-axis widening.** Widening the regex found no
+ * new x-axis containers, and letting the six y-axis ones raise a single
+ * combined bound to 58 would have handed the x axis six free slots it had not
+ * earned. Splitting the count is what keeps the original ratchet as tight
+ * after the widening as it was before.
+ *
+ * 29 after the lesson-figure pass the same day emptied the eighteen `.mdx`
+ * backlog entries described above (twelve moved onto `ScrollableFigure`, six
+ * had a scroll class that could never fire deleted) and retired the
+ * the-quantum-singular-value-transformation entry as already fixed. What is
+ * left on the x axis is 28 excused component containers and one genuinely
+ * untriaged backlog entry.
+ *
+ * Y AXIS — 6, the containers the old regex could not see, all excused above
+ * with the reason each is already reachable. This bound starts at the size of
+ * the set it inherited and, like the other, may only fall.
+ *
+ * Both are re-tightened on every reduction — a ratchet left slack by n is a
+ * ratchet with n free slots in it.
  */
-const EXCUSED_TOTAL_AT_AUDIT = 52;
+const EXCUSED_X_AXIS_AT_AUDIT = 29;
+const EXCUSED_Y_AXIS_AT_WIDENING = 6;
 
 // ---------------------------------------------------------------------------
 // Extraction
@@ -290,6 +415,8 @@ type ScrollContainer = {
   /** The opening tag, as written. */
   tag: string;
   hasKeyboardAffordance: boolean;
+  /** Which axis the class named. See `axisOf`. */
+  axis: "x" | "y";
 };
 
 /**
@@ -317,14 +444,14 @@ export function scrollContainersIn(source: string, relPath: string): ScrollConta
     seenTagStarts.add(start);
 
     const end = openingTagEnd(clean, start);
+    const tag = end === -1 ? clean.slice(start, match.index + 200) : clean.slice(start, end + 1);
     found.push({
       key: `${relPath}#${found.length}`,
       file: relPath,
       line: clean.slice(0, start).split("\n").length,
-      tag: end === -1 ? clean.slice(start, match.index + 200) : clean.slice(start, end + 1),
-      hasKeyboardAffordance: KEYBOARD_AFFORDANCE.test(
-        end === -1 ? clean.slice(start, match.index + 200) : clean.slice(start, end + 1)
-      ),
+      tag,
+      hasKeyboardAffordance: KEYBOARD_AFFORDANCE.test(tag),
+      axis: axisOf(match[0]),
     });
   }
   return found;
@@ -421,12 +548,23 @@ describe("horizontally scrollable regions", () => {
   });
 
   it("keep the excused set shrinking, never growing", () => {
-    const excused = Object.keys(EXCUSED_NO_OVERFLOW).length + Object.keys(BACKLOG_UNTRIAGED).length;
+    const axisByKey = new Map(ALL_CONTAINERS.map((c) => [c.key, c.axis]));
+    const keys = [...Object.keys(EXCUSED_NO_OVERFLOW), ...Object.keys(BACKLOG_UNTRIAGED)];
+    // A key with no live container is stale, not an axis — the staleness
+    // tests below own that failure. Counting it on the x axis here keeps the
+    // bound conservative rather than letting a dead entry buy a free slot.
+    const onX = keys.filter((k) => (axisByKey.get(k) ?? "x") === "x").length;
+    const onY = keys.filter((k) => axisByKey.get(k) === "y").length;
     expect(
-      excused,
-      `${excused} containers are excused, up from ${EXCUSED_TOTAL_AT_AUDIT} at the audit. ` +
+      onX,
+      `${onX} x-axis containers are excused, up from ${EXCUSED_X_AXIS_AT_AUDIT} at the audit. ` +
         "A new scroll container gets a tab stop or a fix — it does not get an allowlist entry."
-    ).toBeLessThanOrEqual(EXCUSED_TOTAL_AT_AUDIT);
+    ).toBeLessThanOrEqual(EXCUSED_X_AXIS_AT_AUDIT);
+    expect(
+      onY,
+      `${onY} y-axis containers are excused, up from ${EXCUSED_Y_AXIS_AT_WIDENING} at the widening. ` +
+        "A new scroll container gets a tab stop or a fix — it does not get an allowlist entry."
+    ).toBeLessThanOrEqual(EXCUSED_Y_AXIS_AT_WIDENING);
   });
 
   it("carry no excuse for a container that no longer needs one", () => {

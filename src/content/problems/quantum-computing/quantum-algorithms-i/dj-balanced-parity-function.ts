@@ -45,11 +45,11 @@ export const djBalancedParityFunction: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "0.25 would be the 'no interference at all' guess — but Deutsch-Jozsa's interference forces an exact 0 or exact 1, never an intermediate value.",
-      c: "0.5 isn't a possible outcome here — the balanced/constant promise rules out any value strictly between 0 and 1.",
-      d: "P=1 is the constant-function outcome — this f is balanced, not constant.",
+      b: "0.25 is the 'no interference at all' guess. Deutsch-Jozsa's interference forces the answer to 0 or to 1, never an intermediate value.",
+      c: "0.5 is not a possible outcome here: the balanced-or-constant promise rules out any value strictly between 0 and 1.",
+      d: "P=1 is the constant-function outcome, and this f is balanced.",
     },
-    defaultIncorrectFeedback: "For a genuinely balanced function, the ± terms in the amplitude sum cancel exactly.",
+    defaultIncorrectFeedback: "For a balanced function, the ± terms in the amplitude sum cancel.",
   },
   hints: [
     { text: "Parity is a standard balanced function: two inputs give 0, two give 1." },

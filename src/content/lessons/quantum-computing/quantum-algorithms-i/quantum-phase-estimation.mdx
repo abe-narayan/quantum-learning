@@ -6,6 +6,7 @@ import { phaseEstimation } from "@/lib/quantum/qft";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
+import { ScrollableFigure } from "@/components/mdx/ScrollableFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-i/quantum-phase-estimation"
@@ -48,7 +49,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mechanics/mathematical-foundations/unitary-operators",
-      note: "This lesson's entire target quantity, the phase θ in a unitary's eigenvalue e^{iθ}, exists only because that lesson proves a unitary operator's eigenvalues always have modulus 1, i.e. are pure phases.",
+      note: "This lesson's entire target quantity, the phase θ in a unitary's eigenvalue e^(iθ), exists only because that lesson proves a unitary operator's eigenvalues always have modulus 1, i.e. are pure phases.",
     },
   ],
 };
@@ -57,7 +58,7 @@ export const lessonMeta = {
 A single real number can encode everything a unitary does to one of its eigenstates. Quantum phase estimation reads that number out, bit by bit, using nothing but controlled-U applications and the inverse QFT.
 </LessonHook>
 
-## Motivation
+## One real number, and how to read it
 
 Every <Term id="eigenvalue-eigenvector">eigenstate</Term> of a unitary $U$ satisfies $U|\psi\rangle=e^{2\pi i\varphi}|\psi\rangle$
 for some phase $\varphi\in[0,1)$, a single real number encoding everything
@@ -70,9 +71,9 @@ phase estimation applied to a modular-multiplication unitary; quantum
 chemistry's energy estimates are phase estimation applied to a
 time-evolution unitary. Learning it once buys both.
 
-## Mathematical Development
+## Deriving the pre-measurement state exactly
 
-### The circuit
+### The circuit, register by register
 
 Use two registers: $t$ "precision" qubits, initialized to
 $|0\rangle^{\otimes t}$, and an "eigenstate" register holding
@@ -93,8 +94,8 @@ own qubit ordering and inverse-QFT convention (not the forward "QFT" the
 period-finding schematic draws, which acts on a periodic rather than a
 phase state):
 
-<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-  <svg width={492} height={252} viewBox="0 0 492 252" role="img" aria-label="Quantum phase estimation circuit with t=3 precision qubits: a Hadamard on each precision qubit, then a staircase of controlled-U^(2^k) applications reaching the eigenstate register (qubit 0 controlling the largest power, U^(2^2), down to qubit 2 controlling U^(2^0)), then the inverse QFT box spanning the three precision qubits" className="min-w-full">
+<ScrollableFigure label="Quantum phase estimation circuit for three precision qubits">
+  <svg width={492} height={252} viewBox="0 0 492 252" role="img" aria-label="Quantum phase estimation circuit with three precision qubits. A Hadamard sits on each precision qubit. Then a staircase of controlled applications of U reaches down to the eigenstate register, each one applying U a power-of-two number of times: qubit 0 controls the largest power, U applied four times, qubit 1 controls U applied twice, and qubit 2 controls a single U. An inverse QFT box then spans all three precision qubits." className="min-w-full">
     <line x1={96} y1={28} x2={492} y2={28} className="stroke-border" strokeWidth={2} />
     <text x={4} y={32} className="fill-muted-foreground text-xs font-mono">q0</text>
     <line x1={96} y1={84} x2={492} y2={84} className="stroke-border" strokeWidth={2} />
@@ -129,7 +130,7 @@ phase state):
     <rect x={398} y={4} width={44} height={160} rx={10} className="fill-accent/10 stroke-accent" strokeWidth={1.5} />
     <text x={420} y={88} textAnchor="middle" transform="rotate(-90 420 88)" className="fill-accent text-sm font-bold">QFT†</text>
   </svg>
-</div>
+</ScrollableFigure>
 
 ### Deriving the pre-measurement state
 
@@ -167,10 +168,10 @@ engine only supports for a genuine $2\times2$ gate, one control, one
 target. A general multi-qubit $U$ would need a controlled-*multi-qubit*-gate
 primitive this platform doesn't build (see the engine's "deliberately not
 built" scope notes); every worked example in this course therefore uses a
-single-qubit unitary with a known eigenstate (a phase gate or Pauli
-rotation), not an arbitrary black-box $U$.
+single-qubit unitary with a known eigenstate: a phase gate or a Pauli
+rotation, never an arbitrary black-box $U$.
 
-## Physical Interpretation
+## The QFT, run backwards
 
 Phase estimation is the QFT run in reverse on a phase already written onto
 a register by repeated controlled-$U$ applications. It is the same
@@ -182,19 +183,24 @@ component. The [period-finding explorer](/simulators#period-finding-explorer)
 runs that end-to-end circuit live if you want to see where this piece ends
 up before the next course derives it.
 
-## Worked Example
+## Three bits of precision on three-eighths
 
 **Estimate the phase of $U=\text{phaseGate}(2\pi\cdot\frac38)$, eigenstate
-$|1\rangle$ (phaseGate's own $+1$-phase eigenstate, up to the phase itself),
-using $t=3$ precision qubits.**
+$|1\rangle$, using $t=3$ precision qubits.**
+
+$\text{phaseGate}(\theta)=\text{diag}(1,e^{i\theta})$ has two eigenstates.
+$|0\rangle$ carries eigenvalue $1$, so it would report $\varphi=0$ and
+tell you nothing; $|1\rangle$ carries $e^{i\theta}$, which is the one that
+carries the phase being estimated. That is why the run below prepares
+$|1\rangle$.
 
 $\varphi=3/8$ is exactly representable in 3 bits ($3/8 = 0.011_2$), so
 $\varphi\cdot2^3=3$ exactly. The derivation above guarantees the precision
 register measures $|011\rangle=|3\rangle$ with certainty. Directly from the
 engine: `phaseEstimation` with this $U$, eigenstate, and $t=3$ gives
 probability $1.0$ (to 6 decimal places) on the combined index
-corresponding to precision register $=3$, eigenstate qubit $=1$, exactly
-as derived, not merely close.
+corresponding to precision register $=3$, eigenstate qubit $=1$. That is
+the derived value exactly, to the last decimal place the engine reports.
 
 <BarChart
   bars={[0, 1, 2, 3, 4, 5, 6, 7].map((x) => ({
@@ -208,28 +214,22 @@ as derived, not merely close.
 />
 
 Every measured value from `phaseEstimation` here lands on outcome $3$;
-the other seven bars are exactly zero, not just small. That single spike
+the other seven bars sit at floating-point residue of order $10^{-33}$,
+which both the geometry and the captions read as zero. That single spike
 is what "exactly representable" means in practice.
 
-## Common Mistakes
+## What happens when the phase does not fit
 
-<Callout type="warning">
-**Expecting an exact answer for a phase not representable in $t$ bits.**
-The derivation above assumed $\varphi N$ is an integer; for other phases,
-the precision register's state is a superposition peaked near the nearest
-representable value rather than a single certain outcome, still useful,
-but a probability distribution, not a certainty.
-</Callout>
-
-Repeating the same circuit for $\varphi=1/3$ (which never terminates in
-binary) at the same $t=3$ tests this directly:
+The derivation leaned on $\varphi N$ being an integer at exactly one step.
+$\varphi=1/3$ never terminates in binary, so running the same circuit at
+the same $t=3$ shows what that assumption was carrying:
 
 <PredictBeforeReveal
   question="Run phaseEstimation on φ=1/3 with t=3 precision qubits. 1/3·8 = 2.667, not an integer, so φ isn't exactly representable in 3 bits. What does the measurement distribution look like?"
   options={[
-    { label: "A single certain spike, just at a slightly wrong outcome", value: "wrong-spike" },
+    { label: "Concentrated on outcomes 2 and 3, with a tail beyond them", value: "smeared" },
+    { label: "A single certain spike, landing on whichever 3-bit value sits nearest to 1/3", value: "wrong-spike" },
     { label: "Uniformly random across all 8 outcomes", value: "uniform" },
-    { label: "Concentrated mostly on outcomes 2 and 3, the nearest representable values, with some spread beyond them", value: "smeared" },
     { label: "The circuit fails to produce a valid probability distribution", value: "fails" },
   ]}
   correctValue="smeared"
@@ -248,6 +248,14 @@ binary) at the same $t=3$ tests this directly:
 />
 
 <Callout type="warning">
+**Expecting an exact answer for a phase not representable in $t$ bits.**
+The derivation above assumed $\varphi N$ is an integer; for other phases,
+the precision register's state is a superposition peaked near the nearest
+representable value. What you get back is still useful, but it arrives as
+a probability distribution and has to be read as one.
+</Callout>
+
+<Callout type="warning">
 **Confusing which qubit controls which power of $U$.** Precision qubit $0$
 controls the *largest* power ($U^{2^{t-1}}$), not the smallest; swapping
 this convention silently reads out the phase's bits in the wrong order.
@@ -257,8 +265,8 @@ this convention silently reads out the phase's bits in the wrong order.
 
 The $\varphi=3/8$ example above is one of exactly eight phases $k/8$
 ($k=0,\dots,7$) that are exactly representable with $t=3$ precision bits.
-The same derivation predicts a certain spike at outcome $k$ for every one
-of them, not just $k=3$:
+The same derivation predicts a certain spike at outcome $k$ for all eight,
+so $k=3$ should be nothing special. Check it:
 
 <InteractiveSection
   title="A certain spike at every one of eight phases"
@@ -282,16 +290,169 @@ single one worked out by hand.
 1. Repeat the derivation's logic for $\varphi=1/4$ with $t=2$ precision
    qubits: which basis state should the precision register measure with
    certainty?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $|01\rangle$, with probability exactly $1$.
+
+   Write $\varphi$ in binary: $1/4 = 0.01_2$, and $t=2$ digits are exactly
+   enough to hold it with nothing left over. The pre-measurement state is
+   $\tfrac{1}{\sqrt{4}}\sum_x e^{2\pi i\varphi x}|x\rangle$ with
+   $\varphi = 1/4$, which is the same phase ramp the forward $\text{QFT}$
+   produces from the basis state $|j\rangle$ with $j = 2^t\varphi = 1$. The
+   inverse $\text{QFT}$ undoes it exactly, returning $|j\rangle = |01\rangle$.
+   The engine agrees: `phaseEstimation` with a phase gate of angle
+   $2\pi/4$ and $t=2$ puts probability $1.000000$ on $01$ and zero on the
+   other three.
+
+   The condition for certainty is worth naming, because it will not hold in
+   general. It is that $2^t\varphi$ is an integer, so that $\varphi$ has an
+   exact $t$-bit binary expansion. Here $2^2\times\tfrac14 = 1$. Give the
+   same $\varphi$ three precision qubits instead and the answer becomes
+   $|010\rangle$, since $2^3\times\tfrac14 = 2$: the same phase, read to one
+   more digit, still exactly. The engine confirms $010$ at probability
+   $1.000000$ for $t=3$.
+
+   The wrong turn is expecting the register to hold $\varphi$ as a plain
+   integer, or to read $|01\rangle$ as "the number one". It holds the
+   *numerator*: the measured $t$-bit string $x$ encodes the estimate
+   $\varphi \approx x/2^t$, so $01$ at $t=2$ means $1/4$ and $010$ at
+   $t=3$ means $2/8$, the same value. Forgetting to divide by $2^t$ is the
+   standard way to misread the output by a factor of eight.
+
+   </details>
+
 2. Explain why $U^{2^{t-1-q}}$, not $U^{q}$ or $U^{2^q}$, is the correct
    power for precision qubit $q$, using the binary expansion
    $x=\sum_qb_q2^{t-1-q}$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The derivation needs the total accumulated phase to come out as
+   $e^{2\pi i\varphi x}$, where $x$ is the integer whose bits are the
+   precision qubits. Controlled-$U^{m}$ on qubit $q$ contributes
+   $e^{2\pi i\varphi m}$ on the branch where $b_q=1$ and nothing otherwise,
+   so the total over all qubits is $e^{2\pi i\varphi\sum_q b_q m_q}$. For
+   that to equal $e^{2\pi i\varphi x}$ for every $x$, the powers must
+   satisfy $\sum_q b_q m_q = x$, and since $x=\sum_q b_q 2^{t-1-q}$ by
+   definition of the binary expansion, the only choice is
+   $m_q = 2^{t-1-q}$.
+
+   In other words, the exponent is the qubit's *place value*. On this
+   platform qubit $0$ is the most significant bit, so it carries place
+   value $2^{t-1}$ and controls the largest power; qubit $t-1$ is the
+   least significant, place value $2^0$, and controls a single $U$. With
+   $t=4$ the powers are $U^8, U^4, U^2, U$ on qubits $0,1,2,3$.
+
+   The two rejected alternatives fail concretely. $U^q$ gives powers
+   $0,1,2,3$, which are not place values at all, so qubit $0$ would
+   contribute nothing and the accumulated phase would encode
+   $\sum_q b_q q$, a quantity many different $x$ share. $U^{2^q}$ gives
+   $1,2,4,8$, the right set of powers attached to the wrong qubits, which
+   reverses the register's bit order: the answer would come out
+   bit-reversed, and the inverse $\text{QFT}$, which expects MSB-first,
+   would return the wrong string.
+
+   The wrong turn is treating the exponent convention as arbitrary because
+   "you could just relabel the qubits". You could, and then the inverse
+   $\text{QFT}$ and its swap layer would have to be relabelled to match.
+   The convention is not free once another component has already committed
+   to one, and this platform's is that qubit $0$ is most significant
+   everywhere.
+
+   </details>
+
 3. What happens to `phaseEstimation`'s precision register if $\varphi=1/3$
    (not exactly representable in any finite number of bits) and $t=3$? You
    don't need to compute exact probabilities; describe qualitatively what
    the derivation predicts.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The certainty disappears and is replaced by a peaked distribution: most
+   of the probability lands on the one or two $t$-bit strings nearest
+   $2^t\varphi$, with a small tail spread over everything else.
+
+   $\tfrac13 = 0.010101\ldots_2$, and $2^3\times\tfrac13 = 2.667$, which is
+   not an integer, so no basis state matches the phase ramp exactly and the
+   inverse $\text{QFT}$ has nothing to concentrate perfectly onto. Instead
+   the amplitude splits between the two bracketing values, $x=3$ (the
+   estimate $3/8 = 0.375$) and $x=2$ ($2/8 = 0.25$), with the nearer one
+   favoured. The engine returns $0.6878$ on $011$ and $0.1749$ on $010$,
+   which is $86\%$ of the probability on the two nearest bins, and the
+   remaining $14\%$ scattered across the other six, none above $0.05$.
+
+   The shape is the standard one and it is worth recognizing. The
+   distribution is $\left|\sum_k e^{2\pi ik\delta}\right|^2/2^{2t}$ with
+   $\delta$ the mismatch between $\varphi$ and $x/2^t$, which is a Dirichlet
+   kernel: a sharp central peak with rapidly decaying side lobes. The
+   general theorem says the best $t$-bit estimate is returned with
+   probability at least $4/\pi^2 \approx 0.405$, and $0.688$ here is
+   comfortably above that floor.
+
+   The practical reading: phase estimation degrades gracefully rather than
+   failing. Adding precision qubits both narrows the bin width and
+   sharpens the peak, so an unrepresentable $\varphi$ costs you a bounded
+   probability of an off-by-one reading rather than a wrong answer, and
+   repeating the circuit a few times and taking the mode fixes it.
+
+   The wrong turn is expecting a uniform mess, on the reasoning that an
+   irrational-looking phase has no good $t$-bit representative. Every
+   $\varphi$ has a nearest $t$-bit representative, and the interference is
+   still overwhelmingly constructive there. The engine's largest stray
+   bin, $0.047$ on $100$, is the size of the failure.
+
+   </details>
+
 4. Why does this platform's `phaseEstimation` require the caller to already
    know a genuine eigenstate of $U$, rather than accepting an arbitrary
-   input state?
+   input state? Then say what happens physically if you feed it a
+   superposition of two eigenstates, and why that behaviour is how Shor's
+   algorithm actually uses this subroutine.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the derivation's very first move is
+   $U^{m}|\psi\rangle = e^{2\pi i\varphi m}|\psi\rangle$, which pulls the
+   eigenvalue out as a number and leaves the eigenstate register untouched.
+   That is what lets the phase land on the precision register instead of
+   changing the target, and it is the same eigenstate condition phase
+   kickback needed. For a non-eigenstate, $U^m|\psi\rangle$ is a different
+   state, not a multiple of $|\psi\rangle$, so there is no single $\varphi$
+   to estimate and no factorization to exploit.
+
+   Feed it a superposition $|\psi\rangle = \sum_j c_j|u_j\rangle$ of
+   eigenstates with eigenvalues $e^{2\pi i\varphi_j}$ and linearity does
+   something useful rather than something broken. Each branch runs its own
+   phase estimation, and the output is the entangled state
+   $\sum_j c_j\,|\widetilde{\varphi_j}\rangle|u_j\rangle$: the precision
+   register holds the estimate of $\varphi_j$ correlated with the
+   eigenstate it came from. Measuring the precision register then returns
+   one $\varphi_j$, chosen at random with probability $|c_j|^2$, and
+   collapses the target onto the matching $|u_j\rangle$.
+
+   That is exactly Shor's arrangement, and it is why the subroutine is
+   usable at all there. Nobody can prepare an eigenstate of modular
+   multiplication by $a$ without already knowing the period, which is the
+   thing being computed. What Shor does instead is feed in $|1\rangle$,
+   which happens to be an equal superposition of all $r$ relevant
+   eigenstates, and accept a randomly chosen $\varphi_j = s/r$ as the
+   output. One random multiple of $1/r$, run through continued fractions,
+   recovers $r$. The apparent limitation is the mechanism.
+
+   The wrong turn is reading the type signature as a claim that
+   non-eigenstate inputs are forbidden by physics. They are not; the
+   circuit runs fine and produces the entangled state above. What the
+   signature enforces is that the *interpretation* of the output as a
+   single number is only valid for an eigenstate input, which is the same
+   kind of honest boundary as `concurrenceOfPureState` refusing a density
+   matrix.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -308,7 +469,7 @@ single one worked out by hand.
 - Verified directly: a $3/8$-phase gate with 3 precision qubits gives
   probability $1.0$ on the correct outcome.
 
-## Further Exploration
+## Back to search, and away from periods
 
 <NextDiscovery>
 Up next, [Grover's Algorithm](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion) returns to Deutsch-Jozsa's style of
@@ -316,7 +477,7 @@ problem (a search rather than a period) and gets a *quadratic*, not
 exponential, speedup, for reasons this course makes precise rather than
 hand-waves.
 
-Later, in the Quantum Mastery pillar, [Phase Estimation Precision and QFT
+Later, in the Quantum Mastery track, [Phase Estimation Precision and QFT
 Depth](/lessons/quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth)
 extends this lesson's exact-phase-only treatment to phases that aren't
 exactly representable in any finite register, deriving the resulting

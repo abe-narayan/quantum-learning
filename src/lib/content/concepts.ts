@@ -4,7 +4,7 @@ import type { Pillar } from "./types";
 /**
  * A real simulator anchor on `/simulators` (each `<section>` there is
  * addressable as `/simulators#${simulatorId}`). The page carries fourteen;
- * the thirteen below are the ones a concept or glossary term points at —
+ * the thirteen below are the ones a concept or glossary term points at.
  * `compare-states-explorer` is reachable only from `/simulators` itself and
  * is deliberately absent rather than listed and unused.
  */
@@ -38,15 +38,16 @@ export type ConceptNode = {
 };
 
 /**
- * The load-bearing concepts of the curriculum — 59 of them, spanning all six
+ * The load-bearing concepts of the curriculum: 59 of them, spanning all six
  * pillars (it began as ~25 across the first four and grew with the Mastery
  * and Apex courses). Every `lessonSlugs` entry was cross-checked against the
  * real file paths under `src/content/lessons/` (and matches the slug format
  * `getAllLessonsMeta()` derives from them: the path relative to that root,
  * minus `.mdx`).
  *
- * These are also the source of 59 of the 258 `/glossary` entries — see
- * `glossary.ts`, which reads this file and must never edit it.
+ * Every one of them is also a `/glossary` entry: `GLOSSARY_TERMS` merges this
+ * array with the terms authored in `glossary.ts`, which reads this file and
+ * must never edit it. The merged total is derived there, never typed here.
  */
 export const CONCEPT_NODES: ConceptNode[] = [
   // ---------------------------------------------------------------------
@@ -56,7 +57,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "superposition",
     title: "Superposition",
     definition:
-      "A quantum system's state can be a weighted combination of basis states, written with complex amplitudes rather than classical probabilities — which is what lets contributions cancel as well as add, and the idea every other concept on this map ultimately builds on.",
+      "A quantum system's state can be a weighted combination of basis states, written with complex amplitudes rather than classical probabilities. That is what lets contributions cancel as well as add, and it is the idea every other concept here builds on.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/classical-to-quantum/superposition-interference-and-phase"],
     prerequisiteIds: [],
@@ -65,7 +66,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "measurement",
     title: "Measurement",
     definition:
-      "Measurement returns exactly one outcome from a state that held several, with probability given by the squared magnitude of that outcome's amplitude (the Born rule), and leaves the system in the state matching what was seen — so an immediate repeat returns the same answer.",
+      "Measurement returns exactly one outcome from a state that held several, with probability given by the squared magnitude of that outcome's amplitude (the Born rule), and leaves the system in the state matching what was seen, so an immediate repeat returns the same answer.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/operators-observables-measurement/the-measurement-postulate-generalized"],
     prerequisiteIds: ["superposition"],
@@ -74,7 +75,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "phase-interference",
     title: "Phase & Interference",
     definition:
-      "Complex amplitudes carry a phase, so contributions to the same outcome can reinforce or cancel before the Born rule squares them — leaving that outcome more or less likely than either contribution alone, which is the mechanism nearly every quantum algorithm exploits for advantage.",
+      "Complex amplitudes carry a phase, so contributions to the same outcome can reinforce or cancel before the Born rule squares them, leaving that outcome more or less likely than either contribution alone. It is the mechanism nearly every quantum algorithm exploits for advantage.",
     pillar: "quantum-mechanics",
     lessonSlugs: [
       "quantum-mechanics/classical-to-quantum/why-complex-amplitudes",
@@ -86,7 +87,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "hamiltonians-time-evolution",
     title: "Hamiltonians & Time Evolution",
     definition:
-      "A system's Hamiltonian generates its unitary time evolution via the Schrödinger equation, determining how a quantum state changes moment to moment.",
+      "The Hamiltonian is the operator standing for a system's total energy, and it is also what pushes the system forward in time: the Schrödinger equation turns Ĥ into the unitary U(t) = e^(−iĤt/ℏ) that carries the state from one moment to the next. Writing down Ĥ is therefore the whole act of specifying a quantum system.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/classical-to-quantum/time-evolution-and-the-schrodinger-equation"],
     prerequisiteIds: ["superposition"],
@@ -114,7 +115,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "hydrogen-atom",
     title: "The Hydrogen Atom",
     definition:
-      "Solving the Schrödinger equation for an electron in a Coulomb potential yields quantized energy levels and orbitals, showing exactly where atomic quantum numbers come from.",
+      "Solving the Schrödinger equation for an electron in a Coulomb potential yields quantized energy levels and orbitals, showing where atomic quantum numbers come from.",
     pillar: "quantum-mechanics",
     lessonSlugs: ["quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels"],
     prerequisiteIds: ["angular-momentum-spin", "wave-mechanics"],
@@ -127,7 +128,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "qubit",
     title: "Qubit",
     definition:
-      "The quantum unit of information: a two-level system that can be in a superposition of |0⟩ and |1⟩, represented as a point on the Bloch sphere.",
+      "The quantum unit of information, the counterpart of a classical bit. A bit holds 0 or 1; a qubit holds a weighted combination of both, α|0⟩ + β|1⟩, and measurement is what forces one of the two. Those weights are complex numbers, so they can cancel as well as add, which is where a quantum algorithm's advantage comes from.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/qubits-and-quantum-states/what-is-a-qubit"],
     simulatorId: "bloch-sphere",
@@ -137,7 +138,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "quantum-gates",
     title: "Quantum Gates",
     definition:
-      "Unitary operations that transform a qubit's state — the quantum analogue of classical logic gates, and the building blocks of every quantum circuit.",
+      "The operations a quantum circuit is built out of: each one takes a qubit's state and turns it into another, the way a classical logic gate turns bits into bits. Every quantum gate is a *unitary*, meaning it is reversible and leaves total probability at 1, which is the hard constraint that classical gates like AND do not have to obey.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/qubits-and-quantum-states/quantum-gates"],
     simulatorId: "bloch-sphere",
@@ -147,7 +148,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "entanglement",
     title: "Entanglement",
     definition:
-      "Two or more qubits can share correlations that can't be explained by either qubit having a definite state on its own — a uniquely quantum resource with no classical counterpart.",
+      "Two or more qubits can share correlations too strong for any account in which each qubit already held a definite value of its own. Neither part then has a state by itself; only the pair does. Measuring one half sends the other nothing a distant experimenter could detect: the correlation appears only once the two sets of results are brought together and compared. Bell's theorem turns that gap into something an experiment can settle, and the correlations are the resource teleportation spends and error correction is built from.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement"],
     simulatorId: "two-qubit-explorer",
@@ -171,7 +172,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "density-matrices",
     title: "Density Matrices",
     definition:
-      "A more general description of a quantum state than a state vector, needed for mixed states and for describing part of an entangled system in isolation.",
+      "The general way to write a quantum state: a matrix ρ rather than a vector, with ρ = |ψ⟩⟨ψ| reproducing an ordinary state vector and weighted sums of such terms covering everything a vector cannot. Two situations force it: a statistical mixture of possible preparations, and one half of an entangled pair considered on its own.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/entanglement-and-measurement/from-state-vectors-to-density-matrices"],
     simulatorId: "density-matrix-explorer",
@@ -181,7 +182,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "quantum-circuits",
     title: "Quantum Circuits",
     definition:
-      "A sequence of gates applied to a register of qubits, drawn and reasoned about the same way across every real quantum programming framework.",
+      "One line per qubit, read left to right as time, gates as boxes where they act. The picture is the program, in every real quantum framework.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/quantum-gates-and-circuits/quantum-circuit-notation"],
     simulatorId: "circuit-builder",
@@ -191,7 +192,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "quantum-fourier-transform",
     title: "Quantum Fourier Transform",
     definition:
-      "A quantum circuit that maps computational-basis states to a Fourier-transformed superposition using exponentially fewer gates than the classical FFT needs operations — though its output is a quantum state whose amplitudes can't simply be read out, so it isn't a faster way to obtain an explicit transformed array — and the engine behind phase estimation and Shor's algorithm.",
+      "A quantum circuit that maps computational-basis states to a Fourier-transformed superposition using exponentially fewer gates than the classical FFT needs operations. Its output is a quantum state whose amplitudes cannot be read out wholesale, so it is not a faster way to obtain an explicit transformed array; what it is, is the engine behind phase estimation and Shor's algorithm.",
     pillar: "quantum-computing",
     lessonSlugs: [
       "quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform",
@@ -203,7 +204,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "grovers-algorithm",
     title: "Grover's Algorithm",
     definition:
-      "A quantum search algorithm that finds a marked item among N unsorted possibilities in roughly √N steps, using oracle calls and amplitude amplification instead of brute force.",
+      "A quantum search algorithm that finds a marked item among N unsorted possibilities in roughly √N steps, where checking them one at a time averages N/2. Each step calls an oracle that recognises the marked item, then reflects the state so that item's share of the amplitude grows; that is amplitude amplification, and the gain it buys is quadratic rather than exponential.",
     pillar: "quantum-computing",
     lessonSlugs: ["quantum-computing/quantum-algorithms-i/grovers-algorithm-oracle-and-diffusion"],
     simulatorId: "grover-explorer",
@@ -256,7 +257,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "superconducting-qubits",
     title: "Superconducting Qubits",
     definition:
-      "Qubits encoded in the quantized energy levels of a superconducting circuit built from Josephson junctions — the platform behind most of today's largest quantum processors.",
+      "Qubits encoded in the quantized energy levels of a superconducting circuit built from Josephson junctions, the platform behind most of today's largest quantum processors.",
     pillar: "quantum-hardware",
     lessonSlugs: ["quantum-hardware/physical-qubit-platforms/superconducting-qubits"],
     prerequisiteIds: ["qubit"],
@@ -274,7 +275,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "qubit-control",
     title: "Qubit Control & Readout",
     definition:
-      "Turning an abstract gate into a real microwave or laser pulse, and reading a qubit's state back out, both governed by the exact Rabi model of a driven two-level system.",
+      "Turning an abstract gate into a real microwave or laser pulse, and reading a qubit's state back out, both governed by the Rabi model of a driven two-level system.",
     pillar: "quantum-hardware",
     lessonSlugs: ["quantum-hardware/control-and-readout/control-electronics", "quantum-hardware/control-and-readout/calibration"],
     simulatorId: "rabi-explorer",
@@ -284,11 +285,11 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "noise-decoherence",
     title: "Noise & Decoherence",
     definition:
-      "Real qubits leak information to their environment over characteristic timescales T1 and T2, describable as Kraus-operator noise channels that shrink a qubit's Bloch vector toward a fixed point.",
+      "No qubit is ever isolated. It leaks what it holds into its surroundings over timescales T1 for energy and T2 for phase, as Kraus-operator channels that shrink its Bloch vector toward a fixed point.",
     pillar: "quantum-hardware",
     lessonSlugs: [
-      "quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence",
       "quantum-mechanics/advanced-quantum-mechanics/open-quantum-systems-and-kraus-operators",
+      "quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence",
     ],
     simulatorId: "noise-explorer",
     prerequisiteIds: ["density-matrices", "superconducting-qubits"],
@@ -301,7 +302,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "quantum-circuit-simulation",
     title: "Quantum Circuit Simulation",
     definition:
-      "Simulating a quantum circuit classically by tracking the full state vector, which costs 16×2ⁿ bytes and becomes intractable around 30-50 qubits — the technique this platform's own simulators use.",
+      "Simulating a quantum circuit classically by tracking the full state vector, which costs 16×2ⁿ bytes and becomes intractable around 30-50 qubits. It is the technique this platform's own simulators use.",
     pillar: "quantum-software",
     lessonSlugs: ["quantum-software/simulating-quantum-systems/state-vector-simulation"],
     prerequisiteIds: ["quantum-circuits"],
@@ -310,7 +311,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "sdks-programming",
     title: "SDKs & Programming",
     definition:
-      "Real quantum software builds a circuit as data before running it — the shared pattern behind SDKs like Qiskit, Cirq, and PennyLane, and behind this platform's own QuantumCircuit class.",
+      "Real quantum software builds a circuit as data before running it: the shared pattern behind SDKs like Qiskit, Cirq, and PennyLane, and behind this platform's own QuantumCircuit class.",
     pillar: "quantum-software",
     lessonSlugs: [
       "quantum-software/programming-quantum-computers/quantum-sdks-overview",
@@ -326,7 +327,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "self-adjoint-operator",
     title: "Self-Adjoint Operators",
     definition:
-      "An operator that equals its own adjoint, domain included: A = A† demands that the domains of A and A† match, not merely that ⟨φ|Aψ⟩=⟨Aφ|ψ⟩ holds. The distinction is invisible for finite-dimensional matrices but essential on the infinite-dimensional spaces quantum mechanics actually uses, since self-adjointness alone guarantees a genuine spectral decomposition and unitary time evolution.",
+      "An operator that equals its own adjoint, domain included: A = A† demands that the domains of A and A† match, not merely that ⟨φ|Aψ⟩=⟨Aφ|ψ⟩ holds. The distinction is invisible for finite-dimensional matrices but essential on the infinite-dimensional spaces quantum mechanics is set in, since self-adjointness alone guarantees a genuine spectral decomposition and unitary time evolution.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness"],
     prerequisiteIds: ["wave-mechanics"],
@@ -357,7 +358,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "adiabatic-theorem-berry-phase",
     title: "Adiabatic Theorem & Berry Phase",
     definition:
-      "A quantum system whose Hamiltonian changes slowly enough tracks its instantaneous eigenstate, up to a phase; that phase splits into an ordinary dynamical part and a geometric (Berry) part that depends only on the path traced through parameter space, not on how long the path takes — for a spin-1/2 dragged around a cone, exactly minus half the solid angle enclosed.",
+      "A quantum system whose Hamiltonian changes slowly enough tracks its instantaneous eigenstate, up to a phase, provided the level it started in stays non-degenerate the whole way: slow means slow compared with the energy gap, so a gap that closes voids the theorem rather than merely weakening it. That phase splits into an ordinary dynamical part and a geometric (Berry) part that depends only on the path traced through parameter space, not on how long the path takes. For a spin-1/2 dragged around a cone it is exactly minus half the solid angle enclosed.",
     pillar: "quantum-mastery",
     lessonSlugs: [
       "quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase",
@@ -368,7 +369,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "schmidt-decomposition",
     title: "Schmidt Decomposition",
     definition:
-      "Every bipartite pure state can be written as a single sum Σₖ√λₖ|uₖ⟩|wₖ⟩ over matched orthonormal bases of each subsystem, proved via the singular value decomposition of the state's amplitude matrix — the theorem that explains why a pure state's two reduced density matrices always share the same eigenvalues.",
+      "Every bipartite pure state can be written as a single sum Σₖ√λₖ|uₖ⟩|wₖ⟩ over matched orthonormal bases of each subsystem, proved via the singular value decomposition of the state's amplitude matrix. It is the theorem that explains why a pure state's two reduced density matrices always share the same nonzero eigenvalues.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification"],
     prerequisiteIds: ["entanglement", "density-matrices"],
@@ -386,7 +387,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "lindblad-master-equation",
     title: "Lindblad Master Equation",
     definition:
-      "The most general continuous-time differential equation generating valid (completely positive, trace-preserving) Markovian open-system dynamics, dρ/dt=−i[H,ρ]+Σₖ(LₖρLₖ†−½{Lₖ†Lₖ,ρ}) — the generator underneath discrete noise channels like amplitude damping, from which the T2≤2T1 bound follows directly.",
+      "The most general continuous-time differential equation generating valid (completely positive, trace-preserving) Markovian open-system dynamics, dρ/dt=−i[H,ρ]+Σₖ(LₖρLₖ†−½{Lₖ†Lₖ,ρ}). It is the generator underneath discrete noise channels like amplitude damping, and the T2≤2T1 bound follows directly from it.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/quantum-information-theory/the-lindblad-master-equation"],
     prerequisiteIds: ["noise-decoherence"],
@@ -415,7 +416,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "hamiltonian-simulation-trotterization",
     title: "Hamiltonian Simulation & Trotterization",
     definition:
-      "Approximates e^{-iHt} for a Hamiltonian H=A+B whose pieces don't commute by alternating e^{-iAδ}e^{-iBδ} in n short steps; the total error is provably bounded by (t²/2n)‖[A,B]‖, shrinking as the number of Trotter steps grows.",
+      "Approximates e^{-iHt} for a Hamiltonian H=A+B whose pieces do not commute by alternating e^{-iAδ}e^{-iBδ} in n short steps. For bounded A and B the total error is provably bounded by (t²/2n)‖[A,B]‖, shrinking as the number of Trotter steps grows. Boundedness is load-bearing: for an unbounded pair such as p̂²/2m and V(x̂), ‖[A,B]‖ is infinite and the bound says nothing.",
     pillar: "quantum-mastery",
     lessonSlugs: [
       "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization",
@@ -435,7 +436,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "barren-plateaus",
     title: "Barren Plateaus",
     definition:
-      "Averaged over random parameter initializations a variational circuit's gradient has zero mean, and for sufficiently deep, expressive ansätze measured against a global cost function its variance shrinks exponentially in qubit count (a concentration-of-measure effect) — the reason gradient-based training of large variational circuits can stall even when nothing else is wrong.",
+      "Averaged over random parameter initializations a variational circuit's gradient has zero mean, and for sufficiently deep, expressive ansätze measured against a global cost function its variance shrinks exponentially in qubit count (a concentration-of-measure effect). That is the reason gradient-based training of large variational circuits can stall even when nothing else is wrong.",
     pillar: "quantum-mastery",
     lessonSlugs: [
       "quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability",
@@ -485,7 +486,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "quantum-channel-capacity",
     title: "Quantum Channel Capacity (Holevo, HSW & LSD)",
     definition:
-      "A channel's classical capacity is the regularized Holevo quantity (HSW theorem) while its quantum capacity is the regularized coherent information (LSD theorem); the two can differ dramatically, letting a channel carry classical bits reliably long after its coherent information — and hence any ability to carry quantum information — has hit zero.",
+      "A channel's classical capacity is the regularized Holevo quantity (HSW theorem) while its quantum capacity is the regularized coherent information (LSD theorem); the two can differ dramatically, letting a channel carry classical bits reliably long after its coherent information, and hence any ability to carry quantum information, has hit zero.",
     pillar: "quantum-mastery",
     lessonSlugs: ["quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise"],
     prerequisiteIds: [
@@ -495,7 +496,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     ],
   },
   // -------------------------------------------------------------------
-  // Apex — Algorithmic Frontiers
+  // Apex: Algorithmic Frontiers
   // -------------------------------------------------------------------
   {
     id: "block-encoding-lcu",
@@ -510,7 +511,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "quantum-signal-processing",
     title: "Quantum Signal Processing (QSP)",
     definition:
-      "Computes a polynomial of a number x on a quantum computer using only one qubit. Alternating the fixed rotation W(x) = e^{i·arccos(x)·X}, whose angle encodes the signal x, with tunable phase gates e^{iφZ} yields a unitary whose top-left entry is a controllable polynomial P(x) of degree ≤d, and essentially any polynomial meeting degree/parity/boundedness conditions is achievable by choosing the phases alone.",
+      "Computes a polynomial of a number x on a quantum computer using only one qubit. Alternating the fixed rotation W(x) = e^{i·arccos(x)·X}, whose angle encodes the signal x, with tunable phase gates e^{iφZ} yields a unitary whose top-left entry is a controllable polynomial P(x) of degree ≤d, and any polynomial meeting the degree, parity, and boundedness conditions is achievable by choosing the phases alone.",
     pillar: "apex",
     lessonSlugs: ["apex/algorithmic-frontiers/quantum-signal-processing"],
     prerequisiteIds: ["block-encoding-lcu", "phase-interference"],
@@ -528,7 +529,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "amplitude-estimation-qpe-free",
     title: "Amplitude Estimation (QPE-Free)",
     definition:
-      "Estimates a Grover-iterate amplitude to Heisenberg-limited O(1/ε) precision — quadratically better than classical Monte Carlo's O(1/ε²) — using only a classical schedule of plain Grover-iterate depths combined by maximum likelihood, matching the original phase-estimation-based algorithm's scaling without its wide coherent ancilla register or QFT.",
+      "Estimates a Grover-iterate amplitude to Heisenberg-limited O(1/ε) precision, quadratically better than classical Monte Carlo's O(1/ε²), using only a classical schedule of plain Grover-iterate depths combined by maximum likelihood, matching the original phase-estimation-based algorithm's scaling without its wide coherent ancilla register or QFT.",
     pillar: "apex",
     lessonSlugs: ["apex/algorithmic-frontiers/amplitude-estimation-without-phase-estimation"],
     prerequisiteIds: ["grovers-algorithm", "quantum-fourier-transform"],
@@ -543,7 +544,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     prerequisiteIds: ["quantum-singular-value-transformation"],
   },
   // -------------------------------------------------------------------
-  // Apex — Fault Tolerance Frontiers
+  // Apex: Fault Tolerance Frontiers
   // -------------------------------------------------------------------
   {
     id: "surface-code-lattice",
@@ -573,9 +574,10 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "magic-state-distillation",
     title: "Magic-State Distillation",
     definition:
-      "Because the Eastin-Knill theorem rules out a *universal* transversal gate set on any error-detecting code — and the surface code's transversal gates are exactly the Cliffords — universal fault-tolerant computation instead injects a non-Clifford 'magic state' via a Clifford-only teleportation-style circuit; distillation protocols (e.g. 15-to-1) consume many noisy copies to output fewer copies at cubically suppressed error, making the injected resource affordable.",
+      "The Eastin-Knill theorem rules out a *universal* transversal gate set on any error-detecting code, and on a 2D topological code like the surface code the Bravyi-König theorem confines every locality-preserving logical gate to the Clifford group. Universal fault-tolerant computation therefore injects a non-Clifford 'magic state' via a Clifford-only teleportation-style circuit; distillation protocols (e.g. 15-to-1) consume many noisy copies to output fewer copies at cubically suppressed error, making the injected resource affordable.",
     pillar: "apex",
     lessonSlugs: [
+      "quantum-computing/quantum-gates-and-circuits/universal-quantum-computation",
       "apex/fault-tolerance-frontiers/magic-states-and-distillation",
       "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
     ],
@@ -585,22 +587,23 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "quantum-threshold-theorem",
     title: "The Quantum Threshold Theorem",
     definition:
-      "Proves that if the physical error rate per gate sits below a constant threshold p_th, recursively concatenating (or scaling up) a quantum error-correcting code drives the logical error rate arbitrarily close to zero at only polylogarithmic qubit overhead in the target precision — the theorem that turned fault-tolerant quantum computing from a theoretical possibility into a scalable engineering target.",
+      "Proves that if the physical error rate per gate sits below a constant threshold p_th, recursively concatenating (or scaling up) a quantum error-correcting code drives the logical error rate arbitrarily close to zero at only polylogarithmic qubit overhead in the target precision. The standard proof also assumes faults are local and close to independent, which is why a correlated source such as crosstalk cannot be cleared simply by checking its rate against p_th. It is the theorem that turned fault-tolerant quantum computing from a theoretical possibility into a scalable engineering target.",
     pillar: "apex",
     lessonSlugs: [
+      "quantum-computing/error-correction-and-fault-tolerance/capstone-fault-tolerant-thresholds-and-resource-overhead",
       "apex/fault-tolerance-frontiers/the-threshold-theorem",
       "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm",
     ],
     prerequisiteIds: ["mwpm-decoding", "magic-state-distillation"],
   },
   // -------------------------------------------------------------------
-  // Apex — Quantum Complexity Theory
+  // Apex: Quantum Complexity Theory
   // -------------------------------------------------------------------
   {
     id: "qma-quantum-verification",
     title: "QMA & Quantum Verification",
     definition:
-      "QMA (Quantum Merlin-Arthur) is the quantum analogue of NP: a language is in QMA if YES instances have some polynomial-size quantum witness accepted with probability ≥2/3 by a polynomial-time verifier circuit, while every possible witness for a NO instance is accepted with probability ≤1/3. Amplifying this gap requires sending multiple independent witness copies rather than reusing one classical certificate, since the no-cloning theorem forbids copying an unknown quantum state for free.",
+      "QMA (Quantum Merlin-Arthur) is the quantum analogue of NP: a language is in QMA if YES instances have some polynomial-size quantum witness accepted with probability ≥2/3 by a polynomial-time verifier circuit, while every possible witness for a NO instance is accepted with probability ≤1/3. The obvious way to amplify that gap is to send several independent copies of the witness, because no-cloning means a quantum witness cannot be duplicated the way a classical certificate can; Marriott and Watrous later showed the gap can in fact be amplified from a single copy.",
     pillar: "apex",
     lessonSlugs: ["apex/quantum-complexity-theory/qma-and-quantum-verification"],
     prerequisiteIds: ["bqp-oracle-complexity"],
@@ -623,13 +626,13 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "quantum-query-lower-bound-methods",
     title: "Quantum Query Lower-Bound Methods",
     definition:
-      "The quantum adversary method (Ambainis) and the polynomial method (Beals-Buhrman-Cleve-Mosca-de Wolf) are two structurally independent techniques for proving unconditional lower bounds on quantum query complexity — one tracking a distinguishability progress measure across hard instance pairs, the other showing a quantum algorithm's acceptance probability is a low-degree polynomial in the oracle bits — and both independently establish the identical Θ(√N) optimality bound for Grover's search.",
+      "The quantum adversary method (Ambainis) and the polynomial method (Beals-Buhrman-Cleve-Mosca-de Wolf) are two structurally independent techniques for proving unconditional lower bounds on quantum query complexity. One tracks a distinguishability progress measure across hard instance pairs, the other shows a quantum algorithm's acceptance probability is a low-degree polynomial in the oracle bits, and both independently establish the identical Θ(√N) optimality bound for Grover's search.",
     pillar: "apex",
     lessonSlugs: ["apex/quantum-complexity-theory/query-complexity-and-lower-bounds"],
     prerequisiteIds: ["bqp-oracle-complexity", "grovers-algorithm"],
   },
   // -------------------------------------------------------------------
-  // Apex — Simulation and Compilation Frontiers
+  // Apex: Simulation and Compilation Frontiers
   // -------------------------------------------------------------------
   {
     id: "matrix-product-states",
@@ -653,7 +656,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "clifford-t-synthesis",
     title: "Clifford+T Synthesis & T-Count",
     definition:
-      "Compiling an arbitrary single-qubit unitary into a finite Clifford+T sequence to precision ε costs a T-count that depends heavily on the synthesis algorithm: generic Solovay-Kitaev synthesis scales as O(log^c(1/ε)) for a construction-dependent constant c, while number-theoretic algorithms like Ross-Selinger exploit the ring ℤ[1/√2, i] to reach near-optimal, ~3-4·log₂(1/ε) T-count for the structured Rz(θ) family — a gap of orders of magnitude at realistic precision.",
+      "Compiling an arbitrary single-qubit unitary into a finite Clifford+T sequence to precision ε costs a T-count that depends heavily on the synthesis algorithm: generic Solovay-Kitaev synthesis scales as O(log^c(1/ε)) for a construction-dependent constant c, while number-theoretic algorithms like Ross-Selinger exploit the ring ℤ[1/√2, i] to reach near-optimal, ~3-4·log₂(1/ε) T-count for the structured Rz(θ) family, a gap of orders of magnitude at realistic precision.",
     pillar: "apex",
     lessonSlugs: ["apex/simulation-and-compilation-frontiers/clifford-t-synthesis-and-resource-counting"],
     prerequisiteIds: ["quantum-gates", "quantum-error-correction"],
@@ -662,7 +665,7 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "noise-aware-resource-estimation",
     title: "Noise-Aware Compilation & Resource Estimation",
     definition:
-      "Compiling a circuit for real hardware layers two costs onto its logical gate count: SWAP-network routing overhead from limited qubit connectivity, and a choice among equal-SWAP-count mappings that routes the heaviest gate load through a device's best-calibrated qubits and couplers — which can shift overall circuit success probability by several percentage points without changing the gate count at all.",
+      "Compiling a circuit for real hardware layers two costs onto its logical gate count: SWAP-network routing overhead from limited qubit connectivity, and a choice among equal-SWAP-count mappings that routes the heaviest gate load through a device's best-calibrated qubits and couplers. That second choice alone can shift overall circuit success probability by several percentage points without changing the gate count.",
     pillar: "apex",
     lessonSlugs: ["apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation"],
     prerequisiteIds: ["clifford-t-synthesis", "qubit-control", "noise-decoherence"],
@@ -671,19 +674,19 @@ export const CONCEPT_NODES: ConceptNode[] = [
     id: "jordan-wigner-electronic-structure",
     title: "Jordan-Wigner Mapping & Electronic Structure Simulation",
     definition:
-      "Maps fermionic creation/annihilation operators onto qubit Pauli strings by prepending a 'Z-string' of Pauli-Z operators on all lower-indexed modes, converting qubits' natural commutation into the anticommutation the canonical fermionic algebra requires — the encoding step that turns a molecule's second-quantized electronic Hamiltonian into a circuit VQE or quantum phase estimation can act on.",
+      "Maps fermionic creation/annihilation operators onto qubit Pauli strings by prepending a 'Z-string' of Pauli-Z operators on all lower-indexed modes, converting qubits' natural commutation into the anticommutation the canonical fermionic algebra requires. It is the encoding step that turns a molecule's second-quantized electronic Hamiltonian into a circuit VQE or quantum phase estimation can act on.",
     pillar: "apex",
     lessonSlugs: ["apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules"],
     prerequisiteIds: ["hamiltonian-simulation-trotterization", "quantum-gates"],
   },
   // -------------------------------------------------------------------
-  // Apex — Research Methods and Synthesis
+  // Apex: Research Methods and Synthesis
   // -------------------------------------------------------------------
   {
     id: "quantum-advantage-claims",
     title: "Evaluating Quantum Advantage Claims",
     definition:
-      "A five-question checklist — the specific task, whether the classical comparison used the best known classical algorithm, whether the claimed classical hardness rests on an unconditional proof or an unproven complexity assumption, whether the task structurally avoids both known efficient-classical-simulation loopholes, and whether it is practically useful or merely engineered to be hard — for turning a 'quantum advantage/supremacy' headline into a set of separately checkable technical claims.",
+      "A five-question checklist for turning a 'quantum advantage/supremacy' headline into a set of separately checkable technical claims: what the specific task was, whether the classical comparison used the best known classical algorithm, whether the claimed classical hardness rests on an unconditional proof or an unproven complexity assumption, whether the task structurally avoids both known efficient-classical-simulation loopholes, and whether it is practically useful or merely engineered to be hard.",
     pillar: "apex",
     lessonSlugs: [
       "apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims",
@@ -712,7 +715,7 @@ const PILLAR_ORDER: Pillar[] = PILLARS.map((pillar) => pillar.slug);
 const COLUMN_WIDTH = 620;
 const ROW_HEIGHT = 160;
 const NODE_GAP_X = 160;
-// Must match ConceptMapExplorer.tsx's NODE_WIDTH — used here only to pad the
+// Must match ConceptMapExplorer.tsx's NODE_WIDTH, used here only to pad the
 // graph's bounding box so a rendered node's edges never clip outside it.
 const NODE_WIDTH = 152;
 const MARGIN_X = 140;
@@ -721,7 +724,7 @@ const MARGIN_Y = 100;
 /**
  * Computes a deterministic, non-force-directed layout for `CONCEPT_NODES`:
  * x is the concept's pillar (one column per pillar, six of them), y is its longest-path depth
- * in the prerequisite DAG (computed via Kahn's algorithm — concepts with no
+ * in the prerequisite DAG (computed via Kahn's algorithm: concepts with no
  * prerequisites sit at the top, deeper concepts sit lower). No layout
  * library or force simulation involved.
  */
@@ -770,7 +773,7 @@ export function buildConceptGraph(): ConceptGraph {
   }
 
   // Sibling spreading (`offset` below) can push a node's raw x left of 0
-  // within its column, so the true bounding box's left edge isn't at x=0 —
+  // within its column, so the true bounding box's left edge isn't at x=0, so
   // track the real min/max here rather than assuming it, otherwise the
   // leftmost node(s) render partially outside `width`, and any viewport
   // centered on `[0, width]` clips them (this was a real, visible bug: the
@@ -799,7 +802,7 @@ export function buildConceptGraph(): ConceptGraph {
 
   // Shift everything so the leftmost node's left edge (accounting for its
   // half-width) lands exactly at MARGIN_X, and re-derive `width` from the
-  // shifted, true right edge — both now genuinely bound every node.
+  // shifted, true right edge. Both now bound every node.
   const shiftX = -minX + NODE_WIDTH / 2 + MARGIN_X;
   const nodes: ConceptNodeLayout[] = rawNodes.map((node) => ({ ...node, x: node.x + shiftX }));
 
@@ -828,7 +831,7 @@ export function getConcept(id: string): ConceptNode | undefined {
  * before it (roots first), followed by `id` itself last.
  *
  * This is the single most useful question a dependency graph can answer for
- * someone new — "what do I need to learn before this?" — so it lives here as
+ * someone new ("what do I need to learn before this?"), so it lives here as
  * a pure function rather than inside the map component: `/map`'s graph uses
  * it to highlight the chain, and `ConceptDetailPanel` renders it as an
  * ordered, clickable route.

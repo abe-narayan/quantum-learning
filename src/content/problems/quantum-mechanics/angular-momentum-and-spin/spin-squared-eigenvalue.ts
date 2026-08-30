@@ -18,7 +18,7 @@ export const spinSquaredEigenvalue: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "Using j(j+1) with j=1/2, what is S²'s eigenvalue in units of ħ²?",
-    inputHint: "as a decimal (e.g. a fraction like 0.75)",
+    inputHint: "as a decimal, not a fraction",
   },
   answer: {
     type: "numeric",
@@ -43,6 +43,6 @@ export const spinSquaredEigenvalue: NumericProblem = {
   explanation: {
     correctIdea: "This matches the direct Pauli-matrix computation X²+Y²+Z²=3I exactly, divided by 4.",
     whyCorrect: "Confirmed both by the general j(j+1) formula and by direct Pauli matrix algebra.",
-    whyWrong: ["Answering 0.25 (just j² instead of j(j+1)) confuses the two different quantities — they're only equal for j=0."],
+    whyWrong: ["Answering 0.25 uses j² instead of j(j+1). The two quantities coincide only at j=0."],
   },
 };

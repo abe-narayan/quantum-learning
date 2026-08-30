@@ -18,7 +18,7 @@ export const wrongBasisForPerturbationMatrix: MultipleChoiceProblem = {
     options: [
       { id: "a", text: "H₀'s own eigenbasis, {|n⁽⁰⁾⟩}" },
       { id: "b", text: "The position basis, regardless of what H₀ is" },
-      { id: "c", text: "Any orthonormal basis — the choice doesn't matter" },
+      { id: "c", text: "Any orthonormal basis; the choice does not matter" },
       { id: "d", text: "H′'s own eigenbasis" },
     ],
   },
@@ -26,11 +26,11 @@ export const wrongBasisForPerturbationMatrix: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "The position basis is only relevant if H₀ itself happens to be diagonal there — for the harmonic oscillator's H₀, the natural basis is the number/Fock basis, not position.",
-      c: "The formulas' E_n^(0) terms specifically reference H₀'s eigenvalues at labeled states n — this only makes sense if the matrix indices n,m label H₀'s eigenstates.",
-      d: "Diagonalizing H′ itself would defeat the purpose — perturbation theory specifically avoids needing to solve the full (H₀+H′) problem directly.",
+      b: "The position basis is relevant only if H₀ itself happens to be diagonal there. For the harmonic oscillator's H₀, the natural basis is the number (Fock) basis, not position.",
+      c: "The formulas' E_n^(0) terms reference H₀'s eigenvalues at labeled states n, which makes sense only if the matrix indices n,m label H₀'s eigenstates.",
+      d: "Diagonalizing H′ itself would defeat the purpose: perturbation theory exists to avoid solving the full (H₀+H′) problem directly.",
     },
-    defaultIncorrectFeedback: "The indices n, m in every formula label H₀'s eigenstates specifically — H' must be expressed as a matrix using that same basis.",
+    defaultIncorrectFeedback: "The indices n, m in every formula label H₀'s eigenstates, so H' must be expressed as a matrix in that same basis.",
   },
   hints: [
     { text: "The formulas reference E_n^(0) and E_m^(0), which are H₀'s eigenvalues at states labeled n, m." },
@@ -43,7 +43,7 @@ export const wrongBasisForPerturbationMatrix: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "The matrix indices and the energy labels in the denominators are the same indices, which pins the basis down: it has to be the one that diagonalizes H₀.",
-    whyCorrect: "Matches the lesson's 'Setup: H₀'s eigenbasis' section, and it is why the worked example builds x⁴ from the creation and annihilation operators, which act naturally in the Fock basis.",
+    whyCorrect: "The denominators are differences of unperturbed energies labelled by the same indices m and n that index the matrix elements. That forces the two labels to mean the same thing, which is only true in the basis that diagonalizes H₀.",
     whyWrong: [
       { optionId: "b", text: "Fixes a basis in advance. Position is right only when H₀ happens to be diagonal there, which the harmonic oscillator's H₀ is not." },
       { optionId: "c", text: "Drops the coupling between the matrix indices and the energy labels. Change basis and E_n^(0) no longer refers to the state H'_mn is indexed by." },

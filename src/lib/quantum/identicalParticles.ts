@@ -33,7 +33,7 @@ function vectorNorm(v: readonly Complex[]): number {
 /** Normalizes a vector; throws for a (near-)zero vector rather than dividing by ~0 — this is deliberately not silently handled, since a zero result is itself meaningful (see antisymmetrize). */
 export function normalizeVector(v: readonly Complex[]): Complex[] {
   const n = vectorNorm(v);
-  if (n < 1e-9) throw new Error("Cannot normalize a (near-)zero vector — this state does not exist.");
+  if (n < 1e-9) throw new Error("Cannot normalize a (near-)zero vector. This state does not exist.");
   return v.map((c) => c.scale(1 / n));
 }
 

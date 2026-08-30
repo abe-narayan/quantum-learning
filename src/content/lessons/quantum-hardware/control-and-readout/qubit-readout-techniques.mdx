@@ -1,6 +1,5 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
-import { ObservePredictExplain } from "@/components/narrative/ObservePredictExplain";
 import { DispersiveReadoutDiagram } from "@/components/visualizations/DispersiveReadoutDiagram";
 import { ReadoutScatter } from "@/components/visualizations/ReadoutScatter";
 
@@ -20,7 +19,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Qubit Readout Techniques",
   description:
-    "Measuring a qubit's state without destroying the information first: dispersive readout couples the qubit to a resonator whose frequency shifts depending on the qubit's state, an indirect measurement scheme, and readout fidelity is a genuine probabilistic classification problem, not a perfect binary readout.",
+    "Measuring a qubit's state without destroying the information first: dispersive readout couples the qubit to a resonator whose frequency shifts depending on the qubit's state, an indirect measurement scheme, and readout fidelity is a probabilistic classification problem, not a perfect binary readout.",
   course: "control-and-readout",
   module: "qubit-readout-techniques",
   order: 1,
@@ -29,29 +28,30 @@ export const lessonMeta = {
   prerequisites: ["quantum-hardware/control-and-readout/control-electronics"],
   objectives: [
     "Explain the dispersive readout scheme at a conceptual level: measuring a resonator, not the qubit directly",
-    "State why readout fidelity is a genuine, imperfect probabilistic quantity, distinct from ideal projective measurement",
+    "State why readout fidelity is an imperfect probabilistic quantity, distinct from ideal projective measurement",
     "Connect readout error to the broader error budget alongside gate errors and decoherence",
   ],
   related: [
     {
       slug: "quantum-computing/qubits-and-quantum-states/measurement-and-probability",
-      note: "The idealized, instantaneous projective measurement postulate this lesson explicitly contrasts against real, imperfect, indirect hardware readout.",
+      note: "The idealized, instantaneous projective measurement postulate this lesson contrasts against real, imperfect, indirect hardware readout.",
     },
   ],
 };
 
 <LessonHook eyebrow="Measurement, less ideal than the textbook version">
-Real qubit readout is neither instantaneous nor perfect: it takes hundreds of nanoseconds, involves real noise, and has a real, measurable error rate — nothing like the idealized instantaneous projection the math postulates.
+Real qubit readout is neither instantaneous nor perfect: it takes hundreds of nanoseconds, involves real noise, and has a measurable error rate. What you get back looks nothing like the instantaneous projection the math postulates.
 </LessonHook>
 
-## Motivation
+## Measurement That Takes Time and Makes Mistakes
 
-Measurement and Probability (Quantum Computing pillar) treats
+Measurement and Probability (Quantum Computing track) treats
 measurement as an instantaneous, ideal projection. Real qubit readout is
 neither instantaneous nor ideal: it takes a few hundred nanoseconds to a
-couple of microseconds, involves real noise, and has a real, measurable
-error rate. This lesson covers how readout actually works in hardware,
-and quantifies exactly how far it falls short of the textbook ideal.
+couple of microseconds, involves real noise, and has a measurable
+error rate. So what is actually happening during those hundreds of
+nanoseconds, and how far does what you get back sit from the clean
+projection the postulate promises?
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Measuring_a_qubit_leaves_no_room_for_error.jpg/1280px-Measuring_a_qubit_leaves_no_room_for_error.jpg"
@@ -62,7 +62,7 @@ and quantifies exactly how far it falls short of the textbook ideal.
   license="CC BY 4.0"
 />
 
-## Engineering Development
+## Dispersive Readout, and Its Error Budget
 
 ### Dispersive readout: measure the resonator, not the qubit
 
@@ -80,7 +80,7 @@ the qubit was in, without directly bombarding the qubit itself.
 
 <DispersiveReadoutDiagram ariaLabel="Dispersive readout: the qubit couples only dispersively to a readout resonator, which is itself coupled to a feedline carrying the probe tone to and from an amplifier chain; the resonator, not the qubit, sits on the measured signal path" />
 
-The feedline, the thing an actual measurement instrument is connected
+The feedline, the thing your measurement instrument is connected
 to, only ever touches the resonator. The qubit sits one coupling step
 further away, its state readable only through the effect it has on the
 resonator's frequency, never sampled directly.
@@ -93,48 +93,45 @@ Noise in this signal means the classification is imperfect: a
 qubit actually in $|0\rangle$ occasionally gets misclassified as "1," and
 vice versa. **Readout fidelity** quantifies this: the probability the
 reported classical bit matches the qubit's actual (pre-measurement)
-state. Representative current values sit in the 95-99% range depending
-on platform and integration time; a <Term id="shot-noise-standard-error">single-shot</Term> measurement typically
+state. Take 95-99% as the representative band this lesson computes with
+rather than as a current specification: it is a mid-2020s figure, it
+varies with platform and integration time, and the best devices already
+sit at the top of it. A <Term id="shot-noise-standard-error">single-shot</Term> measurement typically
 integrates the reflected signal for a few hundred nanoseconds up to a
 couple of microseconds, longer integration averages out more noise and
 buys higher fidelity, but it also holds the qubit in a measured state
-longer, a direct speed-versus-accuracy tradeoff, not the textbook's
-instantaneous, perfect projective measurement.
+longer. That is a direct speed-versus-accuracy tradeoff, and nothing
+like the textbook's instantaneous, perfect projective measurement.
 
-Where does that error actually come from? Every single shot lands
+Where does that error come from? Every single shot lands
 somewhere on the IQ plane, the 2D plane of the demodulated signal's
 in-phase (I) and quadrature (Q) components, as one point drawn from a
 noisy cloud centered near the "measured $|0\rangle$" location or the
 "measured $|1\rangle$" location.
 
-<ObservePredictExplain
-  observe={
-    <InteractiveSection title="Drag the clouds apart and watch the error shrink" description="Drag the separation-to-noise ratio (SNR) slider, which sets how far apart the two point clouds sit relative to their own spread. Watch the two clouds slide together or apart, and watch the live fidelity readout update as that happens." mode="observe">
-      <ReadoutScatter ariaLabel="IQ-plane scatter of single readout shots: two noisy point clouds, one centered at the measured zero location and one at the measured one location, separated by a dashed decision boundary. Dragging the separation-to-noise-ratio slider moves the clouds apart or together, shrinking or growing the overlap between them, with the resulting single-shot fidelity computed live from the two clusters' known Gaussian parameters." />
-    </InteractiveSection>
-  }
-  predict={
-    <PredictBeforeReveal
-      question="Drag the SNR slider higher, separating the two clouds further relative to their own spread. What happens to the overlap between them, and to the reported fidelity?"
-      options={[
-        { label: "Overlap shrinks; fidelity rises", value: "shrinks-rises" },
-        { label: "Overlap grows; fidelity drops", value: "grows-drops" },
-        { label: "Neither changes — SNR only relabels the axes", value: "no-change" },
-      ]}
-      correctValue="shrinks-rises"
-      explanation="Higher SNR means the two clusters sit farther apart relative to their own noise-driven spread, so less of each cloud crosses onto the other's side of the decision boundary — overlap shrinks and fidelity rises."
-    />
-  }
-  explain={
-    <p>
-      A threshold splits the IQ plane into two bins. Noise is what gives
-      each cloud its spread, and it's that spread, not the classifier,
-      that lets some $|0\rangle$ shots land on the $|1\rangle$ side of the
-      boundary (and vice versa): the single-shot physical origin of the
-      error rate the bar chart below reports as a shot count.
-    </p>
-  }
+Answer this before touching the figure below, because the figure gives
+it away.
+
+<PredictBeforeReveal
+  question="Suppose the two clouds could be pushed farther apart relative to their own spread, raising the separation-to-noise ratio (SNR). What happens to the overlap between them, and to the reported single-shot fidelity?"
+  options={[
+    { label: "Overlap shrinks; fidelity rises", value: "shrinks-rises" },
+    { label: "Overlap grows; fidelity drops", value: "grows-drops" },
+    { label: "Neither changes; SNR only relabels the axes", value: "no-change" },
+  ]}
+  correctValue="shrinks-rises"
+  explanation="Higher SNR means the two clusters sit farther apart relative to their own noise-driven spread, so less of each cloud crosses onto the other's side of the decision boundary: overlap shrinks and fidelity rises. The slider below lets you watch it happen and read off how much."
 />
+
+<InteractiveSection title="Move the two shot clouds together and apart" description="Drag the separation-to-noise ratio (SNR) slider, which sets how far apart the two point clouds sit relative to their own spread, and check your prediction against the fidelity those two clusters actually produce." mode="observe">
+  <ReadoutScatter ariaLabel="IQ-plane scatter of single readout shots: two noisy point clouds, one centered at the measured zero location and one at the measured one location, separated by a dashed decision boundary. Dragging the separation-to-noise-ratio slider moves the clouds apart or together, shrinking or growing the overlap between them, with the resulting single-shot fidelity computed live from the two clusters' known Gaussian parameters." />
+</InteractiveSection>
+
+A threshold splits the IQ plane into two bins. Noise is what gives each
+cloud its spread, and it's that spread, not the classifier, that lets
+some $|0\rangle$ shots land on the $|1\rangle$ side of the boundary (and
+vice versa): the single-shot physical origin of the error rate the bar
+chart below reports as a shot count.
 
 ### Readout error joins the broader error budget
 
@@ -143,21 +140,21 @@ Readout error compounds with <Term id="gate-fidelity">gate errors</Term> and dec
 Decoherence & Scaling course) into the device's overall error
 budget. A computation with perfect gates but 97% readout fidelity still
 has a real 3% chance of reporting the wrong final answer on any single
-run, motivating the standard practice of running a circuit many times
-and taking a statistical distribution over outcomes, rather than trusting
-any single shot.
+run. That is why the standard practice is to run a circuit many times
+and read the statistical distribution over outcomes; no single shot is
+worth trusting on its own.
 
-## Physical Interpretation
+## Measuring the Proxy, Not the Thing
 
 Dispersive readout is a clean illustration of a broader hardware theme:
 almost nothing in real quantum hardware is the clean, idealized
 operation described in an introductory circuits course. Every
 operation (gates, readout, even the "instantaneous" measurement
-postulate) has a real, engineered, imperfect physical implementation
-underneath it, with its own error characteristics worth knowing
-explicitly rather than assuming away.
+postulate) has an imperfect physical implementation
+underneath it, with its own error characteristics that you are better
+off knowing explicitly than assuming away.
 
-## Worked Example
+## What 97 Percent Fidelity Costs a Circuit
 
 **A circuit is run 1000 times on hardware with 97% readout fidelity (and
 otherwise-perfect gates and no decoherence, for this idealized
@@ -171,22 +168,22 @@ $$
 About 30 of the 1000 shots are expected to report the wrong bit purely
 from readout error, even though the underlying quantum state and gates
 were assumed perfect in this idealized example. This is why real
-experiments report statistics over many shots rather than trusting a
-single run.
+experiments report statistics over many shots.
 
 <BarChart
   bars={[
     { label: "Correct", value: 970, caption: "970 shots" },
     { label: "Readout error", value: 30, caption: "30 shots", highlight: true },
   ]}
+  maxValue={1000}
   ariaLabel="Out of 1000 shots at 97% readout fidelity, 970 report the correct bit and 30 report a readout error"
 />
 
 Representative current devices don't sit at exactly 97%. They sit
 anywhere in the 95-99% range this lesson already named. Sliding across
 that whole range shows the same $1000\times(1-\text{fidelity})$
-arithmetic the worked example just performed by hand, at every value in
-the stated range, not only the one case above:
+arithmetic the worked example just performed by hand, now applied
+across the whole stated range:
 
 <InteractiveSection title="Explore the 95-99% fidelity range" description="Slide from 95% up to 99% fidelity. Both bars are computed the same way as the worked example above: correct shots = 1000 times fidelity, readout errors = 1000 times (1 minus fidelity). Notice even 99% fidelity, the best end of the stated range, still leaves a real 10-shot error count out of 1000.">
   <BarChartExplorer
@@ -197,7 +194,7 @@ the stated range, not only the one case above:
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Treating Readout as Free and Exact
 
 <Callout type="mistake">
 **Assuming readout directly measures the qubit.** Dispersive readout
@@ -208,23 +205,216 @@ measurement would risk.
 
 <Callout type="warning">
 **Treating readout fidelity as if it were 100%.** As the worked example
-shows, even a "good" 97% fidelity produces a real, non-negligible error
-rate on any single measurement, an important, quantifiable
-contribution to a device's overall error budget, not a rounding
-error to ignore.
+shows, even a "good" 97% fidelity produces a non-negligible error
+rate on any single measurement, a quantifiable contribution to a
+device's overall error budget, not a rounding error to ignore.
 </Callout>
 
 ## Practice Questions
 
 1. Why does dispersive readout measure a resonator instead of the qubit
    directly? What risk does this avoid?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the thing you have to connect a measuring instrument to is,
+   necessarily, strongly coupled to the outside world, and you do not
+   want that thing to be the qubit.
+
+   Probing a qubit's energy levels directly means sending power at or
+   near its own transition frequency. That is the same tone a gate is
+   made of, so the probe drives the very transition it is trying to read.
+   Worse, it puts the qubit on the measurement line permanently: a cold,
+   lossy, amplifier-terminated path out of the fridge is an excellent
+   decoherence channel, and once the qubit is coupled to it, it is
+   coupled to it all the time, not only while you are measuring.
+
+   Dispersive readout puts a resonator in between. The coupling is
+   deliberately far off resonance, strong enough that the resonator's
+   frequency shifts by a measurable amount depending on whether the qubit
+   sits in $|0\rangle$ or $|1\rangle$, weak enough that no energy is
+   exchanged between the two. The measured signal is a probe tone
+   reflected off the *resonator*, and the qubit's state is inferred from
+   which frequency the resonator was at. Your instrument touches the
+   resonator; the qubit sits one coupling step away.
+
+   The property that makes this work is worth naming, because it is what
+   turns a clever trick into a usable measurement. In the dispersive
+   regime the effective interaction is a state-dependent frequency shift,
+   which commutes with the qubit's own $Z$ operator. An interaction that
+   commutes with $Z$ cannot flip the qubit between $|0\rangle$ and
+   $|1\rangle$. So the measurement distinguishes the two states without
+   inducing transitions between them, and the qubit is left in the state
+   the measurement reported. That is what makes mid-circuit measurement,
+   conditional feedback and error-correction syndrome extraction possible
+   at all: each of those needs the qubit to still be usable afterwards.
+
+   The wrong turn is to name the avoided risk as "collapse." Collapse is
+   not the risk; it is the point. A measurement is supposed to project
+   the state. The risk is *uncontrolled* disturbance: a probe that drives
+   transitions rather than reading them, and a permanent strong coupling
+   to a lossy line. The lesson's phrase "disturbing (or fully collapsing)
+   the state in an uncontrolled way" turns on that last clause.
+
+   One honest residual, since the isolation is not total. The qubit is
+   coupled to the resonator, the resonator is coupled to the feedline,
+   and so the qubit has a path, second-hand, to decay out through the
+   readout circuit. That is the Purcell effect, and it sets a ceiling on
+   $T_1$ that gets worse the more strongly you couple the resonator to
+   the line for signal. Real devices insert a Purcell filter, a circuit
+   transparent at the readout frequency and opaque at the qubit's, to
+   break that path while keeping the signal. The resonator buys enormous
+   isolation, not perfect isolation.
+
+   </details>
+
 2. For 1000 shots at 99% readout fidelity, roughly how many are expected
-   to be readout errors? Compare to the worked example's 97% case.
+   to be readout errors? Compare to the worked example's 97% case, then
+   say what that same per-qubit fidelity implies for a 10-qubit register
+   read out shot by shot.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   1000\times(1-0.99) = 1000\times0.01 = 10 \text{ shots}.
+   $$
+
+   Against 30 at 97%. Three times fewer errors, which is worth pausing
+   on, because "97% to 99%" sounds like a two-point improvement and is in
+   fact a factor-of-three reduction. The quantity that governs the error
+   count is the *infidelity* $1-F$, not the fidelity, and infidelity went
+   from 0.03 to 0.01. The same reading applies at the other end of the
+   lesson's stated range: 95% fidelity gives 50 errors per 1000, five
+   times worse than 99%, from a number that looks only four points
+   lower.
+
+   The wrong turn is stopping at "10 out of 1000, so 99% is basically
+   fine." It is not fine on a real register, because every measured qubit
+   pays the error separately. Ten qubits each read out at 99% give
+
+   $$
+   0.99^{10} \approx 0.904,
+   $$
+
+   so roughly one shot in ten comes back with at least one wrong bit in
+   the string. At 97% the same register gives $0.97^{10}\approx0.737$,
+   and better than one shot in four is corrupted somewhere. A per-qubit
+   fidelity is not a per-outcome fidelity, and the gap between them grows
+   with the width of the register.
+
+   One further refinement worth carrying, because it matters as soon as
+   you try to correct for readout error. The two error directions are not
+   equal in practice. A qubit prepared in $|1\rangle$ has a few hundred
+   nanoseconds to a couple of microseconds of readout integration during
+   which it can relax toward $|0\rangle$, while a qubit in $|0\rangle$
+   has no comparable route upward. So the $|1\rangle\to$ "0" error is
+   typically the larger one, and a device's readout confusion matrix
+   comes out asymmetric. That asymmetry is exactly what makes the
+   confusion-matrix inversion in the Quantum Error Mitigation lesson
+   worth doing, rather than just subtracting a flat error rate.
+
+   </details>
+
 3. Explain in one sentence why running a circuit many times (rather than
    once) is standard practice, connecting directly to readout fidelity.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a single shot returns one classical bit that has a real
+   $(1-F)$ chance of being wrong, and no way to tell whether it was, so
+   the thing worth reporting is a distribution estimated over many shots
+   rather than any individual outcome.
+
+   Two separate reasons stack up behind that sentence, and it is worth
+   keeping them apart because they behave differently.
+
+   **The intrinsic one.** A quantum circuit generally does not have a
+   deterministic answer. The Born rule specifies a probability
+   distribution over outcomes, and a single sample cannot estimate a
+   distribution. This would be true on perfect hardware with perfect
+   readout.
+
+   **The instrumental one.** On top of that, readout misclassifies some
+   shots. At 97% fidelity, 30 of 1000 reported bits are wrong even when
+   the underlying state and every gate were exactly right.
+
+   Now the part that is easy to get wrong, and it matters. Repetition
+   fixes the first problem cleanly, because shot noise averages away:
+   the standard error of an estimated probability shrinks as
+   $1/\sqrt{n}$. Repetition does *not* fix the second problem, because
+   readout error is not zero-mean noise. It is a systematic bias, and an
+   asymmetric one, so more shots estimate the *biased* distribution more
+   and more precisely. A million shots on a device with an asymmetric
+   confusion matrix converges confidently to the wrong answer.
+
+   Removing that bias takes a different tool: measure the confusion
+   matrix by preparing known states, then invert it to recover the true
+   distribution from the measured one. That is readout-error mitigation,
+   and it is a separate step from taking more shots. Shots buy precision;
+   mitigation buys accuracy, and they are not substitutes.
+
+   </details>
+
 4. Readout fidelity and gate fidelity are both sources of error. Are
    they the same kind of error, or different? (Hint: think about WHEN
    each error occurs relative to the actual quantum state.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Different kinds, and the timing is the whole distinction.
+
+   **A gate error happens to the quantum state, while it is still
+   quantum.** A miscalibrated rotation or a noisy pulse leaves the
+   register in the wrong state. Everything downstream then operates on
+   that wrong state, so the error propagates: a small over-rotation early
+   in a circuit can be carried, amplified, and spread across qubits by
+   the entangling gates that follow.
+
+   **A readout error happens after the state is gone.** The projection
+   already occurred, the qubit really was in $|0\rangle$, and what went
+   wrong is that a noisy analog signal landed on the wrong side of a
+   threshold on the IQ plane. It is a classical misclassification of a
+   correct quantum result.
+
+   Three consequences follow, and each of them is a practical difference
+   rather than a philosophical one.
+
+   **Propagation.** Readout error does not propagate. It corrupts one
+   reported bit and there are no subsequent gates for it to corrupt.
+   Gate error is the opposite: its damage is done to the object the rest
+   of the circuit is about to use.
+
+   **Repair.** Readout error is a stochastic channel on classical bits
+   with a matrix you can measure directly, by preparing $|0\rangle$ and
+   $|1\rangle$ and counting misclassifications, and then invert after the
+   fact. Gate error cannot be undone this way. Once quantum information
+   has leaked into an environment, no classical post-processing recovers
+   it; you either prevent the error by calibrating, or correct it inside
+   the circuit with an error-correcting code.
+
+   **How each enters the error budget.** Gate error compounds with
+   circuit *depth*, roughly $p^N$ over $N$ sequential gates. Readout
+   error is paid once per measured qubit per shot, so it scales with
+   register *width*, as question 2's $0.99^{10}$ showed. A deep circuit
+   on a few qubits is gate-limited; a shallow circuit reading out many
+   qubits is readout-limited. Collapsing both into one "device fidelity"
+   number hides which of the two you are actually fighting.
+
+   The clean split does blur at one specific place, and pretending
+   otherwise would be dishonest. Readout integration takes hundreds of
+   nanoseconds to a couple of microseconds, and during that window the
+   qubit can relax through $T_1$. That is a genuine change to the quantum
+   state, happening inside the measurement, and it gets reported as a
+   readout error. It is also, as question 2 noted, why the confusion
+   matrix comes out asymmetric. The boundary between "error to the state"
+   and "error in classifying the state" is a real boundary, but the
+   measurement window straddles it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -233,13 +423,13 @@ error to ignore.
 - Dispersive readout measures a qubit indirectly, via a coupled
   resonator's state-dependent frequency shift, not a direct
   measurement of the qubit itself.
-- Readout fidelity (representatively 95-99%) is a real, nonzero error
-  source, a probabilistic classification problem, not the textbook's
-  perfect projective measurement.
+- Readout fidelity (representatively 95-99%) is a nonzero error
+  source: a probabilistic classification problem sitting exactly where
+  the textbook puts a perfect projective measurement.
 - Readout error joins gate error and decoherence in a device's overall
   error budget, motivating multi-shot statistics over any single run.
 
-## Further Exploration
+## Keeping the Pulses Honest
 
 <NextDiscovery>
 [Calibration](/lessons/quantum-hardware/control-and-readout/calibration) covers how a real device's actual pulse

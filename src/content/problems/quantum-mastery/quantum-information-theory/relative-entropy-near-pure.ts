@@ -44,6 +44,6 @@ export const relativeEntropyNearPure: NumericProblem = {
   },
   explanation: {
     correctIdea: "For commuting states, quantum relative entropy reduces exactly to the classical KL divergence of the shared eigenbasis's probability distributions.",
-    whyCorrect: "This is strictly larger than the diag(0.9,0.1) example worked in the lesson (≈0.531 bits), consistent with rho being further from the maximally mixed sigma.",
+    whyCorrect: "The value lands strictly above the diag(0.9,0.1) case worked in the lesson (about 0.531 bits), which is the expected direction: rho here sits further from the maximally mixed sigma, and relative entropy is measuring exactly that separation.",
   },
 };

@@ -48,7 +48,7 @@ export const nEquals2TotalDegeneracy: NumericProblem = {
     finalAnswer: "4",
   },
   explanation: {
-    correctIdea: "This sum-over-l calculation is exactly how the general n² degeneracy formula is derived, done concretely for the smallest nontrivial case.",
+    correctIdea: "This sum-over-l calculation is how the general n² degeneracy formula is derived, done concretely for the smallest nontrivial case.",
     whyCorrect: "1 (2s) + 3 (2p) = 4 = 2², matching the stated n² rule.",
     whyWrong: ["Counting only the l=1 states (3) or only l=0 (1) misses that the level's degeneracy sums over every allowed l, not just one."],
   },

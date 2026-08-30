@@ -45,13 +45,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Every route at once, including the absurd ones">
   Ask a quantum particle how it got from A to B and Feynman's answer is
   every way imaginable, all at once: paths that zigzag, double back, and
   wander off to the far side of the galaxy before returning in time.
 </LessonHook>
 
-## Motivation
+## One language, used by every lesson before this
 
 Every lesson before this one used the same language. There is a state,
 there is a Hamiltonian, and the <Term id="schrodinger-equation">Schrödinger equation</Term> says how the state
@@ -77,10 +77,10 @@ argument you can sketch on a napkin.
   caption="Richard Feynman's Los Alamos identification badge, taken in the 1940s. He developed the sum-over-histories formulation shortly afterwards, building on a remark of Dirac's about the role of the classical action in quantum mechanics that had sat largely unused for a decade."
   credit="Los Alamos National Laboratory"
   creditUrl="https://commons.wikimedia.org/wiki/File:Richard_P._Feynman_Los_Alamos_ID_badge_photo.jpg"
-  license="Public domain (U.S. federal government work)"
+  license="Attribution (LANL)"
 />
 
-## Intuition
+## A spinning clock hand for every path
 
 Picture every route between two points laid out at once, and give each
 one a spinning clock hand: the hand's angle is set by that specific
@@ -118,7 +118,7 @@ computation, which the Worked Example below plots directly.)
 
 <PathPhasorSum />
 
-## Mathematical Development
+## Wick rotation, then a sum you can compute
 
 ### The central idea
 
@@ -194,7 +194,7 @@ integrating over $N-1$ intermediate positions; the worked example below
 does the $N=2$ version and plots the integrand, so "sum over every
 intermediate position" becomes a curve rather than a phrase.
 
-## Physical Interpretation
+## Why the classical path wins for large objects
 
 The sum-over-paths picture makes one thing easy that the operator picture
 makes hard: why the classical path, the one satisfying $\delta S=0$,
@@ -210,31 +210,31 @@ Feynman diagrams are a bookkeeping scheme for terms in such a sum, and of
 statistical mechanics, where the Euclidean version below is not a
 computational trick but the partition function itself.
 
-## Worked Example
+## Splitting one time step into two
 
 **Verify the composition law numerically for $x_f=3,x_i=-1,\tau=2$
 ($m=\hbar=1$).**
 
 Exact: $K_E(3,-1;2)=\sqrt{1/4\pi}\exp(-16/4)\approx0.0051667$.
 Discretized (splitting $\tau=2$ into two halves of $\tau/2=1$ each,
-integrating $x_1$ over $[-30,30]$ with 12000 steps):
-$\approx0.0051667$, matching to a relative difference of
-$\sim1.3\times10^{-15}$, confirmed directly by this platform's test
-suite.
+integrating $x_1$ over $[-30,30]$ with 8000 steps): $\approx0.0051667$,
+matching to a relative difference of $\sim1.3\times10^{-15}$, the grid
+and step count this platform's test suite uses.
 
-Before looking at it, decide what you think the integrand should do as
-$x_1$ ranges over every real number, given that $x_i=-1$ and $x_f=3$.
+One number in that sum is worth committing to before the plot appears.
+The integration runs over every real $x_1$, and that includes $x_1=-8$: a
+path that sprints eight units backwards past the start before doubling
+back to $x_f=3$. How much is such a path worth?
 
 <PredictBeforeReveal
-  question="As x₁ sweeps over every real number, where should K_E(x_f,x_1;τ/2)·K_E(x_1,x_i;τ/2) be largest?"
+  question="Compared with the integrand's largest value, how much does the intermediate position x₁ = -8 contribute?"
   options={[
-    { label: "Near x₁ = -1, the start point", value: "start" },
-    { label: "Near x₁ = 1, the classical midpoint", value: "midpoint" },
-    { label: "Near x₁ = 3, the end point", value: "end" },
-    { label: "Spread out evenly, no real peak", value: "flat" },
+    { label: "About 7×10⁻³⁶ of it: tiny, but not zero", value: "tiny" },
+    { label: "A few percent of it, small but plottable", value: "percent" },
+    { label: "Exactly zero, since that path is not allowed", value: "zero" },
   ]}
-  correctValue="midpoint"
-  explanation="The plot below peaks right at x₁ = 1, the straight-line midpoint between x_i = -1 and x_f = 3, and falls off fast on either side. Every x₁ is included in the sum, but the ones far from the classical path contribute almost nothing."
+  correctValue="tiny"
+  explanation="Both Gaussian legs get stretched at once: the exponent is -(x₁-1)² - 4, so relative to its peak the integrand at x₁ = -8 carries a factor exp(-81) ≈ 7×10⁻³⁶. Nothing in the path sum forbids that path. It is outweighed, which is a different statement, and the whole formulation turns on the difference."
 />
 
 Here is the integrand plotted against $x_1$, the product of the two
@@ -243,21 +243,24 @@ Gaussian propagators as the engine computes it:
 <ParametricCurve
   frames={pathIntegrandFrames}
   sliderLabel="Intermediate position x₁ in the path-integral integrand"
-  ariaLabel="The path-integral integrand K_E(x_f,x_1)K_E(x_1,x_i) as a function of the intermediate position x_1"
+  ariaLabel="The path-integral integrand K_E(x_f,x_1;τ/2)·K_E(x_1,x_i;τ/2) plotted against the intermediate position x_1 from -8 to 8. It is a single symmetric bell centred on x_1 = 1, peaking at about 0.0029. By the endpoints themselves, x_1 = -1 and x_1 = 3, it has already dropped to about 0.000053, under two percent of the peak, and beyond about x_1 = ±4 it is flat against the axis at plot resolution without ever reaching zero."
 />
 
 The peak sits at $x_1=1$, the straight-line midpoint between $x_i=-1$ and
 $x_f=3$, which is where the classical particle would be at half time. The
-curve falls away quickly on both sides.
+curve falls away quickly on both sides: by $x_1=-1$ and $x_1=3$, the two
+endpoints themselves, it is down to $5.3\times10^{-5}$, under two percent
+of its peak.
 
-That is the computed version of the Physical Interpretation's claim.
-Every $x_1$ is in the sum, including $x_1=-8$, which corresponds to a
-particle that sprints backwards and then returns. Its contribution is not
-zero; it is small. The classical answer emerges from weighting, not from
-exclusion, and that distinction is the entire content of the
-formulation.
+That is the computed version of the claim made in words above, that the
+classical path wins by weighting rather than by decree.
+Every $x_1$ is in the sum, including the $x_1=-8$ of the prediction above,
+worth $2\times10^{-38}$ against a peak of $2.9\times10^{-3}$. Its
+contribution is not zero; it is small. The classical answer emerges from
+weighting, not from exclusion, and that distinction is the entire content
+of the formulation.
 
-## Common Mistakes
+## Euclidean time is standard, not a simplification
 
 <Callout type="note">
 **Thinking this lesson's Euclidean-time example is "the real path integral,
@@ -279,17 +282,172 @@ $x_1$, not just the one lying on the classical straight-line trajectory.
 
 1. Why does Euclidean time turn the oscillatory weight $e^{iS/\hbar}$
    into a real, decaying $e^{-S_E/\hbar}$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the substitution supplies a second factor of $i$, and two
+   factors of $i$ make a real minus sign.
+
+   Track it through the action. With $t=-i\tau$, so that $dt=-i\,d\tau$
+   and $\dot x=dx/dt=i\,dx/d\tau$:
+
+   $$
+   S = \int\left(\tfrac12m\dot x^2 - V\right)dt = \int\left(-\tfrac12m\left(\frac{dx}{d\tau}\right)^2 - V\right)(-i\,d\tau) = i\int\left(\tfrac12m\left(\frac{dx}{d\tau}\right)^2 + V\right)d\tau
+   $$
+
+   Calling that last integral the Euclidean action $S_E$, we have
+   $S=iS_E$, and therefore
+
+   $$
+   e^{iS/\hbar} = e^{i(iS_E)/\hbar} = e^{-S_E/\hbar}
+   $$
+
+   The detail most worth noticing is inside $S_E$: the sign between
+   kinetic and potential has *flipped*. The Lagrangian $T-V$ has become
+   $T+V$, which is bounded below and non-negative for a confining
+   potential. That is why the exponential decays rather than growing, and
+   why the whole integral becomes well behaved. It is not that an
+   oscillation was damped; the integrand was replaced by a different, real
+   one.
+
+   Two consequences follow, and they are the reason Wick rotation is
+   standard practice rather than a trick.
+
+   The classical path changes role. In real time it is a point of
+   stationary phase, where neighbouring paths interfere constructively. In
+   Euclidean time it *minimizes* $S_E$ and so carries the largest weight
+   outright. The classical path still dominates, for a related but not
+   identical reason, which is why the lesson is careful to call the
+   interference story an analogy after this point.
+
+   And $e^{-S_E/\hbar}$ is a Boltzmann factor with $\hbar$ where $k_BT$
+   would sit. That is not a resemblance: the Euclidean path integral over
+   a periodic imaginary-time interval *is* the partition function, which
+   is why quantum field theory and statistical mechanics share a
+   formalism.
+
+   </details>
+
 2. Explain what the Chapman-Kolmogorov composition law states, in words,
    and why it's a necessary consistency check for any correct
    path-sum formulation.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It states that propagating from $x_i$ to $x_f$ over a time $\tau$ must
+   give the same answer as stopping halfway: propagate to some
+   intermediate position $x_1$, propagate on from there, and sum over
+   every $x_1$ the particle could have been at.
+
+   The necessity is that the propagator would otherwise not be
+   well-defined. "The amplitude to go from here to there in time $\tau$"
+   cannot depend on whether you chose to describe the journey in one step
+   or two, any more than a distance depends on where you put the
+   milestones. A formalism failing this would give different answers to
+   the same physical question depending on an arbitrary bookkeeping
+   choice.
+
+   For the path integral specifically the stake is higher than
+   consistency, because the identity is the *construction*, not a test
+   applied afterwards. A path integral is defined by splitting $\tau$ into
+   $N$ slices, integrating over the $N-1$ intermediate positions, and
+   taking $N\to\infty$. If composition failed, each $N$ would give a
+   different number and there would be no limit to take. The $N=2$ check
+   in this lesson is the smallest nontrivial instance of the thing the
+   whole definition rests on.
+
+   One hypothesis is quiet and load-bearing: the integral runs over *all*
+   $x_1$, with no restriction and no weighting. In operator language that
+   is the completeness relation $\int|x_1\rangle\langle x_1|\,dx_1=I$,
+   inserted between the two halves of the evolution. Restrict the
+   intermediate positions to anything less than the full line, for
+   instance to a plausible-looking neighbourhood of the classical path,
+   and the identity fails: you would have inserted a projector instead of
+   the identity, which is a different physical situation, and one with a
+   name. It is what a which-path measurement does.
+
+   </details>
+
 3. In the worked example, which specific intermediate position $x_1$
    would a purely classical treatment single out, and how does that
    compare to what the discretized sum actually does (integrate over
    every $x_1$)?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $x_1=1$, the midpoint. A free classical particle travels at constant
+   velocity, so after half the elapsed time it has covered half the
+   distance from $x_i=-1$ to $x_f=3$.
+
+   The sum does not select it, it *peaks* at it, and the peak's shape is
+   computable. Multiplying the two half-time propagators, the exponent is
+
+   $$
+   -\frac{(3-x_1)^2 + (x_1+1)^2}{2} = -\left[(x_1-1)^2 + 4\right]
+   $$
+
+   a Gaussian in $x_1$ centred at $1$, as expected, with standard
+   deviation $1/\sqrt2\approx0.71$. So the classical answer is the centre
+   of the distribution, and the quantum content is entirely in its width.
+
+   That width is the whole difference between the two treatments, and it
+   is not decoration. Classical mechanics says the particle was at $x_1=1$
+   and assigns zero to everywhere else. The path sum says every $x_1$
+   contributes, with weight falling off over a scale set by $\hbar$ (in
+   these units, order one). Shrink $\hbar$ and the Gaussian narrows toward
+   a spike at $x_1=1$, which is the classical limit arriving as a limit of
+   a distribution rather than as a separate law.
+
+   Far-out paths are not excluded either, merely negligible. At
+   $x_1=-8$, nine units from the peak and roughly twelve standard
+   deviations out, the relative weight is $e^{-81}$, about $10^{-35}$. The
+   path that sprints eight units backwards before doubling back is in the
+   sum. It contributes nothing anyone could measure, and it contributes
+   for the same reason every other path does, rather than being ruled out
+   in advance.
+
+   </details>
+
 4. This lesson's `discretizedTwoSlicePropagator` splits $\tau$ into only
    TWO segments (one intermediate point). How would you expect the
    agreement with the exact answer to change if it split $\tau$ into many
    more segments instead: better, worse, or the same? Why?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   For the free particle, the same in principle and slightly worse in
+   practice, and the reason matters more than the answer.
+
+   The composition law is an exact identity here, not an approximation
+   being refined. A convolution of two Gaussians is exactly a Gaussian, so
+   the $N$-slice sum equals the exact propagator for *every* $N$, with
+   $N=2$ carrying no more error than $N=100$. The $10^{-15}$ agreement
+   already reported is floating-point noise, and there is no residual
+   physics error underneath it to be improved on.
+
+   What more slices actually buy you is more numerical error. Each extra
+   slice adds another integration, each performed as a Riemann sum over a
+   finite range with a finite step, so truncation and discretization error
+   accumulate. The cost is worse than the accuracy: an $N$-slice
+   calculation is an $(N-1)$-dimensional integral, so a grid-based
+   evaluation becomes infeasible almost immediately, which is why real
+   path-integral calculations use Monte Carlo sampling rather than grids.
+
+   The situation reverses the moment $V\neq0$, and this is the part worth
+   taking away. For an interacting system the short-time propagator used
+   on each slice is itself only correct to leading order in the slice
+   width, because the kinetic and potential terms do not commute. There
+   the $N\to\infty$ limit is doing real work, the error falls as $N$ rises,
+   and the number of slices is a convergence parameter to be pushed. The
+   free particle is the special case where every $N$ is already exact, so
+   this lesson's check verifies the arithmetic and the code rather than
+   the convergence of the limit.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -306,7 +464,7 @@ $x_1$, not just the one lying on the classical straight-line trajectory.
   propagator to $\sim10^{-15}$ relative error, a direct numerical
   confirmation of the Chapman-Kolmogorov composition law.
 
-## Further Exploration
+## Does the split have to be even?
 
 <ChallengePrompt prompt="The composition law was checked here by splitting τ at the midpoint. Does the identity still hold for an uneven split, say τ/3 and 2τ/3, or was the equal split doing something special? If it holds, where does the integrand's peak move to?">
   Chapman-Kolmogorov is stated for *any* intermediate time. Check whether
@@ -315,7 +473,8 @@ $x_1$, not just the one lying on the classical straight-line trajectory.
 </ChallengePrompt>
 
 <NextDiscovery>
-  **Capstone: Operators, Paths, and What's Still Open** closes this course
-  by connecting the operator and path-integral perspectives and stating
-  honestly what remains open in the foundations of quantum mechanics.
+  [Capstone: Operators, Paths, and What's Still Open](/lessons/quantum-mechanics/advanced-quantum-mechanics/capstone-operators-and-paths)
+  closes this course by connecting the operator and path-integral
+  perspectives and stating honestly what remains open in the foundations of
+  quantum mechanics.
 </NextDiscovery>

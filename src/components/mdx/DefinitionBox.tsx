@@ -83,14 +83,26 @@ export function DefinitionBox({
                 the glyph's `currentColor` resolves against. */}
             <TechLabel className="text-accent">Definition</TechLabel>
           </span>
+          {/* `text-lg sm:text-xl`, matching `TheoremBox` step for step: the
+              two are one family and must not drift apart on size. */}
           {title && (
-            <span className="font-display text-base font-semibold text-foreground sm:text-lg">
+            <span className="font-display text-lg font-semibold text-foreground sm:text-xl">
               {title}
             </span>
           )}
         </p>
       </div>
-      <div className="space-y-3 px-5 py-4 text-sm leading-relaxed text-foreground">
+      {/* `text-lg` for the same reason as `TheoremBox`, which carries the full
+          note: `not-prose` does not reset an inherited `font-size`, so an
+          absolute size here is measured against `.prose`'s 18px body, and
+          `text-base` left the definition at 0.89x the paragraph that
+          introduces it. `text-lg` is 1.125rem, `.prose`'s own size, so a
+          definition now reads at 1.00x its surrounding prose. The header title
+          moved to `text-lg sm:text-xl` in step. */}
+      {/* `data-math-plain`: same opt-out as `TheoremBox`. This panel already
+          draws the pillar-edge rail, so display math inside it drops
+          `.katex-display`'s own frame and keeps its scroll behaviour. */}
+      <div data-math-plain className="space-y-3 px-5 py-4 text-lg leading-relaxed text-foreground">
         {children}
       </div>
     </div>

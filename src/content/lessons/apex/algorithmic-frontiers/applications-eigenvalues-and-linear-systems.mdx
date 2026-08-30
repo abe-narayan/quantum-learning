@@ -38,6 +38,17 @@ export function expectationValue(stateVec, observable) {
   return stateVec.dagger().mul(observable).mul(stateVec).get(0, 0).re;
 }
 
+export function solveByCramer(M, rhs) {
+  const det = M.get(0, 0).mul(M.get(1, 1)).sub(M.get(0, 1).mul(M.get(1, 0)));
+  const detX = rhs.get(0, 0).mul(M.get(1, 1)).sub(M.get(0, 1).mul(rhs.get(1, 0)));
+  const detY = M.get(0, 0).mul(rhs.get(1, 0)).sub(rhs.get(0, 0).mul(M.get(1, 0)));
+  return new Matrix([[detX.div(det)], [detY.div(det)]]);
+}
+
+export function normalizedColumn(M) {
+  return M.scale(1 / vectorNorm(M));
+}
+
 export const linA = new Matrix([
   [new Complex(3, 0), new Complex(1, 0)],
   [new Complex(1, 0), new Complex(3, 0)],
@@ -74,19 +85,29 @@ export const linExpectationX1 = expectationValue(linX1Normalized, PAULI_X);
 export const linExpectationZ2 = expectationValue(linX2Normalized, PAULI_Z);
 export const linExpectationX2 = expectationValue(linX2Normalized, PAULI_X);
 
+export const linCramer1Normalized = normalizedColumn(solveByCramer(linA, linB1));
+export const linCramer2Normalized = normalizedColumn(solveByCramer(linA, linB2));
+
+export const linPanelMaxDiff = Math.max(
+  ...[
+    [linX1Normalized, linCramer1Normalized],
+    [linX2Normalized, linCramer2Normalized],
+  ].flatMap(([p, q]) => [0, 1].map((r) => q.get(r, 0).sub(p.get(r, 0)).magnitude()))
+);
+
 export const linPresets = [
   {
     label: "b = (1, 1)ᵀ",
     panels: [
-      { label: "Classical solution, normalized: x/‖x‖", cells: matrixToCells(linX1Normalized) },
-      { label: "Quantum output amplitudes: ⟨0|x⟩, ⟨1|x⟩", cells: matrixToCells(linX1Normalized) },
+      { label: "Inverse route: (A⁻¹b)/‖A⁻¹b‖", cells: matrixToCells(linX1Normalized) },
+      { label: "Ideal output amplitudes ⟨0|x⟩, ⟨1|x⟩ (Cramer route)", cells: matrixToCells(linCramer1Normalized) },
     ],
   },
   {
     label: "b = (1, -1)ᵀ",
     panels: [
-      { label: "Classical solution, normalized: x/‖x‖", cells: matrixToCells(linX2Normalized) },
-      { label: "Quantum output amplitudes: ⟨0|x⟩, ⟨1|x⟩", cells: matrixToCells(linX2Normalized) },
+      { label: "Inverse route: (A⁻¹b)/‖A⁻¹b‖", cells: matrixToCells(linX2Normalized) },
+      { label: "Ideal output amplitudes ⟨0|x⟩, ⟨1|x⟩ (Cramer route)", cells: matrixToCells(linCramer2Normalized) },
     ],
   },
 ];
@@ -94,7 +115,7 @@ export const linPresets = [
 export const lessonMeta = {
   title: "Applications: Eigenvalues and Linear Systems",
   description:
-    "How QSVT turns a block encoding of a Hermitian matrix into an approximate matrix inverse, producing a quantum state proportional to the solution of Ax=b — and a precise, honest accounting of what that state actually gives you, and exactly which conditions a real quantum speedup depends on.",
+    "How QSVT turns a block encoding of a Hermitian matrix into an approximate matrix inverse, producing a quantum state proportional to the solution of Ax=b, plus a precise accounting of what that state gives you and which conditions a real speedup depends on.",
   course: "algorithmic-frontiers",
   module: "applications-eigenvalues-and-linear-systems",
   order: 5,
@@ -102,14 +123,14 @@ export const lessonMeta = {
   estimatedMinutes: 55,
   prerequisites: ["apex/algorithmic-frontiers/the-quantum-singular-value-transformation"],
   objectives: [
-    "State the quantum linear systems problem precisely: given a block encoding of a Hermitian matrix A and a way to prepare |b>, produce a quantum state proportional to A^{-1}|b> = |x>, the solution of Ax=b",
-    "Explain how QSVT applies a polynomial approximation to 1/x (suitably regularized) to realize A^{-1} approximately, and why the achievable precision/query count depends on A's condition number kappa (the ratio of largest to smallest singular value)",
-    "State honestly and precisely what the algorithm does and does NOT give you: a quantum state encoding the solution vector (useful for reading out a few global properties via further measurement), NOT the classical solution vector itself, and explain exactly why that distinction matters for whether a real speedup is actually realized in a given application",
+    "State the quantum linear systems problem precisely: given a block encoding of a Hermitian matrix A and a way to prepare |b⟩, produce a quantum state proportional to A⁻¹|b⟩ = |x⟩, the solution of Ax=b",
+    "Explain how QSVT applies a polynomial approximation to 1/x (suitably regularized) to realize A⁻¹ approximately, and why the achievable precision/query count depends on A's condition number kappa (the ratio of largest to smallest singular value)",
+    "Pin down honestly and precisely what the algorithm does and does NOT give you: a quantum state encoding the solution vector (useful for reading out a few global properties via further measurement), NOT the classical solution vector itself, and explain exactly why that distinction matters for whether a real speedup is actually realized in a given application",
   ],
   related: [
     {
       slug: "apex/algorithmic-frontiers/the-quantum-singular-value-transformation",
-      note: "This lesson's entire construction — a polynomial applied to a block-encoded matrix via quantum signal processing — is exactly QSVT's machinery, specialized here to the single polynomial P(x)≈c/x that turns 'apply a function of A' into 'apply A⁻¹'.",
+      note: "This lesson's entire construction (a polynomial applied to a block-encoded matrix via quantum signal processing) is exactly QSVT's machinery, specialized here to the single polynomial P(x)≈c/x that turns 'apply a function of A' into 'apply A⁻¹'.",
     },
   ],
 };
@@ -120,23 +141,23 @@ export const lessonMeta = {
   in popular writing about quantum computing.
 </LessonHook>
 
-## Motivation
+## HHL, Rebuilt on Newer Machinery
 
-The underlying result, first
-Harrow, Hassidim, and Lloyd's 2009 algorithm (HHL), now more cleanly
-derived as one instance of QSVT, is real, important, and exactly as
-narrow as this lesson is about to make precise.
+The underlying result, first published as Harrow, Hassidim, and Lloyd's
+2009 algorithm (HHL) and now more cleanly derived as one instance of
+QSVT, is real, and exactly as narrow as this lesson is about
+to make precise.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/a/af/Seth_Lloyd.jpg"
   alt="Portrait photograph of Seth Lloyd, the MIT physicist"
-  caption="Seth Lloyd, the 'L' of HHL — co-author, with Aram Harrow and Avinatan Hassidim, of the original 2009 quantum linear-systems algorithm this lesson reconstructs, more cleanly, as a single QSVT polynomial applied to a block encoding."
+  caption="Seth Lloyd, the 'L' of HHL and co-author, with Aram Harrow and Avinatan Hassidim, of the original 2009 quantum linear-systems algorithm this lesson reconstructs, more cleanly, as a single QSVT polynomial applied to a block encoding."
   credit="Dmitry Rozhkov / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Seth_Lloyd.jpg"
   license="CC BY-SA 3.0"
 />
 
-It answers a
+HHL answers a
 different question than "solve $Ax=b$" in the classical sense: given a
 way to *quantumly* prepare $|b\rangle$ and a *quantum* black box for
 $A$, produce a *quantum state* proportional to $A^{-1}|b\rangle$. Every
@@ -145,7 +166,7 @@ exactly which real problems that state is (and isn't) useful for, using
 the QSVT machinery from the prerequisite lesson as the concrete
 mechanism, not a black box of its own.
 
-## Mathematical Development
+## Inverting A by Choosing the Right Polynomial
 
 ### The quantum linear systems problem, stated precisely
 
@@ -176,10 +197,10 @@ to remain implementable as part of a unitary circuit).
 
 <EquationReveal
   terms={[
-    { id: "P", symbol: "P(x)", gloss: "The QSVT polynomial being realized — here, chosen to approximate matrix inversion." },
-    { id: "c", symbol: "c", gloss: "A normalizing constant, chosen so |P(x)| stays ≤ 1 on the interval below — required for P to be implementable as part of a unitary circuit." },
+    { id: "P", symbol: "P(x)", gloss: "The QSVT polynomial being realized; here it is chosen to approximate matrix inversion." },
+    { id: "c", symbol: "c", gloss: "A normalizing constant, chosen so |P(x)| stays ≤ 1 on the interval below, which P must satisfy to be implementable as part of a unitary circuit." },
     { id: "x", symbol: "x", gloss: "A stand-in for one of A's singular values." },
-    { id: "kappa", symbol: "κ", gloss: "A's condition number, σ_max/σ_min — the interval [1/κ, 1] is exactly the range of singular values a block encoding of A can have." },
+    { id: "kappa", symbol: "κ", gloss: "A's condition number, σ_max/σ_min. The interval [1/κ, 1] is exactly the range of singular values a block encoding of A can have." },
   ]}
 >
 $$
@@ -205,10 +226,10 @@ polynomial.
 
 </TheoremBox>
 
-**The regularization point, stated honestly.** $1/x$ is unbounded as
+**The regularization point.** $1/x$ is unbounded as
 $x\to0$, so no bounded-degree polynomial can approximate it uniformly
-all the way down to $x=0$: this is a real, known technical
-obstruction, not a rounding error the literature glosses over. What
+all the way down to $x=0$. The obstruction is technical and well
+known, and the literature does not gloss over it. What
 makes the construction work at all is that the block encoding's
 singular values are *bounded away from zero*, $x\geq1/\kappa$, by
 assumption; the polynomial only has to approximate $c/x$ on
@@ -220,7 +241,7 @@ larger $\kappa$) pushes the approximation domain closer to the
 unbounded singularity, which is precisely why every version of this
 algorithm's cost scales with $\kappa$, not just with $N$.
 
-### Query complexity, stated honestly
+### Query complexity
 
 The right way to characterize the cost is qualitative:
 $\mathrm{poly}(\kappa,\,1/\epsilon,\,\log N)$ queries to the block
@@ -229,20 +250,20 @@ encoding and to the state-preparation circuit for $|b\rangle$. The
 original 2009 bound and the best current QSVT-based constructions (and
 have been improved more than once since), so citing one specific
 exponent as if it were a fixed, permanent constant of the algorithm
-misstates how this literature actually works; "poly(\kappa, 1/\epsilon,
-\log N)" is the honest, durable characterization this lesson commits
-to.
+misstates how this literature actually works. The durable
+characterization, and the one this lesson commits to, is
+$\mathrm{poly}(\kappa,1/\epsilon,\log N)$.
 
 Compare this to the **classical** cost of solving a general
 $N$-dimensional linear system: $O(N^3)$ for dense Gaussian elimination,
 or, for the fairer comparison, $O(N\cdot\mathrm{poly}(\kappa))$ for a
 sparse well-conditioned system via conjugate-gradient-type iterative
-methods — note that the classical iterative method's cost *also*
+methods. Note that the classical iterative method's cost *also*
 depends on $\kappa$, so a fair comparison must track $\kappa$ on both
 sides, not quote a $\kappa$-free classical cost against a
 $\kappa$-dependent quantum one.
 
-## Physical Interpretation: What This Algorithm Actually Gives You
+## A State, Not a Vector of Numbers
 
 <InsightBlock>
   The output is a quantum state, not a vector of numbers: the single
@@ -260,10 +281,10 @@ first place. The algorithm is only useful when the actual object of
 interest is a **small readout** extractable from $|x\rangle$ with a
 handful of measurements: an expectation value $\langle
 x|M|x\rangle$ for some observable $M$, a small number of specific
-amplitudes, or a similar $O(1)$-sized quantity — never the full solution
+amplitudes, or a similar $O(1)$-sized quantity, and never the full solution
 vector.
 
-**A real, documented controversy, stated fairly.** Popular accounts of
+**A documented controversy.** Popular accounts of
 HHL have repeatedly claimed "exponential quantum speedup for solving
 $Ax=b$" without qualification; researchers in the field (including
 Aram Harrow himself) have pushed back on exactly this over-claiming for
@@ -298,7 +319,7 @@ papers, and the four conditions are not this lesson's invention.
   discussion names the sparsity and condition-number requirements. Then
   read Aaronson's "Read the fine print," which enumerates essentially the
   four conditions above and argues that popular accounts had dropped all
-  of them. That pairing is a small worked example of this pillar's whole
+  of them. That pairing is a small worked example of this track's whole
   reading method: the overclaim was not in the paper, and correcting it
   did not require finding an error in the paper.
 </ResearchConnection>
@@ -314,12 +335,12 @@ papers, and the four conditions are not this lesson's invention.
   QSVT-based construction this lesson describes descends from it. The
   exponent on $\kappa$ has been tightened separately and more than once
   since. That history is why the query complexity above is quoted as
-  $\mathrm{poly}(\kappa, 1/\epsilon, \log N)$ rather than with specific
-  exponents: the shape of the cost is stable, the exponents are a moving
+  $\mathrm{poly}(\kappa, 1/\epsilon, \log N)$ with no specific exponents
+  attached: the shape of the cost is stable, the exponents are a moving
   research front.
 </ResearchConnection>
 
-There is a second, independently real caution worth citing here.
+A second caution belongs here too.
 
 <ResearchConnection
   title="A quantum-inspired classical dequantization"
@@ -331,18 +352,17 @@ There is a second, independently real caution worth citing here.
   construction) showed that, under a specific classical data-access
   model analogous to efficient quantum state preparation, a classical
   algorithm can sometimes match the quantum algorithm's polylogarithmic
-  scaling for certain low-rank problems — a real **dequantization**
-  result, not a refutation of QSVT-based linear solvers in general, but
-  a concrete demonstration that condition (2)–(3) style assumptions can
+  scaling for certain low-rank problems. That is a real **dequantization**
+  result. It does not refute QSVT-based linear solvers in general, but it
+  does show that condition (2)–(3) style assumptions can
   sometimes be satisfied classically too, for specific problem
   structures.
 </ResearchConnection>
 
-None of this makes the algorithm
-uninteresting; it makes precision about its actual, conditional scope
-the whole point, exactly as this lesson has tried to be.
+None of this makes the algorithm uninteresting. It makes precision
+about the algorithm's conditional scope the whole point.
 
-## Worked Example
+## A 2x2 System, Solved Both Ways
 
 **A small, fully computed 2-dimensional (1-qubit) example.**
 Take the real symmetric (hence Hermitian) matrix
@@ -383,7 +403,7 @@ x=A^{-1}b=\frac18\begin{pmatrix}3&-1\\-1&3\end{pmatrix}\begin{pmatrix}1\\1\end{p
 $$
 
 (`linX1`), and multiplying back out, `linCheck1` $=A\,x=(1,1)^\top=b$
-exactly, confirming the solution directly rather than asserting it.
+exactly, confirming the solution by direct computation.
 Its norm is $\|x\|=\sqrt{0.25^2+0.25^2}=\frac1{2\sqrt2}\approx0.353553$
 (`linX1Norm`), so the normalized direction (`linX1Normalized`) is
 
@@ -413,8 +433,8 @@ $$
 \langle x|X|x\rangle = 2(0.707107)(0.707107) = 1 \qquad(\texttt{linExpectationX1})
 $$
 
-Both are real, exactly computed numbers extractable from $O(1)$ repeated
-measurements, useful global information in its own right, while the full pair
+Both are exactly computed numbers extractable from $O(1)$ repeated
+measurements, and each is useful global information in its own right, while the full pair
 $(0.707107,0.707107)$ that produced them is not something you get back
 directly at all.
 
@@ -425,27 +445,47 @@ to $(1/\sqrt2,\,-1/\sqrt2)\approx(0.707107,-0.707107)$ (the $|-\rangle$
 state), with $\langle Z\rangle=0$ again but now $\langle
 X\rangle=-1$ (`linExpectationZ2`, `linExpectationX2`): a different
 solution vector, correctly reflected in a different readout, computed
-the same honest way both times.
+by the same route both times.
+
+Before the callouts, price a rescaled right-hand side.
+
+<PredictBeforeReveal
+  question="Rerun the worked example with b = (2,2) in place of (1,1). The classical solution doubles, from (0.25, 0.25) to (0.5, 0.5). What happens to the state |x⟩ the algorithm hands back?"
+  options={[
+    { label: "Nothing at all: |+⟩ both times, since normalization discards the solution's length", value: "same" },
+    { label: "Its amplitudes double to (1.414, 1.414), and you renormalize afterwards", value: "doubles" },
+    { label: "It stays |+⟩, but ⟨x|X|x⟩ doubles from 1 to 2, which is where the factor is recorded", value: "expectation" },
+    { label: "It stays |+⟩ and the factor is gone for good, unrecoverable from any part of the run", value: "lost" },
+  ]}
+  correctValue="same"
+  explanation="Nothing changes, and not only at the output. The state-preparation circuit prepares |b⟩ = b/‖b‖, so (2,2) and (1,1) enter the algorithm as literally the same state; the doubling never crosses into the quantum part of the run, and the success probability is unchanged too. The third option fails on a hard bound rather than a detail: ⟨X⟩ is the expectation of an operator with eigenvalues ±1, so it can never exceed 1 and has no room anywhere to record a factor of 2. The last option is wrong in the opposite direction. The scale is not lost, it is classical: you know ‖b‖ = 2√2 without measuring anything, and the post-selection success probability gives you ‖A⁻¹ b/‖b‖ ‖, so ‖x‖ is the product of the two. Condition 4 above asks that the thing you want be a small readout; a scale factor is a reminder that not every scalar you want is one, and that some of them are reconstructed outside the quantum computer entirely."
+/>
 
 <MatrixGridExplorer
   presets={linPresets}
-  ariaLabel="Comparison of the classical normalized solution vector against the quantum algorithm's output-state amplitudes for two choices of b — numerically identical in both cases, illustrating that the state encodes the answer exactly, just not in a classically-readable form"
+  ariaLabel="For each of two choices of b, the normalized solution of Ax=b computed from the explicit 2x2 inverse is shown beside the same vector recomputed by Cramer's rule, which is the ideal quantum output state's amplitude pair; the two panels carry the same entries in both presets"
 />
 
-Toggling between the two presets changes the numbers, but in every case
-the two panels ("classical solution, normalized" and "quantum output
-amplitudes") are identical, because that identity *is* the entire
-content of what the algorithm promises to compute.
+Toggling between the presets changes the numbers, but the two panels
+always carry the same entries. The left panel comes from the explicit
+inverse, $A^{-1}b$ normalized; the right comes from Cramer's rule
+applied to the same system, which is a different arithmetic route to the
+same vector and is what an ideal run of the algorithm leaves in the
+amplitudes. Across both presets the largest entrywise discrepancy
+between the two routes is exactly {linPanelMaxDiff}. That
+agreement is the whole content of what the algorithm promises: the
+output state's amplitudes are the classical solution's direction, and
+nothing more.
 
-## Common Mistakes
+## The Readout Trap
 
 <Callout type="mistake">
 **Thinking "the algorithm outputs $x$" means you can print out
 $(0.707107,\,0.707107)$.** It means a quantum state has those two
 numbers as amplitudes. Turning that state back into two classical
 floating-point numbers by measurement would require enough repeated
-shots to resolve each amplitude to your target precision — for a
-2-dimensional toy example this is cheap and unremarkable, but the whole
+shots to resolve each amplitude to your target precision. For a
+2-dimensional toy example that is cheap and unremarkable, but the whole
 reason this algorithm is interesting is its behavior as $N$ grows, and
 full amplitude readout's cost grows with $N$ too, erasing the
 $\log_2N$-qubit advantage that motivated using it. If your application
@@ -467,9 +507,57 @@ ask what $\kappa$ does as the problem scales, not just what $N$ does.
 
 1. This lesson's worked example has $\kappa=2$ and a classical solution
    readable in one step (it's 2-dimensional). Explain concretely, in
-   your own words, why the *same* algorithm's genuine value proposition
-   only appears at large $N$, and only for a small readout — not in a
-   toy example like this one.
+   your own words, why the *same* algorithm's value only shows up at
+   large $N$, and only for a small readout, not in a toy example like
+   this one. Then make the $\kappa$ half of that story quantitative: using
+   the degree estimate $\deg\approx\kappa\ln(1/\epsilon)$, compare the
+   polynomial degree this $\kappa=2$ example needs at $\epsilon=10^{-3}$
+   with the degree needed for a discretized one-dimensional Laplacian on
+   $N=2^{20}$ grid points, whose condition number grows like $N^2$, at the
+   same $\epsilon$. Say what that does to the $\mathrm{polylog}(N)$
+   headline.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Why a toy case cannot show the value.** The algorithm's entire selling point is that a state on $\log_2N$ qubits carries $N$ amplitudes, so the *representation* of the answer is exponentially compressed. At $N=2$ that compression buys one qubit against two numbers, which is nothing. Worse, the two things the algorithm charges you for are both trivially cheap here: the classical alternative is a $2\times2$ inverse computable by hand, and reading the full state out costs a handful of shots. There is no regime in a two-dimensional example where anything can be exponentially better than anything else, because there is no exponent.
+
+   The small-readout half is the same argument run at the output. Even at large $N$, the state $|x\rangle$ is only useful if what you want is extractable in $O(1)$ measurements: an expectation $\langle x|M|x\rangle$, an overlap, a handful of named amplitudes. If you want the whole solution vector back in classical memory, you must resolve $N$ amplitudes to precision $\epsilon$, and the shot count for that grows with $N$, which cancels the $\log_2 N$ advantage exactly. So the algorithm is not "a faster linear solver"; it is a faster way to compute a *scalar functional* of a solution you never see.
+
+   **Now the $\kappa$ arithmetic, which is where most of the honest bad news lives.**
+
+   For this lesson's example, $\kappa=2$ and $\epsilon=10^{-3}$:
+
+   $$
+   \deg\approx\kappa\ln(1/\epsilon)=2\times6.9078=13.82 \longrightarrow 14 .
+   $$
+
+   Fourteen. Cheap, and it is cheap because $\kappa$ is $2$.
+
+   For the discretized one-dimensional Laplacian on $N$ interior grid points, the eigenvalues are $4\sin^2\!\big(k\pi/(2(N+1))\big)$, giving $\kappa=\sin^2\!\big(N\pi/(2(N+1))\big)/\sin^2\!\big(\pi/(2(N+1))\big)$, which is $(2N/\pi)^2$ to excellent accuracy. At $N=2^{20}=1{,}048{,}576$ this evaluates to
+
+   $$
+   \kappa=4.456\times10^{11},
+   $$
+
+   and the same degree estimate at $\epsilon=10^{-3}$ gives
+
+   $$
+   \deg\approx4.456\times10^{11}\times6.9078=3.08\times10^{12} .
+   $$
+
+   Three trillion queries to the block encoding, for a problem whose $\log_2N$ is $20$.
+
+   **What that does to the headline.** It destroys it. The query count is $\mathrm{poly}(\kappa,1/\epsilon,\log N)$, and here $\kappa$ scales as $N^2$, so the cost scales as $N^2\log(1/\epsilon)$: *polynomial* in $N$, not polylogarithmic. The $\log N$ factor is still there and is still doing what it advertises; it is simply irrelevant next to a factor growing as $N^2$. Meanwhile the same tridiagonal system is solvable classically in $O(N)$ time by the Thomas algorithm, so on this problem the quantum method is asymptotically *worse* than the obvious classical one, by roughly a factor of $N$.
+
+   Two wrong turns are worth separating here.
+
+   The first is treating $\kappa$ as a constant of the matrix rather than a function of the problem size. In this example $\kappa$ is what carries the size dependence, and the $N$ that appears in $\log N$ and the $N$ hidden inside $\kappa$ are the *same* $N$. Reading the complexity as "polylog in the dimension, times some condition-number factor" invites you to think of the two as independent knobs. They very often are not, and discretized differential operators, the most commonly cited application, are exactly the case where they are not.
+
+   The second is concluding that the algorithm is therefore useless. It is not; it is *conditional*, and condition (1) of the four-condition list is precisely the condition this example fails. Preconditioning, or a problem whose $\kappa$ genuinely stays bounded as $N$ grows, puts you back on the good side of it. The point of running the number is to see that "well-conditioned" is a hypothesis with teeth, not a footnote: between $\kappa=2$ and $\kappa=4.5\times10^{11}$ lies the difference between $14$ queries and $3\times10^{12}$.
+
+   </details>
+
 2. Suppose a paper claims "exponential quantum speedup" for solving a
    linear system, and confirms condition (1) ($A$ well-conditioned) and
    condition (2) (an efficient block encoding for $A$) from this
@@ -477,10 +565,57 @@ ask what $\kappa$ does as the problem scales, not just what $N$ does.
    prepared or what the desired output is. Is the claim complete? Name
    the specific missing condition(s) and what could go wrong if they
    fail.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The claim is **not complete**. Conditions (3) and (4) are both missing, and either one failing alone is enough to erase the entire exponential advantage.
+
+   **Missing condition (3): $|b\rangle$ efficiently preparable.** The algorithm assumes a circuit that produces the state $|b\rangle\propto b$. If $b$ is an arbitrary classical vector of $N$ numbers sitting in a file, loading it into amplitudes costs $\Omega(N)$ in general, because $N$ numbers have to be read at least once. Paying $O(N)$ at the door and then celebrating a $\mathrm{polylog}(N)$ solve is bookkeeping, not a speedup: the total is still $\Omega(N)$. The advantage survives only when $b$ is *structured*, for instance uniform, sparse, described by a short formula, or itself the output of an earlier efficient quantum circuit. A QRAM assumption can also supply it, but that is an assumption about hardware that does not yet exist at scale, and it must be stated rather than absorbed.
+
+   **Missing condition (4): the output is a small readout.** If the paper wants the full solution vector $x$ back in classical form, it has to resolve $N$ amplitudes to precision $\epsilon$, and the measurement cost grows with $N$. Same arithmetic as condition (3), now at the exit instead of the entrance. The speedup survives only for an $O(1)$-sized functional of $x$: an expectation $\langle x|M|x\rangle$, an overlap with a reference state, a few named amplitudes.
+
+   **Why silence on these two is the common failure rather than a rare one.** Conditions (1) and (2) are properties of the *matrix*, which papers naturally discuss because they are what the algorithm's theorem statement quantifies over. Conditions (3) and (4) are properties of the *interface*, the input at one end and the desired answer at the other, and they are exactly the two that a complexity statement about the solve step can be true while being silent about. Aaronson's "Read the fine print" is largely an enumeration of this asymmetry.
+
+   There is a third thing worth checking that is not on the list at all, and a careful reader should ask for it: whether the same access assumptions could be granted classically. Tang's dequantization results show that for certain low-rank structures, a classical algorithm handed an analogous sampling-access model matches the polylogarithmic scaling. So even a paper that satisfies all four conditions has not automatically demonstrated a quantum advantage; it has demonstrated a quantum algorithm whose classical counterpart under matched assumptions still has to be ruled out.
+
+   The wrong turn worth naming is treating the four conditions as a checklist where partial credit accumulates. It does not. They are conjunctive, and the total cost is the product of the stages, so a single $\Omega(N)$ stage anywhere sets the whole result to $\Omega(N)$ no matter how good the other three are. Two out of four confirmed is not half a speedup; it is no established speedup at all.
+
+   </details>
+
 3. Using this lesson's exact worked numbers, verify by direct
    computation that $\langle x|Z|x\rangle=0$ for the normalized state
    $(1/\sqrt2,\,1/\sqrt2)$, and explain why this is a legitimate,
    informative computed result rather than a sign that something failed.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **The computation.** $Z=\mathrm{diag}(1,-1)$, so for $|x\rangle=\tfrac1{\sqrt2}|0\rangle+\tfrac1{\sqrt2}|1\rangle$,
+
+   $$
+   \langle x|Z|x\rangle=\left|\tfrac1{\sqrt2}\right|^2-\left|\tfrac1{\sqrt2}\right|^2=0.5-0.5=0 .
+   $$
+
+   Running it through the platform's own `expectationValue(linX1Normalized, PAULI_Z)` with the real `PAULI_Z` matrix and `Matrix.dagger` returns exactly $0.000000$.
+
+   **Why this is a result and not a failure.** $\langle Z\rangle$ is the difference between the probability of measuring $0$ and the probability of measuring $1$. Zero means those two probabilities are equal, which is a genuine, checkable statement about the solution: its weight is split evenly between the two basis directions. Nothing has cancelled, nothing has decohered, and nothing was lost. Compare $\langle X\rangle=1$ on the same state, which is the largest value $X$ can take, since $X$'s eigenvalues are $\pm1$: the state is exactly $X$'s $+1$ eigenvector. One observable reads its extreme value and the other reads its midpoint, and both are facts about the same state.
+
+   The instinct that a zero must mean an error comes from treating an expectation value like a signal amplitude, where zero means nothing arrived. An expectation value is a *balance*, and balanced is one of the values it is supposed to be able to report.
+
+   **What $\langle Z\rangle=0$ genuinely does not tell you, which is the more useful half of the answer.** It does not identify the state. The other worked case, $b=(1,-1)^\top$, gives $|x\rangle=\tfrac1{\sqrt2}|0\rangle-\tfrac1{\sqrt2}|1\rangle$, and that state also has $\langle Z\rangle=0$. So does $\tfrac1{\sqrt2}(|0\rangle+i|1\rangle)$, and so does the maximally mixed state. What separates them is $\langle X\rangle$: $+1$, $-1$, $0$ and $0$ respectively. Pinning down even a single qubit takes three numbers, $\langle X\rangle,\langle Y\rangle,\langle Z\rangle$, and that is the readout limitation of the whole algorithm in its smallest possible instance. One expectation value is one number, an $N$-dimensional state has far more than one number in it, and the gap between those two facts is exactly what condition (4) is about.
+
+   **One caution about this particular worked example.** In both of the lesson's cases the solution direction turns out to equal the input direction: $b=(1,1)^\top$ gives $|x\rangle=|+\rangle$ and $b=(1,-1)^\top$ gives $|x\rangle=|-\rangle$. That is not the algorithm being trivial, it is those two $b$'s being *eigenvectors* of $A$. Writing $A=3I+X$ makes it immediate: $A|\pm\rangle=(3\pm1)|\pm\rangle$, so $A^{-1}$ acts on them by a scalar and cannot move their direction at all. Any conclusion of the form "the output state just reproduces the input" is reading an artifact of the chosen $b$.
+
+   Take $b=(1,0)^\top$ instead, which is not an eigenvector. Then
+
+   $$
+   x=A^{-1}b=(0.375,\,-0.125),\qquad \frac{x}{\|x\|}=(0.948683,\,-0.316228),
+   $$
+
+   with $\langle Z\rangle=0.8$ and $\langle X\rangle=-0.6$, against the input state's $\langle Z\rangle=1$ and $\langle X\rangle=0$. The inversion has genuinely rotated the state, and the readouts move accordingly. That is the case worth carrying forward as the mental picture.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -490,9 +625,9 @@ ask what $\kappa$ does as the problem scales, not just what $N$ does.
   Hermitian $A$ (singular values in $[1/\kappa,1]$) and a preparable
   $|b\rangle$, and produces $|x\rangle\propto A^{-1}|b\rangle$ via QSVT
   applying a polynomial approximation to $1/x$, regularized because $1/x$
-  is unbounded near $0$ — realizable specifically because the block
+  is unbounded near $0$. This works only because the block
   encoding keeps singular values bounded away from zero.
-- Cost is honestly $\mathrm{poly}(\kappa,1/\epsilon,\log N)$ queries;
+- Cost is $\mathrm{poly}(\kappa,1/\epsilon,\log N)$ queries;
   the classical comparison is $O(N^3)$ (dense) or
   $O(N\cdot\mathrm{poly}(\kappa))$ (sparse, conjugate-gradient-type,
   $\kappa$-dependent just like the quantum cost), an exponential
@@ -505,10 +640,10 @@ ask what $\kappa$ does as the problem scales, not just what $N$ does.
   direction (verified explicitly here for a real 2×2 system, both
   $b=(1,1)^\top$ and $b=(1,-1)^\top$, against direct classical
   inversion), but that state is not classically readable as a vector
-  without paying a cost that erases the speedup — only a small readout
+  without paying a cost that erases the speedup. Only a small readout
   like $\langle x|M|x\rangle$ preserves the advantage.
 
-## Further Exploration
+## How Narrow the Speedup Really Is
 
 <NextDiscovery>
   The [capstone](/lessons/apex/algorithmic-frontiers/capstone-the-toolbox-that-ate-quantum-algorithms)

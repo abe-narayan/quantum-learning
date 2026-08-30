@@ -22,19 +22,27 @@ export const coherenceDecayRateHalfPopulation: ConceptualProblem = {
     type: "conceptual",
     requiredConceptGroups: [
       {
-        phrases: ["anticommutator", "1/2", "half", "sigma_minus dagger sigma_minus", "prefactor", "one of the two terms", "only one term"],
+        phrases: ["half", "prefactor", "one of the two terms", "only one term", "only one of the two", "just one of them contributes"],
         missingFeedback:
-          "You have located the coherence in the off-diagonal entry. The factor of 1/2 still needs its source: of the two terms in the anticommutator, only ρ|1⟩⟨1| reaches the (0,1) slot, so the entry picks up ρ₀₁ rather than 2ρ₀₁, and the Lindblad equation's own −1/2 prefactor is then what survives.",
+          "You have located the quantity in the right matrix entry. The numeric factor still needs its source. Two products land in that slot; work out how many of them actually survive there, and then combine that count with the numeric factor the Lindblad equation already carries.",
       },
-      ["off-diagonal", "rho_01", "coherence"],
+      {
+        phrases: ["off-diagonal", "rho_01", "coherence"],
+        missingFeedback:
+          "Say which matrix entry you are tracking. The factor only shows up for one of them, so the answer has to name it.",
+      },
     ],
     incorrectFeedback:
-      "Compute {|1><1|, rho} explicitly: it contributes rho_01 (not 2*rho_01) to the (0,1) entry, so the -1/2 prefactor gives a net -rho_01/2 coefficient there, while the jump term sigma_minus*rho*sigma_minus^dagger contributes nothing to the off-diagonal at all.",
+      "Do the algebra instead of quoting the result. Write {|1><1|, rho} out as a two-by-two array and read off its (0,1) entry. Two products are being added there; check how many of them survive. Then fold in the numeric factor the Lindblad equation already carries, and check separately what the jump term contributes to the same slot.",
+    modelAnswers: [
+      "Look at what the anticommutator contributes to the off-diagonal entry. Only one of its two terms lands on rho_01, whereas both land on the population, so the coherence picks up half as much. Combined with the Lindblad equation's own -1/2 prefactor that gives Gamma/2 for the coherence against Gamma for the population.",
+      "The -1/2 prefactor multiplies the anticommutator, and for this L only one of the two terms in the anticommutator contributes to rho_01. Half the terms with the same prefactor gives half the rate.",
+    ],
   },
   hints: [
-    { text: "Compute {|1><1|,rho} = |1><1|rho + rho|1><1| explicitly as a 2x2 matrix." },
-    { text: "Its (0,1) entry comes from only ONE of the two anticommutator terms, contributing exactly rho_01 (not 2 rho_01)." },
-    { text: "The jump term sigma_minus rho sigma_minus^dagger has zero (0,1) entry entirely." },
+    { text: "Write {|1><1|,rho} = |1><1|rho + rho|1><1| out as a two-by-two array." },
+    { text: "Look at the (0,1) slot of that array. Both products land somewhere; do both of them land there?" },
+    { text: "Now check the jump term sigma_minus rho sigma_minus^dagger in the same slot before combining anything." },
   ],
   solution: {
     steps: [
@@ -42,10 +50,10 @@ export const coherenceDecayRateHalfPopulation: ConceptualProblem = {
       { description: "$\\rho|1\\rangle\\langle1| = \\begin{pmatrix}0&\\rho_{01}\\\\0&\\rho_{11}\\end{pmatrix}$, contributing $\\rho_{01}$ to the (0,1) entry." },
       { description: "So $\\{\\sigma_-^\\dagger\\sigma_-,\\rho\\}$ has (0,1) entry exactly $\\rho_{01}$ (not $2\\rho_{01}$), and the jump term contributes nothing there, giving $\\dot\\rho_{01}=-\\tfrac\\Gamma2\\rho_{01}$." },
     ],
-    finalAnswer: "The factor of 1/2 comes directly from the anticommutator's off-diagonal entry being rho_01 (only one of the two terms contributes there), combined with the Lindblad equation's own -1/2 prefactor -- an exact algebraic origin, not a rounding or approximation.",
+    finalAnswer: "The factor of 1/2 comes from the anticommutator's off-diagonal entry being rho_01 (only one of the two terms contributes there), combined with the Lindblad equation's own -1/2 prefactor. That is an exact algebraic origin, not a rounding or an approximation.",
   },
   explanation: {
-    correctIdea: "The anticommutator {L^dagger L, rho} does not contribute symmetrically to every matrix entry -- its off-diagonal contribution is exactly half its diagonal contribution for this specific L.",
-    whyCorrect: "This is precisely the calculation the lesson performs to get rho_01(t)=rho_01(0)e^{-Gamma t/2}, the origin of T2=2*T1 for pure amplitude damping.",
+    correctIdea: "The anticommutator {L^dagger L, rho} does not contribute symmetrically to every matrix entry. For this L its off-diagonal contribution is exactly half its diagonal contribution.",
+    whyCorrect: "Carrying the same algebra through gives rho_01(t)=rho_01(0)e^{-Gamma t/2}: coherence decays at half the population rate, and that factor of two is the origin of T2=2*T1 for pure amplitude damping.",
   },
 };

@@ -52,7 +52,7 @@ const DIFFICULTIES = new Set(["foundational", "intermediate", "advanced", "maste
 /** Throws unless `meta` matches the `LessonMeta` shape in src/lib/content/types.ts. */
 function validateMeta(meta, filePath) {
   const fail = (msg) => {
-    throw new Error(`${filePath}: invalid lessonMeta — ${msg}`);
+    throw new Error(`${filePath}: invalid lessonMeta. ${msg}`);
   };
   if (typeof meta.title !== "string" || !meta.title.trim()) fail("missing/empty title");
   if (typeof meta.description !== "string" || !meta.description.trim()) fail("missing/empty description");
@@ -80,16 +80,32 @@ function validateMeta(meta, filePath) {
 async function main() {
   const slugs = (await walk(LESSONS_ROOT, ".mdx")).sort(compareSlugs);
   if (slugs.length === 0) {
-    throw new Error(`No lesson files found under ${LESSONS_ROOT} — refusing to generate an empty lesson registry.`);
+    throw new Error(`No lesson files found under ${LESSONS_ROOT}, so refusing to generate an empty lesson registry.`);
   }
 
   const metas = [];
+  // Two figures the homepage states as fact about the corpus, counted here
+  // rather than kept by hand. `PredictSection` used to print a literal "213 of
+  // the 219 lessons", with a comment telling the next person to re-derive it
+  // with grep if the corpus moved. The corpus moved (to 218) and the sentence
+  // did not, which is the same failure mode as the hand-typed problem total
+  // CLAUDE.md warns about. Nothing else records which lessons carry the
+  // component, so the count is taken on the one pass that already has every
+  // lesson's source in hand.
+  let predictionLessons = 0;
+  let predictionInstances = 0;
   for (const slug of slugs) {
     const filePath = path.join(LESSONS_ROOT, `${slug}.mdx`);
     const source = await readFile(filePath, "utf8");
     const meta = extractObjectLiteral(source, LESSON_META_KEY_RE, filePath, "lessonMeta");
     validateMeta(meta, filePath);
     metas.push({ ...meta, slug });
+
+    const predictions = source.match(/<PredictBeforeReveal[\s/>]/g);
+    if (predictions) {
+      predictionLessons += 1;
+      predictionInstances += predictions.length;
+    }
   }
 
   const contents = `/**
@@ -110,11 +126,25 @@ async function main() {
 import type { LessonMetaWithSlug } from "./types";
 
 export const LESSON_METAS: LessonMetaWithSlug[] = ${JSON.stringify(metas, null, 2)};
+
+/**
+ * How many lessons contain at least one \`<PredictBeforeReveal>\`, and how many
+ * instances there are in total (some lessons ask more than once).
+ *
+ * Separate consts rather than a field on \`LessonMetaWithSlug\`: this array is
+ * the largest plain-data module on the site and \`clientBoundary.test.ts\` holds
+ * a ceiling on client-reachable data, so a per-lesson boolean would cost 219
+ * entries to answer a question that has one number for an answer.
+ */
+export const PREDICTION_LESSON_COUNT = ${predictionLessons};
+export const PREDICTION_INSTANCE_COUNT = ${predictionInstances};
 `;
 
   await writeGenerated(OUTPUT, contents);
   console.log(
-    `generate-lesson-registry: wrote ${metas.length} lessons to ${path.relative(ROOT, OUTPUT)}`
+    `generate-lesson-registry: wrote ${metas.length} lessons ` +
+      `(${predictionLessons} with a prediction, ${predictionInstances} instances) ` +
+      `to ${path.relative(ROOT, OUTPUT)}`
   );
 }
 

@@ -42,7 +42,16 @@ export function InsightBlock({ children, className }: { children: ReactNode; cla
         />
         <circle cx="7.5" cy="7.5" r="2.6" fill="currentColor" />
       </svg>
-      <p className="text-base font-medium leading-snug text-foreground sm:text-lg">{children}</p>
+      {/* `div`, not `p`: MDX hands `children` over already wrapped in its own
+          `<p>`, and a `p` inside a `p` is not parseable HTML. The parser
+          closes the outer one at the inner start tag, which strips these
+          styles off the text in the pre-hydration HTML (the only HTML a
+          reader without JavaScript ever gets) and leaves React hydrating an
+          empty `<p>`. Every style here is inherited, so it reaches the inner
+          paragraph unchanged. See LessonHook for the full note. */}
+      <div className="space-y-3 text-base font-medium leading-snug text-foreground sm:text-lg">
+        {children}
+      </div>
     </div>
   );
 }

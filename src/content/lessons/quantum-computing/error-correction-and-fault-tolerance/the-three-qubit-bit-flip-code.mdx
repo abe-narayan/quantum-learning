@@ -34,14 +34,14 @@ export const lessonMeta = {
 A stray interaction flips a qubit's |0⟩ to |1⟩, and everything computed downstream is wrong. This lesson builds the smallest code that catches it, using nothing beyond CNOT and partial measurement.
 </LessonHook>
 
-## Motivation
+## The smallest thing that catches one flip
 
 Bit flips happen. This lesson builds the smallest code that catches one: a
 single $X$ error on any of three <Term id="physical-qubit">physical qubits</Term>, detected and reversed.
 
 Notice what it will need, and what it will not. CNOT and partial
 measurement, both built and tested in earlier courses. No new gate, no new
-postulate, nothing this pillar has not already derived. The whole content
+postulate, nothing this track has not already derived. The whole content
 of the code is *which* qubits get connected to which, and that is what the
 circuit below encodes.
 
@@ -67,7 +67,7 @@ checks into a pair of ancillas; then only the ancillas are measured.
 The data wires reach the end unmeasured. That is the point of the whole
 construction, and everything below explains why it works.
 
-## Mathematical Development
+## Encode, extract a syndrome, decode, correct
 
 ### Encoding
 
@@ -113,15 +113,15 @@ encoded state exactly, verified directly for every one of the four
 cases, on an arbitrary $\alpha,\beta$, not just checked once.
 
 <PredictBeforeReveal
-  question="Injecting an X error on qubit 1 and extracting the syndrome requires measuring the two ancilla qubits. Does that measurement collapse or disturb the encoded superposition's α and β amplitudes at all?"
+  question="Inject an X error on qubit 1 of α|000⟩+β|111⟩, then measure the two syndrome ancillas. With what probability does the outcome come out (1,1)?"
   options={[
-    { label: "Yes, it partially collapses α and β", value: "collapses" },
-    { label: "No, α and β survive untouched", value: "untouched" },
-    { label: "It depends on which qubit the error hit", value: "depends" },
-    { label: "The syndrome can't be measured without measuring the data directly", value: "cant-measure" },
+    { label: "1/2, the way any measurement on a superposition comes out", value: "half" },
+    { label: "|β|², since the syndrome has to track which branch the state is in", value: "beta-squared" },
+    { label: "1/4, one of the four table entries drawn at random", value: "quarter" },
+    { label: "1, on every single run", value: "certain" },
   ]}
-  correctValue="untouched"
-  explanation="Both branches of the errored state α|010⟩+β|101⟩ give the identical syndrome (1,1), because the ancilla measurements depend on whether pairs of data qubits agree and never on α or β individually. A measurement that returns the same answer on every branch cannot collapse anything, so the encoded superposition survives untouched. The Explorer below shows it: inject the error, watch (1,1) light up, then check the recovered amplitudes against the original α and β."
+  correctValue="certain"
+  explanation="After the error the state is α|010⟩+β|101⟩. Ancilla 3 reads q0⊕q1, which is 0⊕1=1 in the first branch and 1⊕0=1 in the second; ancilla 4 reads q1⊕q2, which is 1 in both branches too. The two branches agree on both ancillas, so (1,1) comes out with certainty, on every run, whatever α and β are. That determinism is the whole safety argument in one line: an outcome that was certain in advance carries no information about the state, and a measurement that learns nothing cannot collapse anything."
 />
 
 <InteractiveSection title="Syndrome (1,1) points straight at qubit 1" description="Inject an X error on qubit 1. Watch both syndrome bits light up as (1,1). Confirm the decode table points at qubit 1, then check the recovered state's amplitude table matches the original exactly.">
@@ -141,7 +141,7 @@ a measurement extracts only what its outcomes distinguish. Design the
 measurement so the outcomes are identical across the branches you want to
 protect, and the protected structure survives.
 
-## Physical Interpretation
+## Three qubits doing what one cannot
 
 Three physical qubits, entangled, do what no single qubit can: hold one
 logical qubit's information so that a bit flip on any one of the three is
@@ -153,7 +153,7 @@ logical one, plus two ancillas, to survive one error of one type. That
 ratio is the reason fault tolerance is expensive, and it gets worse before
 it gets better.
 
-## Worked Example
+## Tracing an error on the middle qubit
 
 **Trace the correction cycle for an $X$ error on qubit 1.**
 
@@ -167,7 +167,7 @@ matching the decode table exactly. Applying $X$ to qubit 1 gives back
 $\alpha|000\rangle+\beta|111\rangle$, the original encoded state,
 confirmed by direct engine computation to floating-point precision.
 
-## Common Mistakes
+## Measuring the data destroys the data
 
 <Callout type="warning">
 **Measuring the data qubits directly to check for errors.** That collapses
@@ -189,14 +189,198 @@ after that combines the two.
 
 1. Trace the correction cycle for an $X$ error on qubit 0, computing both
    syndrome bits from the actual computational-basis terms.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The syndrome comes out $(1,0)$, the table points at qubit 0, and
+   applying $X_0$ returns the state exactly.
+
+   Start from the encoded state and flip the leftmost bit of every term,
+   since qubit 0 is the most significant position:
+
+   $$
+   \alpha|000\rangle+\beta|111\rangle
+   \;\xrightarrow{\;X_0\;}\;
+   \alpha|100\rangle+\beta|011\rangle.
+   $$
+
+   Ancilla 3 carries $q_0\oplus q_1$. On $|100\rangle$ that is
+   $1\oplus0=1$; on $|011\rangle$ it is $0\oplus1=1$. Ancilla 4 carries
+   $q_1\oplus q_2$. On $|100\rangle$ that is $0\oplus0=0$; on
+   $|011\rangle$ it is $1\oplus1=0$. So $s_1=1$ and $s_2=0$.
+
+   Both branches agreeing is not a coincidence and it is the reason the
+   whole scheme is safe. $X_0$ flips the same bit in both terms, so it
+   changes both parities in the same way, and the two ancillas come out
+   $(1,0)$ with probability $1$ rather than at random. An outcome that
+   was certain before the measurement carries no information about
+   $\alpha$ and $\beta$, and a measurement that learns nothing about a
+   degree of freedom cannot collapse it.
+
+   The decode table sends $(1,0)$ to qubit 0. Apply $X_0$ again and, since
+   $X^2=I$ on each branch,
+
+   $$
+   \alpha|100\rangle+\beta|011\rangle
+   \;\xrightarrow{\;X_0\;}\;
+   \alpha|000\rangle+\beta|111\rangle,
+   $$
+
+   the original encoded state with $\alpha$ and $\beta$ untouched. Note
+   that the recovery was chosen without knowing either of them, which is
+   the property that makes this a code rather than a repair of one
+   particular state.
+
+   </details>
+
 2. Trace the correction cycle for an $X$ error on qubit 2.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Syndrome $(0,1)$, correction $X_2$.
+
+   $$
+   \alpha|000\rangle+\beta|111\rangle
+   \;\xrightarrow{\;X_2\;}\;
+   \alpha|001\rangle+\beta|110\rangle.
+   $$
+
+   Ancilla 3 reads $q_0\oplus q_1$: $0\oplus0=0$ on the first term,
+   $1\oplus1=0$ on the second, so $s_1=0$. Ancilla 4 reads
+   $q_1\oplus q_2$: $0\oplus1=1$ and $1\oplus0=1$, so $s_2=1$. The table
+   sends $(0,1)$ to qubit 2, and $X_2$ restores
+   $\alpha|000\rangle+\beta|111\rangle$.
+
+   Placed beside the other two traces, the table stops looking like a
+   list to memorize. Qubit 0 sits in only the first check, so it moves
+   only $s_1$. Qubit 2 sits in only the second check, so it moves only
+   $s_2$. Qubit 1 sits in both, so it moves both. Three distinguishable
+   patterns, plus $(0,0)$ for no error, and two ancillas are exactly
+   enough. That "exactly" is also a warning: with all four syndrome
+   values already spoken for, the code has no capacity left for anything
+   heavier, which is what question 4 runs into.
+
+   </details>
+
 3. Explain why the syndrome for a $Z$-error case would come out $(0,0)$,
    "no error detected," even though an error actually occurred (a
-   concrete illustration of the previous Common Mistake).
+   concrete illustration of the phase-flip warning just above).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the ancillas read bit values, and a $Z$ error changes no bit
+   value. It changes a sign.
+
+   $Z|0\rangle=|0\rangle$ and $Z|1\rangle=-|1\rangle$, so applying $Z$ to
+   qubit 0 leaves $|000\rangle$ alone and sends $|111\rangle$ to
+   $-|111\rangle$:
+
+   $$
+   \alpha|000\rangle+\beta|111\rangle
+   \;\xrightarrow{\;Z_0\;}\;
+   \alpha|000\rangle-\beta|111\rangle.
+   $$
+
+   Every term still has three agreeing bits. $q_0\oplus q_1=0$ and
+   $q_1\oplus q_2=0$ in both branches, so the syndrome is $(0,0)$ with
+   certainty and the recovery step correctly concludes, from the
+   information it has, that there is nothing to do.
+
+   Nothing has been repaired, though. Take $\alpha=\beta=1/\sqrt2$: the
+   state was the logical $|+\rangle$ and is now the logical $|-\rangle$,
+   which is orthogonal to it. That is the largest error a single logical
+   qubit can suffer, and the code cannot see it at all.
+
+   It is worth being precise about what this costs the code, because the
+   usual shorthand overstates its strength. Against $X$ errors alone the
+   three-qubit code has distance 3: it takes three flips to move one
+   codeword to another. As a general quantum code, which is what a
+   distance figure normally means, its distance is $1$, because $Z_0$ is a
+   weight-1 operator that commutes with both stabilizers and still acts
+   nontrivially on the encoded state. One qubit's worth of the wrong kind
+   of noise defeats it. The next lesson fixes the blind spot by rotating
+   the basis, and the one after that stacks the two constructions so that
+   neither blind spot survives.
+
+   </details>
+
 4. What happens to this code's guarantee if $X$ errors occur
    simultaneously on *two* different data qubits, rather than just one?
    (Hint: compute the resulting syndrome and check whether it matches any
    single-qubit entry in the decode table.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The guarantee is gone, and the failure is not a shrug but an own goal:
+   the code reliably converts a two-qubit error into a complete logical
+   bit flip.
+
+   Each syndrome bit is a parity, so a check whose two qubits are *both*
+   hit flips twice and reads as clean. Take the three cases in turn,
+   reading the parities off the first branch (the second gives the same
+   answer, as always):
+
+   | Error | Corrupted state | $s_1=q_0\oplus q_1$ | $s_2=q_1\oplus q_2$ | Table says | Net operator applied |
+   |---|---|---|---|---|---|
+   | $X_0X_1$ | $\alpha\vert110\rangle+\beta\vert001\rangle$ | $1\oplus1=0$ | $1\oplus0=1$ | qubit 2 | $X_0X_1X_2$ |
+   | $X_0X_2$ | $\alpha\vert101\rangle+\beta\vert010\rangle$ | $1\oplus0=1$ | $0\oplus1=1$ | qubit 1 | $X_0X_1X_2$ |
+   | $X_1X_2$ | $\alpha\vert011\rangle+\beta\vert100\rangle$ | $0\oplus1=1$ | $1\oplus1=0$ | qubit 0 | $X_0X_1X_2$ |
+
+   Every weight-2 error impersonates the weight-1 error on the one qubit
+   it did not touch, so the recovery obligingly flips that qubit too, and
+   the register ends up with all three flipped:
+
+   $$
+   X_0X_1X_2\big(\alpha|000\rangle+\beta|111\rangle\big)
+   = \alpha|111\rangle+\beta|000\rangle.
+   $$
+
+   That is the logical $X$. The syndrome afterwards is $(0,0)$, so the
+   code reports success on a state whose logical bit has been flipped.
+
+   The tempting wrong turn is to read this as a decoder bug that a
+   cleverer table would fix. It is not. Two ancillas give four syndromes
+   and there are already four things to distinguish, so the three
+   weight-2 errors have nowhere to go. $X_0X_1$ and $X_2$ produce
+   *identical* syndromes, so no rule reading only $(s_1,s_2)$ can tell
+   them apart, and the states they leave behind are not identical:
+   $X_2$ gives $\alpha|001\rangle+\beta|110\rangle$ while $X_0X_1$ gives
+   $\alpha|110\rangle+\beta|001\rangle$, the same two terms with
+   $\alpha$ and $\beta$ exchanged. The two differ by exactly $X_0X_1X_2$,
+   the logical $X$, which is why guessing wrong here is not a small
+   error but the largest one available. The decoder's
+   choice of $X_2$ is the right one, in fact, in the sense that it is the
+   more likely explanation whenever single flips are more common than
+   double flips. It is a maximum-likelihood guess that is sometimes
+   wrong.
+
+   That last observation is worth following one step further, because it
+   is the seed of the whole threshold story. Take flips to be
+   independent with probability $p$ per data qubit, and take the
+   syndrome extraction and the recovery gate to be free of error
+   themselves, which is the assumption doing the most work here. Then
+   the code fails when two or three qubits flip:
+
+   $$
+   P_{\text{fail}} = 3p^2(1-p)+p^3 = 3p^2-2p^3.
+   $$
+
+   Compare that to the bare qubit's $p$. The encoding helps exactly when
+   $3p^2-2p^3<p$, which rearranges to $(2p-1)(p-1)>0$ and so to
+   $p<\tfrac12$. Below that crossover, redundancy buys you something.
+   Above it, you have added more places for errors to happen than the
+   code can repair, and encoding makes the qubit worse. The capstone
+   lesson takes this shape and calls it a threshold, with one warning
+   attached: a real threshold sits orders of magnitude lower than
+   $\tfrac12$, because there the checking circuitry is faulty too, and
+   the crossover arrives as soon as the checks inject errors faster than
+   they remove them.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -212,7 +396,7 @@ after that combines the two.
 - This code is silent to $Z$ errors entirely, a real, documented
   limitation the next lesson's dual code addresses.
 
-## Further Exploration
+## The same machinery, conjugated
 
 <NextDiscovery>
 [The Three-Qubit Phase-Flip Code](/lessons/quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-phase-flip-code) is the dual construction: identical

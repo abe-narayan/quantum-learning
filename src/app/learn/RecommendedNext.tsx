@@ -69,11 +69,26 @@ export function RecommendedNext({ lessons }: { lessons: LessonMetaWithSlug[] }) 
     status.done = status.slugs.length > 0 && status.slugs.every((slug) => completed.has(slug));
   }
 
-  const next = COURSES.find((course) => {
+  // "Unlocked": authored, not finished, and every prerequisite finished.
+  const unlocked = COURSES.filter((course) => {
     const status = statuses.get(course.slug);
     if (!status || status.done || status.slugs.length === 0) return false;
     return course.prerequisites.every((prereqSlug) => statuses.get(prereqSlug)?.done ?? false);
   });
+
+  // A course already underway beats an untouched one, and this used to be the
+  // other way round by accident. The rule was `COURSES.find(...)`, i.e. the
+  // first *declared* unlocked course, and `mathematical-foundations` is
+  // declared first and has no prerequisites — so a reader three lessons into
+  // Qubits & Quantum States (the intuition route, whose whole premise is that
+  // it is a complete way in) was told the one thing to do next was to switch
+  // to the other route, under a progress bar reading 0/11. Continuing what you
+  // are in the middle of is the answer to "if you only do one thing next"
+  // whenever there is one; declaration order is only the tie-break.
+  const next =
+    unlocked.find((course) =>
+      (statuses.get(course.slug)?.slugs ?? []).some((slug) => completed.has(slug))
+    ) ?? unlocked[0];
 
   if (!next) return null;
 
@@ -99,11 +114,16 @@ export function RecommendedNext({ lessons }: { lessons: LessonMetaWithSlug[] }) 
 
       <Instrument
         className="mt-5 border-l-4 border-l-pillar-edge"
-        label="Recommended next course"
+        label={completedInCourse > 0 ? "Course in progress" : "Recommended next course"}
+        // "No prerequisites. Start it whenever you like." is the wrong sentence
+        // for a course the reader is already four lessons into, which is now
+        // the common case for this panel.
         footnote={
-          prerequisiteTitles.length > 0
-            ? `Unlocked by finishing ${prerequisiteTitles.join(" and ")}.`
-            : "No prerequisites — start anytime."
+          completedInCourse > 0
+            ? "You have already started this one. Picking it up is the shortest way forward."
+            : prerequisiteTitles.length > 0
+              ? `Unlocked by finishing ${prerequisiteTitles.join(" and ")}.`
+              : "No prerequisites. Start it whenever you like."
         }
       >
         <p className="max-w-2xl text-sm text-muted-foreground">{next.description}</p>
@@ -134,8 +154,8 @@ export function RecommendedNext({ lessons }: { lessons: LessonMetaWithSlug[] }) 
               }}
             />
           </div>
-          <p className="mt-1.5 font-tech text-[0.65rem] uppercase tracking-[0.1em] text-subtle-foreground">
-            Your progress — {completedInCourse}/{nextStatus?.slugs.length ?? 0} lessons
+          <p className="mt-1.5 tech-label text-subtle-foreground">
+            Your progress: {completedInCourse}/{nextStatus?.slugs.length ?? 0} lessons
           </p>
         </div>
 
@@ -145,11 +165,20 @@ export function RecommendedNext({ lessons }: { lessons: LessonMetaWithSlug[] }) 
               Start &ldquo;{nextLesson.title}&rdquo;
             </Button>
           ) : null}
+          {/* "View the full course →" appeared here *and* on the rigor card
+              in the fork below, identical text pointing at two different
+              courses; in a screen reader's link list that is two links to
+              nowhere in particular. Naming the destination's contents fixes
+              both the vagueness and the collision. */}
+          {/* 44px target at no layout cost: this row is `items-center` next to
+              a Button that is already at least 44px tall, so giving the link a
+              44px box changes nothing except that it is now tappable. */}
           <Link
             href={courseHref}
-            className="text-sm font-medium text-pillar-text underline-offset-4 hover:underline"
+            aria-label={`See all ${next.modules.length} modules in ${next.title}`}
+            className="inline-flex min-h-11 items-center text-sm font-medium text-pillar-text underline-offset-4 hover:underline"
           >
-            View the full course →
+            See all {next.modules.length} modules →
           </Link>
         </div>
       </Instrument>

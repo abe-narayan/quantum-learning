@@ -21,17 +21,29 @@ export const whyBlankWireIsIdentity: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["identity"],
-      ["tensor", "dimension", "matrix size", "combined operator"],
+      {
+        phrases: ["contributes an I factor", "an explicit I in the product", "a factor of I", "identity factor", "identity matrix on that wire", "I on that wire", "stands in for the qubit", "placeholder for that wire", "leaves that qubit unchanged", "acts trivially on that qubit"],
+        missingFeedback:
+          "Say what the blank wire actually puts into the column's tensor product, and what that piece does to the qubit riding on that wire.",
+      },
+      {
+        phrases: ["dimension", "matrix size", "combined operator", "sizes must agree", "wrong size", "too small", "2^n", "full matrix", "would not line up", "would not match"],
+        missingFeedback:
+          "You have said what the blank wire stands for. Now say what breaks if you simply omit it: what goes wrong with the operator you build for that column?",
+      },
     ],
     incorrectFeedback:
-      "Think about what building the full column's operator as a tensor product actually requires dimensionally.",
-    partialFeedback: "You're close — be explicit about the identity operator and why the tensor product needs it.",
+      "You said the blank wire 'does nothing', which is right and is not the question. The question is why doing nothing still needs a symbol. Build the column's operator explicitly and count how many factors it must have, and how large the result is.",
+    partialFeedback: "Name the operator that stands for doing nothing, and say why the column's construction needs a symbol in that slot at all.",
+    modelAnswers: [
+      "The column operator is a tensor product with one factor per qubit, so the blank wire has to contribute a factor of I. Leave it out and the combined operator is the wrong size: you would get a 2x2 where you need a 4x4, and the dimensions would not line up with the state vector.",
+      "A blank wire means identity on that wire, not nothing at all. You need an explicit I in the product so the full matrix comes out 2^n by 2^n, and that factor leaves that qubit unchanged.",
+    ],
   },
   hints: [
-    { text: "The column's full operator is a tensor product of one operator per wire." },
-    { text: "A tensor product needs a factor for every wire, with no gaps — what operator does 'nothing' correspond to?" },
-    { text: "Leaving a wire out entirely would change the total number of tensor factors, and the resulting matrix size." },
+    { text: "The column's full operator is assembled from one piece per wire. Write the assembly rule down." },
+    { text: "That rule has no notion of a missing slot. Ask what operator you would put in a slot where nothing happens." },
+    { text: "Now count. With one slot dropped, how many factors would you have, and what size matrix would come out compared with the state it has to act on?" },
   ],
   solution: {
     steps: [
@@ -43,7 +55,7 @@ export const whyBlankWireIsIdentity: ConceptualProblem = {
         description: "If one wire had no operator at all, the tensor product would be missing a factor, and the result wouldn't have the right dimension to act on the full multi-qubit state.",
       },
       {
-        description: "The identity $I$ is the operator that changes nothing, so writing $I$ for the blank wire keeps the tensor product's dimension correct while genuinely doing nothing to that qubit.",
+        description: "The identity $I$ is the operator that changes nothing, so writing $I$ for the blank wire keeps the tensor product's dimension correct while doing nothing to that qubit.",
       },
     ],
     finalAnswer: "A blank wire contributes an explicit $I$ factor to the column's tensor product, keeping the operator's dimensions consistent while leaving that qubit unchanged.",

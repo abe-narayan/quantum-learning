@@ -2,8 +2,8 @@ import { Section } from "@/components/ui/Section";
 
 // Static skeleton (no client state, no animation logic) shown for the brief
 // window while Next.js fetches the RSC payload for a /simulators navigation.
-// The page is fully static — every simulator below it is a client component
-// lazy-loaded on the page itself — so this is purely a perceived-performance
+// The page is fully static, every simulator below it is a client component
+// lazy-loaded on the page itself, so this is purely a perceived-performance
 // nicety. Shape mirrors SimulatorsPage: eyebrow/title/description, the three
 // readouts, the "try the first one" row, the grouped bench directory, then a
 // stack of section groups, each with a heading, description, and one large
@@ -49,7 +49,7 @@ export default function SimulatorsLoading() {
         </div>
       </div>
 
-      {/* The bench directory. It is not a flat row of pills — it is five
+      {/* The bench directory. It is not a flat row of pills, it is five
           labelled groups of link *cards* (instrument name, one-line physics,
           level), which is several hundred pixels taller than the single pill
           row this used to draw. The group sizes below match SIMULATOR_GROUPS

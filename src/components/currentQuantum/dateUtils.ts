@@ -1,7 +1,7 @@
 /**
  * Date handling shared by every Current Quantum surface (the catalog
  * timeline, its cards, and the lesson-embedded related widget). Centralized
- * here — rather than duplicated per component, as it briefly was — because
+ * here, rather than duplicated per component, as it briefly was, because
  * the timeline's proportional spacing and the cards' displayed date must
  * agree on exactly how a date string is parsed.
  *
@@ -41,7 +41,7 @@ export function formatEntryDate(iso: string): string {
   });
 }
 
-/** Value for a `<time dateTime="...">` attribute — the entry's own recorded
+/** Value for a `<time dateTime="...">` attribute, the entry's own recorded
  *  precision, unpadded, never a fabricated day. */
 export function entryDateTimeAttr(iso: string): string {
   return iso;
@@ -57,7 +57,7 @@ export function daysBetween(a: string, b: string): number {
  * real number of days since the previous (more recent) one. Log-scaled and
  * clamped so a multi-year historical gap doesn't blow the page height out,
  * while entries weeks apart still read as visibly closer together than ones
- * a year apart — the point is to make the field's accelerating pace
+ * a year apart, the point is to make the field's accelerating pace
  * legible on scroll, not to plot time to a literal pixel scale.
  */
 export function spineGapPx(days: number): number {
@@ -65,16 +65,16 @@ export function spineGapPx(days: number): number {
   return Math.min(260, Math.max(22, scaled));
 }
 
-// A `relativeRecency(iso, now)` helper used to live here — "3 weeks ago"
+// A `relativeRecency(iso, now)` helper used to live here, "3 weeks ago"
 // style copy computed from `new Date()`. Removed deliberately (see
 // docs/UX_REVIEW.md P0-2): this page is statically generated with no
 // `export const revalidate`, so `new Date()` is evaluated once at build
 // time and the "N weeks ago" readout it produced would be silently frozen
 // at that instant and drift further from true with every day the build
-// stays deployed — exactly wrong for a page whose entire premise is
+// stays deployed, exactly wrong for a page whose entire premise is
 // currency. The absolute dates from `formatEntryDate`/`entryDateTimeAttr`
 // below are the only time-relative-*looking* facts this module now
-// produces, and neither depends on "now" — they're honest for as long as
+// produces, and neither depends on "now", they're honest for as long as
 // the deployment lives, with no rebuild or revalidation schedule required
 // to keep them true. Do not reintroduce a "how long ago" string without a
 // live, client-only, post-mount computation (server and client would

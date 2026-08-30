@@ -1,7 +1,7 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { StateVector } from "@/lib/quantum/state";
-import { HADAMARD, T_GATE, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
+import { HADAMARD, T_GATE, PAULI_X, PAULI_Y, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 
 export const practiceProblems = getProblemMetaForLesson(
@@ -54,6 +54,28 @@ export const toffoliVerificationFrames = Array.from({ length: 8 }, (_, inputInde
   };
 });
 
+export const tConjugatedX = T_GATE.mul(PAULI_X).mul(T_GATE.dagger());
+export const tCliffordTarget = PAULI_X.add(PAULI_Y).scale(Math.SQRT1_2);
+export const tConjugationMaxDeviation = Math.max(
+  ...[0, 1].flatMap((row) =>
+    [0, 1].map((col) => tConjugatedX.get(row, col).sub(tCliffordTarget.get(row, col)).magnitude())
+  )
+);
+
+export const toffoliWorstCorrectProbability = Math.min(
+  ...toffoliVerificationFrames.map((frame, inputIndex) => frame.bars[toffoliExpectedOutputIndex(inputIndex)].value)
+);
+
+export const toffoliWorstLeakage = Math.max(
+  ...toffoliVerificationFrames.map((frame, inputIndex) =>
+    Math.max(
+      ...frame.bars
+        .filter((_, outcomeIndex) => outcomeIndex !== toffoliExpectedOutputIndex(inputIndex))
+        .map((bar) => bar.value)
+    )
+  )
+);
+
 export const lessonMeta = {
   title: "Universal Quantum Computation",
   description:
@@ -95,11 +117,11 @@ export const lessonMeta = {
 This platform's circuits use H, X, Y, Z, S, T, and CNOT throughout. Is that an arbitrary shopping list, or does a small subset of it already suffice to build every circuit there is?
 </LessonHook>
 
-## Motivation
+## A promise made in passing, nine lessons ago
 
 Building Qubit Circuits computed $HZH=X$ and then said, in passing, that
 composing rotations about different axes "makes it possible to build *any*
-gate from just a small, fixed set of 'universal' ones," promising the idea
+gate from a small, fixed set of 'universal' ones," promising the idea
 would return in the next course. It never did. This course went on to build
 CNOT, Bell states, teleportation, BB84, and superdense coding without
 pinning down what "universal" means or why any small set deserves the name.
@@ -111,7 +133,7 @@ continuum? And if it can, which finite set, and why does the standard
 answer include a gate as odd-looking as $T$ rather than stopping at the
 gates you would naturally reach for?
 
-## Intuition
+## Dials that spin in total isolation
 
 Picture each qubit as a dial that a single-qubit gate can spin, but
 only that one dial, in total isolation from every other qubit's dial.
@@ -123,7 +145,7 @@ between qubits, the kind CNOT produces, needs a gate that reads one
 qubit and acts on another. That's the qualitative reason single-qubit
 gates alone can never suffice; the next section proves it exactly.
 
-## Mathematical Development
+## Why one entangling gate is mathematically required
 
 ### Single-qubit gates alone are not enough
 
@@ -232,7 +254,7 @@ Restrict to the discrete gates already built throughout Quantum Gates &
 Circuits: $H$, $S$, and CNOT. The **<Term id="clifford-group">Clifford group</Term>** is exactly the set
 of unitaries that map every Pauli operator to another Pauli operator
 under conjugation, $UPU^\dagger \in \{\pm X,\pm Y,\pm Z,\pm iX,\dots\}$
-for every Pauli $P$. Building Quantum Circuits already verified $HZH=X$,
+for every Pauli $P$. Building Qubit Circuits already verified $HZH=X$,
 exactly this Clifford property for $H$ (Z conjugates to a Pauli, X);
 $S$ and CNOT have the same property (checkable the same way).
 
@@ -249,6 +271,20 @@ introduced for error-correcting codes):
 > be simulated by a classical computer in time polynomial in the number
 > of qubits.
 
+That theorem is a fact about Clifford circuits, with nothing said yet
+about universality. Put the two together yourself before reading on.
+
+<PredictBeforeReveal
+  question="Suppose {H, S, CNOT} alone did turn out to be universal, able to reach any circuit. Given Gottesman-Knill, what would follow?"
+  options={[
+    { label: "Every quantum circuit would be efficiently classically simulable", value: "collapse" },
+    { label: "Nothing unusual: universality has no bearing on classical simulability", value: "nothing" },
+    { label: "It would matter only for error correction, where Clifford gates already dominate", value: "error-correction-only" },
+  ]}
+  correctValue="collapse"
+  explanation="Gottesman-Knill already makes every Clifford circuit efficiently classically simulable. If Clifford were also universal, every quantum circuit would equal some Clifford circuit, and so every quantum circuit would be efficiently classically simulable, erasing any quantum advantage. Universal quantum computation and 'always classically easy' cannot both hold for one gate set. Run that backwards and it is a proof, which is the next paragraph."
+/>
+
 Compare this to Computational Cost & Scaling's $16\times2^n$-byte wall:
 a *general* $n$-qubit circuit needs exponential classical resources to
 simulate, which is exactly why a quantum computer is believed to be
@@ -259,21 +295,11 @@ efficient (Gottesman-Knill), **Clifford alone cannot be a universal gate
 set**. Every Clifford circuit is classically simulable, and a universal set
 has to reach circuits (Shor's, for one) that are believed not to be.
 
-<PredictBeforeReveal
-  question="If {H, S, CNOT} alone were secretly universal, what would that imply about quantum computers?"
-  options={[
-    { label: "Nothing unusual; universality doesn't relate to classical simulability", value: "nothing" },
-    { label: "Every quantum circuit could be simulated efficiently on a classical computer, undermining the basis for believing quantum computers are more powerful", value: "collapse" },
-    { label: "It would only affect error-correction, not algorithms", value: "error-correction-only" },
-  ]}
-  correctValue="collapse"
-  explanation="Gottesman-Knill already makes every Clifford circuit efficiently classically simulable. If Clifford alone could reach every circuit (i.e., were universal), then EVERY quantum circuit would reduce to some Clifford circuit and hence be efficiently classically simulable, erasing any quantum advantage. Universal quantum computation and 'always classically easy' are mutually exclusive for the same gate set, which is exactly why Clifford can't be universal."
-/>
-
 ### T breaks Cliffordness, verified directly
 
 The standard fix adds exactly one more gate, $T=\text{diag}(1,e^{i\pi/4})$
-(Gate Decomposition already used $T=R_z(\pi/4)$). Check directly
+(Gate Decomposition already used $T=R_z(\pi/4)$, up to the global phase
+that decomposition explicitly works modulo). Check directly
 whether $T$ is Clifford, the same conjugation test used above for $H$:
 
 $$
@@ -288,9 +314,10 @@ $$
 TXT^\dagger = \frac{1}{\sqrt2}\begin{pmatrix}0&1-i\\1+i&0\end{pmatrix} = \frac{1}{\sqrt2}(X+Y)
 $$
 
-confirmed here directly using this platform's own `T_GATE`, `PAULI_X`,
-and `Matrix.mul`/`.dagger()` (`T_GATE.mul(PAULI_X).mul(T_GATE.dagger())`
-matches $\frac{1}{\sqrt2}(X+Y)$ to at least 9 decimal digits). This is
+computed on this page rather than quoted: `T_GATE.mul(PAULI_X).mul(T_GATE.dagger())`
+and `PAULI_X.add(PAULI_Y).scale(Math.SQRT1_2)`, both built from this
+platform's own gate matrices, differ by at most {tConjugationMaxDeviation.toExponential(1)}
+in any entry. This is
 **not** a Pauli operator, not even a phase times one: it's an equal
 combination of $X$ and $Y$. So $T$ conjugates a Pauli into something
 that isn't a Pauli, and **$T$ is not a Clifford gate.** Adjoining it to
@@ -336,14 +363,15 @@ Decomposition's exact continuous $R_z,R_y$ decomposition. It's also,
 cited here as a forward pointer and explicitly not derived in this
 course, *why* $T$ gates specifically are the expensive resource in a
 fault-tolerant quantum computer: Clifford gates (including $H$ and
-CNOT) can be implemented fault-tolerantly in a comparatively cheap,
-transversal way, while $T$ needs a separate, costly procedure called
+CNOT) can be implemented fault-tolerantly comparatively cheaply,
+transversally in codes like Steane's, and by lattice surgery and code
+deformation on the surface code, while $T$ needs a separate, costly procedure called
 <Term id="magic-state-distillation">magic-state distillation</Term>. The Fault-Tolerant Thresholds capstone's
 physical-to-logical qubit overhead is, in real architectures, driven
 substantially by this $T$-gate cost: a number this lesson names but,
 matching that capstone's own scoping, does not derive.
 
-## Physical Interpretation
+## The NAND gate's quantum counterpart
 
 This is the quantum analogue of a very old classical fact: NAND alone
 is universal for classical Boolean logic, so any classical circuit,
@@ -381,11 +409,12 @@ Applying exactly this 15-gate sequence to every one of the 8
 three-qubit computational basis states, using this platform's own
 `applySingleQubitGate` and `applyCNOT` functions
 (`HADAMARD`, `T_GATE`, and `T_GATE.dagger()` as the single-qubit gates),
-reproduces the Toffoli truth table on every input, each output landing
-on the correct basis state with probability $>0.999$ and zero leakage
-into any other basis state (checked to below $10^{-9}$): $|110\rangle$
-and $|111\rangle$ swap (both controls set, target flips), and every other
-input is left alone. This is not a schematic claim. It is a gate-by-gate
+reproduces the Toffoli truth table on every input. Across all eight runs
+the worst correct-outcome probability is {toffoliWorstCorrectProbability.toFixed(12)}
+and the largest probability landing anywhere else is
+{toffoliWorstLeakage.toExponential(1)}, both read straight off the bars
+below: $|110\rangle$ and $|111\rangle$ swap (both controls set, target
+flips), and every other input is left alone. This is not a schematic claim. It is a gate-by-gate
 replay of the circuit above through the same engine every other lesson's
 circuits run on, landing on Toffoli's truth table exactly.
 
@@ -407,7 +436,7 @@ tracked $|10\rangle$ through three explicit steps.
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Discrete and entangling is not yet universal
 
 <Callout type="note">
 **Thinking "Clifford+T is universal" means any random discrete gate set
@@ -436,22 +465,191 @@ count.
    single-qubit gates at all, also can't be universal. (Hint: what does
    CNOT do to every computational basis state, and can that alone
    produce something like $H|0\rangle=|+\rangle$?)
-2. Using $HZH=X$ (already verified in Building Quantum Circuits), is
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   CNOT maps every computational basis state to a computational basis
+   state: $|00\rangle\to|00\rangle$, $|01\rangle\to|01\rangle$,
+   $|10\rangle\to|11\rangle$, $|11\rangle\to|10\rangle$. Its matrix is
+   therefore a permutation matrix, every entry $0$ or $1$, with a single
+   $1$ in each row and column. Products of permutation matrices are
+   permutation matrices, so a circuit built only from CNOTs, on any number
+   of qubits and of any depth, is one permutation matrix.
+
+   **Such a circuit maps every basis state to a basis state, never to a
+   superposition.** Applied to $|0\ldots0\rangle$, the output is some
+   single basis state $|b\rangle$ with one amplitude equal to $1$. But
+   $H|0\rangle = |+\rangle$ has two amplitudes equal to $\tfrac{1}{\sqrt2}$.
+   No permutation matrix has an entry $\tfrac{1}{\sqrt2}$, since every
+   entry is $0$ or $1$, so no CNOT-only circuit equals $H\otimes I$ or any
+   circuit containing it. CNOT alone cannot reach every unitary.
+
+   The counting version of the same point is even blunter. On $n$ qubits,
+   CNOT acts on the bit string as $(a,b)\mapsto(a, a\oplus b)$, so
+   CNOT-only circuits generate exactly the invertible linear maps over
+   $\mathbb{F}_2$, a *finite* group. On two qubits there are $6$ of them,
+   and the engine reproduces one, $\text{CNOT}(0,1)$ then
+   $\text{CNOT}(1,0)$, as the permutation
+   $00\to00$, $01\to11$, $10\to01$, $11\to10$. Six matrices cannot
+   approximate a continuum, and the gap is not one you could close with a
+   longer circuit; the group is closed, so length buys nothing.
+
+   Note how this pairs with the lesson's other impossibility argument.
+   Single-qubit gates alone preserve the product-state property and so
+   cannot entangle; CNOT alone preserves the definite-basis-state property
+   and so cannot superpose. Each is missing precisely what the other has,
+   which is why the universality theorem asks for both. The wrong turn is
+   thinking CNOT is disqualified because it is "classical" or has real
+   entries. Realness is not the obstruction, and CNOT is a genuine
+   entangling gate; what disqualifies it is that it never creates
+   superposition, and without superposition there is nothing to entangle.
+
+   </details>
+
+2. Using $HZH=X$ (already verified in Building Qubit Circuits), is
    $H$ itself a Clifford gate by the definition given here? Check
    explicitly that $H$ conjugates $X$ to a Pauli as well (compute
    $HXH$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes, $H$ is Clifford. Note first that $H^\dagger = H$, so the
+   conjugation $HPH^\dagger$ is just $HPH$.
+
+   $$
+   HXH = \frac12\begin{pmatrix}1&1\\1&-1\end{pmatrix}\begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}1&1\\1&-1\end{pmatrix} = \begin{pmatrix}1&0\\0&-1\end{pmatrix} = Z
+   $$
+
+   The engine confirms this on the platform's own `HADAMARD` and
+   `PAULI_X`. Together with the known $HZH = X$, that is the $X$ and $Z$
+   generators handled, and the third case follows without new work:
+   $Y = iXZ$, and conjugation respects products, so
+   $HYH = i(HXH)(HZH) = iZX = -Y$, which the engine also confirms. A
+   leading $-1$ is still a Pauli by the definition given here, which allows
+   $\pm$ and $\pm i$ factors, so all three Paulis map to Paulis and $H$
+   passes.
+
+   The three results together say something geometric that is worth
+   holding on to. $H$ swaps the $x$- and $z$-axes of the Bloch sphere and
+   reverses $y$, which is exactly the half turn about the diagonal between
+   $x$ and $z$ that the first course described. Clifford gates are
+   precisely the gates that permute the Pauli axes rather than tilting
+   them into intermediate directions, and it is that rigidity, a finite
+   set of allowed permutations, that makes their action trackable with
+   bookkeeping rather than with amplitudes. That bookkeeping is what
+   Gottesman-Knill turns into an efficient classical simulation, and it is
+   the same tableau the stabilizer codes later in this track are built on.
+
+   The contrast with $T$ is now sharp. $TXT^\dagger = \tfrac{1}{\sqrt2}(X+Y)$
+   is a tilt halfway between two axes, not a permutation of them, so the
+   tableau has nothing to record and the whole method breaks. The slip to
+   avoid is concluding from $HZH = X$ alone that $H$ is Clifford. The
+   definition quantifies over *every* Pauli, so one case is a necessary
+   check and not a sufficient one. Conveniently, checking $X$ and $Z$ is
+   enough, since they generate the rest.
+
+   </details>
+
 3. This lesson found $TXT^\dagger=\frac{1}{\sqrt2}(X+Y)$. Without
    redoing the full matrix multiplication, use $T^2=S$ and the fact
    that $S$ IS Clifford ($SXS^\dagger=Y$, a standard identity) to
    sanity-check that $T$ applied *twice* should land back on a genuine
    Pauli. Does $(TXT^\dagger)$ conjugated by $T$ again plausibly return
    to a Pauli, given $T\cdot T=S$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes, and not merely plausibly. It has to, and the answer is exactly $Y$.
+
+   Conjugation composes: conjugating by $T$ and then by $T$ again is the
+   same as conjugating once by $T \cdot T$, because
+
+   $$
+   T\left(TXT^\dagger\right)T^\dagger = (TT)X(TT)^\dagger = S X S^\dagger = Y .
+   $$
+
+   No matrix multiplication is needed beyond the quoted identity. The
+   engine confirms all three links independently: $T^2 = S$ exactly,
+   $SXS^\dagger = Y$, and the doubly conjugated matrix equals $Y$ to within
+   floating-point noise.
+
+   The sanity check does its job because it lets a suspicious intermediate
+   result be tested against a known endpoint. $\tfrac{1}{\sqrt2}(X+Y)$ is
+   an unusual-looking object, and it would be easy to suspect an algebra
+   slip in deriving it. Feed it through one more $T$ and it must land on a
+   Pauli, since two $T$s make an $S$ and $S$ is Clifford. It does, so the
+   intermediate is corroborated.
+
+   The geometry underneath is the more useful takeaway. $T$ is a $\pi/4$
+   rotation about the $z$-axis, which carries the $x$-axis to the
+   $45^\circ$ direction between $x$ and $y$: that is precisely
+   $\tfrac{1}{\sqrt2}(X+Y)$, an axis, just not one of the three named ones.
+   A second $T$ completes the quarter turn and lands on $y$, a named axis
+   again. So $T$ is not *anti*-Clifford or lawless; it lands between the
+   Pauli axes, and its square lands back on one. Half of a Clifford
+   operation is exactly what "outside the Clifford group but only just"
+   means, and it is why $T$ is the minimal thing you can add.
+
+   The wrong turn is reading "$T$ is not Clifford" as "$T$ never produces
+   Paulis", and then finding the $Y$ here surprising or contradictory. The
+   definition is a statement about *every* Pauli under a *single*
+   conjugation. Powers of a non-Clifford gate can perfectly well be
+   Clifford, and here $T^2 = S$ and $T^4 = Z$ both are. What matters for
+   universality is that $T$ itself is not, so circuits containing an odd
+   number of $T$s escape the tableau simulation.
+
+   </details>
+
 4. The Toffoli circuit above uses 6 CNOTs and 7 $T$-type gates ($T$ or
    $T^\dagger$). If $T$-count, not total gate count, is what real
    fault-tolerant hardware cares most about minimizing, does this
    circuit's 2 Hadamards and 6 CNOTs matter for cost the same way the 7
-   $T$-gates do? Why or why not, based on this lesson's Common
-   Mistakes section?
+   $T$-gates do? Why or why not, based on this lesson's second closing
+   note, on "universal in principle" versus "cheap in practice"?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No, and the gap is not a small constant factor. The $H$s and CNOTs are
+   Clifford gates and the $T$s are not, and in a fault-tolerant
+   architecture that distinction is the cost model.
+
+   Clifford gates can be implemented directly on encoded logical qubits by
+   comparatively cheap means: transversally in codes like Steane's, where
+   the logical gate is just the physical gate applied to every physical
+   qubit in the block, and by lattice surgery or code deformation on the
+   surface code. Nothing extra has to be manufactured. $T$ cannot be
+   implemented that way, and the standard route is magic-state
+   distillation: prepare many noisy copies of a special resource state,
+   consume most of them to purify a few, and spend one purified state per
+   logical $T$. That distillation factory can dominate the whole machine's
+   qubit count and runtime, so a $T$ can cost orders of magnitude more than
+   a CNOT rather than a few times more.
+
+   For this circuit the practical reading is that the resource line reads
+   "$7$ $T$s", and the $8$ Clifford gates are close to free by comparison.
+   That is why $T$-count is quoted as a figure of merit in its own right,
+   why lowering a circuit's $T$-count is an active research problem, and
+   why a compiler will happily add Clifford gates if doing so removes even
+   one $T$.
+
+   Two things stop this from being the whole story, and both matter. The
+   first is that "cheap" is not "free": CNOTs still take time, still
+   accumulate error, and on hardware with limited connectivity a logical
+   CNOT between distant qubits costs routing, which is real. The second is
+   that the cost model is a fault-tolerant one. On today's NISQ devices
+   there is no encoding, no distillation, and no magic states, and the
+   dominant error source is the two-qubit gate. There $T$ is a cheap
+   single-qubit rotation and the $6$ CNOTs are what limits the circuit. So
+   the honest answer names its regime: $T$-count is the right objective
+   for the fault-tolerant era, two-qubit-gate count for the present one,
+   and the lesson's warning against confusing "universal in principle"
+   with "cheap in practice" cuts both ways.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -477,7 +675,7 @@ count.
   circuit, verified against the Toffoli truth table on all 8 basis
   states using this platform's own gate-application engine.
 
-## Further Exploration
+## Where the T-gate cost gets paid
 
 <NextDiscovery>
 The T-gate cost this lesson only names (magic-state distillation, and

@@ -55,18 +55,18 @@ export const lessonMeta = {
   prerequisites: ["quantum-mechanics/classical-to-quantum/expectation-values-and-uncertainty"],
   objectives: [
     "Derive that the generator of unitary time evolution must be Hermitian",
-    "State the time-dependent Schrödinger equation and derive it from U(t)=e^{-iHt/ℏ}",
+    "State the time-dependent Schrödinger equation and derive it from the evolution operator U(t) = e^(-iHt/ℏ)",
     "Compute a concrete two-level time evolution using the existing quantum engine",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Nobody has to postulate it">
   Demand only that evolution keep states normalized, then ask what the
   smallest possible time step is allowed to look like. The Schrödinger
   equation is what falls out; nobody has to postulate it.
 </LessonHook>
 
-## Motivation
+## The gap Postulate 4 appears to leave
 
 Postulate 4 said evolution is unitary, without saying which unitary
 operator, or how it depends on time. That looks like a gap in the theory,
@@ -88,18 +88,18 @@ $\frac{d}{dt}e^{\lambda t} = \lambda e^{\lambda t}$. Nothing beyond
 those three, and all three sit in the first half of any introductory
 calculus text. If they are new, the *results* of this lesson still stand
 on their own and every later lesson uses only those results, but the
-derivations below will read as assertions rather than arguments, which
+derivations below will read as assertions instead of arguments, which
 is worth knowing before you decide they are.
 </Callout>
 
-## Intuition
+## A tiny nudge, and what unitarity allows
 
 Think of evolving a state for a very short time $dt$ as a tiny nudge,
 $U(dt) \approx I + (\text{something}) \cdot dt$. Unitarity constrains what
 that "something" is allowed to be, and the constraint pushes it into the
 same Hermitian-operator mold every <Term id="observable">observable</Term> already lives in. That
 coincidence is what eventually lets the generator be identified with
-energy rather than being some unrelated bookkeeping object.
+energy, with no unrelated bookkeeping object standing in for it.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/2/2e/Erwin_Schr%C3%B6dinger_%281933%29.jpg"
@@ -110,7 +110,7 @@ energy rather than being some unrelated bookkeeping object.
   license="Public domain"
 />
 
-## Mathematical Development
+## From a Hermitian generator to the equation
 
 ### The generator must be Hermitian
 
@@ -211,7 +211,7 @@ velocity $\omega$ about the axis $\hat n$. Anyone who has clicked the
 Bloch Sphere Explorer's rotation gates has been computing this evolution
 operator already, one discrete step at a time.
 
-## Physical Interpretation
+## Eigenstates hold still; superpositions precess
 
 A state that starts as an <Term id="eigenvalue-eigenvector">eigenstate</Term> of $H$ stays an eigenstate of $H$
 for all time (the next lesson, Stationary States, proves this directly
@@ -219,10 +219,10 @@ from the formula for $U(t)$ above). A state that starts as a
 superposition of two different-energy eigenstates instead **precesses**:
 its measurement probabilities for other observables oscillate at a
 frequency set by the energy *difference* between those eigenstates. The
-difference is what matters, not the individual energies, which is the
+difference is what matters here, with the individual energies dropping out, which is the
 same observation that made the overall phase unobservable in Postulate 1.
 
-## Worked Example
+## Starting from the plus state and watching it return
 
 **$H = \frac{\hbar\omega}{2}Z$ (so $\hat n = \hat z$). The system starts
 in $|\psi(0)\rangle=|+\rangle$. Find $|\psi(t)\rangle$ and its
@@ -288,7 +288,7 @@ buttons compute, one discrete step at a time:
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
-## Common Mistakes
+## The equation and unitarity are one statement
 
 <Callout type="note">
 **Treating the Schrödinger equation as something separate from
@@ -299,7 +299,7 @@ Hermitian: the two are the same statement in different forms.
 
 <Callout type="warning">
 **Confusing $H$ (an operator) with $E$ (a number).** $H$'s *eigenvalues*
-are energies; $H$ itself acts on the whole Hilbert space, not just on
+are energies; $H$ itself acts on the whole Hilbert space, well beyond
 one eigenstate.
 </Callout>
 
@@ -309,11 +309,145 @@ one eigenstate.
    (an eigenstate of $H$), use the rotation formula to find
    $|\psi(t)\rangle$. (Compare your answer to the next lesson's claim
    about eigenstates of $H$.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $|\psi(t)\rangle = e^{-i\omega t/2}|0\rangle$.
+
+   The rotation formula for $\hat n=\hat z$ is the one the worked example
+   used:
+
+   $$
+   U(t) = \cos\!\left(\frac{\omega t}{2}\right)I - i\sin\!\left(\frac{\omega t}{2}\right)Z
+   $$
+
+   Apply it to $|0\rangle$ and use $Z|0\rangle=|0\rangle$, so both terms
+   return $|0\rangle$ and only their coefficients survive:
+
+   $$
+   |\psi(t)\rangle = \left(\cos\frac{\omega t}{2} - i\sin\frac{\omega t}{2}\right)|0\rangle = e^{-i\omega t/2}|0\rangle
+   $$
+
+   the last step by Euler's formula read backwards.
+
+   Sanity-check it against the general eigenstate result the next lesson
+   proves, $|\psi(t)\rangle = e^{-iE_nt/\hbar}|n\rangle$. Here
+   $H|0\rangle = \tfrac{\hbar\omega}{2}|0\rangle$, so
+   $E_0 = \tfrac{\hbar\omega}{2}$ and the predicted phase is
+   $e^{-i(\hbar\omega/2)t/\hbar} = e^{-i\omega t/2}$. The two routes agree,
+   which they must, since the rotation formula is just $e^{-iHt/\hbar}$
+   written out for a two-level system.
+
+   What matters is what did *not* happen. The vector never acquired a
+   $|1\rangle$ component, so no amount of waiting turns $|0\rangle$ into
+   anything else under this Hamiltonian. And the factor it did acquire has
+   magnitude $|e^{-i\omega t/2}|=1$, a global phase, which Postulate 1
+   declares physically invisible. Every measurement probability is
+   therefore frozen, which is exactly the stationarity claim.
+
+   The slip to watch for is dropping the factor of $\tfrac12$ and writing
+   $e^{-i\omega t}$. The half comes from $H$ carrying
+   $\tfrac{\hbar\omega}{2}$ rather than $\hbar\omega$, and it is the same
+   half that makes the Bloch vector complete a turn in $\omega t = 2\pi$
+   rather than $\pi$. It matters the moment you compare two levels: the
+   worked example's $|+\rangle$ picks up $e^{-i\omega t/2}$ on one
+   component and $e^{+i\omega t/2}$ on the other, and the observable
+   oscillation runs at the *difference*, $\omega$, not at $\omega/2$.
+
+   </details>
+
 2. Using the worked example's result, at what time $t$ (in terms of
    $\omega$) is the system guaranteed to be found in $|-\rangle$ instead
    of $|+\rangle$ with certainty?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   At $t = \pi/\omega$, and again at every odd multiple of it:
+   $t = (2k+1)\pi/\omega$ for $k=0,1,2,\ldots$
+
+   The worked example gave $P(+) = \cos^2(\omega t/2)$. Since the two
+   outcomes exhaust the basis, $P(-) = 1 - \cos^2(\omega t/2) =
+   \sin^2(\omega t/2)$. Certainty in $|-\rangle$ means $P(-)=1$, so
+
+   $$
+   \sin^2\!\left(\frac{\omega t}{2}\right) = 1 \quad\Longrightarrow\quad \frac{\omega t}{2} = \frac{\pi}{2} + k\pi \quad\Longrightarrow\quad \omega t = \pi + 2k\pi
+   $$
+
+   The first such moment is $\omega t = \pi$, that is $t = \pi/\omega$.
+   Read it off the plot above: the brand curve touches zero and the accent
+   curve touches one at exactly $\omega t = \pi$ and again at $3\pi$.
+
+   Two features of this answer are the physics.
+
+   The state started certain to be found in $|+\rangle$ and became certain
+   to be found in $|-\rangle$, two orthogonal states, with no measurement
+   performed at any point in between. Nothing collapsed. This is
+   deterministic evolution of the vector, and the probabilities moved
+   because the vector moved.
+
+   And the answer scales as $1/\omega$, not as $\omega$. A larger energy
+   splitting drives the state around faster, so certainty arrives sooner.
+   The commonest error is to solve $\cos^2(\omega t/2)=0$ and stop at
+   $\omega t/2 = \pi/2$ without dividing, reporting $t=\pi/(2\omega)$;
+   that is the halfway point, a quarter turn around the equator from
+   $|+\rangle$, where $P(+)=P(-)=\tfrac12$ and the outcome is as
+   undetermined as it ever gets.
+
+   </details>
+
 3. Explain, using the derivation of $U(dt)$, why a non-Hermitian generator
    would fail to produce a norm-preserving evolution.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the first-order term in $U^\dagger(dt)U(dt)$ is proportional to
+   $H^\dagger - H$, so the moment $H$ is not Hermitian that term is
+   nonzero and the norm starts drifting immediately, at first order in the
+   time step.
+
+   The derivation wrote $U(dt) = I - \tfrac{i}{\hbar}H\,dt + O(dt^2)$ and
+   multiplied out:
+
+   $$
+   U^\dagger U = \left(I+\tfrac{i}{\hbar}H^\dagger dt\right)\left(I-\tfrac{i}{\hbar}H\,dt\right) = I + \tfrac{i}{\hbar}\left(H^\dagger - H\right)dt + O(dt^2)
+   $$
+
+   Requiring $U^\dagger U = I$ leaves $H^\dagger = H$ with nothing else to
+   trade against, because the $O(dt^2)$ remainder cannot cancel a term of
+   order $dt$ as $dt\to0$. So Hermiticity is not one way to preserve the
+   norm; it is the only way.
+
+   Make it concrete. Take $H = \tfrac{\hbar\omega}{2}Z -
+   \tfrac{i\hbar\Gamma}{2}I$ with real $\Gamma>0$, a Hamiltonian widely
+   used in optics precisely because it is not Hermitian. Then $H^\dagger -
+   H = i\hbar\Gamma I$, and
+
+   $$
+   U^\dagger(dt)U(dt) = I - \Gamma\,dt\,I + O(dt^2)
+   $$
+
+   Every state's squared norm shrinks by a factor $1-\Gamma\,dt$ per step,
+   and chaining the steps gives $\| |\psi(t)\rangle \|^2 = e^{-\Gamma
+   t}$. Total probability leaks away exponentially.
+
+   That example is also the reason non-Hermitian generators are not
+   nonsense, and knowing why sharpens the point. They are a deliberately
+   incomplete bookkeeping device: the missing probability has gone
+   somewhere real, usually into a decay channel that the model has
+   declined to represent. The full system including that channel evolves
+   unitarily under a Hermitian Hamiltonian. So a non-Hermitian $H$
+   signals "this is a subsystem, and I am not tracking where the
+   amplitude went," rather than "Postulate 4 is optional."
+
+   The wrong turn is to suppose the problem could be patched by dividing
+   by the norm after each step. That restores the number and destroys the
+   linearity, since the divisor depends on the state; superposition then
+   fails, and with it every interference result in this course.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -327,7 +461,7 @@ one eigenstate.
   $\theta=\omega t$: evolution under a qubit Hamiltonian is Bloch-sphere
   precession, so no new mathematics is needed to compute it.
 
-## Further Exploration
+## The same rotation formula, with X instead of Z
 
 <ChallengePrompt prompt="For H = (ħω/2)X instead of Z (so n̂ = x̂), with the system starting in |0⟩, use the rotation formula to find |ψ(t)⟩.">
   Same rotation formula as the worked example, now with $X$ in place of

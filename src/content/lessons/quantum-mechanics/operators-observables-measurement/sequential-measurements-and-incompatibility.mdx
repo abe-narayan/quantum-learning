@@ -36,11 +36,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Certainty, then a factor of two">
 Does the order you measure things in change what you find? For ordinary compatible quantities, no. For Z and X on a qubit, yes, and by a specific, checkable amount: a factor of two.
 </LessonHook>
 
-## Motivation
+## Abstract since the first course, concrete here
 
 "Incompatible observables disturb each
 other" has been stated abstractly (uncertainty relations, non-commuting
@@ -57,19 +57,42 @@ numbers at every step.
   license="CC BY-SA 4.0"
 />
 
-## Intuition
+## What a shared eigenbasis would have bought
 
 If $Z$ and $X$ shared an eigenbasis, measuring one right after the other
 would never change anything. You'd already be sitting in an <Term id="eigenvalue-eigenvector">eigenstate</Term>
 of both. Since $[X,Z]\ne0$ (proven earlier this course), no such shared
 eigenstate exists, and this lesson traces what breaks, step by step.
 
-## Mathematical Development
+## Three measurements, tracked step by step
 
 ### Step 1: measure $Z$ on $|0\rangle$
 
 Start in $|0\rangle$, already a $Z$-eigenstate. $P(Z{=}0)=1$, with
 certainty. No surprise, and the state doesn't change.
+
+One notational point, since this lesson runs two conventions side by side
+and never mixes them. A $Z$ outcome is written as the *bit* a readout would
+report, $Z{=}0$ for the eigenvalue $+1$ and $Z{=}1$ for the eigenvalue
+$-1$; an $X$ outcome is written as its *eigenvalue*, $X{=}{+}1$ or
+$X{=}{-}1$. Both are standard, and $Z$ and $X$ have the identical spectrum
+$\{+1,-1\}$ despite the different labels.
+
+That certainty is the thing the rest of the lesson puts at risk, so it is
+worth guessing its fate now, before any of the arithmetic is in front of
+you.
+
+<PredictBeforeReveal
+  question="Start at |0⟩ (Z=0 with certainty). Measure X, then measure Z a third time. Is that final Z measurement still 100% certain to give Z=0?"
+  options={[
+    { label: "Yes, still 100% certain", value: "certain" },
+    { label: "It depends which X outcome occurred", value: "depends" },
+    { label: "No, it flips to 100% certain Z=1", value: "certain-flip" },
+    { label: "No, it's now a 50/50 coin flip", value: "fifty-fifty" },
+  ]}
+  correctValue="fifty-fifty"
+  explanation="Whichever X outcome occurs, the qubit collapses to an X-eigenstate, and an X-eigenstate is an equal superposition in the Z-basis. So the third Z measurement comes back exactly 50/50, as Steps 2 and 3 below work out. Which X outcome occurred changes nothing: |+⟩ and |−⟩ give the identical split, and the Worked Example checks the second one explicitly."
+/>
 
 ### Step 2: measure $X$
 
@@ -163,23 +186,11 @@ Both paths through the $X$ branch land on the same $50/50$ split at the
 final $Z$ measurement, which is the "it doesn't matter which $X$ outcome
 occurred" fact proven below.
 
-<PredictBeforeReveal
-  question="Start at |0⟩ (Z=0 with certainty). Measure X, then measure Z a third time. Is that final Z measurement still 100% certain to give Z=0?"
-  options={[
-    { label: "Yes, still 100% certain", value: "certain" },
-    { label: "No, it's now a 50/50 coin flip", value: "fifty-fifty" },
-    { label: "No, it flips to 100% certain Z=1", value: "certain-flip" },
-    { label: "It depends which X outcome occurred", value: "depends" },
-  ]}
-  correctValue="fifty-fifty"
-  explanation="Whichever X-outcome occurs, the qubit collapses to an X-eigenstate, which is an equal superposition in the Z-basis, so the third Z measurement comes back exactly 50/50, as derived above. Which X outcome occurred makes no difference: |+⟩ and |−⟩ give the identical 50/50 split. Try it below: start at |0⟩, apply H, and measure repeatedly."
-/>
-
 <InteractiveSection title="Run the sequence yourself" description="Start at |0⟩, apply H (the X-basis change), and measure a few times. Watch the Z-outcome go from 100% predictable to a coin flip, computed on the real state rather than replayed from a script: the three-step sequence worked out above.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
-## Physical Interpretation
+## What incompatible means operationally
 
 This is what "incompatible" means operationally, not just algebraically:
 measuring $X$ forces the state into an $X$-eigenstate, and an
@@ -188,7 +199,7 @@ $X$-eigenstate is (by the last course's basis-change formulas) an
 a normalized state can get. The disturbance is not a technological
 limitation or measurement noise. It is what the state has become.
 
-## Worked Example
+## Redoing step three after the other outcome
 
 **Suppose instead the Step 2 outcome had been $X{=}{-}1$. Redo Step 3.**
 
@@ -202,7 +213,7 @@ Exactly the same $50/50$ result. The *specific* $X$ outcome doesn't
 matter for how thoroughly it scrambles $Z$; either $X$-eigenstate is
 equally far (in this precise sense) from either $Z$-eigenstate.
 
-## Common Mistakes
+## No gentler measurement is available
 
 <Callout type="warning">
 **Thinking the disturbance is somehow avoidable with a "gentler"
@@ -224,12 +235,139 @@ probabilities come from $|+\rangle$, not from $|0\rangle$ directly.
 1. Redo this entire sequence starting from $|1\rangle$ instead of
    $|0\rangle$ and confirm you still get $50/50$ for the final $Z$
    measurement.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Same result: $P(Z{=}1)=P(Z{=}0)=\tfrac12$ at the third measurement.
+
+   **Step 1.** $|1\rangle$ is a $Z$-eigenstate, so the first $Z$
+   measurement returns $Z{=}1$ with certainty and leaves the state alone.
+
+   **Step 2.** Rewrite in the $X$-basis. From
+   $|\pm\rangle=(|0\rangle\pm|1\rangle)/\sqrt2$ it follows that
+   $|1\rangle=(|+\rangle-|-\rangle)/\sqrt2$, so
+
+   $$
+   P(X{=}{+}1) = |\langle+|1\rangle|^2 = \left|\frac{1}{\sqrt2}\right|^2 = \frac12, \qquad P(X{=}{-}1) = \left|\frac{-1}{\sqrt2}\right|^2 = \frac12
+   $$
+
+   The minus sign in the second amplitude disappears under the squared
+   magnitude, which is the first thing worth checking: it is a relative
+   phase, and it changes nothing about these probabilities.
+
+   **Step 3.** Say the outcome was $+1$, so the state is $|+\rangle$. Then
+   $P(Z{=}0)=|\langle0|+\rangle|^2=\tfrac12$ and $P(Z{=}1)=\tfrac12$. Had
+   the outcome been $-1$, the state would be $|-\rangle$ and the same two
+   numbers come out. The certainty from step 1 is gone either way.
+
+   Why the starting state made no difference is worth saying rather than
+   just observing. Every $Z$-eigenstate has equal-magnitude components in
+   the $X$-basis, and every $X$-eigenstate has equal-magnitude components
+   in the $Z$-basis. That mutual property has a name, *mutually unbiased
+   bases*, and it is what makes the $50/50$ appear here regardless of
+   which $Z$-eigenstate you start from and regardless of which $X$
+   outcome occurs. On the Bloch sphere it is the statement that the $z$
+   and $x$ axes are perpendicular, so a state at either $z$ pole projects
+   equally onto both $x$ poles.
+
+   The slip to avoid is carrying a sign into a probability. Writing
+   $P(X{=}{-}1)=-\tfrac12$ from the $-1/\sqrt2$ amplitude produces a
+   negative probability and a total of zero, which the check
+   $P(+1)+P(-1)=1$ catches immediately. Amplitudes carry signs and phases;
+   probabilities never do.
+
+   </details>
+
 2. If Steps 1 and 3 measured the *same* compatible pair (say, $Z$ then
    $Z$ again, with no $X$ in between), what would Step 3's probabilities
    be, and why?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $P(Z{=}0)=1$ and $P(Z{=}1)=0$: the second reading reproduces the first
+   with certainty.
+
+   The reason is the collapse clause plus idempotence. The first
+   measurement leaves the state in the eigenspace belonging to the outcome
+   it reported, so here the state is $|0\rangle$. Applying the same
+   projector again returns it unchanged, $P_0|0\rangle=|0\rangle$, giving
+   probability $\||0\rangle\|^2=1$, and the orthogonal projector
+   annihilates it, giving exactly zero for the other outcome. Nothing about
+   this depends on how much time is allowed to pass, provided the state is
+   not evolving in between.
+
+   The contrast with the three-step sequence is the whole lesson in one
+   comparison. $Z$, then $Z$: certainty preserved. $Z$, then $X$, then
+   $Z$: certainty destroyed, down to a coin flip. The only difference is
+   the intervening measurement, and it is incompatible with $Z$. Repeated
+   measurement is not gentle *in general*; it is gentle when nothing
+   incompatible happens in between.
+
+   Two clarifications keep the claim honest.
+
+   The question says "the same compatible pair," and the strongest version
+   of the result covers a genuinely different second observable too. If
+   $[Z,B]=0$, then measuring $Z$, then $B$, then $Z$ again also reproduces
+   the first $Z$ outcome with certainty, because collapsing onto an
+   eigenspace of $B$ within the shared eigenbasis leaves the state an
+   eigenstate of $Z$. Compatibility, not sameness, is what the guarantee
+   rests on.
+
+   And "with no $X$ in between" is doing real work beyond ruling out a
+   measurement. If the system evolves under a Hamiltonian that does not
+   commute with $Z$, the state drifts out of the $Z$-eigenstate on its own
+   and the second reading is no longer certain, with no measurement
+   performed at all. The certainty here belongs to the state staying put,
+   which the lesson's setup supplies by measuring immediately.
+
+   </details>
+
 3. Using $[X,Z]=-2iY\ne0$ from earlier in this course, explain in one
    sentence why you should have *expected* Step 3 to be non-trivial,
    before doing any calculation.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $[X,Z]\ne0$ means, by the theorem two lessons back, that $X$
+   and $Z$ share no eigenbasis, so the $X$-eigenstate the second
+   measurement forces the qubit into cannot also be a $Z$-eigenstate, and
+   the third measurement therefore has something genuinely undetermined
+   left to decide.
+
+   The logic runs in three linked steps, each already proven.
+   Non-commuting implies no shared eigenbasis (the if-and-only-if theorem).
+   No shared eigenbasis means every $X$-eigenstate is a nontrivial
+   superposition in the $Z$-basis, hence has $\Delta Z>0$. And the
+   measurement postulate says step 2 leaves the state in an $X$-eigenstate.
+   Chaining them predicts a non-certain third reading without computing a
+   single inner product.
+
+   What the commutator does *not* predict is the number. It says the
+   answer is not $1$; it does not say it is $\tfrac12$. That comes from
+   $X$ and $Z$ being maximally incompatible in the specific sense of
+   question 1, and a different pair of non-commuting observables would
+   scramble the first outcome less thoroughly. So the commutator is a
+   qualitative gate and the explicit calculation supplies the magnitude,
+   which is the same division of labour as in the uncertainty relation:
+   $[A,B]\ne0$ says a trade-off can exist, and the state decides how
+   severe it is.
+
+   The wrong version of this reasoning reaches for the uncertainty
+   relation $\Delta X\,\Delta Z\ge\tfrac12|\langle[X,Z]\rangle|$ instead.
+   That bound is a statement about two spreads in *one* state, each
+   measurable on its own fresh batch of copies, and it is not a claim
+   about measurements performed in sequence. Worse, it goes vacuous
+   exactly where it is being invoked: in $|0\rangle$,
+   $\langle[X,Z]\rangle=-2i\langle Y\rangle=0$, so the bound reads
+   $0\ge0$ and forbids nothing at all, while the disturbance is total.
+   What is doing the work is the commutator's being nonzero as an
+   *operator*, which is a state-independent fact about $X$ and $Z$ and is
+   exactly what the shared-eigenbasis theorem consumes.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -248,7 +386,7 @@ probabilities come from $|+\rangle$, not from $|0\rangle$ directly.
 - This is the concrete face of the abstract $[X,Z]\ne0$ result proven
   earlier in this course.
 
-## Further Exploration
+## An uncertainty bound with no commutator behind it
 
 <NextDiscovery>
 [The Energy-Time Uncertainty Relation](/lessons/quantum-mechanics/operators-observables-measurement/the-energy-time-uncertainty-relation) derives a different kind

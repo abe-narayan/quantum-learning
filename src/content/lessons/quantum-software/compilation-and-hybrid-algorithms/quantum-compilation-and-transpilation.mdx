@@ -25,10 +25,10 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Not every gate can just run">
-<Term id="cnot-controlled-gates">CNOT(0, 3)</Term> is a single, free-floating logical operation — but on a linear-chain device where a qubit can only talk to its immediate neighbors, qubits 0 and 3 aren't even adjacent.
+<Term id="cnot-controlled-gates">CNOT(0, 3)</Term> is a single, free-floating logical operation, but on a linear-chain device where a qubit can only talk to its immediate neighbors, qubits 0 and 3 aren't even adjacent.
 </LessonHook>
 
-## Motivation
+## The Circuit You Wrote Is Not the Circuit That Runs
 
 Every circuit this platform's `QuantumCircuit` has built (Programming
 Quantum Computers) freely calls `cnot(control, target)` between any two
@@ -40,7 +40,7 @@ circuit into one a specific device's connectivity can actually execute.
 
 Transpilation is a stack, not a single rewrite. Each stage below narrows
 what the circuit is allowed to be, and the one this lesson concentrates
-on — routing, where the SWAP networks come from — is highlighted:
+on (routing, where the SWAP networks come from) is highlighted:
 
 <PipelineDiagram
   ariaLabel="The transpilation stack: a logical circuit passes through gate-set translation, qubit layout, routing with SWAP insertion, optimization, and pulse scheduling before it reaches the device"
@@ -57,7 +57,7 @@ on — routing, where the SWAP networks come from — is highlighted:
 Only the "Route" box is forced on the circuit by the chip's wiring. The
 others would exist even on a hypothetical fully-connected device.
 
-## Engineering Development
+## Connectivity, SWAP Networks, and Overhead
 
 ### The connectivity problem
 
@@ -70,8 +70,8 @@ device. Qubits 0 and 3 aren't adjacent.
 
 The standard fix: physically move (via <Term id="qubit-routing-swap-overhead">SWAP gates</Term>) the control qubit's
 data stepwise until it sits next to the target, apply the real CNOT,
-then swap back to restore the original qubit ordering. This is exactly
-what this platform's `cnotOnLinearChain` implements, using nothing
+then swap back to restore the original qubit ordering. This is what
+this platform's `cnotOnLinearChain` implements, using nothing
 beyond `applySwap` and `applyCNOT` (both already built and tested in
 Quantum Gates & Circuits). This platform's test suite confirms
 directly: running `cnotOnLinearChain` for control=0, target=3 on a test
@@ -100,20 +100,21 @@ several more real gates that can fail.
     { label: "10", value: "10" },
   ]}
   correctValue="8"
-  explanation="2(d-1) = 2(5-1) = 8. The bar chart below plots exactly this formula for d=1 through 5, and the Worked Example further down walks through the actual gate-by-gate SWAP sequence for this same d=5 case."
+  explanation="2(d-1) = 2(5-1) = 8. The bar chart below plots this formula for d=1 through 5, and the Worked Example further down walks through the gate-by-gate SWAP sequence for this same d=5 case."
 />
 
 <BarChart
   ariaLabel="SWAP gate overhead versus control-target distance on a linear chain, for distances 1 through 5"
   bars={[1, 2, 3, 4, 5].map((d) => ({ label: `d=${d}`, value: swapOverheadForLinearChain(0, d), highlight: d === 5 }))}
+  maxValue={8}
 />
 
-Distance 1 (already-adjacent qubits) needs zero SWAPs, exactly what the
-formula predicts; the highlighted bar at $d=5$ is the Worked Example
+Distance 1 (already-adjacent qubits) needs zero SWAPs, as the formula
+predicts; the highlighted bar at $d=5$ is the Worked Example
 below.
 
-Rather than reading a single fixed diagram, step through every distance
-from 1 to 5 below and watch the SWAP-walk grow (and the highlighted CNOT
+Step through every distance from 1 to 5 below and watch the SWAP-walk
+grow (and the highlighted CNOT
 column shift right) exactly as $2(d-1)$ predicts:
 
 <InteractiveSection title="Step through the SWAP-network by distance" description="Slide across d=1 through d=5, control fixed at qubit 0. At d=1 the qubits are already adjacent, so it's a bare CNOT with zero SWAPs. Each increase in d adds one more SWAP each way, exactly the 2(d-1) overhead the bar chart above already counted.">
@@ -189,7 +190,7 @@ column shift right) exactly as $2(d-1)$ predicts:
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## Not a Cosmetic Renaming Step
 
 Transpilation is not a cosmetic renaming step. It can substantially
 change a circuit's real cost. A logical circuit that looks compact in
@@ -204,10 +205,10 @@ as a tunable choice: optimization levels 0 through 3 trade transpilation
 time against how hard it tries to minimize the resulting SWAP overhead,
 and every real IBM device publishes its exact coupling map (which
 physical qubit pairs actually support a two-qubit gate) for the
-transpiler to route against, exactly the connectivity constraint this
+transpiler to route against, the connectivity constraint this
 lesson's own SWAP-counting worked example computes by hand.
 
-## Worked Example
+## SWAP Cost on a Linear Chain
 
 **How many SWAP gates does bridging control=0, target=5 need on a
 6-qubit linear chain?**
@@ -217,8 +218,8 @@ $$
 $$
 
 8 extra SWAPs (24 extra CNOTs, since each SWAP is 3 CNOTs) just to
-execute what was logically a single two-qubit gate. This concretely
-shows why algorithms designed with connectivity in mind (grouping
+execute what was logically a single two-qubit gate. That is why
+algorithms designed with connectivity in mind (grouping
 interacting qubits close together) can run substantially more
 efficiently than ones that ignore it.
 
@@ -248,7 +249,7 @@ The highlighted column is the one gate that actually does the requested
 work; every other column is pure overhead the connectivity constraint
 forced onto the circuit.
 
-## Common Mistakes
+## Assuming the Gate Count You Wrote Is the Gate Count You Get
 
 <Callout type="warning">
 **Assuming a logical circuit's gate count is what actually runs on
@@ -268,13 +269,202 @@ the logical outcome.
 ## Practice Questions
 
 1. Compute the SWAP overhead for control=1, target=4 on a linear chain.
+   Then say what the Layout stage of the transpilation pipeline could
+   have done about it.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   d = |4-1| = 3, \qquad \text{overhead} = 2(d-1) = 2\times2 = 4 \text{ SWAP gates}.
+   $$
+
+   `swapOverheadForLinearChain(1, 4)` returns 4. The sequence is: swap
+   qubits 1 and 2, swap 2 and 3, fire the real CNOT between physical
+   positions 3 and 4, then swap 2 and 3 back and swap 1 and 2 back.
+
+   Only the distance matters, not where on the chain the pair sits.
+   Control 0 with target 3 is the same $d=3$ and gives the same 4 SWAPs,
+   which is what makes this a function of one number rather than two.
+
+   **What Layout could have done: made the cost zero.** Look at the
+   pipeline again. Routing is the stage that inserts SWAPs, and it runs
+   *after* Layout, which decides which physical qubit each logical qubit
+   is assigned to. Nothing forces logical qubit 1 onto physical qubit 1.
+   If this circuit's only two-qubit gate is between logical qubits 1 and
+   4, a layout mapping them to adjacent physical qubits leaves the
+   router with nothing to do, and the four SWAPs never exist.
+
+   That is why the two stages are separate boxes, and why Layout comes
+   first. Routing cost is not a property of the circuit alone; it is a
+   property of the circuit *plus a chosen assignment*, and choosing well
+   is free at compile time while every SWAP is paid at run time on every
+   shot.
+
+   Real circuits are of course harder than this. With many two-qubit
+   gates among many pairs, no layout makes them all adjacent, and finding
+   the assignment that minimizes total routing is an optimization problem
+   in its own right. That is exactly what Qiskit's transpiler
+   optimization levels 0 through 3 are trading: how long the compiler
+   spends searching for a good layout and routing against how many SWAPs
+   survive into the executed circuit.
+
+   The wrong turn is reading the $2(d-1)$ formula as a fixed tax
+   determined by the circuit. It is the cost of routing *a given layout*,
+   and the layout is a variable the compiler controls.
+
+   </details>
+
 2. Why does the overhead formula use $d-1$ (not $d$) SWAPs each way?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the goal is to make the two qubits **adjacent**, not to move
+   one onto the other.
+
+   Walk it. The control's data starts at position $c$ and each SWAP moves
+   it one step toward the target at position $t$. After $k$ swaps it sits
+   at position $c+k$, and it is adjacent to $t$ as soon as the gap is one
+   step, which happens at $k=d-1$. At that point the real CNOT fires
+   between positions $t-1$ and $t$, and the $d-1$ swaps are undone to
+   restore the original ordering. Total $2(d-1)$.
+
+   Two checks that pin the off-by-one.
+
+   At $d=1$ the qubits are already adjacent, and the formula gives
+   $2(1-1)=0$. Correct, and a formula using $d$ would demand two SWAPs to
+   bring together a pair that is already together.
+
+   At $d=3$, the lesson's own gate sequence is SWAP(0,1), SWAP(1,2),
+   CNOT(2,3), SWAP(1,2), SWAP(0,1). Count the SWAPs on one side: two,
+   which is $d-1$, not three.
+
+   Taking the $d$-th step would swap the control's data *into* the
+   target's position, which is not merely wasteful but wrong: the two
+   pieces of data would have exchanged places, and the CNOT would then
+   need to fire between the target and whatever now sits beside it. The
+   arrangement you spent the swaps building would have been walked past.
+
+   **One thing the formula assumes that is worth surfacing**, because
+   real routers do not assume it. The factor of 2 is the return journey,
+   restoring the original qubit ordering. That is a choice, and this
+   platform's `cnotOnLinearChain` makes it because it is a self-contained
+   primitive: it must leave the register as it found it so that the
+   result is comparable, amplitude for amplitude, with an idealized
+   `applyCNOT(state, 0, 3)`.
+
+   A real transpiler does not have to. It can leave the qubits permuted
+   and simply *track* the permutation, relabelling for the rest of the
+   circuit, and often the next gate is happier with the new arrangement
+   anyway. Then the cost is $d-1$ rather than $2(d-1)$, amortized across
+   the circuit rather than paid per gate. So $2(d-1)$ is the honest cost
+   of one isolated CNOT, and an upper bound on the marginal cost inside a
+   longer circuit.
+
+   </details>
+
 3. Each SWAP decomposes into 3 CNOTs. For the worked example's 8-SWAP
    case, how many total CNOT-equivalent operations does the fully
    transpiled circuit contain (including the original logical CNOT)?
+   Then, at a representative 99.5% per two-qubit gate, say what that
+   count does to the circuit's success probability.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   8\times3 + 1 = 25 \text{ CNOT-equivalent operations.}
+   $$
+
+   Twenty-four from the SWAP network, plus the one CNOT that was actually
+   asked for. One logical two-qubit gate became twenty-five physical
+   ones.
+
+   **What that costs, since a gate count is only half the story.**
+   Two-qubit gates are the least reliable operation on essentially every
+   platform, and routing overhead lands entirely on them. At a
+   representative 99.5% per two-qubit gate:
+
+   $$
+   0.995^{1} = 0.995, \qquad 0.995^{25} \approx 0.882 .
+   $$
+
+   The error went from half a percent to nearly twelve, from a request
+   that looked like a single gate in the source. At a better 99.9% per
+   gate the same circuit gives $0.999^{25}\approx0.975$, so the overhead
+   costs 2.5% instead of 0.5%: still a fivefold increase in error from a
+   compilation step that changes nothing about what the circuit computes.
+
+   That last clause matters and is worth stating plainly, because the
+   arithmetic can leave the impression that something went wrong. It did
+   not. The SWAP network is *exact*: this platform's test suite confirms
+   `cnotOnLinearChain` reproduces an idealized connectivity-ignoring
+   `applyCNOT` to within $10^{-9}$ in every amplitude. Transpilation
+   changes the physical execution cost and leaves the logical result
+   alone. The 25 is what correctness costs on a chip whose wiring does
+   not match the request.
+
+   The wrong turn is forgetting the $+1$, or including the SWAPs twice by
+   counting both the 8 SWAPs and their 24 CNOTs as separate operations.
+   The 24 *is* the 8, expressed in the units the hardware actually
+   executes.
+
+   </details>
+
 4. Explain why an algorithm designer who knows the target hardware's
    connectivity in advance might deliberately order which qubits
    interact, rather than treating all qubit pairs as equally cheap.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because they are not equally cheap, and the spread is enormous. On a
+   linear chain, a two-qubit gate between neighbours costs 1 CNOT and the
+   same gate at distance 5 costs 25. Writing a circuit as though every
+   pair were adjacent is writing a circuit whose real cost you have not
+   computed.
+
+   **What the difference buys.** Twenty-five two-qubit gates instead of
+   one is twenty-five times the error contribution, 0.882 against 0.995
+   at a 99.5% per-gate fidelity. It is also twenty-five times the
+   duration of that operation, and duration is exposure to $T_1$ and
+   $T_2$, so the same choice is paid twice: once in gate error and once
+   in decoherence. And it lands on the worst-performing operation the
+   device has, since SWAPs are two-qubit gates and two-qubit gates are
+   where the error budget already goes.
+
+   **What "deliberately ordering" looks like in practice.** Choose an
+   ansatz whose entangling gates connect qubits the device already
+   couples, which is what a hardware-efficient ansatz is. Group the terms
+   of a Hamiltonian so that the ones measured together act on nearby
+   qubits. Order a sequence of interactions so that a pair the router has
+   just brought together is used again before it is separated, taking
+   advantage of the fact that a router can leave qubits permuted rather
+   than swapping back.
+
+   Two qualifications keep this from being a rule to apply blindly.
+
+   **Hardware-efficient is not free.** Restricting an ansatz to the
+   device's native coupling graph trades expressivity for routing cost.
+   Such ansätze are also more prone to the barren-plateau problem, so the
+   circuit gets cheaper to run and possibly harder to optimize. It is a
+   trade, not a strict improvement.
+
+   **And the whole consideration is platform-specific.** All of this
+   assumes limited connectivity. On a trapped-ion device with all-to-all
+   coupling inside a trap, $d$ is not defined and the routing cost is
+   zero for every pair, which is precisely the architectural advantage
+   the Physical Qubit Platforms capstone identified. An algorithm tuned
+   into a linear chain's geometry gains nothing there, and a designer who
+   hard-codes one machine's topology into an algorithm has written
+   something less portable than the abstract circuit they started with.
+
+   The general lesson is the one the transpilation pipeline is built
+   around: a gate count is not a cost until you say which machine it runs
+   on.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -288,9 +478,9 @@ the logical outcome.
   $2(d-1)$.
 - This overhead compounds directly with Noise, Decoherence & Scaling's
   per-gate error accumulation. Connectivity-aware circuit design is a
-  genuine performance concern, not a minor detail.
+  first-order performance concern, not a minor detail.
 
-## Further Exploration
+## The Other Half of Compilation
 
 <NextDiscovery>
 [Gate Decomposition](/lessons/quantum-software/compilation-and-hybrid-algorithms/gate-decomposition) covers the other major compilation

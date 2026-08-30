@@ -21,7 +21,7 @@ export const MIXTURE_PRESETS: MixturePreset[] = [
     component1: ZERO,
     component2: ONE,
     weight: 1,
-    narration: "Weight 1 on |0⟩ — a pure state, sitting exactly on the sphere's surface.",
+    narration: "Weight 1 on |0⟩: a pure state, sitting exactly on the sphere's surface.",
   },
   {
     id: "pure-plus",
@@ -29,7 +29,7 @@ export const MIXTURE_PRESETS: MixturePreset[] = [
     component1: PLUS,
     component2: MINUS,
     weight: 1,
-    narration: "Weight 1 on |+⟩ — still pure, still on the surface, just at a different point.",
+    narration: "Weight 1 on |+⟩: still pure, still on the surface, just at a different point.",
   },
   {
     id: "mix-0-1",
@@ -37,7 +37,7 @@ export const MIXTURE_PRESETS: MixturePreset[] = [
     component1: ZERO,
     component2: ONE,
     weight: 0.5,
-    narration: "A classical coin flip between |0⟩ and |1⟩ — the point collapses to the exact center: I/2.",
+    narration: "A classical coin flip between |0⟩ and |1⟩. The point collapses to the exact center: I/2.",
   },
   {
     id: "mix-plus-minus",
@@ -46,7 +46,7 @@ export const MIXTURE_PRESETS: MixturePreset[] = [
     component2: MINUS,
     weight: 0.5,
     narration:
-      "A different recipe — mixing |+⟩ and |−⟩ instead — lands on the exact same center point, I/2. Different ensembles, identical physical state.",
+      "A different recipe, mixing |+⟩ and |−⟩ instead, lands on the exact same center point, I/2. Different ensembles, identical physical state.",
   },
   {
     id: "bell-partner",
@@ -55,7 +55,7 @@ export const MIXTURE_PRESETS: MixturePreset[] = [
     component2: ONE,
     weight: 0.5,
     narration:
-      "This is also exactly what tracing out an entangled partner from |Φ+⟩ produces — the reduced state is maximally mixed, even though the full 2-qubit state is perfectly pure.",
+      "This is also exactly what tracing out an entangled partner from |Φ+⟩ produces: the reduced state is maximally mixed, even though the full 2-qubit state is perfectly pure.",
   },
   {
     id: "mostly-0",
@@ -63,6 +63,6 @@ export const MIXTURE_PRESETS: MixturePreset[] = [
     component1: ZERO,
     component2: ONE,
     weight: 0.9,
-    narration: "A lopsided mixture — mostly |0⟩, a little |1⟩ — sits partway between the surface and the center.",
+    narration: "A lopsided mixture, mostly |0⟩ and a little |1⟩, sits partway between the surface and the center.",
   },
 ];

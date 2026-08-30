@@ -26,9 +26,9 @@ export const fineStructureTwoEffects: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Exclusion and electron-electron repulsion require more than one electron — hydrogen has only one, so this isn't relevant to hydrogen's own fine structure.",
-      c: "Fine structure doesn't require an external field or nuclear spin — it arises from the electron's own spin coupling to its orbital motion, an effect present with no external field at all.",
-      d: "These are both already fully accounted for in this course's non-relativistic treatment — they aren't the extra corrections fine structure adds.",
+      b: "Exclusion and electron-electron repulsion require more than one electron. Hydrogen has only one, so neither bears on hydrogen's own fine structure.",
+      c: "Fine structure needs no external field and no nuclear spin. It arises from the electron's own spin coupling to its orbital motion, and is present with no external field at all.",
+      d: "Both of these are already accounted for in this course's non-relativistic treatment, so neither is one of the corrections fine structure adds.",
     },
     defaultIncorrectFeedback: "Fine structure is specifically the combination of spin-orbit coupling and the leading relativistic kinetic-energy correction.",
   },
@@ -43,7 +43,7 @@ export const fineStructureTwoEffects: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Both pieces of fine structure are single-electron effects, present in isolated hydrogen with no external field and no second electron.",
-    whyCorrect: "Matches the lesson's Conceptual Overview.",
+    whyCorrect: "Both corrections come from taking the electron's own relativity seriously: one from the momentum expansion of the relativistic kinetic energy, the other from the field the electron sees in its own rest frame coupling to its spin. Neither needs a second electron or an applied field.",
     whyWrong: [
       { optionId: "b", text: "Needs more than one electron. Hydrogen has one, so neither effect has anything to act on." },
       { optionId: "c", text: "Needs an external field. Fine structure is there with the field switched off; the Zeeman effect is a separate, applied-field splitting." },

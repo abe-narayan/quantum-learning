@@ -26,23 +26,23 @@ export const threeKindsOfAdvantageClaims: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "These are three genuinely different kinds of claims — treating them as identical erases exactly the distinction this course built across two lessons.",
+      b: "These are three different kinds of claim. Treating them as identical erases the distinction the course built across two lessons.",
       c: "This reverses Grover's and Deutsch-Jozsa's actual guarantees, and mischaracterizes QAOA as promise-dependent when it's a heuristic with no proven guarantee at all.",
-      d: "Grover's and Deutsch-Jozsa both carry real, proven mathematical guarantees — only QAOA lacks one.",
+      d: "Grover's and Deutsch-Jozsa both carry proven mathematical guarantees. QAOA is the only one of the three without.",
     },
     defaultIncorrectFeedback: "Recall Quantum Algorithms I's capstone (Grover's, Deutsch-Jozsa) and this course's capstone (QAOA) separately.",
   },
   hints: [
     { text: "Grover's speedup was proven optimal for unstructured search generally." },
     { text: "Deutsch-Jozsa's exponential speedup depends entirely on its specific promise." },
-    { text: "QAOA has no proven performance guarantee — it's evaluated empirically, worked example by worked example." },
+    { text: "QAOA has no proven performance guarantee; it is judged empirically, worked example by worked example." },
   ],
   solution: {
     steps: [{ description: "Grover's = provably optimal; Deutsch-Jozsa = promise-dependent exponential; QAOA = heuristic, no guarantee." }],
     finalAnswer: "Grover's = provably optimal; Deutsch-Jozsa = promise-dependent exponential; QAOA = heuristic, no guarantee.",
   },
   explanation: {
-    correctIdea: "Recognizing these as three genuinely distinct categories, not interchangeable synonyms for 'quantum is faster,' is the central synthesis point across both algorithms courses.",
+    correctIdea: "Recognizing these as three distinct categories, rather than interchangeable synonyms for 'quantum is faster', is the synthesis point across both algorithms courses.",
     whyCorrect: "This matches exactly the distinctions drawn in Quantum Algorithms I's capstone and reinforced in this course's own capstone.",
     whyWrong: [
       { optionId: "b", text: "Collapses three different kinds of claim into one, erasing the distinction this course built across two lessons." },

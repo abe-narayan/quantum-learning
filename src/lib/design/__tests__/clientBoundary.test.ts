@@ -84,13 +84,15 @@ const SERVER_ONLY: Record<string, string> = {
   // (`lib/search/index.ts`, `components/glossary/**`). Keeping it here means a
   // future `"use client"` component that reaches for a definition fails loudly
   // rather than quietly shipping the whole glossary to every visitor.
-  "lib/content/glossary.ts": "all 239 glossary definitions (~38KB gzip); search reads the prebuilt index instead",
+  "lib/content/glossary.ts": "all 272 glossary definitions (~38KB gzip); search reads the prebuilt index instead",
   // The meta-only registry split out of `lib/problems/registry` so server
   // pages can list/count problems without the bodies. Meta-only is *lighter*
   // than the full registry, not light: 547 titles/slugs/tags is still a
   // corpus-sized module, and any client surface that needs a slice of it
-  // should be handed that slice by a server component (the
-  // `problemPillarIndex` pattern) rather than importing the whole thing.
+  // should be handed that slice by a server component — as a prop, the way
+  // `app/layout.tsx` hands `Navbar` its `problemCount` — rather than
+  // importing the whole thing, and rather than mirroring it into a
+  // client-safe table of its own (see ALLOWED_BUDGET_KB for how that ended).
   "lib/problems/metaRegistry.ts": "meta for all 547 problems; shape a slice server-side instead of shipping the index",
   "lib/problems/problemMeta.generated.ts": "the generated all-problem meta array behind metaRegistry",
   // Same reasoning as the problem meta registry: 219 lesson metas (~40KB
@@ -158,8 +160,12 @@ const CLIENT_DATA_BUDGET_KB: Record<string, number> = {
  * is genuinely small and purpose-built, not that the failure was tolerable.
  */
 const ALLOWED: Record<string, string> = {
-  "components/layout/problemPillarIndex.ts":
-    "a purpose-built slug->pillar table (~21KB source, no problem bodies), written specifically so the Navbar need not import the registry",
+  // `components/layout/problemPillarIndex.ts` was the first and largest entry
+  // here and is gone: a 556-row slug->pillar table, exempted on the grounds
+  // that it carried no problem bodies, which was true and beside the point at
+  // 7.24KB gzip on every route. See the note on ALLOWED_BUDGET_KB below for
+  // what the number attached to it was for, and CLIENT_DATA_TOTAL_CEILING_KB
+  // for what replaced the table.
   "lib/content/types.ts": "types plus the DIFFICULTY_LABEL constant; trivial at runtime",
   "lib/problems/types.ts": "types only",
   "lib/content/progress": "client-side progress storage; belongs on the client by design",
@@ -170,25 +176,30 @@ const ALLOWED: Record<string, string> = {
  * A size cap for every `ALLOWED` exception, because "small and purpose-built"
  * is a claim about today that nothing was checking.
  *
- * `components/layout/problemPillarIndex.ts` is the reason this map exists.
- * It is exempt from SERVER_ONLY on the grounds that it carries no problem
- * bodies — true, and still beside the point for a browser: it is one row per
- * problem, it is imported by `Navbar`, `Navbar` is in the root layout, so
- * every visitor on every one of the 821 routes downloads all 547 rows. At
- * ~15 bytes gzip per slug it grows with the problem corpus forever, and an
- * exemption with no number attached cannot notice. `CLIENT_DATA_BUDGET_KB`
- * already makes this argument for the modules a client component may import;
- * an exception to "must never reach the client" deserves it at least as much.
+ * `components/layout/problemPillarIndex.ts` is the reason this map exists,
+ * and the reason it works. It was exempt from SERVER_ONLY on the grounds that
+ * it carried no problem bodies — true, and still beside the point for a
+ * browser: one row per problem, imported by `Navbar`, `Navbar` in the root
+ * layout, so every visitor on every route downloaded all 556 rows to tint a
+ * badge on the 556 problem pages. At ~15 bytes gzip per slug it grew with the
+ * corpus forever, and an exemption with no number attached cannot notice.
+ *
+ * The number noticed. It was set at 9KB against 8.4KB with the note "roughly
+ * another 100 problems before someone has to decide whether the navbar's
+ * pillar tint is worth a table that large" — and that decision came due at
+ * 7.24KB of a 100KB ceiling rather than at the per-module cap. The answer was
+ * neither "shrink it" nor "raise it" but the third option the note named:
+ * `detectPillar` no longer answers `/problems/*` at all. `<PillarScope>` has
+ * always published the page's pillar to `components/field/fieldStore`, so
+ * `Navbar` subscribes to that with `useFieldState()`, and the table, its
+ * exemption and its budget are all deleted rather than renegotiated. The
+ * entry is gone from both maps; this paragraph is what it left behind.
  *
  * A prefix that names a directory is measured as the sum of every
  * client-reachable module under it, so splitting a file in two does not
  * launder its weight.
  */
 const ALLOWED_BUDGET_KB: Record<string, number> = {
-  // 8.4KB today. The cap allows roughly another 100 problems before someone
-  // has to decide whether the navbar's pillar tint is worth a table that
-  // large, or whether `detectPillar` should fetch it on `/problems/*` only.
-  "components/layout/problemPillarIndex.ts": 9,
   "lib/content/types.ts": 1,
   "lib/problems/types.ts": 2,
   "lib/content/progress": 3,
@@ -205,9 +216,94 @@ const ALLOWED_BUDGET_KB: Record<string, number> = {
  * modules, each obviously fine on its own, each below every budget, each
  * added by a different person. Measured at 90.1KB gzip of payload across 85
  * modules when this was written (the earlier 160.3KB figure counted comment
- * text, which ships nowhere — see `payloadKb`); the ceiling leaves ~11%, about
+ * text, which ships nowhere — see `payloadKb`); the ceiling left ~11%, about
  * five more simulators' worth of `lib/quantum` kernels, or one new content
- * registry, before it has to be raised on purpose.
+ * registry, before it had to be raised on purpose.
+ *
+ * RAISED ONCE, ON PURPOSE, WITH THE ARITHMETIC.
+ *
+ * That headroom is spent: the tree reached 99.9KB across 88 modules on its
+ * own, and the simulator-correctness pass then added 0.435KB and crossed the
+ * line. Measured, per module, rather than waved through:
+ *
+ *   lib/quantum/timeEvolution.ts                        +0.213KB
+ *   components/simulators/bloch-sphere/
+ *     useAnimatedBlochPoint.ts                          +0.207KB
+ *   lib/quantum/format.ts                               +0.015KB
+ *
+ * All three are bug fixes with tests, not features. `timeEvolution` gained
+ * two probability-mass checks that let the Wavefunction Explorer notice when
+ * a packet has wrapped around the periodic FFT box, which it previously
+ * narrated as physical spreading while ⟨x⟩ ran backwards;
+ * `useAnimatedBlochPoint` gained the length/direction split that stops the
+ * Noise Explorer's Bloch arrow growing 24% mid-tween while decohering; and
+ * `format` stopped printing a zero amplitude as "-0.00". None of it is
+ * corpus-shaped, none of it grows with the content, and shrinking it further
+ * (the error strings are already trimmed and the two new sums already share
+ * one loop) only buys back hundredths of a KB.
+ *
+ * 102 rather than 101: at 101 the next module of any size trips this again
+ * immediately, which turns a deliberate decision into a recurring tax on
+ * whoever is unlucky. The ~1.6KB of room left is roughly one more engine
+ * kernel; the next person to need more should do this same arithmetic rather
+ * than nudge the number.
+ *
+ * LOWERED AGAIN, SAME DAY, BY DERIVATION RATHER THAN BY FEEL.
+ *
+ * `components/layout/problemPillarIndex.ts` then left the client graph
+ * entirely — 7.24KB, 7.2% of this whole ceiling, one row per problem shipped
+ * on all 830 routes so the navbar could tint a badge on 556 of them. The page
+ * already publishes its pillar to `components/field/fieldStore` through
+ * `<PillarScope>`, so `Navbar` subscribes with `useFieldState()` instead, and
+ * the count the table also carried (`PROBLEM_COUNT`) now crosses the boundary
+ * as a prop from `app/layout.tsx`, the way `startLessonMinutes` already did.
+ * Total: 99.9 -> 93.9KB across 89 modules.
+ *
+ * Leaving the ceiling at 102 would have handed that 8KB to whoever asked
+ * next, which is the opposite of what a reduction is for. So it is re-derived
+ * rather than restored:
+ *
+ *   measured total                                        93.87KB
+ *   + slack the per-module budgets above already grant      5.24KB
+ *       curriculum.ts        11.83 / 12   0.17
+ *       concepts.ts          13.13 / 14   0.88
+ *       currentQuantum/
+ *         metaRegistry.ts     2.83 / 4    1.17
+ *       content/types.ts      0.43 / 1    0.57
+ *       problems/types.ts     1.12 / 2    0.88
+ *       content/progress      2.03 / 3    0.97
+ *       problems/progress     2.40 / 3    0.60
+ *   ------------------------------------------------------------
+ *                                                         99.11KB  ->  100
+ *
+ * The margin IS that slack, and nothing else. Anything with a budget of its
+ * own can grow into it without this number firing first and pointing at the
+ * wrong guard; anything *without* one — a new module, a new registry, an
+ * unbudgeted helper — trips this immediately, which is the addition this
+ * ceiling exists to catch. Rounding 99.11 up to a whole KB is the only free
+ * room in it, 0.89KB, and it is there because eleven agents were editing this
+ * tree while it was measured (it moved 0.74KB in ninety minutes) and a guard
+ * that fires on measurement jitter gets deleted.
+ *
+ * Note the coupling this creates, deliberately: raising a per-module budget
+ * raises the slack, so it also raises the honest value of this number. They
+ * move together, and both should be re-derived in the same change.
+ *
+ * WHAT THIS NUMBER IS NOT. It is the union across all 830 routes, not what a
+ * reader downloads. The walk roots at every `"use client"` file whether or not
+ * any route eagerly renders it, and it does not model `next/dynamic`, so a
+ * lazily-fetched module counts here at full weight. Measured against the real
+ * build: 29 emitted chunks totalling 986KB raw are referenced by none of the
+ * 824 HTML files. The ceiling is therefore conservative relative to per-reader
+ * cost — which is a reason to keep it strict, not a reason to loosen it.
+ *
+ * `curriculum.ts` is untouched by any of this and remains the tightest thing
+ * here: 11.83KB against its own 12KB budget, 0.17KB, with course descriptions
+ * still being written. Nothing in this change helps it — different scope, and
+ * the navbar table was never in its graph. When it goes over, the move is the
+ * one `currentQuantum` already made: the client surfaces that import it
+ * (`CurriculumExplorer`, `FilterChips`, `CourseList`) need slugs, titles,
+ * pillars and order, not the prose, and the prose is the half that grows.
  */
 const CLIENT_DATA_TOTAL_CEILING_KB = 100;
 
@@ -239,10 +335,27 @@ const CLIENT_DATA_TOTAL_CEILING_KB = 100;
  * Raise them only with the per-lesson cap (`LESSON_KEYWORD_BUDGET`) and the
  * generator's own `MAX_INDEX_BYTES`, which fails the build rather than the
  * test suite, in the same change.
+ *
+ * The gzip ceiling was raised 140 -> 145 on 2026-08-29, under that rule and
+ * with the cap pulled first. Ten glossary entries were added (258 -> 272), and
+ * because a term carries its whole definition so it is findable by what it
+ * says rather than only by its name, that took the index to 141.85KB gzip.
+ * `LESSON_KEYWORD_BUDGET` went 600 -> 540, which is 531.5KB raw / 138.51KB
+ * gzip. It did not go lower because 520 breaks `RECOVERY_QUERIES`: `factorial`
+ * stops reaching the lesson that teaches it, which is the exact query class
+ * the keyword set exists for. So the cap is now at its recall floor, the
+ * content that pushed the number up is content a reader benefits from, and
+ * 1.5KB of headroom is not enough to edit a definition against. 145 restores
+ * 6.5KB.
+ *
+ * What has NOT changed is the shape of the decision. The alternative measured
+ * and rejected when this budget was set (appending each lesson's deduplicated
+ * vocabulary) is 1.27MB raw / 316KB gzip. This is a 5KB step taken with the
+ * sweep written down, not a slope.
  */
 const SEARCH_INDEX_PATH = "public/search-index.json";
 const SEARCH_INDEX_RAW_CEILING_KB = 560;
-const SEARCH_INDEX_GZIP_CEILING_KB = 140;
+const SEARCH_INDEX_GZIP_CEILING_KB = 145;
 
 /**
  * Routes whose eager client graph reaches the `katex` runtime today.

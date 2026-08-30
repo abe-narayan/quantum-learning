@@ -52,13 +52,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="What actually stops your hand">
   Push your hand against a table and something stops it, though both are
   mostly empty space and both are electrically neutral. What resists is
   not charge. It is electrons having nowhere left to go.
 </LessonHook>
 
-## Motivation
+## Electrostatics is the obvious answer, and it fails
 
 Electrostatics is the obvious explanation for solidity and it does not
 work. An atom is neutral overall, so at any appreciable distance its
@@ -99,7 +99,7 @@ lesson only takes it seriously.
   license="Public domain"
 />
 
-## Intuition
+## Swap two things that are already the same
 
 Swapping two identical fermions flips the sign of the <Term id="wavefunction">wavefunction</Term>. That is
 antisymmetry, established last lesson.
@@ -114,7 +114,7 @@ Notice the character of the conclusion. Nothing here is approximate or
 suppressed by a small factor. The formalism does not make the
 configuration unlikely; it declines to represent it.
 
-## Mathematical Development
+## Exactly zero, for any state whatsoever
 
 ### The vanishing is exact, not approximate
 
@@ -150,7 +150,7 @@ same state at low temperature (Bose-Einstein condensation, well beyond
 this course's scope but a direct large-N consequence of this same
 symmetric-combination mathematics).
 
-## Physical Interpretation
+## Why atoms have shells and the table has rows
 
 Exclusion is why atoms have structure. It is the reason a multi-electron
 atom fills successive shells (the next lesson) instead of stacking every
@@ -160,6 +160,20 @@ hydrogen. Scale it up and it is why white dwarfs hold together, and why
 they stop holding together above about $1.4$ solar masses. None of this
 is extra physics. It all comes from demanding one sign flip under
 exchange.
+
+That $1.4$ is worth pushing on, because a core just past it does not
+simply vanish.
+
+<PredictBeforeReveal
+  question="Electron degeneracy pressure gives out above about 1.4 solar masses, and the stellar core collapses further. Just past that limit, what stops the collapse?"
+  options={[
+    { label: "Neutrons are fermions too; their own pressure takes over", value: "neutrons" },
+    { label: "The electrons pair into bosons, which lifts the restriction", value: "pairing" },
+    { label: "Nothing stops it: exclusion is exhausted and collapse continues", value: "nothing" },
+  ]}
+  correctValue="neutrons"
+  explanation="Neutron degeneracy pressure. A neutron is spin-½, so neutrons antisymmetrize among themselves exactly as electrons do, and the same vanishing that forbids two electrons in one state forbids two neutrons. Past the limit the core's electrons and protons combine into neutrons, and what settles is a neutron star, roughly 20 km across, held up by the identical line of algebra one particle species over. That support has a ceiling of its own, somewhere near 2 to 3 solar masses, and above that nothing known holds."
+/>
 
 It pays to be exact about when exclusion applies, because it is easy to
 over-apply. The trigger is antisymmetry under exchange of *identical*
@@ -174,18 +188,7 @@ two genuinely identical particles are candidates for the same
 single-particle state with no label available to separate them, which is
 a narrower condition than "two similar systems."
 
-<PredictBeforeReveal
-  question="Two identical fermions, both forced into the same single-particle state e0. What does antisymmetrize(e0, e0) return?"
-  options={[
-    { label: "e0 ⊗ e0, same as the plain product", value: "product" },
-    { label: "A valid but unusual normalized state", value: "valid" },
-    { label: "Nothing at all: there is no such state", value: "none" },
-  ]}
-  correctValue="none"
-  explanation="tensorProduct(e0,e0) minus itself is the zero vector, and normalizeVector throws rather than dividing by a norm of zero. This is not a bug to route around: it is the Pauli exclusion principle arriving as a function with nothing to return. Compare symmetrize(e0,e0), which returns a perfectly good state, and the entire difference between bosons and fermions is visible in those two call results."
-/>
-
-## Worked Example
+## Why the engine throws instead of returning a state
 
 **Confirm directly that `antisymmetrize(e0, e0)` throws, using a
 3-dimensional basis, and explain exactly why.**
@@ -203,11 +206,11 @@ returned a fallback vector instead.
 <InteractiveSection title="See the vanishing, and its absence for bosons" description="For fermions, the antisymmetric combination of e0 with itself is the zero vector entry by entry: not small, zero. Switch to bosons and the symmetric combination of the same two states is nonzero and normalizes without complaint. Both grids start from the identical input, e0 ⊗ e0, so the only thing separating a forbidden configuration from an allowed one is the sign between the two terms.">
   <ExchangeDiagramExplorer
     presets={exclusionPresets}
-    ariaLabel="Choose between the fermion and boson combinations of e0 with itself, showing the fermion case vanishes entirely while the boson case does not"
+    ariaLabel="Two 3-by-3 coefficient grids side by side, before and after, rows and columns labelled 0, 1, 2. Both presets start from the same before grid: a single entry of 1 at row 0, column 0, and zeros everywhere else. In the fermion preset the after grid is zero in all nine cells, including the one that held the 1. In the boson preset the after grid is identical to the before grid, the 1 still at row 0 column 0."
   />
 </InteractiveSection>
 
-## Common Mistakes
+## The same complete state, spin included
 
 <Callout type="mistake">
 **Thinking exclusion means two fermions can never have the same energy,
@@ -218,25 +221,162 @@ are completely allowed.
 </Callout>
 
 <Callout type="warning">
-**Applying exclusion to bosons.** As the Mathematical Development section
-shows directly, $|\psi_S\rangle$ never vanishes at $a=b$. There is no
-boson exclusion principle.
+**Applying exclusion to bosons.** The symmetric combination above never
+vanishes at $a=b$: it doubles, to $2|a\rangle\otimes|a\rangle$, and
+normalizes without complaint. There is no boson exclusion principle.
 </Callout>
 
 ## Practice Questions
 
 1. Derive, in one line of algebra, why $|a\rangle\otimes|a\rangle-|a\rangle\otimes|a\rangle=\vec0$
    for any $|a\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because any vector minus itself is the zero vector. Writing
+   $|v\rangle=|a\rangle\otimes|a\rangle$, the expression is
+   $|v\rangle-|v\rangle=\vec0$, with no property of $|a\rangle$ used and
+   nothing left to check.
+
+   The arithmetic being this trivial is the point, and it is worth
+   resisting the urge to look for something deeper in it. All the physics
+   sits upstream, in the claim that identical fermions must be described
+   by the antisymmetric combination. Once that is granted, exclusion is
+   not a further law: it is the antisymmetrization formula evaluated at
+   $b=a$, and it returns nothing because there was nothing to return.
+
+   The general version is the same fact in a larger determinant. For $N$
+   fermions the antisymmetric state is a Slater determinant whose columns
+   are the occupied single-particle states, and a determinant with two
+   equal columns vanishes, for exactly the reason above: swapping the two
+   equal columns must flip the sign and must also change nothing. So
+   exclusion for $N$ particles is a standard linear algebra fact, not a
+   new physical input at every particle count.
+
+   </details>
+
 2. Two electrons in hydrogen's 1s orbital, one spin-up and one
    spin-down: does this violate exclusion? Why or why not, using the
    "complete single-particle state" definition?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No violation. The complete single-particle state includes spin, so
+   $|1s\rangle\otimes|{\uparrow}\rangle$ and
+   $|1s\rangle\otimes|{\downarrow}\rangle$ are two different states,
+   orthogonal to each other. Exclusion forbids two electrons in the *same*
+   complete state, and these are not the same.
+
+   Write the two-electron state out and the antisymmetry is visible where
+   it has to be:
+
+   $$
+   |\Psi\rangle = \underbrace{\psi_{1s}(\vec r_1)\,\psi_{1s}(\vec r_2)}_{\text{symmetric in space}} \times \underbrace{\frac{|{\uparrow}{\downarrow}\rangle - |{\downarrow}{\uparrow}\rangle}{\sqrt2}}_{\text{antisymmetric in spin}}
+   $$
+
+   Swapping the two electrons swaps both factors at once: the spatial
+   factor is unchanged, the spin factor flips sign, and the product flips
+   sign overall. Antisymmetry is satisfied, and nothing vanishes.
+
+   Notice what that spin factor is. It is the singlet $|0,0\rangle$ from
+   Addition of Angular Momentum, and it is not chosen for convenience. If
+   both electrons share one spatial orbital, the spatial factor has no
+   choice but to be symmetric, so the spin factor is forced to be the
+   antisymmetric one. The helium ground state has total spin zero, and
+   that is a prediction of exclusion rather than an observation about
+   helium.
+
+   The rule this makes precise: one spatial orbital holds at most two
+   electrons, since there are only two orthogonal spin states to
+   distinguish them. A third electron in 1s would have to duplicate one of
+   the two, and the state would vanish. That "at most two" is where every
+   shell-filling count in the next lesson comes from, and it is why the
+   $n^2$ orbital degeneracy of hydrogen becomes $2n^2$ electrons.
+
+   </details>
+
 3. Why does this platform's engine treat `normalizeVector`'s throw on a
    zero vector as a feature (a correct physical statement) rather than
    fixing it to return some fallback vector?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because there is no correct vector to return. The configuration has no
+   representation, and any fallback would assert that it does.
+
+   Consider what a fallback would cost. Return the zero vector and every
+   downstream probability comes out zero, so a caller summing outcome
+   probabilities gets $0$ instead of $1$ and has to notice on their own.
+   Return some arbitrary unit vector and the engine is reporting
+   measurement statistics for a configuration that cannot exist. Both are
+   worse than stopping, because both are silent, and a wrong number that
+   arrives quietly is harder to find than an exception with a message.
+
+   The throw carries the physics accurately: asking for two identical
+   fermions in one state is not a computation with an unusual answer, it
+   is a question with no answer. The test asserting that the throw happens
+   is doing something slightly unusual as tests go, since it pins down the
+   *absence* of a state, and it exists so a later refactor cannot quietly
+   introduce a fallback in the name of robustness.
+
+   One boundary worth marking, since "throw on zero" is not a universal
+   rule. The check is on a *near*-zero norm, and that threshold is a
+   judgment call. A genuine state with a very small norm, arising from
+   accumulated floating-point error somewhere upstream, would trip the
+   same guard and be reported as nonexistent. Encoding physics into an
+   error is right when the impossibility is exact, as it is here; it needs
+   more care when the quantity being tested is only approximately zero.
+
+   </details>
+
 4. Explain why Bose-Einstein condensation (bosons clustering into the
    same state) is not just "allowed" but actively suggested by the
    symmetric-combination math, in a way exclusion actively forbids for
    fermions.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because symmetrization does not merely fail to forbid $a=b$; it
+   increases the amplitude for the two particles to be found in the same
+   state, relative to what distinguishable particles would give.
+
+   The norms from the previous lesson show it in one line. For two
+   single-particle states with overlap $s=\langle a|b\rangle$:
+
+   $$
+   \big\||ab\rangle \pm |ba\rangle\big\|^2 = 2\left(1 \pm |s|^2\right)
+   $$
+
+   The symmetric norm squared *grows* as the states approach each other,
+   reaching $4$ at $s=1$; the antisymmetric one shrinks to $0$. Once these are
+   normalized, the same asymmetry appears as a bias in the statistics:
+   bosons are more likely than distinguishable particles to be found close
+   together, and fermions are less likely. Those effects have names and
+   have been measured, as photon bunching and its fermionic counterpart,
+   antibunching, in Hanbury Brown and Twiss style experiments.
+
+   The dynamical version is the one with an industry attached. The rate
+   for a boson to enter a mode that already contains $n$ bosons carries a
+   factor of $n+1$, so occupancy encourages further occupancy: the more
+   crowded the state, the more attractive it becomes. That factor is
+   stimulated emission, and it is why a laser produces a single mode
+   rather than a spread. Fermions have the reverse factor, $1-n$, which
+   hits zero at $n=1$ and shuts the transition off entirely. Exclusion in
+   dynamical clothing.
+
+   Where to stop, in the interest of not overclaiming. The two-particle
+   algebra establishes the *tendency*, not the phase transition. Actual
+   Bose-Einstein condensation, a macroscopic fraction of the gas in one
+   state below a sharp critical temperature, needs statistical mechanics
+   and a thermodynamic limit that this course does not build. What the
+   symmetric combination tells you is which way the bias points, and that
+   the bias is there at $N=2$ before any large-$N$ argument begins.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -251,7 +391,7 @@ boson exclusion principle.
   spatial orbital if their spins differ, since that makes their complete
   single-particle states distinct.
 
-## Further Exploration
+## Two electrons in 1s, and whether that counts
 
 <ChallengePrompt prompt="Same setup as practice question 2, but with matching spins this time: two electrons in hydrogen's 1s orbital, both spin-up. Does THIS violate exclusion? Justify using the same 'complete single-particle state' definition.">
   Check whether the two electrons' complete single-particle states,

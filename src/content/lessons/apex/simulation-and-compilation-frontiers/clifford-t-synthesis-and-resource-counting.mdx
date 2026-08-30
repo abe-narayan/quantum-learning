@@ -86,7 +86,7 @@ export const lessonMeta = {
   algorithms can quote wildly different prices for the exact same gate.
 </LessonHook>
 
-## Motivation
+## Which Decomposition, Not Just Whether
 
 Gate Decomposition showed that every gate this platform uses decomposes
 *exactly* into native rotations, $H=R_y(\pi/2)R_z(\pi)$ confirmed to
@@ -102,7 +102,7 @@ real algorithm needs, especially arbitrary rotations $R_z(\theta)$ for a
 generic angle $\theta$, are **not** exactly representable by any finite
 Clifford+T sequence at all: they must be *approximated*, to some target
 precision $\epsilon$, by a finite sequence of Clifford+T gates. This
-lesson works out exactly how that price tag gets computed, for a target
+lesson works out how that price tag gets computed, for a target
 gate and precision fixed in advance.
 
 Concretely, what either synthesis algorithm actually *hands back* is
@@ -123,7 +123,7 @@ series on one wire:
   ]}
 />
 
-*Illustrative only, not a specific computed output* — a stand-in for the
+*Illustrative only, not a specific computed output.* It stands in for the
 general **shape** any Clifford+T synthesis algorithm's answer takes: a
 chain of gates drawn from the fixed alphabet $\{H,S,T\}$ (plus their
 adjoints, where the target gate set includes them), applied one after
@@ -131,10 +131,10 @@ another to approximate a single target unitary. Solovay-Kitaev-style and
 Ross-Selinger-style synthesis both output a sequence with exactly this
 structure; what the rest of this lesson shows is that the two algorithms
 disagree sharply, for the same target and the same precision, on how
-*long* that chain has to be — count the T gates in a chain like this one,
-and the count is the entire quantity this lesson is about.
+*long* that chain has to be. Count the T gates in a chain like this one,
+and that count is the quantity this lesson is about.
 
-## Mathematical Development
+## Solovay-Kitaev Against Number-Theoretic Synthesis
 
 ### T-count and T-depth: restating the "currency" precisely
 
@@ -146,7 +146,7 @@ across different qubits, which matters because a magic-state factory can
 only produce states at some finite rate, so T-depth (not T-count alone)
 can also bound the wall-clock time of a fault-tolerant run. Clifford gates
 appear in the count too, but the magic-state-distillation prerequisite's
-finding was exactly that Clifford gates are comparatively free next to a
+finding was that Clifford gates are comparatively free next to a
 T gate's factory cost, so a compiler targeting fault-tolerant hardware
 optimizes for T-count (and T-depth) first, and treats Clifford-gate count
 as a distant second-order concern. Every result below is really a result
@@ -169,7 +169,7 @@ gates from that set whose product $V$ satisfies $\lVert U-V\rVert\le
 translate between norms, in diamond norm on the corresponding channel),
 **and** a classical algorithm can *find* such a $V$ in time polynomial in
 $\log(1/\epsilon)$. Both halves matter: the theorem is not just an
-existence proof, it comes with an efficient search procedure, the
+existence proof; it comes with an efficient search procedure, the
 recursive Solovay-Kitaev algorithm, that actually constructs the
 sequence.
 
@@ -200,19 +200,19 @@ one.
 
 Solovay-Kitaev's guarantee is deliberately generic: it works for *any*
 target unitary from *any* sufficiently rich gate set, and that generality
-is exactly why it cannot promise a tight, target-specific bound. A large
+is why it cannot promise a tight, target-specific bound. A large
 fraction of the single-qubit gates a real algorithm actually needs,
 though, are not arbitrary: they are $R_z(\theta)$ rotations for a
 specific, structured family of angles. Hamiltonian simulation's Trotter
 steps and, closer to this course, the Algorithmic Frontiers course's
 quantum signal processing and QSVT phase sequences are both, at their
 core, long lists of $R_z$-type phase rotations that must each be compiled
-to some target precision. For exactly this family, a different kind of
+to some target precision. For this family, a different kind of
 algorithm applies: **number-theoretic exact and near-optimal synthesis**.
 
 The key fact enabling it: every matrix entry a Clifford+T circuit can
 produce lies in the ring $\mathbb{Z}[1/\sqrt2, i]$ (numbers built from
-integers, $i$, and $1/\sqrt2$ under addition and multiplication), a real,
+integers, $i$, and $1/\sqrt2$ under addition and multiplication), a
 structural consequence of the fact that $H$ introduces factors of
 $1/\sqrt2$ and $S$, $T$ introduce powers of $i$ and $e^{i\pi/4}$ and
 nothing else. Because that ring has rich, well-understood number-theoretic
@@ -250,9 +250,10 @@ actually *finds* a near-optimal one, not merely an existence argument.
   A synthesis result quoted as "provably optimal" without that clause is
   quoting it slightly too strongly.
 </ResearchConnection>
+
 This lesson cites that scaling result and its attribution rather than
-re-deriving the ring-theoretic search algorithm itself, which is genuinely
-a lesson (and a paper) of its own.
+re-deriving the ring-theoretic search algorithm itself, which is a lesson
+(and a paper) of its own.
 
 <Callout type="warning">
 **Solovay-Kitaev proves EFFICIENT synthesis is always possible; it does
@@ -263,13 +264,13 @@ achieves. But its exponent $c$ is a worst-case, target-agnostic bound; for
 the specific, highly structured $R_z(\theta)$ family, a specialized
 number-theoretic algorithm like Ross-Selinger achieves a *linear* (not
 just polylogarithmic) dependence on $\log(1/\epsilon)$ with a small
-constant, dramatically fewer T gates for the same target and precision.
+constant, and so far fewer T gates for the same target and precision.
 Reaching for generic Solovay-Kitaev synthesis on a gate family that has a
-specialized near-optimal algorithm available is a real, practical
+specialized near-optimal algorithm available is a practical
 compiler-engineering mistake, not just a missed optimization.
 </Callout>
 
-## Physical Interpretation: Why This Matters
+## Why T-Count Is the Currency
 
 Magic States and Distillation established that magic-state factories
 often dominate a fault-tolerant algorithm's *entire* physical resource
@@ -284,10 +285,10 @@ for an actual fault-tolerant execution. The numerical comparison below is
 not a hypothetical; it is the concrete reason the field abandoned generic
 Solovay-Kitaev synthesis for $R_z$ rotations specifically once
 number-theoretic algorithms like Ross-Selinger became available, and it is
-exactly the kind of accounting this course's own capstone (resource
-estimation for a real algorithm) will need directly.
+the kind of accounting this course's own capstone (resource estimation
+for a real algorithm) will need directly.
 
-## Worked Example
+## Synthesizing One Rotation to a Tolerance
 
 **Compile a single $R_z(\theta)$ rotation to precision $\epsilon=10^{-10}$
 (a realistic target for a long fault-tolerant computation, since a
@@ -298,19 +299,21 @@ would need against the T-count Ross-Selinger-style synthesis achieves.**
 <PredictBeforeReveal
   question="Both algorithms compile the same Rz(θ) target to the same precision ε=10⁻¹⁰. Roughly how much bigger do you expect the generic Solovay-Kitaev-style T-count to be than the Ross-Selinger-style T-count?"
   options={[
-    { label: "About the same — both are 'efficient' synthesis algorithms", value: "same" },
-    { label: "A few times bigger — a modest constant-factor overhead", value: "few-times" },
-    { label: "Orders of magnitude bigger — thousands of times or more", value: "orders-of-magnitude" },
+    { label: "About the same, since both are 'efficient' synthesis algorithms", value: "same" },
+    { label: "A few times bigger: a modest constant-factor overhead", value: "few-times" },
+    { label: "Orders of magnitude bigger, thousands of times or more", value: "orders-of-magnitude" },
   ]}
   correctValue="orders-of-magnitude"
-  explanation="Both scale efficiently (polylogarithmically) with 1/ε, but a polylog with exponent 3.97 eventually dwarfs a polylog that is merely linear in log(1/ε), even with a small coefficient. At ε=10⁻¹⁰ the gap below comes out in the thousands, and it only widens at tighter precision — 'efficient' and 'near-optimal' are different guarantees, and the numbers make the difference concrete rather than abstract."
+  explanation="Both scale efficiently (polylogarithmically) with 1/ε, but a polylog with exponent 3.97 eventually dwarfs a polylog that is merely linear in log(1/ε), even with a small coefficient. At ε=10⁻¹⁰ the gap below comes out in the thousands, and it only widens at tighter precision. 'Efficient' and 'near-optimal' are different guarantees, and the numbers make the difference concrete."
 />
 
 First, the input both estimates share: $\log_2(1/\epsilon)$ for
 $\epsilon=10^{-10}$,
 $$
-\log_2(1/\epsilon) = \log_2(10^{10}) = 10\log_2(10) \approx {comparisonAtTenDigits.bits.toFixed(2)}\text{ bits.}
+\log_2(1/\epsilon) = \log_2(10^{10}) = 10\log_2(10)
 $$
+
+which comes out at {comparisonAtTenDigits.bits.toFixed(2)} bits.
 
 **Generic Solovay-Kitaev-style estimate**, using $O(\log^{c}(1/\epsilon))$
 with the illustrative exponent $c=3.97$ (Dawson–Nielsen's analysis of the
@@ -318,23 +321,32 @@ basic recursive algorithm; a stand-in for "some constant in the literature
 range," not a universal fixed value) and an illustrative prefactor of 1
 so only the scaling is shown:
 $$
-T\text{-count}_{\text{SK}} \approx \left(\log_2(1/\epsilon)\right)^{3.97} \approx ({comparisonAtTenDigits.bits.toFixed(2)})^{3.97} \approx {comparisonAtTenDigits.solovayKitaevTCount.toExponential(3)}
+T\text{-count}_{\text{SK}} \approx \left(\log_2(1/\epsilon)\right)^{3.97}
 $$
+
+Raising the {comparisonAtTenDigits.bits.toFixed(2)} bits above to the power
+$3.97$ gives {comparisonAtTenDigits.solovayKitaevTCount.toExponential(3)},
 roughly **{Math.round(comparisonAtTenDigits.solovayKitaevTCount / 1000) * 1000}** T gates.
 
 **Ross-Selinger-style estimate**, using the $3$–$4\times\log_2(1/\epsilon)$
 near-optimal scaling:
 $$
-T\text{-count}_{\text{RS}} \approx (3\text{ to }4)\times{comparisonAtTenDigits.bits.toFixed(2)} \approx {comparisonAtTenDigits.rossSelingerLow.toFixed(0)}\text{ to }{comparisonAtTenDigits.rossSelingerHigh.toFixed(0)}
+T\text{-count}_{\text{RS}} \approx (3\text{ to }4)\times\log_2(1/\epsilon)
 $$
-call it about **{comparisonAtTenDigits.rossSelingerMid.toFixed(0)}** T
+
+At {comparisonAtTenDigits.bits.toFixed(2)} bits that is
+{comparisonAtTenDigits.rossSelingerLow.toFixed(0)} to
+{comparisonAtTenDigits.rossSelingerHigh.toFixed(0)} T gates; call it about
+**{comparisonAtTenDigits.rossSelingerMid.toFixed(0)}** T
 gates at the midpoint coefficient $3.5$.
 
 The ratio between the two estimates,
 $$
-\frac{T\text{-count}_{\text{SK}}}{T\text{-count}_{\text{RS}}} \approx {comparisonRatioAtTenDigits.toExponential(2)},
+\frac{T\text{-count}_{\text{SK}}}{T\text{-count}_{\text{RS}}},
 $$
-is the whole point made numeric: at $\epsilon=10^{-10}$, the generic
+
+comes out at {comparisonRatioAtTenDigits.toExponential(2)}. That is the
+whole point made numeric: at $\epsilon=10^{-10}$, the generic
 illustrative Solovay-Kitaev-style estimate needs roughly
 **{comparisonRatioAtTenDigits.toFixed(0)}× more T gates**, several orders
 of magnitude more magic-state consumption for the *identical* target gate
@@ -344,7 +356,9 @@ algorithm compiled it.
 <InteractiveSection title="Watch the gap grow with precision" description="Each curve plots log10(T-count) against the number of decimal digits n of target precision (epsilon = 10^-n), from n=2 out to n=12. The Solovay-Kitaev-style curve (illustrative exponent 3.97) rises far faster than the Ross-Selinger-style curve (~3.5 times log2(1/epsilon)), because a polylogarithmic-with-a-large-exponent bound eventually loses badly to a linear-in-log bound with a small coefficient.">
   <ParametricCurve
     frames={tCountComparisonFrames}
-    ariaLabel="Log10 of estimated T-count versus digits of target precision n from 2 to 12, comparing an illustrative generic Solovay-Kitaev-style scaling (exponent 3.97, rising from about 3.3 to about 6.4) against a Ross-Selinger-style near-optimal scaling for Rz rotations (about 3.5 times log2 of 1/epsilon, rising only from about 1.4 to about 2.1) — the gap between the two curves widens steadily as the precision target tightens"
+    xAxisLabel="digits of precision n (ε = 10⁻ⁿ)"
+    yAxisLabel="log₁₀(T-count)"
+    ariaLabel="Log10 of estimated T-count versus digits of target precision n from 2 to 12, comparing an illustrative generic Solovay-Kitaev-style scaling (exponent 3.97, rising from about 3.3 to about 6.4) against a Ross-Selinger-style near-optimal scaling for Rz rotations (about 3.5 times log2 of 1/epsilon, rising only from about 1.4 to about 2.1). The gap between the two curves widens steadily as the precision target tightens."
   />
 </InteractiveSection>
 
@@ -353,20 +367,20 @@ already roughly {tCountComparisonTable[0] ? (tCountComparisonTable[0].solovayKit
 by $n=12$ ($\epsilon=10^{-12}$) it has grown to roughly
 {tCountComparisonTable[5] ? (tCountComparisonTable[5].solovayKitaevTCount / tCountComparisonTable[5].rossSelingerMid).toExponential(2) : ""}×.
 Both curves grow with tighter precision, since compiling to more digits
-genuinely does need more T gates under any method, but they grow at
+does need more T gates under any method, but they grow at
 completely different rates: Ross-Selinger's line is linear in
 $\log_2(1/\epsilon)$, while the illustrative Solovay-Kitaev-style curve
 grows like that same quantity raised to the 3.97 power, and a
 polynomial-in-the-exponent gap between two polylog quantities widens
 without bound as $\epsilon\to0$.
 
-## Common Mistakes
+## Existence Confused With Optimality
 
 <Callout type="warning">
-**Solovay-Kitaev proves EFFICIENT synthesis is always possible, it does
+**Solovay-Kitaev proves EFFICIENT synthesis is always possible; it does
 NOT mean every synthesis method achieves near-optimal T-count in
-practice.** The theorem's $O(\log^c(1/\epsilon))$ bound is a real,
-efficient (polylogarithmic) guarantee, but it is a worst-case, generic
+practice.** The theorem's $O(\log^c(1/\epsilon))$ bound is a genuine
+polylogarithmic efficiency guarantee, but it is a worst-case, generic
 bound over *all* single-qubit targets and makes no promise of
 target-specific optimality. Treating "Solovay-Kitaev says it's efficient"
 as equivalent to "this is close to the best possible T-count" conflates
@@ -392,16 +406,195 @@ Both matter for the total resource budget, but they are separate levers.
 1. State the Solovay-Kitaev theorem's $O(\log^c(1/\epsilon))$ guarantee
    precisely, including what the theorem does and does not promise about
    the constant $c$ and about optimality for a specific target gate.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **The statement.** Let $G$ be a finite set of gates in $SU(2)$ that is
+   closed under inverses and generates a dense subgroup. Then there is a
+   constant $c$ such that for every target $U\in SU(2)$ and every
+   $\epsilon>0$, some product of $O(\log^c(1/\epsilon))$ gates from $G$
+   approximates $U$ to within $\epsilon$ in operator norm, and a
+   classical algorithm finds such a sequence in time polylogarithmic in
+   $1/\epsilon$.
+
+   Three hypotheses are doing real work and are worth naming rather than
+   skimming: the gate set is *finite*, *closed under inverses*, and
+   *densely generating*. Clifford+T satisfies all three. Drop density and
+   there are targets nothing can approach; drop inverse-closure and the
+   recursive construction, which builds group commutators out of
+   approximations and their inverses, has nothing to build with.
+
+   **What it promises.** That efficient synthesis is always possible, for
+   any target, from any qualifying gate set, and that it is
+   *constructive*: an algorithm produces the sequence, rather than a
+   counting argument asserting one exists. The polylogarithmic dependence
+   is the whole content. A bound polynomial in $1/\epsilon$ would be
+   useless, since $\epsilon=10^{-10}$ would then mean something like
+   $10^{10}$ gates for one rotation.
+
+   **What it does not promise, first: any particular $c$.** The theorem
+   asserts that *some* constant works. Its value depends on which variant
+   of the algorithm is analyzed, and the $c\approx3.97$ figure used in
+   this lesson is Dawson and Nielsen's analysis of the basic recursion,
+   not a constant of nature. Refinements do better. So
+   "$O(\log^c(1/\epsilon))$" with $c$ unspecified is a statement about
+   asymptotic shape and not a number anyone can budget against, and the
+   hidden constant in the $O(\cdot)$ is unspecified too.
+
+   **What it does not promise, second: optimality.** Nothing in the
+   theorem says the sequence found is anywhere near the shortest one for
+   that target. Counting settles what the shortest could be: a sequence
+   of length $L$ over a fixed gate set names at most a fixed constant to
+   the power $L$ distinct products, and covering $SU(2)$ to resolution
+   $\epsilon$ needs about $\epsilon^{-3}$ of them, so
+   $L=\Omega(\log(1/\epsilon))$ and no better. A construction with
+   $c\approx4$ therefore overshoots the information-theoretic floor by a
+   large polynomial factor in $\log(1/\epsilon)$, and the theorem is
+   entirely comfortable with that.
+
+   **What it does not promise, third: anything about T-count.** It counts
+   gates from $G$ undifferentiated. On a fault-tolerant machine the only
+   gate anyone is billed for is $T$, and a synthesis algorithm that
+   minimizes total gate count is not optimizing the quantity that costs
+   money.
+
+   The compressed version worth carrying: Solovay-Kitaev is an
+   *existence-and-efficiency* theorem, and the practical question is
+   always an *optimality* question. Confusing the two is what makes
+   people stop looking once they have a working compiler, and this
+   lesson's factor of several thousand is what that costs.
+
+   </details>
+
 2. For $\epsilon=10^{-10}$, using $\log_2(1/\epsilon)\approx33.22$
    bits, compute the Ross-Selinger-style T-count estimate at both the
    $3\times$ and $4\times$ coefficients, and explain why a real near-optimal
    synthesis algorithm's actual output should fall inside that range
    rather than exactly matching either endpoint.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   3\times33.22 = 99.7, \qquad 4\times33.22 = 132.9,
+   $$
+
+   so roughly **100 to 133 T gates**, about 116 at the midpoint
+   coefficient $3.5$.
+
+   Put that beside the generic estimate for the same target at the same
+   precision, $33.22^{3.97}\approx1.1\times10^{6}$: about $9{,}400$ times
+   more T gates for an identical rotation compiled to identical accuracy.
+   That ratio is the entire argument for using the right synthesis
+   algorithm, and it is not an asymptotic curiosity, it is a hundred
+   magic states against a million.
+
+   **Why a real output lands strictly inside the band.** The endpoints
+   are not two competing formulas with one correct answer between them.
+   They bracket a leading coefficient whose exact value depends on the
+   particular angle being compiled.
+
+   The reachable Clifford+T operators form a discrete, arithmetically
+   defined set, and how close the nearest reachable point happens to sit
+   to a given $\theta$ is a property of that $\theta$'s arithmetic, not
+   of the algorithm. Some angles are lucky and some are not. The extreme
+   case makes it obvious: an angle that is *exactly* representable, say
+   $\theta=\pi/4$, needs one T gate at any $\epsilon$ whatsoever, and no
+   formula linear in $\log_2(1/\epsilon)$ describes that. Ordinary angles
+   scatter through the band.
+
+   Two further reasons the endpoints are not attainable targets. The
+   estimate carries lower-order additive terms, on the order of
+   $\log\log(1/\epsilon)$, which shift a hundred-gate answer by a few
+   gates in either direction. And the near-optimality guarantee itself is
+   conditional on a number-theoretic conjecture about the density of
+   certain primes, with a slightly worse unconditional fallback. An
+   algorithm reporting exactly $3\log_2(1/\epsilon)$ every time, for
+   every angle, would be reporting the formula rather than its own
+   output.
+
+   **What the number means downstream, since T-count is a currency and
+   not a score.** One rotation costs about 116 magic states. A
+   Trotterized simulation or a QSVT phase sequence contains millions of
+   $R_z$ rotations, so the factory bill is $10^8$ magic states and up, and
+   the choice of synthesis algorithm multiplies that bill by four
+   orders of magnitude. This is the same arithmetic the fault-tolerance
+   capstone runs from the other end, and it is why compilers optimize
+   T-count before anything else.
+
+   </details>
+
 3. Why does it make sense that a number-theoretic algorithm like
    Ross-Selinger exists specifically for the $R_z(\theta)$ gate family
    and not (with the same near-optimality guarantee) for an arbitrary
    $SU(2)$ target, given what the ring $\mathbb{Z}[1/\sqrt2,i]$ has to do
    with which matrices a Clifford+T circuit can even produce?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the ring turns synthesis into a Diophantine approximation
+   problem, and $R_z$ makes that problem one-dimensional while a general
+   $SU(2)$ target makes it three-dimensional.
+
+   Start from what the ring actually says. A Clifford+T circuit's matrix
+   entries all lie in $\mathbb{Z}[1/\sqrt2,i]$, because $H$ contributes
+   factors of $1/\sqrt2$ and $S$ and $T$ contribute powers of $i$ and
+   $e^{i\pi/4}$, and nothing else ever enters. The exactly reachable
+   operators are therefore not a vague dense cloud; they are a discrete
+   set defined by arithmetic conditions, enumerable by the power of
+   $\sqrt2$ in their denominators. Synthesis stops being "search a
+   continuous group" and becomes "find the nearest point of an
+   arithmetically described set."
+
+   **Why $R_z$ is the tractable case.** $R_z(\theta) =
+   \mathrm{diag}(e^{-i\theta/2}, e^{i\theta/2})$ is diagonal, so up to
+   global phase the entire target is one unit complex number. Approaching
+   it means finding a ring element of the right form close to a single
+   point on the unit circle: an approximation problem in **one** complex
+   parameter. That is exactly the shape classical number theory is good
+   at. Ross-Selinger reduces it to enumerating candidates in a thin
+   region (a two-dimensional lattice problem, solvable directly) and then
+   solving a norm equation to complete the candidate into a full unitary,
+   which reduces to factoring one integer. Both halves exist because
+   there is one unknown.
+
+   **Why a general target is not.** An arbitrary $SU(2)$ element has
+   three real parameters, so the same reduction produces a
+   higher-dimensional grid problem and there is no analogue of the
+   one-variable norm equation to close it. Nobody has a comparable
+   algorithm, and the fallback is generic Solovay-Kitaev recursion, with
+   the cost this lesson measures.
+
+   **The wrong turn worth correcting** is reading the ring as a
+   *limitation* that a clever algorithm has to route around. It is the
+   reverse. The ring is the structure that makes near-optimal synthesis
+   possible at all. If the reachable set were merely dense in $SU(2)$
+   with no arithmetic description, no search better than generic
+   recursive refinement would be available for anything. Structure is the
+   resource here, and Ross-Selinger's achievement is exploiting it rather
+   than surviving it.
+
+   **How compilers handle arbitrary targets anyway,** because they do,
+   and it is worth knowing the escape route. Any $SU(2)$ element factors
+   into Euler angles, $U = R_z(\alpha)R_y(\beta)R_z(\gamma)$, and the
+   $y$-rotation becomes a $z$-rotation by Clifford conjugation, which is
+   free in T-count. Synthesize the three $z$-rotations separately, each
+   to about a third of the error budget. The cost is roughly three times
+   a single rotation's T-count plus a small additive term for splitting
+   the budget, which is excellent in practice and is still not the same
+   claim: it inherits a factor-of-three penalty and a guarantee that no
+   longer matches the single-rotation optimality result. Good enough for
+   a compiler; not the theorem.
+
+   And this is why the $R_z$-only result is the one that mattered rather
+   than a special case anyone should apologize for. Trotter steps, QSP
+   and QSVT phase sequences, and phase-estimation ladders are all long
+   lists of $z$-rotations. Solving one family well solved most of the
+   demand.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -429,16 +622,15 @@ Both matter for the total resource budget, but they are separate levers.
   {comparisonRatioAtTenDigits.toExponential(2)}, and the gap widens further
   as the target precision tightens.
 
-## Further Exploration
+## What T-Count Leaves Out
 
-Next: [Noise-Aware Compilation and Resource Estimation](/lessons/apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation),
-which takes T-count as one input among several (connectivity, native
-gate fidelities, decoder timing) needed to turn a compiled circuit into a
-full resource estimate for real hardware.
+T-count is a property of the compiled circuit alone. It says nothing
+about the machine the circuit runs on, and a real device imposes costs
+that no amount of synthesis cleverness removes.
 
 <NextDiscovery>
-  Next: Noise-Aware Compilation and Resource Estimation takes T-count as
-  one input among several — connectivity, native gate fidelities,
-  decoder timing — needed to turn a compiled circuit into a full
-  resource estimate for real hardware.
+  [Noise-Aware Compilation and Resource Estimation](/lessons/apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation)
+  takes T-count as one input among several (connectivity, native gate
+  fidelities, decoder timing) needed to turn a compiled circuit into a
+  full resource estimate for real hardware.
 </NextDiscovery>

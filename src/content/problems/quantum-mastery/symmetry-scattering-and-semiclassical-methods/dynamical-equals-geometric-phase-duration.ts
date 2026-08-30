@@ -46,6 +46,6 @@ export const dynamicalEqualsGeometricPhaseDuration: NumericProblem = {
     finalAnswer: "≈3.1416 (T=π)",
   },
   explanation: {
-    correctIdea: "Past this duration, the dynamical phase keeps growing without bound as the loop is traversed ever more slowly, while the geometric phase stays fixed at π/2 forever after — the capstone's central contrast, made concrete at this specific crossing point.",
+    correctIdea: "Past this duration, the dynamical phase keeps growing without bound as the loop is traversed ever more slowly, while the geometric phase stays fixed at π/2. That is the capstone's central contrast, made concrete at this crossing point.",
   },
 };

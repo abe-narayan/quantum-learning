@@ -38,7 +38,7 @@ export const zeroPlusInnerProduct: NumericProblem = {
   hints: [
     { text: "⟨0| = (1, 0), acting on |+⟩'s column vector, is ordinary row-times-column matrix multiplication." },
     { text: "|+⟩ = (1/√2, 1/√2), so ⟨0|+⟩ picks out just the first entry." },
-    { text: "The first entry of |+⟩'s vector is 1/√2." },
+    { text: "Read off that first entry. Note that the result is an amplitude, not yet a probability." },
   ],
   solution: {
     steps: [
@@ -51,8 +51,8 @@ export const zeroPlusInnerProduct: NumericProblem = {
     correctIdea: "Taking an inner product with a basis state ⟨0| just extracts that basis state's coefficient from the ket, thanks to orthonormality.",
     whyCorrect: "⟨0|+⟩ = ⟨0|(1/√2|0⟩+1/√2|1⟩) = 1/√2⟨0|0⟩ + 1/√2⟨0|1⟩ = 1/√2(1) + 1/√2(0) = 1/√2, using ⟨0|0⟩=1 and ⟨0|1⟩=0 directly.",
     whyWrong: [
-      "Answering 1 confuses this with ⟨0|0⟩ — |+⟩ is not |0⟩, it's a superposition, so the overlap is partial.",
-      "Answering 0 would be correct for ⟨0|1⟩, not ⟨0|+⟩ — |+⟩ has a nonzero |0⟩ component.",
+      "Answering 1 confuses this with ⟨0|0⟩. |+⟩ is a superposition, not |0⟩, so the overlap is partial.",
+      "Answering 0 would be right for ⟨0|1⟩. |+⟩ carries a nonzero |0⟩ component.",
     ],
   },
 };

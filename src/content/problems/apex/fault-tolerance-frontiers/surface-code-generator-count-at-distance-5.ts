@@ -44,7 +44,7 @@ export const surfaceCodeGeneratorCountAtDistance5: NumericProblem = {
   hints: [
     { text: "The lesson showed the general d-dependence: n = 2d^2-2d+1 data qubits, and X-stabilizers and Z-stabilizers each number d(d-1)." },
     { text: "Since exactly 1 logical qubit is encoded for any d, independent generators must equal n-1." },
-    { text: "Compute either n-1 directly, or 2*d*(d-1) directly -- both routes must agree." },
+    { text: "Compute either n-1 or 2*d*(d-1). Both routes must agree." },
   ],
   solution: {
     steps: [
@@ -55,8 +55,8 @@ export const surfaceCodeGeneratorCountAtDistance5: NumericProblem = {
     finalAnswer: "40 independent stabilizer generators (20 X-type + 20 Z-type) at distance 5.",
   },
   explanation: {
-    correctIdea: "Both counting routes -- (data qubits minus 1) and (2 times the per-type stabilizer count) -- must agree for any d, because the surface code always encodes exactly 1 logical qubit regardless of its distance.",
-    whyCorrect: "This is the same n-1 arithmetic the lesson verified explicitly at d=3 (13 qubits, 12 generators), just carried to a larger, still fully computable, patch size.",
-    whyWrong: ["Using n = d^2 (the rotated-code qubit count) instead of n = 2d^2-2d+1 (this lesson's chosen unrotated convention) gives a different, inconsistent answer -- the two conventions are not interchangeable."],
+    correctIdea: "Both counting routes, (data qubits minus 1) and (2 times the per-type stabilizer count), must agree for any d, because the surface code always encodes exactly 1 logical qubit regardless of its distance.",
+    whyCorrect: "This is the same n-1 arithmetic the lesson verified at d=3 (13 qubits, 12 generators), carried to a larger but still hand-computable patch size.",
+    whyWrong: ["Using n = d^2 (the rotated-code qubit count) instead of n = 2d^2-2d+1 (this lesson's unrotated convention) gives a different, inconsistent answer. The two conventions are not interchangeable."],
   },
 };

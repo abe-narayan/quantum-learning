@@ -29,7 +29,7 @@ export type ScatteringResult = { reflection: number; transmission: number };
 export function stepPotentialScattering(energy: number, stepHeight: number): ScatteringResult {
   if (!(energy > stepHeight)) {
     throw new Error(
-      `stepPotentialScattering requires energy > stepHeight (got energy=${energy}, stepHeight=${stepHeight}) — energy <= stepHeight is total reflection, not covered by this over-the-step formula.`
+      `stepPotentialScattering requires energy > stepHeight (got energy=${energy}, stepHeight=${stepHeight}). Energy <= stepHeight is total reflection, which is not covered by this over-the-step formula.`
     );
   }
   const k1 = wavenumber(energy);
@@ -58,7 +58,7 @@ export function stepPotentialScattering(energy: number, stepHeight: number): Sca
 export function barrierScatteringTransmission(energy: number, barrierHeight: number, barrierWidth: number): number {
   if (!(energy > barrierHeight)) {
     throw new Error(
-      `barrierScatteringTransmission requires energy > barrierHeight (got energy=${energy}, barrierHeight=${barrierHeight}) — use the Wavefunction Explorer's tunneling preset for energy < barrierHeight.`
+      `barrierScatteringTransmission requires energy > barrierHeight (got energy=${energy}, barrierHeight=${barrierHeight}). Use the Wavefunction Explorer's tunneling preset for energy < barrierHeight.`
     );
   }
   const k2 = Math.sqrt(2 * (energy - barrierHeight));

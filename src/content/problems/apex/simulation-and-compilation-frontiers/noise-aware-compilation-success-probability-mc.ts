@@ -17,10 +17,10 @@ export const noiseAwareCompilationSuccessProbabilityMc: MultipleChoiceProblem = 
     prompt:
       "The lesson's naive (identity) and noise-aware (mirrored) mappings both compile the same circuit into exactly 17 CNOT-equivalent two-qubit operations on the same 4-qubit linear-chain device, yet the naive mapping's estimated success probability (about 73.8%) is meaningfully lower than the noise-aware mapping's (about 83.8%). What best explains this gap?",
     options: [
-      { id: "fewer-gates", text: "The noise-aware compiler cancelled redundant SWAPs, so its 17 operations are cheaper ones." },
-      { id: "recalibrated", text: "The noise-aware compiler recalibrated the device's worst coupler before running the circuit." },
-      { id: "remapped-load", text: "The noise-aware mapping routes fewer operations through the device's worst coupler, at the same gate count." },
-      { id: "better-gate-set", text: "The noise-aware compiler targeted a native two-qubit gate with a lower error rate than CNOT." },
+      { id: "fewer-gates", text: "The noise-aware compiler cancelled redundant SWAPs, so its 17 operations are individually cheaper." },
+      { id: "recalibrated", text: "The noise-aware compiler recalibrated the device's worst coupler before running the circuit on it." },
+      { id: "remapped-load", text: "The noise-aware compiler routed fewer of the 17 operations through the device's worst coupler." },
+      { id: "better-gate-set", text: "The noise-aware compiler targeted a native two-qubit gate whose error rate is lower than CNOT's." },
     ],
   },
   answer: {
@@ -35,14 +35,14 @@ export const noiseAwareCompilationSuccessProbabilityMc: MultipleChoiceProblem = 
       "Compare the two mappings' operation tallies per coupler: naive puts 7 of 17 operations on the flagged worst coupler, while noise-aware puts only 2 of 17 there, with the same 8 on the middle coupler in both cases. Nothing about the gate count or the hardware itself changed.",
   },
   hints: [
-    { text: "Count the total CNOT-equivalent operations in each compilation first — the lesson is explicit that both equal 17." },
-    { text: "Since the circuit size is identical, the success-probability difference must come from WHERE each operation physically runs, not how many there are." },
+    { text: "Count the total CNOT-equivalent operations in each compilation first. The lesson is explicit that both equal 17." },
+    { text: "Since the circuit size is identical, the success-probability difference must come from where each operation physically runs, not how many there are." },
     { text: "Recall the device's three couplers have different, individually calibrated error rates (0.5%, 1%, and 3%), and mapping choice determines which coupler absorbs the heaviest load." },
   ],
   solution: {
     steps: [
       { description: "Both compilations have identical gate count: 17 CNOT-equivalent operations, so gate count cannot explain the gap." },
-      { description: "The device itself is unchanged between the two compilations — no recalibration, no different native gate set." },
+      { description: "The device itself is unchanged between the two compilations: no recalibration, no different native gate set." },
       { description: "The only thing that differs is the logical-to-physical qubit mapping, which changes which physical coupler each operation uses, and the device's couplers have different, non-uniform error rates." },
       { description: "The naive mapping happens to route 7 of 17 operations through the flagged 3%-error coupler; the noise-aware mapping routes only 2 of 17 through it, moving the heavy load onto the well-calibrated 0.5%-error coupler instead." },
     ],

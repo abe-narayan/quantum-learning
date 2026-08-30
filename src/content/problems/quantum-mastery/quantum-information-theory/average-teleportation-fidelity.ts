@@ -40,7 +40,7 @@ export const averageTeleportationFidelity: NumericProblem = {
     finalAnswer: "F_avg = 0.9.",
   },
   explanation: {
-    correctIdea: "This averaged formula answers a different question than a specific-state fidelity computation -- it's the mean fidelity over every possible message state, weighted by the Haar measure.",
-    whyCorrect: "The lesson's own worked example computed a genuinely different number, F≈0.9528, for one specific message state under a resource with F_e=0.9 -- both are correct, but they answer different questions.",
+    correctIdea: "This averaged formula answers a different question than a specific-state fidelity computation. It is the mean fidelity over every possible message state, weighted by the Haar measure.",
+    whyCorrect: "The lesson's worked example computed a different number, F≈0.9528, for one specific message state under a resource with F_e=0.9. Both are correct; they answer different questions.",
   },
 };

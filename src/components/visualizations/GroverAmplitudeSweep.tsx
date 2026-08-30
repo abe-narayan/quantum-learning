@@ -8,7 +8,7 @@
  *   <GroverAmplitudeSweep
  *     n={3}
  *     markedIndices={[5]}
- *     ariaLabel="Grover amplitude amplification over iterations, showing the marked state's probability rise past 96% then fall back down."
+ *     ariaLabel="Grover amplitude amplification over iterations, showing the marked state's probability peak near 95% at the optimal iteration count and fall away either side of it."
  *   />
  *
  * Steps through real Grover iterations computed by `@/lib/quantum/grover.ts`
@@ -86,7 +86,42 @@ export function GroverAmplitudeSweep({
 
   const markedProbability = distribution.filter((o) => markedSet.has(o.index)).reduce((sum, o) => sum + o.probability, 0);
 
-  const phase = k === 0 ? "Uniform superposition, before any iteration." : k < optimal ? "Rising toward the optimum." : k === optimal ? "At the library's optimal iteration count — the peak." : "Past the optimum — over-rotating back down.";
+  // The whole sweep's marked probability, from the same `runGrover` the drawn
+  // bars come from, so the sentence below can be read off the data instead of
+  // asserted over it.
+  //
+  // It has to be, because the old sentence was false at the end of the real
+  // call site's sweep. `grovers-algorithm-amplitude-amplification.mdx` mounts
+  // n = 4, one marked item, so `optimal` is 3 and `upperBound` is 3 x 2 + 2 = 8,
+  // and P(marked) over k = 0..8 runs
+  //   0.0625, 0.4727, 0.9084, 0.9613, 0.5817, 0.1255, 0.0204, 0.3649, 0.8361.
+  // Grover's iteration is a rotation by a fixed angle, so it is periodic: the
+  // amplitude falls to a floor at k = 6 and then climbs again. For every k > 3
+  // the readout said "over-rotating back down", which is right at k = 4, 5, 6
+  // and plainly contradicted by the bars at k = 7 and 8, where the marked bar
+  // is visibly taller than it was the step before. At the component default
+  // (n = 3, upperBound 6) it was worse still: P at k = 6 is 0.9998, higher than
+  // the 0.9453 at the optimum the sentence was calling "the peak".
+  const sweepMarkedProbability = useMemo(() => {
+    return Array.from({ length: upperBound + 1 }, (_, step) =>
+      measurementDistribution(runGrover(n, markedIndices, step))
+        .filter((o) => markedSet.has(o.index))
+        .reduce((sum, o) => sum + o.probability, 0)
+    );
+  }, [n, markedIndices, markedSet, upperBound]);
+
+  const risingFromPreviousStep = k > 0 && markedProbability > sweepMarkedProbability[k - 1] + 1e-9;
+
+  const phase =
+    k === 0
+      ? "Uniform superposition, before any iteration."
+      : k < optimal
+        ? "Rising toward the optimum."
+        : k === optimal
+          ? "At the library's optimal iteration count: the high point of the first climb, and the value the algorithm is meant to stop on."
+          : risingFromPreviousStep
+            ? "Past the optimum. The rotation has overshot, passed its low point and started back up, so this rise is a later lap rather than progress: the algorithm has no way to know which lap it is on without the count."
+            : "Past the optimum, over-rotating back down.";
 
   const handlePlayPause = () => {
     if (playing) {
@@ -201,7 +236,7 @@ export function GroverAmplitudeSweep({
       <div className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         P(marked) = {markedProbability.toFixed(3)} after {k} iteration{k === 1 ? "" : "s"}. {phase}
       </div>
-      <div aria-live="polite" className="sr-only">
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
         {playing ? "" : `P(marked) = ${markedProbability.toFixed(3)} after ${k} iteration${k === 1 ? "" : "s"}. ${phase}`}
       </div>
     </div>

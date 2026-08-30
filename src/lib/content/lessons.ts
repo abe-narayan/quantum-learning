@@ -100,3 +100,11 @@ export function getLessonMeta(slug: string): LessonMetaWithSlug | undefined {
 export async function getLessonsForCourse(courseSlug: string): Promise<LessonMetaWithSlug[]> {
   return LESSON_METAS.filter((lesson) => lesson.course === courseSlug);
 }
+
+/**
+ * How many lessons stop and ask the reader to commit to an answer, counted
+ * from the corpus by the registry generator. The homepage states this as a
+ * fact about the site, so it is derived here rather than kept by hand: the
+ * previous hand-kept figure had drifted five lessons behind the corpus.
+ */
+export { PREDICTION_LESSON_COUNT, PREDICTION_INSTANCE_COUNT } from "./lessonMeta.generated";

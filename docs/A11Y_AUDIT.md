@@ -1,5 +1,18 @@
 # Accessibility audit
 
+> **This file is a findings log, not a guide.** It records what was found on
+> a specific date, in a specific tree, and whether each finding has since
+> been resolved. **Nothing in it is a rule.** The accessibility rules that
+> bind live in [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) §9 and in the tests
+> listed in [`README.md`](README.md); if a finding here produced a durable
+> rule, that rule was written into one of those and this entry stayed
+> historical. Do not "fix" anything on the strength of a line reference in
+> this file without re-reading the code first; several of these files have
+> been rewritten since.
+>
+> Audit date: **2026-08-29**. Resolution status is recorded inline below,
+> and is itself dated. Where a finding has not been re-verified, it says so.
+
 Read against `docs/DESIGN_SYSTEM.md` §9, `docs/UX_REVIEW.md`, `docs/UX_REVIEW_2.md`,
 `docs/README.md` and `AGENTS.md`, then the components and routes below, as
 they stand in the working tree while twelve agents actively edit them. This
@@ -34,11 +47,32 @@ Counts: **4 Blocker, 9 Serious, 9 Polish** = 22 findings.
 >    (implicit ARIA `term`) around the phrase, `role="definition"` on the
 >    panel. There is no literal `role="term"` attribute to grep for.
 >
-> The Serious and Polish findings further down have **not** been re-verified
-> one by one in this pass; several are known fixed (Navbar Escape,
-> `IconButton`, linked prerequisites — see `SPRINT_BRIEF.md`). Re-check
-> against the code before acting on any specific line reference, as the
-> preamble to `docs/README.md` says.
+> Four further findings were re-verified against the code on 2026-08-29 and
+> are **resolved**:
+>
+> - *Polish, `Navbar.tsx`: mobile menu disclosure doesn't close on Escape.*
+>   It does now, and it hands focus back to the trigger rather than dropping
+>   it to `<body>`. The component's own comment records why it deliberately
+>   omits the `onBlur` close and the focus trap that `TracksDropdown` has.
+> - *Polish, `SearchTrigger.tsx`: `aria-expanded`/`aria-haspopup` with no
+>   `aria-controls`.* It now sets `aria-controls` **only while open**, which
+>   is the correct reading of the spec: the attribute may name only an id
+>   actually in the document, and the dialog does not exist when closed.
+> - *Polish: chrome icon buttons at 40×40px.* `ui/IconButton.tsx` now
+>   declares the 44px hit area in one place, as `max(44px, own size)` so it
+>   can never *shrink* a larger labelled trigger.
+> - *Serious: `.katex-display` scroll has no keyboard path.* Covered by
+>   Top-five item 3 above; note additionally that the `[data-math-plain]`
+>   variant added later (display math inside a `TheoremBox`,
+>   `DefinitionBox` or `DerivationSteps`) deliberately preserves the
+>   `tabindex`, the scroll and the overflow indicator while dropping only
+>   the frame. See `DESIGN_SYSTEM.md` §4.
+>
+> The remaining Serious and Polish findings have **not** been re-verified one
+> by one. Re-check against the code before acting on any specific line
+> reference, as the preamble to `docs/README.md` says. Several of the files
+> named below have been substantially rewritten since this was written, and
+> the line numbers in particular should be assumed wrong.
 
 ## Top five
 

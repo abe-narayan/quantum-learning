@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { PresetToggle } from "./PresetToggle";
 import { useFrameIndex } from "./useFrameIndex";
 
@@ -31,7 +32,7 @@ const modes = [
   },
   {
     label: "Actual result",
-    caption: "Stern and Gerlach's silver atoms landed in exactly two spots — nothing in between.",
+    caption: "Stern and Gerlach's silver atoms landed in exactly two spots, with nothing in between.",
   },
 ];
 
@@ -62,6 +63,14 @@ function Label({ x, y, children }: { x: number; y: number; children: string }) {
 export function SternGerlachScreen({ ariaLabel }: { ariaLabel: string }) {
   const { index, setIndex, frame: mode } = useFrameIndex(modes);
   const isActual = index === 1;
+  // `useId()` rather than a literal id string. Two instances of this figure
+  // on one page emitted duplicate ids, which is invalid HTML and leaves
+  // every reference ambiguous: an `id` lookup resolves to the first match in
+  // document order, so the second instance's references silently pointed at
+  // the first instance's element. Harmless while both are identical, wrong
+  // the moment they are not. Matches `ProjectionShadow`, which already does
+  // this.
+  const idBase = useId();
 
   return (
     <div className="not-prose space-y-4 panel-inset p-4">
@@ -89,12 +98,12 @@ export function SternGerlachScreen({ ariaLabel }: { ariaLabel: string }) {
           aria-label={`${ariaLabel}: ${mode.label}. ${mode.caption}`}
         >
           <defs>
-            <radialGradient id="sg-classical-smear" cx="50%" cy="50%" r="50%">
+            <radialGradient id={`${idBase}-classical-smear`} cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="var(--brand)" stopOpacity={0.5} />
               <stop offset="55%" stopColor="var(--brand)" stopOpacity={0.22} />
               <stop offset="100%" stopColor="var(--brand)" stopOpacity={0} />
             </radialGradient>
-            <marker id="sg-beam-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <marker id={`${idBase}-beam-arrow`} markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
               <path d="M0,0 L8,4 L0,8 Z" className="fill-foreground" />
             </marker>
           </defs>
@@ -113,7 +122,7 @@ export function SternGerlachScreen({ ariaLabel }: { ariaLabel: string }) {
             y2={EXIT_Y}
             className="stroke-foreground"
             strokeWidth={2}
-            markerEnd="url(#sg-beam-arrow)"
+            markerEnd={`url(#${idBase}-beam-arrow)`}
           />
 
           {/* inhomogeneous magnet: knife-edge N pole above, wide U-shaped S pole below */}
@@ -178,7 +187,7 @@ export function SternGerlachScreen({ ariaLabel }: { ariaLabel: string }) {
               y={SCREEN_TOP + 2}
               width={SCREEN_WIDTH - 4}
               height={SCREEN_BOTTOM - SCREEN_TOP - 4}
-              fill="url(#sg-classical-smear)"
+              fill={`url(#${idBase}-classical-smear)`}
             />
           )}
           <Label x={SCREEN_X + SCREEN_WIDTH / 2} y={198}>

@@ -42,7 +42,7 @@ export const totalCnotEquivalentOps: NumericProblem = {
   },
   explanation: {
     correctIdea: "This shows the real multiplicative cost of transpilation: one logical two-qubit gate becomes 25 physical CNOT-equivalent operations for a distant qubit pair.",
-    whyCorrect: "Direct application of the lesson's own SWAP-to-CNOT decomposition count.",
+    whyCorrect: "Each SWAP costs three CNOTs, so the routed circuit's two-qubit count follows from the SWAP count by one multiplication. Counting in CNOT-equivalents is what makes routing overhead comparable across architectures with different native gates.",
     whyWrong: ["Forgetting to add the original logical CNOT (answering just 24) undercounts the true total by one operation."],
   },
 };

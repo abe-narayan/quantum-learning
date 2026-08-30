@@ -22,7 +22,7 @@ export const uncertaintyBoundYZ: NumericProblem = {
     type: "numeric",
     value: 1,
     tolerance: 0.01,
-    incorrectFeedback: "⟨[Y,Z]⟩ = 2i⟨X⟩. The common slips are forgetting to halve at the end, or mishandling the magnitude of the imaginary unit. The factor of two from the commutator and the half in front of the bound interact simply; track them separately.",
+    incorrectFeedback: "⟨[Y,Z]⟩ = 2i⟨X⟩. The common slips are forgetting to halve at the end, or mishandling the magnitude of the imaginary unit. Track the factor of two from the commutator and the half in front of the bound separately.",
     nearMisses: [
       { value: 2, feedback: "2 is |⟨[Y,Z]⟩| before the bound's factor of 1/2 is applied." },
       { value: 0.5, feedback: "0.5 halves ⟨X⟩ but drops the commutator's own factor of 2. Both factors are in play: [Y,Z] = 2iX, and the bound halves the result." },

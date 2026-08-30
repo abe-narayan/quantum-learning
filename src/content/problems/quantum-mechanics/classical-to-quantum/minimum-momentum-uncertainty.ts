@@ -29,8 +29,9 @@ export const minimumMomentumUncertainty: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Rearrange rather than compute: divide both sides of the uncertainty relation by Δx and read off the smallest Δp allowed." },
-    { text: "In units of ħ/Δx, the bound Δp ≥ ħ/(2Δx) becomes a pure number. What fraction sits in front?" },
+    { text: "Nothing here has to be evaluated numerically. Rearranging the inequality so that $\\Delta p$ stands alone is the entire task." },
+    { text: "Divide both sides by $\\Delta x$, then read off the smallest value of $\\Delta p$ the inequality still permits." },
+    { text: "The prompt asks for the result in units of $\\hbar/\\Delta x$, so what is left over is the pure number in front of that combination. Check whether the 2 ended up above or below the line." },
   ],
   solution: {
     steps: [

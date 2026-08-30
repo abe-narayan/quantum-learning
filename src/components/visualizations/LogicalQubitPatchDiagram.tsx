@@ -30,11 +30,36 @@ export function LogicalQubitPatchDiagram({ ariaLabel }: { ariaLabel: string }) {
   );
 
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
-      <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
-        {/* 11 -> 13 units. This 420-unit viewBox renders `w-full`, so on a 320px phone
-            (a ~256px column inside `panel-inset p-4`) a unit is ~0.61px and 11 came out
-            at ~6.7px. The old wording was also already too long for the box: 68
+    // `w-full` removed. The note below computes the scale correctly and then
+    // stops one step short of the floor. The real content box is
+    // 320 - 32 (Container `px-4`) = 288, less 2 x (16px `p-4` + 1px
+    // `panel-inset` border) = 254px, so against a 420-unit viewBox a unit is
+    // 254/420 = 0.605px and the sizes this file settled on paint at
+    //   13 units -> 7.86px   (title, "one logical qubit")
+    //   12 units -> 7.26px   (legend, "illustrative, not to scale" caption)
+    // both under the ~9px floor. Reaching 9px under `w-full` would need
+    // 9 x 420/254 = 14.9 -> 15 units, at which the longest caption line
+    // ("physical qubits, per this lesson's Synthesis", 43 monospace characters,
+    // 43 x 15 x 0.6 = 387 units from x = 84) ends at 471 and clips out of the
+    // 420-unit viewBox. Text that overruns a viewBox is silently cut, not
+    // scrolled, so raising the size under `w-full` trades illegible type for
+    // missing words.
+    //
+    // Dropping `w-full` lets the intrinsic `width={420}` stand: one unit is one
+    // CSS pixel, 13 and 12 units are a literal 13px and 12px, and every width
+    // budget already written into the notes below is unchanged because the
+    // viewBox is unchanged. The wrapper's `overflow-x-auto` takes the 166px of
+    // overflow on a phone, exactly as in `EnergyLevelDiagram`.
+    //
+    // `tabIndex={0}`: a scroll container is focusable by default in no browser
+    // but Firefox, and the right-hand columns of the patch (and the ancilla
+    // legend swatch at x = 224) sit past a 254px viewport. No `role` or
+    // `aria-label` on the wrapper: the `<svg>` already carries both.
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
+      <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
+        {/* 11 -> 13 units. Under the `w-full` this figure used to carry, a unit was
+            ~0.605px on a 320px phone (a 254px column inside `panel-inset p-4`) and 11
+            came out at ~6.7px. The old wording was also already too long for the box: 68
             monospace characters is ~449 units at 11 against a 420-unit viewBox, so it
             was clipping at *every* width. Trimmed to the claim itself — "surface-code-
             style" is what the picture shows, and the aria-label carries the full
@@ -115,7 +140,7 @@ export function LogicalQubitPatchDiagram({ ariaLabel }: { ariaLabel: string }) {
             the caveat that keeps this figure honest about not being to scale. The
             viewBox is 400 units tall and the last line now ends at ~372. */}
         <text x={RECT_X} y={336} className="fill-muted-foreground text-[12px] font-mono">
-          illustrative, not to scale — a real
+          illustrative, not to scale: a real
         </text>
         <text x={RECT_X} y={352} className="fill-muted-foreground text-[12px] font-mono">
           logical qubit runs 100s to several thousand

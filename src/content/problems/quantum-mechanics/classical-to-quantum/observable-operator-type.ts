@@ -27,7 +27,7 @@ export const observableOperatorType: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "Unitary operators are what Postulate 4 requires for dynamics, not observables.",
-      c: "Anti-Hermitian operators have purely imaginary expectation values — the opposite of what a real-valued measurement outcome needs.",
+      c: "Anti-Hermitian operators have purely imaginary expectation values, the opposite of what a real-valued measurement outcome needs.",
       d: "Most invertible operators aren't Hermitian and would allow complex eigenvalues, which can't be measurement outcomes.",
     },
     defaultIncorrectFeedback: "Think about what guarantees a measurement outcome comes out real.",

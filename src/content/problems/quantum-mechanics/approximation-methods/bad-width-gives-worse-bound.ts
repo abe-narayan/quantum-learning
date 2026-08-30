@@ -25,20 +25,20 @@ export const badWidthGivesWorseBound: MultipleChoiceProblem = {
     prompt: `A Gaussian trial with width σ=3 (far from the optimum σ≈0.7) gives ⟨H⟩≈${badEnergy.toFixed(3)}, compared to the optimized ⟨H⟩≈${bestEnergy.toFixed(3)}. What does the variational theorem say about this?`,
     options: [
       { id: "a", text: "Both are valid upper bounds on E₀=0.5; the badly-chosen width just gives a looser (higher) bound" },
-      { id: "b", text: "The σ=3 result must be wrong, since it doesn't match the exact answer" },
-      { id: "c", text: "Only the optimized result is a valid upper bound — non-optimal widths don't obey the theorem" },
-      { id: "d", text: "This shows the variational method fails for badly-chosen trial parameters" },
+      { id: "b", text: "The σ=3 result must be wrong, since it sits nowhere near the exact answer" },
+      { id: "c", text: "Only the optimized result is a valid upper bound, since the theorem is a statement about the minimum over the family" },
+      { id: "d", text: "This shows the variational method fails once the trial parameters are chosen badly enough" },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Both values are legitimate — ⟨H⟩ for ANY normalized trial state is ≥E₀; a bad choice just means a less tight bound, not an invalid one.",
-      c: "The theorem applies to every normalized trial state, optimized or not — optimization only finds the tightest bound within a family, it isn't a precondition for the inequality to hold.",
-      d: "The method isn't failing — it's working exactly as guaranteed: giving a valid (if loose) upper bound, which is all the theorem promises for any single trial choice.",
+      b: "Both values are legitimate: ⟨H⟩ for ANY normalized trial state is ≥E₀, and a bad choice means a less tight bound, not an invalid one.",
+      c: "The theorem applies to every normalized trial state, optimized or not. Optimization finds the tightest bound within a family; it is not a precondition for the inequality to hold.",
+      d: "The method is not failing. It is doing what the theorem guarantees: giving a valid, if loose, upper bound, which is all that is promised for any single trial choice.",
     },
-    defaultIncorrectFeedback: "Every normalized trial state gives a valid upper bound on E₀, regardless of how good or bad the parameter choice is — only the tightness of the bound changes.",
+    defaultIncorrectFeedback: "Every normalized trial state gives a valid upper bound on E₀, regardless of how good or bad the parameter choice is. Only the tightness of the bound changes.",
   },
   hints: [
     { text: "State the theorem's hypothesis carefully: which trial states does ⟨H⟩ ≥ E₀ apply to?" },
@@ -51,7 +51,7 @@ export const badWidthGivesWorseBound: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Validity and tightness are separate. The theorem promises validity for any normalized trial state, and tightness is what a good trial family and a good parameter choice buy you.",
-    whyCorrect: "Matches the lesson's Common Mistakes point about what a lower ⟨H⟩ does and does not indicate.",
+    whyCorrect: "The theorem's hypothesis is only that the trial state is normalized, and both trials satisfy it. So both expectation values sit above the true ground-state energy; the badly-chosen width buys nothing except a bound further from it.",
     whyWrong: [
       { optionId: "b", text: "Treats disagreement with the exact answer as an error. An upper bound is expected to sit above E₀." },
       { optionId: "c", text: "Adds a hypothesis the theorem does not have. It quantifies over every normalized trial state." },

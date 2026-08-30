@@ -25,7 +25,7 @@ export const anharmonicFirstOrderShift: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "For H'=λx⁴ with λ=0.02 on the harmonic oscillator (m=ω=1), using E₀^(1)=λ⟨0|x⁴|0⟩=3λ/4, what is E₀^(1)?",
-    inputHint: "as a decimal",
+    inputHint: "as a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",

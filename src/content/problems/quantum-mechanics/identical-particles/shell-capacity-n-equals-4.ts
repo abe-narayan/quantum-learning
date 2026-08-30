@@ -33,7 +33,8 @@ export const shellCapacityNEquals4: NumericProblem = {
   },
   hints: [
     { text: "The formula is named in the prompt, so the real work is understanding what it encodes: a shell with principal quantum number n contains n² orbitals, and the exclusion principle lets each orbital hold two electrons of opposite spin." },
-    { text: "Substitute n = 4 into 2n². Square first, then double." },
+    { text: "Substitute n = 4 and respect the order the formula sets: the square acts on n alone, and the factor of 2 is applied to the result." },
+    { text: "If your answer came out as 64, the doubling was pulled inside the square instead of staying outside it." },
   ],
   solution: {
     steps: [

@@ -30,7 +30,7 @@ export const entropyOfSixtyFortyMixture: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "Since ρ is already diagonal, its eigenvalues are just its diagonal entries — apply Shannon entropy directly to (0.6, 0.4).",
+    incorrectFeedback: "Since ρ is already diagonal, its eigenvalues are its diagonal entries. Apply Shannon entropy directly to (0.6, 0.4).",
     nearMisses: [
       {
         value: -0.6 * Math.log(0.6) - 0.4 * Math.log(0.4),

@@ -71,7 +71,7 @@ export function GateControls({
             onChange={(id) => onTargetQubitChange(Number(id))}
           />
         </div>
-        {/* `@sm:` — container query on the controls rail's own box, not the
+        {/* `@sm:` is a container query on the controls rail's own box, not the
             viewport; see SimulatorInstrument.tsx. */}
         <div className="mt-3 grid grid-cols-4 gap-2 @sm:grid-cols-6">
           {SINGLE_QUBIT_GATE_OPTIONS.map((gate) => (
@@ -82,7 +82,7 @@ export function GateControls({
               disabled={disabled}
               title={gate.explanation}
               // The visible label is a single letter, and `title` supplies
-              // only the accessible *description* — which many screen readers
+              // only the accessible *description*, which many screen readers
               // do not announce. Without this the row reads as six bare
               // letters with no indication of what pressing one does, or
               // which wire it lands on.
@@ -99,7 +99,7 @@ export function GateControls({
             variant="secondary"
             size="sm"
             disabled={disabled}
-            title="Marks this wire as measured at this point in the circuit (a diagram annotation — it doesn't change the simulated state)."
+            title="Marks this wire as measured at this point in the circuit (a diagram annotation, so it doesn't change the simulated state)."
             onClick={() => onApplyMeasurement(targetQubit)}
           >
             Measure q{targetQubit}
@@ -119,7 +119,7 @@ export function GateControls({
               // `text-base` below `sm`, matching the Grover and period-finding
               // selects: these inherit `text-xs` from the wrapping row, and
               // iOS Safari zooms the whole page in whenever a form control
-              // smaller than 16px takes focus — so picking a control qubit on
+              // smaller than 16px takes focus, so picking a control qubit on
               // a phone yanked the layout sideways. The desktop size is
               // unchanged.
               className="min-h-11 rounded-(--radius-tight) border border-border bg-surface px-2 py-1 font-mono text-base text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-xs"
@@ -140,7 +140,7 @@ export function GateControls({
               // `text-base` below `sm`, matching the Grover and period-finding
               // selects: these inherit `text-xs` from the wrapping row, and
               // iOS Safari zooms the whole page in whenever a form control
-              // smaller than 16px takes focus — so picking a control qubit on
+              // smaller than 16px takes focus, so picking a control qubit on
               // a phone yanked the layout sideways. The desktop size is
               // unchanged.
               className="min-h-11 rounded-(--radius-tight) border border-border bg-surface px-2 py-1 font-mono text-base text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:text-xs"
@@ -168,7 +168,7 @@ export function GateControls({
                 // Points at the warning below whenever these buttons are
                 // greyed out for the same-qubit reason. Without it, a screen
                 // reader announced "dimmed" with no explanation anywhere in
-                // the control's own name or description — the sighted reader
+                // the control's own name or description; the sighted reader
                 // gets the sentence right underneath, and now so does everyone.
                 aria-describedby={
                   controlQubit === twoQubitTarget ? SAME_QUBIT_WARNING_ID : undefined
@@ -191,14 +191,14 @@ export function GateControls({
               symbol: "ctrl",
               name: "control qubit",
               means:
-                "the qubit that decides. It is never changed by the gate — it only determines whether the target is.",
+                "the qubit that decides. It is never changed by the gate; it only determines whether the target is.",
               glossaryId: "cnot-controlled-gates",
             },
             {
               symbol: "CNOT",
               name: "controlled-NOT",
               means:
-                "flip the target, but only where the control is 1. Applied to a control already in superposition, it is how two qubits become entangled — this is the gate that does it.",
+                "flip the target, but only where the control is 1. Applied to a control already in superposition, it is how two qubits become entangled. This is the gate that does it.",
               glossaryId: "cnot-controlled-gates",
             },
           ]}
@@ -219,7 +219,7 @@ export function GateControls({
           keyboard reader who pressed Clear had focus dropped to <body> by
           their own keystroke and their next Tab restarted from the top of the
           page rather than continuing to the Restore control sitting right
-          beside it — the one control that undoes what they just did.
+          beside it, the one control that undoes what they just did.
 
           `aria-disabled` announces the same "dimmed, unavailable" state while
           keeping the element focusable, so focus stays put and Tab still
@@ -259,7 +259,7 @@ export function GateControls({
           and until now Clear was a one-way door: once emptied there was no
           control anywhere that put the reference circuit back, so the reader
           who cleared it to experiment lost the example the surrounding lesson
-          prose keeps referring to. Never disabled — its whole job is to be
+          prose keeps referring to. Never disabled; its whole job is to be
           available from any state, including the empty one and a 3-qubit
           circuit (it returns to 2 qubits).
         */}

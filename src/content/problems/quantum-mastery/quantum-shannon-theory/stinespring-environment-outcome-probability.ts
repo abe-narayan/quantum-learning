@@ -31,7 +31,7 @@ export const stinespringEnvironmentOutcomeProbability: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The lesson showed Tr_E of the joint output, restricted to the environment finding outcome i, is exactly Tr[K_i rho K_i-dagger] -- the probability that branch occurred." },
+    { text: "The lesson showed Tr_E of the joint output, restricted to the environment finding outcome i, is Tr[K_i rho K_i-dagger], the probability that branch occurred." },
     { text: "For amplitude damping, K1 = [[0, sqrt(gamma)], [0, 0]]." },
     { text: "Compute K1 rho K1-dagger directly: only the (0,0) entry survives, equal to gamma * rho_11." },
   ],
@@ -49,7 +49,7 @@ export const stinespringEnvironmentOutcomeProbability: NumericProblem = {
     whyCorrect:
       "This follows directly from tracing the joint output state onto the environment's |1> outcome instead of tracing it away entirely: Tr_S[<1|_E (U(rho tensor |0><0|_E) U-dagger) |1>_E] = K1 rho K1-dagger, whose trace is the marginal probability of that outcome.",
     whyWrong: [
-      "Using rho_00 instead of rho_11 swaps which population is at risk of decaying -- K1 only has support on the |1> subspace of the system, since only an excited qubit can decay.",
+      "Using rho_00 instead of rho_11 swaps which population is at risk of decaying. K1 has support only on the |1> subspace of the system, since only an excited qubit can decay.",
       "Forgetting to square/use gamma directly (rather than sqrt(gamma)) undercounts the probability, since the Kraus operator carries sqrt(gamma) but the probability is quadratic in it.",
     ],
   },

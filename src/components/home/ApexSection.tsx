@@ -1,28 +1,32 @@
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
-import { Eyebrow, SectionTitle, Readouts, TechLabel } from "@/components/ui/Typography";
+import { Eyebrow, SectionTitle } from "@/components/ui/Typography";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
 import { PillarBand } from "@/components/home/PillarBand";
-import { getCoursesByPillar, PILLARS } from "@/lib/content/curriculum";
-import { PILLAR_VISUALS } from "@/lib/design/pillars";
+import { PillarFooter } from "@/components/home/PillarFooter";
+import { START_LEARNING_HREF } from "@/lib/nav";
 
 const PILLAR = "apex" as const;
 
 /**
- * Pillar 6 of 6 — the terminal section, where the field's `journey`
- * crossfade ends on `frontier`: a horizon separating dense, settled results
- * below from sparse, tentatively-linked open problems above. Deliberately
- * the least card-like, least colorful section on the page — Apex's identity
- * is contrast and density, not a louder accent — and it carries the
- * homepage's one remaining call to action, replacing what used to be a
- * separate generic "FinalCTA" section.
+ * Track 6 of 6, the last stop, where the field's `journey` crossfade ends on
+ * `frontier`: a horizon separating dense, settled results below from sparse,
+ * tentatively-linked open problems above. Deliberately the least card-like,
+ * least colorful section on the page (Apex's identity is contrast and density,
+ * not a louder accent) and it carries the page's closing call to action.
+ *
+ * That closing action is now the *same* action as the hero's: "Start learning"
+ * to `START_LEARNING_HREF`, with "Browse the curriculum" beside it as the
+ * secondary. It used to invert them, on the reasoning that "start" reads
+ * oddly at the bottom of a page. But the site has exactly one primary action
+ * and it is shared by the hero and the Navbar, and a reader who has just
+ * scrolled the entire descent is the single most likely person on the site to
+ * take it. Two buttons that swap roles depending on how far down the page you
+ * are is not a contract, it is a coin flip. The way into Apex itself is the
+ * `PillarFooter` link above, exactly as it is for the other five tracks.
  */
 export function ApexSection() {
-  const courses = getCoursesByPillar(PILLAR);
-  const hours = courses.reduce((sum, course) => sum + course.estimatedHours, 0);
-  const visual = PILLAR_VISUALS[PILLAR];
-
   return (
     <PillarBand pillar={PILLAR} className="bg-background">
       <div
@@ -38,8 +42,8 @@ export function ApexSection() {
       <Section width="wide" aria-labelledby="apex-heading" className="border-t border-border">
         <Container className="max-w-3xl">
           <Reveal>
-            <Eyebrow>06 · Apex — the summit</Eyebrow>
-            <SectionTitle id="apex-heading" size="xl" className="mt-4">
+            <Eyebrow>06 · Apex, the summit</Eyebrow>
+            <SectionTitle id="apex-heading" level={3} size="xl" className="mt-4">
               Everything before this built toward here.
             </SectionTitle>
           </Reveal>
@@ -50,43 +54,35 @@ export function ApexSection() {
               2D surface-code lattice and its decoder, not a toy 3-qubit code. QMA and the
               Local Hamiltonian problem. Tensor networks and the classical-simulation boundary
               that is the actual definition of quantum advantage. A final course in reading and
-              evaluating real quantum-computing papers. Dense, research-depth material — built
+              evaluating real quantum-computing papers. Dense, research-depth material, built
               entirely on courses you&rsquo;ve already completed by the time you reach it.
             </p>
           </Reveal>
 
-          <Reveal
-            delay={140}
-            className="mt-12 flex flex-wrap items-end justify-between gap-6 border-t border-border pt-8"
-          >
-            <Readouts
-              items={[
-                { label: "Courses", value: courses.length },
-                { label: "Est. time", value: hours, unit: "hrs" },
-                { label: "Tracks climbed", value: PILLARS.length - 1, unit: "→ here" },
-              ]}
-            />
-          </Reveal>
-
-          <p className="mt-6 flex items-baseline gap-2">
-            <TechLabel>Field</TechLabel>
-            <span className="text-xs text-subtle-foreground">{visual.fieldCaption}</span>
-          </p>
+          <PillarFooter pillar={PILLAR} />
 
           <Reveal delay={200} className="mt-14 border-t border-border-strong pt-10 text-center">
-            <p className="font-tech text-xs uppercase tracking-[0.14em] text-subtle-foreground">
+            <p className="font-tech text-xs uppercase tracking-meta text-subtle-foreground">
               The curriculum ends here. For now.
             </p>
+            {/* "Five tracks above this one" was off by one and pointed at the
+                wrong track. Apex is 06; the lesson both buttons below open
+                (`START_LEARNING_HREF`, "What Is a Qubit?") is in Quantum
+                Computing, which is 02. Four tracks, not five. Worth being
+                right about: it is the last sentence before the page's closing
+                action, and it is describing where that action goes. */}
+            <p className="mx-auto mt-5 max-w-md text-muted-foreground">
+              It began four tracks above this one, at a single qubit, in a lesson that assumes
+              nothing at all.
+            </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              {/* Deliberately "Browse", not "Start": /learn is an index, and
-                  labeling a link to an index "start" is the mismatch the
-                  hero and navbar's shared "Start learning" contract
-                  (START_LEARNING_HREF) exists to avoid. */}
-              <Button href="/learn" size="lg">
-                Browse the curriculum
+              {/* The same contract as the hero and the Navbar: one primary
+                  action, one destination, one label. See the note above. */}
+              <Button href={START_LEARNING_HREF} size="lg">
+                Start learning
               </Button>
-              <Button href={visual.route} size="lg" variant="secondary">
-                See the summit
+              <Button href="/learn" size="lg" variant="secondary">
+                Browse the curriculum
               </Button>
             </div>
           </Reveal>

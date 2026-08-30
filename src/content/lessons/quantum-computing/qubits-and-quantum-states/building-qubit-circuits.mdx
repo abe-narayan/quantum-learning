@@ -27,11 +27,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Nothing new, everything at once">
 Nine lessons have built, piece by piece, everything needed to describe a single qubit and everything that can happen to it. This lesson introduces nothing new. It is where those pieces get used together.
 </LessonHook>
 
-## Motivation
+## The thing you will spend most of your time doing
 
 Every piece from the last nine lessons gets used together here: analyzing
 sequences of gates, which is what you will spend most of your time doing
@@ -42,7 +42,7 @@ $H$, combine into a fourth gate you already know, and the reason they do
 is the reason a small handful of gates turns out to be enough to build
 anything at all.
 
-## Intuition
+## Right to left, and why
 
 A **circuit** is just a sequence of gates applied one after another. If
 $U_1$ is applied first, then $U_2$, the combined operation is written
@@ -51,7 +51,7 @@ closest to the state acts first. This convention trips up nearly everyone
 at least once, so it's worth stating as plainly as possible before going
 further: in $U_2U_1|\psi\rangle$, $U_1$ happens first.
 
-## Mathematical Development
+## Composing gates, and one identity worth knowing
 
 ### Composing gates
 
@@ -63,22 +63,13 @@ the same as $U_2$ then $U_1$, because matrix multiplication itself isn't
 commutative in general. Order is part of the circuit's meaning, not an
 implementation detail.
 
-<PredictBeforeReveal
-  question="Before doing any matrix multiplication: sandwich Z between two H gates, HZH. Which single gate do you expect the result to match?"
-  options={[
-    { label: "H itself", value: "h" },
-    { label: "X", value: "x" },
-    { label: "Y", value: "y" },
-    { label: "Z again, unchanged", value: "z" },
-  ]}
-  correctValue="x"
-  explanation="HZH = X, worked out below by direct matrix multiplication. Geometrically, H swaps the roles of the X-axis and Z-axis on the Bloch sphere, so sandwiching a π rotation about Z between two H's turns it into a π rotation about X."
-/>
-
 ### The identity $HZH = X$
 
 Take $H$, then $Z$, then $H$ again, written as the operator
-$HZH$ (rightmost $H$ acts first). Compute $ZH$ first:
+$HZH$ (rightmost $H$ acts first). Both steps below are the
+matrix-times-matrix rule from Dirac Notation, one column at a time: entry
+$(i,j)$ of a product is row $i$ of the left factor paired against column
+$j$ of the right one. Compute $ZH$ first:
 
 $$
 ZH = \begin{pmatrix}1&0\\0&-1\end{pmatrix}\cdot\frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\-1&1\end{pmatrix}
@@ -138,13 +129,25 @@ probability), and the second $H$ collects everything onto $|1\rangle$.
   markedIndex={1}
 />
 
+<PredictBeforeReveal
+  question="The Z in the middle leaves both probability bars at one half: nothing a measurement could see happens at that step. So delete it, and run just H then H on |0⟩. Where does the shortened circuit end?"
+  options={[
+    { label: "|1⟩, exactly as before: the Z was doing nothing", value: "one" },
+    { label: "|0⟩, back where the circuit started", value: "zero" },
+    { label: "|+⟩, the even superposition the first H made", value: "plus" },
+    { label: "|−⟩, the other point on the equator", value: "minus" },
+  ]}
+  correctValue="zero"
+  explanation="H is its own inverse, so H then H is the identity and the shortened circuit ends on |0⟩, not |1⟩. The Z that changed no probability at all while it ran is the only reason the full circuit lands somewhere else: it flipped the sign of the |1⟩ amplitude, and the final H turned that invisible sign into the difference between a certain 0 and a certain 1."
+/>
+
 The middle two steps are the interesting ones. After $H$ and after $ZH$ the
 bars are identical, because $Z$ only flipped the sign of the $|1\rangle$
 amplitude, and a sign is invisible to $|\cdot|^2$. Nothing observable
 happened at that step. Yet delete the $Z$ and the circuit ends on
 $|0\rangle$ instead of $|1\rangle$. A relative phase that no measurement
 could see at the time decided the final outcome once the last $H$ made the
-two amplitudes interfere. Every algorithm in this pillar works this way.
+two amplitudes interfere. Every algorithm in this track works this way.
 
 ### Predicting outcomes through a circuit
 
@@ -160,7 +163,7 @@ inverse, so $H|-\rangle=|1\rangle$). Total: $|0\rangle \to |1\rangle$,
 what $X|0\rangle$ gives directly, confirming $HZH=X$ a second way,
 state by state instead of matrix by matrix.
 
-## Physical Interpretation
+## A circuit is one net rotation
 
 A circuit is a single net rotation of the Bloch sphere, built by composing
 several simpler ones: nothing more exotic than that. Reading a circuit
@@ -169,13 +172,13 @@ though the *operator product* is written right-to-left) is really reading
 off a sequence of instructions: "rotate this way, then that way, then
 measure."
 
-## Interactive Experiment
+## Build a sequence and compare it to your prediction
 
 <InteractiveSection title="Reproduce HZH = X yourself" description="Starting from |0⟩, apply H, then Z, then H. Confirm the state panel reads α=0, β=1, matching what X does to |0⟩ in a single step. Then predict, on paper, the result of a different three-gate sequence of your choosing before you run it.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
-## Worked Example
+## Statistics after a Hadamard on the south pole
 
 **Predict the measurement statistics of $H$ applied to $|1\rangle$, then
 measured in the computational basis.**
@@ -187,7 +190,7 @@ despite starting from a definite state. Compare $H|+\rangle$, which gives
 $|0\rangle$ with $P(0)=1$. The same gate turns certainty into randomness
 or randomness into certainty, depending only on what it is applied to.
 
-## Common Mistakes
+## The first thing to check when it disagrees
 
 <Callout type="warning">
 **Applying gates left to right instead of right to left in the operator
@@ -197,25 +200,205 @@ first thing to check.
 </Callout>
 
 <Callout type="warning">
-**Assuming gate sequences commute.** $HZ \neq ZH$ in general (check: you
-derived $HZH=X$ above; by contrast $ZHZ$ works out to a different matrix
-entirely, a good exercise). Order is meaningful.
+**Assuming gate sequences commute.** $HZ \neq ZH$, and the two matrices
+are both a line away. $ZH = \tfrac{1}{\sqrt2}\left(\begin{smallmatrix}1&1\\-1&1\end{smallmatrix}\right)$
+was computed above; running the same product the other way gives
+$HZ = \tfrac{1}{\sqrt2}\left(\begin{smallmatrix}1&-1\\1&1\end{smallmatrix}\right)$,
+with the minus sign in a different place. Order is meaningful.
 </Callout>
 
 ## Practice Questions
 
 1. Compute $XZ|0\rangle$ and $ZX|0\rangle$ separately. Are they equal?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Work right to left, the way the notation reads.
+
+   $XZ|0\rangle$: $Z|0\rangle = |0\rangle$, then $X|0\rangle = |1\rangle$. So
+   $XZ|0\rangle = |1\rangle$.
+
+   $ZX|0\rangle$: $X|0\rangle = |1\rangle$, then $Z|1\rangle = -|1\rangle$. So
+   $ZX|0\rangle = -|1\rangle$.
+
+   The honest answer is "it depends what you mean by equal", and saying which
+   is the point of the question.
+
+   As *vectors* they are not equal: $|1\rangle \ne -|1\rangle$. As *physical
+   states* they are, because $-1 = e^{i\pi}$ is a global phase, both sit at the
+   south pole of the Bloch sphere, and no measurement in any basis separates
+   them.
+
+   As *operators*, $XZ$ and $ZX$ are definitively not equal:
+
+   $$
+   XZ = \begin{pmatrix}0&-1\\1&0\end{pmatrix}, \qquad ZX = \begin{pmatrix}0&1\\-1&0\end{pmatrix} = -XZ.
+   $$
+
+   $X$ and $Z$ anticommute, $XZ = -ZX$, and that is a fact about the gates
+   rather than about $|0\rangle$. Feeding them $|0\rangle$ hides the difference
+   behind a global phase because $|0\rangle$ happens to produce a single
+   nonzero amplitude either way. Feed them a superposition and the difference
+   becomes visible: $XZ|+\rangle$ and $ZX|+\rangle$ are $|-\rangle$ and
+   $-|-\rangle$, still a global phase apart, but put either sequence under a
+   control and the sign is a relative phase between branches, and it is
+   measurable.
+
+   The takeaway for circuits is the one this lesson opens with: gate order is
+   not a formality. The reason it looked harmless here is a property of the
+   input, not of the circuit.
+
+   </details>
+
 2. Predict, without the simulator, the final Bloch coordinates of
    $|0\rangle$ after $H$, then $S$, then $H$. Then verify.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $(x,y,z) = (0,-1,0)$, the $-y$ pole, which is the state $|{-i}\rangle$.
+
+   Follow the Bloch vector one gate at a time rather than multiplying
+   matrices.
+
+   $|0\rangle$ starts at the north pole $(0,0,1)$. $H$ is a half turn about the
+   diagonal $(x+z)/\sqrt2$ axis, which exchanges the $z$- and $x$-axes, so the
+   north pole lands on $(1,0,0)$: the state $|+\rangle$. $S$ is a quarter turn
+   about $z$, which advances longitude by $90°$ and carries $(1,0,0)$ to
+   $(0,1,0)$, the state $|{+i}\rangle$. The second $H$ exchanges $z$ and $x$
+   again and flips the sign of $y$, sending $(0,1,0)$ to $(0,-1,0)$.
+
+   In amplitudes the final state is
+   $\tfrac12(1+i)|0\rangle + \tfrac12(1-i)|1\rangle$, which is
+   $e^{i\pi/4}|{-i}\rangle$: the same point, wearing a global phase that the
+   Bloch coordinates correctly ignore.
+
+   The step most likely to go wrong is assuming the second $H$ undoes the
+   first. It does not. $H$ is its own inverse, so $HH = I$, but there is an $S$
+   sitting between them, and $HSH$ is a genuinely different operation, a
+   quarter turn about the $x$-axis rather than about $z$. Sandwiching a gate
+   between two $H$s is the standard trick for *converting* a $z$-rotation into
+   an $x$-rotation, which is exactly what question 3 asks you to prove in its
+   cleanest case.
+
+   Sanity check on the answer: the final point is on the equator, so
+   $P(0) = P(1) = \tfrac12$, unchanged from $|+\rangle$. All three gates left
+   the computational-basis statistics alone; only the phase moved.
+
+   </details>
+
 3. Show that $HXH = Z$ (the same style of identity as $HZH=X$, with the
    roles of $X$ and $Z$ swapped).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $H = \tfrac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}$, take it in
+   two steps. First $XH$:
+
+   $$
+   XH = \begin{pmatrix}0&1\\1&0\end{pmatrix}\frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1&-1\\1&1\end{pmatrix}
+   $$
+
+   ($X$ swaps the rows). Then multiply by $H$ on the left:
+
+   $$
+   H(XH) = \frac{1}{2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}\begin{pmatrix}1&-1\\1&1\end{pmatrix} = \frac{1}{2}\begin{pmatrix}2&0\\0&-2\end{pmatrix} = \begin{pmatrix}1&0\\0&-1\end{pmatrix} = Z \checkmark
+   $$
+
+   The geometric reading is quicker and generalizes. $H$ is a half turn about
+   the axis halfway between $x$ and $z$, and a half turn about that diagonal
+   swaps the $x$- and $z$-axes. Conjugating any gate by $H$ therefore relabels
+   its rotation axis: $X$ (a half turn about $x$) becomes a half turn about
+   $z$, which is $Z$. Running the same argument backwards gives $HZH = X$ for
+   free, and it is the same swap in reverse.
+
+   Two details worth having explicitly. There is no need to write $H^{-1}$ on
+   the right, because $H^\dagger = H$ and $H^2 = I$, so $H$ is its own inverse
+   and $HXH$ really is a conjugation. And the identity fails if you change
+   either $H$: $SXS^\dagger$, for instance, is $Y$, not $Z$, because $S$
+   rotates the $x$-axis onto $y$ rather than onto $z$.
+
+   </details>
+
 4. A friend built a circuit $H, S, S, S, S, H$ (four $S$ gates in a row,
    sandwiched by $H$s) and claims it does nothing at all to any input
    state. Is this correct? Justify using a fact from an earlier lesson in
-   this course.
+   this course. Then say what the circuit would do instead with three $S$
+   gates in the middle rather than four.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With four, the friend is right. With three, they are badly wrong, and the
+   contrast is the lesson.
+
+   *Four.* From the Quantum Gates lesson, $S^2 = Z$, so
+   $S^4 = (S^2)^2 = Z^2 = I$. The middle of the circuit collapses to nothing at
+   all, leaving $H \cdot I \cdot H = H^2 = I$, since $H$ is its own inverse.
+   The whole circuit is the identity, exactly, for every input state.
+   Geometrically it is even quicker: $S$ is a quarter turn about $z$, and four
+   quarter turns is one full turn.
+
+   *Three.* Now $S^3 = S^2 \cdot S = ZS = \mathrm{diag}(1,-i) = S^\dagger$, a
+   quarter turn about $z$ in the *opposite* direction, and the sandwich turns
+   that into a quarter turn about the $x$-axis:
+
+   $$
+   HS^3H = \frac{1}{2}\begin{pmatrix}1-i&1+i\\1+i&1-i\end{pmatrix},
+   $$
+
+   which is $R_x(-\pi/2)$ up to a global phase of $e^{-i\pi/4}$. It sends
+   $|0\rangle$ to $|{+i}\rangle$ and $|1\rangle$ to $|{-i}\rangle$, while
+   leaving $|+\rangle$ and $|-\rangle$ exactly where they are, since those two
+   sit on its rotation axis.
+
+   The trap the question is built around is generalizing from one input. A
+   friend who tested the three-$S$ circuit on $|+\rangle$ alone would see
+   nothing change and conclude, wrongly, that it does nothing. "Does nothing to
+   this state" and "is the identity" are different claims, and only the second
+   one survives being handed a state on a different axis.
+
+   </details>
+
 5. Starting from $|+\rangle$, find a two-gate sequence (using only gates
    from this course) that returns the state to $|+\rangle$ but is not
    the identity in disguise.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Apply $Y$, then $Z$.
+
+   $Y|+\rangle = \tfrac{1}{\sqrt2}(-i|0\rangle + i|1\rangle) = -i|-\rangle$, and
+   then $Z|-\rangle = |+\rangle$, so the pair returns
+   $-i|+\rangle$: the state $|+\rangle$, wearing a global phase that no
+   measurement can see. ($Z$ then $Y$ works equally well, returning
+   $+i|+\rangle$.)
+
+   And it is not the identity in disguise. Multiplying the matrices,
+
+   $$
+   ZY = \begin{pmatrix}1&0\\0&-1\end{pmatrix}\begin{pmatrix}0&-i\\i&0\end{pmatrix} = \begin{pmatrix}0&-i\\-i&0\end{pmatrix} = -iX,
+   $$
+
+   which is the $X$ gate up to a global phase, not the identity up to any
+   phase. Hand it $|0\rangle$ instead and it returns $-i|1\rangle$: a state on
+   the far side of the sphere.
+
+   Why this works is worth stating in one line, because it is the general
+   principle: $X$ is a rotation about the $x$-axis, and $|+\rangle$ sits on
+   that axis, so $X$ fixes it while moving almost everything else. Any rotation
+   about $x$ would have done, which is why "returns *this* state" is a far
+   weaker condition than "is the identity".
+
+   Exhaustively, over ordered pairs drawn from this course's six gates
+   $\{X,Y,Z,H,S,T\}$, the only sequences that leave $|+\rangle$ where it is are
+   $XX$, $YY$, $ZZ$ and $HH$, which are all the identity, and $YZ$ and $ZY$,
+   which are not. So this pair is essentially the only answer available.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -230,7 +413,7 @@ entirely, a good exercise). Order is meaningful.
   in the correct order; predicting its measurement statistics means
   applying the Born rule to whatever state comes out the other end.
 
-## Further Exploration
+## From one qubit to many
 
 <NextDiscovery>
 This completes **Qubits & Quantum States**: everything about a single

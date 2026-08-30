@@ -16,6 +16,24 @@ describe("formatAmplitudeLatex", () => {
     expect(formatAmplitudeLatex(new Complex(0.5, 0.5))).toBe("0.50 + 0.50i");
     expect(formatAmplitudeLatex(new Complex(0.5, -0.5))).toBe("0.50 - 0.50i");
   });
+
+  /**
+   * `toFixed` keeps the sign of a negative number that rounds to zero, so a
+   * component that is zero to within display precision but happens to carry a
+   * minus sign printed as "-0.00": a state-vector row claiming a negative
+   * amplitude for an amplitude that is exactly zero, alongside another zero
+   * printed as "0.00". Reachable from ordinary use: an H, CNOT, T, T, H, S,
+   * Y, H sequence in the Circuit Builder leaves real parts at -5.6e-17.
+   */
+  it("never renders a rounds-to-zero component with a leading minus sign", () => {
+    expect(formatAmplitudeLatex(new Complex(-5.551115123125784e-17, 0))).toBe("0.00");
+    expect(formatAmplitudeLatex(new Complex(-0, 0))).toBe("0.00");
+    expect(formatAmplitudeLatex(new Complex(0, -1e-15))).toBe("0.00");
+    expect(formatAmplitudeLatex(new Complex(-1e-15, -0.5))).toBe("-0.50i");
+    expect(formatAmplitudeLatex(new Complex(-0.5, -1e-15))).toBe("-0.50");
+    // Values that genuinely round to a nonzero figure keep their sign.
+    expect(formatAmplitudeLatex(new Complex(-0.006, 0))).toBe("-0.01");
+  });
 });
 
 describe("formatMatrixLatex", () => {

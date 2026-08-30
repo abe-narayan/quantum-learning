@@ -1,6 +1,6 @@
 import { Section } from "@/components/ui/Section";
 
-// Static skeleton for `/lessons` — the flat "All lessons" index — shown for
+// Static skeleton for `/lessons`, the flat "All lessons" index, shown for
 // the brief window while Next.js fetches its RSC payload. The page is fully
 // static (`getAllLessonsMeta()` is the only await), so this is purely a
 // perceived-performance nicety.
@@ -11,8 +11,8 @@ import { Section } from "@/components/ui/Section";
 // none of which exist here. That skeleton now lives in `[...slug]/loading.tsx`
 // where it belongs, and this one mirrors what actually loads: the measured
 // intro column (eyebrow, title, lede, the four readouts, the "recommended
-// order" line), then `LessonIndex`'s "Find a lesson" instrument — its label
-// and count readout on one row, the search field, the two chip rails — then
+// order" line), then `LessonIndex`'s "Find a lesson" instrument, its label
+// and count readout on one row, the search field, the two chip rails, then
 // the grouped lesson list.
 export default function LessonsIndexLoading() {
   return (
@@ -33,7 +33,7 @@ export default function LessonsIndexLoading() {
         <div className="mt-2 h-5 w-3/4 max-w-xl rounded bg-surface-muted" />
 
         {/* The four readouts: Lessons / Courses with content / Tracks /
-            Reading time, each a label above a value. */}
+            Est. time, each a label above a value. */}
         <div className="mt-8 flex flex-wrap gap-x-10 gap-y-5">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex flex-col gap-1">
@@ -41,6 +41,24 @@ export default function LessonsIndexLoading() {
               <div className="h-6 w-14 rounded bg-surface-muted" />
             </div>
           ))}
+        </div>
+
+        {/* The "Not sure where to begin?" block: a rule-left label, four lines
+            of framing, the large Start-with button, and the course/duration
+            line under it. It renders on every arrival (it is the site's one
+            "Start learning" destination, not stored progress), so leaving it
+            out of the skeleton would drop the whole intro column the instant
+            the payload landed. Four bars, not two: the framing paragraph grew
+            when this block stopped nominating a starting lesson of its own and
+            started naming the two routes /learn forks into. */}
+        <div className="mt-8 border-l-2 border-border pl-5">
+          <div className="h-2.5 w-40 rounded bg-surface-muted" />
+          <div className="mt-2 h-4 w-full max-w-lede rounded bg-surface-muted" />
+          <div className="mt-1.5 h-4 w-full max-w-lede rounded bg-surface-muted" />
+          <div className="mt-1.5 h-4 w-full max-w-lede rounded bg-surface-muted" />
+          <div className="mt-1.5 h-4 w-3/4 max-w-lg rounded bg-surface-muted" />
+          <div className="mt-4 h-11 w-72 max-w-full rounded-(--radius-tight) bg-surface-muted" />
+          <div className="mt-3 h-3 w-56 max-w-full rounded bg-surface-muted" />
         </div>
 
         <div className="mt-6 h-4 w-full max-w-md rounded bg-surface-muted" />

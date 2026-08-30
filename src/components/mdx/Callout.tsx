@@ -12,19 +12,28 @@ type CalloutType = "note" | "warning" | "mistake";
  * ```
  * `type` defaults to `"note"`.
  *
- * Across the corpus this collapses to two tiers in practice (`mistake`:
- * ~450 uses, `note`: ~23, `warning`: ~4 — see docs/UX_REVIEW.md P2-2), which
- * flattens the one severity signal this component carries: if almost
- * everything is `mistake`, `mistake` stops reading as elevated. That's an
- * authoring-balance problem this file can't fix by itself (there's no
- * incorrect prop being passed), but the vocabulary is worth restating
- * plainly for whoever reaches for this next: `mistake` is for "students
- * reliably get this wrong" inside a *Common Mistakes*-style section, not a
- * general-purpose "important aside" — most asides that feel worth boxing
- * are a `warning` (a lower-stakes caution: a sign convention, a unit, an
- * edge case) or a plain `note`. Defaulting to `mistake` because it's the
- * most visually prominent option is exactly the drift that produced the
- * imbalance above.
+ * ## Corpus distribution, recounted 2026-08-29
+ *
+ * `warning` 268, `note` 182, `mistake` 49 — 499 uses across all 219 lessons,
+ * every one of them passing an explicit `type` (the count of `<Callout`
+ * openings and the count of typed ones are both 499, so the `"note"` default
+ * is never exercised from MDX).
+ *
+ * This comment previously read "`mistake`: ~450 uses, `note`: ~23,
+ * `warning`: ~4 — see docs/UX_REVIEW.md P2-2" and warned that the severity
+ * signal had collapsed because almost everything was `mistake`. That was
+ * true when it was written and is now backwards: the imbalance was fixed by
+ * an authoring pass, `mistake` is the rarest of the three at under 10%, and
+ * anyone reading the old numbers would have concluded the exact opposite of
+ * what the corpus says. Recount before trusting them again; the figures
+ * above are a snapshot, not an invariant.
+ *
+ * The vocabulary is what actually matters and has not changed: `mistake` is
+ * for "students reliably get this wrong" inside a *Common Mistakes*-style
+ * section, not a general-purpose "important aside" — most asides that feel
+ * worth boxing are a `warning` (a lower-stakes caution: a sign convention, a
+ * unit, an edge case) or a plain `note`. Reaching for `mistake` because it is
+ * the loudest option is the drift that produced the old imbalance.
  */
 
 // ## Why a `<div>` and not an `<aside>`
@@ -35,7 +44,7 @@ type CalloutType = "note" | "warning" | "mistake";
 // escapes that mapping when scoped inside sectioning content (`article`,
 // `section`, `nav`, `aside`) — the lesson prose container is a `<div>`
 // (LessonLayout's `#lesson-prose`), so every one of these would become a
-// page-level landmark. At 486 uses across 219 lessons that is routinely five
+// page-level landmark. At 499 uses across 219 lessons that is routinely five
 // or more `complementary` landmarks per lesson, which does not make callouts
 // easier to find; it buries `main`, `navigation` and `contentinfo` in the
 // landmark rotor and makes the one navigation aid a screen-reader user has
@@ -125,7 +134,12 @@ export function Callout({
     <div
       data-callout={type}
       className={cn(
-        "not-prose my-6 rounded-panel border bg-surface p-4 text-sm sm:p-5",
+        // `text-base`, not `text-sm`: `not-prose` excludes this subtree from
+        // the typography plugin's selectors but does not reset the inherited
+        // `font-size`, so an absolute size here is read against `.prose`'s
+        // 18px body. A callout is running prose the reader is meant to read,
+        // not a label.
+        "not-prose my-6 rounded-panel border bg-surface p-4 text-base sm:p-5",
         BORDER_STYLES[type]
       )}
     >

@@ -21,26 +21,38 @@ export const whyReflectionAlwaysPositive: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["k1 != k2", "different wavenumbers", "k1 equals k2 only when V0=0"],
       {
-        phrases: ["squared", "square", "nonzero numerator squared is positive", "strictly positive", "never zero", "cannot vanish", "always positive"],
+        phrases: ["k1=k2 only when", "k1 = k2 only when", "only when v0=0", "only when v0 = 0", "only if v0 is zero", "numerator nonzero", "nonzero numerator", "numerator is nonzero", "different wavenumbers", "wavenumbers differ", "the two wavenumbers are not equal", "a step changes the wavenumber"],
         missingFeedback:
-          "You have said k₁ and k₂ differ for any real step. Finish the argument: R is that nonzero difference squared, and the square of a nonzero real number is strictly positive, so R can approach zero at large E without ever reaching it.",
+          "Look at the numerator. Say under exactly what circumstance those two quantities would come out the same, and whether that ever happens for a real step.",
+      },
+      {
+        phrases: ["squared", "square", "never zero", "cannot vanish", "can not vanish", "always positive", "positive whatever the sign", "sign does not matter"],
+        missingFeedback:
+          "You have said the two wavenumbers differ for any real step. Finish it: apply the operation the formula performs on that difference, and say what that operation can never produce from a nonzero real input.",
       },
     ],
-    incorrectFeedback: "Name both pieces: that k1 and k2 are only equal when V0=0 (any step at all makes them different), and that squaring a nonzero difference always gives a strictly positive result.",
+    incorrectFeedback: "You gave a physical reason (the particle 'feels' the step) instead of reading it off the formula. Two facts do the whole job: what the numerator can and cannot be when V0 is anything but zero, and what raising a nonzero real number to the second power gives.",
+    modelAnswers: [
+      "The two wavenumbers are not equal unless V0 is zero, so any real step makes the numerator nonzero, and squaring a nonzero number always gives something strictly positive.",
+      "A step changes the wavenumber, so the numerator is nonzero whenever V0 is not zero. The square of a nonzero number is always positive, no matter how large E is.",
+    ],
   },
-  hints: [{ text: "When are k1 and k2 exactly equal? What does that require about V0?" }],
+  hints: [
+    { text: "R is built from a single fraction. Ask first when that fraction's top line could possibly be zero." },
+    { text: "The top line vanishes only if the two wavenumbers coincide, and they coincide only under one condition on the potential. State that condition." },
+    { text: "So for every real step the top line is a nonzero real number. Now apply the exponent that sits outside the bracket and say what values the result can take." },
+  ],
   solution: {
     steps: [
-      { description: "$k_1=k_2$ only when $V_0=0$ (no actual step) — any nonzero $V_0$ makes $k_1\\ne k_2$." },
+      { description: "$k_1=k_2$ only when $V_0=0$, meaning no step at all; any nonzero $V_0$ makes $k_1\\ne k_2$." },
       { description: "$R=\\left(\\dfrac{k_1-k_2}{k_1+k_2}\\right)^2$ is a square of a nonzero number whenever $k_1\\ne k_2$, hence strictly positive." },
     ],
     finalAnswer: "k1=k2 only when V0=0, so any real step makes the numerator nonzero, and squaring a nonzero number always gives something strictly positive.",
   },
   explanation: {
     correctIdea: "The persistence of reflection is a direct algebraic consequence of the formula's structure, not a separate physical assumption.",
-    whyCorrect: "This matches the lesson's own observation about the E -> infinity limit only approaching, never reaching, R=0.",
+    whyCorrect: "Raising E shrinks the gap between the two wavenumbers but never closes it while the step is there, so the numerator approaches zero without arriving. Squaring a number that is small but nonzero still gives something strictly above zero.",
     whyWrong: ["Arguing this only holds 'for small V0' misses that the algebraic argument (squaring a nonzero difference) works for any V0 != 0, large or small."],
   },
 };

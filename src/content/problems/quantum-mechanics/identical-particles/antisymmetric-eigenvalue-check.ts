@@ -29,6 +29,11 @@ export const antisymmetricEigenvalueCheck: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
+    nearMisses: [
+      { value: 2, tolerance: 0.01, feedback: "2 is what ‖ψ − P₁₂ψ‖ gives: on an antisymmetric state, subtracting the swapped copy reinforces rather than cancels. The prompt adds it." },
+      { value: 1, tolerance: 0.01, feedback: "1 is the norm of ψ on its own. The quantity asked for combines ψ with its swapped copy first, and only then takes a norm." },
+      { value: 1.4142135623730951, tolerance: 0.01, feedback: "√2 is what you get by adding the two norms in quadrature, as though the terms were orthogonal. They are not: they are exact negatives, so they cancel outright rather than combining." },
+    ],
     incorrectFeedback: "If ψ is genuinely antisymmetric, the exchange flips its sign, so adding the swapped copy cancels it term by term. A nonzero result signals an arithmetic slip or a subtly non-antisymmetric ψ, not new physics.",
   },
   hints: [

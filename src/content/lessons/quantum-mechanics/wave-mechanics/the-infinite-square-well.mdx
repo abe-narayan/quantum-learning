@@ -21,6 +21,7 @@ export const lessonMeta = {
     "Set up and solve the time-independent Schrödinger equation for the infinite square well",
     "Derive the boundary conditions that force quantized energy levels E_n = n^2*pi^2*hbar^2/(2mL^2)",
     "Normalize the resulting eigenstates and verify orthogonality between different levels",
+    "Read the energy ordering off the node count, using the curvature the kinetic term charges for",
   ],
   related: [
     {
@@ -30,18 +31,18 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Two boundary conditions, one whole spectrum">
 This is the first potential this course solves in closed form, and the shortest route to the result that confinement is what forces energies to be discrete. Two boundary conditions do the whole job.
 </LessonHook>
 
-## Motivation
+## The first potential solved in closed form
 
 The system is a particle strictly confined to $0 < x < L$ by walls of
 infinite potential energy. Everything about it can be worked out with
 nothing beyond the time-independent Schrödinger equation and two
 boundary conditions.
 
-## Intuition
+## A guitar string has the same problem
 
 Classically, a ball bouncing between two rigid walls can have *any*
 energy: bounce it harder, it just goes faster. Quantum mechanically, the
@@ -49,7 +50,7 @@ wavefunction must fit the box the way a guitar string's vibration must
 fit its fixed length. Only certain wavelengths, and hence only certain
 energies, are geometrically possible.
 
-## Mathematical Development
+## How two zeros at the walls force a discrete spectrum
 
 ### Setting up the equation
 
@@ -146,7 +147,7 @@ operator have orthogonal eigenvectors), confirmed here numerically by
 `overlapProbability` between different-$n$ eigenstates in the engine's
 test suite.
 
-## Physical Interpretation
+## Counting humps, and paying for curvature
 
 $n$ counts the number of "humps" in $\psi_n$ (equivalently, $n-1$
 internal nodes, points where $\psi_n=0$ inside the well). More nodes means
@@ -174,11 +175,11 @@ depositing a layer of the right thickness.
   license="CC BY-SA 3.0"
 />
 
-<InteractiveSection title="Change n, watch the nodes appear" description="The Infinite Well presets use a very tall but finite wall (not a literal infinity: the Numerically Evolving Quantum States lesson explains why) with height chosen so tunnelling leakage is far below anything the plot can show. Play the ground state and watch ⟨H⟩ stay locked near the analytical E₁; switch to the excited state and change n to see the energy jump by roughly n², and the extra nodes appear directly in the plotted density.">
+<InteractiveSection title="Change n, watch the nodes appear" description="The Infinite Well presets use a very tall but finite wall (not a literal infinity: the Numerically Evolving Quantum States lesson explains why) with height chosen so tunnelling leakage is far below anything the plot can show. Play the ground state and watch ⟨H⟩ against the analytical E₁. Then switch to the excited state and step n upward, reading the energy at each step and counting the nodes in the plotted density: the formula above commits to a specific answer for both.">
   <LazyWavefunctionExplorer initialPresetId="infinite-well-ground" />
 </InteractiveSection>
 
-## Worked Example
+## Two levels in a well of width ten
 
 **For $L=10$ (natural units, $\hbar=m=1$), find $E_1$ and $E_3$, and
 confirm $E_3/E_1=9$.**
@@ -198,7 +199,7 @@ $$
 confirming the $E_n\propto n^2$ scaling, and matching the Wavefunction
 Explorer's live comparison panel at these preset defaults.
 
-## Common Mistakes
+## The cosine term and the missing n = 0
 
 <Callout type="warning">
 **Including the cosine term.** $\psi(0)=0$ eliminates $B\cos(kx)$
@@ -219,10 +220,140 @@ approximation (see the Numerically Evolving Quantum States lesson).
 
 1. For $L=5$, find $E_1, E_2, E_4$ and confirm the ratios match
    $1:4:16$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   In natural units ($\hbar=m=1$), $E_n = n^2\pi^2/(2L^2) =
+   n^2\pi^2/50$:
+
+   $$
+   E_1 = \frac{\pi^2}{50} \approx 0.1974, \qquad E_2 = \frac{4\pi^2}{50} \approx 0.7896, \qquad E_4 = \frac{16\pi^2}{50} \approx 3.1583
+   $$
+
+   matching `infiniteSquareWellEnergyLevel(n, 5)` to eight decimal places.
+   The ratios are
+
+   $$
+   \frac{E_1}{E_1} : \frac{E_2}{E_1} : \frac{E_4}{E_1} = 1 : 4 : 16
+   $$
+
+   since every constant, $\pi^2$, the $2$, and $L^2$ alike, cancels in the
+   ratio, leaving only $n^2$: $1^2$, $2^2$, $4^2$.
+
+   That cancellation is worth noticing on its own. It means the *shape* of
+   the spectrum is universal for this potential: any infinite well, of any
+   width, holding any mass, has levels in the proportions
+   $1:4:9:16:\ldots$. The width and the mass set the overall energy scale
+   and nothing else. This is why the graded problem asking for $E_4/E_2$
+   can be answered without knowing $L$ at all.
+
+   The scaling in the other direction is the one with engineering
+   consequences. $E_n \propto 1/L^2$, so halving the well's width
+   quadruples every level. Narrower confinement is more expensive,
+   steeply, which is the same $1/L^2$ that sets the colour of a quantum
+   well laser and makes the smallest quantum dots glow bluest.
+
+   The common numerical slip is dropping the factor of $2$ in the
+   denominator, which comes from the classical $p^2/2m$ and survives
+   natural units untouched. It doubles every energy, and it is invisible in
+   the ratios, so checking $1:4:16$ will not catch it. Only comparing an
+   absolute value against the formula or the simulator will.
+
+   </details>
+
 2. How many internal nodes does $\psi_4(x)$ have inside the well?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Three.
+
+   $\psi_4(x) = \sqrt{2/L}\,\sin(4\pi x/L)$ vanishes wherever
+   $4\pi x/L$ is a multiple of $\pi$, that is at
+
+   $$
+   x = 0,\ \frac{L}{4},\ \frac{L}{2},\ \frac{3L}{4},\ L
+   $$
+
+   five zeros in total. Two of them, $x=0$ and $x=L$, are the walls, and
+   the question asks for zeros *inside*. That leaves three.
+
+   The general rule is $n-1$ internal nodes for $\psi_n$, which is easy to
+   state and easy to misapply in exactly one way: counting the walls. The
+   walls are forced zeros for every state, including the ground state, so
+   they carry no information about which level you are looking at. Only the
+   interior crossings do. A state with $6$ interior zeros is $n=7$, not
+   $n=6$, and since energy goes as $n^2$ the difference between those two
+   readings is $49E_1$ against $36E_1$: a large error from an off-by-one.
+
+   Why the count rises with $n$ at all is the physics underneath. Fitting
+   more half-wavelengths into a fixed width means the wavefunction has to
+   turn around more often, so $|\psi''|$ grows, and the kinetic term
+   $-\tfrac{\hbar^2}{2m}\psi''$ charges directly for that curvature. Nodes
+   are therefore a visual readout of energy: count the interior crossings
+   in the Explorer's density plot, add one, and square, and you have the
+   level's energy in units of $E_1$ without touching the formula.
+
+   One caution when reading the *density* rather than the wavefunction.
+   $|\psi_n|^2$ touches zero at the same places but does not change sign
+   there, so the nodes appear as points where the curve dips to the axis
+   between humps. The hump count is $n$ and the node count is $n-1$;
+   whichever you count, be clear which one you are reporting.
+
+   </details>
+
 3. Explain briefly why $\psi_n(0)=\psi_n(L)=0$ is required physically
    (not just mathematically). What would $\psi_n(0)\ne 0$ imply about
    the particle's presence outside the well?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $|\psi|^2$ is a probability density, and a nonzero value at the
+   wall would mean a nonzero probability of finding the particle where the
+   potential energy is infinite: an outcome with unbounded energy, which no
+   finite-energy state can have.
+
+   The argument runs in two steps.
+
+   Outside the well the potential is infinite, so any nonzero amplitude
+   there contributes an infinite amount to $\langle V\rangle =
+   \int V(x)|\psi(x)|^2dx$. A state with infinite energy is not a solution
+   of the eigenvalue equation for any finite $E$, so $\psi$ must be exactly
+   zero outside, not merely small.
+
+   Then continuity forces the boundary values. $\psi$ has to be continuous
+   for $\psi''$ to exist in the Schrödinger equation at all, so the inside
+   solution must match the outside solution at the walls, and the outside
+   solution is $0$. Hence $\psi(0)=\psi(L)=0$.
+
+   If instead $\psi_n(0)\ne0$, continuity would carry a nonzero amplitude
+   across into the forbidden region, and the particle would have a genuine,
+   nonzero probability of being found somewhere it can never be. The
+   wavefunction would also have a jump discontinuity if you insisted on
+   zero outside anyway, and a jump has no finite second derivative, so the
+   equation the state is supposed to solve would be undefined at the wall.
+
+   Two refinements keep this honest.
+
+   The condition on $\psi'$ is *not* imposed here, and that is deliberate.
+   For a finite step, both $\psi$ and $\psi'$ must be continuous, which is
+   what makes tunnelling work later in this course. At an infinite wall
+   $\psi'$ is allowed to jump, which is why the sine can arrive at the wall
+   with a nonzero slope and stop dead. Demanding continuity of $\psi'$ as
+   well would over-constrain the problem and leave only the zero solution.
+
+   And the infinite well is an idealization, which the simulator makes
+   plain by using a tall-but-finite wall instead. For a finite $V_0$ the
+   wavefunction does leak into the wall, decaying as $e^{-\kappa x}$ with
+   $\kappa=\sqrt{2m(V_0-E)}/\hbar$, and the boundary value is small rather
+   than zero. Letting $V_0\to\infty$ sends $\kappa\to\infty$ and collapses
+   that tail to nothing, recovering the hard boundary condition as a limit.
+   So "zero at the wall" is the $V_0\to\infty$ endpoint of the same physics
+   the tunnelling lesson works out, not a separate rule.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -236,7 +367,7 @@ approximation (see the Numerically Evolving Quantum States lesson).
 - Both formulas are implemented in `potentials.ts` and visualized live in
   the Wavefunction Explorer's infinite-well presets.
 
-## Further Exploration
+## From sines that stop dead to tails that decay
 
 <NextDiscovery>
 [The Harmonic Oscillator in Position Space](/lessons/quantum-mechanics/wave-mechanics/the-harmonic-oscillator-in-position-space) reconnects the

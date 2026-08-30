@@ -28,8 +28,9 @@ export const compositeSystemDimension: NumericProblem = {
     ],
   },
   hints: [
-    { text: "dim(V⊗W) = dim(V) · dim(W), not dim(V) + dim(W)." },
-    { text: "3 × 4 = ?" },
+    { text: "A basis for the combined space is built by pairing each of A's basis vectors with each of B's, so what has to be counted is the pairs, not the vectors." },
+    { text: "Counting every pairing of one choice from A with one choice from B is a product of the two dimensions, not a sum of them." },
+    { text: "If your answer came out as 7 you added. Adding would make a 100-qubit register 200-dimensional, and the difficulty of classical simulation would evaporate." },
   ],
   solution: {
     steps: [
@@ -38,8 +39,8 @@ export const compositeSystemDimension: NumericProblem = {
     finalAnswer: "$12$",
   },
   explanation: {
-    correctIdea: "Composite quantum systems multiply dimensions, not add them — this is the mathematical origin of the exponential growth seen in multi-qubit systems.",
+    correctIdea: "Composite quantum systems multiply dimensions, not add them. This is the mathematical origin of the exponential growth seen in multi-qubit systems.",
     whyCorrect: "Directly applying dim(V⊗W)=dim(V)·dim(W) with 3 and 4 gives 12.",
-    whyWrong: ["Adding 3+4=7 would be the dimension of a classical Cartesian-product-style pairing, not the tensor product a quantum composite system actually needs."],
+    whyWrong: ["Adding 3+4=7 would be the dimension of a classical Cartesian-product-style pairing, not the tensor product a quantum composite system needs."],
   },
 };

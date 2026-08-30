@@ -151,7 +151,7 @@ function buildAriaLabel(phase: number, normalizedCenter: number): string {
   const pct = Math.round(normalizedCenter * 100);
   return (
     `Two coherent wave sources interfering on a screen. Relative phase is ${phaseDeg} degrees. ` +
-    `The central fringe carries ${pct} percent of the maximum possible intensity — ${describeInterference(
+    `The central fringe carries ${pct} percent of the maximum possible intensity: ${describeInterference(
       normalizedCenter
     )} interference. Bright and dark bands above and below the center repeat as the path-length difference to each source varies.`
   );
@@ -229,10 +229,17 @@ export function WaveInterferenceCanvas({ phase, className }: { phase: number; cl
             figure being read as to-scale is the wrong place to save 18 units;
             266 starts the band at 257.4, clear of the arc, and the second
             line's descender lands at ~285 inside the 320-unit box. */}
-        <text x={64} y={266} textAnchor="middle" fontSize={12} className="fill-axis">
+        {/* And `fill-muted-foreground`, not `fill-axis`. This is a caveat about
+            the drawing, which is exactly the kind of prose `--axis` is not for:
+            at 4.5:1 it sits a step below `--muted-foreground` at 6.78:1, so the
+            smallest type in the figure was also being given the lower of the two
+            available contrasts. `--axis` keeps the screen rule, the source
+            markers and the fringe strip, which are the marks positions are read
+            against. */}
+        <text x={64} y={266} textAnchor="middle" fontSize={12} className="fill-muted-foreground">
           source–screen gap
         </text>
-        <text x={64} y={282} textAnchor="middle" fontSize={12} className="fill-axis">
+        <text x={64} y={282} textAnchor="middle" fontSize={12} className="fill-muted-foreground">
           not to scale
         </text>
 
@@ -326,7 +333,7 @@ export function WaveInterferenceCanvas({ phase, className }: { phase: number; cl
           caveat. */}
       <p className="mx-auto mt-2 max-w-xs text-center text-xs text-muted-foreground @min-[420px]:hidden">
         The gap drawn between the sources and the screen is compressed to fit this width. Fringe positions
-        and spacing are unaffected — they are still computed from the true source-to-screen distance.
+        and spacing are unaffected; they are still computed from the true source-to-screen distance.
       </p>
 
       {/* Wide composition. The *geometry* is unchanged — same 748 × 320

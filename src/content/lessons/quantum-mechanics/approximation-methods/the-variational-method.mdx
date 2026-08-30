@@ -39,11 +39,11 @@ export const variationalCurveFrames = [
   },
 ];
 
-export const compareSigmaA = 0.5;
-export const compareSigmaB = 1.5;
+export const compareSigmaA = 0.4;
+export const compareSigmaB = 1.1;
 export const compareEnergyA = gaussianTrialEnergy(trialGrid, trialPotential, compareSigmaA);
 export const compareEnergyB = gaussianTrialEnergy(trialGrid, trialPotential, compareSigmaB);
-export const sigmaCompareExplanation = `σ=${compareSigmaA} gives E(σ) ≈ ${compareEnergyA.toFixed(4)}; σ=${compareSigmaB} gives E(σ) ≈ ${compareEnergyB.toFixed(4)}. Both are legal trial widths and both sit above E₀=0.5, as the theorem requires, but σ=${compareSigmaA} is nearer the true optimum σ≈0.704, so it comes in lower. Nothing distinguishes ${compareSigmaA} itself: whichever width sits closer to 0.704 wins the comparison, which is why the variational method can rank two guesses without knowing E₀.`;
+export const sigmaCompareExplanation = `σ=${compareSigmaA} gives E(σ) ≈ ${compareEnergyA.toFixed(4)}; σ=${compareSigmaB} gives E(σ) ≈ ${compareEnergyB.toFixed(4)}. The wider width wins, despite sitting farther from the optimum: 0.4 is 0.30 short of σ≈0.704 while 1.1 overshoots it by 0.40. E(σ) is not symmetric about its minimum. Squeeze the trial and ⟨T⟩ climbs like 1/σ², a wall; stretch it and ⟨V⟩ climbs like σ², which over this range is the gentler slope. Both numbers still sit above E₀=0.5, as the theorem requires, and both are honest upper bounds. Nearness in σ is not what ranks two guesses. Their energies are, which is the only comparison the method ever claimed to license.`;
 
 export const lessonMeta = {
   title: "The Variational Method",
@@ -68,13 +68,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Guess badly and the bound still holds">
   Guess any <Term id="normalization">normalized</Term> wavefunction at all, however crude, and its energy
   expectation value is guaranteed to sit at or above the true ground
   energy. That single inequality is the entire method.
 </LessonHook>
 
-## Motivation
+## When nothing in H resembles anything solved
 
 Perturbation theory needed $H=H_0+H'$ with $H'$ small, which is useless
 when no part of $H$ resembles anything already solved. That describes
@@ -92,7 +92,7 @@ from a single run. A method that only ever overestimates turns "try
 something and see" into a chain of provable upper bounds, each one an
 honest statement about a system nobody can solve.
 
-## Mathematical Development
+## The theorem, then minimizing over a family
 
 ### The variational theorem
 
@@ -147,7 +147,7 @@ range, evaluate `expectationEnergy` at each, keep the minimum. This is
 the same direct-search optimization strategy Quantum Algorithms II's VQE
 lesson already used for a different (qubit) variational problem.
 
-## Physical Interpretation
+## Where the method earns its keep
 
 The method earns its keep when the true answer is unavailable. For a
 many-body Hamiltonian with more electrons or spins than can be
@@ -163,7 +163,7 @@ diagonalize, and it is what a variational quantum eigensolver does on
 hardware, with a parameterized circuit playing the part of the Gaussian
 width $\sigma$ used here.
 
-## Worked Example
+## Scanning a Gaussian's width against the exact answer
 
 **Minimize the Gaussian trial energy for the <Term id="quantum-harmonic-oscillator">harmonic oscillator</Term>
 ($m=\omega=1$), and compare to the exact $E_0=0.5$.**
@@ -175,8 +175,11 @@ $E(\sigma)\approx0.50002$, within $0.004\%$ of the exact $E_0=0.5$.
 That agreement is too good to be typical, and the reason is worth
 naming: the harmonic oscillator's true ground state *is* a Gaussian, so
 the trial family contains the exact answer and the minimization has
-nothing to do but find it. The residual $0.00002$ is grid discretization,
-not method error.
+nothing to do but find it. The residual $0.00002$ is not method error
+either: the true optimum is $\sigma=1/\sqrt2\approx0.7071$, and a
+300-step scan of $[0.2,3]$ has no sample there, landing on $0.704$
+instead. Evaluate the same $\langle H\rangle$ at $0.7071$ and it returns
+$0.500000$. The gap is the resolution of the search, not of the physics.
 
 Run the same procedure on a potential whose ground state is not
 Gaussian-shaped, a double well for instance, and the machinery works
@@ -188,13 +191,13 @@ Before scanning the whole range, it's worth checking whether intuition
 about "closer to the optimum" actually predicts the ranking correctly:
 
 <PredictBeforeReveal
-  question="Two trial widths, σ=0.5 and σ=1.5, are both far from the optimal σ≈0.704 but on opposite sides of it. Which one gives the lower trial energy E(σ)?"
+  question="Two trial widths sit on opposite sides of the optimal σ≈0.704: σ=0.4, which falls 0.30 short of it, and σ=1.1, which overshoots by 0.40. Which gives the lower trial energy E(σ)?"
   options={[
-    { label: "σ = 0.5 (narrower)", value: "narrow" },
-    { label: "σ = 1.5 (wider)", value: "wide" },
-    { label: "They tie exactly", value: "tie" },
+    { label: "σ = 1.1, the wider one", value: "wide" },
+    { label: "σ = 0.4, the narrower one", value: "narrow" },
+    { label: "Neither: the two come out equal", value: "tie" },
   ]}
-  correctValue="narrow"
+  correctValue="wide"
   explanation={sigmaCompareExplanation}
 />
 
@@ -219,11 +222,18 @@ mechanism behind the variational optimum. It is also, in miniature, why
 the ground state has nonzero energy at all: the two costs cannot be
 minimized at once.
 
+The two costs are not mirror images, which is what the prediction above
+turned on. A $1/\sigma^2$ wall rises far faster than a $\sigma^2$ slope,
+so the curve is steep on the narrow side and shallow on the wide one, and
+a width that overshoots the optimum can beat one that undershoots by
+less. Reading closeness in $\sigma$ off the horizontal axis and expecting
+it to rank two trials is exactly the mistake the asymmetry punishes.
+
 The total curve sits at or above the dashed $E_0=0.5$ line everywhere, as
 the theorem requires, touching it only at $\sigma\approx0.704$. It has no
 way to dip below, whatever width you try.
 
-## Common Mistakes
+## Normalize the trial state first
 
 <Callout type="warning">
 **Forgetting the trial wavefunction must be normalized before computing
@@ -244,14 +254,156 @@ to the true ground state, only about the energy expectation value.
 
 1. State the variational theorem in one sentence, including which
    direction the inequality goes and why.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   For any normalized trial state,
+   $\langle\psi|H|\psi\rangle\ge E_0$, always an upper bound and never a
+   lower one, because expanding $|\psi\rangle$ in $H$'s true eigenbasis
+   turns the left side into a weighted average of the exact energies
+   $\sum_n|c_n|^2E_n$, and no weighted average can fall below the smallest
+   number being averaged.
+
+   Three hypotheses are packed into that sentence and all three earn their
+   place.
+
+   $|\psi\rangle$ must be normalized. The weights $|c_n|^2$ have to sum to
+   $1$ for the final step to work; an unnormalized state scales
+   $\langle H\rangle$ by an arbitrary factor and the inequality means
+   nothing.
+
+   $H$ must have a lowest eigenvalue for $E_0$ to name something. This is
+   true of any bound-state Hamiltonian in this course and is not automatic
+   in general.
+
+   The eigenbasis has to exist for the expansion, which Hermiticity of $H$
+   supplies. Notice that the proof never asks you to *know* that
+   eigenbasis. It exists, the expansion is therefore legitimate, and the
+   argument runs to completion using only that. Proving something with an
+   object you cannot compute is the move worth taking away from this
+   derivation.
+
+   One sharpening: equality holds if and only if $|\psi\rangle$ is itself a
+   ground state, since any weight on a higher $E_n$ strictly raises the
+   average.
+
+   </details>
+
 2. A badly-chosen fixed width ($\sigma=3$, far from the optimum) gives a
    *higher* trial energy than the optimized $\sigma\approx0.704$. Is this
    consistent with the variational theorem? Explain.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes, and it is what the theorem predicts rather than something it
+   merely tolerates. The theorem places a floor under every trial energy
+   and no ceiling at all. Both $\sigma=0.704$ and $\sigma=3$ produce
+   numbers at or above $E_0=0.5$, and how far above is unconstrained.
+
+   The only result that would contradict the theorem is a trial energy
+   *below* $0.5$. A bad guess giving a bad number is the one-sidedness
+   working as designed: worse guesses climb higher, and none of them can
+   sink underneath.
+
+   The practical consequence is worth stating plainly, because it is the
+   method's real limitation. You get the sign of the error for free and
+   never its size. Reading $E(\sigma)=0.62$ off some system with no known
+   answer tells you $E_0\le0.62$ and nothing else: the truth could be
+   $0.61$ or $0.2$. The one escape is comparison. Two different trial
+   families, or the same family at two parameter values, can be ranked
+   with certainty, since the lower number is provably the better bound.
+   Progress comes from ordering guesses against each other, never from
+   grading one against the unknown truth.
+
+   </details>
+
 3. If a trial wavefunction family happens to include the true ground
    state exactly (at some specific parameter value), what does the
    variational method's minimization procedure find?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It finds the exact answer: the minimum over the family equals $E_0$,
+   attained at that parameter value, with the trial state equal to the
+   true ground state.
+
+   The reason is the equality condition from Question 1. $\langle H\rangle
+   =E_0$ requires all the weight on the ground eigenstate, so the minimum
+   over any family containing that state cannot be lower (the theorem
+   forbids it) and cannot be higher (that member achieves it).
+
+   This is the situation in the worked example, which is why the numbers
+   look implausibly good. The harmonic oscillator's ground state *is* a
+   Gaussian, at $\sigma=1/\sqrt2$, so the family contains the answer and
+   the search has only to locate it. The residual $0.00002$ is not the
+   method being slightly wrong: a 300-point scan of $[0.2,3]$ simply has no
+   sample at $0.7071$, and evaluating there returns $0.500000$.
+
+   Two cautions, since this case is the exception and it is easy to
+   generalize from it.
+
+   Containing the answer is not the same as finding it. A coarse scan can
+   step over the optimum, and a minimizer on a family with several
+   parameters can settle into a local minimum and stop. Exactness is a
+   statement about the family, and the search is a separate problem that
+   can fail on its own.
+
+   The reverse inference does not hold either. A trial energy very close
+   to $E_0$ does not mean the trial *state* is close to the ground state.
+   The energy error is second order in the state error near the minimum,
+   which is exactly why variational energies are much better than
+   variational wavefunctions, and why a variational calculation that
+   reports an excellent energy can still give poor expectation values for
+   other observables.
+
+   </details>
+
 4. Why doesn't the variational method require identifying a "small"
    part of the Hamiltonian, unlike perturbation theory?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because nothing was expanded. Go back through the three-step proof and
+   check what it consumed: a normalized state, an eigenbasis expansion,
+   and the observation that an average is at least its smallest term.
+   There is no series, so there is no small parameter for a series to
+   converge in, and there is nothing to truncate.
+
+   Perturbation theory is a different kind of object. It produces an
+   expansion in $\lambda$ that is only useful while successive terms
+   shrink, and the lesson before this one showed exactly what its failure
+   looks like: slide $\lambda$ up and the second-order term catches the
+   first. That requirement is structural, not a matter of care. Without a
+   solvable $H_0$ and a genuinely small $H'$, the method has no starting
+   point.
+
+   The variational method still needs something, and it is honest to say
+   what. It needs a good guess about the *shape* of the answer, encoded in
+   the trial family. That is a demand on physical insight rather than on
+   the Hamiltonian's structure, which is why the two methods apply to
+   different situations rather than one dominating the other.
+
+   The trade in full:
+
+   Perturbation theory gives a systematic route to improvement, another
+   order whenever you want one, along with excited states, the corrected
+   wavefunctions, and a rough error estimate from the size of the next
+   term. It needs a solvable neighbour.
+
+   The variational method gives one number with a guaranteed direction of
+   error, for any Hamiltonian at all. It gives no error size, no systematic
+   improvement beyond enlarging the family by hand, and no excited states
+   without an extra orthogonality constraint that presupposes the ground
+   state you just computed.
+
+   The methods are complementary in practice, which is why quantum
+   chemistry uses both, often on the same molecule.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -267,7 +419,7 @@ to the true ground state, only about the energy expectation value.
   matches the exact $E_0=0.5$ to within $0.004\%$, expected since the
   true ground state is itself Gaussian-shaped here.
 
-## Further Exploration
+## Which of kinetic and potential wins as the width grows
 
 <ChallengePrompt prompt="As the trial width σ grows very large, so the Gaussian becomes nearly flat, what happens to E(σ)? Does it diverge, settle at a finite value, or something else, and is the answer still consistent with the variational theorem?">
   The two component curves plotted above answer this between them. ⟨T⟩
@@ -277,7 +429,7 @@ to the true ground state, only about the energy expectation value.
 </ChallengePrompt>
 
 <NextDiscovery>
-  **The WKB Approximation** is a semiclassical method that turns out
-  to give the *exact* harmonic oscillator spectrum too, for a completely
-  different mathematical reason.
+  [The WKB Approximation](/lessons/quantum-mechanics/approximation-methods/the-wkb-approximation)
+  is a semiclassical method that turns out to give the *exact* harmonic
+  oscillator spectrum too, for a completely different mathematical reason.
 </NextDiscovery>

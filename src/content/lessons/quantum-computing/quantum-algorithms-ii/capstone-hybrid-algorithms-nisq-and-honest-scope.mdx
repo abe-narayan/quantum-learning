@@ -62,7 +62,7 @@ export const lessonMeta = {
 One long, precise circuit that has to go right in a single shot, versus short circuits run thousands of times with a classical loop absorbing some of the damage. Shor's algorithm and VQE/QAOA are bets on different hardware futures.
 </LessonHook>
 
-## Motivation
+## Two families that assume different machines
 
 This course built two structurally different families of quantum
 algorithm. They differ in more than technique: they assume different
@@ -74,7 +74,7 @@ something a course rarely does to itself. It lists, algorithm by
 algorithm, which pieces this platform builds and runs, which it computes
 by shortcut, and which it declines to build at all.
 
-## Mathematical Development
+## Depth, error tolerance, and the NISQ definition
 
 ### Circuit depth and error tolerance
 
@@ -95,7 +95,7 @@ a single long, must-be-exactly-right circuit.
 <PredictBeforeReveal
   question="Take the triangle's p=1-tuned parameters (γ=0.60, β=0.30) and repeat that exact same pair at every layer, p=1 through 6, without re-optimizing anything. Does expectedCutSize climb steadily toward the true max of 2 as p grows?"
   options={[
-    { label: "Yes, more layers of the same good pair only helps", value: "climbs" },
+    { label: "Yes: repeating a pair that already works can only add more of the same improvement", value: "climbs" },
     { label: "No: it stays flat at the p=1 value", value: "flat" },
     { label: "No: it swings up and down, sometimes below the p=1 baseline", value: "swings" },
   ]}
@@ -138,11 +138,11 @@ Table of exactly what this course built:
 | QAOA | Cost/mixer derivation | Full circuit, exactly, for small graphs | A real classical optimizer (grid search substitutes); large-graph scaling |
 
 Every "simulates directly, exactly" entry is backed by this course's
-tests, not just its lessons. Every "scoped out" entry is a real,
-documented limitation, not a claim that this platform secretly does
-more than it does.
+tests, which is a stronger claim than being backed by its lessons. Every
+"scoped out" entry names a real, documented limitation, and none of them
+quietly means the opposite.
 
-## Physical Interpretation
+## The accurate version of the slogan
 
 The accurate version of "quantum computers will change everything" is
 narrower and more interesting than the slogan. Different algorithms need
@@ -154,7 +154,7 @@ skips those distinctions is not a claim about anything.
 This platform's engine mirrors that. It builds the pieces that demonstrate
 each mechanism and says which pieces it does not build.
 
-## Worked Example
+## Classifying VQE's tolerance against Shor's
 
 **Classify VQE's error tolerance relative to Shor's, using the circuit
 depth argument above.**
@@ -167,7 +167,7 @@ parameters. Shor's period-finding circuit, by contrast, is one long
 circuit (Hadamards, many controlled modular multiplications, a QFT) that
 must produce a *single* usable measurement. An error partway through
 directly corrupts that one shot, with no built-in mechanism to average it
-away. This structural difference, not just historical accident, is why
+away. That structural difference, rather than any historical accident, is why
 VQE is considered NISQ-friendly and Shor's algorithm is not. The contrast
 in how many independent chances each algorithm gets is drawn from this
 course's own worked examples rather than invented for the comparison. What
@@ -182,26 +182,28 @@ iteration) is a real circuit execution, counted here by
     { label: "Shor's: usable measurements needed", value: 1, highlight: false },
     { label: "VQE: circuit executions across one optimization run", value: capstoneVqeCircuitExecutions, highlight: true }
   ]}
+  maxValue={capstoneVqeCircuitExecutions}
   ariaLabel={`Number of circuit executions each algorithm needs or uses: Shor's single required measurement versus VQE's ${capstoneVqeCircuitExecutions} circuit executions across one optimization run`}
 />
 
 Shor's algorithm gets one shot at the whole answer. VQE's toy example got
-113: one initial evaluation plus four candidate directions tried across
-each of the 28 pattern-search iterations, with each execution a fresh
+{capstoneVqeCircuitExecutions}: one initial evaluation plus four candidate
+directions tried across
+each of the {capstoneVqeAcceptedIterations} pattern-search iterations, with each execution a fresh
 opportunity for the classical loop to route around whatever noise the
 previous one left behind. That is many more chances than the iteration
 count alone suggests, because the pattern search runs the circuit for every
-direction it tries, not only for the ones it keeps.
+direction it tries, including every direction it then discards.
 
-## Common Mistakes
+## Useful NISQ advantage is still an open question
 
 <Callout type="note">
 **Believing NISQ-era hardware can already run useful VQE/QAOA at scales
 that beat classical computers.** Whether NISQ-era VQE/QAOA achieves a
 genuine, practically useful quantum advantage on any real-world problem
 remains an open, actively debated research question. This course's toy
-examples demonstrate the *mechanism*, not a proven practical advantage at
-scale.
+examples demonstrate the *mechanism*. Whether that mechanism pays off at
+scale is precisely what remains unsettled.
 </Callout>
 
 <Callout type="note">
@@ -209,25 +211,209 @@ scale.
 hardware arrives.** Even in a future fault-tolerant era, classical
 computers remain far cheaper for many subroutines (the gcd computations in
 Shor's algorithm, the parameter updates in VQE). Hybrid architectures are
-a lasting design pattern, not just a NISQ-era workaround.
+a lasting design pattern that will outlive the NISQ era that prompted it.
 </Callout>
 
 ## Practice Questions
 
 1. Using the depth argument, explain why increasing QAOA's layer count
-   $p$ (making the circuit deeper) is a tradeoff, not a free improvement,
-   on NISQ-era hardware.
+   $p$ (making the circuit deeper) buys accuracy at a cost on NISQ-era
+   hardware, and say what that cost is.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Each extra layer adds one cost unitary and one mixer, so the circuit
+   grows by one two-qubit rotation per edge plus one single-qubit rotation
+   per vertex. On a device without error correction, every gate carries a
+   failure probability, and those probabilities compound: a circuit of
+   depth $d$ with per-gate error $\varepsilon$ retains roughly
+   $(1-\varepsilon)^{d}$ of its signal, which decays exponentially in $d$.
+   Past a depth set by the hardware's coherence time, the measured
+   distribution is dominated by noise and the expectation you are
+   estimating stops being the circuit's.
+
+   The accuracy side of the trade is real: at $p\to\infty$ with optimal
+   parameters QAOA provably reaches the exact optimum, by an adiabatic
+   argument. So depth genuinely buys quality *in principle*, and noise is
+   what stops you spending it.
+
+   There is a second cost, and this lesson's own numbers make it the
+   sharper one. Repeating the $p=1$-tuned pair $\gamma=0.60,\beta=0.30$
+   unchanged at every layer, the engine gives expected cuts of
+   $1.999,\ 1.544,\ 1.460,\ 1.992,\ 1.592,\ 1.424$ for $p=1$ through $6$.
+   That is not a climb, it is a swing, and at $p=3$ and $p=6$ it falls
+   *below* the $1.5$ baseline that random guessing achieves. Extra layers
+   help only with parameters re-optimized for that depth, and the
+   parameter space grows to $2p$ dimensions, so the classical outer loop
+   gets exponentially harder to search at the same time the quantum
+   circuit gets noisier.
+
+   The wrong turn is treating $p$ as an accuracy dial you turn until
+   satisfied. Depth alone buys nothing at all, as the swing shows, and on
+   hardware it actively costs. The honest statement is that $p$ trades
+   classical optimization effort and circuit fidelity for a better
+   achievable optimum, and on current devices the binding constraint is
+   usually the fidelity.
+
+   </details>
+
 2. Why does Shor's algorithm's period-finding step specifically need many
    *coherent* qubits (no measurement until the very end), while VQE can
    measure after every single ansatz execution?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the two algorithms locate their answer in different places.
+   Shor's answer lives in an interference pattern across the whole
+   counting register: the QFT's cancellation depends on the relative
+   phases of all $2^t$ branches being intact simultaneously, and measuring
+   any counting qubit early collapses the superposition and destroys the
+   pattern before it can form. Every gate from the initial Hadamards
+   through the modular exponentiation to the QFT has to preserve coherence
+   across the entire register, so the coherence requirement is the full
+   circuit depth times the full register width.
+
+   VQE's answer is an expectation value, $\langle\psi(\vec\theta)|H|\psi(\vec\theta)\rangle$,
+   which is a statistical average over many independent runs. Each run
+   prepares a shallow ansatz state, measures, and throws the state away.
+   Coherence is needed only for the length of one ansatz circuit, and
+   nothing has to survive from one shot to the next, because the
+   classical optimizer, not the quantum state, is what carries information
+   between iterations.
+
+   That difference is the entire NISQ argument in one sentence: Shor's
+   algorithm needs one long thing to go right, VQE needs many short things
+   to go right on average. Averaging is also why VQE tolerates some noise
+   structurally rather than accidentally: a noise process that shifts the
+   measured expectation slightly still leaves the optimizer a landscape to
+   descend, whereas a single bit flip mid-circuit in Shor's period-finding
+   corrupts the measured outcome with no way to detect it from that shot
+   alone.
+
+   The wrong turn is describing VQE as noise-immune. It is not. Noise
+   biases the estimated energy, and because the variational principle
+   bounds only the *exact* expectation, a noisy estimate can and does dip
+   below $E_0$, which is exactly the symptom you would otherwise read as a
+   bug. What VQE has is a structure that tolerates *some* noise, not
+   protection from it, and that distinction is what error correction
+   exists to close.
+
+   </details>
+
 3. From this capstone's table, name one algorithm this course implements
    with zero scope limitations, and one with the most scope limitations.
    What's different about their underlying mathematical structure that
    explains the difference?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Zero limitations: Grover's algorithm, and Deutsch-Jozsa alongside it,
+   both marked "Nothing omitted". Most limitations: Shor's period finding,
+   with the controlled-modular-exponentiation circuit and continued
+   fractions both scoped out.
+
+   The structural difference is what each algorithm needs from its
+   function. Grover and Deutsch-Jozsa are *black-box* algorithms: they
+   assume an oracle exists and their entire analysis is in terms of how
+   many times it is queried, never how it is built. A simulator can
+   therefore implement the oracle as a sign flip on marked indices,
+   `applyPhaseOracle`, which is honest because the algorithm genuinely
+   does not care what is inside. Query complexity is the whole subject,
+   and query complexity is fully implemented here.
+
+   Shor's algorithm is not a black-box algorithm. Its function is a
+   *specific* one, $f(x)=a^x\bmod N$, and the speedup depends on that
+   function being computable by a polynomial-size reversible circuit.
+   There is no oracle to postulate, because the thing being asserted is
+   precisely that this arithmetic can be done quantum-mechanically at
+   scale. Building the state directly from its closed-form amplitudes, as
+   this platform does, reproduces the state exactly and skips the claim
+   that makes the algorithm work. Continued fractions is scoped out for a
+   different and lesser reason: it is ordinary classical number theory,
+   omitted for effort rather than for difficulty of principle.
+
+   The general lesson is that "scoped out" means different things. A
+   black-box algorithm has nothing hidden in its oracle by construction; a
+   structured algorithm has its entire advantage hidden there. The honest
+   version of this course's Shor's implementation is that it demonstrates
+   the interference mechanism completely and demonstrates the speedup not
+   at all.
+
+   The wrong turn is ranking by the number of table entries rather than by
+   what the entries mean. QAOA also lists two omissions, a real classical
+   optimizer and large-graph scaling, but both are engineering an
+   interested reader could add without new physics. Shor's missing piece
+   is the part the whole claim rests on.
+
+   </details>
+
 4. In your own words, summarize the difference between "provably optimal"
    (Grover's), "promise-dependent exponential" (Deutsch-Jozsa), and
    "heuristic, no guarantee" (QAOA) as three distinct *kinds* of quantum
-   advantage claim.
+   advantage claim. Then say which of the three this course's own QAOA
+   results demonstrate, and what would have to be shown to upgrade it.
+
+   <details className="answer-reveal">
+   <summary>A defensible answer</summary>
+
+   Marked on the distinctions drawn, not on wording. One version in full,
+   then alternatives, then what fails.
+
+   A worked version. **Provably optimal** is a two-sided claim: Grover
+   achieves $O(\sqrt N)$ queries, and a matching lower bound says no
+   quantum algorithm can do better for unstructured search. Both halves
+   are theorems, they hold against every algorithm that will ever be
+   written, and nothing about the claim is waiting on future work.
+   **Promise-dependent exponential** is one-sided and conditional:
+   Deutsch-Jozsa beats every *deterministic* classical algorithm
+   exponentially, but only on inputs satisfying a promise nobody
+   encounters, and the gap collapses to nothing once the classical side is
+   allowed randomness and a one-in-a-billion error rate. **Heuristic, no
+   guarantee** is neither: QAOA has no proof it beats classical methods on
+   any problem, no lower bound protecting it, and its quality depends on
+   the graph, the depth, and how well a classical optimizer happens to
+   find parameters. It is a candidate, not a result.
+
+   This course's QAOA results are firmly in the third category, and it is
+   worth being precise about how narrowly. The triangle at
+   $\gamma=0.6,\beta=0.3$ reaches an expected cut of $1.999$ against a
+   true maximum of $2$, which is excellent and proves nothing: the
+   parameters were found by grid search over a two-dimensional space on a
+   three-vertex graph whose answer was already computed by brute force. No
+   classical algorithm was outperformed, and Max-Cut on a triangle is not
+   a hard problem.
+
+   Upgrading it would take a comparison the course never makes: QAOA at
+   some depth $p$, on a family of graphs large enough that brute force is
+   impossible, beating the best classical approximation algorithm, which
+   for Max-Cut means beating Goemans-Williamson's $0.878$ guarantee, with
+   the parameter-finding cost counted honestly on the classical side. That
+   comparison is an open research question, and no version of it has been
+   settled in QAOA's favour.
+
+   Equally defensible framings. You can organize the three by what varies:
+   optimality quantifies over all algorithms, promise-dependence
+   quantifies over all inputs satisfying a condition, heuristics quantify
+   over nothing. You can organize by what would refute each: a faster
+   quantum search algorithm would refute Grover's optimality and cannot
+   exist; a better classical algorithm would refute Deutsch-Jozsa's gap
+   and already does; and QAOA has nothing to refute because it claims
+   nothing. You can also note that only the first is robust to the
+   classical side improving, which is the property that matters for
+   long-range planning.
+
+   What a bad answer looks like: ranking them by speedup size, so
+   exponential beats quadratic beats heuristic. That gets the ordering
+   backwards on the axis that matters, since Grover's smaller speedup is
+   the only one that is guaranteed. Also wrong is calling QAOA's lack of a
+   guarantee a temporary gap awaiting a proof; it may equally await a
+   disproof, and treating an open question as a pending confirmation is
+   the specific error the capstone's Sycamore note warns about.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -244,7 +430,7 @@ a lasting design pattern, not just a NISQ-era workaround.
   circuitry, continued fractions, multi-qubit ansätze, a real classical
   optimizer for QAOA) is named explicitly, not glossed over.
 
-## Further Exploration
+## Where the hardware requirement gets addressed
 
 <NextDiscovery>
 This completes **Quantum Algorithms II: Advanced**. From here, **Quantum
@@ -252,7 +438,7 @@ Error Correction & Fault Tolerance** picks up exactly where this
 capstone left off: the hardware regime Shor's algorithm actually needs,
 and how noisy physical qubits become reliable logical ones.
 
-Later, in the Quantum Mastery pillar, this capstone's "provably optimal /
+Later, in the Quantum Mastery track, this capstone's "provably optimal /
 promise-dependent / heuristic" taxonomy gets formal proofs of its own in
 [BQP and Oracle
 Complexity](/lessons/quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity),

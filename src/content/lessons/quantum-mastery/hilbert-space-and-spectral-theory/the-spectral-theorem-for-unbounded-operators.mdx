@@ -92,13 +92,13 @@ export const lessonMeta = {
   ],
   objectives: [
     "State the projection-valued-measure (PVM) form of the spectral theorem for a self-adjoint operator",
-    "Derive explicitly how the discrete-spectrum case reduces to Spectral Decomposition and Degeneracy's A=Σλᵢλᵢ|eᵢ⟩⟨eᵢ| formula",
+    "Derive explicitly how the discrete-spectrum case reduces to Spectral Decomposition and Degeneracy's A=Σλᵢ|eᵢ⟩⟨eᵢ| formula",
     "Restate the measurement postulate (discrete and continuous) as one unified statement, P(outcome∈Δ)=⟨ψ|E(Δ)|ψ⟩",
   ],
   related: [
     {
       slug: "quantum-mechanics/operators-observables-measurement/spectral-decomposition-and-degeneracy",
-      note: "This lesson's discrete-spectrum reduction reproduces that lesson's A=Σλᵢ Pᵢ formula exactly, now derived as a special case of the general theorem rather than stated as the whole story.",
+      note: "This lesson's discrete-spectrum reduction reproduces that lesson's A=Σλᵢ Pᵢ formula exactly, now derived as a special case of the general theorem, where that lesson stated it as the whole story.",
     },
   ],
 };
@@ -110,11 +110,11 @@ export const lessonMeta = {
   theorem below looks like when the spectrum happens to be a staircase.
 </LessonHook>
 
-## Motivation
+## The Sum That Was Never Justified
 
 Spectral Decomposition and Degeneracy wrote $A=\sum_i\lambda_iP_i$ and
-called it "the spectral decomposition," full stop. That's completely
-correct when $A$'s spectrum is discrete. But the position operator
+called it "the spectral decomposition," full stop. That is correct when
+$A$'s spectrum is discrete. But the position operator
 $\hat x$ has *no* eigenvalues in $L^2(\mathbb R)$ at all in the ordinary
 sense (Continuous Spectra and Rigged Hilbert Space, next lesson, makes
 this precise); its "eigenvalues" fill the entire real line continuously.
@@ -134,7 +134,7 @@ continuous part.
   license="Public domain"
 />
 
-## Intuition
+## From Projectors to a Measure
 
 Replace "eigenvalue $\lambda_i$ with projector $P_i$" by "**every** real
 number $\lambda$ gets an infinitesimal projector $dE(\lambda)$," and
@@ -147,7 +147,7 @@ literal instances of one formula, the same way a Riemann–Stieltjes
 integral $\int f\,dG$ unifies a sum (when $G$ is a staircase function)
 and an ordinary integral (when $G$ is differentiable) into one notation.
 
-## Mathematical Development
+## The Projection-Valued Measure and Its Theorem
 
 ### The projection-valued measure
 
@@ -215,7 +215,24 @@ measurement statistic to compute. The two lessons meet at that point.
 Suppose $A$'s spectrum is purely discrete: eigenvalues $\lambda_1<
 \lambda_2<\cdots$ with orthogonal projectors $P_1,P_2,\ldots$ onto their
 (possibly degenerate) eigenspaces, $\sum_iP_i=I$, the setup Spectral
-Decomposition and Degeneracy established. Define
+Decomposition and Degeneracy established.
+
+Two hypotheses ride along silently in that sentence, and both are free in
+finite dimensions. First, $\sum_iP_i=I$ can hold only in the *strong*
+sense when there are infinitely many eigenvalues: the partial sums
+converge on each vector, never in operator norm, since
+$\|I-\sum_{i\le n}P_i\|=1$ for every $n$ as long as anything is left
+over. Second, the $\lambda_i$ are assumed to have no finite accumulation
+point, so that each bounded interval contains finitely many of them.
+That is what lets the integral below be read as an elementary
+Riemann–Stieltjes sum over jumps rather than a Lebesgue–Stieltjes
+integral against a measure with infinitely many atoms in a compact set.
+Both hold for the harmonic oscillator, where $\lambda_n=(n+\tfrac12)
+\hbar\omega$ marches off to infinity in even steps. Neither holds for the
+hydrogen Hamiltonian's bound states, where $E_n=-13.6\,\text{eV}/n^2$
+accumulates at $0$: the sum over jumps still converges, but only as a
+Lebesgue–Stieltjes integral, and $0$ itself sits at the seam where the
+discrete part meets the continuum. Define
 
 $$
 E(\lambda)\equiv\sum_{i:\,\lambda_i\le\lambda}P_i
@@ -223,8 +240,9 @@ $$
 
 This satisfies every PVM axiom: it's non-decreasing in $\lambda$ (each term is a
 projector, and projectors onto orthogonal subspaces add without
-cancellation), it equals $0$ below $\lambda_1$ and $I$ at and above the
-largest eigenvalue, and it satisfies the consistency condition (a direct
+cancellation), it equals $0$ below $\lambda_1$ and rises to $I$ as
+$\lambda\to+\infty$ (reaching it at and above the largest eigenvalue when
+the list is finite, and only in the limit when it is not), and it satisfies the consistency condition (a direct
 consequence of $P_iP_j=0$ for $i\ne j$, already proven in Spectral
 Decomposition and Degeneracy). $E(\lambda)$, as a function of $\lambda$,
 is a **staircase**: constant except for a jump of size $P_i$ exactly at
@@ -234,7 +252,7 @@ Now evaluate $\langle\psi|A|\psi\rangle=\int\lambda\,d\langle\psi|E(\lambda)\psi
 for this staircase measure directly:
 
 <DerivationSteps>
-  <DerivationStep annotation="⟨ψ|E(λ)ψ⟩ is itself a staircase function of λ, jumping by ‖P_iψ‖² at each λ_i — a direct readout of the E(λ) definition above.">
+  <DerivationStep annotation="⟨ψ|E(λ)ψ⟩ is itself a staircase function of λ, jumping by ‖P_iψ‖² at each λ_i, which is a direct readout of the E(λ) definition above.">
     $$
     \langle\psi|E(\lambda)\psi\rangle=
     \sum_{i:\lambda_i\le\lambda}\langle\psi|P_i|\psi\rangle=\sum_{i:\lambda_i\le\lambda}\|P_i\psi\|^2
@@ -245,7 +263,7 @@ for this staircase measure directly:
     \int\lambda\,d\langle\psi|E(\lambda)\psi\rangle=\sum_i\lambda_i\|P_i\psi\|^2=\sum_i\lambda_i\langle\psi|P_i|\psi\rangle=\left\langle\psi\left|\sum_i\lambda_iP_i\right|\psi\right\rangle
     $$
   </DerivationStep>
-  <DerivationStep annotation="This holds for every ψ, so the operators themselves agree — Spectral Decomposition and Degeneracy's formula, now derived as the special case where the spectral measure happens to be a staircase.">
+  <DerivationStep annotation="This holds for every ψ, so the operators themselves agree. That recovers Spectral Decomposition and Degeneracy's formula, now derived as the special case where the spectral measure happens to be a staircase.">
     $$
     A=\int\lambda\,dE(\lambda)=\sum_i\lambda_iP_i
     $$
@@ -263,9 +281,9 @@ language they are the **same single statement**:
 
 <EquationReveal
   terms={[
-    { id: "P", symbol: "P(outcome ∈ Δ)", gloss: "The probability the measured value falls in the set Δ — discrete or continuous, same formula." },
+    { id: "P", symbol: "P(outcome ∈ Δ)", gloss: "The probability the measured value falls in the set Δ. Discrete or continuous, the formula is the same." },
     { id: "psi", symbol: "ψ", gloss: "The quantum state being measured." },
-    { id: "E", symbol: "E(Δ)", gloss: "The PVM's projector for the set Δ — equals P_i for a discrete eigenvalue, or 'multiply by the indicator function' for a continuous set like position." },
+    { id: "E", symbol: "E(Δ)", gloss: "The PVM's projector for the set Δ. It equals P_i for a discrete eigenvalue, or 'multiply by the indicator function' for a continuous set like position." },
   ]}
 >
 
@@ -284,7 +302,7 @@ $\langle\psi|E(\Delta)|\psi\rangle=\int_\Delta|\psi(x)|^2dx$ by direct
 substitution), recovering the position postulate exactly. One theorem,
 two courses' separately-stated rules, now visibly the same fact.
 
-## Physical Interpretation
+## The Measure Carries the Discrete/Continuous Split
 
 <InsightBlock>
   The measure, not the operator, is where the discrete/continuous
@@ -305,7 +323,7 @@ smoothly. Green's Functions and Resolvents, next, reads both parts off
 the same resolvent: the jumps are poles, the smooth rise is a branch
 cut.
 
-## Worked Example
+## A Staircase PVM, Written Out
 
 **Reconstruct $N=\mathrm{diag}(1,1,2)$ from Spectral Decomposition and
 Degeneracy via its explicit staircase PVM $E(\lambda)$.**
@@ -330,7 +348,7 @@ $E(\lambda)$ is *literally a staircase function of $\lambda$* is easier
 to see by collapsing the operator down to a single number. Fix a test
 state $\psi=(|0\rangle+|1\rangle+|2\rangle)/\sqrt3$ (equal superposition
 of all three eigenvectors) and plot the scalar $\langle\psi|E(\lambda)
-\psi\rangle$ against $\lambda$ directly, the actual quantity the
+\psi\rangle$ against $\lambda$ directly, the quantity the
 Riemann–Stieltjes integral above integrates against:
 
 <PredictBeforeReveal
@@ -346,6 +364,8 @@ Riemann–Stieltjes integral above integrates against:
 
 <ParametricCurve
   frames={eOfLambdaFrames}
+  xAxisLabel="λ"
+  yAxisLabel="⟨ψ|E(λ)|ψ⟩"
   referenceLines={[
     { y: normSquaredOnP1, label: "‖P₁ψ‖²" },
     { y: normSquaredOnP1 + normSquaredOnP2, label: "‖P₁ψ‖² + ‖P₂ψ‖² = 1" },
@@ -366,11 +386,10 @@ weighted by $\lambda$, reconstructs $N$ directly:
   ariaLabel="1 times P1 plus 2 times P2 reconstructing N as diag(1,1,2), the Riemann-Stieltjes sum over the two jumps of E(lambda)"
 />
 
-matching $N=\mathrm{diag}(1,1,2)$ exactly, confirming the general
-reduction derived above on this lesson's own concrete finite-dimensional
-example, not just abstractly.
+matching $N=\mathrm{diag}(1,1,2)$ exactly, which is the general
+reduction derived above run on a concrete finite-dimensional example.
 
-## Common Mistakes
+## Reading This as a Separate, Harder Theorem
 
 <Callout type="note">
 **Thinking the PVM form of the spectral theorem is a *different, more
@@ -394,12 +413,152 @@ in the next lesson.
 1. For $N=\mathrm{diag}(1,1,2)$, what is $E(\lambda)$ for $\lambda=1$
    exactly (the boundary case, using the definition
    $E(\lambda)=\sum_{\lambda_i\le\lambda}P_i$ with $\le$, not $<$)?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $E(1)=P_1=\mathrm{diag}(1,1,0)$, the rank-two projector onto
+   $\mathrm{span}\{|0\rangle,|1\rangle\}$. The condition $\lambda_i\le1$
+   is satisfied by $\lambda_1=1$ and by nothing else, so exactly one term
+   survives.
+
+   The reason the boundary case is worth asking about is that it fixes the
+   staircase's *right*-continuity, which is not a stylistic choice. The
+   definition box sets $E(\lambda)\equiv E((-\infty,\lambda])$, a half-open
+   interval closed on the right, so the value at a jump point belongs to
+   the upper step, not the lower one:
+
+   $$
+   \lim_{\varepsilon\to0^+}E(1-\varepsilon)=0,\qquad E(1)=P_1,\qquad \lim_{\varepsilon\to0^+}E(1+\varepsilon)=P_1 .
+   $$
+
+   That convention is what makes the jump at $\lambda_i$ equal to $P_i$,
+   and it is what the Riemann-Stieltjes reduction consumes when it turns
+   $\int\lambda\,dE$ into $\sum_i\lambda_iP_i$. Flip to $<$ and the
+   singleton $\{\lambda_i\}$ carries no measure, the staircase never lands
+   on a step, and the integral loses all of its mass.
+
+   On the equal superposition $\psi=(|0\rangle+|1\rangle+|2\rangle)/\sqrt3$
+   the scalar reading is $\langle\psi|E(1)|\psi\rangle=\|P_1\psi\|^2=
+   \tfrac13+\tfrac13=\tfrac23$, the same $2/3$ that
+   `pvm-outcome-probability` gets for $P(\text{outcome}\le1.5)$. It has to
+   be the same number: there is no spectrum between $1$ and $1.5$, so the
+   staircase is flat across that whole stretch.
+
+   Two wrong turns. The first is answering $E(1)=0$, reading "up to
+   $\lambda$" as excluding the endpoint the way an open interval would.
+   The second is more common and harder to see: answering
+   $P_1=|0\rangle\langle0|$, a rank-one projector, because $\lambda=1$
+   appears once in the list of *distinct* eigenvalues. It is doubly
+   degenerate in $N=\mathrm{diag}(1,1,2)$, so $P_1$ has rank two. The
+   check that catches it in one line is $\mathrm{Tr}\,E(\lambda)$, which
+   counts eigenvalues at or below $\lambda$ *with multiplicity*: here
+   $\mathrm{Tr}\,E(1)=2$, not $1$.
+
+   </details>
+
 2. Explain in one or two sentences why $E(\Delta)=$ "multiply by
    $\mathbf1_\Delta(x)$" satisfies the projector conditions
    ($E(\Delta)^2=E(\Delta)$, $E(\Delta)^\dagger=E(\Delta)$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Both conditions are pointwise facts about a function that only ever
+   takes the values $0$ and $1$.
+
+   Idempotence: applying the operator twice multiplies by
+   $\mathbf1_\Delta(x)^2$, and $0^2=0$, $1^2=1$, so
+   $\mathbf1_\Delta^2=\mathbf1_\Delta$ as a function and
+   $E(\Delta)^2=E(\Delta)$ as an operator.
+
+   Self-adjointness: $\mathbf1_\Delta$ is real-valued, so it is unchanged
+   by conjugation and can be moved across the inner product freely,
+
+   $$
+   \langle\phi|E(\Delta)\psi\rangle=\int\phi^*(x)\,\mathbf1_\Delta(x)\,\psi(x)\,dx=\int\big(\mathbf1_\Delta(x)\phi(x)\big)^*\psi(x)\,dx=\langle E(\Delta)\phi|\psi\rangle .
+   $$
+
+   The consistency axiom falls out of the same observation, since
+   $\mathbf1_{\Delta_1}\mathbf1_{\Delta_2}=\mathbf1_{\Delta_1\cap\Delta_2}$
+   pointwise.
+
+   What deserves a second look is the domain, given how hard the previous
+   lesson worked on it. Here there is nothing to check, and that is the
+   point rather than an oversight: $|\mathbf1_\Delta(x)\psi(x)|\le|\psi(x)|$
+   pointwise, so $E(\Delta)$ maps $L^2(\mathbb R)$ into itself and is
+   *bounded*, with $\|E(\Delta)\|\le1$. It is therefore defined on the
+   whole space, and so is its adjoint:
+   $D(E(\Delta))=D(E(\Delta)^\dagger)=L^2(\mathbb R)$, with no room to
+   spare, so the last lesson's symmetric-versus-self-adjoint gap cannot
+   open. That is precisely what the spectral theorem buys. It trades one
+   unbounded, domain-fussy operator $\hat x$ for a family of bounded
+   projectors on which self-adjointness is as cheap as it is in finite
+   dimensions.
+
+   The wrong turn is reaching for integration by parts, because that is
+   what the last lesson's symmetry check looked like. There is no
+   derivative anywhere in $E(\Delta)$ and no boundary term to produce; the
+   whole verification is "the indicator is real and squares to itself." A
+   second wrong turn is worrying that $\mathbf1_\Delta$ is discontinuous
+   and therefore somehow inadmissible. $L^2$ elements are equivalence
+   classes up to sets of measure zero, and multiplication by any bounded
+   measurable function is a perfectly good bounded operator on them.
+
+   </details>
+
 3. Using $P(\text{outcome}\in\Delta)=\langle\psi|E(\Delta)|\psi\rangle$
    with the position operator's $E(\Delta)$, show this reduces to
    exactly $\int_\Delta|\psi(x)|^2dx$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   One substitution, with no machinery in between:
+
+   $$
+   \langle\psi|E(\Delta)|\psi\rangle=\int_{-\infty}^{\infty}\psi^*(x)\big[\mathbf1_\Delta(x)\psi(x)\big]dx=\int_{-\infty}^{\infty}\mathbf1_\Delta(x)|\psi(x)|^2dx=\int_\Delta|\psi(x)|^2dx .
+   $$
+
+   The indicator's entire job is to be the limits of integration. It is
+   $1$ on $\Delta$ and $0$ off it, so multiplying by it and integrating
+   over all of $\mathbb R$ is the same operation as integrating over
+   $\Delta$ alone; the last equality is the definition of what
+   $\int_\Delta$ means.
+
+   So Wave Mechanics' position postulate was never an independent axiom.
+   It is $P(\text{outcome}\in\Delta)=\langle\psi|E(\Delta)|\psi\rangle$
+   evaluated on one particular PVM, exactly as
+   $P(\text{outcome}=\lambda_i)=\langle\psi|P_i|\psi\rangle$ is the same
+   formula evaluated on a staircase one.
+
+   Two limits are worth taking, because they are where the formula earns
+   its keep. Setting $\Delta=\mathbb R$ gives
+   $\langle\psi|I|\psi\rangle=\|\psi\|^2=1$, which is completeness
+   $E(\mathbb R)=I$ reappearing as normalization. Setting
+   $\Delta=\{x_0\}$, a single point, gives $\mathbf1_{\{x_0\}}\psi=0$ in
+   $L^2$, since it differs from zero only on a set of measure zero, so
+   $E(\{x_0\})$ is the *zero operator* and the probability is exactly $0$.
+   That is the precise content of the claim that $\hat x$ has no
+   eigenvalues: an eigenvector for $x_0$ would have to lie in the range of
+   $E(\{x_0\})$, and that range is $\{0\}$. The continuous spectrum is not
+   a spectrum whose eigenvectors are merely hard to write down. It is one
+   with no eigenvectors in $\mathcal H$ at all.
+
+   The wrong turn is deriving the result by inserting
+   $\int|x\rangle\langle x|dx$ and writing
+   $\int_\Delta|\langle x|\psi\rangle|^2dx$. It lands on the right
+   expression, which is exactly why it passes unchallenged, but it assumes
+   the objects this course has not yet built: $|x\rangle$ is not a vector
+   of $L^2(\mathbb R)$ and $\langle x|\psi\rangle$ needs the rigged Hilbert
+   space of the next lesson before it means anything. The PVM route never
+   mentions $|x\rangle$, and that is the whole reason it is the rigorous
+   one. A second wrong turn is reporting $P(\hat x=x_0)=|\psi(x_0)|^2$.
+   That quantity is a probability *density*, with units of inverse length;
+   the probability of a single point is $0$, as the computation above
+   shows outright.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -418,7 +577,7 @@ in the next lesson.
 - Born's rule, discrete and continuous, is one statement,
   $P(\text{outcome}\in\Delta)=\langle\psi|E(\Delta)|\psi\rangle$.
 
-## Further Exploration
+## When the Spectrum Has No Eigenvectors
 
 <NextDiscovery>
   [Continuous Spectra and Rigged Hilbert Space](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space)

@@ -178,14 +178,14 @@ export function EntanglementCorrelationCanvas({
         <Glyph
           centerX={NARROW_LEFT_CENTER_X}
           layout={NARROW_GLYPH}
-          holder="Alice — qubit 0"
+          holder="Alice (qubit 0)"
           state={alice}
           {...glyphProps}
         />
         <Glyph
           centerX={NARROW_RIGHT_CENTER_X}
           layout={NARROW_GLYPH}
-          holder="Bob — qubit 1"
+          holder="Bob (qubit 1)"
           state={bob}
           {...glyphProps}
         />
@@ -196,12 +196,32 @@ export function EntanglementCorrelationCanvas({
             could shrink — and they stay inside the SVG (rather than becoming
             HTML siblings) so this composition keeps a single `role="img"` with
             one aria-label, exactly like the wide one. */}
+        {/* `fill-muted-foreground`, not `fill-axis`. These two lines are
+            annotation prose: nothing is measured against them and no value is
+            read off them. `--axis` is the 4.5:1 token and `--muted-foreground`
+            the 6.78:1 one, so putting prose on `--axis` is a contrast *cut*.
+            `--axis` stays where it belongs in this file: the glyph circle, the
+            dashed z-axis rule, and the |0>/|1> pole labels the dot's height is
+            actually read against.
+
+            Effective type. This SVG is `w-full max-w-xs`, so it paints at
+            min(box, 320)px against a 320-unit viewBox. Worst case is a 320px
+            viewport: 320 - 32 (Container `px-4`) = 288, and this canvas's only
+            wrapper is `EntanglementCorrelation`'s `rounded-3xl border p-6`, so
+            288 - 2 x (24 + 1) = 238px. 238/320 = 0.744 px per unit, so 15 ->
+            11.2px and 13 -> 9.7px: both clear the ~9px floor, the second by
+            only 0.7px. It goes to 14 (-> 10.4px) for real margin rather than
+            floor-scraping margin. 15 is the ceiling, not 14: at 15 units,
+            uppercase with `tracking-wide`, "FAR APART, NO PHYSICAL LINK"
+            measures ~15.9 em ~= 239 units in a 320-unit box, and at 14 it is
+            ~223, which centred on x = 160 runs 48.5 to 271.5 and clears both
+            edges. */}
         <text
           x={NARROW_WIDTH / 2}
           y={272}
           textAnchor="middle"
           fontSize={15}
-          className="fill-axis font-mono"
+          className="fill-muted-foreground font-mono"
         >
           one shared state |&#934;&#8314;&#10217;
         </text>
@@ -209,10 +229,10 @@ export function EntanglementCorrelationCanvas({
           x={NARROW_WIDTH / 2}
           y={294}
           textAnchor="middle"
-          fontSize={13}
-          className="fill-axis uppercase tracking-wide"
+          fontSize={14}
+          className="fill-muted-foreground uppercase tracking-wide"
         >
-          far apart — no physical link
+          far apart, no physical link
         </text>
       </svg>
 
@@ -243,12 +263,18 @@ export function EntanglementCorrelationCanvas({
           strokeDasharray="2 6"
           opacity={0.6}
         />
+        {/* Same reclassification as the narrow composition's captions above:
+            annotation prose belongs on `--muted-foreground` (6.78:1), not on
+            `--axis` (4.5:1), which is a step down for text that measures
+            nothing. Effective type here is safe by construction: the wide
+            composition only renders above a 460px container, and 14 x 460/640
+            = 10.1px, 13 x 460/640 = 9.3px. */}
         <text
           x={VIEW_WIDTH / 2}
           y={GLYPH_CENTER_Y - 12}
           textAnchor="middle"
           fontSize={14}
-          className="fill-axis font-mono"
+          className="fill-muted-foreground font-mono"
         >
           one shared state |&#934;&#8314;&#10217;
         </text>
@@ -271,7 +297,7 @@ export function EntanglementCorrelationCanvas({
           y={GLYPH_CENTER_Y + 24}
           textAnchor="middle"
           fontSize={13}
-          className="fill-axis uppercase tracking-wide"
+          className="fill-muted-foreground uppercase tracking-wide"
         >
           far apart
         </text>
@@ -280,7 +306,7 @@ export function EntanglementCorrelationCanvas({
           y={GLYPH_CENTER_Y + 42}
           textAnchor="middle"
           fontSize={13}
-          className="fill-axis uppercase tracking-wide"
+          className="fill-muted-foreground uppercase tracking-wide"
         >
           no physical link
         </text>
@@ -288,14 +314,14 @@ export function EntanglementCorrelationCanvas({
         <Glyph
           centerX={LEFT_CENTER_X}
           layout={WIDE_GLYPH}
-          holder="Alice — qubit 0"
+          holder="Alice (qubit 0)"
           state={alice}
           {...glyphProps}
         />
         <Glyph
           centerX={RIGHT_CENTER_X}
           layout={WIDE_GLYPH}
-          holder="Bob — qubit 1"
+          holder="Bob (qubit 1)"
           state={bob}
           {...glyphProps}
         />
@@ -465,7 +491,7 @@ function describeStatus(state: GlyphState, isMeasuring: boolean): { word: string
 
 function describeGlyph(label: string, state: GlyphState): string {
   if (state.bit !== null) return `${label}'s qubit just collapsed to the definite state ket ${state.bit}.`;
-  return `${label}'s qubit, on its own, has no definite value yet — its reduced state is maximally mixed (Bloch z near ${state.z.toFixed(2)}).`;
+  return `${label}'s qubit, on its own, has no definite value yet: its reduced state is maximally mixed (Bloch z near ${state.z.toFixed(2)}).`;
 }
 
 function buildAriaLabel(alice: GlyphState, bob: GlyphState, isMeasuring: boolean): string {

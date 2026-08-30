@@ -16,10 +16,10 @@ export const pennylaneVqeFit: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "Why does this lesson highlight PennyLane specifically for VQE-style algorithms?",
     options: [
-      { id: "a", text: "It is built around differentiable programming, so gradients of a parametrized circuit come out of the same machinery that evaluates it" },
-      { id: "b", text: "It is the only SDK whose gradients are exact rather than finite-difference approximations" },
-      { id: "c", text: "It runs the whole optimization loop on the device, avoiding the round trip after every parameter update" },
-      { id: "d", text: "It ships the chemistry Hamiltonians VQE needs, which the other SDKs leave to the user" },
+      { id: "a", text: "It is built around differentiable programming, so circuit gradients come out of its evaluation machinery" },
+      { id: "b", text: "It is the only SDK whose circuit gradients are exact rather than finite-difference approximations" },
+      { id: "c", text: "It runs the whole optimization loop on the device, avoiding a round trip after every parameter update" },
+      { id: "d", text: "It ships the chemistry Hamiltonians a VQE run needs, which the other SDKs leave to the user to assemble" },
     ],
   },
   answer: {
@@ -43,7 +43,7 @@ export const pennylaneVqeFit: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "The lesson's claim is about ergonomics: the same VQE is expressible in any of these SDKs, and PennyLane's design happens to put the gradient step where the algorithm wants it.",
-    whyCorrect: "Matches the lesson's Worked Example and Common Mistakes sections.",
+    whyCorrect: "VQE's inner loop is an optimisation, and optimisation wants gradients. Treating the circuit as a differentiable object lets the gradient compose with the surrounding autodiff framework instead of being assembled by hand. That is a workflow claim, not a claim about what the other SDKs can compute.",
     whyWrong: [
       { optionId: "b", text: "Turns an ergonomics claim into an exclusivity claim. The parameter-shift rule is available everywhere." },
       { optionId: "c", text: "Moves the optimizer onto the device. It stays classical, and the round trip stays." },

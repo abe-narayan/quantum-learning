@@ -18,15 +18,21 @@ export const gammaFor100UsT1: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "For T1=100μs and a timestep dt=1μs, what per-step damping probability γ=1-e^(-dt/T1) does decayProbabilityForTimestep give?",
-    inputHint: "as a decimal",
+    inputHint: "as a decimal, to 5 decimal places",
   },
   answer: {
     type: "numeric",
     value,
-    tolerance: 0.0001,
+    tolerance: 0.00003,
     incorrectFeedback: "If your number came out near 0.99, you computed the survival probability e^(-dt/T1) rather than the decay probability, which is 1 minus that. Otherwise, check the exponent: it is -dt/T1 = -1/100.",
     nearMisses: [
       { value: Math.exp(-0.01), tolerance: 0.0002, feedback: "That is the survival probability. The decay probability is what is left over: 1 minus it." },
+      {
+        value: 0.01,
+        tolerance: 0.00002,
+        feedback:
+          "0.01 is dt/T1, the first-order approximation to 1 - e^(-dt/T1). It is close, but the exponential form is what the channel actually uses, and it sits slightly below the ratio.",
+      },
     ],
   },
   hints: [
@@ -43,7 +49,7 @@ export const gammaFor100UsT1: NumericProblem = {
   },
   explanation: {
     correctIdea: "This is a small per-step probability, as expected when the timestep is much shorter than T1: most steps leave the qubit unchanged, with only a small chance of decay each step.",
-    whyCorrect: "Matches decayProbabilityForTimestep(100,1) computed directly from the engine.",
+    whyCorrect: "Survival over one step is e^(-dt/T1), so the damping probability is its complement. With dt/T1 = 0.01 the exponential is nearly linear, which is why γ comes out at 0.00995 rather than exactly 0.01. decayProbabilityForTimestep(100,1) returns the same value.",
     whyWrong: ["Computing dt/T1 directly as the answer (0.01) instead of 1-e^(-dt/T1) misses the exponential form of the formula."],
   },
 };

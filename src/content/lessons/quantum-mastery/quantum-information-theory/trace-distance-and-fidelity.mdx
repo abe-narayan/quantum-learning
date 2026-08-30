@@ -28,7 +28,7 @@ export const lessonMeta = {
   ],
   objectives: [
     "Derive trace distance's variational (Helstrom) characterization and its closed form for qubits",
-    "Derive the Uhlmann fidelity's pure-state shortcut and state Uhlmann's theorem",
+    "Establish the Uhlmann fidelity's pure-state shortcut and state Uhlmann's theorem",
     "Prove the Fuchs–van de Graaf inequalities relating trace distance and fidelity",
     "Compute real trace-distance and fidelity numbers for this platform's amplitude-damping and dephasing channels",
   ],
@@ -83,17 +83,17 @@ export const fvgFrames = [
     paramLabel: "",
     series: [
       {
-        label: "D(gamma) — trace distance, from the engine's own channel",
+        label: "D(gamma), the trace distance, from the engine's own channel",
         color: "brand",
         points: fvgSamples.map((s) => ({ x: s.g, y: s.D })),
       },
       {
-        label: "1 - F(gamma) — lower bound",
+        label: "1 - F(gamma), the lower bound",
         color: "muted",
         points: fvgSamples.map((s) => ({ x: s.g, y: 1 - s.F })),
       },
       {
-        label: "sqrt(1 - F(gamma)^2) — upper bound",
+        label: "sqrt(1 - F(gamma)^2), the upper bound",
         color: "accent",
         points: fvgSamples.map((s) => ({ x: s.g, y: Math.sqrt(1 - s.F ** 2) })),
       },
@@ -134,7 +134,7 @@ export const pxDP = blochPx(blochDP);
   questions, and this platform has quietly needed both all along.
 </LessonHook>
 
-## Motivation
+## One Question With Two Different Answers
 
 Ask "how close are two quantum states?" and it sounds like a single
 question, but this platform's engine has quietly needed two different
@@ -147,7 +147,7 @@ already sitting in this codebase, and "amplitude damping disturbs a
 state" stops being a qualitative claim and becomes an exact, computed
 number.
 
-This is also, unglamorously, the actual vocabulary of a hardware
+This is also, unglamorously, the vocabulary of a hardware
 datasheet. When a lab reports a two-qubit gate at "99.5% fidelity," that
 number comes from randomized benchmarking: running long random Clifford
 sequences and fitting how a survival probability decays, which is an
@@ -164,18 +164,18 @@ first principles.
   url="https://www.nature.com/articles/s41586-019-1666-5"
 >
   The claim rested on comparing a chip's actual output distribution
-  against the ideal circuit's predicted one — the same distinguishability
-  question Helstrom's formula answers below, just asked of an entire
-  circuit's output statistics instead of one qubit's state.
+  against the ideal circuit's predicted one. That is the same
+  distinguishability question Helstrom's formula answers below, asked of
+  an entire circuit's output statistics instead of one qubit's state.
 </ResearchConnection>
 
-## Mathematical Development
+## Trace Distance, Uhlmann Fidelity, and Fuchs-van de Graaf
 
 ### Trace distance: definition and variational form
 
 <EquationReveal
   terms={[
-    { id: "D", symbol: "D(ρ,σ)", gloss: "Trace distance — half the trace norm of the difference between two states." },
+    { id: "D", symbol: "D(ρ,σ)", gloss: "Trace distance, half the trace norm of the difference between two states." },
     { id: "mu", symbol: "μ_i", gloss: "Eigenvalues of the Hermitian, traceless operator Δ ≡ ρ − σ." },
   ]}
 >
@@ -249,7 +249,7 @@ not a ball, its geometry is not Euclidean, and no comparable shortcut
 survives; the trace norm is then irreducibly a spectral computation. Enjoy
 the picture, but do not carry it up in dimension.
 
-<div className="not-prose my-8 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
+<div className="not-prose my-8 rounded-panel border border-border bg-surface-muted/40 p-4">
   <svg width={236} height={236} viewBox="0 0 236 236" className="mx-auto max-w-full" role="img" aria-label="The x-z cross-section of the Bloch ball, drawn as a circle. Three points are marked. The input state ket plus sits on the circle at the far right, on the equator, because it is pure. Two interior points sit inside: the state after amplitude damping, displaced both inward and upward toward the north pole, and the state after dephasing, displaced straight inward along the equator toward the centre. A straight line segment is drawn from ket plus to each of the two outputs; the length of each segment, halved, is exactly that channel's trace distance from the input.">
     <line x1={118} y1={18} x2={118} y2={218} className="stroke-border" strokeWidth={1} />
     <line x1={18} y1={118} x2={218} y2={118} className="stroke-border" strokeWidth={1} />
@@ -280,7 +280,7 @@ agreeing with the eigenvalue computation to within
 
 <EquationReveal
   terms={[
-    { id: "F", symbol: "F(ρ,σ)", gloss: "Uhlmann fidelity — how much two states overlap, in general (possibly mixed) form." },
+    { id: "F", symbol: "F(ρ,σ)", gloss: "Uhlmann fidelity, meaning how much two states overlap, in general (possibly mixed) form." },
     { id: "sqrtrho", symbol: "√ρ", gloss: "The matrix square root of ρ." },
   ]}
 >
@@ -309,7 +309,7 @@ is also pure, this further reduces to $F=|\langle\psi|\phi\rangle|$, the
 ordinary state-overlap fidelity used informally throughout this
 platform's earlier courses.
 
-**Uhlmann's theorem**, stated here rather than re-derived, since a full
+**Uhlmann's theorem**, stated here without proof, since a full
 proof means optimizing over the space of every possible purifying system
 in general dimension, machinery well beyond what this lesson builds
 elsewhere, says $F(\rho,\sigma)=\max_{|\psi\rangle,|\phi\rangle}|\langle\psi|\phi\rangle|$,
@@ -325,7 +325,18 @@ every numerical computation that follows.
 
 ### The Fuchs–van de Graaf inequalities
 
-**Claim.** $1-F(\rho,\sigma) \leq D(\rho,\sigma) \leq \sqrt{1-F(\rho,\sigma)^2}$.
+**Claim.** For any two density operators $\rho,\sigma$ on a common
+finite-dimensional Hilbert space $\mathcal H_A$,
+$1-F(\rho,\sigma) \leq D(\rho,\sigma) \leq \sqrt{1-F(\rho,\sigma)^2}$.
+
+Nothing further is assumed: neither state need be pure, they need not
+commute, and the dimension is unrestricted above $1$. The proof of the
+upper bound does need a purifying system $B$ with
+$\dim\mathcal H_B\geq\dim\mathcal H_A$, which the previous lesson
+guarantees exists. The upper bound is saturated whenever both states are
+pure, which is the equality case proved first below. Purity is
+sufficient for that saturation but not necessary: any two states with
+orthogonal supports, however mixed, also give $D=1$ and $F=0$.
 
 **Upper bound, full proof.** First, a pure-state identity: for
 normalized $|\psi\rangle,|\phi\rangle$,
@@ -380,7 +391,7 @@ formalism this platform's engine doesn't otherwise use. Granting it:
 $1-F(\rho,\sigma)\leq1-F_{cl}(p,q)\leq D_{cl}(p,q)=D(\rho,\sigma)$.
 $\blacksquare$
 
-## Physical Interpretation
+## A Sandwich, Not an Identity
 
 <InsightBlock>
   Fuchs–van de Graaf is a sandwich, not an identity, and the width of the
@@ -399,13 +410,13 @@ interchangeably; in between they are only loosely tied, which is what the
 inequalities quantify.
 
 The worked example makes the gap concrete. Amplitude damping at
-$\gamma={gamma}$ sits at $D={D_AD.toFixed(4)}$ with the bounds
+$\gamma=$ {gamma} sits at $D=$ {D_AD.toFixed(4)} with the bounds
 {(1 - F_AD).toFixed(4)} and {Math.sqrt(1 - F_AD ** 2).toFixed(4)} on
 either side, so knowing $F$ alone pins $D$ only to within a factor of
 about {(Math.sqrt(1 - F_AD ** 2) / (1 - F_AD)).toFixed(1)}. A datasheet
 that reports one number has reported less than it appears to.
 
-## Worked Example
+## Two Channels That Look Identical to One State
 
 **Quantify exactly how well this platform's own amplitude-damping and
 dephasing channels preserve $|+\rangle$.**
@@ -420,8 +431,8 @@ platform:
 <PredictBeforeReveal
   question="Same strength parameter, 0.3, fed to both channels acting on |+⟩. Which one leaves the state more mixed (lower purity Tr(rho^2))?"
   options={[
-    { label: "Amplitude damping — it changes the state's populations, a bigger structural shift", value: "ad" },
-    { label: "Dephasing — |+⟩ has nothing but coherence, and that's exactly what dephasing removes", value: "dp" },
+    { label: "Dephasing, since |+⟩ has nothing but coherence, and that is exactly what dephasing removes", value: "dp" },
+    { label: "Amplitude damping, since it changes the state's populations, a bigger structural shift", value: "ad" },
     { label: "The same either way, since both use strength 0.3", value: "same" },
   ]}
   correctValue="dp"
@@ -435,8 +446,8 @@ Computed directly via `eigenvaluesHermitian2x2` on $\rho_0-\rho_{AD}$
 
 | Channel | $D$ | $F$ | $\text{Tr}(\rho^2)$ | $1-F$ (lower bound) | $\sqrt{1-F^2}$ (upper bound) |
 |---|---|---|---|---|---|
-| Amplitude damping, $\gamma={gamma}$ | {D_AD.toFixed(4)} | {F_AD.toFixed(4)} | {purityAD.toFixed(4)} | {(1 - F_AD).toFixed(4)} | {Math.sqrt(1 - F_AD ** 2).toFixed(4)} |
-| Dephasing, $\lambda={lambda}$ | {D_DP.toFixed(4)} | {F_DP.toFixed(4)} | {purityDP.toFixed(4)} | {(1 - F_DP).toFixed(4)} | {Math.sqrt(1 - F_DP ** 2).toFixed(4)} |
+| Amplitude damping, $\gamma=$ {gamma} | {D_AD.toFixed(4)} | {F_AD.toFixed(4)} | {purityAD.toFixed(4)} | {(1 - F_AD).toFixed(4)} | {Math.sqrt(1 - F_AD ** 2).toFixed(4)} |
+| Dephasing, $\lambda=$ {lambda} | {D_DP.toFixed(4)} | {F_DP.toFixed(4)} | {purityDP.toFixed(4)} | {(1 - F_DP).toFixed(4)} | {Math.sqrt(1 - F_DP ** 2).toFixed(4)} |
 
 Both rows satisfy Fuchs–van de Graaf with room on each side, and the two
 channels rank differently depending on which column is read. Dephasing
@@ -458,10 +469,12 @@ other rather than one standing in for the other.
 
 <ParametricCurve
   frames={fvgFrames}
+  xAxisLabel="damping strength γ"
+  yAxisLabel="trace distance and its bounds"
   ariaLabel="Trace distance D(gamma) for amplitude damping applied to the plus state, sandwiched between the Fuchs-van de Graaf lower bound 1-F(gamma) and upper bound sqrt(1-F(gamma)^2), plotted for gamma from 0 to 1"
 />
 
-## Common Mistakes
+## Applying the Pure-State Shortcut to Mixed States
 
 <Callout type="warning">
 **Using $F(\rho,\sigma)=\sqrt{\langle\psi|\sigma|\psi\rangle}$ when
@@ -475,10 +488,11 @@ this platform's engine cannot evaluate for a general mixed qubit pair
 <Callout type="warning">
 **Treating Fuchs–van de Graaf as an equality.** It's a two-sided bound,
 not an identity: the worked example's own numbers ($D\approx0.1708$
-strictly between $0.0417$ and $0.2857$ for amplitude damping) show real
+strictly between $0.0417$ and $0.2858$ for amplitude damping) show real
 daylight on both sides for a generic channel; equality on the upper
-bound is only exact when both states are pure (proved above), and on the
-lower bound only in special cases.
+bound holds when both states are pure (proved above) and in the
+orthogonal-support case noted there, and on the lower bound only in
+special cases.
 </Callout>
 
 ## Practice Questions
@@ -487,16 +501,232 @@ lower bound only in special cases.
    directly for $|\psi\rangle=|0\rangle$, $|\phi\rangle=|+\rangle$
    (overlap $1/\sqrt2$), and confirm it matches $F=|\langle\psi|\phi\rangle|$
    plugged into the pure-pure Fuchs–van de Graaf equality case.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $D=1/\sqrt2\approx0.70711$, computed three independent ways, and the
+   upper Fuchs-van de Graaf bound is met exactly.
+
+   **Straight from the definition.** Build $\Delta$ and diagonalize it:
+
+   $$
+   \Delta=|0\rangle\langle0|-|{+}\rangle\langle{+}|=\begin{pmatrix}1&0\\0&0\end{pmatrix}-\begin{pmatrix}\tfrac12&\tfrac12\\\tfrac12&\tfrac12\end{pmatrix}=\begin{pmatrix}\tfrac12&-\tfrac12\\-\tfrac12&-\tfrac12\end{pmatrix}.
+   $$
+
+   It is traceless, as it must be, and $\det\Delta=-\tfrac14-\tfrac14=-\tfrac12$,
+   so its eigenvalues satisfy $\mu^2=\tfrac12$ and are $\pm1/\sqrt2$. Then
+
+   $$
+   D=\tfrac12\left(|\mu_1|+|\mu_2|\right)=\tfrac12\left(\tfrac1{\sqrt2}+\tfrac1{\sqrt2}\right)=\tfrac1{\sqrt2}\approx0.70711.
+   $$
+
+   **From the pure-state identity.** $|\langle0|{+}\rangle|=1/\sqrt2$, so
+   $\sqrt{1-|\langle\psi|\phi\rangle|^2}=\sqrt{1-\tfrac12}=1/\sqrt2$. Agreed.
+
+   **From the Bloch picture.** $\vec r_0=(0,0,1)$ and
+   $\vec r_+=(1,0,0)$ are orthogonal unit vectors, so
+   $|\vec r_0-\vec r_+|=\sqrt2$ and $D=\tfrac12\sqrt2=1/\sqrt2$. Agreed
+   again, and this one is worth doing because it shows the two Bloch
+   vectors sitting $90°$ apart while the Hilbert-space angle between the
+   states is $45°$. The Bloch sphere doubles angles, which is the standing
+   reason $|0\rangle$ and $|{+}\rangle$ look "more different" on the sphere
+   than their overlap suggests.
+
+   For the equality case: $F=|\langle\psi|\phi\rangle|=1/\sqrt2$ for two
+   pure states, so
+
+   $$
+   \sqrt{1-F^2}=\sqrt{1-\tfrac12}=\tfrac1{\sqrt2}=D,
+   $$
+
+   the upper bound saturated on the nose, exactly as the proof of the
+   pure-state identity guarantees it must be. The lower bound is
+   $1-F=1-0.70711=0.29289$, comfortably below $D$, so the sandwich here is
+   $0.2929\leq0.7071\leq0.7071$: tight above, slack below.
+
+   Two things not to read into the numbers. That $D$ and $F$ both come out
+   $1/\sqrt2$ is a coincidence of this particular pair, holding only when
+   $|\langle\psi|\phi\rangle|^2=1-|\langle\psi|\phi\rangle|^2$, that is at
+   overlap $1/\sqrt2$ exactly. And $D\approx0.707$ does not mean these
+   states are $70\%$ distinguishable. Helstrom says the optimal single-shot
+   success probability at equal priors is $\tfrac12(1+D)\approx0.854$, so a
+   little over one guess in seven still goes wrong.
+
+   </details>
+
 2. Using Helstrom's formula, explain why $D(\rho,\sigma)=0$ if and only
    if $\rho=\sigma$ exactly (hint: what does $\Delta=0$ imply about every
    possible measurement's bias?).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   One direction is immediate and the other needs one fact about positive
+   operators.
+
+   **If $\rho=\sigma$ then $D=0$.** $\Delta=0$, so $\mathrm{Tr}[P\Delta]=0$
+   for every $P$ whatsoever, and the maximum of a set of zeros is zero.
+
+   **If $D=0$ then $\rho=\sigma$.** The proof of Helstrom's formula
+   identified where the maximum is attained: at $P=\Pi_+$, the projector
+   onto $\Delta$'s non-negative eigenspace, with value
+   $\mathrm{Tr}[\Delta_+]$. So $D=0$ says $\mathrm{Tr}[\Delta_+]=0$. Now
+   $\Delta_+$ is positive semidefinite, and a positive semidefinite
+   operator whose trace vanishes is the zero operator, since its
+   eigenvalues are non-negative and sum to zero, forcing every one of them
+   to be zero. Hence $\Delta_+=0$. Tracelessness of $\Delta$ gave
+   $\mathrm{Tr}\,\Delta_-=\mathrm{Tr}\,\Delta_+=0$, so the same argument
+   kills $\Delta_-$, and $\Delta=\Delta_+-\Delta_-=0$. Therefore
+   $\rho=\sigma$.
+
+   Note where the work happened. It is tempting to argue "the maximum is
+   zero, but $\mathrm{Tr}[P\Delta]$ could be negative for other $P$, so
+   perhaps $\Delta$ is merely small rather than zero." The reply is that
+   the maximum is *attained*, not approached, and the attaining $P$ reads
+   off the total positive weight of $\Delta$. Nothing about a single
+   cleverly chosen measurement would have sufficed.
+
+   The physical statement underneath is worth spelling out, because it is
+   stronger than it looks. $\mathrm{Tr}[P\rho]-\mathrm{Tr}[P\sigma]$ is the
+   difference in outcome probabilities for the measurement $P$. So $D=0$
+   says that *no* measurement, of any kind, on a single copy, gives even an
+   infinitesimally different outcome distribution for the two states. What
+   the proof establishes is that this complete statistical
+   indistinguishability implies the density matrices are literally equal.
+   The density matrix therefore contains exactly the measurable content and
+   nothing more: two different preparation procedures that yield the same
+   $\rho$ (an equal mixture of $|0\rangle$ and $|1\rangle$, versus an equal
+   mixture of $|{+}\rangle$ and $|{-}\rangle$) are not merely hard to tell
+   apart, they are the same state.
+
+   Formally, this is the axiom that upgrades trace distance from a
+   pseudo-metric to a genuine metric. Symmetry is obvious from the
+   definition, the triangle inequality follows from Helstrom's variational
+   form, and this question supplies the identity of indiscernibles.
+
+   </details>
+
 3. For the amplitude-damping worked example, verify
    $1-F(\rho_0,\rho_{AD})\approx0.0417$ using the boxed closed form
    $F(\gamma)=\sqrt{\tfrac12(1+\sqrt{1-\gamma})}$ at $\gamma=0.3$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \sqrt{1-0.3}=\sqrt{0.7}=0.836660,\qquad
+   \tfrac12(1+0.836660)=0.918330,
+   $$
+
+   $$
+   F=\sqrt{0.918330}=0.9582954,\qquad 1-F=0.0417046\approx0.0417.
+   $$
+
+   That matches the table's lower-bound column, and it is worth seeing
+   where the closed form itself comes from, since the question is only
+   arithmetic otherwise. Amplitude damping's Kraus operators are
+   $K_0=\mathrm{diag}(1,\sqrt{1-\gamma})$ and
+   $K_1=\sqrt\gamma\,|0\rangle\langle1|$. Applying them to
+   $\rho_0=|{+}\rangle\langle{+}|=\tfrac12\begin{pmatrix}1&1\\1&1\end{pmatrix}$ gives
+
+   $$
+   \rho_{AD}=\frac12\begin{pmatrix}1+\gamma&\sqrt{1-\gamma}\\\sqrt{1-\gamma}&1-\gamma\end{pmatrix}.
+   $$
+
+   Since $\rho_0$ is pure, the boxed shortcut applies, and
+   $\langle{+}|\rho_{AD}|{+}\rangle$ is just half the sum of all four
+   entries:
+
+   $$
+   \langle{+}|\rho_{AD}|{+}\rangle=\frac12\cdot\frac12\left[(1+\gamma)+2\sqrt{1-\gamma}+(1-\gamma)\right]=\frac{1+\sqrt{1-\gamma}}{2},
+   $$
+
+   with the $\pm\gamma$ terms cancelling, which is why the population
+   change drops out of the fidelity entirely and only the coherence
+   damping $\sqrt{1-\gamma}$ survives. Taking the square root gives the
+   boxed $F(\gamma)$.
+
+   Sanity checks on the number. $F$ must lie in $[0,1]$ and be close to $1$
+   for a weak channel: $0.958$ is right. The Fuchs-van de Graaf sandwich at
+   this $\gamma$ reads $0.0417\leq D\leq0.2858$, and the measured
+   $D=0.1708$ sits strictly inside both, with the upper bound roughly seven
+   times the lower one. That ratio is the concrete form of the lesson's
+   warning that reporting fidelity alone pins down distinguishability only
+   loosely.
+
+   One trap in the arithmetic worth flagging: $\sqrt{1-\gamma}$, not
+   $1-\gamma$. Writing $\tfrac12(1+0.7)=0.85$ and $F=0.922$ produces
+   exactly the dephasing row's fidelity instead, which looks plausible and
+   is the wrong channel. The square root is there because a Kraus operator
+   acts on amplitudes while $\gamma$ is defined as a probability.
+
+   </details>
+
 4. Explain physically why dephasing at $\lambda=0.3$ drops purity further
    than amplitude damping at $\gamma=0.3$ despite giving a *smaller*
    trace distance from $|+\rangle\langle+|$: are these two facts in
    tension, or consistent?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Entirely consistent. The two quantities measure different things: purity
+   is how far the output sits from the *centre* of the Bloch ball, trace
+   distance is how far it sits from the *input*. A channel can move a long
+   way without moving inward.
+
+   The Bloch picture settles it in two lines, using
+   $\mathrm{Tr}(\rho^2)=\tfrac12(1+|\vec r|^2)$ and
+   $D=\tfrac12|\vec r_{\rm out}-\vec r_{\rm in}|$, with
+   $\vec r_{\rm in}=(1,0,0)$ for $|{+}\rangle$.
+
+   Dephasing at $\lambda=0.3$ multiplies the coherence by $1-\lambda$ and
+   leaves populations alone, so $\vec r_{DP}=(0.7,0,0)$. The motion is
+   $0.3$, all of it straight inward along the equator. Purity falls to
+   $\tfrac12(1+0.49)=0.745$ and $D=0.150$.
+
+   Amplitude damping at $\gamma=0.3$ multiplies the coherence by
+   $\sqrt{1-\gamma}=0.8367$ and pushes population toward $|0\rangle$, so
+   $\vec r_{AD}=(0.8367,0,0.3)$. Decompose that displacement relative to
+   the input direction $\hat x$: the radial part is $0.1633$ (inward) and
+   the tangential part is $0.3$ (upward, toward the pole). Total
+   displacement $0.3416$, so $D=0.171$, larger than dephasing's. But only
+   the radial $0.1633$ shortens the vector, so $|\vec r_{AD}|=\sqrt{0.79}=0.8888$
+   and purity only falls to $0.895$.
+
+   That is the whole answer: damping travels further but spends most of the
+   trip going sideways. Nearly nine tenths of its motion is a rotation
+   toward the north pole, which changes *which* state you have without
+   making it much more mixed.
+
+   The physical reading, in the same terms. $|{+}\rangle$ is pure coherence
+   in the computational basis, with zero population imbalance. Dephasing
+   attacks that one component and does nothing else, so every bit of its
+   strength is converted into mixedness. Amplitude damping splits its
+   effort: it damps coherence more gently at the same nominal strength
+   ($0.8367$ versus $0.7$, because a Kraus operator acts on amplitudes) and
+   spends the rest tilting the state toward $|0\rangle$, which is a
+   direction the input had no weight in and which costs no purity by
+   itself.
+
+   The extreme case makes the independence undeniable. Take $\gamma=1$:
+   amplitude damping maps every input to $|0\rangle\langle0|$, so purity
+   returns to exactly $1$ while the trace distance from $|{+}\rangle$
+   reaches $1/\sqrt2\approx0.707$, the largest value in the sweep. Maximum
+   disturbance, zero mixing. Purity under damping is therefore not even
+   monotonic in $\gamma$: it bottoms out at $\gamma=0.5$ with
+   $\mathrm{Tr}(\rho^2)=0.875$ and climbs back to $1$, taking the same
+   value $0.9063$ at $\gamma=0.25$ and $\gamma=0.75$.
+
+   So the wrong turn is treating "noisier" as a single ordering. Purity
+   loss, trace distance from the input, and fidelity each rank these two
+   channels differently at the same nominal strength, and none of the three
+   is the definition of noise. This is exactly the failure mode a
+   single-number datasheet invites, and it is why the lesson's table has
+   four columns.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -520,7 +750,7 @@ lower bound only in special cases.
   the derived inequalities, checked numerically and across the
   full range of $\gamma$.
 
-## Further Exploration
+## From Distinguishability to Channel Structure
 
 <NextDiscovery>
   [Quantum Channels: Kraus and Choi](/lessons/quantum-mastery/quantum-information-theory/quantum-channels-kraus-and-choi)

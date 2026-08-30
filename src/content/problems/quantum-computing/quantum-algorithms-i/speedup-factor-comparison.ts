@@ -18,7 +18,7 @@ export const speedupFactorComparison: NumericProblem = {
   },
   question: {
     type: "numeric",
-    prompt: "For n=16, what is Deutsch-Jozsa's classical worst-case query count (2^(n-1)+1) — i.e., the exact factor by which the quantum algorithm's single query beats it?",
+    prompt: "For n=16, what is Deutsch-Jozsa's classical worst-case query count, 2^(n-1)+1? Since the quantum algorithm uses a single query, this is also the factor by which it beats the classical bound.",
     inputHint: "as an integer",
   },
   answer: {
@@ -34,16 +34,16 @@ export const speedupFactorComparison: NumericProblem = {
   },
   hints: [
     { text: "The formula is 2^(n-1)+1 with n=16." },
-    { text: "2^15 = 32768." },
-    { text: "Add 1." },
+    { text: "Powers of two double each step: 2^10 = 1024, so 2^15 = 1024 × 32." },
+    { text: "Add the +1. The worst case is one query past the halfway point, not the halfway point itself." },
   ],
   solution: {
     steps: [{ description: "2^15 + 1 = 32768 + 1 = 32769." }],
     finalAnswer: `${value}`,
   },
   explanation: {
-    correctIdea: "The classical worst-case bound grows exponentially with n, while the quantum algorithm stays at exactly 1 query regardless of n.",
-    whyCorrect: "This is exactly why the gap between the two widens dramatically as n grows, as the capstone's worked example showed at n=10.",
-    whyWrong: ["Using 2^n instead of 2^(n-1)+1 would overstate the classical bound — the +1 and the halving both matter to the exact worst-case count."],
+    correctIdea: "The classical worst-case bound grows exponentially with n, while the quantum algorithm stays at 1 query for every n.",
+    whyCorrect: "This is why the gap widens so fast as n grows, as the capstone's worked example showed at n=10.",
+    whyWrong: ["Using 2^n instead of 2^(n-1)+1 overstates the classical bound; both the halving and the +1 matter to the worst-case count."],
   },
 };

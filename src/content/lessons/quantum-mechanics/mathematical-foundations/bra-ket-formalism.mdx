@@ -25,14 +25,17 @@ export const standardBasisPreset = {
 };
 export const projectorZeroV = { x: 0.6, y: 0.8 };
 export const projectorZeroPv = { x: projectorZeroV.x, y: 0 };
+export const invSqrt2 = Math.SQRT1_2;
+export const plusKet = [invSqrt2, invSqrt2];
+export const minusKet = [invSqrt2, -invSqrt2];
 export const hadamardBasisPreset = {
   label: "Hadamard basis {|+⟩, |−⟩}",
   panels: [
-    { label: "|+⟩⟨+|", cells: outerProduct([0.7071, 0.7071], [0.7071, 0.7071]) },
-    { label: "|−⟩⟨−|", cells: outerProduct([0.7071, -0.7071], [0.7071, -0.7071]) },
+    { label: "|+⟩⟨+|", cells: outerProduct(plusKet, plusKet) },
+    { label: "|−⟩⟨−|", cells: outerProduct(minusKet, minusKet) },
     {
       label: "Sum",
-      cells: cellSum(outerProduct([0.7071, 0.7071], [0.7071, 0.7071]), outerProduct([0.7071, -0.7071], [0.7071, -0.7071])),
+      cells: cellSum(outerProduct(plusKet, plusKet), outerProduct(minusKet, minusKet)),
       highlightDiagonal: true
     }
   ]
@@ -69,13 +72,13 @@ a general vector space, and goes further, into outer products and the
 completeness relation, which the rest of this course needs.
 </Callout>
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="A number or an operator, depending on the order">
   A ket times a bra in the wrong order is not a typo. Swap $\langle
   u|v\rangle$ for $|u\rangle\langle v|$ and a number turns into an
   operator.
 </LessonHook>
 
-## Motivation
+## Why Dirac bothered inventing a notation
 
 Every result from the last two lessons, inner products, norms,
 orthogonality, can be written in ordinary vector and matrix notation. But
@@ -94,7 +97,7 @@ introduces another fragment of it.
   license="Public domain"
 />
 
-## Intuition
+## The bracket, split down the middle
 
 A **ket** $|v\rangle$ is just a name for a vector, nothing new yet, only
 notation. The payoff comes from its partner, the **bra** $\langle v|$,
@@ -103,7 +106,7 @@ left-to-right it looks like "bra-c-ket," which is where the names come
 from, and that combination is exactly the <Term id="inner-product">inner product</Term> from the last
 lesson.
 
-## Mathematical Development
+## Bras, outer products, and completeness
 
 ### Ket, bra, and the inner product
 
@@ -138,7 +141,7 @@ recipe above is what that functional looks like once you write vectors as
 columns. This lesson mostly works with the concrete picture, but the more
 abstract statement is what lets <Term id="dirac-notation">bra-ket notation</Term> extend cleanly to
 infinite-dimensional spaces (like wavefunctions) later in the Quantum
-Mechanics pillar, where there's no column of numbers to transpose.
+Mechanics track, where there's no column of numbers to transpose.
 
 ### The outer product
 
@@ -151,9 +154,15 @@ $$
 
 This **outer product** is an operator: applied to a ket $|w\rangle$, it
 gives $|u\rangle\langle v|w\rangle = \langle v|w\rangle\,|u\rangle$, the
-number $\langle v|w\rangle$ times the vector $|u\rangle$. A concrete and
-important example: $|0\rangle\langle0|$ for the standard <Term id="basis">basis</Term> of
-$\mathbb{C}^2$ is
+number $\langle v|w\rangle$ times the vector $|u\rangle$.
+
+For a concrete and important example, fix some notation that the rest of
+this course uses without further comment. The standard <Term id="basis">basis</Term> of
+$\mathbb{C}^2$ is written $|0\rangle=\begin{pmatrix}1\\0\end{pmatrix}$ and
+$|1\rangle=\begin{pmatrix}0\\1\end{pmatrix}$ rather than $|e_1\rangle$ and
+$|e_2\rangle$: the label inside a ket is a *name*, free to be whatever
+identifies the state, and for a two-state system the two obvious names are
+the two bit values. With that, $|0\rangle\langle0|$ is
 
 $$
 |0\rangle\langle0| = \begin{pmatrix}1\\0\end{pmatrix}\begin{pmatrix}1&0\end{pmatrix} = \begin{pmatrix}1&0\\0&0\end{pmatrix}
@@ -181,23 +190,29 @@ axis.
 
 ### The completeness relation
 
-For an <Term id="orthonormal-basis">orthonormal basis</Term> $\{|e_i\rangle\}$, the sum of every basis
-vector's projector equals the **identity operator**:
+Take an <Term id="orthonormal-basis">orthonormal basis</Term> $\{|e_i\rangle\}$ of an
+$n$-dimensional space and build one projector $|e_i\rangle\langle e_i|$
+from each of its vectors, the way $|0\rangle\langle0|$ was built above.
+Adding all $n$ of them together produces a single operator. Decide which
+one before reading on.
+
+<PredictBeforeReveal
+  question="Add up all n projectors built from an orthonormal basis, ∑ᵢ|eᵢ⟩⟨eᵢ|. What single operator does that sum come out to?"
+  options={[
+    { label: "The zero operator", value: "zero" },
+    { label: "The identity operator I", value: "identity" },
+    { label: "n times the projector onto |e₁⟩", value: "scaled" },
+    { label: "A different operator for each choice of basis", value: "basis-dependent" },
+  ]}
+  correctValue="identity"
+  explanation="The identity, and the same identity for every orthonormal basis rather than only the standard one. The derivation below never uses anything about {|e_i⟩} except orthonormality, and the interactive check further down confirms it numerically for the Hadamard basis {|+⟩, |−⟩} too."
+/>
+
+That sum is the **identity operator**:
 
 $$
 \sum_i |e_i\rangle\langle e_i| = I
 $$
-
-<PredictBeforeReveal
-  question="Does this identity depend on which orthonormal basis {|e_i⟩} you pick?"
-  options={[
-    { label: "Yes, only the standard basis works", value: "standard-only" },
-    { label: "No, it holds for any orthonormal basis", value: "any" },
-    { label: "Only in two dimensions", value: "2d-only" },
-  ]}
-  correctValue="any"
-  explanation="It holds for every orthonormal basis of the space, not just the standard one. The derivation below never uses anything about {|e_i⟩} except orthonormality, and the interactive check further down confirms it numerically for the Hadamard basis {|+⟩, |−⟩} too."
-/>
 
 Every remaining lesson in this course leans on this identity, so it is
 worth seeing where it comes from rather than filing it away as a rule.
@@ -220,7 +235,7 @@ $$
   </DerivationStep>
 </DerivationSteps>
 
-<InteractiveSection title="Check completeness for a second basis" description="The standard basis {|0⟩, |1⟩} is not special: switch to the Hadamard basis {|+⟩, |−⟩} and confirm the two projectors still sum to the identity, as the derivation above promises for any orthonormal basis.">
+<InteractiveSection title="Check completeness for a second basis" description="The standard basis {|0⟩, |1⟩} is not special: switch to the Hadamard basis {|+⟩, |−⟩} and add the two projectors entry by entry. Whatever you get, ask whether the derivation above left it free to come out any other way for an orthonormal basis.">
   <MatrixGridExplorer
     presets={[standardBasisPreset, hadamardBasisPreset]}
     ariaLabel="Choose a basis to see its two rank-one projectors and their sum, which equals the identity matrix in both cases"
@@ -251,7 +266,7 @@ notation extends to matrices: for any matrix $M$, $M^\dagger$ is its
 conjugate transpose, $(M^\dagger)_{ij}=M_{ji}^*$. This single symbol will
 carry the entire Hermitian Operators lesson.
 
-## Physical Interpretation
+## Completeness as an operator identity
 
 The completeness relation is the formal version of "any state can be
 decomposed into basis states, and the decomposition is unique," the same
@@ -260,7 +275,7 @@ operator identity rather than a sentence. Projectors like
 $|e_i\rangle\langle e_i|$ are the mathematical objects that represent
 "asking whether the system is in state $|e_i\rangle$."
 
-## Worked Example
+## Checking completeness on the standard basis
 
 **Verify the completeness relation for $\mathbb{C}^2$'s standard basis by
 computing $|0\rangle\langle0|+|1\rangle\langle1|$ directly.**
@@ -272,7 +287,7 @@ $$
 The result is the identity matrix, confirming the general derivation above
 in the simplest concrete case.
 
-## Common Mistakes
+## Which order gives a number and which an operator
 
 <Callout type="note">
 **Confusing $|u\rangle\langle v|$ with $\langle u|v\rangle$.** The first is
@@ -289,12 +304,136 @@ itself.
 ## Practice Questions
 
 1. Compute the outer product $|1\rangle\langle0|$ as a $2\times2$ matrix.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   |1\rangle\langle0| = \begin{pmatrix}0\\1\end{pmatrix}\begin{pmatrix}1&0\end{pmatrix} = \begin{pmatrix}0&0\\1&0\end{pmatrix}.
+   $$
+
+   A column times a row, in that order, produces a matrix: entry $(i,j)$ is the
+   $i$th entry of the ket times the $j$th entry of the bra, so the only nonzero
+   entry is $(2,1)$.
+
+   Read as an operator, it is the map that sends $|0\rangle$ to $|1\rangle$ and
+   annihilates $|1\rangle$: applying it to any state picks out the $|0\rangle$
+   component (that is the $\langle0|$ half doing the asking) and re-emits it as
+   $|1\rangle$ (that is the $|1\rangle$ half doing the answering). Every outer
+   product reads that way, right to left, and it is the reason
+   $\sum_i|e_i\rangle\langle e_i|$ is the identity: it asks for each component
+   in turn and puts it back where it came from.
+
+   Two neighbours worth keeping distinct. Reversing the order gives a *number*,
+   $\langle0|1\rangle = 0$, not a matrix; the shape of the result is decided by
+   which of the ket and bra is on the outside. And the transpose-looking cousin
+   $|0\rangle\langle1| = \begin{pmatrix}0&1\\0&0\end{pmatrix}$ is a different
+   operator, the one that maps $|1\rangle$ to $|0\rangle$. Their sum is the
+   Pauli-$X$ matrix, which is what "$X$ flips the two basis states" means when
+   written out.
+
+   </details>
+
 2. Using $|+\rangle=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)$ and
    $|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$, verify that
    $|+\rangle\langle+|+|-\rangle\langle-|=I$ as well (a *different*
    orthonormal basis satisfying the same completeness relation).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Each projector is $\tfrac12$ times a matrix whose entries all have magnitude 1:
+
+   $$
+   |+\rangle\langle+| = \frac12\begin{pmatrix}1&1\\1&1\end{pmatrix}, \qquad |-\rangle\langle-| = \frac12\begin{pmatrix}1&-1\\-1&1\end{pmatrix}.
+   $$
+
+   Adding them, the off-diagonal entries cancel and the diagonal entries add:
+
+   $$
+   \frac12\begin{pmatrix}1+1&1-1\\1-1&1+1\end{pmatrix} = \begin{pmatrix}1&0\\0&1\end{pmatrix} = I \checkmark
+   $$
+
+   The result is the point of the exercise, and it is not a coincidence of these
+   particular vectors. Completeness holds for *every* orthonormal basis, and the
+   proof never mentions which one: expand an arbitrary $|\psi\rangle$ in the
+   basis and $\sum_i|e_i\rangle\langle e_i|\psi\rangle$ reassembles exactly the
+   state you started with. So $\{|0\rangle,|1\rangle\}$ has no special standing
+   in the mathematics. It is a choice of which question to ask, and the X basis
+   asks a different one with equal right.
+
+   Notice which parts did the work. The two off-diagonal terms cancelled because
+   the relative sign in $|-\rangle$ flips exactly one of them, which is the
+   algebraic trace of $\langle+|-\rangle = 0$; and the diagonal came to 1
+   because both states are normalized. Orthogonality and normalization are
+   separately required, and dropping either breaks the identity: rescale one of
+   the two states and the sum becomes a diagonal matrix with unequal entries,
+   while dropping orthogonality leaves it not diagonal at all.
+
+   </details>
+
 3. Compute $\langle1|X|0\rangle$ for the Pauli-$X$ matrix above.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\langle1|X|0\rangle = 1$.
+
+   Work from the inside out. $X|0\rangle = |1\rangle$, so the expression
+   collapses to $\langle1|1\rangle = 1$.
+
+   Equivalently, and this is the reading worth having: a matrix element
+   $\langle e_i|A|e_j\rangle$ *is* the $(i,j)$ entry of $A$ in that basis. With
+   the standard ordering $\{|0\rangle,|1\rangle\}$ as rows and columns 1 and 2,
+   $\langle1|X|0\rangle$ is the $(2,1)$ entry of
+   $X = \begin{pmatrix}0&1\\1&0\end{pmatrix}$, which is 1. Nothing had to be
+   multiplied out; the matrix was already a table of its own matrix elements.
+
+   That equivalence is the whole reason this notation is worth learning. A
+   matrix is a basis-dependent list of numbers, while $\langle\phi|A|\psi\rangle$
+   is defined without reference to any basis, and the two coincide when the bra
+   and ket are basis vectors.
+
+   The index order to keep straight: the *bra* names the row and the *ket* names
+   the column, so $\langle1|X|0\rangle$ is entry $(2,1)$ and not $(1,2)$. For
+   $X$ both entries are 1 and the mix-up is invisible; for a matrix with
+   different off-diagonal entries it is not, and for a Hermitian operator the
+   two are conjugates rather than equals.
+
+   </details>
+
 4. Explain in one sentence why $(|u\rangle\langle v|)^\dagger = |v\rangle\langle u|$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the dagger reverses the order of a product and daggers each factor,
+   and daggering a ket gives its bra and vice versa:
+   $(|u\rangle\langle v|)^\dagger = (\langle v|)^\dagger(|u\rangle)^\dagger = |v\rangle\langle u|$.
+
+   That is the one sentence. The two ingredients are worth naming separately,
+   since they are usually learned apart. The reversal rule $(AB)^\dagger = B^\dagger A^\dagger$
+   is inherited from the transpose, and it is not optional: order reversal is
+   what makes the adjoint of a product well defined. And $(|u\rangle)^\dagger = \langle u|$
+   is the definition of the bra, conjugate transpose of the ket, which is why
+   the coefficients get conjugated when a ket is turned around.
+
+   A consistency check makes it concrete. Taking $|u\rangle = |1\rangle$ and
+   $|v\rangle = |0\rangle$, question 1 gave
+   $|1\rangle\langle0| = \begin{pmatrix}0&0\\1&0\end{pmatrix}$, whose conjugate
+   transpose is $\begin{pmatrix}0&1\\0&0\end{pmatrix} = |0\rangle\langle1| \checkmark$.
+
+   One corollary earns its keep immediately: setting $|v\rangle = |u\rangle$
+   shows every projector $|u\rangle\langle u|$ is its own adjoint, that is,
+   Hermitian. Projectors are the operators measurement is built from, and their
+   Hermiticity is what puts real probabilities at the end of the Born rule.
+
+   The wrong instinct is to leave the order alone and just conjugate, giving
+   $|u\rangle\langle v|$ back with conjugated coefficients. That is not the
+   adjoint of an outer product; it is the entrywise conjugate, and for a
+   non-symmetric operator it is a different matrix.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -310,7 +449,7 @@ itself.
 - $\langle i|A|j\rangle$ is $A$'s $(i,j)$ matrix element in the basis
   $\{|i\rangle\}$.
 
-## Further Exploration
+## Taking the dagger of an outer product
 
 <ChallengePrompt prompt="Compute (|0⟩⟨1|)† directly as an explicit 2×2 matrix (conjugate transpose), and confirm it equals |1⟩⟨0|.">
   Write $|0\rangle\langle1|$ out as a matrix first (same method as the

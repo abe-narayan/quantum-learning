@@ -34,13 +34,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="No algebra, and still six decimal places">
   Some equations physics hands you offer no algebraic way to isolate the
   answer. That is not a dead end. It is the situation numerical methods
   were built for, and the answer comes out to six decimal places.
 </LessonHook>
 
-## Motivation
+## A statement about algebra, not about physics
 
 The last lesson derived a real physical result, $k\tan(ka)=\kappa$, and
 then admitted there is no algebraic way to isolate $E$ from it. That is a
@@ -53,7 +53,7 @@ available. The same standard applies here: a numerical answer is a real
 answer when the method is provably convergent and its error is bounded.
 Bisection is both.
 
-## Intuition
+## A tangent curve crossing a quarter circle
 
 Plot both sides of $k\tan(ka)=\kappa$ as functions of $k$ (for fixed
 well parameters). The left side is a repeating, diverging tangent
@@ -97,7 +97,7 @@ solution** every introductory course shows a picture of.
     ]
   }))}
   sliderLabel="Well depth V0 (half-width a=1 fixed)"
-  ariaLabel="Graphical bisection solver: k tan(ka) versus kappa(k), crossing point marks the bound-state wavenumber, for varying well depth V0"
+  ariaLabel="Two curves against k, with a slider for well depth V0 at fixed half-width a=1. The rising branch is k·tan(ka), identical in every frame because it does not depend on V0; it is clipped flat at a height of 6, so its true divergence past that point is not drawn. The falling arc is κ(k)=√(2V0−k²), and it lifts bodily as V0 grows, starting at 1.41 when V0=1 and at 4.90 when V0=12. The two cross exactly once per frame, and the crossing slides steadily rightward: k=0.890 at V0=1, then 1.030, 1.103, 1.186, 1.252 and 1.302 at V0=2, 3, 5, 8 and 12. Every crossing sits below the clipping height, so the clip hides none of them."
 />
 
 Drag the slider and watch the quarter-circle grow with $V_0$ while the
@@ -111,7 +111,7 @@ moved out to $k\approx1.186$, clearly visible. Bisection is just that same graph
 automated: repeatedly halve a bracket known to contain a sign change in
 $k\tan(ka)-\kappa$, converging on the crossing point.
 
-## Mathematical Development
+## Bisection, run on one concrete well
 
 ### The bisection method, briefly
 
@@ -163,7 +163,7 @@ sits at $E+V_0\approx0.7036$ above *its* well's bottom,
 have the same width and this one has a depth ($V_0=5$) much larger than
 either ground energy.
 
-## Physical Interpretation
+## Why the finite well's ground state sits lower
 
 The finite well's ground state sits lower (relative to its own floor)
 because the wavefunction isn't forced to zero at the walls. It leaks
@@ -173,25 +173,41 @@ that isn't perfectly rigid always costs a little less zero-point energy
 than confinement that is, a real, general trend, not specific to this
 one example.
 
-## Worked Example
+## Counting bound states off the graph
 
-**How many bound states (of either parity) does the $a=1,V_0=5$ well
-have, at minimum, based on the graphical picture?**
+**How many bound states, of either parity, does the $a=1,V_0=5$ well
+have?**
 
 The quarter-circle $\kappa=\sqrt{10-k^2}$ spans $k\in(0,\sqrt{10}
-\approx3.162)$. The tangent curve $k\tan(ka)$ (even states) has branches
-starting at $ka=0,\pi,2\pi,\ldots$ and diverging as $ka\to\pi/2,3\pi/2,
-\ldots$; with $a=1$, that's branches near $k\approx1.571,4.712,\ldots$.
-Only the first branch ($k\in(0,1.571)$) overlaps the quarter-circle's
-domain, giving exactly **one** even bound state (confirmed: the
-bisection found it at $k\approx1.186$, safely inside that branch). The
-odd-parity equation would need its own check, but by the same reasoning
-(its first branch spans roughly $k\in(\pi/2a,\ldots)$) there is likely
-exactly one odd state too for these parameters. This well supports a
-small, finite number of bound states in total, not the infinite ladder
-the infinite well has.
+\approx3.1623)$, and everything happens inside that domain. The
+even-parity curve $k\tan(ka)$ rises from zero on each branch that starts
+at $ka=0,\pi,2\pi,\ldots$ and diverges as $ka\to\pi/2,3\pi/2,\ldots$;
+with $a=1$ those branches begin at $k=0$ and $k=\pi\approx3.1416$.
 
-## Common Mistakes
+The first branch crosses the arc in the obvious place, and the bisection
+found it: $k\approx1.1863$, $E\approx-4.2964$, the ground state.
+
+The second branch is the one worth slowing down for. It begins at
+$k=3.1416$, only $0.02$ short of where the arc runs out at $3.1623$, so
+the two overlap on a sliver almost too narrow to see on a sketch. On that
+sliver $k\tan(ka)$ climbs from zero while $\kappa$ falls to zero, so they
+must cross, and they do, at $k\approx3.1616$ with
+$E\approx-0.0020$. That is a genuine bound state, barely.
+
+The odd-parity condition $-k\cot(ka)=\kappa$ has its first branch on
+$ka\in(\pi/2,\pi)$, comfortably inside the arc's domain, and contributes
+one crossing at $k\approx2.3186$, $E\approx-2.3121$.
+
+So this well holds **three** bound states, alternating even, odd, even,
+and the standard count agrees: a well of half-width $a$ and depth $V_0$
+holds $\left\lceil 2a\sqrt{2V_0}/\pi\right\rceil$ of them, here
+$\lceil2.0132\rceil=3$. The near-miss on the third is the lesson inside
+the lesson. Whether that state exists at all turns on comparing $3.1416$
+against $3.1623$, and no graphical reading settles a margin that thin.
+Finitely many bound states, yes; the exact count is arithmetic, not
+eyeballing.
+
+## Bisection is rigorous, not a heuristic
 
 <Callout type="note">
 **Treating bisection as an approximation to be distrusted.** For a
@@ -212,13 +228,132 @@ never higher.
 1. For $a=2,V_0=3$, this platform's engine finds the ground state at
    $E\approx-2.7882$. Confirm this is between $-V_0$ and $0$, as any
    bound state must be.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $-3 < -2.7882 < 0$, so yes.
+
+   The condition $-V_0<E<0$ is not a formality; each inequality rules out
+   a different kind of nonsense, and checking them is the cheapest test a
+   numerical root has to pass.
+
+   $E>-V_0$ says the energy sits above the well's floor. If it did not,
+   then $E+V_0<0$ and $k=\sqrt{2(E+V_0)}$ would be imaginary, so the
+   wavefunction would decay rather than oscillate *inside* the well. Here
+   $E+V_0\approx0.2118>0$, comfortably above, and $k\approx0.6509$ is
+   real.
+
+   $E<0$ says the state is bound. If it were not, $\kappa=\sqrt{-2E}$
+   would be imaginary and the "decaying tails" would oscillate instead,
+   making the state a scattering state with a continuous spectrum rather
+   than one of a discrete set. Here $\kappa\approx2.3614$ is real.
+
+   The quantization condition itself gives a stronger check, and it costs
+   one line: $k\tan(ka)$ with these numbers is $2.3614$, matching
+   $\kappa=2.3614$ to six figures. That is what the platform's test suite
+   asserts, and it verifies the root rather than just its bracket.
+
+   Worth noting how little of the well's depth this state uses. It sits
+   only $0.2118$ above a floor $3$ deep, so $|E|/V_0\approx93\%$: a wide
+   well ($a=2$) confines gently, the wavefunction is long and slow inside,
+   and the state settles close to the bottom. Compare the lesson's own
+   $a=1,V_0=5$ well, whose ground state sits $0.7036$ above its floor. The
+   narrower well costs far more zero-point energy, which is the
+   $E\propto1/a^2$ scaling of the infinite well showing through.
+
+   </details>
+
 2. Explain in one sentence why bisection needs a *confirmed sign change*
    in its starting bracket, and what could go wrong if you picked a
    bracket without checking this first.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the sign change is the entire guarantee: the Intermediate Value
+   Theorem promises a root inside a bracket where $g$ changes sign, and
+   with no sign change there is no promise at all, so the method still
+   converges, to a number that need not be a root of anything.
+
+   That is the failure worth naming: bisection does not error out. It
+   halves the bracket, keeps a half by the same rule as always, and
+   returns a perfectly precise answer, which is simply wrong. There is no
+   diagnostic in the output to distinguish it from a correct run, which is
+   why the check belongs at the start rather than the end.
+
+   Two concrete ways to pick a bad bracket here.
+
+   Bracketing no root at all, for instance by starting above
+   $k=\sqrt{2V_0}$ where $\kappa$ has already gone imaginary and $g$ is
+   not even defined. The physical statement is that no bound state exists
+   there, and the numerics have no way to say so unprompted.
+
+   Bracketing a *pole* rather than a root. $g(k)=k\tan(ka)-\kappa$ jumps
+   from $+\infty$ to $-\infty$ across $ka=\pi/2$, so a bracket spanning
+   that point contains a sign change and no root. Bisection will happily
+   converge on the pole, reporting a "solution" at $k=\pi/(2a)$ where the
+   equation is not satisfied at all. This is the standard trap for
+   tangent-based conditions and the reason the lesson's bracket stops at
+   the first divergence rather than running past it.
+
+   Both are caught by the same habit: evaluate $g$ at the two endpoints,
+   confirm the signs differ, and then confirm afterwards that $g$ at the
+   returned root really is near zero rather than near infinity. The second
+   check is what separates a root from a pole, since only one of them has
+   $|g|$ small.
+
+   </details>
+
 3. Without recomputing anything, would you expect a *deeper* well (same
    width, larger $V_0$) to push the ground state's energy above its
    floor higher or lower, relative to the $V_0=5$ example? Justify using
    the trend toward the infinite-well limit.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Higher. Deepening the well raises the ground state's energy above its
+   own floor, climbing toward the infinite well's $\approx1.2337$ from
+   below.
+
+   The reasoning uses only the limit already established. As
+   $V_0\to\infty$ at fixed $a$, the transcendental equation forces
+   $k\to\pi/(2a)$, the infinite well's ground-state wavenumber, and
+   the energy above the floor is
+
+   $$
+   E+V_0 = \frac{k^2}{2} \;\longrightarrow\; \frac{1}{2}\left(\frac{\pi}{2a}\right)^{\!2} = \frac{\pi^2}{8a^2}
+   $$
+
+   which at $a=1$ is $\approx1.2337$. The finite well always sits below
+   that value, because its wavefunction leaks and so behaves like a
+   slightly wider box, and deepening the well suppresses the leak. So the
+   energy above the floor rises monotonically toward the ceiling and never
+   passes it.
+
+   The platform's bisection confirms the trend at $a=1$: $V_0=5$ gives
+   $0.7036$ above the floor, $V_0=12$ gives $0.8474$, $V_0=50$ gives
+   $1.0190$, and $V_0=200$ gives $1.1189$, all approaching $1.2337$
+   without reaching it. Notice how slowly: quadrupling the depth from
+   $50$ to $200$ closes only about half the remaining gap.
+
+   Two things the answer is *not*, since the question invites both
+   confusions.
+
+   It is not a claim that the state becomes less bound. The absolute
+   energy $E$ plunges: $-4.296$ at $V_0=5$, $-198.881$ at $V_0=200$. The
+   state is far more tightly bound in absolute terms while sitting higher
+   above its own, much lower, floor. "Above the floor" and "below zero"
+   are two different reference points, and the question fixes the first.
+
+   And it is not a violation of the Common Mistakes warning that a finite
+   well's ground state is always lower than the infinite well's. It stays
+   lower at every finite depth. The limit is approached, not crossed, which
+   is exactly what makes the infinite well the ceiling rather than a case
+   the finite well can beat.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -234,7 +369,7 @@ never higher.
   qualitatively different prediction from the infinite well's endless
   ladder.
 
-## Further Exploration
+## Where the divergence point moves as the well widens
 
 <ChallengePrompt prompt="The interactive above varies V0 at fixed width a=1. Without recomputing anything, would WIDENING the well instead (larger a, same V0=5) push the ground-state k to a larger or smaller value?">
   Same graphical picture: the quarter-circle κ=√(2V0−k²) doesn't depend
@@ -253,5 +388,5 @@ never higher.
   eigenfunctions, proved once for the whole class of problem rather than
   case by case, see
   [Sturm-Liouville Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory)
-  in the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
+  in the Quantum Mastery track's Hilbert Space & Spectral Theory course.
 </NextDiscovery>

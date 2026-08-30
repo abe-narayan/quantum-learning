@@ -60,7 +60,21 @@ export function amplitudeDampingChannel(gamma: number): Matrix[] {
 /**
  * The (pure) dephasing channel, randomizing relative phase with
  * probability `lambda` per application while preserving populations — a
- * single-qubit model of pure decoherence with no energy loss (T2 decay).
+ * single-qubit model of pure decoherence with no energy loss.
+ *
+ * **Its time constant is T_phi, not T2.** T2 is the *total* coherence time
+ * once both mechanisms are acting, and the two rates add as
+ * `1/T2 = 1/(2*T1) + 1/T_phi`, because energy relaxation costs coherence at
+ * half the rate it costs population. Feeding this channel a T2 does reproduce
+ * the observed coherence envelope, but only while it acts alone: compose it
+ * with `amplitudeDampingChannel` at T1 and relaxation contributes its own
+ * coherence loss on top, so the pair decays at `1/T2 + 1/(2*T1)` and
+ * double-counts relaxation. To model both at once, pass T1 to the damping
+ * channel and **T_phi** to this one.
+ *
+ * The docstring said "(T2 decay)" until 2026-08-30. The same conflation had
+ * spread into the hardware lessons, where "T2 processes (pure dephasing)"
+ * treated the total as if it were one of its own two mechanisms.
  */
 export function dephasingChannel(lambda: number): Matrix[] {
   if (lambda < 0 || lambda > 1) throw new Error(`dephasingChannel requires 0<=lambda<=1, got ${lambda}.`);

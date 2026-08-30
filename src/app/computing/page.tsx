@@ -15,6 +15,7 @@ import {
   pillarFacts,
   pillarReadoutItems,
 } from "@/components/pillar/PillarFraming";
+import { TierLadder } from "@/components/pillar/TierLadder";
 import { LazyBlochSphereHeroExplorer } from "@/components/simulators/bloch-sphere/LazyBlochSphereHeroExplorer";
 import { StaticCircuitDiagram } from "@/components/visualizations/StaticCircuitDiagram";
 import { getCoursesByPillar } from "@/lib/content/curriculum";
@@ -40,13 +41,18 @@ const BELL_CIRCUIT: GateInstruction[] = [
 ];
 
 /**
- * Computing is state-and-circuit led: an asymmetric split puts the state
- * (a live, drivable Bloch sphere) directly beside the text that introduces
- * it, then a small static circuit diagram grounds "circuit" as a concrete
- * object before the curriculum lists the courses that build up to it. A
- * structurally different language from Mechanics' single reading column —
- * see that page file for why the four pillars deliberately don't share one
- * template.
+ * Computing is state-and-circuit led, and the page argues that twice with
+ * the same move. The hero is an asymmetric split with the state on the wide
+ * side: a live, drivable Bloch sphere beside the text that introduces it.
+ * The curriculum is the same split again, with the course stack on the wide
+ * side and a real two-qubit circuit on the narrow one, because a gate
+ * sequence composed against a state is exactly what these courses are, and
+ * putting the circuit in a full-width band of its own said the opposite.
+ *
+ * A structurally different language from Mechanics' reading column and
+ * full-bleed chronological rail, Hardware's schematic, and Software's staged
+ * pipeline. See those page files for why the four tracks deliberately don't
+ * share one template.
  */
 export default async function ComputingPage() {
   const lessons = await getAllLessonsMeta();
@@ -61,7 +67,7 @@ export default async function ComputingPage() {
 
   // One derivation over the real registries for every figure this page quotes
   // about itself, and for the primary action (the real first course, in
-  // curriculum order) — see `pillarFacts`, shared with the other three track
+  // curriculum order), see `pillarFacts`, shared with the other three track
   // pages, and mechanics/page.tsx for why `getCourseHref` (→
   // `/courses/<slug>`) is the right destination.
   const facts = pillarFacts(courses, lessons);
@@ -94,10 +100,15 @@ export default async function ComputingPage() {
                 QAOA, and the error correction that keeps any of it working.
               </p>
 
+              {/* Same four-rung ladder, same position, as every other pillar
+                  page: it is the one element that carries the hierarchy
+                  between them, so it cannot be styled per page. */}
+              <TierLadder pillar="quantum-computing" className="mt-8" />
+
               <PillarBriefing
                 className="mt-8"
                 facts={facts}
-                outcome="Build a working algorithm out of gates you chose yourself — and say honestly which problems it does and does not speed up."
+                outcome="Build a working algorithm out of gates you chose yourself, and say honestly which problems it does and does not speed up."
               />
 
               <Readouts className="mt-8" items={pillarReadoutItems(facts)} />
@@ -131,22 +142,6 @@ export default async function ComputingPage() {
         />
       </Section>
 
-      <Section width="reading" tight>
-        <Reveal>
-          <Instrument
-            label="Example circuit"
-            readout={<span className="font-tech text-xs text-subtle-foreground">2 qubits · Bell state</span>}
-            footnote="Hadamard puts q0 in superposition; CNOT then entangles it with q1 — the smallest circuit whose two qubits can no longer be described separately. Build and run circuits like this yourself in Quantum Gates & Circuits."
-          >
-            <StaticCircuitDiagram
-              numQubits={2}
-              instructions={BELL_CIRCUIT}
-              ariaLabel="A two-qubit circuit: Hadamard on qubit 0, then a controlled-NOT from qubit 0 to qubit 1, producing a Bell state."
-            />
-          </Instrument>
-        </Reveal>
-      </Section>
-
       <Section width="reading" tight aria-labelledby="computing-start-heading">
         <Reveal>
           <PillarLessonStrip
@@ -166,14 +161,32 @@ export default async function ComputingPage() {
               <SectionTitle level={2} size="lg" id="computing-curriculum-heading" className="mt-3">
                 {courses.length} courses, one qubit to fault tolerance
               </SectionTitle>
-              <p className="mt-3 max-w-sm text-muted-foreground">
+              <p className="mt-3 text-muted-foreground">
                 States, then circuits, then the algorithms and the error correction that make them
                 useful, each course built directly on the one before it.
               </p>
-              <p className="mt-4 max-w-sm text-sm leading-relaxed text-subtle-foreground">
-                Same asymmetric split as the state above: the course stack is the wide, weighty
-                side, the way the Bloch sphere was.
-              </p>
+
+              {/* The circuit sits *beside* the course stack rather than in a
+                  section of its own above it, because that is the claim this
+                  pillar makes: a gate sequence is composed against a state,
+                  and the courses are the sequence. Two qubits and two gates
+                  is the smallest circuit that has anything to compose. */}
+              <Instrument
+                className="mt-6"
+                label="Example circuit"
+                readout={
+                  <span className="font-tech text-xs text-subtle-foreground">
+                    2 qubits · Bell state
+                  </span>
+                }
+                footnote="Hadamard puts q0 in superposition; CNOT then entangles it with q1: the smallest circuit whose two qubits can no longer be described separately. Quantum Gates & Circuits, listed here, is where you build and run one yourself."
+              >
+                <StaticCircuitDiagram
+                  numQubits={2}
+                  instructions={BELL_CIRCUIT}
+                  ariaLabel="A two-qubit circuit: Hadamard on qubit 0, then a controlled-NOT from qubit 0 to qubit 1, producing a Bell state."
+                />
+              </Instrument>
             </Reveal>
           }
           figure={

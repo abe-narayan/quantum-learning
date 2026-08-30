@@ -24,20 +24,39 @@ export const decayFrames = [
   },
 ];
 
-export const halfLineXValues = Array(100).fill(0).map((_, i) => (i / 99) * 4);
+export const halfLineXValues = Array.from({ length: 121 }, (_, i) => (i / 120) * 6);
+
+export function runningNormSquared(f, xs) {
+  const out = [];
+  let acc = 0;
+  for (let i = 0; i < xs.length; i++) {
+    if (i > 0) {
+      const dx = xs[i] - xs[i - 1];
+      acc += 0.5 * dx * (f(xs[i - 1]) ** 2 + f(xs[i]) ** 2);
+    }
+    out.push({ x: xs[i], y: acc });
+  }
+  return out;
+}
+
+export const decayMass = runningNormSquared((x) => Math.exp(-x), halfLineXValues);
+export const growMass = runningNormSquared((x) => Math.exp(x), halfLineXValues);
+export const decayMassLimit = decayMass[decayMass.length - 1].y;
+export const growMassLimit = growMass[growMass.length - 1].y;
+
 export const deficiencyFrames = [
   {
     paramLabel: "",
     series: [
       {
-        label: "e^(−x): normalizable on (0,∞) — the n₊ deficiency solution",
+        label: "log₁₀ of ∫₀ˣ|e^(−t)|²dt, the n₊ solution (flattens at log₁₀½ ≈ −0.301)",
         color: "brand",
-        points: halfLineXValues.map((x) => ({ x, y: Math.exp(-x) })),
+        points: decayMass.filter((p) => p.y > 0).map((p) => ({ x: p.x, y: Math.log10(p.y) })),
       },
       {
-        label: "e^(+x): NOT normalizable on (0,∞) — no n₋ partner, clamped to 8 so the plot stays legible (the true curve diverges to ∞)",
+        label: "log₁₀ of ∫₀ˣ|e^(+t)|²dt, the rejected n₋ candidate (climbs without bound)",
         color: "warning",
-        points: halfLineXValues.map((x) => ({ x, y: Math.min(Math.exp(x), 8) })),
+        points: growMass.filter((p) => p.y > 0).map((p) => ({ x: p.x, y: Math.log10(p.y) })),
       },
     ],
   },
@@ -59,12 +78,12 @@ export const lessonMeta = {
   objectives: [
     "State precisely what makes L²(ℝ) a Hilbert space (completeness, separability) and why both properties matter physically",
     "Derive, not assert, that a function in the domain of p̂ = −iħd/dx on the whole line vanishes at ±∞",
-    "Distinguish a symmetric (formally Hermitian) operator from a fully self-adjoint one, and compute the deficiency-subspace calculation showing p̂ on a half-line has no self-adjoint extension at all",
+    "Distinguish a symmetric (formally Hermitian) operator from a fully self-adjoint one, and settle by an explicit deficiency-subspace calculation whether p̂ on a half-line admits a self-adjoint extension",
   ],
   related: [
     {
       slug: "quantum-mechanics/the-hydrogen-atom/the-radial-equation",
-      note: "The radial equation's boundary condition u(0)=0 is a domain choice of the kind this lesson makes precise — the physically forced condition for the radial momentum-like operator to be self-adjoint on a half-line, not an ad hoc requirement.",
+      note: "The radial equation's boundary condition u(0)=0 is a domain choice of the kind this lesson makes precise. It is the physically forced condition for the radial momentum-like operator to be self-adjoint on a half-line, not an ad hoc requirement.",
     },
   ],
 };
@@ -75,7 +94,7 @@ export const lessonMeta = {
   and "self-adjoint" is where that happens.
 </LessonHook>
 
-## Motivation
+## Where Hermitian Stops Being Enough
 
 Hermitian Operators proved that $A=A^\dagger$ forces real eigenvalues and
 orthogonal eigenvectors, for a **matrix**. Every later course reused that
@@ -87,7 +106,7 @@ operator you get has no self-adjoint version at all, not with this
 boundary condition, not with any other. On an infinite-dimensional
 space, $A=A^\dagger$ checked by integration by parts is weaker than what
 "the eigenvalues are provably real and a complete eigenbasis provably
-exists" actually requires, and the half-line momentum operator is where
+exists" requires, and the half-line momentum operator is where
 that gap becomes a real obstruction rather than a footnote. This lesson
 isolates exactly what's missing, gives it its real name
 (**self-adjointness**, not mere Hermiticity), and works through that
@@ -99,10 +118,10 @@ half-line case in full.
   caption="Von Neumann built the rigorous theory of symmetric versus self-adjoint operators and the deficiency-index machinery this lesson uses to show the half-line momentum operator has no self-adjoint extension at all. The obstruction is in the operator, not in a badly chosen boundary condition."
   credit="Los Alamos National Laboratory / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.jpg"
-  license="Public domain"
+  license="Attribution (LANL)"
 />
 
-## Intuition
+## The Domain Is Part of the Operator
 
 In finite dimensions, "$A$ maps vectors to vectors, and $\langle
 u|Av\rangle=\langle Au|v\rangle$ for all $u,v$" is the whole story,
@@ -112,12 +131,12 @@ infinite-dimensional function space this stops being true: differential
 operators like $\hat p$ aren't defined on every element of $L^2(\mathbb
 R)$ (not every $L^2$ function is even differentiable), so *which
 functions the operator is allowed to act on*, its **domain** $D(A)$,
-becomes part of the operator's actual identity, not an afterthought.
+becomes part of the operator's identity, not an afterthought.
 Self-adjointness asks a domain question finite dimensions never has to:
 does $A$'s domain match $A^\dagger$'s domain *exactly*, not just does
 the boundary-term calculation come out looking symmetric.
 
-## Mathematical Development
+## Symmetric, Self-Adjoint, and the Deficiency Indices
 
 ### Why $L^2(\mathbb R)$ qualifies as a Hilbert space
 
@@ -139,13 +158,13 @@ $\sum_nc_n\psi_n$.
 
 Both properties are load-bearing, not decoration. Completeness is what
 guarantees a Cauchy sequence of approximate solutions (e.g. the
-numerical time-evolution steps Wave Mechanics computed) actually
+numerical time-evolution steps Wave Mechanics computed)
 converges *to something in the space*, rather than to a "hole" outside
 it. Separability is what guarantees a countable eigenbasis can exist at
 all; without it, "expand $\psi$ in energy eigenstates" wouldn't even
 be the right *kind* of statement to make.
 
-### Formally Hermitian ("symmetric") vs. actually self-adjoint
+### Formally Hermitian ("symmetric") versus self-adjoint
 
 An operator $A$ with dense domain $D(A)\subset\mathcal H$ is **symmetric** if
 $\langle\phi|A\psi\rangle=\langle A\phi|\psi\rangle$ for all
@@ -173,7 +192,7 @@ Self-adjointness demands the stronger claim that the two regions
 coincide exactly, no leftover room at all. The two operators this
 lesson works out land on opposite sides of that line:
 
-<div className="not-prose grid grid-cols-1 gap-4 overflow-x-auto sm:grid-cols-2">
+<div className="not-prose grid grid-cols-1 gap-4 sm:grid-cols-2">
   <div className="flex flex-col items-center gap-2 rounded-panel border border-border bg-surface-muted/40 p-4">
     <svg width={240} height={180} viewBox="0 0 240 180" role="img" aria-label="Self-adjoint case: D of p-hat and D of p-hat-dagger coincide exactly, drawn as one shared rectangle labeled from both the top and the bottom" className="max-w-full">
       <rect x={40} y={45} width={160} height={90} rx={10} className="fill-brand/10 stroke-brand" strokeWidth={2.5} />
@@ -220,7 +239,7 @@ to zero at $\pm\infty$", true, but that vanishing is itself a fact that
 needs deriving, since $L^2$ membership alone does **not** imply a
 function tends to $0$ pointwise (a function can spike arbitrarily high
 on shrinking intervals and still have finite $\int|\psi|^2$). What
-actually forces the vanishing is $\psi'\in L^2$ *as well*:
+forces the vanishing is $\psi'\in L^2$ *as well*:
 
 <DerivationSteps>
   <DerivationStep annotation="Product rule for d/dx|ψ|², valid for any ψ regardless of domain. The identity holds for real or complex ψ.">
@@ -252,9 +271,9 @@ $\phi,\psi\to0$), confirming $\hat p$ is symmetric on $H^1(\mathbb R)$:
 
 <EquationReveal
   terms={[
-    { id: "lhs", symbol: "∫φ*(−iℏψ′)dx", gloss: "The matrix element ⟨φ|p̂ψ⟩ — the left side of the symmetry check." },
-    { id: "boundary", symbol: "[φ*ψ]", gloss: "The boundary term from integration by parts — vanishes because both φ,ψ → 0 at ±∞, by the lemma just proved." },
-    { id: "rhs", symbol: "∫φ′*ψ dx", gloss: "The matrix element ⟨p̂φ|ψ⟩ — the right side, once the vanished boundary term is dropped." },
+    { id: "lhs", symbol: "∫φ*(−iℏψ′)dx", gloss: "The matrix element ⟨φ|p̂ψ⟩, the left side of the symmetry check." },
+    { id: "boundary", symbol: "[φ*ψ]", gloss: "The boundary term from integration by parts. It vanishes because both φ,ψ → 0 at ±∞, by the lemma just proved." },
+    { id: "rhs", symbol: "∫φ′*ψ dx", gloss: "The matrix element ⟨p̂φ|ψ⟩, the right side, once the vanished boundary term is dropped." },
   ]}
 >
 
@@ -322,8 +341,8 @@ $\hat p^\dagger\psi=+i\psi$ and $\hat p^\dagger\psi=-i\psi$.
 <PredictBeforeReveal
   question="The Dirichlet domain ψ(0)=0 already makes p̂ symmetric on the half-line. Before computing n₊ and n₋: does the symmetric check that already passed mean a self-adjoint extension is guaranteed to exist?"
   options={[
-    { label: "Yes — symmetric always extends", value: "yes" },
-    { label: "No — symmetry alone doesn't decide it", value: "no" },
+    { label: "Yes, symmetric always extends", value: "yes" },
+    { label: "No, symmetry alone doesn't decide it", value: "no" },
     { label: "Only if the wall is at x=0 specifically", value: "wall" },
   ]}
   correctValue="no"
@@ -350,21 +369,38 @@ $\hat p^\dagger\psi=+i\psi$ and $\hat p^\dagger\psi=-i\psi$.
   </DerivationStep>
 </DerivationSteps>
 
+The figure plots the quantity the two integrals above are really about,
+which is the *running* squared norm $\int_0^X|\psi|^2\,dt$ as the
+half-line is exhausted, computed by trapezoidal quadrature rather than
+quoted from the closed forms, on a $\log_{10}$ vertical axis so both
+behaviors fit in one frame without clamping anything.
+
 <ParametricCurve
   frames={deficiencyFrames}
-  ariaLabel="e to the minus x, normalizable on the half-line, versus e to the plus x, not normalizable and clamped at 8 for legibility since it actually diverges to infinity — the two candidate deficiency-subspace solutions for momentum on a half-line"
+  xAxisLabel="upper limit X"
+  yAxisLabel="log₁₀ of running ∫₀ˣ|·|²dt"
+  ariaLabel="Running squared norm from 0 to X of each candidate deficiency solution on a log10 vertical axis, plotted against X from 0 to 6. The e-to-the-minus-t curve rises and then goes flat at log10 of one half, about -0.301. The e-to-the-plus-t curve becomes a straight line of slope 0.869 per unit X and keeps climbing off the top of the frame"
 />
 
-(the plotted $e^{+x}$ curve is clamped at $8$ for legibility, because it
-actually diverges to infinity, which is why this function
-isn't normalizable). So the $\psi'=-\psi$ equation (eigenvalue $+i$)
+The two shapes are the whole argument. The $e^{-t}$ curve levels off
+into a horizontal line: by $X=3$ it has already accumulated $0.4992$ of
+its eventual $\tfrac12$, and the rest of the half-line contributes almost
+nothing, so the limit exists and the function is in $L^2(0,\infty)$. The
+$e^{+t}$ curve becomes a *straight line* on the log axis, of measured
+slope $0.869$ per unit $X$, which is $2/\ln10$: exponential growth
+without bound. It reaches $8.14\times10^4$ by $X=6$ and would run off
+any frame you drew. A horizontal asymptote versus a line of constant
+positive slope is what "normalizable" and "not normalizable" look like
+when you plot the criterion itself instead of the function.
+
+So the $\psi'=-\psi$ equation (eigenvalue $+i$)
 has exactly one $L^2(0,\infty)$ solution ($n_+=1$), while $\psi'=+\psi$
 (eigenvalue $-i$) has none ($n_-=0$). **$n_+\ne n_-$**: by von Neumann's theorem,
 **no self-adjoint extension of $\hat p$ on the half-line exists at
 all**, not the Dirichlet choice above, not any other local boundary
 condition. Every domain choice leaves it merely symmetric at best.
 
-## Physical Interpretation
+## Choosing a Domain Is Choosing a Boundary Condition
 
 <InsightBlock>
   Choosing a domain is choosing a boundary condition, and a boundary
@@ -396,7 +432,7 @@ signature of that broken symmetry. Momentum survives on spaces with no
 one-sided edge, the whole line or a periodic interval, where both
 directions are structurally alike.
 
-## Worked Example
+## Momentum on a Half-Line, Where It Fails
 
 **Confirm the vanishing-at-infinity lemma concretely for a real domain
 member.**
@@ -408,6 +444,8 @@ $\psi_0\in D(\hat p)=H^1(\mathbb R)$ by the actual hypotheses of the lemma, not 
 
 <ParametricCurve
   frames={decayFrames}
+  xAxisLabel="position x"
+  yAxisLabel="|ψ₀(x)|²"
   ariaLabel="Probability density of the harmonic oscillator ground state, an H-1 function, computed by the platform's engine and shown decaying to zero at both ends"
 />
 
@@ -415,10 +453,10 @@ $|\psi_0(x)|^2$, computed directly by this platform's
 `harmonicOscillatorEigenstate`, visibly decays to (numerically)
 indistinguishable from zero well before the grid's edge at $x=\pm8$,
 the concrete instance of the general lemma proved above, for a function
-that actually belongs to $\hat p$'s domain, not merely one chosen to
+that belongs to $\hat p$'s domain, not merely one chosen to
 look well-behaved.
 
-## Common Mistakes
+## Integration by Parts Mistaken for a Proof
 
 <Callout type="mistake">
 **Treating "$A=A^\dagger$ by integration by parts" as the complete
@@ -433,7 +471,7 @@ domain can be symmetric and still admit no self-adjoint extension.
 <Callout type="warning">
 **Assuming $L^2$ membership alone implies a function vanishes at
 infinity.** It doesn't: only the *combination* $\psi,\psi'\in L^2$
-(the actual hypothesis of $\hat p$'s domain) forces the vanishing, via
+(the hypothesis of $\hat p$'s domain) forces the vanishing, via
 the Cauchy–Schwarz argument derived above. A function can be square
 integrable while spiking arbitrarily high on ever-narrower intervals
 without tending to any limit at all.
@@ -444,10 +482,124 @@ without tending to any limit at all.
 1. Redo the deficiency-index calculation for $\hat p=-i\,d/dx$ on
    $L^2(-\infty,0)$ (a half-line extending the *other* direction).
    Which of $n_+,n_-$ is now $1$, and which is $0$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $n_-=1$ and $n_+=0$, the exact reverse of the $(0,\infty)$ case.
+
+   The eigenvalue equations do not change at all, because the deficiency
+   indices are read off $\hat p^\dagger$ acting on the maximal domain, and
+   the differential expression $-i\,d/dx$ has no idea which half-line it
+   is sitting on:
+
+   $$
+   \hat p^\dagger\psi=\pm i\psi \ \Longrightarrow\ \psi'=\mp\psi \ \Longrightarrow\ \psi(x)=Ce^{\mp x}.
+   $$
+
+   What changes is the normalization integral, and it changes decisively,
+   because the end of the interval that runs to infinity has moved:
+
+   $$
+   \int_{-\infty}^{0}|e^{-x}|^2dx=\int_{-\infty}^{0}e^{-2x}dx=\infty,
+   \qquad
+   \int_{-\infty}^{0}|e^{+x}|^2dx=\int_{-\infty}^{0}e^{2x}dx=\tfrac12 .
+   $$
+
+   The growing and decaying exponentials have traded places, because
+   "decaying" was never a property of the function alone: it is a
+   statement about which end of the domain is being exhausted. The
+   eigenvalue-$(-i)$ solution $e^{+x}$ is now the normalizable one, with
+   the same norm $\tfrac12$ that `half-line-deficiency-normalization`
+   computes for $e^{-x}$ on the right half-line.
+
+   The verdict does not trade places. Von Neumann's criterion asks only
+   whether $n_+=n_-$, and $0\ne1$ just as surely as $1\ne0$, so the left
+   half-line momentum operator has no self-adjoint extension either. The
+   physics reads the same way: a space with one impenetrable edge is not
+   translation invariant, and translation invariance does not care which
+   side the edge is on.
+
+   Run the same count on the whole line as a check. Neither exponential
+   is in $L^2(\mathbb R)$, since $e^{-x}$ blows up at $-\infty$ and
+   $e^{+x}$ blows up at $+\infty$, so $n_+=n_-=0$: essential
+   self-adjointness with a unique extension, agreeing with the
+   Fourier-transform argument given above.
+
+   The wrong turn is copying the lesson's two integrals verbatim and
+   reporting $n_+=1,n_-=0$ again. It is seductive because the ODE
+   solutions really are identical and only the limits of integration
+   move, which makes the changed part look like bookkeeping. The habit
+   that protects you is refusing to call a function "decaying" without
+   naming the limit: $e^{+x}$ decays as $x\to-\infty$, and here that is
+   the only limit in play.
+
+   </details>
+
 2. Why does the argument that $D(\hat p)$-functions vanish at infinity
    fail if only $\psi\in L^2(\mathbb R)$ is assumed, without also
    assuming $\psi'\in L^2(\mathbb R)$? Identify exactly which step of the
    derivation breaks.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Step two breaks: the Cauchy-Schwarz bound
+
+   $$
+   \int|\psi'\psi^*|\,dx\le\|\psi'\|_{L^2}\|\psi\|_{L^2}<\infty
+   $$
+
+   has $\|\psi'\|_{L^2}$ on its right side. Drop $\psi'\in L^2$ and that
+   factor is $+\infty$, so the inequality is vacuously true and asserts
+   nothing. The product $\psi'\psi^*$ need not be integrable at all.
+
+   Trace what that costs downstream, because the damage is not where it
+   is usually looked for. Step three, the identity
+
+   $$
+   |\psi(x)|^2-|\psi(0)|^2=\int_0^x2\,\mathrm{Re}\big(\psi'\psi^*\big)\,dt,
+   $$
+
+   is still *true*; it is just the fundamental theorem of calculus applied
+   to step one. What it loses is convergence: without an absolutely
+   integrable integrand, the right side need not approach a limit as
+   $x\to+\infty$, so $|\psi(x)|^2$ need not approach a limit either. Step
+   four is then arguing about an object that does not exist. Its logic is
+   "the limit cannot be positive, therefore it is zero," which presupposes
+   that a limit is there to be pinned down. With no limit, that inference
+   is a non sequitur, and the conclusion $\psi(x)\to0$ is simply
+   unavailable.
+
+   A concrete $L^2$ function that fails the conclusion makes the gap
+   tangible. Put a smooth spike of height $n$ and width $n^{-4}$ centred
+   at $x=n$, for every integer $n\ge1$, and zero elsewhere. Then
+
+   $$
+   \int|\psi|^2dx\;\lesssim\;\sum_{n\ge1}n^2\cdot n^{-4}=\sum_{n\ge1}n^{-2}=\frac{\pi^2}{6}<\infty,
+   $$
+
+   so $\psi\in L^2(\mathbb R)$, yet $\psi(n)=n$, so $\psi$ does not tend to
+   zero and is not even bounded. It is perfectly smooth, so nothing about
+   differentiability is at issue. Its derivative runs at order
+   $n/n^{-4}=n^5$ across each spike, giving $\int|\psi'|^2\sim n^{10}\cdot
+   n^{-4}=n^6$ per spike, wildly divergent, exactly as the lemma demands
+   of any counterexample.
+
+   The wrong turn is naming step four, because that is the step where
+   $\psi\in L^2$ appears and $L^2$ feels like the hypothesis being
+   weakened. Step four is fine: it uses only the hypothesis that was kept.
+   The failure happened two steps earlier and silently, at the moment an
+   integral was declared convergent. A second wrong turn is answering that
+   without $\psi'\in L^2$ the function need not be differentiable, so step
+   one fails. The spike function above is smooth, and step one holds for
+   it. What $\psi'\in L^2$ supplies is not local regularity but *global*
+   control on how much total variation the function is allowed to spend
+   out at infinity, and that is the thing being spent when the spikes keep
+   getting taller.
+
+   </details>
+
 3. A periodic interval $[0,L]$ with the boundary condition
    $\psi(0)=\psi(L)$ (not $\psi(0)=\psi(L)=0$) turns out to admit a
    one-parameter family of self-adjoint extensions of $\hat p$,
@@ -455,6 +607,57 @@ without tending to any limit at all.
    this lesson's boundary-term argument, explain in one sentence why
    *this* boundary condition (unlike the half-line's) makes the term
    $[\phi^*\psi]_0^L$ vanish.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   In one sentence: an interval has two finite endpoints, so the boundary
+   term can cancel *between* them rather than having to vanish *at* each
+   of them, and because $\phi$ and $\psi$ are drawn from the same domain
+   they carry the same twist, whose modulus is one.
+
+   Written out, with $\psi(L)=e^{i\theta}\psi(0)$ and
+   $\phi(L)=e^{i\theta}\phi(0)$, so that $\phi^*(L)=e^{-i\theta}\phi^*(0)$:
+
+   $$
+   [\phi^*\psi]_0^L=\phi^*(L)\psi(L)-\phi^*(0)\psi(0)=e^{-i\theta}e^{i\theta}\phi^*(0)\psi(0)-\phi^*(0)\psi(0)=0 .
+   $$
+
+   The unimodularity $|e^{i\theta}|=1$ is doing all the work. Any other
+   multiplier would rescale one endpoint relative to the other and leave a
+   residue.
+
+   The half-line has no such partner. It has one finite endpoint, at
+   $x=0$; the other end is $+\infty$, where the $H^1$ lemma already sends
+   the contribution to zero on its own. So there is nothing for
+   $\phi^*(0)\psi(0)$ to cancel against, and the only way to kill it is to
+   demand $\psi(0)=0$ outright. That does make $\hat p$ symmetric, but it
+   over-constrains $D(\hat p)$ relative to $D(\hat p^\dagger)=H^1(0,\infty)$,
+   which carries no boundary condition at all, and the leftover room is
+   what the deficiency count measures.
+
+   The abstract count agrees, which is worth checking rather than
+   assuming. On $[0,L]$ both candidate solutions $e^{-x}$ and $e^{+x}$ are
+   continuous on a bounded interval and therefore both lie in $L^2(0,L)$,
+   so $n_+=n_-=1$. Von Neumann's theorem then predicts a family indexed by
+   the unitary maps of a one-dimensional space, which is
+   $U(1)=\{e^{i\theta}\}$: one real parameter, $n^2=1$. That is exactly the
+   family the question names, arriving from the theorem rather than from
+   guessing boundary conditions.
+
+   The wrong turn is claiming the term vanishes at each endpoint
+   separately. It vanishes at neither; $\phi^*(0)\psi(0)$ is generically
+   nonzero and so is $\phi^*(L)\psi(L)$. A subtler and more instructive
+   wrong turn is letting $\phi$ and $\psi$ carry *different* twists,
+   $\psi(L)=e^{i\theta}\psi(0)$ and $\phi(L)=e^{i\theta'}\phi(0)$. The
+   leftover factor is then $e^{i(\theta-\theta')}$ and the boundary term
+   survives. That is not a technicality to wave through: it is why the
+   $\theta$ label distinct self-adjoint operators instead of one operator
+   with a free knob. Each $\theta$ is a different physical system, a
+   different magnetic flux threaded through the ring, and a domain built
+   from two different twists at once is not symmetric to begin with.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -470,14 +673,14 @@ without tending to any limit at all.
   $D(\hat p)=H^1(\mathbb R)$, derivable via the Fourier-transform
   equivalence to a self-adjoint multiplication operator; every $H^1$
   function provably vanishes at $\pm\infty$, which is what makes
-  the earlier boundary-term calculation legitimate rather than assumed.
+  the earlier boundary-term calculation legitimate.
 - $\hat p$ on a half-line has unequal deficiency indices ($n_+=1$,
   $n_-=0$, computed directly), so by von Neumann's theorem it has **no**
   self-adjoint extension at all, a worked case where the
   informal "check $A=A^\dagger$" recipe would have missed a real
   mathematical obstruction.
 
-## Further Exploration
+## From Self-Adjointness to a Spectral Measure
 
 <NextDiscovery>
   [The Spectral Theorem for Unbounded Operators](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators)

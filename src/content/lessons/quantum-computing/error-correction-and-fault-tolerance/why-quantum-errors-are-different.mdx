@@ -25,10 +25,10 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="A recipe that fails at every step">
-Classical error correction protects a bit by copying it. Every step of that recipe fails for a qubit, and the reasons are ones this pillar has already proved: no-cloning, a continuous state space, and measurement collapse.
+Classical error correction protects a bit by copying it. Every step of that recipe fails for a qubit, and the reasons are ones this track has already proved: no-cloning, a continuous state space, and measurement collapse.
 </LessonHook>
 
-## Motivation
+## Copy, look, vote, and three illegal moves
 
 Store $0$ as $000$; if noise flips one copy, majority vote recovers the
 original. That is the classical strategy, and it is three steps long. Copy.
@@ -55,7 +55,7 @@ Peter Shor's nine-qubit code is the first concrete construction to show that qua
 Andrew Steane's seven-qubit code follows, a second, independent construction confirming quantum information really can be protected.
 </HistoricalMoment>
 
-## Mathematical Development
+## Three obstacles, each already proven
 
 ### Obstacle 1: no-cloning rules out simple copying
 
@@ -74,19 +74,9 @@ to be built from something else entirely.
 
 A classical bit has exactly one possible error: flip, or don't. A qubit's
 state is a point on the Bloch sphere, and *any* small unwanted rotation,
-not just a full $X$ flip, counts as an error. This looks like it needs
-infinitely many distinct correction procedures, one per possible
-rotation angle. It doesn't: any single-qubit error can be expanded as a
-linear combination of exactly four fixed operators, $I,X,Y,Z$ (the
-identity and the three <Term id="pauli-matrices">Pauli matrices</Term> in use since Course
-1), a fact that follows from $I,X,Y,Z$ forming a basis for all
-$2\times2$ matrices. **Correcting against $X$ and $Z$ errors specifically
-(and therefore $Y=iXZ$, their combination) is enough to correct against
-an arbitrary, continuously-varying single-qubit error.** The reduction
-from "infinitely many possible errors" to "just these two" is the
-mathematical fact that makes quantum error correction possible at all, and
-why this course builds a bit-flip ($X$) code and a phase-flip
-($Z$) code separately, then combines them.
+not just a full $X$ flip, counts as an error. On the face of it that needs
+infinitely many distinct correction procedures, one per possible rotation
+angle.
 
 <PredictBeforeReveal
   question="A continuum of unwanted rotations can hit a single qubit on the Bloch sphere. How many distinct correction procedures do you actually need to build to handle all of them?"
@@ -97,8 +87,33 @@ why this course builds a bit-flip ($X$) code and a phase-flip
     { label: "One generic 'undo whatever happened' gate", value: "one" },
   ]}
   correctValue="two"
-  explanation="Any single-qubit error is a linear combination of I, X, Y, Z, because those four matrices span all 2×2 operators. That cuts infinity to four immediately. It cuts further because Y = iXZ, confirmed in the Worked Example below: a code built to correct X and Z errors corrects Y for free. Two mechanisms, not four and not infinitely many. This is the single most surprising fact in error correction, and without it none of the rest would be possible."
+  explanation="Any single-qubit error is a linear combination of I, X, Y, Z, because those four matrices span all 2×2 operators. That cuts infinity to four. It cuts further because Y = iXZ, multiplied out below: a code built to correct X and Z errors corrects Y for free. Two mechanisms, not four and not infinitely many. The section below spells out the step that turns a spanning argument into an actual correction procedure, which is the part that is easy to skip and does the real work."
 />
+
+Two fixed operators, then, rather than a continuum. Any single-qubit
+error can be expanded as a
+linear combination of exactly four fixed operators, $I,X,Y,Z$ (the
+identity and the three <Term id="pauli-matrices">Pauli matrices</Term> in use since Course
+1), because those four form a basis for all
+$2\times2$ matrices. **Correcting against $X$ and $Z$ errors specifically
+(and therefore $Y=iXZ$, their combination) is enough to correct against
+an arbitrary, continuously-varying single-qubit error.** That reduction
+is why this course builds a bit-flip ($X$) code and a phase-flip
+($Z$) code separately, then combines them.
+
+Spanning on its own does not get you there, and the missing step is worth
+naming now even though the machinery to carry it out arrives in Lesson 6.
+An arbitrary error $E=c_0I+c_1X+c_2Y+c_3Z$ applied to an encoded state
+leaves the register in a *superposition* of four error branches, not in
+any one of them. What collapses that superposition onto a single branch
+is the syndrome measurement itself: its outcome is a random draw among
+the four, and after the draw the register is left in exactly the branch
+that outcome names, with the continuous coefficients $c_i$ gone. So a
+continuous error becomes a discrete one at the moment you look for it,
+and a discrete one is what the correction gate can undo. This is called
+**error discretization**, and it is the reason a finite code can defend
+against an infinite set of errors. Lesson 6 does the projection
+explicitly.
 
 <MeasurementTree
   ariaLabel="An arbitrary single-qubit error decomposes into I, X, Y, Z components; correcting X and Z automatically corrects Y as well"
@@ -115,8 +130,8 @@ why this course builds a bit-flip ($X$) code and a phase-flip
 
 Correcting the $X$ and $Z$ branches directly also corrects the $Y$
 branch, since $Y$ is nothing but their combination (up to the
-unobservable global phase $i$), confirmed algebraically in the Worked
-Example below.
+unobservable global phase $i$), confirmed algebraically in
+*Y as a product of X and Z* below.
 
 ### Obstacle 3: measurement collapses superposition
 
@@ -132,14 +147,14 @@ encoded superposition is never touched directly, and the recovered state
 matches the original encoded state whatever $\alpha,\beta$ were. That is
 checked in the tests rather than argued in prose.
 
-## Physical Interpretation
+## All three have the same shape
 
 All three obstacles have the same shape. The classical strategy relies on
 something quantum mechanics forbids: perfect copying, discrete errors,
-harmless observation. So quantum error correction is not the classical
-scheme patched up. It is a different scheme, built from entanglement and
-syndrome extraction, that solves the same underlying problem using only
-what quantum mechanics permits.
+harmless observation. What replaces it is built from entanglement and
+syndrome extraction rather than from repair of the classical recipe, and
+it solves the same underlying problem using only what quantum mechanics
+permits.
 
 Solving the obstacles in principle leaves a practical question open. A code
 helps only once the physical error rate is below a <Term id="quantum-threshold-theorem">threshold</Term>; above that
@@ -153,7 +168,7 @@ one code family in one regime, not a claim that fault tolerance at scale is
 solved, but it is a measured instance of crossing the threshold this
 lesson's obstacles make necessary.
 
-## Interactive Experiment
+## Inject an error and watch the syndrome
 
 Obstacle 3's fix, measure only a syndrome, is not a hypothetical. It is
 the real `runBitFlipCorrectionCycle` engine running in your browser.
@@ -165,7 +180,7 @@ exactly, for the same $\alpha,\beta$ the lesson's text already claims.
   <LazySyndromeExplorer mode="bit-flip" />
 </InteractiveSection>
 
-## Worked Example
+## Y as a product of X and Z
 
 **Confirm $Y=iXZ$ directly, connecting the $Y$-error case to $X$ and $Z$
 corrections.**
@@ -177,7 +192,7 @@ bit flip and a phase flip (up to the overall factor $i$, an unobservable
 global phase); a code correcting both $X$ and $Z$ errors automatically
 corrects $Y$ errors too, with no separate machinery needed.
 
-## Common Mistakes
+## Two corrections cover a continuum of errors
 
 <Callout type="note">
 **Assuming quantum error correction needs infinitely many distinct
@@ -200,16 +215,200 @@ arbitrary $\alpha,\beta$, not for one hand-picked pair.
 1. Show that $X^2=Z^2=Y^2=I$ (each Pauli, applied twice, undoes itself).
    Why is this property essential for identifying which single correction
    gate reverses a detected error?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   All three square to the identity, and the payoff is that the
+   correction gate is then the *same gate* as the error. A syndrome that
+   names an error has, in the same breath, named its cure.
+
+   $$
+   X^2=\begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}0&1\\1&0\end{pmatrix}=\begin{pmatrix}1&0\\0&1\end{pmatrix},
+   \qquad
+   Z^2=\begin{pmatrix}1&0\\0&-1\end{pmatrix}\begin{pmatrix}1&0\\0&-1\end{pmatrix}=\begin{pmatrix}1&0\\0&1\end{pmatrix}
+   $$
+
+   $$
+   Y^2=\begin{pmatrix}0&-i\\i&0\end{pmatrix}\begin{pmatrix}0&-i\\i&0\end{pmatrix}=\begin{pmatrix}(-i)(i)&0\\0&(i)(-i)\end{pmatrix}=\begin{pmatrix}1&0\\0&1\end{pmatrix}
+   $$
+
+   There is a one-line version that covers all three at once and
+   generalizes to every tensor product of Paulis. Each Pauli is both
+   Hermitian and unitary: $P=P^\dagger$ and $P^\dagger P=I$. Substitute
+   the first into the second and $P^2=I$ falls out with no matrix
+   arithmetic at all.
+
+   Now the part that matters for error correction. Undoing an error $E$
+   means applying $E^{-1}$, and for a general unitary that is a different
+   gate from $E$, one you would have to compute. For a Pauli,
+   $E^{-1}=E$. So the decode table can be a lookup from two syndrome bits
+   to a gate you already have in the instruction set, applied to a qubit
+   whose index the syndrome also gave you. Nothing is estimated, nothing
+   is inverted, and nothing depends on the encoded $\alpha,\beta$, since
+   $P^2=I$ is an identity between operators and holds whatever state they
+   act on.
+
+   The tempting wrong turn is to think the correction step needs to know
+   *how much* error occurred, in the way a classical feedback loop
+   measures a deviation and applies a proportional counter-signal. That
+   instinct is right about the raw physics and wrong about the procedure.
+   A real drift is something like $e^{-i\theta X/2}$ with $\theta$ small
+   and continuous, and applying $X$ to that does not repair it; it makes
+   things worse. What rescues the situation is that the syndrome
+   measurement runs *first*, and its projection collapses the register
+   onto one branch of $c_0I+c_1X+c_2Y+c_3Z$. The correction gate never
+   meets $\theta$. It only ever meets a Pauli, and Paulis are exactly the
+   operators that are their own undo.
+
+   </details>
+
 2. Explain in one sentence why "just measure the qubit and see if it's
    still correct" fails as an error-detection strategy for a qubit in
    superposition, specifically.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   A computational-basis measurement of $\alpha|0\rangle+\beta|1\rangle$
+   returns $0$ or $1$ at random and leaves the qubit in $|0\rangle$ or
+   $|1\rangle$, so the check destroys the superposition it was supposed
+   to protect and returns a bit that could equally well have come from an
+   uncorrupted qubit.
+
+   Both halves of that sentence are doing work, and it is worth
+   separating them, because the strategy fails twice over.
+
+   It fails as *detection*. Measuring an intact $|+\rangle$ gives $0$
+   half the time; measuring an $X$-corrupted $|+\rangle$, which is still
+   $|+\rangle$, also gives $0$ half the time. One sample of a random
+   variable cannot distinguish two states that produce the same
+   distribution, and for a state in superposition the two distributions
+   generally overlap. A single classical bit is simply not enough
+   evidence.
+
+   It fails as *preservation*, which is the worse failure. Even in the
+   case where the outcome does tell you something, the encoded state is
+   gone. The relative phase between $\alpha$ and $\beta$ is not recorded
+   in the outcome and is not recoverable from it. You have traded the
+   payload for one bit of information about the payload.
+
+   That second failure is the one specific to superposition, and it is
+   why the escape route is a syndrome rather than a better direct
+   measurement. A syndrome such as "do qubits 0 and 1 agree?" is a
+   question whose answer is the same for both branches of the encoded
+   superposition, so learning it reveals nothing about $\alpha,\beta$ and
+   therefore collapses nothing about them.
+
+   </details>
+
 3. Using the no-cloning theorem's proof (from Quantum Gates & Circuits),
    explain precisely which step would fail if you tried to build a
    cloning circuit as an error-correction encoder.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The step that fails is the extension from basis states to
+   superpositions by linearity. Everything before it is fine, and that is
+   what makes the failure interesting: the circuit gets built, it runs,
+   and it produces something other than a copy.
+
+   Fixing the encoder's behaviour on the two basis states is exactly what
+   "copy the bit" asks for:
+
+   $$
+   U|0\rangle|0\rangle=|0\rangle|0\rangle,
+   \qquad
+   U|1\rangle|0\rangle=|1\rangle|1\rangle.
+   $$
+
+   $\text{CNOT}(0,1)$ does this. But $U$ is a fixed unitary, so its
+   action on every other input is now determined, and there is no freedom
+   left to negotiate. On $|+\rangle$:
+
+   $$
+   U\big(\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)|0\rangle\big)
+   = \tfrac{1}{\sqrt2}\big(|00\rangle+|11\rangle\big),
+   $$
+
+   whereas a genuine copy would have to be
+
+   $$
+   |+\rangle|+\rangle=\tfrac12\big(|00\rangle+|01\rangle+|10\rangle+|11\rangle\big).
+   $$
+
+   The first is entangled, the second is a product state, and no amount
+   of engineering reconciles them.
+
+   Read that as an error-correction statement rather than as a
+   prohibition and it turns into the encoder this course is about to
+   build. Run the same circuit on $\alpha|0\rangle+\beta|1\rangle$ and
+   the output is $\alpha|00\rangle+\beta|11\rangle$, which is the
+   two-qubit version of the next lesson's
+   $\alpha|000\rangle+\beta|111\rangle$. The no-cloning proof is not
+   telling you the encoder is impossible. It is telling you what the
+   encoder actually does.
+
+   The wrong turn is concluding that because copying is out, redundancy
+   is out, so quantum error correction cannot get off the ground. The
+   difference is where the information sits. In three classical copies,
+   each copy holds the whole bit. In $\alpha|000\rangle+\beta|111\rangle$
+   no single qubit holds anything: trace out two of the three and the
+   survivor's reduced state is
+   $|\alpha|^2|0\rangle\langle0|+|\beta|^2|1\rangle\langle1|$, which has
+   lost the relative phase entirely. The information is stored in the
+   correlations rather than in the parts, and that is precisely why
+   no-cloning has no objection to it.
+
+   </details>
+
 4. If a code can correct arbitrary single-qubit errors on one specific
    physical qubit within a larger register, does that automatically mean
    it can correct simultaneous errors on two different qubits? Why or why
    not?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No, and the three-qubit code makes the failure concrete rather than
+   abstract. Its two syndrome bits have four possible values, and the
+   four situations it already needs to distinguish, no error and an $X$
+   on each of the three qubits, use all four. There is nothing left over
+   to assign to a two-qubit error.
+
+   What happens instead is worse than a shrug. Take $X_0X_1$. The
+   syndrome bits are the parities $Z_0Z_1$ and $Z_1Z_2$, so flipping
+   qubits 0 and 1 flips the first parity twice, back to $0$, and the
+   second once, to $1$. The syndrome reads $(0,1)$, which the decode
+   table assigns to a single $X$ on qubit 2. The recovery applies $X_2$,
+   and the register ends up with $X_0X_1X_2$ applied to it, which maps
+   $\alpha|000\rangle+\beta|111\rangle$ to
+   $\alpha|111\rangle+\beta|000\rangle$: a clean, undetectable logical
+   bit flip. The code did not fail to act. It acted confidently and
+   wrongly.
+
+   The counting behind this generalizes. A code correcting every error of
+   weight at most $t$ needs a distinct syndrome for each such error, and
+   the number of weight-$\le t$ Pauli errors grows like $\binom{n}{t}3^t$
+   while the syndrome space is fixed by the number of stabilizer
+   generators. The clean statement, which Lesson 6 derives, is that
+   correcting all errors of weight $\le t$ requires code distance
+   $d\ge 2t+1$. Weight 1 needs $d\ge3$; weight 2 needs $d\ge5$. Nothing
+   about achieving $d=3$ hands you $d=5$.
+
+   Two refinements are worth carrying forward. First, "cannot correct
+   every weight-2 error" is not "cannot correct any". The Shor code has
+   distance 3, yet an $X$ on one qubit of its first block and an $X$ on
+   one qubit of its second block are handled fine, because each block
+   corrects its own. The *guarantee* stops at weight 1; particular
+   patterns beyond it may survive by luck of structure. Second, the
+   question's premise is weaker than it looks. Being able to correct an
+   arbitrary error on one *known* qubit is a much smaller claim than
+   correcting an arbitrary error on an *unknown* one, and even the
+   stronger claim does not reach weight 2.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -219,11 +418,14 @@ arbitrary $\alpha,\beta$, not for one hand-picked pair.
   codes use entanglement instead.
 - Any single-qubit error decomposes into $I,X,Y,Z$ components; correcting
   $X$ and $Z$ specifically suffices for the continuum of possible errors.
+- The step that makes that work is error discretization: the syndrome
+  measurement collapses the superposition of error branches onto one
+  Pauli, so the correction gate only ever faces a discrete error.
 - Syndrome measurement extracts only error-location information, provably
   without collapsing the protected superposition, verified directly by
   the engine, not just asserted.
 
-## Further Exploration
+## The first concrete code
 
 <NextDiscovery>
 [The Three-Qubit Bit-Flip Code](/lessons/quantum-computing/error-correction-and-fault-tolerance/the-three-qubit-bit-flip-code) builds and verifies the first

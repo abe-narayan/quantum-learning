@@ -15,14 +15,14 @@ const WavefunctionExplorer = dynamic(
 );
 
 /** Visibility-gated so this embed's chunk doesn't fetch until it's actually
- *  near-viewport — see `LazyBlochSphereExplorer`'s doc comment for why this
+ *  near-viewport; see `LazyBlochSphereExplorer`'s doc comment for why this
  *  matters on a lesson page carrying several simulator embeds. */
 export function LazyWavefunctionExplorer({
   initialPresetId,
   showMeanSpreadOverlay,
 }: {
   initialPresetId?: PresetId;
-  /** Forwarded to WavefunctionCanvas — draws ⟨x⟩ and Δx on the density plot. */
+  /** Forwarded to WavefunctionCanvas; draws ⟨x⟩ and Δx on the density plot. */
   showMeanSpreadOverlay?: boolean;
 } = {}) {
   const { ref, ready } = useDeferredMount<HTMLDivElement>();

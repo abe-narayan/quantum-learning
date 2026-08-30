@@ -34,17 +34,18 @@ export const lessonMeta = {
   objectives: [
     "Compute the adjoint of an operator and determine whether it is Hermitian",
     "Derive that Hermitian operators have real eigenvalues and orthogonal eigenvectors for distinct eigenvalues",
+    "State the spectral theorem and write a Hermitian operator as a weighted sum of projectors",
     "Compute expectation values and connect them to the spectral decomposition",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Nobody has measured 3+2i volts">
   Nobody has ever measured 3+2i volts. That single fact about the real
   world forces every observable in quantum mechanics into one narrow
   class of operators.
 </LessonHook>
 
-## Motivation
+## Real outcomes demand real eigenvalues
 
 A measurement outcome, the energy of an atom, the spin of an electron, is
 always a real number; nobody has ever measured $3+2i$ volts. If
@@ -63,7 +64,7 @@ rather than asserting it.
   license="Public domain"
 />
 
-## Intuition
+## The matrix version of equalling your own conjugate
 
 A real number equals its own conjugate. **Hermitian** operators are the
 matrix generalization of that idea: an operator that, in a precise sense,
@@ -72,7 +73,7 @@ that buys: the algebraic condition $A=A^\dagger$ is strong enough, on its
 own, to force every eigenvalue real and every pair of eigenvectors with
 distinct eigenvalues orthogonal.
 
-## Mathematical Development
+## One condition, two theorems
 
 ### The adjoint
 
@@ -86,18 +87,26 @@ kets in the Bra-Ket Formalism lesson, now applied to operators.
 
 $A$ is **Hermitian** (or self-adjoint) if $A = A^\dagger$.
 
-### Theorem: Hermitian operators have real eigenvalues
+That is the entire condition, and on its face it says nothing about
+eigenvalues at all. A general operator on a complex space has complex
+eigenvalues, and some have no real ones at all: the $90°$ rotation matrix
+$\begin{pmatrix}0&-1\\1&0\end{pmatrix}$ that stood in for $i$ back in the
+Complex Numbers lesson has characteristic equation $\lambda^2+1=0$, whose
+roots are $\pm i$. So before reading on, decide what $A=A^\dagger$ buys.
 
 <PredictBeforeReveal
-  question="Is it guaranteed that a Hermitian operator's eigenvalues are real, or just typically the case for the ones physics happens to use?"
+  question="A is a Hermitian operator on a complex vector space. What can you say about its eigenvalues?"
   options={[
-    { label: "Guaranteed, for every Hermitian operator", value: "guaranteed" },
-    { label: "Just a common pattern, not a strict guarantee", value: "typical" },
-    { label: "Only for operators on real (not complex) vector spaces", value: "real-only" },
+    { label: "All real, for every Hermitian operator without exception", value: "guaranteed" },
+    { label: "Usually real, but complex ones are possible for unusual A", value: "typical" },
+    { label: "All real only if A's entries happen to be real numbers", value: "real-entries" },
+    { label: "Nothing follows: A = A† constrains the matrix, not its spectrum", value: "nothing" },
   ]}
   correctValue="guaranteed"
-  explanation="Strictly guaranteed, with no exceptions, for any Hermitian operator on any complex inner product space. The derivation below needs nothing beyond A=A† and the inner product axioms, and never assumes anything about the specific operator beyond Hermiticity."
+  explanation="All real, strictly and without exception, for any Hermitian operator on any complex inner product space. Note that A's entries need not be real for this: the Pauli-Y matrix has purely imaginary off-diagonal entries and eigenvalues +1 and −1. What A = A† constrains is the spectrum, which is exactly why quantum mechanics reaches for Hermitian operators when it needs measurement outcomes to be real numbers. The proof below needs nothing beyond A = A† and the inner product axioms."
 />
+
+### Theorem: Hermitian operators have real eigenvalues
 
 Let $A|v\rangle=\lambda|v\rangle$, $v\ne0$, $A$ Hermitian. Consider
 $\langle v|Av\rangle$.
@@ -184,7 +193,7 @@ it represents the average result if the same measurement were repeated
 many times on identically-prepared systems, made precise in the
 Probability and Quantum States lesson.
 
-## Physical Interpretation
+## What A = A-dagger buys you physically
 
 Hermiticity is not an arbitrary mathematical restriction. The two theorems
 above turn a single algebraic condition, $A=A^\dagger$, into two physical
@@ -204,7 +213,7 @@ leaking particles to its surroundings, the imaginary part is not a
 measurement outcome. It is a decay rate, and the model is understood as an
 approximation to a larger Hermitian description.
 
-## Worked Example
+## Pauli-Z decomposed, and one impostor tested
 
 **Verify the spectral decomposition of Pauli-$Z=\begin{pmatrix}1&0\\0&-1\end{pmatrix}$,
 and check whether $S=\begin{pmatrix}1&0\\0&i\end{pmatrix}$ is Hermitian.**
@@ -224,8 +233,8 @@ if you've seen quantum computing).
   question="Is S = diag(1, i) Hermitian?"
   options={[
     { label: "Hermitian", value: "hermitian" },
-    { label: "Not Hermitian", value: "not-hermitian" },
     { label: "Can't tell without computing S† in full", value: "unsure" },
+    { label: "Not Hermitian", value: "not-hermitian" },
   ]}
   correctValue="not-hermitian"
   explanation="Not Hermitian, and you don't even need the full conjugate transpose to see it: a Hermitian matrix's diagonal entries must equal their own conjugates, i.e. be real, and S's bottom-right entry is i."
@@ -236,14 +245,14 @@ Hermitian**, confirming the prediction: $S$'s bottom-right entry, $i$,
 isn't real, so it already fails the diagonal check before the
 off-diagonal entries even matter.
 
-<InteractiveSection title="Check M = M† for yourself" description="Switch between three standard quantum gates and compare M to M† entry by entry. Pauli-Y and Pauli-Z match exactly (Hermitian), Pauli-Y despite its imaginary off-diagonal entries; the S gate's bottom-right entry flips sign under the dagger and never matches (not Hermitian).">
+<InteractiveSection title="Check M = M† for yourself" description="Switch between three standard quantum gates and compare M to M† entry by entry. Pauli-Y is the one to look at first: its off-diagonal entries are imaginary, so decide whether you expect it to survive the dagger before you look. Then find the single entry, in one of the three, that flips sign.">
   <MatrixGridExplorer
     presets={hermitianPresets}
     ariaLabel="Choose an operator to compare its matrix directly against its conjugate transpose, checking whether the two match entry by entry"
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Hermitian does not mean real-entried
 
 <Callout type="note">
 **Confusing "Hermitian" with "real."** A Hermitian matrix can have complex
@@ -266,13 +275,161 @@ It's the fastest way to rule out a candidate.
 
 1. Is $\begin{pmatrix}1&i\\-i&1\end{pmatrix}$ Hermitian? Justify using the
    adjoint definition.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes. Apply $(A^\dagger)_{ij} = A_{ji}^*$ in two steps.
+
+   Transpose:
+
+   $$
+   A^\mathsf{T} = \begin{pmatrix}1&-i\\i&1\end{pmatrix}.
+   $$
+
+   Then conjugate every entry:
+
+   $$
+   A^\dagger = \left(A^\mathsf{T}\right)^* = \begin{pmatrix}1&i\\-i&1\end{pmatrix} = A \checkmark
+   $$
+
+   Both operations were needed, and neither alone would have sufficed:
+   $A^\mathsf{T} \ne A$ and $A^* \ne A$. The off-diagonal pair swapped places
+   under the transpose and swapped back under the conjugation, which is exactly
+   the structure Hermiticity requires.
+
+   Two features generalize. The diagonal entries of a Hermitian matrix must be
+   real, since $A_{ii} = A_{ii}^*$; both are 1 here. And the off-diagonal
+   entries must be conjugates of each other across the diagonal,
+   $A_{12} = A_{21}^*$; here $i = (-i)^* \checkmark$. Scanning for those two
+   conditions is faster than writing the transpose out, and it is the same
+   check.
+
+   As predicted by the theorem, the eigenvalues come out real: the trace is 2
+   and the determinant is $1 - (i)(-i) = 1 - 1 = 0$, giving
+   $\lambda^2 - 2\lambda = 0$ and $\lambda = 0, 2$.
+
+   </details>
+
 2. Is $\begin{pmatrix}0&1\\-1&0\end{pmatrix}$ Hermitian? (This one is real,
    so don't assume that settles it.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No.
+
+   Conjugation does nothing to a real matrix, so $A^\dagger = A^\mathsf{T}$
+   here, and
+
+   $$
+   A^\mathsf{T} = \begin{pmatrix}0&-1\\1&0\end{pmatrix} \ne \begin{pmatrix}0&1\\-1&0\end{pmatrix} = A.
+   $$
+
+   The off-diagonal entries are negatives of each other rather than conjugates
+   of each other, so the matrix fails the test at exactly the place question 1
+   passed it.
+
+   The parenthetical warning in the question is the substance. "Real" is not
+   the criterion; for a real matrix Hermitian means *symmetric*, and this
+   matrix is antisymmetric, $A^\mathsf{T} = -A$. Being real removes the
+   conjugation from the requirement but leaves the transposition, which is the
+   half that fails.
+
+   The consequence is visible in the spectrum, and it is a useful independent
+   check. Trace 0 and determinant $0 - (1)(-1) = 1$ give $\lambda^2 + 1 = 0$,
+   so $\lambda = \pm i$: purely imaginary, so this operator cannot represent an
+   observable. It is not a broken operator, though. $A^\dagger = -A$ makes it
+   *anti*-Hermitian, and $iA = \begin{pmatrix}0&i\\-i&0\end{pmatrix} = -Y$ is
+   Hermitian. Multiplying by $i$ always converts between the two families,
+   which is why the Schrödinger equation carries an explicit $i$: it turns the
+   Hermitian Hamiltonian into the anti-Hermitian generator that unitary time
+   evolution requires.
+
+   </details>
+
 3. For $A=$ Pauli-$Z$ and $|\psi\rangle = (\sqrt{0.6},\sqrt{0.4})$ (both
-   entries real and positive), compute $\langle\psi|Z|\psi\rangle$.
+   entries real and positive), compute $\langle\psi|Z|\psi\rangle$, and
+   explain why the answer is not one of $Z$'s possible measurement
+   outcomes.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \langle\psi|Z|\psi\rangle = \left(\sqrt{0.6}\right)^2(+1) + \left(\sqrt{0.4}\right)^2(-1) = 0.6 - 0.4 = 0.2.
+   $$
+
+   Doing it as a matrix sandwich gives the same thing:
+   $Z|\psi\rangle = (\sqrt{0.6}, -\sqrt{0.4})^\mathsf{T}$, and pairing that
+   against $\langle\psi|$ gives $0.6 - 0.4 = 0.2$.
+
+   Now the second half. $Z$'s eigenvalues are $+1$ and $-1$, and a measurement
+   of $Z$ returns one of those two numbers and nothing else. Yet
+   $\langle Z\rangle = 0.2$, which is neither. There is no contradiction,
+   because an expectation value is not a prediction about any single
+   measurement; it is the long-run *average* over many measurements on
+   identically prepared states:
+
+   $$
+   \langle Z\rangle = (+1)P(+1) + (-1)P(-1) = (+1)(0.6) + (-1)(0.4) = 0.2.
+   $$
+
+   An average of $\pm1$ outcomes can land anywhere in $[-1, 1]$, and it lands
+   *at* an eigenvalue only when the state is an eigenstate, so that one outcome
+   is certain. The same thing happens with a fair die, whose average roll of
+   3.5 is not a face.
+
+   The reading to resist is "the measurement gives 0.2", or its cousin "the
+   qubit is 60% in state $|0\rangle$" as a description of the qubit itself.
+   The right statement is that repeated preparation and measurement yields
+   $+1$ about 60% of the time and $-1$ about 40% of the time, and 0.2 is the
+   mean of that record. This is also why the notation is
+   $\langle A \rangle$ rather than $A$: the angle brackets are an average.
+
+   </details>
+
 4. Explain why the theorem "eigenvectors of different eigenvalues are
    orthogonal" required $A$ to be Hermitian. Where exactly would the
    proof break down for a non-Hermitian $A$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The proof computes $\langle u|Av\rangle$ in two ways and equates them. The
+   first way is unconditional:
+
+   $$
+   \langle u|Av\rangle = \lambda_2\langle u|v\rangle.
+   $$
+
+   The second way moves $A$ across the bracket, and *that* is the step
+   Hermiticity pays for. By the definition of the adjoint,
+   $\langle u|Av\rangle = \langle A^\dagger u|v\rangle$, always. To continue,
+   the proof needs $A^\dagger u$ to be something known, and it writes
+   $A^\dagger u = Au = \lambda_1 u$, which is legal only because
+   $A^\dagger = A$.
+
+   So the breakdown is precise. For a non-Hermitian $A$, $|u\rangle$ is an
+   eigenvector of $A$ but there is no reason for it to be an eigenvector of
+   $A^\dagger$, so $\langle A^\dagger u|v\rangle$ cannot be simplified at all
+   and there is no second expression to equate with the first. The chain stops
+   before it reaches $(\lambda_2-\lambda_1)\langle u|v\rangle = 0$.
+
+   A second, smaller dependence is easy to miss. Even granting the move, the
+   proof uses $\lambda_1^* = \lambda_1$ to pull the eigenvalue out of the bra
+   without conjugating it, and that realness is itself the *previous* theorem,
+   which also required Hermiticity. The two theorems are not independent
+   results that happen to share a hypothesis.
+
+   A concrete counterexample settles that this is a real gap and not a defect
+   of the argument. Take $A = \begin{pmatrix}1&1\\0&2\end{pmatrix}$, which is
+   not Hermitian. Its eigenvalues are 1 and 2, distinct, with eigenvectors
+   $(1,0)^\mathsf{T}$ and $(1,1)^\mathsf{T}$. Their inner product is 1, not 0:
+   distinct eigenvalues, and the eigenvectors are not orthogonal. Hermiticity
+   was doing real work.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -291,7 +448,7 @@ It's the fastest way to rule out a candidate.
 - Expectation value $\langle A\rangle=\langle\psi|A|\psi\rangle$ is always
   real for Hermitian $A$.
 
-## Further Exploration
+## Orthogonality of the plus and minus states
 
 <ChallengePrompt prompt="Pauli-X's eigenvectors are |+⟩ (eigenvalue +1) and |−⟩ (eigenvalue −1), established in the Eigenvalues and Eigenvectors lesson. Verify directly that ⟨+|−⟩=0, confirming the orthogonality theorem proved above for this specific pair.">
   Compute the inner product directly from $|+\rangle=(1,1)/\sqrt2$ and

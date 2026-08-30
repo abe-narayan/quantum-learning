@@ -23,7 +23,7 @@ export const lessonMeta = {
   estimatedMinutes: 25,
   prerequisites: ["quantum-computing/quantum-algorithms-ii/worked-example-factoring-15"],
   objectives: [
-    "Prove the variational principle: ⟨ψ|H|ψ⟩ ≥ E₀ for any normalized |ψ⟩",
+    "Prove the variational principle: ⟨ψ|H|ψ⟩ ≥ E₀ for any normalized |ψ⟩, given an H with a discrete spectrum bounded below",
     "Define an ansatz circuit and explain what 'expressive enough' means precisely",
     "Contrast the hybrid quantum-classical algorithm structure with Shor's fixed-circuit structure",
   ],
@@ -35,11 +35,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Run, measure, adjust, run again">
 VQE and QAOA do not run a fixed circuit once and stop, the way Shor's algorithm does. They run a parameterized circuit again and again, with a classical optimizer steering the parameters between runs.
 </LessonHook>
 
-## Motivation
+## Run once, or run and steer
 
 Shor's algorithm is a fixed sequence of gates, run once, with classical
 post-processing at the end. **<Term id="vqe">VQE (the variational quantum eigensolver)</Term>**
@@ -54,7 +54,7 @@ the quantity being minimized has a hard floor at the true ground energy. An
 optimizer can fail to reach the floor. It cannot fall through it, and a
 reported value below it means a bug rather than a discovery.
 
-## Mathematical Development
+## The principle, the ansatz, and the loop between them
 
 ### The variational principle, proved
 
@@ -68,11 +68,13 @@ $$
 \langle\psi|H|\psi\rangle = \sum_i|c_i|^2E_i \geq \sum_i|c_i|^2E_0 = E_0\sum_i|c_i|^2 = E_0
 $$
 
-using $E_i\geq E_0$ for every $i$ in the inequality step. So
+using $E_i\geq E_0$ for every $i$ in the inequality step. So, for $H$ with
+a discrete spectrum bounded below,
 **$\langle\psi|H|\psi\rangle\geq E_0$ for every normalized $|\psi\rangle$,
-with equality exactly when $|\psi\rangle=|\phi_0\rangle$** (any weight on
-a higher-energy eigenstate strictly increases the expectation value,
-unless that eigenstate happens to be degenerate with $E_0$). This is the
+with equality exactly when $|\psi\rangle$ lies in $H$'s ground eigenspace**
+(any weight on a state of strictly higher energy pushes the expectation
+value up, while weight spread among degenerate ground states costs
+nothing). This is the
 **variational principle**: the ground energy is a lower bound on every
 state's energy expectation value, so minimizing that expectation over any
 family of states approaches $E_0$ from above and cannot overshoot below.
@@ -96,15 +98,16 @@ does. Simple, but a real optimizer rather than a hardcoded answer.
 
 The variational principle guarantees `runVqe`'s output energy is at least
 $E_0$, however badly the optimizer performs and however few iterations it
-runs. That is a safety property, and this course's tests check it directly
-(`result.energy >= exact - 1e-6` for every Hamiltonian tried).
+runs. That is a safety property, and this course's tests assert it directly:
+after running the optimizer on $H=0.3Z+0.9X$ they require
+`result.energy >= exact - 1e-6`.
 
 The asymmetry is worth stating plainly. The optimizer can fail to *reach*
 $E_0$, and often does. It cannot report a value *below* $E_0$, so a number
 under the floor is evidence of a bug in the ansatz, the cost function, or
 the optimizer, and never of a better answer.
 
-## Physical Interpretation
+## Built for a different hardware regime
 
 VQE and QAOA are built for a different regime than Shor's algorithm. They
 accept imperfect answers, an approximate ground energy or a near-optimal
@@ -114,7 +117,7 @@ in, which is why this family is the leading candidate for near-term
 ("<Term id="nisq">NISQ</Term>", covered in the capstone) devices that cannot yet run Shor's deep
 circuits reliably.
 
-## Worked Example
+## Checking the bound on one explicit state
 
 **For $H=Z$ (eigenvalues $+1,-1$), confirm the variational principle holds
 for the ansatz state at $\theta=\pi/2,\varphi=0$ (i.e. $|+\rangle$).**
@@ -143,7 +146,7 @@ floor $E_0$ sets. That isn't special to $\theta=\pi/2$.
 Sweeping $\theta$ across its *entire* range shows the trial energy
 staying at or above $E_0$ everywhere, never dipping below it even once:
 
-<InteractiveSection title="Never below the floor, touching it once" description="Drag θ from 0 to 2π. Watch ⟨ψ|H|ψ⟩ touch the E₀ line at θ=π, the true minimizer, and never cross below it anywhere else, which is what the variational principle guarantees.">
+<InteractiveSection title="Never below the floor, touching it once" description="The whole sweep is drawn at once, θ running left to right from 0 to 2π. The curve touches the E₀ line at θ=π, the true minimizer, and never crosses below it anywhere else, which is what the variational principle guarantees.">
   <ParametricCurve
     frames={[{
       paramLabel: "⟨ψ|H|ψ⟩ vs θ (φ=0 fixed)",
@@ -158,13 +161,13 @@ staying at or above $E_0$ everywhere, never dipping below it even once:
   />
 </InteractiveSection>
 
-## Common Mistakes
+## A lower reading is not automatically better
 
 <Callout type="warning">
 **Believing a lower measured energy is always more trustworthy.** The
 variational principle says the *true* minimum is a hard floor. If an
 implementation ever reports an energy below the Hamiltonian's actual
-smallest eigenvalue, that's evidence of a bug, not a better answer.
+smallest eigenvalue, that is evidence of a bug rather than a discovery.
 </Callout>
 
 <Callout type="warning">
@@ -180,16 +183,178 @@ limitation of VQE in practice.
 
 1. Prove the variational principle's equality case: show that if
    $|\psi\rangle=|\phi_0\rangle$ exactly, $\langle\psi|H|\psi\rangle=E_0$.
+   Then say why the *converse* (equality forces $|\psi\rangle=|\phi_0\rangle$)
+   needs the extra hypothesis that $E_0$ is non-degenerate, with an
+   example where it fails.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Expand in the eigenbasis. If $|\psi\rangle=|\phi_0\rangle$ then
+   $c_0=1$ and every other $c_i=0$, so
+
+   $$
+   \langle\psi|H|\psi\rangle = \sum_i|c_i|^2E_i = 1\cdot E_0 + 0 = E_0 .
+   $$
+
+   Equivalently and more directly, $H|\phi_0\rangle=E_0|\phi_0\rangle$ by
+   definition of an eigenstate, so
+   $\langle\phi_0|H|\phi_0\rangle=E_0\langle\phi_0|\phi_0\rangle=E_0$ using
+   normalization. Either route is two lines.
+
+   The converse needs non-degeneracy because the inequality step in the
+   proof, $\sum_i|c_i|^2E_i \geq \sum_i|c_i|^2E_0$, is tight for any term
+   with $E_i = E_0$, not only for $i=0$. Weight sitting on a *different*
+   eigenstate that happens to share the ground energy costs nothing, so
+   equality no longer pins down which state you are in.
+
+   A concrete failure: take $H=-I$ on a single qubit, whose eigenvalues
+   are $-1$ and $-1$. Every normalized $|\psi\rangle$ gives
+   $\langle\psi|H|\psi\rangle=-1=E_0$, so equality holds universally while
+   $|\psi\rangle$ is completely unconstrained. The correct general
+   statement, which the lesson gives, is that equality holds exactly when
+   $|\psi\rangle$ lies in $H$'s ground *eigenspace*, and that eigenspace is
+   one-dimensional only when $E_0$ is non-degenerate.
+
+   This matters for VQE rather than being a pedantic footnote. An
+   optimizer that reaches the floor has found *a* ground state, and with
+   degeneracy there is no guarantee about which one, which is exactly the
+   situation in molecular problems with symmetry. The energy is still
+   right; any property computed from the returned state may not be.
+
+   The wrong turn is proving only the direction the question opens with
+   and treating the biconditional as obvious. The forward direction is the
+   easy half and says nothing about whether a low energy certifies a good
+   state, which is the half an optimizer's user actually needs.
+
+   </details>
+
 2. For $H=-Z$ (eigenvalues $-1,+1$, so $E_0=-1$ still, but now belonging
-   to $|1\rangle$ rather than $|0\rangle$), which $(\theta,\varphi)$
+   to $|0\rangle$ rather than $|1\rangle$), which $(\theta,\varphi)$
    minimizes the ansatz energy?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $(\theta,\varphi)=(0,0)$, giving the ansatz state $|0\rangle$ and energy
+   exactly $-1$. Any $\varphi$ works, since $\theta=0$ makes
+   $R_y(0)|0\rangle=|0\rangle$ and $R_z(\varphi)$ then contributes only a
+   global phase, so $\varphi$ is unconstrained.
+
+   Work it out from the matrix. $Z=\mathrm{diag}(1,-1)$, so
+   $-Z=\mathrm{diag}(-1,1)$. Applying it to $|0\rangle$ gives
+   $-|0\rangle$, eigenvalue $-1$; applying it to $|1\rangle$ gives
+   $+|1\rangle$, eigenvalue $+1$. So the ground state of $-Z$ is
+   $|0\rangle$. `costFunction` confirms it: at $(\theta,\varphi)=(0,0)$ the
+   energy is $-1.000000$, and at $(\pi,0)$, the state $|1\rangle$, it is
+   $+1.000000$. `exactGroundStateEnergy(-Z)` returns $-1$.
+
+   The contrast with the lesson's worked example is the whole point of the
+   question. For $H=Z$ the minimizer is $\theta=\pi$, the state
+   $|1\rangle$, and flipping the Hamiltonian's sign flips which pole is
+   the ground state without changing $E_0$ at all. In Bloch terms,
+   $\langle\psi|(\pm Z)|\psi\rangle=\pm\cos\theta$, minimized at
+   $\theta=\pi$ for $+Z$ and at $\theta=0$ for $-Z$: the energy landscape
+   is reflected, not shifted.
+
+   The wrong turn is assuming the ground state is always $|1\rangle$
+   because it was for $H=Z$ in the lesson. The eigenvalue $-1$ is a
+   property of the Hamiltonian; which state carries it is a separate
+   question that has to be read off the matrix each time. Checking is one
+   line, $H|0\rangle$ versus $H|1\rangle$, and it is worth doing before
+   trusting any intuition about "the lower state".
+
+   </details>
+
 3. Explain, using the eigenbasis expansion in the derivation, why a state
    with *any* nonzero overlap with an excited eigenstate has strictly
    higher energy than $E_0$ (assuming no degeneracy at $E_0$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Start from the expansion and subtract the floor term by term:
+
+   $$
+   \langle\psi|H|\psi\rangle - E_0 = \sum_i|c_i|^2E_i - E_0\sum_i|c_i|^2 = \sum_i|c_i|^2\,(E_i-E_0)
+   $$
+
+   using $\sum_i|c_i|^2=1$ to rewrite $E_0$ as a weighted sum. Every term
+   in that final sum is non-negative, since $|c_i|^2\geq0$ and
+   $E_i\geq E_0$. So the whole thing is zero only if every term is zero,
+   which requires $|c_j|^2(E_j-E_0)=0$ for each $j$. With no degeneracy,
+   $E_j-E_0>0$ strictly for every $j\neq0$, so each such term forces
+   $c_j=0$. A single nonzero $c_j$ with $j\neq0$ contributes
+   $|c_j|^2(E_j-E_0)>0$ and the total is strictly positive.
+
+   The quantitative version is more useful than the yes-or-no one. The
+   excess energy above the floor is exactly
+   $\sum_{i\neq0}|c_i|^2(E_i-E_0)$: a weighted average of the excitation
+   gaps, weighted by how much of the state sits in each excited level. So
+   a VQE run reporting an energy $10^{-3}$ above $E_0$ is telling you the
+   state has at most $10^{-3}/\Delta$ of its probability outside the ground
+   state, where $\Delta$ is the first gap. Energy error bounds state error,
+   and the gap is the conversion factor.
+
+   That relationship is also why VQE is more forgiving than it looks.
+   Energy is *quadratic* in the amplitude error near the minimum: an
+   overlap error of $\varepsilon$ in amplitude gives an energy error of
+   order $\varepsilon^2$, so a state that is $99\%$ correct reports an
+   energy far closer than $1\%$ off. The flip side is the one to worry
+   about: a good energy is weak evidence of a good state.
+
+   The wrong turn is arguing from a single example, say $|+\rangle$ for
+   $H=Z$ giving $0>-1$, and calling it done. That shows the inequality
+   holds once; the sum above shows why it cannot fail, and identifies
+   degeneracy as the exact circumstance under which the strictness is lost.
+
+   </details>
+
 4. Why does this platform's ansatz needing only 2 real parameters
    ($\theta,\varphi$) to span every single-qubit state not generalize
    automatically to larger systems? (Hint: how many real parameters does a
    general $n$-qubit pure state need?)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the parameter count explodes. An $n$-qubit pure state has $2^n$
+   complex amplitudes, so $2^{n+1}$ real numbers, minus one for
+   normalization and one for global phase: $2^{n+1}-2$ real parameters. At
+   $n=1$ that is $2$, which is why $(\theta,\varphi)$ suffices and the
+   Bloch sphere is the whole state space. At $n=10$ it is $2046$; at
+   $n=50$ it is about $2\times10^{15}$.
+
+   A fully expressive ansatz would therefore need at least that many
+   parameters, and a circuit with exponentially many gates to carry them.
+   That is not a practical circuit, and it would also hand the classical
+   optimizer an exponentially large search space, so the quantum speedup
+   would be spent on the outer loop instead.
+
+   Real ansätze give up expressivity deliberately. A hardware-efficient
+   ansatz uses a fixed number of layers of single-qubit rotations and
+   entangling gates, with parameter count polynomial in $n$, and covers a
+   tiny sliver of state space chosen to be reachable on the device. A
+   chemistry-motivated ansatz such as UCCSD instead restricts to states
+   with the right particle number and symmetry. Both are bets that the
+   true ground state lies near the sliver, and neither can promise it
+   does. So the guarantee changes character: the variational principle
+   still says the reported energy is at least $E_0$, but it no longer says
+   the minimum over the ansatz family is anywhere near $E_0$.
+
+   There is a second, less obvious cost worth naming. Many expressive
+   randomly-initialized ansätze suffer *barren plateaus*, where the cost
+   landscape's gradients vanish exponentially in $n$, so the optimizer has
+   nothing to follow. Expressivity and trainability pull against each
+   other, and choosing an ansatz is choosing where to sit between them.
+
+   The wrong turn is reading the single-qubit case as a proof of concept
+   that scales. It is a proof that the machinery is correct, verified end
+   to end, and it is silent on the one question that decides whether VQE
+   is useful: whether a polynomially-sized ansatz can reach a chemically
+   accurate state for a molecule anyone cares about.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -202,16 +367,16 @@ limitation of VQE in practice.
   loop alternates quantum expectation-value measurement with classical
   parameter updates.
 - This platform's single-qubit ansatz is exactly expressive enough to
-  reach any single-qubit ground state, verified directly, not merely
+  reach any single-qubit ground state, verified directly instead of merely
   argued.
 - The variational principle guarantees the optimizer's output energy is
   never below the true ground energy, a genuine safety check built into
   this course's own tests.
 
-## Further Exploration
+## The loop, run on a concrete Hamiltonian
 
 <NextDiscovery>
 [VQE: A Worked Toy Example](/lessons/quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example) runs the full hybrid optimization
-loop on two different Hamiltonians and confirming convergence to their
-exact ground-state energies.
+loop on one concrete Hamiltonian, $H=0.6Z+0.8X$, and checks the energy it
+converges to against the exact ground-state value.
 </NextDiscovery>

@@ -103,7 +103,7 @@ export const distributionBars6 = dist6.map((entry) => ({
   comparatively tiny typical subspace.
 </LessonHook>
 
-## Motivation
+## Entropy as a Rate, Not a Description
 
 The Data-Processing Inequality treated von Neumann entropy and mutual
 information as abstract bookkeeping quantities: numbers a channel or a
@@ -111,19 +111,19 @@ state carries, useful for proving inequalities. This lesson asks a much
 more physical question about entanglement specifically: if two parties,
 Alice and Bob, share $n$ copies of a *partially* entangled state, not a
 perfect Bell pair, can they use only **local operations and classical
-<Term id="locc">communication (LOCC)</Term>** — no direct interaction between them, exactly the
-restriction that makes entanglement a resource rather than
-something either party could produce alone — to convert those $n$
+<Term id="locc">communication (LOCC)</Term>** (no direct interaction between them, which is
+exactly the restriction that makes entanglement a resource rather than
+something either party could produce alone) to convert those $n$
 imperfect copies into a smaller number of *nearly perfect* Bell pairs?
-The answer is yes, the protocol is called **entanglement distillation**,
+The answer is yes: the protocol is called **entanglement distillation**,
 and the idea behind it is adapted directly from Schumacher's proof
 that quantum data can be compressed: for many
 identical copies of a state, almost all of the probability mass
 concentrates on a comparatively tiny **typical subspace**. This lesson
-derives that idea from scratch and checks it against real, computed
-numbers, not just the clean asymptotic formula.
+derives that idea from scratch and then computes the numbers, instead of
+stopping at the clean asymptotic formula.
 
-## Mathematical Development
+## The Typical Subspace, and Concentration Inside It
 
 ### Setup: $n$ copies and their joint Schmidt coefficients
 
@@ -177,7 +177,16 @@ matching intuition.
 
 <TheoremBox title="Typical subspace concentration (Schumacher)" provenance="cited">
 
-By the law of large numbers, as $n\to\infty$ the binomial distribution
+**Hypotheses.** The $n$ copies are **i.i.d.**: independent, and all in
+the same state $|\psi\rangle$ with the same Schmidt coefficients. That
+is what makes the type counts binomial and lets the law of large numbers
+apply at all. The local dimension is finite and fixed, $\epsilon>0$ is
+fixed *before* the limit is taken, and every statement below is
+asymptotic in $n$ with $\epsilon$ held still. Nothing here holds at fixed
+$n$; the worked example below is a trend, not an instance.
+
+By the law of large numbers (this is the **asymptotic equipartition
+property**), as $n\to\infty$ the binomial distribution
 above concentrates its probability mass on types whose fraction of
 $|00\rangle$-branch copies, $k/n$, lies within any fixed $\epsilon>0$ of
 $p$ (equivalently, whose exponential rate $-\tfrac1n\log_2\lambda_k$ lies
@@ -225,13 +234,13 @@ This protocol, due to Bennett, Bernstein, Popescu, and Schumacher (1996),
 is called **entanglement concentration**: it is the special, cleanest
 case of general distillation, restricted to *pure* partially-entangled
 states, and it is worth deriving explicitly because every step above is
-a real, checkable claim (a projection, a counting argument, a
+a checkable claim (a projection, a counting argument, a
 relabeling), not a black box. The achievable rate,
 $m/n\to H(p)=S(\rho_A)$ Bell pairs per copy, is also *optimal*: no LOCC
-protocol on pure states can do better, because entanglement entropy is
-exactly conserved on average under LOCC for pure bipartite states (a
-fact proved elsewhere in this course's entropy lesson via concavity, not
-re-derived here).
+protocol on pure states can do better, because entanglement entropy
+cannot increase on average under LOCC for pure bipartite states (a
+standard entanglement-monotone result, cited here rather than proved
+anywhere in this track).
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/8/80/Dr._Charles_Bennett_IBM_Fellow.jpg"
@@ -246,35 +255,36 @@ re-derived here).
 
 Real shared entanglement is never a perfect, isolated pure state:
 transmission through fiber or free space adds noise, so Alice and Bob
-actually share $n$ copies of some *mixed* state $\rho_{AB}$. The typical
+share $n$ copies of some *mixed* state $\rho_{AB}$. The typical
 subspace idea still applies (via the state's purification: distilling
 $\rho_{AB}^{\otimes n}$ is equivalent to distilling entanglement from a
 purification $|\psi\rangle_{ABE}$ against an inaccessible environment
 $E$), but the clean projective argument above is no longer enough on
 its own, because $E$ carries information that could be
 correlated with $A$ or $B$ in ways a single projection doesn't remove.
-General mixed-state distillation protocols — **entanglement pumping**
-(distill a smaller number of higher-fidelity pairs from many noisy ones,
-iterate) and **hashing** (use many copies' worth of local Clifford
-operations and classical syndrome measurements, structurally close to a
-quantum error-correcting code) — handle this at the cost of more
-involved LOCC. The achievable rate is bounded above by, and for
+Two families of general mixed-state distillation protocol handle this at
+the cost of more involved LOCC. **Entanglement pumping** distills a
+smaller number of higher-fidelity pairs from many noisy ones and then
+iterates. **Hashing** spends many copies' worth of local Clifford
+operations and classical syndrome measurements, and is structurally
+close to a quantum error-correcting code. The achievable rate is bounded above by, and for
 important state classes (e.g. states arising from degradable channels)
 asymptotically equals, the **coherent information**
-$I_c(A\rangle B)=S(\rho_B)-S(\rho_{AB})$ from The Data-Processing
-Inequality: the same quantity that lesson used to bound how much
-quantum information a noisy channel can carry, now reappearing as the
-bound on how much entanglement noisy channel *use* can generate. That
+$I_c(A\rangle B)=S(\rho_B)-S(\rho_{AB})$ defined in Quantum Entropy and
+Information Measures: the same quantity that lesson introduced as the
+control on whether a channel can carry quantum information at all, now
+reappearing as the bound on how much entanglement noisy channel *use*
+can generate. That
 coincidence is not an accident: it is the technical heart of this
 course's own capstone on channel capacities, which this lesson's typical
 subspace argument is the concrete, fully-worked special case of.
 
-## Physical Interpretation: Why This Matters
+## Why Repeaters Depend on This
 
 Distillation is not a mathematical curiosity: it is the specific reason
 long-distance quantum communication is possible at all. A pair of
 entangled photons sent through real optical fiber picks up loss and
-decoherence over distance, so the entanglement Alice and Bob actually
+decoherence over distance, so the entanglement Alice and Bob
 end up sharing is never a perfect Bell pair: it degrades roughly
 exponentially with distance. **Quantum repeaters** solve this by
 chaining shorter, higher-fidelity entangled links and periodically
@@ -286,7 +296,7 @@ guarantees degrade along with the fidelity of the shared state; with it,
 a noisy channel can still support secure key generation, provided the
 noise is below distillation's threshold.
 
-Distillation also answers a question the Quantum Computing pillar's own
+Distillation also answers a question the Quantum Computing track's own
 [Entanglement Entropy for Pure Bipartite States](/lessons/quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states)
 lesson only ever *asserted*: why should entanglement entropy, a number
 computed from an abstract density matrix's eigenvalues, be *the*
@@ -299,14 +309,14 @@ reference to entropy at all. The fact that this operational quantity
 turns out to equal $S(\rho_A)$ exactly, for pure states, is what makes
 entanglement entropy more than an abstract formula: it is the honest
 exchange rate between raw partially-entangled resource and usable,
-near-perfect entanglement, provable rather than assumed.
+near-perfect entanglement, and it is provable.
 
-## Worked Example
+## Six Copies, Enumerated
 
 **Take $p=0.9$, so $|\psi\rangle=\sqrt{0.9}\,|00\rangle+\sqrt{0.1}\,|11\rangle$.
 Compute $H(0.9)$, then take $n=6$ copies (small enough to enumerate all
 $2^6=64$ Schmidt coefficients by type) and check how much of the
-probability mass the typical set actually captures.**
+probability mass the typical set captures.**
 
 `vonNeumannEntropy` applied to $\rho_A=\mathrm{diag}(0.9,0.1)$ (already
 diagonal, since $|\psi\rangle$'s off-diagonal amplitudes are zero) gives
@@ -337,20 +347,28 @@ $P(k)=\binom{6}{k}\,0.9^{k}\,0.1^{6-k}$:
 | 5 | 6 | 0.354294 |
 | 6 | 1 | 0.531441 |
 
-(`dist6` above, computed directly from `schmidtTypeDistribution`, not
-asserted; the seven values sum to exactly $1.000000$.) The mean type is
+(`dist6` above, computed directly from `schmidtTypeDistribution`; the
+seven values sum to exactly $1.000000$.) The mean type is
 $np=6\times0.9=5.4$, with standard deviation
 $\sigma=\sqrt{np(1-p)}\approx0.7348$. Defining the typical set here as
 types within one standard deviation of the mean, $k\in[4.665,\,6.135]$,
 gives exactly $k\in\{5,6\}$: the two largest-$k$ types, since $p=0.9$
 means most copies are expected in the $|00\rangle$ branch.
 
+That one-sigma window is a stand-in chosen so this example can be
+enumerated by hand, and it is *not* the $\epsilon$-typical set
+$T_\epsilon$ of the theorem box above. The two differ in how they scale:
+a one-sigma window is $O(\sqrt n)$ types wide, while $T_\epsilon$ is
+$O(\epsilon n)$ types wide, which is what lets its probability mass tend
+to $1$. Keep the distinction in view while reading the numbers below,
+because it is exactly what Practice Question 1 turns on.
+
 <PredictBeforeReveal
   question="The typical set at n=6 is just two of the seven possible types (k=5 and k=6), together only 7 of the 64 total basis strings, about 11% of the full dimension. How much of the total probability do you expect those two types to carry?"
   options={[
+    { label: "Almost none, since probability should spread roughly evenly across all 64 strings", value: "none" },
     { label: "A modest share, maybe 20-30%, since it's such a small slice of the space", value: "modest" },
-    { label: "The vast majority — well over 85% of the total probability", value: "vast" },
-    { label: "Almost none — probability should spread roughly evenly across all 64 strings", value: "none" },
+    { label: "The vast majority, well over 85% of the total probability", value: "vast" },
   ]}
   correctValue="vast"
   explanation="Together k=5 and k=6 carry about 88.6% of the total probability, computed just below, from only 11% of the dimension. That lopsidedness, a tiny subspace holding almost all the weight, is the entire mechanism behind entanglement concentration: project onto that small typical subspace and you keep almost everything that matters while discarding 89% of the dimension."
@@ -363,9 +381,14 @@ $$
 P(k=5)+P(k=6) = 0.354294+0.531441 = 0.885735 \approx 88.57\%
 $$
 
-leaving only $\approx 11.43\%$ of the weight on the remaining, atypical
-types $k=0,\ldots,4$. Already at $n=6$, the great majority of the
-probability sits on just two of the seven possible types. In terms of
+leaving only $\approx 11.43\%$ of the weight on the remaining types
+$k=0,\ldots,4$. At $n=6$, the great majority of the probability already
+sits on just two of the seven possible types. Read that as a fact about
+$n=6$ and not as the start of a trend: the mass inside a *fixed*
+one-sigma window does not climb toward $1$ as $n$ grows, it settles at
+the Gaussian one-sigma value $2\Phi(1)-1\approx0.683$, which Practice
+Question 1 works out. What does behave the way the theorem promises is
+the *dimension* fraction, which is the next number. In terms of
 raw *dimension* (individual basis strings, not types): those two typical
 types together account for $\binom{6}{5}+\binom{6}{6}=6+1=7$ of the full
 $2^6=64$-dimensional space: only $10.9\%$ of the dimension, yet
@@ -382,24 +405,33 @@ $n\to\infty$ does $nH(p)$ round cleanly to a whole number of
 near-perfect Bell pairs per copy.
 
 <Callout type="note">
-This is a checkable trend toward the $n\to\infty$ theorem, not
-the theorem itself. The clean statements "$|T_\epsilon|\approx 2^{nH(p)}$"
-and "the typical subspace is nearly maximally entangled" are *limiting*
-claims. At $n=6$ they already point the right direction, as the numbers
-above show, but they are not yet sharp; see Common Mistakes below for
-where this small-$n$ example still falls short of the limit.
+This is an illustration of the $n\to\infty$ theorem, not the theorem
+itself, and the two halves of it behave differently. The dimension
+statement "$|T_\epsilon|\approx 2^{nH(p)}$" does point the right way here:
+$7$ against a predicted $7.03$, and a fraction of the full space that
+keeps shrinking with $n$. The probability statement does not, because the
+set being measured is the one-sigma window rather than $T_\epsilon$: its
+mass falls from $94.77\%$ at $n=4$ to $88.57\%$ here and converges to
+$\approx0.683$, not to $1$. Only the $\epsilon$-typical set, wide enough
+to swallow the $\sqrt n$ fluctuations, captures everything in the limit,
+and it is that set the protocol and the $m/n\to H(p)$ rate rest on. See
+the cautions below for a third way this small-$n$ example falls short.
 </Callout>
 
 ## Interactive: the Typical Subspace, Concretely
 
 <BarChart
   bars={distributionBars6}
-  ariaLabel="Bar chart of the binomial-weighted Schmidt coefficient probability P(k) for k=0 through 6, for n=6 copies of the partially entangled state with p=0.9, with k=5 and k=6 highlighted as the typical set, together carrying about 88.6 percent of the total probability"
+  maxValue={1}
+  ariaLabel="Bar chart of the binomial-weighted Schmidt coefficient probability P(k) for k=0 through 6, for n=6 copies of the partially entangled state with p=0.9, drawn on a full 0-to-1 probability scale. The k=5 and k=6 bars are highlighted as the typical set and fill 35 and 53 percent of the frame respectively, together carrying about 88.6 percent of the total probability, while k=0 through k=4 are barely visible"
 />
 
-The two highlighted bars, $k=5$ and $k=6$, are the typical set computed
-above: together they already dominate the distribution. Notice that
-$k=6$ — all six copies landing in the $|00\rangle$ branch — is *both*
+The vertical axis is the full probability range $[0,1]$, so bar height
+is readable as probability directly, with no normalization to the
+tallest bar. The two highlighted bars, $k=5$ and $k=6$, are the typical set
+computed above: together they fill $88.6\%$ of the frame's height while
+the other five types are barely off the axis. Notice that
+$k=6$ (all six copies landing in the $|00\rangle$ branch) is *both*
 the single most probable individual basis string (Schmidt coefficient
 $0.9^6\approx0.531$, larger than any other single string's) *and* part
 of the typical set; at this particular $p$ and $n$ the two notions
@@ -409,7 +441,7 @@ fall off sharply moving away from $k=6$, the concentration the
 typical-subspace theorem predicts, well before $n$ is anywhere near
 asymptotically large.
 
-## Common Mistakes
+## Typical Sequences Are Not the Likeliest Ones
 
 <Callout type="warning">
 **Treating "individually most probable" and "typical" as the same
@@ -423,7 +455,7 @@ set, but that agreement is a small-$n$, large-$p$ coincidence, not a
 general fact. The typical-subspace theorem is a statement about
 concentration of the *empirical frequency* $k/n$ around $p$, not about
 which single string is most likely; for large $n$, the probability of
-the single all-$|00\rangle$ string, $p^n$, actually vanishes, even
+the single all-$|00\rangle$ string, $p^n$, vanishes, even
 though it always remains the single most probable individual string.
 Only in the $n\to\infty$ limit do "typical" and "individually most
 probable" cleanly separate into visibly different sets.
@@ -446,18 +478,185 @@ scale $2^{-nH(p)}$) is visible, not that flatness has been reached.
 
 1. For $p=0.9$ and $n=4$ copies (small enough to enumerate directly),
    find the mean and standard deviation of the type distribution, define
-   the typical set the same way as this lesson (within one standard
-   deviation of the mean), and compute the total probability mass it
-   captures.
+   the typical set the same way as this lesson (types $k$ with
+   $|k-np|\leq\sigma$, endpoints included), and compute the total
+   probability mass it captures.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Mean $np=3.6$, standard deviation $\sigma=\sqrt{np(1-p)}=\sqrt{0.36}=0.6$,
+   typical set $\{3,4\}$, carrying $94.77\%$ of the probability from
+   $5$ of the $16$ basis strings.
+
+   The full type distribution
+   $P(k)=\binom4k(0.9)^k(0.1)^{4-k}$ is short enough to write out:
+
+   | $k$ | $\binom4k$ | $P(k)$ |
+   |---|---|---|
+   | 0 | 1 | 0.000100 |
+   | 1 | 4 | 0.003600 |
+   | 2 | 6 | 0.048600 |
+   | 3 | 4 | 0.291600 |
+   | 4 | 1 | 0.656100 |
+
+   summing to exactly $1$. The window $|k-3.6|\leq0.6$ is
+   $k\in[3.0,4.2]$, so $k=3$ sits exactly on the boundary and $k=4$ is
+   inside. Including the boundary,
+
+   $$
+   P(3)+P(4)=0.291600+0.656100=0.947700,
+   $$
+
+   from $\binom43+\binom44=5$ strings out of $2^4=16$, which is $31.25\%$
+   of the dimension. (The original wording of this question said "within
+   one standard deviation" without saying whether the boundary counts; at
+   $n=4$ that is not a quibble, since $k=3$ lands exactly on it and carries
+   $29\%$ of the mass. The statement above fixes the convention.)
+
+   Now compare against $n=6$ from the lesson, because the comparison is
+   more instructive than either number alone. Going from $n=4$ to $n=6$,
+   the dimension fraction fell usefully, $31.25\%\to10.9\%$, which is the
+   trend the theorem predicts. But the probability mass fell too,
+   $94.77\%\to88.57\%$, which is the wrong direction if you are expecting
+   the typical set to capture everything in the limit.
+
+   It is not the wrong direction, and the reason is worth having, because
+   it is a place the small-$n$ illustration and the actual theorem come
+   apart. A window of *fixed* width one standard deviation does not
+   capture everything asymptotically. By the central limit theorem it
+   converges to the Gaussian one-sigma mass, $2\Phi(1)-1\approx0.683$.
+   Computing it directly for $p=0.9$: $0.759$ at $n=100$, $0.722$ at
+   $n=400$, $0.703$ at $n=1600$, heading for $0.683$.
+
+   The typical set of the asymptotic equipartition property is a different
+   and wider set: all $k$ with
+   $\big|-\tfrac1n\log_2P-H(p)\big|\leq\epsilon$, which is a window of
+   width of order $\epsilon n$ rather than $\sqrt n$. That set has
+   probability tending to $1$ *and* dimension $2^{n(H(p)\pm\epsilon)}$,
+   because a window growing like $n$ swallows the $\sqrt n$ fluctuations
+   while still occupying an exponentially negligible slice of the space.
+   The one-sigma window is a legitimate stand-in for building intuition at
+   $n=4$ or $6$, where it already shows a small slice of dimension holding
+   most of the weight, but it is the $\epsilon$-typical set that the
+   protocol and the $m/n\to H(p)$ rate actually rest on.
+
+   </details>
+
 2. A source with $p=0.5$ (a *maximally* entangled state to begin with)
    is fed into the same entanglement-concentration argument. What is
    $H(0.5)$, and what does entanglement concentration have left to do in
    this case? Explain in terms of the theorem's rate $m/n\to H(p)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $H(0.5)=1$ bit, the rate is $m/n\to1$, and the protocol has nothing to
+   do: it is the identity.
+
+   At $p=0.5$ the source state is
+   $|\psi\rangle=\tfrac1{\sqrt2}(|00\rangle+|11\rangle)$, which *is*
+   $|\Phi^+\rangle$. So $n$ copies are already $n$ perfect Bell pairs, and
+   a protocol delivering $m\approx nH(p)=n$ pairs delivers exactly what it
+   was handed. Concentration concentrates nothing because nothing is
+   diffuse.
+
+   Every step of the machinery degenerates in the same way, which is the
+   check worth running. The type distribution becomes
+   $\mathrm{Binomial}(n,\tfrac12)$, every Schmidt coefficient is
+   $\lambda_k=2^{-n}$ regardless of $k$, so the joint state is already
+   maximally entangled across the *whole* $2^n$-dimensional space. The
+   typical subspace has dimension $2^{nH(0.5)}=2^n$: it is the entire
+   space, so the projection Alice performs is the identity operator and
+   succeeds with probability exactly $1$ even at finite $n$, rather than
+   only asymptotically.
+
+   Reading it through the rate makes the boundary clear. $H(p)\leq1$ for
+   every $p$, with equality only at $p=\tfrac12$, so $p=\tfrac12$ is where
+   the rate is maximal and is the one point where LOCC gets a full Bell
+   pair per copy. It cannot do better: extracting more than one Bell pair
+   per copy would mean LOCC created entanglement, which the
+   monotonicity result cited above forbids.
+
+   The opposite degenerate case is worth naming for contrast. At $p=1$ the
+   state is the product $|00\rangle$, $H(1)=0$, and the rate is zero: again
+   nothing to do, this time because there is nothing there. The protocol
+   is only interesting strictly between, where the entanglement is real but
+   spread thinly across many copies, and the typical subspace is a genuine
+   proper subspace.
+
+   One more reason the endpoints matter. Pure-state entanglement
+   manipulation is *reversible*: concentration turns $n$ copies into
+   $nH(p)$ Bell pairs, and dilution turns $m$ Bell pairs back into
+   $m/H(p)$ copies, so $S(\rho_A)$ is a genuine exchange rate with no
+   spread between buying and selling. At $p=\tfrac12$ that exchange rate is
+   $1$ and both directions are the identity map. This reversibility is
+   exactly what fails for mixed states, where distillable entanglement and
+   entanglement cost are different numbers, and it is why the pure-state
+   case is the one that admits a single clean answer.
+
+   </details>
+
 3. Explain, in your own words, why the coherent information
    $I_c(A\rangle B)=S(\rho_B)-S(\rho_{AB})$ is the natural generalization
    of this lesson's rate $H(p)=S(\rho_A)$ once the shared state is mixed
    rather than pure. (Hint: what does $S(\rho_{AB})$ reduce to when
    $\rho_{AB}$ is pure?)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because it reduces to exactly $S(\rho_A)$ on pure states, and the term
+   it adds is precisely the correction for an environment that a pure state
+   does not have.
+
+   The reduction is two lines. If $\rho_{AB}$ is pure then
+   $S(\rho_{AB})=0$, and the Schmidt decomposition gives
+   $S(\rho_B)=S(\rho_A)$. Hence
+
+   $$
+   I_c(A\rangle B)=S(\rho_B)-S(\rho_{AB})=S(\rho_A)-0=S(\rho_A)=H(p),
+   $$
+
+   this lesson's rate on the nose. Any candidate generalization has to pass
+   that test, so passing it is necessary rather than impressive on its own.
+
+   What makes it the *right* generalization is what the subtracted term is
+   doing. Purify $\rho_{AB}$ to $|\psi\rangle_{ABE}$ with an inaccessible
+   environment $E$. Then $S(\rho_{AB})=S(\rho_E)$, so
+
+   $$
+   I_c(A\rangle B)=S(\rho_B)-S(\rho_E):
+   $$
+
+   what $B$ holds, minus what the environment holds. Entanglement Alice
+   shares with Bob is only useful if the environment is not also holding a
+   copy of the relevant correlations, and that competition is exactly the
+   feature a pure state lacks, since there $S(\rho_E)=0$ and the correction
+   vanishes. Mixedness *is* an environment, and coherent information is
+   $S(\rho_A)$ with the environment's share deducted.
+
+   Three consistency checks make the identification stick rather than
+   merely plausible. It equals $-S(A|B)$, so it is positive precisely when
+   conditional entropy is negative, which the entropy lesson tied to
+   genuinely quantum rather than classical correlation. It is monotone
+   under local processing on $B$, by the data-processing inequality, which
+   any legitimate resource rate must be. And operationally it is the
+   hashing protocol's achievable rate and, regularized, the quantum
+   capacity itself, so it is the rate at which the general protocols this
+   lesson sketched actually run.
+
+   The honest qualification, which the pure-state case makes easy to miss:
+   for mixed states, $I_c$ does *not* equal the distillable entanglement in
+   general. It is a lower bound achievable by one-way protocols, two-way
+   LOCC can beat it, and even the regularized quantity is not known in
+   closed form for most channels. The clean single number $S(\rho_A)$ that
+   answers everything for pure states has no mixed-state successor, because
+   distillable entanglement and entanglement cost genuinely differ there.
+   Coherent information is the right generalization of the *rate*, not a
+   restoration of the pure-state theory's completeness.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -468,27 +667,29 @@ scale $2^{-nH(p)}$) is visible, not that flatness has been reached.
   using only LOCC.
 - For $n$ copies of a pure partially-entangled state
   $|\psi\rangle=\sqrt p|00\rangle+\sqrt{1-p}|11\rangle$, the joint
-  Schmidt coefficients are binomially weighted by type $k$; the **typical
-  subspace** of types near $k\approx pn$ has dimension
-  $\approx2^{nH(p)}$ and captures almost all the probability weight as
-  $n\to\infty$, a trend already visible at the small, by-hand
-  $n=6,p=0.9$ example above, where two of seven types already carry
-  $\approx88.6\%$ of the weight.
+  Schmidt coefficients are binomially weighted by type $k$; the
+  $\epsilon$-**typical subspace** of types near $k\approx pn$ has
+  dimension $\approx2^{nH(p)}$ and captures almost all the probability
+  weight as $n\to\infty$. The small, by-hand $n=6,p=0.9$ example above
+  shows the dimension side of that (two of seven types, $7$ of $64$
+  basis strings, against a predicted $7.03$) using a one-sigma window in
+  place of $T_\epsilon$; that window's $88.6\%$ of the weight is a
+  finite-$n$ figure heading for $2\Phi(1)-1\approx0.683$, not for $1$.
 - Projecting onto the typical subspace and relabeling
   (**entanglement concentration**, Bennett–Bernstein–Popescu–Schumacher)
   distills $m\approx nH(p)=nS(\rho_A)$ near-perfect Bell pairs, the
   optimal LOCC rate for pure states.
 - For mixed, noisy shared states, more involved LOCC protocols
   (entanglement pumping, hashing) still work, with achievable rate
-  bounded by — and for some state classes asymptotically equal to — the
-  coherent information $I_c(A\rangle B)$, directly foreshadowing this
+  bounded by the coherent information $I_c(A\rangle B)$, and for some
+  state classes asymptotically equal to it, directly foreshadowing this
   course's capstone on channel capacities.
 - Distillation is what makes quantum repeaters, and therefore
   long-distance QKD and teleportation, physically possible over noisy
   channels, and it is the operational justification for treating
   entanglement entropy as *the* entanglement measure in the first place.
 
-## Further Exploration
+## Distillation Under Genuine Mixing
 
 This lesson is what makes
 [Entanglement Entropy for Pure Bipartite States](/lessons/quantum-computing/entanglement-and-measurement/entanglement-entropy-for-pure-states)
@@ -498,9 +699,11 @@ asymptotic conversion rate is a fact about protocols rather than a
 definition.
 
 <NextDiscovery>
-  [Relative Entropy and Mixed-State Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement)
-  picks up where "Beyond pure states" above stops. Once the shared state
-  is mixed, distillable entanglement and entanglement of formation come
-  apart, and the measures that lesson builds are what a general
-  distillation protocol is judged against.
+  The [capstone](/lessons/quantum-mastery/quantum-shannon-theory/capstone-what-can-be-sent-through-noise)
+  takes the coherent-information bound this lesson stopped at and asks it
+  of a channel rather than a state: exactly how many classical bits and
+  how many quantum bits survive one use of a given noisy channel. For the
+  mixed-state entanglement measures a general distillation protocol is
+  judged against, see [Relative Entropy and Mixed-State
+  Entanglement](/lessons/quantum-mastery/quantum-information-theory/relative-entropy-and-mixed-state-entanglement).
 </NextDiscovery>

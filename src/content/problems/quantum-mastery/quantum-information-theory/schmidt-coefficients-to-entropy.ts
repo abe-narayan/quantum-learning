@@ -15,7 +15,7 @@ export const schmidtCoefficientsToEntropy: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "A bipartite pure state has Schmidt coefficients λ1=0.8, λ2=0.2 (and no others -- Schmidt rank 2). Compute its entanglement entropy S(ρ_A), in bits.",
+      "A bipartite pure state has Schmidt coefficients λ1=0.8, λ2=0.2 and no others, so its Schmidt rank is 2. Compute its entanglement entropy S(ρ_A), in bits.",
     inputHint: "bits, to 3 decimal places",
   },
   answer: {
@@ -44,8 +44,8 @@ export const schmidtCoefficientsToEntropy: NumericProblem = {
     finalAnswer: "S(rho_A) ≈ 0.721928 bits.",
   },
   explanation: {
-    correctIdea: "Once Schmidt coefficients are known, entanglement entropy is exactly the Shannon entropy of those coefficients -- no further diagonalization needed.",
-    whyCorrect: "This is the direct payoff of the lesson's proof: rho_A = sum_k lambda_k |u_k><u_k| is automatically in diagonal (eigenbasis) form, so its eigenvalues are read off immediately.",
+    correctIdea: "Once the Schmidt coefficients are known, entanglement entropy is exactly the Shannon entropy of those coefficients, with no further diagonalization needed.",
+    whyCorrect: "The Schmidt decomposition hands back rho_A = sum_k lambda_k |u_k><u_k| already diagonal, so no eigenvalue problem has to be solved at all: the entropy is read straight off the Schmidt coefficients.",
     whyWrong: ["Treating the raw amplitude matrix entries (a,b,c,d) as if they were the Schmidt coefficients directly would give a wrong, generally non-normalized result."],
   },
 };

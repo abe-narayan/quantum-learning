@@ -52,9 +52,9 @@ export const p0AfterHSHOnZero: NumericProblem = {
   },
   explanation: {
     correctIdea: "Composing gates means applying them one at a time to the evolving state, exactly as this lesson's step-by-step tracking method does for HZH=X.",
-    whyCorrect: "Even though the final probability (0.5) looks like 'no information,' the actual final state has a nontrivial relative phase — this is genuinely different from, say, HH|0⟩ which returns exactly to |0⟩ with P(0)=1.",
+    whyCorrect: "Even though the final probability (0.5) looks like 'no information,' the final state carries a nontrivial relative phase. That makes it different from HH|0⟩, which returns to |0⟩ with P(0)=1.",
     whyWrong: [
-      "Assuming H then S then H must cancel out symmetrically (since it starts and ends with H) and give P(0)=1 — the S gate in the middle genuinely changes the outcome, unlike a circuit with nothing between the two H's.",
+      "Assuming H then S then H must cancel out symmetrically (since it starts and ends with H) and give P(0)=1. The S gate in the middle changes the outcome, unlike a bare wire between the two H's.",
       "Stopping after only two of the three gates and reading off that intermediate state's probability instead.",
     ],
   },

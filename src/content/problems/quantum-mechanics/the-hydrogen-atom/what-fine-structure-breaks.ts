@@ -20,28 +20,40 @@ export const whatFineStructureBreaks: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["l-independence", "independent of l", "same energy regardless of l", "doesn't depend on l"],
-      ["spin-orbit", "L·S", "spin couples", "total angular momentum", "j"],
+      {
+        phrases: ["l-independence", "independent of l", "same energy regardless of l", "doesn't depend on l"],
+        missingFeedback:
+          "Name the specific earlier result that gets modified. It is a statement about what E_n does and does not vary with.",
+      },
+      {
+        phrases: ["spin-orbit", "spin orbit", "l dot s", "spin couples", "couples the spin", "coupling of spin", "total angular momentum"],
+        missingFeedback:
+          "You have the result that breaks. Now say what including spin introduces, and what quantity the energy comes to depend on instead.",
+      },
     ],
-    incorrectFeedback: "Name the specific l-independence result from Hydrogen Energy Levels, then connect it to why L·S coupling breaks it.",
-    partialFeedback: "Good — make sure both the specific broken result and the mechanism (spin-orbit coupling) are named explicitly.",
+    incorrectFeedback: "You named 'fine structure' as the answer, which is the question's own word. Two specific things are wanted: the earlier formula whose degeneracy is lifted, quoted precisely enough that someone could point to it, and the term in the Hamiltonian that lifts it.",
+    partialFeedback: "One of the two is there. Supply the other: either quote the earlier formula precisely, or name the interaction term that has to be added once the electron carries an intrinsic angular momentum of its own.",
+    modelAnswers: [
+      "It breaks the l-independence of E_n: in the plain Coulomb result the energy is the same regardless of l. Once you include spin, spin-orbit coupling adds a term proportional to L dot S, so the energy depends on total angular momentum rather than just n.",
+      "Fine structure modifies the result that the energy is independent of l. Including electron spin brings in spin orbit coupling, which couples the spin to the orbital motion and splits the levels.",
+    ],
   },
   hints: [
-    { text: "Hydrogen Energy Levels showed Eₙ depends only on n, not l — this is the result in question." },
-    { text: "Spin-orbit coupling adds an energy term proportional to L·S." },
-    { text: "Once L and S are coupled, states are better labeled by total angular momentum j=l±1/2, and different j (for the same n,l) get slightly different energies." },
+    { text: "Go back to the Hydrogen Energy Levels formula and read off which quantum numbers appear in it and which do not." },
+    { text: "Adding spin to the electron gives the atom a second angular momentum. Ask what new term in the Hamiltonian a pair of angular momenta in the same system makes possible." },
+    { text: "That term's value depends on how the two are oriented relative to each other. Say which quantum number now labels the states, and what happens to two states that share n and l but differ in it." },
   ],
   solution: {
     steps: [
       { description: "Fine structure breaks the exact l-independence of Eₙ established in Hydrogen Energy Levels." },
       { description: "Including electron spin introduces a spin-orbit coupling term proportional to L·S." },
-      { description: "This forces the good quantum number to become total angular momentum j (from L and S combined, via Addition of Angular Momentum), and states of the same n but different j pick up slightly different energies — breaking the pure l-independence." },
+      { description: "This forces the good quantum number to become total angular momentum j (from L and S combined, via Addition of Angular Momentum), and states of the same n but different j pick up slightly different energies, which breaks the pure l-independence." },
     ],
     finalAnswer: "Fine structure breaks the exact l-independence of Eₙ, because spin-orbit coupling (∝L·S) makes the energy depend on total angular momentum j, not just n.",
   },
   explanation: {
     correctIdea: "This connects the lesson's abstract 'fine structure breaks something' claim to the one specific, previously-derived numerical result it actually modifies.",
-    whyCorrect: "Matches the lesson's explicit statement that l-independence is the result fine structure breaks.",
+    whyCorrect: "Spin-orbit coupling introduces L·S, which is not diagonal in l and s separately but is diagonal in j. So the energy stops being a function of n alone and becomes a function of n and j, which is precisely the loss of l-independence.",
     whyWrong: ["Vaguely stating 'fine structure changes the energy levels' without naming the specific l-independence result or the L·S mechanism misses the lesson's actual point."],
   },
 };

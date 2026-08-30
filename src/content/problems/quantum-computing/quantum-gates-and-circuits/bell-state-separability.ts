@@ -21,17 +21,32 @@ export const bellStateSeparability: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["cannot", "can't", "no way", "not possible", "impossible", "no single"],
-      ["product state", "separable", "factor", "single-qubit states", "tensor product", "outer product"],
+      // The prompt already says "cannot be written as a product state", so
+      // groups holding the verdict and the words "product state" graded the
+      // question itself as a full answer. Both groups now ask for the argument.
+      {
+        phrases: ["four equations", "system of equations", "all four", "coefficients must satisfy", "match coefficients", "matching coefficients", "comparing coefficients", "expand the product", "expanding the tensor product", "write out the four products"],
+        missingFeedback:
+          "Do the algebra rather than describing it. Multiply out a general two-qubit product and set its coefficients against the Bell state's, then say what you are left holding.",
+      },
+      {
+        phrases: ["cross terms", "cross-term", "must vanish", "one of them must be zero", "one of the four must be zero", "forces one factor to vanish", "forces a zero", "contradiction", "no solution", "cannot all hold", "can not all hold", "cannot be satisfied", "no assignment", "kills one of the", "kills the"],
+        missingFeedback:
+          "You have the equations. Now finish the argument: say which two of them force one of the numbers to be zero, and what that does to the other two.",
+      },
     ],
     incorrectFeedback:
-      "Try again — the key idea is about whether the state can be *factored* into two independent single-qubit states.",
-    partialFeedback: "You're on the right track, but be explicit about why the product-state structure is impossible here.",
+      "You asserted that the state is entangled, which is the same claim in different words. Assume the opposite instead: suppose it does split into two independent single-qubit pieces, work out what each of the four basis amplitudes would then have to be, and follow the two that are required to be zero to where they lead.",
+    partialFeedback: "Now say why: run the four equations to their conclusion and show what each of the two zero-valued ones forces, then what that does to the other two.",
+    modelAnswers: [
+      "Expand |a>|b> and match coefficients with the Bell state. You get four equations: a0b0 = 1/sqrt2, a1b1 = 1/sqrt2, and the two cross terms a0b1 = 0 and a1b0 = 0. Those force one of the four numbers to be zero, which kills one of the two terms you need, so there is no solution.",
+      "Write out the four products of the tensor product and compare coefficients. The cross-term equations must vanish, so one of a0, a1, b0, b1 is zero, but then one of the |00> or |11> amplitudes is zero too. The four equations cannot all hold at once.",
+    ],
   },
   hints: [
-    { text: "Try assuming |Φ+⟩ = |a⟩⊗|b⟩ for some single-qubit states |a⟩, |b⟩, and see what that would require." },
-    { text: "Matching coefficients gives four equations relating a₀, a₁, b₀, b₁ to the amplitudes of |Φ+⟩." },
-    { text: "Two of those equations force a contradiction — no values satisfy all four at once." },
+    { text: "Suppose the state did split. Write |a⟩ and |b⟩ with general coefficients and expand their combination into the four basis terms." },
+    { text: "Match those four terms against the Bell state's amplitudes. Two of the four right-hand sides are 0." },
+    { text: "Each of those two equations forces one of the four unknowns to vanish. Feed that back into the other two equations and see what they now demand." },
   ],
   solution: {
     steps: [
@@ -45,16 +60,16 @@ export const bellStateSeparability: ConceptualProblem = {
       },
       {
         description:
-          "From $a_0b_1=0$, either $a_0=0$ or $b_1=0$. If $a_0=0$, then $a_0b_0=0\\neq\\frac{1}{\\sqrt2}$ — a contradiction. If $b_1=0$, then $a_1b_1=0\\neq\\frac{1}{\\sqrt2}$ — also a contradiction.",
+          "From $a_0b_1=0$, either $a_0=0$ or $b_1=0$. If $a_0=0$, then $a_0b_0=0\\neq\\frac{1}{\\sqrt2}$, a contradiction. If $b_1=0$, then $a_1b_1=0\\neq\\frac{1}{\\sqrt2}$, also a contradiction.",
       },
     ],
-    finalAnswer: "No values of $a_0,a_1,b_0,b_1$ satisfy all four equations — $|\\Phi^+\\rangle$ is entangled, not a product state.",
+    finalAnswer: "Expanding the product and matching coefficients gives four equations. The two cross terms force $a_0b_1=0$ and $a_1b_0=0$, so one of the four numbers must be zero, and that kills one of the two terms the Bell state needs. No assignment satisfies all four at once, so the state is entangled.",
   },
   explanation: {
     correctIdea: "The Bell state's amplitudes can't be matched by any choice of two single-qubit states' coefficients.",
     whyCorrect: "The equations force a contradiction no matter which of the two cases (a₀=0 or b₁=0) is chosen.",
     whyWrong: [
-      "Saying 'it's entangled because it's called a Bell state' just restates the label — it isn't a proof.",
+      "Saying 'it is entangled because it is called a Bell state' restates the label rather than proving anything.",
       "Assuming any two normalized single-qubit states can be combined to match these amplitudes ignores that the resulting system of equations is overdetermined and inconsistent.",
     ],
   },

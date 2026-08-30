@@ -50,11 +50,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="One continuous argument, six lessons long">
 This course built one continuous argument. A commutation relation forced a discrete spectrum; the spectrum produced explicit functions and an explicit 2×2 case, spin-½; and that case turned out to be sitting inside this platform's oldest and most-used machinery all along.
 </LessonHook>
 
-## Motivation
+## From an identity with no obvious payload
 
 Six lessons ago the only thing on the table was $[L_x,L_y]=i\hbar L_z$,
 an identity about operators with no obvious physical payload. It forced
@@ -67,7 +67,7 @@ useful than summarizing: it shows how much of the hydrogen atom is
 already finished before the next course writes down a single differential
 equation.
 
-## Mathematical Development
+## The chain, one line per link
 
 ### The logical chain, in one line each
 
@@ -112,9 +112,21 @@ down a radial equation.
 
 The payoff is not only qualitative. Every $m$ at a given $l$ shares the
 same $\vec L^{\,2}$ <Term id="eigenvalue-eigenvector">eigenvalue</Term> $l(l+1)\hbar^2$, and $H$ for a central
-potential sees $\vec L^{\,2}$ and $r$ but never $L_z$, so those $2l+1$
-states must be degenerate. Counting them gives the size of each hydrogen
-shell without solving anything:
+potential is built from $r$ and $\vec L^{\,2}$ alone.
+
+<PredictBeforeReveal
+  question="For a fixed l, the 2l+1 states with different m all share the same L² eigenvalue. Does H (which depends only on r and L²) distinguish between them?"
+  options={[
+    { label: "No: all 2l+1 are exactly degenerate", value: "degenerate" },
+    { label: "Yes, each m gets a different energy", value: "different" },
+    { label: "Only m=0 has a different energy from the rest", value: "m0-special" },
+  ]}
+  correctValue="degenerate"
+  explanation="H for a central potential depends on r and L² and never on Lz, and every m at a fixed l carries the identical L² eigenvalue l(l+1)ħ². H therefore cannot tell the m states apart, and all 2l+1 come out at one energy. The matrix comparison below shows this directly: Lz's diagonal changes as you step through the states while L² does not move. Break the symmetry, for instance by switching on a magnetic field, and the degeneracy splits; that is the Zeeman effect."
+/>
+
+Those $2l+1$ states must therefore be degenerate, and counting them gives
+the size of each hydrogen shell without solving anything:
 
 <EnergyLevelDiagram
   levels={hydrogenShellLevels}
@@ -134,17 +146,6 @@ Lesson 4 showed doubles every count to $2n^2$. That factor of two is what
 makes the periodic table's rows come out $2, 8, 8, 18$ rather than
 $1, 4, 4, 9$.
 
-<PredictBeforeReveal
-  question="For a fixed l, the 2l+1 states with different m all share the same L² eigenvalue. Does H (which depends only on r and L²) distinguish between them?"
-  options={[
-    { label: "Yes, each m gets a different energy", value: "different" },
-    { label: "No, all 2l+1 of them are exactly degenerate in energy", value: "degenerate" },
-    { label: "Only m=0 has a different energy from the rest", value: "m0-special" },
-  ]}
-  correctValue="degenerate"
-  explanation="H for a central potential depends on r and L² and never on Lz, and every m at a fixed l carries the identical L² eigenvalue l(l+1)ħ². H therefore cannot tell the m states apart, and all 2l+1 come out at one energy. The matrix comparison below shows this directly: Lz's diagonal changes as you step through the states while L² does not move. Break the symmetry, for instance by switching on a magnetic field, and the degeneracy splits; that is the Zeeman effect."
-/>
-
 <InteractiveSection
   title="Step through l, watch L² ignore m entirely"
   description="Step through l = 0, 1, 2, 3. L² on the right is l(l+1) times the identity, one number repeated down the diagonal no matter which m you are looking at, which is why every m-state at a given l shares an energy. Lz on the left shows the 2l+1 distinct m eigenvalues those degenerate states nevertheless carry. Degenerate in energy does not mean identical."
@@ -155,7 +156,7 @@ $1, 4, 4, 9$.
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## Why a central potential always separates
 
 Splitting a three-dimensional problem into radial and angular pieces is
 not a trick that happens to work for hydrogen. It follows from the
@@ -171,7 +172,7 @@ proved. That extra degeneracy is specific to the $1/r$ potential and
 breaks the moment the potential deviates from it, which is exactly what
 happens in every atom heavier than hydrogen.
 
-## Worked Example
+## Predicting a spherical harmonic with no radial work
 
 **Given that hydrogen's ground state has $l=0$, predict which spherical
 harmonic appears in its wavefunction, without solving any radial
@@ -188,7 +189,7 @@ ground state has no electric dipole moment and no preferred axis, so
 hydrogen in its ground state cannot be oriented by a weak field. The next
 course reaches the same conclusion from the Schrödinger equation.
 
-## Common Mistakes
+## None of this is specific to hydrogen
 
 <Callout type="note">
 **Assuming this course's results only apply to hydrogen specifically.**
@@ -210,16 +211,148 @@ $R_{n,l}(r)$ and the resulting energy levels.
 1. For $l=1$, list all allowed $m$ values and state how many distinct
    spherical harmonics could appear in an $l=1$ hydrogen state's angular
    part.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $m=-1,\ 0,\ +1$, so three: $Y_1^{-1}$, $Y_1^{0}$, $Y_1^{+1}$.
+
+   The count is Lesson 2's $2l+1$, which came from the ladder running
+   from $-l$ to $+l$ in unit steps. All three carry the same
+   $\vec L^{\,2}$ eigenvalue $2\hbar^2$ and the same radial factor
+   $R_{n,1}(r)$, so at the level of energy they are indistinguishable:
+   these are the three degenerate states that make up the $p$ subshell.
+
+   Two things the number does not mean. It is not a claim that a
+   particular $l=1$ electron is in one of the three. A general $l=1$ state
+   is any superposition $\sum_m c_m Y_1^m$, and the three chemists' real
+   $p_x$, $p_y$, $p_z$ orbitals are precisely such superpositions, chosen
+   real instead of chosen as $L_z$ eigenstates. And it is not the number
+   of states in the $n=2$ shell, which is $4$: the $l=0$ state comes along
+   as well, and doubles to $8$ once spin is counted.
+
+   </details>
+
 2. Explain, using only the logical chain above (not the next course's
    content), why you can already predict the ground state has no angular
    dependence before solving any Schrödinger equation.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $l=0$ leaves the angular part with only one option, and that
+   option is a constant.
+
+   The chain, in order. A central potential makes $H$, $\vec L^{\,2}$ and
+   $L_z$ commute, so every energy eigenstate can be written
+   $\psi=R(r)\,Y_l^m(\theta,\varphi)$ with the angular factor drawn from
+   Lesson 3's list. At $l=0$, Lesson 2's count gives $2l+1=1$ allowed $m$
+   value, namely $m=0$. Lesson 3 supplies that single function
+   explicitly: $Y_0^0=1/(2\sqrt\pi)$, a number with no $\theta$ or
+   $\varphi$ in it. So $\psi=R(r)/(2\sqrt\pi)$ depends on distance alone.
+   No radial equation was solved, and none needed to be: the radial
+   equation determines $R(r)$, and $R(r)$ is not where angular dependence
+   could hide.
+
+   Being straight about what the chain does and does not deliver. Given
+   $l=0$, the conclusion is airtight. The chain does not by itself
+   establish that the *ground state* is the $l=0$ one, and that step is
+   worth making explicit rather than smuggling in. It costs one
+   observation and still no solving: separating the Schrödinger equation
+   for a central potential leaves a radial problem whose effective
+   potential carries the centrifugal term $\hbar^2l(l+1)/(2\mu r^2)$
+   ($\mu$ the mass, written this way to keep $m$ free for the magnetic
+   quantum number), which is zero at $l=0$ and strictly positive
+   otherwise. Raising $l$ therefore raises the effective potential at
+   every radius, which raises every energy level with it, so the lowest
+   state of all must sit at $l=0$.
+
+   The prediction has teeth. A spherically symmetric ground state has no
+   preferred axis and no permanent electric dipole moment, so hydrogen in
+   its ground state cannot be oriented by a weak static field. That is a
+   laboratory statement, arrived at from a commutation relation and a
+   counting argument.
+
+   </details>
+
 3. If a central potential problem had $l=2$ as its ground-state angular
    momentum (unlike hydrogen, whose ground state has $l=0$), how many
    different $m$-degenerate states would share that same energy, from
    angular momentum alone?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Five: $2l+1=5$ at $l=2$, with $m=-2,-1,0,1,2$.
+
+   The reasoning does not touch the potential's shape. $H$ for a central
+   potential is built from $r$ and $\vec L^{\,2}$ and never contains
+   $L_z$, and all five $m$ states share the identical $\vec L^{\,2}$
+   eigenvalue $6\hbar^2$, so $H$ has nothing to tell them apart with.
+   Whatever the radial problem turns out to be, its answer is the same
+   for all five.
+
+   "From angular momentum alone" is the phrase carrying the weight, and
+   it marks the boundary of the claim. Five is a *lower* bound on the
+   degeneracy, not the full count. Hydrogen exceeds it: its energies
+   happen to depend only on $n$ and not on $l$, so different $l$ values
+   pile into the same level and the shell degeneracy climbs to $n^2$.
+   That extra coincidence belongs to the $1/r$ potential specifically and
+   is not available here. Spin, if the particle has any, multiplies
+   whatever count you end up with by two.
+
+   The $2l+1$ part, on the other hand, is guaranteed for every $V(r)$
+   there is, because it follows from rotational symmetry rather than from
+   any detail of the potential. Break the symmetry, with a magnetic field
+   for instance, and it is the first degeneracy to go.
+
+   </details>
+
 4. Summarize, in your own words, the single most surprising result from
    this entire course (your choice) and explain briefly why it surprised
    you.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   There is no single correct answer here, so what follows is one
+   defensible choice worked through, not a key to check yours against. If
+   you picked something else and can say what the argument was and where
+   it stopped being obvious, that is the whole exercise.
+
+   The choice: half-integer angular momentum falls out of a counting
+   argument that never mentions rotation, space, or spin.
+
+   The reason it lands hard is that the ingredients are so thin.
+   Lesson 2 has a ladder whose rungs are one unit apart, pinned at $+j$
+   on top and $-j$ at the bottom, and closure requires the descent from
+   one end to land on the other, so $2j$ is a whole number. Nothing in
+   that says $2j$ must be *even*. The odd cases survive, and they are
+   half-integer $j$. A structural argument about a finite ladder,
+   available to anyone who has never heard of an electron, predicts the
+   existence of a kind of angular momentum that no rotating object can
+   have.
+
+   Then Lesson 3 supplies the constraint that separates the two families
+   and does it geometrically: a position-space wavefunction has to be
+   single-valued, which kills the odd cases for orbital motion. So the
+   half-integers are not merely permitted; they are permitted *and*
+   excluded from everything made of motion through space, which leaves a
+   labelled gap. Lesson 4 finds the electron sitting in it.
+
+   Other strong candidates, for calibration. The singlet state, derived
+   by asking which two-spin combination has zero total angular momentum,
+   turning out to be the Bell state $|\Psi^-\rangle$ that Quantum Gates &
+   Circuits had already built from a Hadamard and a CNOT: two questions
+   with no visible relationship and one answer. A $2\pi$ rotation
+   returning a spin-$\tfrac12$ state multiplied by $-1$, which sounds like
+   an artefact of notation until you learn it was measured with a neutron
+   interferometer in 1975. And the plainest one: the Pauli matrices, in
+   use since Course 1 as abstract qubit machinery, are the $j=\tfrac12$
+   case of this course's construction, so the Bloch sphere was always a
+   picture of a physical direction in a laboratory.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -239,11 +372,11 @@ $R_{n,l}(r)$ and the resulting energy levels.
   Quantum Gates & Circuits by an equality between vectors, not by
   resemblance.
 
-## Further Exploration
+## The radial equation, next
 
 <NextDiscovery>
 This completes **Angular Momentum & Spin**. Next: **The Hydrogen Atom**,
 which solves the radial equation this capstone previewed, completing the
 first fully three-dimensional solved system in this platform's
-Quantum Mechanics pillar.
+Quantum Mechanics track.
 </NextDiscovery>

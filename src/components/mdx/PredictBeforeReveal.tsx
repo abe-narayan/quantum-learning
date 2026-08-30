@@ -51,6 +51,51 @@ export type PredictOption = { label: string; value: string };
  * inert (`disabled`), which also removes them from the tab order, so nothing
  * further needs managing there.
  *
+ * ## The one leak this component cannot close: authored option position
+ *
+ * Options render in the order the author wrote them, so the distribution of
+ * `correctValue` across the slots is a real property of the corpus and not of
+ * this file. It has been measured and corrected once already. The 127
+ * three-option blocks (the most common shape) previously carried the answer
+ * at index 1 in 63 of them, 49.6% against a 33% baseline: "always pick the
+ * middle one" beat the device without engaging with the physics, which is the
+ * one failure mode a predict-then-reveal cannot survive. Twenty of those were
+ * re-ordered, and the three-option slots now read 42 / 43 / 42 (33.1 / 33.9 /
+ * 33.1%). The 97 four-option blocks sit at 23 / 25 / 28 / 21 and were left
+ * alone. Across all 229 call sites in `src/content`, index 1 now holds 72
+ * (31%) and index 0 holds 66 (29%).
+ *
+ * The correction was deliberately not a blind shuffle, and the next author
+ * should not treat it as one. Roughly a quarter of the middle-answer
+ * three-option lists carry a real order the reader is meant to use ("larger /
+ * exactly equal / smaller", "10⁻³ / 10⁻⁵ / 10⁻⁷", "Tier 1 / Tier 2 / Tier
+ * 3"), and in those the correct answer sitting in the middle is a fact about
+ * the scale, not a tell. Sixteen such lists were identified and left exactly
+ * as authored; the twenty that moved were the ones whose options had no
+ * inherent order at all (yes / no / it depends, this-one / that-one /
+ * neither), plus a handful of numeric sets that were sorted into their proper
+ * ascending order on the way, which improved the reading and moved the answer
+ * off the middle in the same edit.
+ *
+ * `AnswerInput` solves exactly this for graded problems with a seeded
+ * display shuffle (`optionOrder.ts`), and the same trick would work here
+ * mechanically: the reveal names the committed option by `label`, never by
+ * position or letter, so nothing downstream depends on the authored order.
+ * It is deliberately not done, for two reasons. The first is the ordered
+ * lists above: a shuffle cannot tell a scale from an unordered set, so it
+ * would scramble "larger / equal / smaller" on every render, costing every
+ * reader comprehension to deny a guesser one heuristic. The second is that
+ * the incentive differs: `optionOrder`'s shuffle protects
+ * a *scored* answer, where position-guessing has a payoff; nothing here is
+ * scored, recorded, or comparable between readers.
+ *
+ * So this is an authoring-balance problem, in the same category as
+ * `Callout`'s `mistake`/`note` imbalance and stated here for the same
+ * reason: no prop is being passed wrongly, so nothing in this file can
+ * detect or fix it, but whoever authors the next hundred of these should
+ * spread `correctValue` across the slots rather than reaching for the
+ * middle.
+ *
  * Nothing in the pre-commit DOM reveals which option is correct:
  * `correctValue` is only ever compared, never rendered, and `explanation`
  * has no element until a prediction exists. So neither view-source nor a
@@ -137,7 +182,7 @@ export function PredictBeforeReveal({
                 // and nudged every option after it in the wrap row — a layout
                 // shift at the exact moment the reader commits, which is the
                 // one moment in this component they are looking at the thing
-                // that moves, and it happens on all 209 lessons that use this
+                // that moves, and it happens on all 218 lessons that use this
                 // block. `PresetToggle` fixed precisely this and documents the
                 // same reasoning; the only difference is that a `bg-brand` fill
                 // needs no visible edge of its own, so the reserved border is
@@ -188,12 +233,24 @@ export function PredictBeforeReveal({
           commit. Sighted readers saw the answer; a screen-reader user pressed
           Space, heard the radio state flip, and got nothing back — on the
           device that carries this lesson's single most important moment,
-          across 209 uses.
+          across 218 uses.
 
           `aria-atomic` because the reveal is one statement, not two: without
           it only the changed subtree is spoken, which can strand "you
-          predicted Quarters" from the explanation that gives it meaning. */}
-      <div aria-live="polite" aria-atomic="true">
+          predicted Quarters" from the explanation that gives it meaning.
+
+          `role="status"` is the site's house form for a polite live region
+          (ProblemsCatalog, GlossaryFilter, CircuitStateStepper, Feedback and
+          three more all carry it), and it is not decoration here: on a
+          role-less `<div>` some screen readers treat the container as a plain
+          generic and the region is easier to lose track of across a
+          re-render. `status` names it, and its implicit `aria-live="polite"`
+          and `aria-atomic="true"` agree with what is written out beside it,
+          so the two can never contradict each other. The explicit attributes
+          stay for the same reason the rest of the codebase keeps them: they
+          are what a reader of this file sees without having to know the
+          implicit mapping. */}
+      <div role="status" aria-live="polite" aria-atomic="true">
         {selectedOption ? (
           <div
             className={cn(
@@ -204,12 +261,17 @@ export function PredictBeforeReveal({
               // globally. The margin lives here rather than on the live
               // region above so the empty pre-commit wrapper takes up no
               // space at all.
-              "panel-arrive mt-4 rounded-panel border border-border bg-surface p-4 text-sm"
+              // `text-base`, not `text-sm`: this panel is the payoff the whole
+              // component exists for, and `not-prose` on the wrapper does not
+              // reset the inherited `font-size`, so an absolute size here is
+              // measured against `.prose`'s 18px body. The option pills above
+              // stay `text-sm` — they are controls, not reading.
+              "panel-arrive mt-4 rounded-panel border border-border bg-surface p-4 text-base"
             )}
           >
             <p className="font-semibold text-foreground">
-              You predicted {selectedOption.label}
-              {selected === correctValue ? " — that's exactly what happens." : " — here's what actually happens."}
+              You predicted {selectedOption.label}.{" "}
+              {selected === correctValue ? "That's exactly what happens." : "Here's what actually happens."}
             </p>
             <p className="mt-2 text-muted-foreground">{explanation}</p>
           </div>

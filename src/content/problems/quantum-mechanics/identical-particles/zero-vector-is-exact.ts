@@ -28,6 +28,11 @@ export const zeroVectorIsExact: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.0001,
+    nearMisses: [
+      { value: 1, tolerance: 0.01, feedback: "1 is the norm of |a⟩⊗|a⟩ itself. The expression subtracts that vector from an identical copy before any norm is taken." },
+      { value: 1.4142135623730951, tolerance: 0.01, feedback: "√2 adds the two norms in quadrature, as though the terms were orthogonal. They are the same vector, so they cancel component by component instead." },
+      { value: 2, tolerance: 0.01, feedback: "2 is what the two copies would give if they were added. The expression subtracts, which is what makes antisymmetrizing a state with itself return nothing." },
+    ],
     incorrectFeedback: "Subtracting any vector from itself gives the zero vector, term by term, and the zero vector's norm carries no floating-point ambiguity. If you got something tiny but nonzero, you computed a difference of two different vectors.",
   },
   hints: [

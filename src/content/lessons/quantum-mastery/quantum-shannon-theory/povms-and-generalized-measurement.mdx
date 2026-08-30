@@ -30,6 +30,7 @@ export const lessonMeta = {
     "State the definition of a POVM and show why {E_i} summing to identity is exactly the condition needed for a valid, unbiased probability distribution",
     "Prove (or derive) Naimark's dilation theorem: every POVM measurement on a system is a projective (von Neumann) measurement on a larger system plus a partial trace",
     "Explain quantum instruments as the general object that specifies BOTH the measurement outcome probabilities and the post-measurement state, and why POVMs alone only give the former",
+    "Build the three-effect POVM that unambiguously discriminates two non-orthogonal states, and settle what a two-outcome projective measurement on the same qubit can do by comparison",
   ],
   related: [
     {
@@ -135,19 +136,37 @@ export const K1Luders = sqrtE1;
 export const K1Alt = pauliX.mul(sqrtE1);
 export const E1FromLuders = K1Luders.dagger().mul(K1Luders);
 export const E1FromAlt = K1Alt.dagger().mul(K1Alt);
-export const postMeasDirectionLuders = K1Luders.apply([new Complex(psi2Vec[0]), new Complex(psi2Vec[1])]);
-export const postMeasDirectionAlt = K1Alt.apply([new Complex(psi2Vec[0]), new Complex(psi2Vec[1])]);
+export const postMeasDirectionLuders = K1Luders.apply([new Complex(psi1Vec[0]), new Complex(psi1Vec[1])]);
+export const postMeasDirectionAlt = K1Alt.apply([new Complex(psi1Vec[0]), new Complex(psi1Vec[1])]);
 
 export const sSamples = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
 
-export const povmFrameForS = (sVal) => ({
-  paramLabel: `s = ${sVal.toFixed(1)}, θ ≈ ${((Math.acos(sVal) * 180) / Math.PI).toFixed(1)}°`,
-  bars: [
-    { label: "E1: \"ψ1\"", value: 1 - sVal, caption: (1 - sVal).toFixed(3) },
-    { label: "E2: \"ψ2\"", value: 0, caption: "0.000" },
-    { label: "E?: inconclusive", value: sVal, caption: sVal.toFixed(3), highlight: true },
-  ],
-});
+export const optimalPovmForS = (sVal) => {
+  const sinAt = Math.sqrt(1 - sVal * sVal);
+  const psi2PerpAt = [sinAt, -sVal];
+  const kappaAt = 1 / (1 + sVal);
+  const kappa3At = (2 * sVal) / (1 + sVal);
+  const phiRaw = [psi1Vec[0] + sVal, psi1Vec[1] + sinAt];
+  const phiN = Math.hypot(phiRaw[0], phiRaw[1]);
+  const phiAt = [phiRaw[0] / phiN, phiRaw[1] / phiN];
+  return [
+    outerProductReal(psi2PerpAt).scale(kappaAt),
+    outerProductReal(psi1PerpVec).scale(kappaAt),
+    outerProductReal(phiAt).scale(kappa3At),
+  ];
+};
+
+export const povmFrameForS = (sVal) => {
+  const probs = optimalPovmForS(sVal).map((E) => densityMatrixExpectationValue(rho1, E).re);
+  return {
+    paramLabel: `s = ${sVal.toFixed(1)}, θ ≈ ${((Math.acos(sVal) * 180) / Math.PI).toFixed(1)}°`,
+    bars: [
+      { label: "E1: \"ψ1\"", value: probs[0], caption: probs[0].toFixed(3) },
+      { label: "E2: \"ψ2\"", value: probs[1], caption: probs[1].toFixed(3) },
+      { label: "E?: inconclusive", value: probs[2], caption: probs[2].toFixed(3), highlight: true },
+    ],
+  };
+};
 
 export const povmOutcomeFrames = sSamples.map(povmFrameForS);
 
@@ -177,11 +196,12 @@ export const workedVectors = [
 <LessonHook eyebrow="Beyond orthogonal projectors">
   An orthogonal projective measurement on a qubit can have at most 2
   outcomes, and it can never be optimal for telling apart two
-  non-orthogonal quantum states. This lesson introduces the object that
-  removes both restrictions.
+  non-orthogonal quantum states. Both restrictions trace back to a
+  single assumption, and it is not one the measurement postulate
+  actually requires.
 </LessonHook>
 
-## Motivation
+## Every Measurement So Far Was a Projector
 
 Every measurement this platform has used so far, from The Measurement
 Postulate, Generalized through Quantum Channels: Kraus and Choi's own
@@ -198,7 +218,7 @@ object that removes both restrictions is the <Term id="povm">POVM</Term>,
 and this lesson proves rather than states why it is the right
 generalization.
 
-## Mathematical Development
+## Completeness, Naimark, and Instruments
 
 ### The definition
 
@@ -245,10 +265,10 @@ the spanning set of basis matrices $\rho=|j\rangle\langle k|$ (extending
 by linearity past just density matrices). Writing $A\equiv\sum_iE_i$,
 $\text{Tr}(A|j\rangle\langle k|)=A_{kj}$ must equal
 $\text{Tr}(|j\rangle\langle k|)=\delta_{jk}$ for every $j,k$, which
-forces $A=I$ entry by entry. So $\sum_iE_i=I$ is not one *sufficient*
-way to get a valid distribution — it is the unique *necessary* condition,
-by the same reasoning this course already trusted for a different
-completeness relation.
+forces $A=I$ entry by entry. So $\sum_iE_i=I$ is not merely one
+*sufficient* way to get a valid distribution. It is the unique
+*necessary* condition, by the same reasoning this course already trusted
+for a different completeness relation.
 
 ### Naimark's dilation theorem
 
@@ -300,9 +320,9 @@ so $V$ is an **isometry**: its $d$ columns are orthonormal vectors in
 $\mathbb C^n$. Any isometry extends to a full unitary $U$ on
 $\mathbb C^n$ by completing those $d$ orthonormal columns to a full
 orthonormal basis of $\mathbb C^n$ (Gram-Schmidt on the orthogonal
-complement of $V$'s range) — the same "extend to a full basis" move the
-SVD-based Schmidt decomposition proof already used, run here on an
-isometry instead of a single vector. If $n\leq d\cdot d_{\text{anc}}$,
+complement of $V$'s range). This is the same "extend to a full basis"
+move the SVD-based Schmidt decomposition proof already used, run here on
+an isometry instead of a single vector. If $n\leq d\cdot d_{\text{anc}}$,
 embed $\mathbb C^n$ into $\mathbb C^d\otimes\mathbb C^{d_{\text{anc}}}$
 (padding with zero rows for the unused basis vectors) so $U$ is a
 unitary on system-plus-ancilla. For any state $|\psi\rangle$ of
@@ -354,7 +374,7 @@ at $|w\rangle$, a different physical state for each choice, all
 completely invisible to the POVM. A concrete version of this, with real
 numbers, appears in the worked example.
 
-## Physical Interpretation
+## An Effect Need Not Answer a Question
 
 A POVM element does not have to correspond to "a question the system
 can definitely answer" the way an orthogonal projector does. It only has
@@ -365,7 +385,7 @@ still positive semi-definite and the whole set still sums to $I$, a
 concession an orthogonal projective measurement, capped at $d$ mutually
 exclusive outcomes with no slack, cannot make.
 
-## Why This Matters
+## Questions That Cannot Otherwise Be Posed
 
 Without POVMs, several questions this platform will need cannot even be
 *stated* rigorously, let alone answered:
@@ -386,10 +406,11 @@ Without POVMs, several questions this platform will need cannot even be
   elements, not a projector.
 - **QKD security proofs.** Proving a key-distribution protocol secure
   means bounding what *any* POVM an eavesdropper could build reveals
-  about the key — a claim about *all* physically valid measurements,
-  which requires the POVM formalism to even quantify over.
+  about the key. That is a claim about *all* physically valid
+  measurements, and the POVM formalism is what makes quantifying over
+  them expressible at all.
 
-## Worked Example
+## Unambiguous Discrimination, Built Explicitly
 
 **Two non-orthogonal qubit states $|\psi_1\rangle=|0\rangle$ and
 $|\psi_2\rangle=0.6|0\rangle+0.8|1\rangle$ have overlap
@@ -397,8 +418,8 @@ $s=\langle\psi_1|\psi_2\rangle=0.6$ (relative angle
 $\theta=\arccos(0.6)\approx53.13°$). Find the 3-outcome POVM that
 unambiguously discriminates them (zero probability of ever
 *misidentifying* one as the other) with the smallest possible
-inconclusive rate, and show no 2-outcome projective measurement on this
-qubit can do the same at all.**
+inconclusive rate, then settle what a 2-outcome projective measurement
+on this qubit can do against the same standard.**
 
 <VectorDiagram
   vectors={workedVectors}
@@ -438,25 +459,35 @@ sensible place for "I can't tell" to live. Summing all three:
 ### Outcome probabilities
 
 Given the actual state is $|\psi_1\rangle$:
-$P(E_1)=\text{Tr}(E_1\rho_1)={povmProbsPsi1[0].toFixed(3)}$,
-$P(E_2)=\text{Tr}(E_2\rho_1)={povmProbsPsi1[1].toFixed(3)}$ (exactly zero,
+$P(E_1)=\text{Tr}(E_1\rho_1)=$ {povmProbsPsi1[0].toFixed(3)},
+$P(E_2)=\text{Tr}(E_2\rho_1)=$ {povmProbsPsi1[1].toFixed(3)} (exactly zero,
 unambiguous as designed), and
-$P(E_?)=\text{Tr}(E_?\rho_1)={povmProbsPsi1[2].toFixed(3)}$. Given the
+$P(E_?)=\text{Tr}(E_?\rho_1)=$ {povmProbsPsi1[2].toFixed(3)}. Given the
 actual state is $|\psi_2\rangle$, by the mirrored construction:
-$P(E_1)={povmProbsPsi2[0].toFixed(3)}$ (exactly zero),
-$P(E_2)={povmProbsPsi2[1].toFixed(3)}$,
-$P(E_?)={povmProbsPsi2[2].toFixed(3)}$. In general,
-$P(\text{correct})=1-s$ and $P(\text{inconclusive})=s$: this is the
-optimal (Ivanovic-Dieks-Peres) unambiguous discrimination bound: **no**
-valid measurement of any kind can unambiguously discriminate
-$|\psi_1\rangle,|\psi_2\rangle$ with a smaller inconclusive probability
-than $s=|\langle\psi_1|\psi_2\rangle|$.
+$P(E_1)=$ {povmProbsPsi2[0].toFixed(3)} (exactly zero),
+$P(E_2)=$ {povmProbsPsi2[1].toFixed(3)},
+$P(E_?)=$ {povmProbsPsi2[2].toFixed(3)}. In general,
+$P(\text{correct})=1-s$ and $P(\text{inconclusive})=s$, which is the
+optimal **Ivanovic–Dieks–Peres** unambiguous-discrimination bound: for
+two *pure* states supplied with *equal* prior probabilities, no valid
+measurement of any kind can unambiguously discriminate
+$|\psi_1\rangle,|\psi_2\rangle$ with inconclusive probability below
+$s=|\langle\psi_1|\psi_2\rangle|$.
+
+Both of those hypotheses carry weight. With unequal priors
+$\eta_1,\eta_2$ the floor drops to $2\sqrt{\eta_1\eta_2}\,s$, so an
+adversary who knows the two signals are unevenly likely does strictly
+better than this bound suggests. And for two *mixed* states whose
+supports overlap, unambiguous discrimination is impossible at any
+inconclusive rate whatsoever: no effect can annihilate one state without
+annihilating part of the other. Purity is what makes a zero-error
+guarantee available in the first place.
 
 <PredictBeforeReveal
   question="This 3-outcome POVM tells |ψ1⟩ and |ψ2⟩ apart (overlap s=0.6) with zero chance of ever misidentifying one as the other. Can some ordinary 2-outcome projective measurement on this same qubit match that guarantee?"
   options={[
     { label: "Yes, with the right choice of measurement basis", value: "yes" },
-    { label: "No — provably impossible for any non-orthogonal pair, no matter the basis", value: "no" },
+    { label: "No, provably impossible for any non-orthogonal pair, no matter the basis", value: "no" },
     { label: "Yes, but only using two qubits instead of one", value: "twoqubit" },
   ]}
   correctValue="no"
@@ -478,13 +509,13 @@ i.e. $\langle\psi_2^\perp|\psi_1^\perp\rangle=-\cos\theta=0$, true only
 when $\theta=90°$, i.e. when $\psi_1,\psi_2$ were already orthogonal to
 begin with. For this lesson's non-orthogonal pair
 ($s=0.6\neq0$), **no** 2-outcome projective measurement can achieve zero
-misidentification probability, period; the POVM above is not merely
-*better* than projective measurement here, it is doing something
+misidentification probability, period. The POVM above is not merely
+*better* than projective measurement here; it is doing something
 projective measurement cannot do at all. The best a forced-decision
 (2-outcome) measurement can do is *minimize error instead of eliminating
 it*: Helstrom's formula (Trace Distance and Fidelity) gives minimum error
-probability $\tfrac12(1-\sin\theta)={helstromErrorMin.toFixed(3)}$ for
-equal priors, a real, nonzero error rate on every single trial, traded
+probability $\tfrac12(1-\sin\theta)=$ {helstromErrorMin.toFixed(3)} for
+equal priors, a nonzero error rate on every single trial, traded
 here for this POVM's zero error rate at the cost of a 60% inconclusive
 rate.
 
@@ -509,9 +540,9 @@ $\mathbb C^4$ gives an explicit unitary $U$ on system-plus-qubit-ancilla:
 Applying $U$ to $|\psi\rangle\oplus(0,0)$ (the system state embedded in
 the first two of four joint coordinates) and reading off
 $|(U\psi)_i|^2$ for $i=1,2,3$ reproduces
-$\big({naimarkProbsPsi1[0].toFixed(3)},\ {naimarkProbsPsi1[1].toFixed(3)},\ {naimarkProbsPsi1[2].toFixed(3)}\big)$
+({naimarkProbsPsi1[0].toFixed(3)}, {naimarkProbsPsi1[1].toFixed(3)}, {naimarkProbsPsi1[2].toFixed(3)})
 for $|\psi_1\rangle$ and
-$\big({naimarkProbsPsi2[0].toFixed(3)},\ {naimarkProbsPsi2[1].toFixed(3)},\ {naimarkProbsPsi2[2].toFixed(3)}\big)$
+({naimarkProbsPsi2[0].toFixed(3)}, {naimarkProbsPsi2[1].toFixed(3)}, {naimarkProbsPsi2[2].toFixed(3)})
 for $|\psi_2\rangle$, identical, to numerical precision, to the direct
 Born-rule numbers $\text{Tr}(E_i\rho)$ computed above from two completely
 independent calculations. The fourth basis outcome never fires for
@@ -547,13 +578,16 @@ Two different Kraus operators both square to $E_1$:
 
 Both give exactly the same $E_1$ (same right column above in each
 preset), so both are completely indistinguishable from outcome
-statistics alone. But applied to $|\psi_2\rangle$, the (unnormalized)
-post-measurement directions are
-$K_{1,\text{Lüders}}|\psi_2\rangle\propto({postMeasDirectionLuders[0].re.toFixed(3)},\ {postMeasDirectionLuders[1].re.toFixed(3)})$
+statistics alone. Apply them to $|\psi_1\rangle$, the state on which
+outcome $1$ actually fires (applying them to $|\psi_2\rangle$ would show
+nothing, since $E_1$ was built to annihilate it, and both operators
+return the zero vector there). The (unnormalized) post-measurement
+directions are
+$K_{1,\text{Lüders}}|\psi_1\rangle\propto$ ({postMeasDirectionLuders[0].re.toFixed(3)}, {postMeasDirectionLuders[1].re.toFixed(3)})
 versus
-$K_{1,\text{alt}}|\psi_2\rangle\propto({postMeasDirectionAlt[0].re.toFixed(3)},\ {postMeasDirectionAlt[1].re.toFixed(3)})$
-— different qubit states. A POVM alone cannot tell you which
-of these (or the infinitely many other valid choices) actually
+$K_{1,\text{alt}}|\psi_1\rangle\propto$ ({postMeasDirectionAlt[0].re.toFixed(3)}, {postMeasDirectionAlt[1].re.toFixed(3)})
+and those are different qubit states. A POVM alone cannot tell you which
+of these (or the infinitely many other valid choices)
 describes your hardware; only the full instrument does.
 
 ## Interactive: the discrimination trade-off
@@ -582,11 +616,11 @@ As $s\to0$ (near-orthogonal states), the inconclusive rate vanishes and
 the POVM degenerates smoothly into an ordinary 2-outcome projective
 measurement. As $s\to1$ (nearly identical states), correct identification
 becomes rare and the measurement is forced to answer "inconclusive"
-almost every time — the intuition that near-identical states are
+almost every time. That is the intuition that near-identical states are
 hard to tell apart, now attached to an exact formula rather than just a
 feeling.
 
-## Common Mistakes
+## Mistaking an Effect for a Projector
 
 <Callout type="mistake">
 **Assuming every POVM element must be a projector.** $E_1$ above has
@@ -613,16 +647,186 @@ choice is a common *default*, not a fact forced by the POVM itself.
 1. Why does $\sum_iE_i=I$ have to hold for *every* density matrix
    $\rho$ simultaneously, rather than just for one particular state of
    interest?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a measurement device is a fixed piece of apparatus and the
+   state is not its input parameter. The $E_i$ are chosen once; whatever
+   arrives at the detector has to come out with a valid probability
+   distribution.
+
+   The mathematical consequence of dropping the quantifier is severe. With
+   $A\equiv\sum_iE_i$, demanding $\mathrm{Tr}(A\rho_0)=1$ for a single
+   $\rho_0$ is *one scalar equation* on a matrix with $d^2$ real degrees of
+   freedom, and it is satisfied by a huge family of wrong answers. Take
+   $A=I+X$ and $\rho_0=|0\rangle\langle0|$:
+
+   $$
+   \mathrm{Tr}\big((I+X)|0\rangle\langle0|\big)=1+\langle0|X|0\rangle=1+0=1,
+   $$
+
+   which passes. Now hand the same device $|{+}\rangle$:
+
+   $$
+   \mathrm{Tr}\big((I+X)|{+}\rangle\langle{+}|\big)=1+\langle{+}|X|{+}\rangle=1+1=2.
+   $$
+
+   The outcome probabilities sum to two. Nothing was wrong with the
+   algebra; the calibration was simply done against one state and the
+   device was then used on another.
+
+   Quantifying over every $\rho$ is what promotes that one equation to the
+   $d^2$ equations $A=I$, and the lesson's proof is exactly that
+   promotion: test on the spanning set $\rho=|j\rangle\langle k|$ and read
+   off $A_{kj}=\delta_{jk}$ entry by entry. Note that "every density
+   matrix" already suffices even though the argument uses non-positive
+   basis matrices, because density matrices span the whole space of
+   Hermitian operators and $A$ is determined by linearity from any
+   spanning set.
+
+   The physical reasons the quantifier is not paranoia are worth listing,
+   since a reader can reasonably ask who would ever feed the device an
+   unexpected state. A drifting source prepares something slightly off
+   target. A channel between preparation and detector alters what arrives.
+   And most sharply: if the measured qubit is entangled with anything at
+   all, its reduced state is not the one you prepared and can be any state
+   in the ball. A completeness relation that holds only on one state is a
+   device that reports nonsense the first time it is used inside a larger
+   experiment.
+
+   </details>
+
 2. If $|\langle\psi_1|\psi_2\rangle|=0$ (already orthogonal), what does
    the optimal unambiguous-discrimination POVM above reduce to, and why
    does that match ordinary projective measurement?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It collapses to the ordinary projective measurement in the
+   $\{|\psi_1\rangle,|\psi_2\rangle\}$ basis, with the inconclusive
+   outcome carrying exactly zero weight.
+
+   Set $s=0$ in the closed form. The scaling becomes
+   $\kappa=1/(1+s)=1$, and orthogonality means
+   $|\psi_2^\perp\rangle=|\psi_1\rangle$ and
+   $|\psi_1^\perp\rangle=|\psi_2\rangle$, so
+
+   $$
+   E_1=|\psi_1\rangle\langle\psi_1|,\qquad E_2=|\psi_2\rangle\langle\psi_2|,
+   $$
+
+   $$
+   E_?=I-|\psi_1\rangle\langle\psi_1|-|\psi_2\rangle\langle\psi_2|=0,
+   $$
+
+   the last step because two orthonormal vectors in a two-dimensional space
+   are a complete basis, so their projectors already sum to the identity.
+   An outcome with $E_?=0$ has probability $\mathrm{Tr}(0\cdot\rho)=0$ on
+   every state: it exists on paper and never fires.
+
+   What remains is two rank-1 orthogonal projectors summing to $I$, which
+   is the definition of a projective measurement. Its behaviour matches the
+   general formulas at $s=0$ on every count: $P(\text{correct})=1-s=1$ and
+   $P(\text{inconclusive})=s=0$, so the measurement identifies the state
+   with certainty and never hedges.
+
+   Three other results in this course agree at the same point, which is
+   the check worth doing. The Helstrom minimum error
+   $\tfrac12(1-\sin\theta)$ is zero at $\theta=90°$. The trace distance
+   between two orthogonal pure states is $\sqrt{1-s^2}=1$, its maximum, so
+   the optimal single-shot success probability $\tfrac12(1+D)$ is $1$. And
+   the impossibility argument in the lesson, that unambiguous projective
+   discrimination requires $\langle\psi_2^\perp|\psi_1^\perp\rangle=0$,
+   holds precisely at $\theta=90°$, which is this case.
+
+   The useful way to read all of that: the POVM is not a different
+   *kind* of thing from a projective measurement, it is a one-parameter
+   family that contains projective measurement as its $s=0$ member. The
+   third outcome's weight $\mathrm{Tr}(E_?)=2s/(1+s)$ grows from zero
+   exactly as the two states start to overlap. Non-orthogonality is what
+   creates the need for "I cannot tell", and the amount of it is set by
+   how much overlap there is.
+
+   </details>
+
 3. A proposed 2-outcome measurement uses $E_1=0.7|0\rangle\langle0|$,
    $E_2=I-E_1$. Is $\{E_1,E_2\}$ a valid POVM? Check both required
    conditions explicitly.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes, valid, and both conditions have to be checked because the second
+   one is not implied by the first.
+
+   **Completeness.** $E_1+E_2=E_1+(I-E_1)=I$. This holds by construction
+   and is the easy half; defining the last effect as "whatever is left"
+   always satisfies it.
+
+   **Positivity.** In the computational basis,
+
+   $$
+   E_1=\begin{pmatrix}0.7&0\\0&0\end{pmatrix},\qquad
+   E_2=I-E_1=\begin{pmatrix}0.3&0\\0&1\end{pmatrix}.
+   $$
+
+   Both are diagonal, so their eigenvalues are their diagonal entries:
+   $\{0.7,0\}$ and $\{0.3,1\}$. All are non-negative, so
+   $E_1,E_2\geq0$ and the POVM is valid.
+
+   The reason this is a real check and not a formality is that
+   completeness alone guarantees nothing about the leftover. Replace the
+   coefficient $0.7$ with $1.3$ and completeness still holds by
+   construction, but $E_2=\mathrm{diag}(-0.3,1)$ has a negative eigenvalue,
+   so $\mathrm{Tr}(E_2\rho)<0$ for $\rho=|0\rangle\langle0|$: a negative
+   probability. That is exactly the failure mode positivity exists to
+   exclude, and it is invisible if you only sum the effects.
+
+   It is worth naming what this POVM *is*, since it is a clean example of
+   something projective measurement cannot express. $E_1^2=0.49|0\rangle\langle0|\neq E_1$,
+   so $E_1$ is not a projector and this is not a projective measurement in
+   disguise. It models a detector that fires on $|0\rangle$ only $70\%$ of
+   the time and never on $|1\rangle$: outcome $1$ means "definitely was
+   $|0\rangle$", while outcome $2$ is inconclusive, since it occurs with
+   probability $0.3$ on $|0\rangle$ and $1$ on $|1\rangle$. Explicitly,
+   $P(1)=0.7\rho_{00}$ and $P(2)=1-0.7\rho_{00}$. An inefficient detector
+   is a POVM, not a projective measurement with noise bolted on, which is
+   one of the main practical reasons the formalism is needed at all.
+
+   </details>
+
 4. Explain, in one or two sentences, why a POVM's outcome statistics
    alone can never tell you whether your hardware is implementing the
    Lüders instrument or some other instrument consistent with the same
    POVM.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the outcome distribution depends on the instrument only through
+   $E_i=\sum_kK_{i,k}^\dagger K_{i,k}$, and that map from instruments to
+   POVMs is many-to-one: replacing every $K_{i,k}$ by $W_iK_{i,k}$ for any
+   unitary $W_i$ leaves $E_i$ untouched, since
+   $K^\dagger W^\dagger WK=K^\dagger K$, while sending the post-measurement
+   state $\mathcal I_i(\rho)$ to $W_i\mathcal I_i(\rho)W_i^\dagger$.
+
+   So the difference is real and simply not recorded in the number the
+   detector prints. The lesson's rank-1 case is the extreme version: with
+   $E=|v\rangle\langle v|$, every $K=|w\rangle\langle v|$ reproduces the
+   same $E$ while leaving the system deterministically in $|w\rangle$, so
+   two devices with identical statistics can be leaving the qubit in
+   orthogonal states.
+
+   The constructive half is the part to act on. The only way to tell them
+   apart is to *use* the post-measurement state: measure again in a basis
+   sensitive to $W_i$, or run the output through more circuit and look at
+   what comes out. Process tomography on the instrument does exactly this,
+   and it is strictly more work than tomography on the POVM, because it has
+   to probe a larger object.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -647,7 +851,7 @@ choice is a common *default*, not a fact forced by the POVM itself.
   more information than the POVM it induces; the POVM is the marginal
   that keeps outcome statistics and forgets the post-measurement state.
 
-## Further Exploration
+## Enlarging the System, in General
 
 <NextDiscovery>
   [Stinespring Dilation and Channel Purification](/lessons/quantum-mastery/quantum-shannon-theory/stinespring-dilation-and-channel-purification)

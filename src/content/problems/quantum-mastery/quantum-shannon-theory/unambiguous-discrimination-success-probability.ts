@@ -45,7 +45,7 @@ export const unambiguousDiscriminationSuccessProbability: NumericProblem = {
     correctIdea: "The optimal unambiguous discrimination POVM trades a nonzero inconclusive rate (probability s) for a zero misidentification rate; the remaining probability 1-s goes to correctly identifying the true state.",
     whyCorrect: "This is a direct instance of the lesson's general result P(success) = 1 - |<psi1|psi2>|, re-derived from E1 = (1/(1+s))|psi2-perp><psi2-perp| and Tr(E1 rho1) for the specific overlap s = 0.8.",
     whyWrong: [
-      "Reporting s = 0.8 itself confuses the inconclusive probability with the success probability -- the two are complementary (they sum to 1 since P(E2)=0 exactly for this input state), not equal.",
+      "Reporting s = 0.8 itself confuses the inconclusive probability with the success probability. The two are complementary, summing to 1 since P(E2)=0 exactly for this input state, not equal.",
       "Using the Helstrom minimum-error formula instead of the unambiguous-discrimination formula answers a different question: minimum-error discrimination is a forced 2-outcome decision with no inconclusive option, not the same setup as this problem.",
     ],
   },

@@ -21,17 +21,29 @@ export const purificationUnitaryFreedom: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["trace", "partial trace", "traced out", "tr_b"],
-      ["unitary", "cancels", "cyclic", "w w-dagger", "identity"],
+      {
+        phrases: ["trace", "partial trace", "traced out", "tracing out"],
+        missingFeedback:
+          "The reduced state is not the whole state. Say what operation you apply to the global projector to get it, because that operation is what makes W invisible.",
+      },
+      {
+        phrases: ["unitary", "cancels", "cyclic", "w w-dagger", "identity"],
+        missingFeedback:
+          "You have named the operation. Now say what happens to W and its dagger underneath it, and what they come to when they meet.",
+      },
     ],
     incorrectFeedback:
-      "Write rho_A = Tr_B[(I⊗W)|psi><psi|(I⊗W)^dagger] and use the cyclic property of partial trace/trace to show the W's cancel exactly when they act only on the traced-out system.",
-    partialFeedback: "Good start -- now make explicit why the cancellation only works when W acts on B, not on A.",
+      "Do the computation rather than asserting the answer. Write down what rho_A is in terms of the new purification, then move the W and its adjoint around inside the operation that produces rho_A and see what they do to each other. Then ask the mirror question: had W acted on A instead, what would be left sitting on either side of rho_A?",
+    partialFeedback: "Good start. The answer is not finished until you say why the cancellation depends on which side W sits. Run the same computation with W acting on A and say what survives.",
+    modelAnswers: [
+      "rho_A is the partial trace over B, and under that trace a unitary acting only on B can be moved around by cyclicity so that W and W-dagger meet and cancel to the identity. So rho_A is untouched. A unitary on A is not traced over at all; it conjugates rho_A directly, which generally changes it.",
+      "Tracing out B kills any B-only unitary: W W-dagger becomes the identity inside the trace, so nothing about A's reduced state changes. On the A side there is no trace to absorb it, so the state really is conjugated.",
+    ],
   },
   hints: [
     { text: "Write the new purification as (I_A ⊗ W_B)|psi>_AB for some unitary W_B." },
-    { text: "Compute Tr_B[(I⊗W)|psi><psi|(I⊗W)^dagger] using the cyclic property of trace on the B factor." },
-    { text: "The W and W-dagger factors are entirely inside the trace over B and cancel via WW^dagger = I." },
+    { text: "Compute rho_A from that state. The B-side operators sit inside an operation that acts only on B; ask whether they can be moved past each other there." },
+    { text: "What is WW^dagger, and where does that factor end up?" },
   ],
   solution: {
     steps: [
@@ -43,7 +55,7 @@ export const purificationUnitaryFreedom: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "Partial trace over B is exactly the operation that makes a B-only unitary invisible to A's reduced state.",
-    whyCorrect: "Tr_B[(I⊗W)σ(I⊗W)^dagger] = Tr_B(σ) for any σ and unitary W on B -- a direct consequence of the trace's cyclic property restricted to the B factor, independent of what σ is.",
+    whyCorrect: "Tr_B[(I⊗W)σ(I⊗W)^dagger] = Tr_B(σ) for any σ and any unitary W on B, a direct consequence of the trace's cyclic property restricted to the B factor, independent of what σ is.",
     whyWrong: ["A unitary applied to A instead would appear directly as U rho_A U^dagger after the partial trace, generally a different state unless U happens to commute with rho_A."],
   },
 };

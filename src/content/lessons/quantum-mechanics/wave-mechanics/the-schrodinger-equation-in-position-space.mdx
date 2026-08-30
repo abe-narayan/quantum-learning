@@ -27,11 +27,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="One substitution, and there it is">
 The last course derived iħ d|ψ⟩/dt = H|ψ⟩ from requiring the evolution generator to be Hermitian, and worked with H as an abstract matrix. This lesson substitutes the explicit position-space Hamiltonian and gets the differential equation every introductory quantum mechanics course calls the Schrödinger equation.
 </LessonHook>
 
-## Motivation
+## The most famous equation as a corollary
 
 Substituting $H=\hat p^2/2m+V(\hat x)$ into the abstract evolution
 equation shows the <Term id="schrodinger-equation">Schrödinger equation</Term> is a special
@@ -48,7 +48,7 @@ out of results this course already owns.
   license="No known copyright restrictions"
 />
 
-## Intuition
+## Kinetic plus potential, promoted to operators
 
 Energy in classical mechanics splits into kinetic ($p^2/2m$) plus
 potential ($V(x)$). The Hamiltonian operator does the same split, with
@@ -57,7 +57,7 @@ that operator's explicit differential form into the abstract time-evolution
 equation is pure bookkeeping: no new physical input required, just
 algebra applied to something already proven.
 
-## Mathematical Development
+## Substituting the explicit Hamiltonian in
 
 ### The position-space Hamiltonian
 
@@ -69,9 +69,9 @@ $$
 $$
 
 using $\hat p^2 = (-i\hbar\,d/dx)(-i\hbar\,d/dx) = -\hbar^2\,d^2/dx^2$
-directly (apply the derivative twice; the two factors of $i$ give
-$i^2=-1$, cancelling the earlier minus sign into a plus, which combines
-with the overall minus to leave $-\hbar^2$).
+directly (apply the derivative twice; the two minus signs multiply to a
+plus, and the two factors of $i$ supply $i^2=-1$, which is where the
+surviving minus sign in $-\hbar^2$ comes from).
 
 ### Substituting into the abstract equation
 
@@ -109,7 +109,7 @@ equation, and $|\psi(x,t)|^2=|\psi_n(x)|^2$ for all $t$: the numerically
 verified stationarity the Infinite Square Well and Harmonic Oscillator
 lessons build on directly.
 
-## Physical Interpretation
+## Curvature is what the kinetic term charges for
 
 The kinetic term $-\frac{\hbar^2}{2m}\psi''$ measures curvature: a
 sharply-curving <Term id="wavefunction">wavefunction</Term> (large $|\psi''|$) carries large kinetic
@@ -120,21 +120,21 @@ page: it weights each position by the potential energy a classical
 particle would have there.
 
 <PredictBeforeReveal
-  question="The infinite-well ground state is an energy eigenstate. If the Wavefunction Explorer is honestly integrating the Schrödinger equation above forward in time step by step, what should its live <H> readout do while the preset plays?"
+  question="The infinite-well ground state is an energy eigenstate. If the Wavefunction Explorer is honestly integrating the Schrödinger equation above forward in time step by step, what should its live ⟨H⟩ readout do while the preset plays?"
   options={[
     { label: "Stay essentially fixed at the analytical E_1", value: "fixed" },
     { label: "Oscillate at a beat frequency", value: "oscillate" },
     { label: "Drift steadily upward as the simulation runs", value: "drift" },
   ]}
   correctValue="fixed"
-  explanation="Energy is conserved for a stationary state, so <H> should sit essentially flat at the analytical E_1 for as long as the preset runs. A beat frequency would mean a superposition of two energies (a later lesson's territory), and steady drift would mean the numerical integrator itself is leaking energy it should not, which is the failure mode the readout below is built to expose."
+  explanation="Energy is conserved for a stationary state, so ⟨H⟩ should sit essentially flat at the analytical E₁ for as long as the preset runs. A beat frequency would mean a superposition of two energies (a later lesson's territory), and steady drift would mean the numerical integrator itself is leaking energy it should not, which is the failure mode the readout below is built to expose."
 />
 
-<InteractiveSection title="Confirm the solver is honest" description="Every preset in the Wavefunction Explorer solves the equation above forward in time by finite-timestep integration, rather than replaying a canned animation (the next lessons build the specific potentials and the numerical method). Play any preset and watch the live ⟨H⟩ readout against the prediction above: for an eigenstate preset it should stay essentially fixed at the analytical E_n, which is a numerical confirmation that the simulator is solving this equation and not merely drawing a plausible-looking picture.">
+<InteractiveSection title="Confirm the solver is honest" description="Every preset in the Wavefunction Explorer solves the equation above forward in time by finite-timestep integration, rather than replaying a canned animation (the next lessons build the specific potentials and the numerical method). Play any preset and watch the live ⟨H⟩ readout against the prediction above. On an eigenstate preset, what ⟨H⟩ does over time is the whole test of whether the simulator is solving this equation or merely drawing a plausible-looking picture, so watch it long enough to be sure which.">
   <LazyWavefunctionExplorer initialPresetId="infinite-well-ground" />
 </InteractiveSection>
 
-## Worked Example
+## Checking that a phase factor solves it
 
 **Verify that $\psi(x,t)=e^{-iEt/\hbar}\psi_0(x)$ satisfies the
 time-dependent equation, given that $\psi_0$ solves the time-independent
@@ -151,7 +151,7 @@ $$
 (using the time-independent equation on $\psi_0$ in the last step). Both
 sides come out to $E\,e^{-iEt/\hbar}\psi_0(x)$, so the ansatz holds.
 
-## Common Mistakes
+## Time-dependent against time-independent
 
 <Callout type="note">
 **Confusing the time-dependent and time-independent equations.** The
@@ -172,12 +172,138 @@ common transcription slip.
 
 1. Starting from $\hat p=-i\hbar\,d/dx$, show explicitly that $\hat
    p^2\psi = -\hbar^2\psi''$ (apply the operator twice, step by step).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Apply the operator once, then again to the result:
+
+   $$
+   \hat p\,\psi = -i\hbar\,\psi'
+   $$
+
+   $$
+   \hat p^2\psi = \hat p\left(\hat p\,\psi\right) = -i\hbar\frac{d}{dx}\left(-i\hbar\,\psi'\right) = (-i\hbar)(-i\hbar)\,\psi'' = (-i)^2\hbar^2\,\psi'' = -\hbar^2\,\psi''
+   $$
+
+   The constant $-i\hbar$ pulls out of the second derivative because
+   differentiation is linear, and $(-i)^2 = i^2 = -1$, leaving the single
+   minus sign in front of $\hbar^2$.
+
+   Feeding that into the kinetic term gives the sign the lesson boxes:
+
+   $$
+   \frac{\hat p^2}{2m} = \frac{-\hbar^2}{2m}\frac{d^2}{dx^2}
+   $$
+
+   Two sign errors are worth pointing at directly, because they are
+   different mistakes that produce the same wrong-looking answer.
+
+   Writing $(-i\hbar)^2 = +\hbar^2$ mistakes where the surviving minus comes
+   from. Squaring destroys the explicit minus, since $(-1)^2 = +1$; what
+   supplies the overall minus is $i^2 = -1$ instead. So the sign in front of
+   the $i$ never mattered here, and $(+i\hbar)^2$ would have given
+   $-\hbar^2$ too, leaving the kinetic term exactly as it stands.
+
+   Writing $\hat p^2\psi = \left(-i\hbar\psi'\right)^2 = -\hbar^2(\psi')^2$
+   squares the *result* rather than applying the operator twice. Operator
+   powers mean repeated application, not pointwise squaring of the output,
+   and the difference shows immediately: the correct answer is linear in
+   $\psi$, as any operator acting on a state must be, while $(\psi')^2$ is
+   not.
+
+   The physical reading of the surviving minus is that the kinetic energy
+   charges for *curvature with the right sign*. Where $\psi$ curves back
+   toward the axis, $\psi''$ has the opposite sign to $\psi$, so
+   $-\hbar^2\psi''/2m$ is a positive multiple of $\psi$: positive kinetic
+   energy. A wavefunction that wiggles faster has larger $|\psi''|$ and
+   costs more, which is the same statement as narrow packets carrying
+   broad, high-$k$ Fourier content.
+
+   </details>
+
 2. Why does $|\psi(x,t)|^2=|\psi_n(x)|^2$ for all $t$, given
    $\psi(x,t)=e^{-iE_nt/\hbar}\psi_n(x)$? (One line, using
    $|e^{i\theta}|=1$.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   |\psi(x,t)|^2 = \left|e^{-iE_nt/\hbar}\right|^2\left|\psi_n(x)\right|^2 = 1\cdot|\psi_n(x)|^2 = |\psi_n(x)|^2
+   $$
+
+   using $|zw| = |z||w|$ and $|e^{i\theta}|=1$ for real $\theta$, which
+   requires $E_n$ to be real. It is, because $\hat H$ is Hermitian, so
+   nothing here is accidental.
+
+   The consequences run further than the one line suggests, and both are
+   worth stating.
+
+   Every expectation value built from the density is frozen too, not just
+   the density itself: $\langle x\rangle$, $\langle x^2\rangle$, $\Delta x$,
+   $\langle V\rangle$, all of them, since each is an integral of some
+   function of $x$ against $|\psi|^2$. And the same argument in momentum
+   space, where the phase factors out identically, freezes the momentum
+   statistics as well. This is what "stationary" means, and it is why a
+   textbook orbital can be drawn as a still image.
+
+   The phase is not absent, though, and this is where the concept usually
+   goes wrong. $\psi(x,t)$ genuinely changes at every instant; it rotates
+   in the complex plane at angular frequency $E_n/\hbar$. It is
+   unobservable only because it is *global*, the same factor at every $x$,
+   so it cancels out of every squared magnitude. The moment two different
+   energies are present, their two phases turn at different rates, the
+   ratio between them is no longer constant, and the phase stops being
+   global. Then the cross terms in $|\psi|^2$ carry
+   $\cos\big((E_2-E_1)t/\hbar\big)$ and the density visibly beats, which is
+   the superposition case the capstone lesson works out.
+
+   So the correct summary is not "the state does not change." It is "the
+   state changes by a factor that no measurement can see, and only because
+   a single energy is present."
+
+   </details>
+
 3. In natural units ($\hbar=m=1$, this platform's convention), write the
    time-independent Schrödinger equation with the $\hbar$'s and $m$'s
    dropped.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   -\frac12\,\psi''(x) + V(x)\,\psi(x) = E\,\psi(x)
+   $$
+
+   Setting $\hbar=1$ and $m=1$ in $-\dfrac{\hbar^2}{2m}\psi''+V\psi=E\psi$
+   turns the kinetic coefficient into $-\tfrac12$. The factor of $2$ is
+   *not* one of the constants being set to one: it came from the classical
+   $p^2/2m$, and it stays.
+
+   That is the mistake this question exists to catch. Writing
+   $-\psi''+V\psi=E\psi$ silently doubles every kinetic energy and would
+   put every computed level off by a factor that depends on the potential.
+   Check it against a known answer: with the infinite well's
+   $\psi_n=\sin(n\pi x/L)$, the correct equation gives
+   $E_n = \tfrac12(n\pi/L)^2 = n^2\pi^2/(2L^2)$, which at $L=10$ is
+   $E_1 = \pi^2/200 \approx 0.0493$, matching the well lesson's worked
+   example and the engine's `infiniteSquareWellEnergyLevel`. Dropping the
+   $\tfrac12$ would give $0.0987$, and the simulator's comparison panel
+   would disagree with the formula immediately.
+
+   It is worth being explicit about what natural units are and are not
+   doing here. They are a choice of measuring stick, not a change to the
+   physics: energies are now expressed in whatever unit makes $\hbar$ and
+   the particle's mass equal to one, so the *numbers* change while every
+   ratio, every level spacing relative to another, and every dimensionless
+   result stays exactly as it was. Restoring the constants is always
+   possible by dimensional analysis, and the platform works in natural
+   units for the same reason numerical code usually does: it keeps
+   quantities near order one and away from the floating-point extremes
+   that $10^{-34}$ invites.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -193,7 +319,7 @@ common transcription slip.
   equation directly; the accuracy of that integration is checkable via the
   live $\langle H\rangle$ readout against known analytical energies.
 
-## Further Exploration
+## The simplest nontrivial solution
 
 <NextDiscovery>
 [Free-Particle Wave Packets](/lessons/quantum-mechanics/wave-mechanics/free-particle-wave-packets) is the simplest nontrivial solution

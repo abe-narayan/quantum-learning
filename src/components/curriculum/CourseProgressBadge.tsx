@@ -21,8 +21,11 @@ export function CourseProgressBadge({ lessonSlugs }: { lessonSlugs: string[] }) 
   if (completedCount === 0) return null;
 
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-pillar-edge bg-pillar-wash px-2.5 py-1 font-tech text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-pillar-text">
-      {completedCount}/{lessonSlugs.length} done
+    // "3/8 done" sat inches from CourseList's authoring fraction in the same
+    // pillar hue and the two read as one number. Naming the owner ("Your
+    // progress") is what separates them, and it costs one word.
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-pillar-edge bg-pillar-wash px-2.5 py-1 tech-label text-pillar-text">
+      Your progress {completedCount}/{lessonSlugs.length}
     </span>
   );
 }

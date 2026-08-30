@@ -150,10 +150,18 @@ function objectivesOf(meta) {
   return Array.isArray(meta.objectives) ? meta.objectives.filter((line) => typeof line === "string") : [];
 }
 
+/** `<Term id="...">` in a lesson body, single or double quoted. */
+const TERM_LINK_RE = /<Term\s+id=["']([^"']+)["']/g;
+
+/** Filled by `collectLessons`, read once in `main`. Module scope rather than
+ *  a return value because `collectLessons` already returns the lesson array
+ *  and the two callers of that array should not have to unpack a tuple. */
+const termLinkCounts = Object.create(null);
+
 async function collectLessons(extractLessonKeywords) {
   const slugs = (await walk(LESSONS_ROOT, ".mdx")).sort(compareSlugs);
   if (slugs.length === 0) {
-    throw new Error(`No lesson files found under ${LESSONS_ROOT} — refusing to generate an empty search index.`);
+    throw new Error(`No lesson files found under ${LESSONS_ROOT}, so refusing to generate an empty search index.`);
   }
 
   const lessons = [];
@@ -165,6 +173,18 @@ async function collectLessons(extractLessonKeywords) {
     // Note what is NOT happening: the module is not imported, compiled, or
     // executed — see this file's header, and `lessonKeywords.ts`'s.
     lessons.push({ ...meta, slug, keywords: extractLessonKeywords(source, objectivesOf(meta)) });
+    // Third sweep of the same string, for how often the corpus links to each
+    // glossary entry. It is a ranking weight, not content: when two terms
+    // score identically for a query ("Dirac" names both Dirac Notation and
+    // the Dirac delta; "Grover" names both the algorithm and its diffusion
+    // operator) the one the lessons actually lean on should lead, and the
+    // alternative tie-break is alphabetical. See `linkCount` in
+    // src/lib/search/types.ts for why difficulty and glossary-graph degree
+    // were both tried and both rejected.
+    for (const match of source.matchAll(TERM_LINK_RE)) {
+      const id = match[1];
+      termLinkCounts[id] = (termLinkCounts[id] ?? 0) + 1;
+    }
   }
   return lessons;
 }
@@ -172,7 +192,7 @@ async function collectLessons(extractLessonKeywords) {
 async function collectProblems() {
   const slugs = (await walk(PROBLEMS_ROOT, ".ts")).sort(compareSlugs);
   if (slugs.length === 0) {
-    throw new Error(`No problem files found under ${PROBLEMS_ROOT} — refusing to generate an empty search index.`);
+    throw new Error(`No problem files found under ${PROBLEMS_ROOT}, so refusing to generate an empty search index.`);
   }
 
   const problems = [];
@@ -222,7 +242,7 @@ async function main() {
 
   if (!Array.isArray(terms) || terms.length === 0) {
     throw new Error(
-      "No glossary terms found in src/lib/content/glossary.ts — refusing to generate a search index with no glossary. A single-word query is the most common search a newcomer makes."
+      "No glossary terms found in src/lib/content/glossary.ts, so refusing to generate a search index with no glossary. A single-word query is the most common search a newcomer makes."
     );
   }
 
@@ -232,11 +252,12 @@ async function main() {
     problems,
     curriculumModule.COURSES,
     terms,
-    curriculumModule.PILLARS
+    curriculumModule.PILLARS,
+    termLinkCounts
   );
 
   if (index.length === 0) {
-    throw new Error("buildSearchIndex() produced an empty index — refusing to write an empty search-index.json.");
+    throw new Error("buildSearchIndex() produced an empty index, so refusing to write an empty search-index.json.");
   }
 
   const serialized = JSON.stringify(index);
@@ -256,7 +277,7 @@ async function main() {
     throw new Error(
       `Only ${withKeywords.length} of ${lessons.length} lessons produced a keyword set. ` +
         "A lesson whose body yields no terms is either empty or has an .mdx preamble the body scan " +
-        "cannot find the end of — see bodyOf() in src/lib/search/lessonKeywords.ts."
+        "cannot find the end of. See bodyOf() in src/lib/search/lessonKeywords.ts."
     );
   }
 
@@ -272,7 +293,7 @@ async function main() {
   // overlay for real users rather than failing a build.
   await writeGenerated(OUTPUT, serialized);
   console.log(
-    `generate-search-index: wrote ${index.length} entries (${terms.length} glossary terms, ${lessons.length} lessons, ${problems.length} problems) to ${path.relative(ROOT, OUTPUT)} — ${(bytes / 1024).toFixed(1)}KB of ${MAX_INDEX_BYTES / 1024}KB`
+    `generate-search-index: wrote ${index.length} entries (${terms.length} glossary terms, ${lessons.length} lessons, ${problems.length} problems) to ${path.relative(ROOT, OUTPUT)}, ${(bytes / 1024).toFixed(1)}KB of ${MAX_INDEX_BYTES / 1024}KB`
   );
 }
 

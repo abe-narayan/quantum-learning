@@ -76,6 +76,7 @@ export const barrenCurveFrames = [
       {
         label: "log₁₀(gradient variance)",
         color: "brand",
+        mode: "points",
         points: barrenResults.map((r) => ({ x: r.n, y: Math.log10(r.variance) })),
       },
     ],
@@ -87,6 +88,8 @@ export const barrenBars = barrenResults.map((r) => ({
   value: r.variance,
   caption: r.variance.toExponential(2),
 }));
+
+export const barrenBarMax = Math.max(...barrenResults.map((r) => r.variance));
 
 export function landscapeCurvesForN(n, seed) {
   const layers = 4 * n;
@@ -171,22 +174,22 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The landscape flattens faster than you can sample it">
   Gradients don't just get harder to find as a variational circuit
-  scales up — they vanish, exponentially fast in the number of qubits.
+  scales up. They vanish, exponentially fast in the number of qubits.
 </LessonHook>
 
-## Motivation
+## Why the Toy Example Converged
 
 VQE's worked toy example converged without incident: 80 pattern-search
 iterations, monotonic descent throughout, agreement with the exact answer
-to $10^{-12}$. That example used exactly one qubit. This lesson asks the
+to $10^{-12}$. That example used a single qubit. This lesson asks the
 question the toy example was too small to expose: what happens to that
 same training process as the ansatz scales up to real problem sizes?
 The answer is one of the most important, and most numerically verifiable,
 results in variational quantum computing.
 
-## Mathematical Development
+## Mean Zero, Variance Exponentially Small
 
 ### The parameter-shift rule, derived
 
@@ -238,10 +241,10 @@ function's gradient also averages to zero over a symmetric domain). The
 real obstruction is that the gradient's *typical size* (its standard
 deviation) shrinks toward zero as the number of qubits grows, so
 gradient-based optimization has nothing to work with even locally. The
-mechanism (McClean, Boixo, Smelyanskiy, Babbush & Neven 2018, cited
-here rather than fully re-derived; the complete argument uses
-Weingarten calculus over the Haar measure, which is substantial
-technical machinery) is **concentration of measure**: a sufficiently
+mechanism (McClean, Boixo, Smelyanskiy, Babbush & Neven 2018; the
+complete argument uses Weingarten calculus over the Haar measure, which
+is substantial technical machinery this lesson does not build) is
+**concentration of measure**: a sufficiently
 deep, sufficiently expressive parametrized circuit behaves, statistically,
 like a Haar-random unitary applied to the initial state. For a
 Haar-random pure state $|\psi\rangle$ in a $2^n$-dimensional Hilbert
@@ -264,9 +267,9 @@ starting point is, with overwhelming probability, sitting on a
 region so flat that no local optimizer can find a direction of descent
 within any reasonable numerical precision.
 
-## Physical Interpretation
+## What a Flat Landscape Costs the Optimizer
 
-The single-qubit VQE toy example converged so easily precisely because
+The single-qubit VQE toy example converged so easily because
 $2^1=2$ is nowhere near large enough for concentration of measure to
 bite: the whole point of that lesson's ansatz being "fully expressive"
 (reaching every point on the Bloch sphere) meant the cost landscape had
@@ -279,7 +282,7 @@ in this sense, always "near the equator" of the cost landscape,
 nowhere near a useful gradient, for purely geometric reasons that have
 nothing to do with how good the classical optimizer is.
 
-## Worked Example
+## The Plateau, Measured
 
 **Scale VQE's own $R_y$-then-$R_z$ ansatz pattern up to $n=2,3,4,5,6$
 qubits (4 layers per qubit, entangling CNOT ring between layers, a
@@ -287,13 +290,15 @@ standard hardware-efficient ansatz), measure the parameter-shift
 gradient of $\langle Z^{\otimes n}\rangle$ with respect to the first
 parameter at $300$ random parameter settings per size (a seeded,
 deterministic pseudorandom generator is used instead of `Math.random()`
-so this lesson's numbers are exactly reproducible on every rebuild, the
+so this lesson's numbers are reproducible on every rebuild, the
 same reproducibility discipline this platform's own problem-sampling
 code already follows), and compute the sample variance at each $n$.**
 
 <ParametricCurve
   frames={barrenCurveFrames}
-  ariaLabel="log10 of measured gradient variance plotted against number of qubits n, for a real multi-qubit variational ansatz built from this platform's actual gate and expectation-value engine"
+  xAxisLabel="qubits n"
+  yAxisLabel="log₁₀(gradient variance)"
+  ariaLabel="Five measured points, one per qubit count n from 2 to 6, plotting log10 of the sample gradient variance for a real multi-qubit variational ansatz built from this platform's actual gate and expectation-value engine. The points fall almost on a straight line, sloping steadily downward, which on a log axis is exponential decay in n"
 />
 
 | $n$ | layers | parameters | mean gradient | gradient variance |
@@ -312,13 +317,13 @@ violation of the exact identity). The variance itself drops by roughly
 half at each additional qubit ($0.130\to0.069\to0.027\to0.017\to0.0076$,
 ratios of $0.53,0.39,0.62,0.45$, noisy from finite sampling, but
 consistently well below $1$, and consistent with the cited $O(2^{-n})$
-scaling, not with any slower decay), a factor of roughly
-$17\times$ shrinkage from $n=2$ to $n=6$, measured directly, not merely
-asserted.
+scaling, not with any slower decay), a measured factor of roughly
+$17\times$ shrinkage from $n=2$ to $n=6$.
 
 <BarChart
   bars={barrenBars}
-  ariaLabel="Measured gradient variance for a real multi-qubit variational ansatz at n=2 through 6 qubits, showing clear shrinkage as qubit count grows"
+  maxValue={barrenBarMax}
+  ariaLabel="Measured gradient variance for a real multi-qubit variational ansatz at n=2 through 6 qubits, on a linear scale pinned to the n=2 variance, showing clear shrinkage as qubit count grows"
 />
 
 ### What the plateau actually looks like
@@ -331,14 +336,18 @@ above, computed with this lesson's own `scaledAnsatz`/`scaledCost` engine,
 not a stylized cartoon of it. Scrub $n$ from $2$ to $6$ below and watch
 several independent random draws at each size: at $n=2$ the curves swing
 across a sizable fraction of $Z^{\otimes n}$'s full $[-1,1]$ range, while by
-$n=6$ they've visibly collapsed toward flat, near-zero lines — the same
-$O(2^{-n})$ shrinkage as above, but seen directly in the shape of the cost
-landscape instead of inferred from its variance.
+$n=6$ they've visibly collapsed toward flat, near-zero lines. That is the
+same $O(2^{-n})$ shrinkage as above, seen directly in the shape of the cost
+landscape instead of inferred from its variance. (All five frames share one
+vertical scale, so the flattening across frames is a real comparison and not
+an artifact of per-frame rescaling.)
 
 <ParametricCurve
   frames={barrenLandscapeFrames}
+  xAxisLabel="θ₁ (rad)"
+  yAxisLabel="cost C(θ)"
   sliderLabel="qubits (n)"
-  ariaLabel="Cost function C(theta) plotted over a full period of theta, for four random draws of the other parameters, at each qubit count n from 2 to 6 — computed with this lesson's real multi-qubit ansatz and expectation-value engine, showing the curves visibly flattening toward zero as n grows"
+  ariaLabel="Cost function C(theta) plotted over a full period of theta, for four random draws of the other parameters, at each qubit count n from 2 to 6, computed with this lesson's real multi-qubit ansatz and expectation-value engine on a single shared vertical scale, showing the curves visibly flattening toward zero as n grows"
 />
 
 ### The landscape flattens in two dimensions, not just one
@@ -346,53 +355,63 @@ landscape instead of inferred from its variance.
 The curves above only ever move one parameter at a time. A full grid
 search over *two* parameters at once (holding everything else fixed at
 the same random draw) shows the same flattening as a literal picture of
-terrain rather than a bundle of 1D slices through it:
+terrain, where the curves above gave only 1D slices through it:
 
 <CostLandscapeHeatmap
   grid={barrenGridSmall}
   thetaLabel="θ₀"
   phiLabel="θ₁"
-  ariaLabel={`Cost landscape grid search over the first two ansatz parameters for n=${barrenGridSmallN} qubits, showing sharp variation from deep green to deep red across the grid`}
+  ariaLabel={`Cost landscape grid search over the first two ansatz parameters for n=${barrenGridSmallN} qubits. Color runs green to red against this grid's own range, which spans ${barrenGridSmallRange.toFixed(3)} in expectation value, and the green-to-red variation is organized into broad connected regions with one clear basin.`}
 />
 
 <CostLandscapeHeatmap
   grid={barrenGridLarge}
   thetaLabel="θ₀"
   phiLabel="θ₁"
-  ariaLabel={`Cost landscape grid search over the first two ansatz parameters for n=${barrenGridLargeN} qubits, showing a nearly uniform color across the whole grid`}
+  ariaLabel={`Cost landscape grid search over the first two ansatz parameters for n=${barrenGridLargeN} qubits. Color again runs green to red against this grid's own range, but that range spans only ${barrenGridLargeRange.toFixed(3)} in expectation value, about ${(barrenGridSmallRange / barrenGridLargeRange).toFixed(1)} times narrower than the grid above, and the color is scattered rather than organized into a basin.`}
 />
 
-At $n=2$, sweeping just the first two parameters $\theta_0,\theta_1$
-over a $12\times12$ grid (everything else pinned at one random draw)
-covers a range of $\langle H\rangle$ values spanning $1.248$, most of
-the observable's full $[-1,1]$ reach, and the grid shows it: sharp
-green-to-red structure with a clear minimum. At $n=6$, the identical
-procedure (computed directly by this lesson's own `landscapeGridForN`,
-not a separate hand-picked example) covers a range of only $0.221$ —
-about $5.6\times$ narrower — and the grid looks almost uniformly
-colored: not because the search did anything different, but because
-there's less terrain left to find. A gradient-based optimizer dropped
-anywhere on that second grid has nothing to descend.
+Read the two grids by their numbers first, because each one's color scale
+is stretched across its *own* min-to-max range: green always marks that
+grid's lowest cell and red its highest, however small the gap between them
+happens to be. At $n=2$, sweeping just the first two parameters
+$\theta_0,\theta_1$ over a $12\times12$ grid (everything else pinned at one
+random draw) covers a range of $\langle H\rangle$ values spanning
+{barrenGridSmallRange.toFixed(3)}, most of the observable's full
+$[-1,1]$ reach. At $n=6$, the identical
+procedure (computed by this lesson's own `landscapeGridForN`, not a
+separate hand-picked example) covers a range of only
+{barrenGridLargeRange.toFixed(3)}, about
+{(barrenGridSmallRange / barrenGridLargeRange).toFixed(1)} times
+narrower, though the self-normalized palette repaints that
+thin sliver across the same full green-to-red span. What the second
+picture does still show honestly is *shape*: at $n=2$ the color sorts
+itself into broad connected regions around one basin, the terrain a local
+optimizer can follow downhill, while at $n=6$ it breaks into scattered
+speckle with no basin to follow. Both facts point the same way. A
+gradient-based optimizer dropped anywhere on that second grid has
+{(barrenGridSmallRange / barrenGridLargeRange).toFixed(1)} times less
+height to descend and no coherent slope to descend it along.
 
 <PredictBeforeReveal
   question="This lesson's own ansatz pattern (4n layers, entangling ring, global Z⊗n cost) shows gradient variance dropping by roughly half per extra qubit, from n=3 (6.909×10⁻²) to n=6 (7.557×10⁻³). Over those 3 extra qubits, how much did the variance actually shrink?"
   options={[
+    { label: "Only a few percent, since barren plateaus need many more qubits to bite", value: "percent" },
     { label: "Roughly halved once, since it's one 'step' in the trend", value: "half" },
     { label: "Roughly an order of magnitude (about 9×)", value: "order" },
-    { label: "Only a few percent — barren plateaus need many more qubits to bite", value: "percent" },
   ]}
   correctValue="order"
   explanation="6.909×10⁻² / 7.557×10⁻³ ≈ 9.1×, close to the roughly-halving-per-qubit trend compounded over 3 qubits (2³=8, in the right ballpark given the noisy, finite-sample ratios reported above). The exact factor matters less than the shrinkage compounding multiplicatively per qubit, so a trend that looks mild going from n=3 to n=4 becomes crippling by n=20 or n=50, the extrapolation Practice Question 3 below asks you to make explicit."
 />
 
-## Common Mistakes
+## Blaming the Optimizer for the Landscape
 
 <Callout type="note">
 **Expecting the exponential shrinkage to show up cleanly at *any*
 circuit depth.** This lesson's own verification process ran into this
 directly: using only $n$ layers (rather than the $4n$ layers used
 above), the measured variance at $n=2\to3$ *increased* before
-decreasing, a real, reproducible finding, not a mistake to hide. The
+decreasing. The increase is reproducible, and worth reporting. The
 concentration-of-measure argument requires the circuit to be
 "sufficiently random," which in practice means sufficiently *deep*; a
 shallow ansatz hasn't yet scrambled enough to approximate a Haar-random
@@ -407,8 +426,8 @@ used above.
 Barren plateaus specifically afflict circuits that are *both* deep
 enough to be "sufficiently random" *and* trained against a *global*
 cost function like $Z^{\otimes n}$. Shallower, problem-tailored ansätze
-(not generic random circuits) and *local* cost functions (built from
-few-qubit terms rather than an all-qubit observable) are active,
+(not generic random circuits) and *local* cost functions (few-qubit
+terms in place of an all-qubit observable) are active,
 partially effective mitigation strategies in real research; the
 phenomenon derived here is an obstacle for the generic case, not
 a no-go theorem for every possible variational circuit design.
@@ -420,19 +439,236 @@ a no-go theorem for every possible variational circuit design.
    verify directly (by substitution) that $C(\theta+\pi/2)-C(\theta-\pi/2)$
    equals $-2b\sin\theta+2c\cos\theta$, confirming the parameter-shift
    rule's derivation above.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Shift the argument in each trig term, using
+   $\cos(\theta\pm\pi/2)=\mp\sin\theta$ and
+   $\sin(\theta\pm\pi/2)=\pm\cos\theta$:
+
+   $$
+   C(\theta+\tfrac\pi2)=a-b\sin\theta+c\cos\theta,
+   \qquad
+   C(\theta-\tfrac\pi2)=a+b\sin\theta-c\cos\theta.
+   $$
+
+   Subtracting, the constant $a$ cancels and each remaining term doubles:
+
+   $$
+   C(\theta+\tfrac\pi2)-C(\theta-\tfrac\pi2)=-2b\sin\theta+2c\cos\theta=2\,C'(\theta),
+   $$
+
+   since $C'(\theta)=-b\sin\theta+c\cos\theta$ by direct differentiation.
+   Dividing by two gives the rule as stated.
+
+   Two features of that calculation deserve to be pointed at, because they
+   are what make the rule useful rather than merely correct.
+
+   The constant $a$ dropping out is not cosmetic. It holds *everything*
+   the circuit does that does not involve $\theta$: every other parameter,
+   the whole rest of the ansatz, the observable. None of it needs to be
+   known, and none of it needs to be small.
+
+   And the shift is $\pi/2$, an enormous step by finite-difference
+   standards, yet the answer is the exact derivative rather than an
+   approximation with an $O(h^2)$ truncation error. That is possible only
+   because $C$ is a pure single-frequency trig polynomial: two samples
+   determine a function with two unknown Fourier coefficients, exactly.
+   There is no step-size tradeoff and no cancellation error from
+   subtracting nearly equal numbers, which matters a great deal when each
+   evaluation carries shot noise.
+
+   The hypothesis making all of this work is $P^2=I$, so that
+   $e^{-i\theta P/2}=\cos(\theta/2)I-i\sin(\theta/2)P$ and only the
+   frequencies $0,\pm1$ appear. Break it and the rule breaks with it: a
+   generator with three or more distinct eigenvalues produces additional
+   harmonics, and a two-term shift rule can no longer determine them. Such
+   gates need a longer multi-term shift rule with more evaluations, which
+   is why "the parameter-shift rule" is really a statement about Pauli
+   rotations rather than about parametrized gates in general.
+
+   </details>
+
 2. Explain why the zero-mean gradient result derived in this lesson
    requires *no* assumption about circuit depth or qubit count, while
    the vanishing-variance result specifically requires both "sufficiently
    deep" and "sufficiently many qubits."
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the zero-mean statement is an identity about a periodic
+   function, while the variance statement is a claim about how a
+   high-dimensional random object concentrates.
+
+   **The mean.** There is a one-line version that makes its triviality
+   plain. $C$ is $2\pi$-periodic in $\theta_i$, so
+
+   $$
+   \mathbb E[C'(\theta_i)]=\frac{1}{2\pi}\int_0^{2\pi}C'(\theta_i)\,d\theta_i=\frac{C(2\pi)-C(0)}{2\pi}=0
+   $$
+
+   by the fundamental theorem of calculus. Nothing about circuits appears:
+   any periodic cost, at any depth, on any number of qubits, differentiated
+   with respect to a uniformly distributed periodic parameter, has mean
+   gradient zero. The lesson's derivation via $-b\sin+c\cos$ is the same
+   fact with the structure exhibited.
+
+   This is why the zero mean, on its own, says nothing about trainability.
+   A perfect parabola in disguise would satisfy it too. It rules out one
+   trivial failure mode, a systematic drift, and no more.
+
+   **The variance.** The claim $\mathrm{Var}=O(2^{-n})$ is a
+   concentration-of-measure result, and concentration needs two separate
+   things to be true.
+
+   The dimension has to be large. Lévy's lemma bounds fluctuations of a
+   Lipschitz function on the unit sphere in $\mathbb C^{2^n}$ by something
+   shrinking like $2^{-n}$. At $n=1$ that "sphere" is the Bloch sphere, and
+   an expectation value on it swings across the full $[-1,1]$ range with no
+   concentration whatsoever. This is exactly why the single-qubit VQE toy
+   example trained without incident.
+
+   The circuit has to be random enough for the lemma to apply. The state
+   $U(\theta)|\psi_0\rangle$ is not Haar-distributed for a fixed shallow
+   ansatz; it is confined to a low-dimensional manifold that the ansatz can
+   reach. Only once the circuit is deep enough to scramble, approximating
+   at least a unitary $2$-design, does it behave statistically like a Haar
+   draw and inherit the bound. The lesson's own callout is the evidence:
+   at $n$ layers rather than $4n$, the measured variance *increased* from
+   $n=2$ to $n=3$ before turning over. A shallow circuit has not earned the
+   theorem yet.
+
+   The asymmetry in logical type is worth naming as well. The mean result
+   is exact at every finite $n$ and every depth. The variance result is
+   asymptotic, about a family of circuits as $n$ grows, and the measured
+   ratios $0.53,0.39,0.62,0.45$ scattering around $1/2$ are what an
+   asymptotic claim looks like when sampled $300$ times at small $n$.
+
+   </details>
+
 3. From the measured variance ratios ($n=2\to6$), estimate (order of
    magnitude) what the gradient variance might be at $n=20$ qubits if
    the same roughly-halving-per-qubit trend continued, and explain why
-   this makes gradient-based training essentially hopeless at that scale
+   this makes gradient-based training hopeless at that scale
    without a fundamentally different ansatz or cost function design.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   About $5\times10^{-7}$, so a typical gradient component of roughly
+   $7\times10^{-4}$. The reason that is fatal is not that the number is
+   small but that resolving it costs a number of measurement shots growing
+   like $2^n$.
+
+   The extrapolation is a factor of $2$ per qubit over $14$ more qubits
+   from the measured endpoint:
+
+   $$
+   \mathrm{Var}(n{=}20)\approx7.557\times10^{-3}\times2^{-14}=4.6\times10^{-7},
+   \qquad
+   \sigma\approx6.8\times10^{-4}.
+   $$
+
+   The measured data supports the exponent well enough for an
+   order-of-magnitude claim: from $n=2$ to $n=6$ the variance fell by
+   $0.1301/0.007557=17.2$, against $2^4=16$ predicted.
+
+   Now the part that matters. A gradient of typical size $\sigma$ has to be
+   distinguished from zero, and every circuit evaluation of
+   $\langle Z^{\otimes n}\rangle$ is an average of $\pm1$ outcomes, so $S$
+   shots give it a standard error of about $1/\sqrt S$. The parameter-shift
+   gradient combines two such evaluations, with shot noise roughly
+   $1/\sqrt{2S}$. Requiring that to fall below $\sigma$:
+
+   $$
+   S\gtrsim\frac{1}{2\sigma^2}=\frac{1}{2\,\mathrm{Var}}\approx1.1\times10^{6}
+   \ \text{shots per shifted circuit}.
+   $$
+
+   The ansatz at $n=20$ carries $8n^2=3200$ parameters, each needing two
+   shifted evaluations, so a single gradient step costs on the order of
+   $3200\times2\times10^{6}\approx6\times10^{9}$ circuit executions. That
+   is one step of one optimization run.
+
+   And the scaling is the whole point: shots per component grow like
+   $1/\mathrm{Var}\sim2^{n}$. The measurement cost of *reading* the
+   gradient is exponential in the qubit count, which cancels precisely
+   whatever exponential advantage the circuit was supposed to provide. At
+   $n=50$ the extrapolation gives $\mathrm{Var}\approx4\times10^{-16}$ and
+   $S\approx10^{15}$ shots per evaluation, which is not a hard engineering
+   problem but an impossible one.
+
+   Nothing about the classical optimizer enters this. Adam, BFGS, a
+   natural-gradient method: all of them are being handed a number that is
+   noise. The fixes have to change the landscape rather than the search,
+   which is why the active research directions are shallower
+   problem-tailored ansätze, local cost functions, and clever
+   initialization near a known-good point, all of which attack the variance
+   rather than the descent rule.
+
+   </details>
+
 4. Why does using a *global* observable like $Z^{\otimes n}$ (rather
    than, say, just $Z$ on one qubit) make the barren plateau problem
    worse? (Hint: think about how many of the $2^n$ computational basis
    states have a given eigenvalue under each observable.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $Z^{\otimes n}$ asks a question that every one of the $2^n$
+   basis states participates in equally, so its expectation value is a sum
+   of $2^n$ terms that almost perfectly cancel, while a single-qubit $Z$
+   only ever probes the few qubits the circuit has had time to connect to
+   it.
+
+   Take the hint literally first. $Z^{\otimes n}$ has just two eigenvalues,
+   $\pm1$, each with degeneracy $2^{n-1}$: it reads the global parity of
+   the bit string and nothing else. For a state spread over many basis
+   strings,
+
+   $$
+   \langle Z^{\otimes n}\rangle=\sum_{x:\,\text{even}}|c_x|^2-\sum_{x:\,\text{odd}}|c_x|^2
+   $$
+
+   is a difference between two halves of the distribution, each of total
+   weight near $\tfrac12$. Getting a value away from zero requires the
+   amplitudes to be correlated with parity across all $n$ qubits at once,
+   which is a vanishingly special condition on a spread-out state. Single
+   $Z_1$, by contrast, splits the basis the same way but according to one
+   bit, and that bit's marginal is something a shallow circuit can still
+   control.
+
+   The sharper mechanism is the light cone, and it is what makes locality
+   a *depth-dependent* remedy rather than a universal one. Differentiating
+   with respect to $\theta_i$ produces an expression involving only the
+   part of the circuit lying between that gate and the observable. For
+   $Z_1$ in an architecture with local entangling gates, that region
+   touches only $O(d)$ qubits at depth $d$, so the relevant Hilbert space
+   has effective dimension $2^{O(d)}$ rather than $2^n$, and concentration
+   of measure is correspondingly weaker. For $Z^{\otimes n}$ the
+   observable's support is all $n$ qubits from the outset, so the effective
+   dimension is $2^n$ immediately and the concentration is exponential in
+   $n$ at any depth at all.
+
+   This is the content of the cost-function-dependent barren plateau
+   result (Cerezo, Sone, Volkoff, Cincio and Coles, 2021): for a global
+   cost the gradient variance is exponentially small even for
+   constant-depth circuits, while for a local cost and depth $O(\log n)$
+   it decays only polynomially in $n$, which is trainable. This lesson's
+   own numbers sit squarely in the bad regime, using $Z^{\otimes n}$ with
+   $4n$ layers.
+
+   One caution against over-reading the fix. Locality buys trainability
+   only while the circuit stays shallow. Push a local-cost ansatz to depth
+   well beyond $O(\log n)$ and the light cone grows to cover everything,
+   the circuit approaches a $2$-design, and the plateau returns. Locality
+   and shallowness are one mitigation, not two, and neither survives the
+   other's absence.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -458,7 +694,7 @@ a no-go theorem for every possible variational circuit design.
   once the ansatz is deep enough, as the "sufficiently random"
   precondition predicts.
 
-## Further Exploration
+## Trainability as a Wall in Its Own Right
 
 <NextDiscovery>
   The capstone, [What Scale Actually Requires](/lessons/quantum-mastery/advanced-algorithms-and-complexity/capstone-what-scale-actually-requires),

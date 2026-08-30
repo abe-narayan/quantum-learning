@@ -25,7 +25,7 @@ export function QAOAControls({
       <ControlSection
         id="qaoa-graph"
         title="Which graph to cut"
-        description="One qubit per dot. Different shapes are genuinely different problems — some can be solved perfectly by this circuit, some can't."
+        description="One qubit per dot. Different shapes are genuinely different problems: some can be solved perfectly by this circuit, some can't."
       >
         <PresetToggle
           options={QAOA_GRAPH_PRESETS}
@@ -46,6 +46,11 @@ export function QAOAControls({
           min={0}
           max={2 * Math.PI}
           step={0.01}
+          // The readout was a bare "0.60" with the unit only in the
+          // screen-reader `valueText`. Both angles run in radians over a range
+          // whose ends (2π and π) are only recognisable as angles once the unit
+          // is on screen, so the eye now gets what the ear already had.
+          unit="rad"
           formatValue={(v) => v.toFixed(2)}
           valueText={(v) => `Cost angle ${v.toFixed(2)} radians, ${Math.round((v * 180) / Math.PI)} degrees`}
           onChange={onGammaChange}
@@ -56,7 +61,7 @@ export function QAOAControls({
               symbol: "γ",
               name: "cost angle",
               means:
-                "gamma. It marks good splits by giving them a different phase, in proportion to how many edges they cut — the phase e^(−iγ·cut) applied by the cost step. On its own it changes no probability at all.",
+                "gamma. It marks good splits by giving them a different phase, in proportion to how many edges they cut: the phase e^(−iγ·cut) applied by the cost step. On its own it changes no probability at all.",
               glossaryId: "ansatz",
             },
           ]}
@@ -74,6 +79,7 @@ export function QAOAControls({
           min={0}
           max={Math.PI}
           step={0.01}
+          unit="rad"
           formatValue={(v) => v.toFixed(2)}
           valueText={(v) => `Mixer angle ${v.toFixed(2)} radians, ${Math.round((v * 180) / Math.PI)} degrees`}
           onChange={onBetaChange}
@@ -84,7 +90,7 @@ export function QAOAControls({
               symbol: "β",
               name: "mixer angle",
               means:
-                "beta. An Rx(2β) rotation on every qubit that converts γ's invisible phase marking into visible probability — the same trick Grover's diffusion step pulls, one layer at a time.",
+                "beta. An Rx(2β) rotation on every qubit that converts γ's invisible phase marking into visible probability, the same trick Grover's diffusion step pulls, one layer at a time.",
               glossaryId: "ansatz",
             },
           ]}

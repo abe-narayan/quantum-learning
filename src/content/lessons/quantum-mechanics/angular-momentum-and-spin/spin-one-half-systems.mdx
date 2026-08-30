@@ -47,11 +47,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Already built, for another reason entirely">
 Nothing new gets built in this lesson. Instead we check a claim: the Pauli matrices you have used since Course 1 are the j=½ case of the angular momentum algebra, entry for entry.
 </LessonHook>
 
-## Motivation
+## A claim that is easy to under-read
 
 The <Term id="pauli-matrices">Pauli matrices</Term> $X,Y,Z$ from Course 1 are, up to a factor of
 $\hbar/2$, the operators $J_x,J_y,J_z$ at $j=\tfrac12$. That claim is
@@ -72,7 +72,7 @@ physical reading.
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## Entry for entry, against the engine
 
 ### The identification
 
@@ -90,20 +90,9 @@ precision. This is not an analogy holding up unexpectedly well. The
 general construction of Lesson 2, evaluated at $j=\tfrac12$, produces the
 Pauli matrices as its output.
 
-<PredictBeforeReveal
-  question="Sx, Sy, Sz are defined as the j=1/2 case of the general Jx,Jy,Jz construction from Lesson 2. How closely should they match (ħ/2)X, (ħ/2)Y, (ħ/2)Z, the Pauli matrices in use since Course 1?"
-  options={[
-    { label: "Roughly similar, but not exactly the same operators", value: "similar" },
-    { label: "Exactly equal, entry by entry, with no approximation", value: "exact" },
-    { label: "Related only by a change of basis, not directly equal", value: "basis-change" },
-  ]}
-  correctValue="exact"
-  explanation="Equal, entry by entry, to floating-point precision. At j=1/2 the general ladder-operator construction emits (ħ/2)X, (ħ/2)Y and (ħ/2)Z themselves; there is no basis change or approximation in between. Every qubit gate applied anywhere on this site has been spin-1/2 physics."
-/>
-
 <InteractiveSection
   title="Sx, Sy, Sz against (ħ/2)X, (ħ/2)Y, (ħ/2)Z, entry by entry"
-  description="Pick an axis and compare the spin-1/2 operator, produced by the general ladder-operator construction at j=1/2 (angularMomentumX/Y/Z), against (ħ/2) times the corresponding Pauli matrix the qubit engine uses. The two agree on all three axes. Note that the Y case needs the imaginary entries to line up as well as the real ones, which is a sharper test than X or Z alone."
+  description="Pick an axis and compare the spin-1/2 operator, produced by the general ladder-operator construction at j=1/2 (angularMomentumX/Y/Z), against (ħ/2) times the corresponding Pauli matrix the qubit engine uses. Check all three axes. Y is the sharpest of the three, since it needs the imaginary entries to line up as well as the real ones, so start there if you want the test that could actually fail."
 >
   <MatrixGridExplorer
     presets={spinPauliPresets}
@@ -126,8 +115,22 @@ are the qubit basis $|0\rangle$ and $|1\rangle$, are not functions of
 angle, so there is nothing for single-valuedness to constrain.
 
 The value $j=\tfrac12$, unavailable to orbital motion, is therefore open,
-and it is what an electron's intrinsic spin turns out to use. One
-consequence is worth flagging: a $2\pi$ rotation applied to a spin-$\tfrac12$
+and it is what an electron's intrinsic spin turns out to use. Which
+invites the obvious question about the very rotation that ruled it out
+for orbital motion.
+
+<PredictBeforeReveal
+  question="Take a spin-½ state and rotate it through a full 2π about any axis, using the same rotationAboutAxis the qubit engine has used all along. What comes back?"
+  options={[
+    { label: "The same state exactly: 2π is a full turn", value: "same" },
+    { label: "The state times −1", value: "negated" },
+    { label: "A different state entirely, not proportional to the original", value: "different" },
+  ]}
+  correctValue="negated"
+  explanation="R_n(2π) = cos(π)I − i sin(π)(n·σ) = −I, on every axis. A spin-½ state needs 4π to come back to itself, not 2π, which is the exact factor of −1 the previous lesson used to rule half-integer values out for orbital motion. The difference is what the minus sign attaches to. There it was one function disagreeing with itself at a single point, which is a contradiction; here it is a global phase on a whole state vector, which is unobservable on its own. It is not unobservable in an interferometer, though: send a neutron beam down two arms, rotate one arm's spin by 2π, and the recombined beams interfere destructively. That experiment was done in 1975 and the 4π periodicity is measured, not merely tolerated."
+/>
+
+So a $2\pi$ rotation applied to a spin-$\tfrac12$
 state returns it multiplied by $-1$, the very factor the orbital argument
 rejected. For spin this is not a contradiction, because the sign is a
 global phase on a state rather than a disagreement between two values of
@@ -150,7 +153,7 @@ actually align with.
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
-## Physical Interpretation
+## Every single-qubit result, reread as spin
 
 Every single-qubit result already proven (the Pauli algebra, the Bloch
 sphere, $R_x,R_y,R_z$ rotations, measurement probabilities) is a
@@ -169,7 +172,7 @@ entirely from that excess. The reason the technique works at all is
 numbers: a voxel of tissue holds enough protons that a few parts per
 million is still an enormous count.
 
-## Worked Example
+## Summing the squares of three Pauli matrices
 
 **Confirm $\vec S^{\,2}=S_x^2+S_y^2+S_z^2=\tfrac34\hbar^2 I$ using the
 Pauli matrices directly (with $\hbar=1$, the engine's convention).**
@@ -180,7 +183,7 @@ $S_x^2+S_y^2+S_z^2=\tfrac14(X^2+Y^2+Z^2)=\tfrac14(I+I+I)=\tfrac34I$,
 which is $j(j+1)=\tfrac12\cdot\tfrac32=\tfrac34$, matching Lesson 2's
 general formula at $j=\tfrac12$.
 
-## Common Mistakes
+## Spin needed no derivation of its own
 
 <Callout type="note">
 **Thinking spin-$\tfrac12$ needed a separate derivation of its own.** It is
@@ -202,16 +205,169 @@ the abstract angular-momentum algebra, realized at $j=\tfrac12$.
 1. Confirm $S_z|{\uparrow}\rangle=\tfrac\hbar2|{\uparrow}\rangle$ and
    $S_z|{\downarrow}\rangle=-\tfrac\hbar2|{\downarrow}\rangle$ directly
    from $Z|0\rangle=|0\rangle$, $Z|1\rangle=-|1\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Substitute $S_z=\tfrac\hbar2Z$ and the identifications
+   $|{\uparrow}\rangle=|0\rangle$, $|{\downarrow}\rangle=|1\rangle$, and
+   the two eigenvalue equations you already have carry straight over:
+
+   $$
+   S_z|{\uparrow}\rangle = \frac\hbar2 Z|0\rangle = \frac\hbar2|0\rangle = \frac\hbar2|{\uparrow}\rangle, \qquad S_z|{\downarrow}\rangle = \frac\hbar2 Z|1\rangle = -\frac\hbar2|1\rangle = -\frac\hbar2|{\downarrow}\rangle
+   $$
+
+   Multiplying an operator by a constant multiplies every eigenvalue by
+   that constant and changes no eigenvector, so nothing had to be
+   recomputed.
+
+   The factor of $\hbar/2$ is doing more than rescaling. $Z$ is
+   dimensionless with eigenvalues $\pm1$, which is all a qubit ever needed;
+   $S_z$ is a physical angular momentum, and its eigenvalues must come out
+   in units of angular momentum. Matching against Lesson 2's general rule
+   that $J_z$'s eigenvalues are $m\hbar$ for $m$ running from $-j$ to $j$,
+   these two values are $m=\pm\tfrac12$: the entire ladder at $j=\tfrac12$,
+   which has exactly $2j+1=2$ rungs and no $m=0$ in between.
+
+   </details>
+
 2. Using $S_\pm=S_x\pm iS_y$ and Lesson 2's general ladder formula,
    confirm $S_+|{\downarrow}\rangle\propto|{\uparrow}\rangle$ and
    $S_+|{\uparrow}\rangle=0$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Build $S_+$ from the Pauli matrices, then act with it. With
+   $\hbar$ kept explicit:
+
+   $$
+   S_+ = S_x + iS_y = \frac\hbar2(X+iY) = \frac\hbar2\left[\begin{pmatrix}0&1\\1&0\end{pmatrix} + i\begin{pmatrix}0&-i\\i&0\end{pmatrix}\right] = \frac\hbar2\begin{pmatrix}0&2\\0&0\end{pmatrix} = \hbar\begin{pmatrix}0&1\\0&0\end{pmatrix}
+   $$
+
+   Acting on the two basis states, with $|{\uparrow}\rangle=(1,0)^T$ and
+   $|{\downarrow}\rangle=(0,1)^T$:
+
+   $$
+   S_+|{\downarrow}\rangle = \hbar\begin{pmatrix}0&1\\0&0\end{pmatrix}\begin{pmatrix}0\\1\end{pmatrix} = \hbar\begin{pmatrix}1\\0\end{pmatrix} = \hbar|{\uparrow}\rangle, \qquad S_+|{\uparrow}\rangle = \hbar\begin{pmatrix}0&1\\0&0\end{pmatrix}\begin{pmatrix}1\\0\end{pmatrix} = \begin{pmatrix}0\\0\end{pmatrix}
+   $$
+
+   Now the cross-check against Lesson 2's general coefficient,
+   $J_+|j,m\rangle=\hbar\sqrt{j(j+1)-m(m+1)}\,|j,m+1\rangle$, at
+   $j=\tfrac12$:
+
+   $$
+   m=-\tfrac12:\ \sqrt{\tfrac34-\left(-\tfrac12\right)\left(\tfrac12\right)} = \sqrt{\tfrac34+\tfrac14} = 1, \qquad m=+\tfrac12:\ \sqrt{\tfrac34-\left(\tfrac12\right)\left(\tfrac32\right)} = \sqrt{0} = 0
+   $$
+
+   Coefficients $\hbar$ and $0$, exactly what the matrices gave. The
+   general formula's zero at the top rung is not imposed by hand; it falls
+   out of $j(j+1)-m(m+1)$ vanishing at $m=j$.
+
+   The trap here comes from familiarity with gates. $S_+$ looks like it
+   should be a spin flip, and it is nothing of the sort. $X$ is unitary
+   and flips both ways, $X|{\uparrow}\rangle=|{\downarrow}\rangle$ and
+   $X|{\downarrow}\rangle=|{\uparrow}\rangle$. $S_+$ is not unitary, has
+   no inverse, and is not a gate any circuit can run: it maps
+   $|{\uparrow}\rangle$ to the zero vector, which is not a state at all.
+   Ladder operators are bookkeeping devices for relating basis vectors and
+   for computing matrix elements. They are not operations you can perform
+   on a qubit.
+
+   </details>
+
 3. Explain why $\vec S^{\,2}$ commutes with $S_z$ (a general angular
    momentum fact from Lesson 2) but $S_x$ and $S_z$ do not. Connect this
    to which quantities can be simultaneously measured for a spin-1/2
    particle.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\vec S^{\,2}$ commutes with every component because the pieces of
+   $[\vec S^{\,2},S_z]$ coming from $S_x^2$ and $S_y^2$ cancel each other.
+   $S_x$ and $S_z$ do not commute because that is the defining algebra:
+   $[S_x,S_z]=-i\hbar S_y$, nonzero.
+
+   Check the second one on the actual matrices. Using the Course 1 result
+   $[X,Z]=-2iY$:
+
+   $$
+   [S_x,S_z] = \frac{\hbar^2}{4}[X,Z] = \frac{\hbar^2}{4}(-2iY) = -i\hbar\left(\frac\hbar2 Y\right) = -i\hbar S_y
+   $$
+
+   which is the cyclic identity $[S_z,S_x]=i\hbar S_y$ with the bracket
+   reversed.
+
+   For the first, there is a caution specific to $j=\tfrac12$ that is
+   worth being honest about. At $j=\tfrac12$,
+   $\vec S^{\,2}=\tfrac34\hbar^2I$ is a multiple of the identity, so it
+   commutes with everything for a reason that has nothing to do with
+   angular momentum. This case therefore cannot be used as evidence for
+   the general theorem; it is the one value of $j$ where the theorem is
+   true for free. The real argument is Lesson 2's, which holds for all $j$:
+   in $[S_x^2,S_z]=S_x[S_x,S_z]+[S_x,S_z]S_x=-i\hbar(S_xS_y+S_yS_x)$ and
+   the matching $[S_y^2,S_z]=+i\hbar(S_xS_y+S_yS_x)$, the two anticommutator
+   terms are equal and opposite, and $[S_z^2,S_z]=0$ trivially.
+
+   What this means for measurement, and the part that is easy to
+   overstate. The compatible pair is $(\vec S^{\,2},S_z)$, which is why
+   states are labelled $|j,m\rangle$: length and one projection, known
+   together. But for a fixed spin-$\tfrac12$ particle, $\vec S^{\,2}$
+   returns $\tfrac34\hbar^2$ on every state without exception, so
+   measuring it tells you nothing you did not know. All the information a
+   spin-$\tfrac12$ state carries is in a single component, and choosing
+   which component to measure is a real choice, because $S_x$, $S_y$ and
+   $S_z$ are mutually incompatible. Measure one and the other two are
+   maximally uncertain. That is the whole content of the next lesson's
+   sequential Stern-Gerlach experiment.
+
+   </details>
+
 4. If spin-1/2 has no position-space wavefunction, what does
    $|\psi\rangle=\alpha|{\uparrow}\rangle+\beta|{\downarrow}\rangle$
    actually describe physically, if not "where" the particle is?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It describes a *direction in ordinary three-dimensional space*: the
+   axis along which this particle's spin is definitely up.
+
+   That is a real theorem, not a picture. For any normalized $(\alpha,
+   \beta)$ there is a unit vector $\hat n$ such that $|\psi\rangle$ is the
+   $+\hbar/2$ eigenstate of $\hat n\cdot\vec S$. Writing
+   $\alpha=\cos(\theta/2)$ and $\beta=e^{i\varphi}\sin(\theta/2)$, which
+   costs nothing but a choice of overall phase, that vector is
+
+   $$
+   \hat n = (\sin\theta\cos\varphi,\ \sin\theta\sin\varphi,\ \cos\theta), \qquad \langle\vec S\rangle = \frac\hbar2\hat n
+   $$
+
+   So the Bloch sphere point is not a bookkeeping device. It is where a
+   Stern-Gerlach magnet has to be pointed for this particle to come out
+   the "up" port with certainty, and it is the direction the particle's
+   magnetic moment $\vec\mu=\gamma\vec S$ contributes along in a field. A
+   spin state is an orientation.
+
+   The misconception worth killing here: reading $|\alpha|^2$ and
+   $|\beta|^2$ as the whole story, so that a superposition means "it is up
+   with probability $|\alpha|^2$, we just do not know which." Take
+   $\alpha=\beta=1/\sqrt2$ and $\alpha=1/\sqrt2,\ \beta=i/\sqrt2$. Both
+   give $50/50$ along $z$. They are entirely different states, pointing
+   along $+x$ and $+y$ respectively, and a magnet along $x$ separates them
+   with certainty. The relative phase of $\beta$ is a physical direction,
+   not a hidden ignorance, and a genuine statistical mixture of up and
+   down points nowhere at all and gives $50/50$ on every axis.
+
+   One thing this state is not: a description of the *whole* electron. A
+   real electron's state is a wavefunction of position tensored with a
+   spin state, and the spin factor is an extra two-dimensional degree of
+   freedom alongside the position one, never a replacement for it. The
+   hydrogen atom in the next course carries both at once, which is where
+   the $2n^2$ rather than $n^2$ degeneracy comes from.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -226,7 +382,7 @@ the abstract angular-momentum algebra, realized at $j=\tfrac12$.
 - The Bloch sphere, used since Course 1, is physically the spin
   direction $(\langle S_x\rangle,\langle S_y\rangle,\langle S_z\rangle)$.
 
-## Further Exploration
+## The experiment that found this first
 
 <NextDiscovery>
 [The Stern-Gerlach Experiment](/lessons/quantum-mechanics/angular-momentum-and-spin/the-stern-gerlach-experiment) is the historical experiment that

@@ -4,7 +4,9 @@ import { QuantumStateDisplay } from "@/components/quantum/QuantumStateDisplay";
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
-import { pureStateDensityMatrix } from "@/lib/quantum/densityMatrix";
+import { pureStateDensityMatrix, purity } from "@/lib/quantum/densityMatrix";
+import { reducedDensityMatrixQubit0 } from "@/lib/quantum/partialTrace";
+import { concurrenceOfPureState, entanglementEntropy } from "@/lib/quantum/entanglement";
 import { spinObservableInXZPlane, chshValue } from "@/lib/quantum/chsh";
 
 export const practiceProblems = getProblemMetaForLesson(
@@ -14,7 +16,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Capstone: Analyzing Quantum Correlations",
   description:
-    "Every tool this course built, applied end to end to one unfamiliar entangled state: purity, entropy, concurrence, partial trace, and a real if partial CHSH violation, plus a demonstration of where this engine's scope ends.",
+    "Every tool this course built, applied end to end to one unfamiliar entangled state: purity, entropy, concurrence, partial trace, and a CHSH test run at angles that were tuned for a different state, plus a demonstration of where this engine's scope ends.",
   course: "entanglement-and-measurement",
   module: "capstone-analyzing-quantum-correlations",
   order: 1,
@@ -35,15 +37,26 @@ export const capstoneState = new StateVector([
   Complex.fromPolar(Math.sqrt(0.3), Math.PI / 3),
 ]);
 
-export const capstoneConcurrence = 2 * Math.sqrt(0.21);
-export const capstoneEntropy = -0.7 * Math.log2(0.7) - 0.3 * Math.log2(0.3);
-export const capstoneMixedness = 1 - 0.58;
-export const capstoneChshFraction = 2.0623 / (2 * Math.SQRT2);
-
 export const capstoneRho = pureStateDensityMatrix(capstoneState);
+export const capstoneReducedA = reducedDensityMatrixQubit0(capstoneRho);
+
+export const capstoneConcurrence = concurrenceOfPureState(capstoneState);
+export const capstoneEntropy = entanglementEntropy(capstoneState);
+export const capstoneReducedPurity = purity(capstoneReducedA);
+export const capstoneMixedness = 1 - capstoneReducedPurity;
+
 export const capstoneChshA = spinObservableInXZPlane(0);
 export const capstoneChshAPrime = spinObservableInXZPlane(Math.PI / 2);
 export const capstoneChshBPrimeFixed = spinObservableInXZPlane(-Math.PI / 4);
+
+export const capstoneChshS = chshValue(capstoneRho, {
+  a: capstoneChshA,
+  aPrime: capstoneChshAPrime,
+  b: spinObservableInXZPlane(Math.PI / 4),
+  bPrime: capstoneChshBPrimeFixed,
+});
+
+export const capstoneChshFraction = capstoneChshS / (2 * Math.SQRT2);
 
 export const capstoneChshCurveThetaBs = Array.from({ length: 41 }, (_, i) => -Math.PI / 4 + (i / 40) * ((11 * Math.PI) / 12));
 
@@ -73,7 +86,7 @@ export const capstoneChshCurveFrames = [
 Eleven lessons built a toolkit, one idea at a time. This capstone runs the entire toolkit against a single unfamiliar state, to show it working together as one coherent analysis rather than eleven separate ideas.
 </LessonHook>
 
-## Motivation
+## Eleven tools, each attached to its own example
 
 The last eleven lessons built a toolkit for describing quantum states
 beyond what a state vector can express. Each tool arrived attached to the
@@ -99,7 +112,7 @@ unequal amplitude split ($0.7/0.3$, not $0.5/0.5$) *and* a nontrivial
 deliberate. They test whether the formulas handle complex amplitudes, and
 not only the real-valued special cases chosen earlier for clarity.
 
-## Mathematical Development
+## Every measure, run on the same state
 
 ### Entanglement measures (pure-state tools)
 
@@ -125,10 +138,12 @@ $$
 E(|\psi\rangle) = S(\rho_A) = -0.7\log_2(0.7)-0.3\log_2(0.3) \approx 0.8813 \text{ bits}
 $$
 
-Both computed directly by `entanglementEntropy` and
-`concurrenceOfPureState`, and cross-checked against Lesson 5's identity:
-$1-\text{Tr}(\rho_A^2)=2|ad-bc|^2=2(0.21)=0.42$, so
-$\text{Tr}(\rho_A^2)=0.58$, matching `purity(reducedA)` exactly.
+Both numbers on this page come straight from `entanglementEntropy` and
+`concurrenceOfPureState` rather than from the hand algebra above, which
+is what makes the agreement worth anything. Cross-checked against
+Lesson 5's identity: $1-\text{Tr}(\rho_A^2)=2|ad-bc|^2=2(0.21)=0.42$, so
+$\text{Tr}(\rho_A^2)$ should be $0.58$, and `purity` applied to the
+engine's own reduced state returns {capstoneReducedPurity.toFixed(2)}.
 
 ### Mixing in noise: which tools still apply
 
@@ -165,7 +180,7 @@ diagonalization), but `validateDensityMatrix`'s positivity check
 reports `null` rather than true or false for a matrix this size:
 another honest, engine-enforced boundary, not a bug.
 
-### A partial CHSH violation
+### CHSH, at angles chosen for a different state
 
 $C\approx0.92$ says this state is strongly entangled but not maximally
 so. Before running the numbers, predict what that means for a CHSH
@@ -174,12 +189,13 @@ test.
 <PredictBeforeReveal
   question="Using the Lesson 11 angle configuration derived for the maximally entangled |Φ+⟩ (C=1), what will S come out to for this state (C≈0.92)?"
   options={[
-    { label: "No violation: S stays at or below 2", value: "none" },
-    { label: "A real but small violation, just above 2", value: "small" },
-    { label: "The full Tsirelson bound, S=2√2≈2.83", value: "full" },
+    { label: "No violation at all: S stays at or below 2", value: "none" },
+    { label: "A violation about 92% of the way to 2√2, in proportion to the concurrence", value: "proportional" },
+    { label: "The full Tsirelson bound, S=2√2≈2.83, since the state is still entangled", value: "full" },
+    { label: "A real violation, but a small one, just above 2", value: "small" },
   ]}
   correctValue="small"
-  explanation="chshValue gives S≈2.0623 at the Lesson-11 angles: a real violation of the classical bound, but barely, and nowhere near 2√2. That tracks C≈0.92. Two separate things cost you here. The state is not maximally entangled, and the Lesson-11 angles were optimized for a Bell state rather than this one, so the angle choice leaves something on the table too."
+  explanation="chshValue gives S≈2.0623 at the Lesson-11 angles: a real violation of the classical bound, but barely, and nowhere near 2√2. Three separate things cost you, and only the first is about entanglement. The state is not maximally entangled; the Lesson-11 angles were optimized for a Bell state rather than this one; and the relative phase e^(iπ/3) points part of the correlation out of the X-Z plane these observables live in. Concurrence does not translate proportionally into CHSH value, because CHSH depends on the measurement axes and concurrence does not."
 />
 
 Using the standard angle configuration from Lesson 11
@@ -188,25 +204,38 @@ derived specifically for $|\Phi^+\rangle$ and not this state,
 `chshValue` gives $S\approx2.0623$ for $|\psi\rangle$: still above the
 classical bound of 2, but only barely, nowhere near $2\sqrt2$. A
 numerical search over $B,B'$ (holding $A,A'$ fixed) finds this state can
-reach at best $|S|\approx2.20$, a real violation, consistent with
-$C\approx0.92$ indicating strong-but-not-maximal entanglement, and well
-short of $2\sqrt2$, consistent with this state not being a Bell state.
+reach at best $|S|\approx2.20$: a real violation, and still well short of
+$2\sqrt2$. It is worth being precise about where that shortfall comes
+from, because "the state is less entangled" is only part of it. For a
+state $a|00\rangle+d|11\rangle$ measured with in-plane observables
+$M(\theta)=\cos\theta\,Z+\sin\theta\,X$, the correlation works out to
+$E(\theta_a,\theta_b)=\cos\theta_a\cos\theta_b+2\,\text{Re}(a^*d)\,\sin\theta_a\sin\theta_b$,
+and the best achievable $|S|$ is $2\sqrt{1+4\,\text{Re}(a^*d)^2}$. Here
+$2\,\text{Re}(a^*d)=C\cos(\pi/3)=0.9165\times0.5=0.4583$, giving
+$2\sqrt{1.21}=2.2$ exactly. Strip the phase out ($e^{i0}$ instead of
+$e^{i\pi/3}$) and the same amplitudes reach $2\sqrt{1+C^2}\approx2.71$.
+The relative phase, which concurrence and entropy ignore entirely,
+costs this state most of its CHSH violation, because it tilts the
+correlation out of the $X$-$Z$ plane these four observables can see.
 (The full [CHSH simulator](/simulators#chsh-bell-test) lets you search
 over all four angles by hand, on a Bell state instead of this one, if
 you want to see the Lesson-11 configuration recovered as the optimum
 there.)
 
-Four independently-built tools, one consistent picture: each bar below
-is shown as a fraction of its own maximum, so a taller bar means "more
-entangled/correlated" the same way across all four, despite their very
-different native scales (the exact numbers are in each caption).
+Four independently-built tools, side by side. Each bar is shown as a
+fraction of its own theoretical maximum, so the bars are comparable
+despite their very different native scales (the exact numbers are in each
+caption). The first three land close together. The CHSH bar is the short
+one, and the paragraph above says why: $2\sqrt2$ is the ceiling across all
+states and all axes, not the ceiling this state can reach with these
+four.
 
 <BarChart
   bars={[
     { label: "Concurrence C", value: capstoneConcurrence, caption: `${capstoneConcurrence.toFixed(3)} (max 1)` },
     { label: "Entropy E", value: capstoneEntropy, caption: `${capstoneEntropy.toFixed(3)} bits (max 1)` },
     { label: "Reduced mixedness", value: capstoneMixedness / 0.5, caption: `${capstoneMixedness.toFixed(2)} (max 0.5)`, highlight: true },
-    { label: "CHSH S / max", value: capstoneChshFraction, caption: "S≈2.062 (bound 2, max 2.83)" }
+    { label: "CHSH S / max", value: capstoneChshFraction, caption: `S≈${capstoneChshS.toFixed(3)} (classical 2, ceiling 2.83)` }
   ]}
   maxValue={1}
   ariaLabel="Four entanglement-related metrics for this capstone state, each shown as a fraction of its own maximum, all four drawn against a common full-height scale of 1"
@@ -215,32 +244,40 @@ different native scales (the exact numbers are in each caption).
 Holding $\theta_a=0,\theta_{a'}=\pi/2,\theta_{b'}=-\pi/4$ fixed and
 sweeping only $\theta_b$, `chshValue` recomputes $S$ at every step. The
 curve passes through $S\approx2.0623$ at $\theta_b=\pi/4$, confirming the
-Lesson 11 number, and then keeps climbing: it peaks near $\theta_b=\pi/8$
-at $S\approx2.13$. That is numerical evidence for the claim above, that a
+Lesson 11 number, but $\pi/4$ is already past the peak rather than short
+of it. Setting $\tfrac{d}{d\theta_b}\big[\cos\theta_b+k\sin\theta_b\big]=0$
+for $k=2\,\text{Re}(a^*d)$ puts the maximum at
+$\theta_b=\arctan k\approx0.43$ radians, about $25°$, where
+$S\approx2.131$. That is numerical evidence for the claim above, that a
 search over angles beats the Lesson-11 configuration for this state.
 
 <InteractiveSection title="Sweep θ_b, watch S move past 2.0623" description="A, A', and B' held fixed at the Lesson 11 configuration; only θ_b sweeps continuously from -π/4 to 2π/3. The curve is S(θ_b), computed live at 41 points by the real chshValue engine. Read off where it crosses 2.0623 (the Lesson 11 configuration, marked by the dashed line) and where, nearby, it climbs a little higher.">
   <ParametricCurve
     frames={capstoneChshCurveFrames}
-    referenceLines={[{ y: 2.0623, label: "Lesson 11 config (θ_b=π/4)" }, { y: 2, label: "classical bound" }]}
+    referenceLines={[{ y: capstoneChshS, label: "Lesson 11 config (θ_b=π/4)" }, { y: 2, label: "classical bound" }]}
     ariaLabel="S as a continuous function of theta_b, with theta_a, theta_a prime, and theta_b prime held fixed at the Lesson 11 configuration, crossing 2.0623 at theta_b = pi/4 and peaking slightly higher nearby"
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## Where the measures agree, and how far
 
-Every number in this analysis agrees with every other one. High but not
-maximal concurrence goes with high but not maximal entanglement entropy,
-which goes with a real but not maximal CHSH violation: three
-independently-built tools converging on the same picture from three
-directions, which is what a coherent theory looks like from the inside.
+Concurrence and entanglement entropy agree closely: high but not maximal,
+by both measures, and tied together by an exact identity. CHSH agrees on
+the qualitative verdict (entangled, provably beyond any local hidden
+variable) and disagrees on the amount, and the disagreement is the more
+useful result. Concurrence and entropy are properties of the state alone.
+A CHSH value is a property of the state *and* the four measurement axes
+you chose, so it can be depressed by a bad choice of axes or, as here, by
+a relative phase that the axes cannot reach. When two measures of "the
+same thing" disagree, the first question is whether they were measuring
+the same thing.
 
 The boundaries matter as much as the agreements. A pure-state tool handed
 a mixed input, or a $2\times2$-only tool handed a $4\times4$ matrix, does
 not quietly return a plausible-looking number. It refuses, which is the
 behaviour you want from anything you plan to trust.
 
-## Common Mistakes
+## A phase that changes the state without changing these numbers
 
 <Callout type="warning">
 **Assuming a relative phase changes concurrence or entropy for this
@@ -264,19 +301,198 @@ entangled state.
    $|\psi'\rangle=\sqrt{0.5}|00\rangle+\sqrt{0.5}\,e^{i\pi/6}|11\rangle$,
    and confirm the phase $e^{i\pi/6}$ doesn't change either value
    compared to the ordinary $|\Phi^+\rangle$ (phase $0$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $C = 1$ and $E = 1$ bit: maximally entangled by both measures, exactly
+   as $|\Phi^+\rangle$ is.
+
+   Concurrence first. With $a=\sqrt{0.5}$, $b=c=0$ and
+   $d=\sqrt{0.5}\,e^{i\pi/6}$, the determinant is
+   $ad = 0.5\,e^{i\pi/6}$, whose magnitude is $0.5$ because
+   $|e^{i\pi/6}|=1$. So $C = 2|ad-bc| = 1$. The phase rotated the
+   determinant in the complex plane and left its length alone, and $C$ uses
+   only the length.
+
+   Entropy next. The reduced state is
+   $\rho_A = \mathrm{diag}(|a|^2, |d|^2) = \mathrm{diag}(0.5, 0.5) = I/2$,
+   since the diagonal entries are squared magnitudes and a phase does not
+   survive a squared magnitude. That gives $E = 1$ bit. The engine returns
+   $1.0000000000000002$ for $C$ and $1$ for $E$.
+
+   The general statement for this family is that both measures depend only
+   on $|a|$ and $|d|$. That is not a limitation to apologize for. Adding a
+   relative phase is applying a local gate, $\mathrm{diag}(1,e^{i\pi/6})$
+   on qubit 1 alone, and no local gate can change how entangled a pair is,
+   so any correct entanglement measure *must* return the same value. A
+   measure that responded to this phase would be measuring something other
+   than entanglement.
+
+   The wrong turn is concluding that the phase is therefore physically
+   irrelevant. It is a relative phase, not a global one, so $|\psi'\rangle$
+   and $|\Phi^+\rangle$ are genuinely different states, distinguishable by
+   experiment. The capstone's own CHSH analysis is the demonstration: a
+   phase of $e^{i\pi/3}$ on an otherwise identical state costs most of its
+   CHSH violation, because the four in-plane observables cannot see a
+   correlation that has been tilted out of the $X$-$Z$ plane. Same
+   entanglement, different state, different results from a fixed set of
+   measurement axes.
+
+   </details>
+
 2. Explain, citing the specific type signatures involved, why
    `concurrenceOfPureState` takes a `StateVector` rather than a `Matrix`
-   as its argument, and why this is a feature, not an oversight.
+   as its argument, and why this is a feature, not an oversight. Then say
+   what would have to be true of a function that could legitimately accept
+   a `Matrix`.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The formula is $C = 2|ad-bc|$, built from the four complex amplitudes
+   $a,b,c,d$ of a pure state. A `StateVector` is exactly a list of
+   amplitudes, so the type carries precisely the input the formula needs.
+   A `Matrix` does not: a general density matrix has no amplitudes to read
+   off, because a mixture is not any single ket. The function's
+   implementation makes this concrete by delegating to `testSeparability`,
+   which also takes a `StateVector` and computes `determinantMagnitude`
+   from the same four numbers.
+
+   The feature is that the type signature enforces the mathematical
+   precondition at compile time. Lesson 7 proved that reduced entropy stops
+   being an entanglement measure once the global state is mixed, and the
+   same failure would apply to any pure-state formula wrongly extended.
+   Because `concurrenceOfPureState` cannot be handed
+   $\rho_{\text{noisy}} = 0.8\rho_\psi + 0.2(I/4)$, there is no way to
+   obtain a confident, meaningless number from it. The alternative, a
+   function accepting a `Matrix` and silently applying a pure-state
+   formula, would return a plausible value that means nothing, which is the
+   worst failure mode available.
+
+   A function that could legitimately accept a `Matrix` would have to
+   compute a genuine mixed-state entanglement measure, and that is a real
+   and much harder object. Wootters' concurrence for mixed states is the
+   standard one, and it needs the eigenvalues of
+   $\rho\,(\sigma_y\otimes\sigma_y)\,\rho^*\,(\sigma_y\otimes\sigma_y)$,
+   a $4\times4$ non-Hermitian eigenvalue problem, well outside the
+   closed-form $2\times2$ solver this platform scopes itself to. It
+   coincides with $2|ad-bc|$ on pure states, so the current function is its
+   restriction, not a rival to it. Building it would mean adding a general
+   eigensolver first, which the capstone's own error message about
+   $4\times4$ matrices already flags as out of scope.
+
+   The wrong turn is treating the signature as an inconvenience to route
+   around, for instance by extracting a "closest pure state" from
+   $\rho_{\text{noisy}}$ and passing that. That produces a number about a
+   different state, and the difference is exactly the noise you were trying
+   to account for.
+
+   </details>
+
 3. Using Lesson 5's identity, predict $\text{Tr}(\rho_A^2)$ for a state
    with $|ad-bc|=0.48$, and check it against a value between this
    lesson's $|\psi\rangle$ ($|ad-bc|\approx0.458$, purity $0.58$) and a
-   Bell state ($|ad-bc|=0.5$, purity $0.5$).
+   Bell state ($|ad-bc|=0.5$, purity $0.5$). Then give the same state's
+   concurrence and entanglement entropy, and check those against the same
+   two reference points.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The identity gives
+
+   $$
+   \text{Tr}(\rho_A^2) = 1 - 2(0.48)^2 = 1 - 0.4608 = 0.5392 ,
+   $$
+
+   which sits between the Bell state's $0.5$ and the capstone state's
+   $0.58$, as it must, since $0.48$ sits between $0.5$ and $0.458$ and the
+   identity is monotonic in $|ad-bc|$.
+
+   Concurrence is immediate: $C = 2(0.48) = 0.96$, between the capstone
+   state's $0.9165$ and the Bell state's $1$.
+
+   Entropy takes one more step. For a state $a|00\rangle+d|11\rangle$ with
+   $|a||d| = 0.48$ and $|a|^2+|d|^2=1$, the two squared magnitudes satisfy
+   $x(1-x) = 0.2304$, so $x^2 - x + 0.2304 = 0$ and
+   $x = \left(1 \pm \sqrt{1-0.9216}\right)/2 = (1\pm0.28)/2$, giving
+   $\rho_A = \mathrm{diag}(0.64, 0.36)$. Then
+
+   $$
+   E = -0.64\log_2 0.64 - 0.36\log_2 0.36 = 0.4121 + 0.5306 = 0.9427 \text{ bits,}
+   $$
+
+   which the engine confirms as $0.9426831892554921$. Between the capstone
+   state's $0.8813$ and the Bell state's $1$, completing the pattern.
+
+   All three move in step, and here they move by nearly the same fraction
+   of their remaining range: from the capstone state to this one, purity
+   closes $51\%$ of its gap to the floor of $0.5$, concurrence $52\%$ of
+   its gap to $1$, entropy $52\%$ of its gap to $1$ bit. That near-match is
+   a feature of this narrow family rather than a general law, since the
+   three are tied to one another by exact but nonlinear identities. Over a
+   wider range they separate, as the previous lesson's comparison of
+   $C(\theta)$ against $E(\theta)$ near $\theta=0$ shows. What is general is
+   that they always agree on the ranking and never on the scale, so a claim
+   like "this state is $96\%$ as entangled as a Bell pair" is only
+   meaningful once you say which measure the percentage is on.
+
+   The wrong turn is inferring the CHSH value from any of these. A state
+   with $C=0.96$ can violate CHSH strongly or barely, depending on its
+   relative phase and on which axes you measure, exactly as this lesson's
+   own $S\approx2.06$ against a possible $2.20$ shows.
+
+   </details>
+
 4. This lesson found $\rho_{\text{noisy}}$'s reduced entropy
    ($\approx0.9248$) is *higher* than $|\psi\rangle$'s own entanglement
    entropy ($\approx0.8813$), even though mixing in noise should reduce
    entanglement. Explain why this isn't a contradiction, using this
    lesson's discussion of what reduced entropy conflates once the global
    state is mixed.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the two numbers are not the same quantity. $0.8813$ is an
+   entanglement entropy, computed from a pure global state, where
+   $S(\rho_A)$ is entitled to be read as entanglement. $0.9248$ is just the
+   entropy of a reduced state, computed from a mixed global state, where
+   the same formula no longer measures entanglement and never claimed to.
+
+   Follow the arithmetic and the two sources become visible. Partial trace
+   is linear, so $\rho_A$ for the noisy state is
+   $0.8\,\mathrm{diag}(0.7,0.3) + 0.2\,\mathrm{diag}(0.5,0.5) = \mathrm{diag}(0.66,0.34)$,
+   which the engine confirms, with entropy $0.9248$ bits. The mixing pulled
+   the reduced state closer to $I/2$, and closer to $I/2$ means higher
+   entropy, full stop. It got there by adding classical randomness, not by
+   adding correlation.
+
+   So $S(\rho_A)$ for a mixed global state is a sum of two things it cannot
+   separate: uncertainty about qubit A because it is entangled with B, and
+   uncertainty about qubit A because the preparation was already a
+   classical mixture. Here the first component went down, as the noise
+   diluted the entangled fraction, and the second went up by more, so the
+   total rose. Lesson 7's $I/4$ case is the extreme version of the same
+   effect, where the first component is zero and the reading is still a
+   full bit.
+
+   The engine enforces the distinction rather than leaving it to the
+   reader, which is worth noticing as design. `entanglementEntropy` and
+   `concurrenceOfPureState` both require a `StateVector` and so cannot be
+   called on $\rho_{\text{noisy}}$ at all, while `vonNeumannEntropy` on the
+   reduced $2\times2$ state runs happily and returns $0.9248$. The number
+   is correct; only its interpretation as entanglement is unavailable, and
+   the type system is what stops you from claiming otherwise.
+
+   The wrong turn is concluding that noise increased the entanglement, or
+   that the $0.8813$ figure was wrong. Both numbers are right about their
+   own questions. What is wrong is comparing them as though they answered
+   the same one, and the general lesson is that a formula's validity
+   conditions are part of the formula.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -295,10 +511,12 @@ entangled state.
   throws, an engine-enforced boundary at the dimension where this
   platform's closed-form eigensolver stops.
 - A strongly (but not maximally) entangled state gives a real (but
-  weaker than $2\sqrt2$) CHSH violation. The three measures built in
-  this course agree quantitatively, not just qualitatively.
+  weaker than $2\sqrt2$) CHSH violation. Concurrence and entanglement
+  entropy agree quantitatively with each other; CHSH agrees on the
+  verdict and not on the number, because it also depends on the
+  measurement axes and on a relative phase the other two ignore.
 
-## Further Exploration
+## Interference, used for a different purpose
 
 <NextDiscovery>
 This completes **Entanglement, Mixed States & Bell Tests**. From here,

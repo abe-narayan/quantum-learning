@@ -65,6 +65,7 @@ export const radialWaveFrames = Array.from({ length: radialWaveFrameCount }, (_,
       {
         label: "hard wall (r = a)",
         color: "warning",
+        excludeFromDomain: true,
         points: [
           { x: hardSphereRadius, y: -1.4 },
           { x: hardSphereRadius, y: 1.4 },
@@ -77,7 +78,7 @@ export const radialWaveFrames = Array.from({ length: radialWaveFrameCount }, (_,
 export const lessonMeta = {
   title: "Three-Dimensional Scattering and the S-Matrix",
   description:
-    "Scattering Off a Step Potential and Resonant Transmission Through a Barrier solved 1D scattering exactly. This lesson generalizes to a real 3D central potential: the partial-wave expansion, phase shifts δₗ, the cross-section formula built from them, and the S-matrix, worked explicitly for hard-sphere scattering with a closed-form δ₀=−ka and the famous σ→4πa² low-energy limit.",
+    "Scattering Off a Step Potential and Resonant Transmission Through a Barrier solved 1D scattering exactly. This lesson generalizes to a real 3D central potential: the partial-wave expansion, phase shifts δₗ, the cross-section formula built from them, and the S-matrix, worked explicitly for hard-sphere scattering with a closed-form δ₀=−ka and a famous low-energy cross-section limit that is not the sphere's geometric shadow.",
   course: "symmetry-scattering-and-semiclassical-methods",
   module: "three-dimensional-scattering-and-the-s-matrix",
   order: 1,
@@ -90,8 +91,8 @@ export const lessonMeta = {
   ],
   objectives: [
     "Derive the partial-wave radial equation from separating a 3D central-potential Schrödinger equation, and identify the phase shift δₗ as the full content of the scattering information in each channel",
-    "State and apply the differential and total cross-section formulas built from the δₗ's, and define the S-matrix Sₗ=e^{2iδₗ}",
-    "Work hard-sphere scattering explicitly, deriving the exact s-wave phase shift δ₀=−ka and the low-energy limit σ→4πa²",
+    "State and apply the differential and total cross-section formulas built from the δₗ's, and define the S-matrix Sₗ=exp(2iδₗ)",
+    "Work hard-sphere scattering explicitly, deriving the exact s-wave phase shift δ₀=−ka and evaluating its low-energy cross-section limit against the sphere's classical geometric area",
   ],
   related: [
     {
@@ -102,13 +103,12 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Same idea, three real dimensions">
-  A beam of particles off a nucleus, electrons off an atom — real
+  A beam of particles off a nucleus, electrons off an atom. Real
   scattering happens in three dimensions. The matching idea from 1D
-  survives entirely intact; what's new here is new in substance, not a
-  cosmetic change of coordinates.
+  survives entirely intact; what's new here is substance, not notation.
 </LessonHook>
 
-## Motivation
+## From One Dimension to Three
 
 Scattering Off a Step Potential and Resonant Transmission Through a
 Barrier solved 1D scattering completely: match $\psi,\psi'$ at each
@@ -125,7 +125,7 @@ depending only on distance from a center.
   license="CC BY-SA 2.0"
 />
 
-## Mathematical Development
+## Partial Waves, Phase Shifts, and the S-Matrix
 
 ### Separating the 3D problem into independent channels
 
@@ -181,10 +181,23 @@ built entirely from the set $\{\delta_l\}$.
 The scattering amplitude and cross sections (a standard, longer algebraic
 construction from matching the partial-wave sum to the physical
 "incident plane wave plus outgoing spherical wave" boundary condition,
-cited here rather than re-derived in full, the same convention Resonant
+cited here without the full re-derivation, the same convention Resonant
 Transmission Through a Barrier used for its own longer matching algebra):
 
 <TheoremBox title="Partial-wave cross-section formula" provenance="cited">
+
+**Hypotheses.** $V$ is real (so scattering is purely elastic, with no
+absorption), spherically symmetric, and **short-range**: it must fall off
+faster than $1/r$, fast enough that $rV(r)\to0$. Short-range is the
+hypothesis that quietly does the most work here, because it is what makes
+$\delta_l$ a finite number at all. It fails for the Coulomb potential.
+An incoming particle in a $1/r$ tail is still being pushed at
+arbitrarily large $r$, its asymptotic phase acquires a divergent
+$\eta\ln(2kr)$ term, and no constant $\delta_l$ exists to absorb it.
+Rutherford's own experiment, pictured above, therefore sits outside the
+formula this lesson is about, and Coulomb scattering has to be treated by
+a separate modified partial-wave analysis. The hard sphere below is at the
+opposite extreme, with strictly zero range beyond $r=a$.
 
 $$
 f(\theta) = \frac1k\sum_{l=0}^\infty (2l+1)\,e^{i\delta_l}\sin\delta_l\,P_l(\cos\theta), \qquad
@@ -214,7 +227,7 @@ For a real potential (no absorption), $\delta_l$ is real, so
 $|S_l|=|e^{2i\delta_l}|=1$ **exactly**: this is the direct 3D
 generalization of Scattering Off a Step Potential's $R+T=1$, now a
 per-channel statement (incoming flux in channel $l$ equals outgoing flux
-in that *same* channel $l$, since channels don't mix) rather than a
+in that *same* channel $l$, since channels don't mix) where 1D had a
 single global balance between two channels.
 
 ### Worked example: hard-sphere scattering
@@ -249,15 +262,17 @@ $$
     { label: "σ₀ → 4πa², four times the classical area", value: "four" },
   ]}
   correctValue="four"
-  explanation="Taking sin(ka)≈ka in σ₀=(4π/k²)sin²(ka) gives σ₀→4πa², not πa². A long-wavelength wave doesn't just clip the sphere's silhouette — it diffracts around the whole thing, and the detector far away registers that too."
+  explanation="Taking sin(ka)≈ka in σ₀=(4π/k²)sin²(ka) gives σ₀→4πa², not πa². A long-wavelength wave doesn't just clip the sphere's silhouette. It diffracts around the whole thing, and the detector far away registers that too."
 />
 
 <InteractiveSection
   title="s-wave cross section, in units of 4πa²"
-  description="Plotted from the real closed-form δ₀=−ka above, no numbers hand-typed beyond a=1. As ka→0 the curve approaches exactly 1 (σ₀→4πa²), the famous 'four times the classical area' quantum result; it falls away as ka grows and the small-angle approximation sin(ka)≈ka stops holding."
+  description="Plotted from the real closed-form δ₀=−ka above, no numbers hand-typed beyond a=1. As ka→0 the curve approaches exactly 1 (σ₀→4πa²), the famous 'four times the classical area' quantum result. It falls away as ka grows and the sin(ka)≈ka approximation stops holding, reaching exactly 0 at ka=π where sin(ka) vanishes, then rising into a small secondary lobe (0.036 at ka=4). The plotted quantity is sinc²(ka), so those zeros and lobes are the sinc function's, not an artifact."
 >
   <ParametricCurve
     frames={crossSectionFrames}
+    xAxisLabel="ka"
+    yAxisLabel="σ₀ / 4πa²"
     ariaLabel="Hard sphere s-wave cross section divided by 4 pi a squared, as a function of ka, approaching 1 as ka goes to zero"
     referenceLines={[{ y: 1, label: "4πa² (low-energy limit)" }]}
   />
@@ -265,22 +280,36 @@ $$
 
 The "entire content of the scattering information" claim made algebraically
 above, that $\delta_l$ is the *only* thing distinguishing $u_l(r)$ from the
-free wave at large $r$, is easiest to see directly rather than just read off
-the formula: plot the free wave against the actual hard-sphere wave and
+free wave at large $r$, is easiest to see directly: plot the free wave
+against the actual hard-sphere wave and
 watch the gap between them.
 
 <InteractiveSection
   title="Free wave vs. actual wave: the phase shift made visible"
   description="The free wave sin(kr−lπ/2) (l=0, no sphere) against the actual s-wave u₀(r)∝sin(kr+δ₀), both plotted past the hard wall at r=a. u₀ is forced to exactly zero inside the sphere (r<a, the wall), then rejoins the same frequency kr as the free wave but offset by δ₀=−ka. Drag the slider: the wave is shifted outward by exactly one sphere radius at every energy. What visibly changes with ka is how many oscillations fit in the same window, making the shift more apparent, the same δ₀ that sets σ₀(ka) in the plot above."
 >
+  {/* The `excludeFromDomain: true` on the "hard wall (r = a)" series in
+      `radialWaveFrames` above. That series is a marker, not data: two points
+      standing in for a vertical rule at r = a, authored at y = ±1.4 so the
+      rule would look full height. Left inside the y-domain it *set* the
+      domain, stretching it to [−1.4, 1.4] while the two waves never leave
+      [−1, 1], so the waves got 105.7 of this plot's 148 viewBox units (55.9
+      CSS px at a 320px viewport) and 28.6% of the height went to empty margin
+      above and below them. Excluded, the domain is the waves' own [−1, 1],
+      they occupy all 148 units, and `ParametricCurve` still draws the rule,
+      clamped to the plot box, so it reads as the full-height wall it is.
+      Keep the ±1.4 authoring: it is what "as tall as you have" looks like
+      once the series is out of the domain. */}
   <ParametricCurve
     frames={radialWaveFrames}
+    xAxisLabel="radius r"
+    yAxisLabel="u₀(r)"
     sliderLabel="ka"
-    ariaLabel="Free wave sin(kr) versus the actual hard-sphere s-wave u0(r) proportional to sin(kr plus delta0), plotted against radius r past the hard wall at r=a, with a slider over ka from 0.02 to 4 showing the horizontal offset delta0 equals minus ka growing as ka increases"
+    ariaLabel="Free wave sin(kr) versus the actual hard-sphere s-wave u0(r) proportional to sin(kr plus delta0), plotted against radius r past the hard wall at r=a, with a slider over ka from 0.02 to 4. Because delta0 equals minus ka, the two curves differ by a horizontal shift of exactly one sphere radius at every ka; what changes across frames is the wavelength, so the same fixed shift spans a larger fraction of a wavelength and becomes easier to see"
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## Why Low Energy Sees Only One Channel
 
 At low energy ($ka\ll1$), $\sin(ka)\approx ka$, so
 $\sigma_0\to(4\pi/k^2)(ka)^2=4\pi a^2$: **four times** the sphere's
@@ -290,10 +319,10 @@ the sphere (cross section $\pi a^2$) or misses entirely; a long-wavelength
 quantum wave diffracts around the whole sphere, and the wave nature of
 scattering, not the sphere's literal silhouette, sets the cross section.
 The plot above shows this limit is approached smoothly and directly
-from the same closed form governing every $ka$, not as a separate
-asymptotic curiosity.
+from the same closed form governing every $ka$, with no separate
+asymptotic argument needed.
 
-## Common Mistakes
+## Dropping the Centrifugal Term
 
 <Callout type="mistake">
 **Forgetting the centrifugal term when writing down the "radial
@@ -317,14 +346,238 @@ dominates, as used above.
 
 1. Using $\delta_0=-ka$, compute $\sigma_0$ for $ka=0.5$ (sphere radius
    $a=1$), and express your answer as a multiple of $4\pi a^2$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\sigma_0=0.9194\times4\pi a^2\approx11.553\,a^2$.
+
+   With $a=1$ and $ka=0.5$ we have $k=0.5$, so
+
+   $$
+   \sigma_0=\frac{4\pi}{k^2}\sin^2(ka)=\frac{4\pi}{0.25}\,(0.4794255)^2=16\pi\times0.2298488=11.5535.
+   $$
+
+   The cleaner route is to divide by $4\pi a^2$ before evaluating
+   anything, because $k$ and $a$ then disappear into the single
+   dimensionless variable the physics actually depends on:
+
+   $$
+   \frac{\sigma_0}{4\pi a^2}=\frac{(4\pi/k^2)\sin^2(ka)}{4\pi a^2}=\frac{\sin^2(ka)}{(ka)^2}=\mathrm{sinc}^2(ka),
+   $$
+
+   and $\mathrm{sinc}^2(0.5)=(0.4794255/0.5)^2=(0.958851)^2=0.919395$. This
+   is the quantity the plot above draws, which is why its curve starts at
+   exactly $1$ and has zeros at $ka=\pi,2\pi,\dots$.
+
+   Two things follow from writing it that way. The answer depends only on
+   $ka$, so a sphere twice as large probed at half the wavenumber gives the
+   identical ratio; there is no separate size scale in the problem. And
+   $ka=0.5$ is already deep enough into the long-wavelength regime that the
+   cross section sits within $9\%$ of the full $4\pi a^2$ limit, which is
+   worth knowing because "low energy" sounds like it should demand
+   $ka\ll1$ by orders of magnitude and does not.
+
+   The wrong turn is to answer $\sigma_0\approx11.55$ and stop. That
+   number is in units of $a^2$ with $a$ set to $1$, and the ratio to the
+   classical geometric cross section $\pi a^2$ is $11.553/\pi=3.68$, still
+   most of the way to the factor of four. Quoting a bare number here hides
+   the only comparison that means anything.
+
+   </details>
+
 2. Explain why $u_l(0)=0$ is required for *every* $l$, directly from
    $R_l(r)=u_l(r)/r$ needing to stay finite (not blow up) as $r\to0$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The short version is the one the question asks for: $R_l=u_l/r$, so
+   $u_l(0)\neq0$ makes $R_l$ diverge like $1/r$ at the origin, and a
+   wavefunction cannot do that. Near $r=0$ the radial equation is dominated
+   by the centrifugal term, and its two behaviours are $u_l\sim r^{l+1}$
+   (regular, giving $R_l\sim r^l$, finite) and $u_l\sim r^{-l}$ (irregular,
+   giving $R_l\sim r^{-l-1}$). Imposing $u_l(0)=0$ selects the first and
+   discards the second, in every channel.
+
+   That answer is correct but incomplete, and the gap is worth opening,
+   because "finite" is not actually the criterion a Hilbert space applies.
+   Membership in $L^2$ is, and the radial measure is $r^2\,dr$:
+
+   $$
+   \int|\psi|^2\,d^3r=\int_0^\infty |R_l(r)|^2 r^2\,dr=\int_0^\infty|u_l(r)|^2\,dr.
+   $$
+
+   For $l\geq1$ the irregular solution $u_l\sim r^{-l}$ gives
+   $\int_0 r^{-2l}\,dr$, which diverges, so those solutions genuinely are
+   not states and normalizability alone throws them out. For $l=0$ it does
+   not. The irregular $s$-wave solution is $u_0\to\text{const}$, giving
+   $R_0\sim1/r$ and $\int_0|u_0|^2dr$ perfectly finite. The function
+   $1/r$ *is* square-integrable near the origin in three dimensions. So the
+   argument that works for $l\geq1$ fails precisely in the channel this
+   lesson cares about most.
+
+   What rules it out is that $R_0=1/r$ does not solve the Schrödinger
+   equation at the origin. Using $\nabla^2(1/r)=-4\pi\delta^3(\vec r)$, the
+   candidate $\psi=1/r$ satisfies $H\psi=E\psi$ everywhere except $r=0$,
+   where it leaves behind an uncancelled delta function. Accepting it would
+   mean silently adding a point interaction at the origin that is not in
+   the $V(r)$ you wrote down. Stated in the language of Hilbert Spaces and
+   Self-Adjointness: the radial operator on the half-line is symmetric but
+   not self-adjoint until a boundary condition at $r=0$ is chosen, there is
+   a one-parameter family of admissible choices, and $u_0(0)=0$ is the one
+   that reproduces the three-dimensional Laplacian. The other choices are
+   not errors; they are the delta-shell and Fermi-pseudopotential
+   interactions used to model contact forces in cold-atom physics, which is
+   a *different* Hamiltonian.
+
+   One hypothesis is quietly assumed throughout: that $V(r)$ is less
+   singular than $1/r^2$ near the origin. A potential diverging as fast as
+   or faster than $-1/r^2$ competes with the centrifugal term on equal
+   footing, the two near-origin behaviours stop being $r^{l+1}$ and
+   $r^{-l}$, and for a strong enough attractive $-\lambda/r^2$ the spectrum
+   becomes unbounded below and no boundary condition at the origin saves
+   it. Hard-sphere and finite-range potentials, this lesson's subject
+   matter, are all comfortably inside the safe regime.
+
+   </details>
+
 3. Why can a central potential never scatter an incident $l=0$ wave into
    an outgoing $l=1$ wave, in terms of a conserved quantity from
    Orbital Angular Momentum and Spherical Harmonics?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $\vec L^{\,2}$ commutes with $H$, so $l$ is a constant of the
+   motion and no amount of time evolution can change it.
+
+   The one-line proof is worth doing explicitly, since it shows the
+   conclusion holds to all orders and not just perturbatively. Let
+   $|l\rangle$ and $|l'\rangle$ be eigenstates of $\vec L^{\,2}$ with
+   eigenvalues $\hbar^2l(l+1)$ and $\hbar^2l'(l'+1)$. Then
+
+   $$
+   0=\langle l'|[H,\vec L^{\,2}]|l\rangle=\hbar^2\left[l(l+1)-l'(l'+1)\right]\langle l'|H|l\rangle,
+   $$
+
+   so $\langle l'|H|l\rangle=0$ whenever $l\neq l'$ (the bracket is nonzero
+   for distinct non-negative integers). $H$ is block diagonal in $l$, hence
+   so is $e^{-iHt/\hbar}$, and an amplitude that starts entirely in $l=0$
+   stays there for all time. This is the formal content of the lesson's
+   claim that the 3D problem "splits into independent channels": the
+   splitting is exact, not an approximation good at low energy.
+
+   The commutator itself comes from rotational invariance. $\vec L$
+   generates rotations, and $H=p^2/2m+V(r)$ is built from two rotational
+   scalars, so $[H,\vec L]=0$ and therefore $[H,\vec L^{\,2}]=0$. In the
+   language of Clebsch-Gordan Coefficients and the Wigner-Eckart Theorem,
+   $V(r)$ is a rank-$0$ spherical tensor, and Wigner-Eckart says a rank-$0$
+   operator has vanishing matrix elements between states of different $l$
+   (and different $m$). The partial-wave decomposition is a selection rule,
+   nothing more exotic.
+
+   Naming the hypothesis matters here, because it is the one real
+   scattering problems break. "Central" has to mean $V$ depends on $r$
+   alone. A spin-orbit term $\vec L\cdot\vec S$ is the near miss worth
+   getting right, because it looks like a counterexample and is not one:
+   $\vec L^{\,2}$ commutes with every component of $\vec L$ and with all
+   of $\vec S$, so $[\vec L^{\,2},\vec L\cdot\vec S]=0$ identically and
+   $l$ remains conserved. What spin-orbit coupling costs is $m_l$ and
+   $m_s$ separately, leaving $l$, $j$ and $m_j$ good, so the phase shift
+   picks up a second label, $\delta_{l,j}$, and the interaction can flip
+   the spin without ever moving amplitude between $l$ channels. A genuine
+   tensor force
+   $S_{12}\propto3(\vec\sigma_1\cdot\hat r)(\vec\sigma_2\cdot\hat r)-\vec\sigma_1\cdot\vec\sigma_2$
+   is a rank-2 tensor and does mix $l$ by two units: the deuteron is the
+   textbook case, a bound state that is roughly $96\%$ $l=0$ and $4\%$
+   $l=2$ with the same $j$. Any external field, even a weak one, breaks
+   full rotational symmetry too, and then not even $j$ survives.
+
+   The tensor force is what makes the hypothesis's exact shape matter, so
+   it is worth stating the conclusion in the form the proof actually
+   supports. Rotational invariance alone buys conservation of $j$ and
+   $m_j$, since it says only that $\vec J$ generates a symmetry. Getting
+   $l$ as well needs the stronger statement that the interaction commutes
+   with $\vec L^{\,2}$, which holds for $V(r)$ and for $\vec L\cdot\vec S$
+   and fails for $S_{12}$. So the correct claim is "$l$ is conserved by
+   dynamics commuting with $\vec L^{\,2}$", and a rotationally invariant
+   force need not qualify: the deuteron is the standing counterexample.
+
+   Parity is a useful cross-check on the specific case asked about. A
+   central potential conserves parity, $l=0$ is even and $l=1$ is odd, so
+   the transition asked about is forbidden twice over, and even a
+   non-central but parity-preserving perturbation could not produce it.
+
+   </details>
+
 4. If $|S_l|<1$ for some channel, what would that imply physically about
    the potential, given the derivation above connected $|S_l|=1$ directly
    to $\delta_l$ being real?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   That particles are disappearing from channel $l$: the potential is
+   absorptive, and the elastic problem this lesson set up is no longer the
+   whole story.
+
+   Track it through the algebra. $S_l=e^{2i\delta_l}$, so writing
+   $\delta_l=\alpha_l+i\beta_l$ gives $|S_l|=e^{-2\beta_l}$, and
+   $|S_l|<1$ requires $\beta_l>0$: a complex phase shift with positive
+   imaginary part. Since the reality of $\delta_l$ followed from $V$ being
+   real, a complex $\delta_l$ means a complex potential, conventionally
+   written $V-iW$ with $W>0$, the **optical potential** of nuclear physics.
+   The continuity equation then has a sink term rather than balancing, so
+   flux into the interaction region exceeds flux out.
+
+   The essential point is that nothing about quantum mechanics has broken.
+   $W$ is bookkeeping for channels the elastic calculation declined to
+   model: the projectile knocked a nucleon out, excited the target, or was
+   captured. Restore those channels and the full multi-channel $S$-matrix
+   is exactly unitary again. $|S_l|<1$ is a statement about an incomplete
+   description, not about lost probability.
+
+   The quantitative consequence is the part worth carrying away. With
+   $f=\frac1{2ik}\sum_l(2l+1)(S_l-1)P_l(\cos\theta)$, the cross sections
+   separate into
+
+   $$
+   \sigma_{\text{el}}=\frac{\pi}{k^2}\sum_l(2l+1)\,|1-S_l|^2,
+   \qquad
+   \sigma_{\text{r}}=\frac{\pi}{k^2}\sum_l(2l+1)\left(1-|S_l|^2\right),
+   $$
+
+   the second counting everything that left the elastic channel, and
+   $\sigma_{\text{tot}}=\sigma_{\text{el}}+\sigma_{\text{r}}$ still obeying
+   the optical theorem $\sigma_{\text{tot}}=(4\pi/k)\,\mathrm{Im}f(0)$.
+   Note that $\sigma_{\text{r}}$ vanishes identically when $|S_l|=1$, which
+   is the consistency check that this reduces to the lesson's elastic case.
+
+   Now the counter-intuitive fact this makes visible, and the wrong turn it
+   guards against. It is natural to read absorption as "the particle was
+   swallowed, so it did not scatter". Set $S_l=0$, total absorption in
+   channel $l$, and the formulas give
+
+   $$
+   \sigma_{\text{r}}=\frac{\pi}{k^2}(2l+1),\qquad \sigma_{\text{el}}=\frac{\pi}{k^2}(2l+1),
+   $$
+
+   equal. A perfectly black channel scatters elastically exactly as much as
+   it absorbs. Summing over the $l\lesssim ka$ that a black disk of radius
+   $a$ blocks gives $\sigma_{\text{tot}}\to2\pi a^2$, twice the geometric
+   area, for the same reason as the $4\pi a^2$ result earlier in this
+   lesson: removing amplitude from the forward beam requires a diffracted
+   wave to interfere it away, and that shadow-forming wave is itself
+   elastic scattering that a detector off-axis will register.
+
+   The one thing $|S_l|>1$ would imply is that the model has a source in
+   it, creating particles from nothing. Unitarity of the underlying
+   many-channel theory forbids it, so $|S_l|\leq1$ is a hard bound rather
+   than a convention, and a fit that returns $|S_l|>1$ is a fit with an
+   error in it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -339,10 +592,9 @@ dominates, as used above.
   of 1D scattering's $R+T=1$.
 - Hard-sphere scattering gives the exact closed form $\delta_0=-ka$, and
   the low-energy limit $\sigma_0\to4\pi a^2$, four times the classical
-  geometric cross section, computed here directly rather than merely
-  quoted.
+  geometric cross section, both computed here from that closed form.
 
-## Further Exploration
+## Semiclassical Limits of the Same Problem
 
 <NextDiscovery>
   The [capstone](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/capstone-symmetry-and-the-classical-limit)

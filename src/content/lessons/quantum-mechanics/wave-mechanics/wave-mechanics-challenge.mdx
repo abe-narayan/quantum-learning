@@ -63,11 +63,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="New machinery, no new postulate">
 This course took the postulates from "From Classical to Quantum," proven there for finite-dimensional Hilbert spaces, and carried them across to continuous position, one lesson at a time. No new physical postulate was needed anywhere, only new mathematical machinery.
 </LessonHook>
 
-## Motivation
+## Everything that crossed over, and what carried it
 
 The crossing went lesson by lesson: the wavefunction as a
 continuum-limit <Term id="basis">basis</Term> expansion, momentum space as a Fourier-transform
@@ -102,17 +102,17 @@ computed exactly. Continuous-position evolution generally cannot, and that
 gap is why this course had to build a real numerical engine (the FFT, the
 split-operator method) rather than only proving formulas on paper.
 
-## Worked Synthesis Examples
+## Problems that need more than one lesson
 
 <PredictBeforeReveal
-  question="A particle sits in the infinite well's ground state, which is an energy eigenstate, and is left alone. What happens to <x> over time?"
+  question="A particle sits in the infinite well's ground state, which is an energy eigenstate, and is left alone. What happens to ⟨x⟩ over time?"
   options={[
     { label: "It oscillates back and forth", value: "oscillates" },
     { label: "It stays exactly constant", value: "constant" },
     { label: "It decays toward the well's center", value: "decays" },
   ]}
   correctValue="constant"
-  explanation="An energy eigenstate evolves by a pure phase (Schrödinger Equation in Position Space), so |psi(x,t)|^2 never changes, and neither does any expectation value built from it, including <x>. Worked Example 1 below reaches the same conclusion from Ehrenfest's theorem instead."
+  explanation="An energy eigenstate evolves by a pure phase (Schrödinger Equation in Position Space), so |ψ(x,t)|² never changes, and neither does any expectation value built from it, including ⟨x⟩. Worked Example 1 below reaches the same conclusion from Ehrenfest's theorem instead."
 />
 
 **1. A particle is in the infinite well's ground state. Using both this
@@ -144,8 +144,8 @@ $\kappa\to\infty$, collapsing the tail to exactly zero. The well is the
 $V_0\to\infty$ limiting case of the same underlying physics.
 
 <InteractiveSection
-  title="The tail the well can't have"
-  description="The well's half-width and the oscillator's classical turning point are both set to x = 2.5 here, so the two curves share the same confinement scale. That isolates the one difference Example 2 describes: past x = ±2.5, the well's ground state is clipped to exactly zero while the oscillator's Gaussian tail is still visibly nonzero.">
+  title="What each curve does past x = ±2.5"
+  description="The well's half-width and the oscillator's classical turning point are both set to x = 2.5 here, so the two curves share the same confinement scale. That isolates the one difference Example 2 describes. Look past x = ±2.5 on both curves and compare what each one is still doing out there.">
   <ParametricCurve
     frames={synthesisComparisonFrames}
     ariaLabel="Infinite well ground state and harmonic oscillator ground state wavefunctions plotted on the same axis, both scaled to a confinement region of half-width 2.5: the well's wavefunction is clipped to exactly zero beyond x=±2.5, while the oscillator's Gaussian tail remains visibly nonzero well past the same boundary"
@@ -170,7 +170,7 @@ eigenstate has no second term to beat against, so no oscillation survives.
   <LazyWavefunctionExplorer initialPresetId="superposition" />
 </InteractiveSection>
 
-## Common Mistakes, Revisited
+## The two misreadings worth carrying forward
 
 <Callout type="note">
 **Treating "continuous" quantum mechanics as a different theory from the
@@ -192,13 +192,156 @@ course derived is exact.
 1. Using the recap table, identify which single derivation in this course
    most directly reproved something the last course had only stated
    (rather than deriving something new from scratch).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The derivation of $[\hat x,\hat p]=i\hbar$ in The Position and Momentum
+   Operators.
+
+   The table names it outright: the row reads "$[\hat x,\hat p]=i\hbar$
+   (stated)" on the left and "(derived from $\hat p=-i\hbar\,d/dx$)" on the
+   right. It is the only row where the left-hand entry is flagged as
+   something asserted rather than established, and the Position and
+   Momentum lesson of the last course said so explicitly at the time,
+   promising the justification once continuous position existed. The debt
+   was paid with two lines of the product rule.
+
+   Notice how little the derivation needed. Only one physical input went
+   in, that a plane wave $e^{ipx/\hbar}$ carries momentum $p$, and that
+   fixed $\hat p$ uniquely; the commutator then followed from calculus with
+   no further physics. Everything the last course built on top of that
+   commutator, the Heisenberg bound above all, was left untouched, because
+   its proof used only the commutator's *value* and never $\hat p$'s form.
+
+   The near-miss worth ruling out is the harmonic oscillator. Its spectrum
+   is derived twice in these two courses, algebraically from
+   $[a,a^\dagger]=1$ and then again by substituting a Gaussian into the
+   differential equation, and that is a genuine independent cross-check.
+   But the first derivation was a derivation, not an assertion, so the
+   second one confirms a result rather than discharging a promise. What the
+   position-space treatment *did* add there is different in kind: it
+   identified which physical potential, $\tfrac12m\omega^2x^2$, the
+   abstract $H$ had been standing in for, which the algebra alone could
+   never have told you.
+
+   The other rows are translations rather than proofs of anything
+   outstanding: the Born rule reinterpreted as a density, the basis change
+   carried out by Fourier transform, the same evolution equation with a
+   differential $H$. None of them settles a claim the last course had left
+   unsupported.
+
+   </details>
+
 2. A particle tunnels through a barrier. Using Ehrenfest's theorem,
    explain whether $\langle p\rangle$ is conserved throughout the process
    (hint: consider whether $V(x)$ is uniform).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. $\langle p\rangle$ is not conserved, and Ehrenfest's second theorem
+   says exactly why.
+
+   The theorem gives $d\langle p\rangle/dt = -\langle V'(x)\rangle$. For a
+   rectangular barrier, $V$ is flat everywhere except at its two edges,
+   where it steps up and then down, so $V'$ is nonzero there. As long as
+   the packet has amplitude sitting on an edge, $\langle V'(x)\rangle\ne0$
+   and $\langle p\rangle$ changes. Momentum is conserved only where the
+   potential is uniform, which is true before the packet arrives and after
+   it has left, and false during the interaction.
+
+   The sign and size are worth working out, because they make the effect
+   concrete. A packet arriving from the left with $\langle p\rangle = +p_0$
+   leaves as two pieces: a transmitted part still moving right with roughly
+   $+p_0$, and a reflected part moving left with roughly $-p_0$. Afterwards
+
+   $$
+   \langle p\rangle \approx \left(P_T - P_R\right)p_0
+   $$
+
+   which for a typical barrier, where $P_R$ is close to $1$, is *negative*.
+   The packet's average momentum has reversed. The barrier pushed back on
+   it, and $-\langle V'\rangle$ integrated over the interaction is the
+   impulse that did so.
+
+   Two clarifications.
+
+   Energy *is* conserved throughout, exactly, because $H$ commutes with
+   itself and $V$ has no explicit time dependence. So this is a case where
+   one average is rigorously constant and another is not, and the
+   difference between them is entirely whether the corresponding operator
+   commutes with $H$. Ehrenfest's theorem in its general form,
+   $d\langle A\rangle/dt=(i/\hbar)\langle[\hat H,A]\rangle$, makes that the
+   whole criterion.
+
+   Nothing here is peculiar to tunnelling. The same statement holds for a
+   classical ball bouncing off a hill: momentum reverses, energy does not
+   change, and the force that reversed it acted only on the slope. What
+   tunnelling adds is that the outgoing state is a *superposition* of the
+   two outcomes rather than one or the other, so $\langle p\rangle$ lands
+   at an intermediate value that no single measurement would ever return.
+
+   </details>
+
 3. If a future course extended this platform to three spatial dimensions,
    which single piece of this course's machinery (the grid, the FFT, the
    split-operator method) would need the most fundamental rework, and
    which would generalize essentially unchanged?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The **grid** needs the most fundamental rework. The **split-operator
+   method** generalizes essentially unchanged, and the FFT sits between
+   them, extended mechanically but not rethought.
+
+   **The split-operator method survives untouched**, because the argument
+   behind it never mentioned dimension. $\hat V$ is still diagonal in
+   position space, $\hat T = (\hat p_x^2+\hat p_y^2+\hat p_z^2)/2m$ is
+   still diagonal in momentum space, the same symmetric
+   potential-half/kinetic/potential-half sequence still applies, each
+   factor is still a pure phase so norm is still preserved exactly, and the
+   error is still $O(\Delta t^3)$ from the same commutator. The only change
+   is that the kinetic phase reads $e^{-i\hbar(k_x^2+k_y^2+k_z^2)\Delta
+   t/2m}$ instead of $e^{-i\hbar k^2\Delta t/2m}$, which is a change to one
+   expression rather than to the method.
+
+   **The FFT extends rather than changes.** A multidimensional Fourier
+   transform is separable: transform along $x$ for every $(y,z)$, then
+   along $y$, then along $z$, reusing the existing one-dimensional
+   radix-2 routine each time. No new algorithm and no new mathematics, but
+   real work in indexing and in memory access patterns, since striding
+   through a three-dimensional array along its slowest axis is nothing like
+   walking a contiguous line.
+
+   **The grid is where the rework is fundamental**, and for two distinct
+   reasons. Structurally, `Grid1D` and the `amplitudes` array indexed by a
+   single integer become a three-index object, and every routine that walks
+   them, every expectation value, every probability-in-a-region sum,
+   changes shape with them; the Riemann sums pick up $\Delta x\,\Delta
+   y\,\Delta z$ in place of $\Delta x$. Quantitatively, the cost explodes:
+   $N$ points becomes $N^3$, so the $256$-point grid this course uses
+   becomes about $16.8$ million complex amplitudes, and refining the
+   resolution by a factor of two now costs eight times the memory rather
+   than two.
+
+   That second point is the one with consequences beyond engineering. The
+   $N^3$ scaling is why real three-dimensional simulations lean on symmetry
+   rather than brute force: a central potential separates into radial and
+   angular equations, which reduces the problem back to something
+   one-dimensional in $r$ with the angular part handled analytically by
+   spherical harmonics. That is the route the hydrogen atom takes later in
+   this track, and it is chosen because the grid does not scale, not
+   because the split-operator method fails.
+
+   The wrong answer worth naming is the split-operator method, on the
+   intuition that a more complicated geometry must need a more complicated
+   integrator. It does not. The integrator is indifferent to how many
+   dimensions the vectors it phases have; what suffers is the cost of
+   storing and traversing them.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -216,14 +359,14 @@ course derived is exact.
   barriers transmit a calculable, generally nonzero fraction of any
   incident wave packet.
 
-## Further Exploration
+## Off the line, into three dimensions
 
 <NextDiscovery>
 This completes **Wave Mechanics**. Everything here lived on a line. Real
 atoms do not: an electron bound to a nucleus moves in three dimensions,
 and the extra two bring structure this course's machinery says nothing
 about, starting with angular momentum and spin. Those are the natural next
-steps deeper into the Quantum Mechanics pillar, and they build directly on
+steps deeper into the Quantum Mechanics track, and they build directly on
 the position-space Schrödinger equation, the Fourier techniques, and the
 bound-state intuition developed here.
 </NextDiscovery>

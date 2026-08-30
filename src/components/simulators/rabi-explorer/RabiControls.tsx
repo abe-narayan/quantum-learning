@@ -4,8 +4,8 @@ import { FrameSlider } from "@/components/visualizations/FrameSlider";
 import { ControlSection, SimulatorSlider, SymbolGloss } from "../shared/controls";
 
 /**
- * This instrument is linked directly from the homepage (`HardwareSection.tsx`)
- * — a reader can land here having never met "detuning" or "drive strength" in
+ * This instrument is linked directly from the homepage (`HardwareSection.tsx`),
+ * so a reader can land here having never met "detuning" or "drive strength" in
  * a lesson. `docs/BEGINNER_REVIEW.md` flagged exactly that: Δ and V appeared
  * as bare symbols on the sliders and in the KaTeX readouts with nothing on the
  * page that said what they were. Every symbol this panel exposes is therefore
@@ -43,7 +43,7 @@ export function RabiControls({
       <ControlSection
         id="rabi-drive"
         title="Drive strength V"
-        description="How hard you are pushing the qubit — the amplitude of the microwave or laser pulse aimed at it."
+        description="How hard you are pushing the qubit: the amplitude of the microwave or laser pulse aimed at it."
       >
         <SimulatorSlider
           label="V (drive strength)"
@@ -82,7 +82,7 @@ export function RabiControls({
           formatValue={(v) => v.toFixed(2)}
           valueText={(v) =>
             v === 0
-              ? "Detuning zero — the drive is exactly on resonance"
+              ? "Detuning zero: the drive is exactly on resonance"
               : `Detuning ${v.toFixed(2)}, ${v > 0 ? "above" : "below"} the qubit's transition frequency`
           }
           onChange={onDetuningChange}
@@ -122,7 +122,7 @@ export function RabiControls({
         />
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {prefersReducedMotion ? (
-            <Badge tone="neutral">Reduced motion — drag the slider above to scrub</Badge>
+            <Badge tone="neutral">Reduced motion: drag the slider above to scrub</Badge>
           ) : (
             <Button variant="primary" size="sm" onClick={onTogglePlay}>
               {isPlaying ? "Pause" : "Play"}

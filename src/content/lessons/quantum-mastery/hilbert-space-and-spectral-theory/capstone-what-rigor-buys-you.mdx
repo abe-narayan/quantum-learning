@@ -83,7 +83,7 @@ export const convergencePresets = [
 export const lessonMeta = {
   title: "Capstone: What Rigor Buys You",
   description:
-    "Four heuristic shortcuts the earlier curriculum used freely — 'check A=A†,' 'sum over eigenvalues,' 'use |p⟩ like any other ket,' 'match boundary conditions and move on' — reexamined against this course's actual theorems, and one honest exception, the half-line momentum operator, showing exactly why rigor is worth having even when the shortcuts never failed.",
+    "Four heuristic shortcuts the earlier curriculum used freely ('check A=A†,' 'sum over eigenvalues,' 'use |p⟩ like any other ket,' 'match boundary conditions and move on'), reexamined against this course's actual theorems, and one honest exception, the half-line momentum operator, showing exactly why rigor is worth having even when the shortcuts never failed.",
   course: "hilbert-space-and-spectral-theory",
   module: "capstone-what-rigor-buys-you",
   order: 6,
@@ -112,10 +112,10 @@ export const lessonMeta = {
 <LessonHook eyebrow="Did any of it matter?">
   Five lessons of theorems, and not one answer from the earlier
   curriculum changes. That is the result worth explaining, and it stops
-  holding one question to the side of anything this platform has asked.
+  holding, one question to the side of anything this platform has asked.
 </LessonHook>
 
-## Motivation
+## Five Lessons of Unpaid Debts
 
 Five lessons ago, this course opened by pointing out that "check
 $A=A^\dagger$" was never quite the whole story. Now that the whole story
@@ -129,8 +129,8 @@ honest about the one place they come apart.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d3/David_Hilbert_Grab_Wissen.jpg"
-  alt="David Hilbert's grave at Stadtfriedhof Göttingen, inscribed with his motto Wir müssen wissen — wir werden wissen"
-  caption="Hilbert's own epitaph, 'We must know — we will know,' reads less like a slogan and more like a research program once you've watched this course spend five lessons finding out exactly what 'know' has to mean for a domain, a spectrum, or a boundary condition before the earlier curriculum's shortcuts can be trusted rather than merely hoped for."
+  alt="David Hilbert's grave at Stadtfriedhof Göttingen, inscribed with his motto Wir müssen wissen, wir werden wissen"
+  caption="Hilbert's own epitaph, 'We must know, we will know,' reads less like a slogan and more like a research program once you've watched this course spend five lessons finding out exactly what 'know' has to mean for a domain, a spectrum, or a boundary condition before the earlier curriculum's shortcuts can be trusted rather than merely hoped for."
   credit="Unknown author, published under GNU FDL / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:David_Hilbert_Grab_Wissen.jpg"
   license="CC BY-SA 3.0"
@@ -145,7 +145,7 @@ Spaces and Self-Adjointness showed the full statement needs
 $D(\hat p)=D(\hat p^\dagger)$, not just the boundary-term calculation,
 and then *derived*, via the Fourier-transform equivalence to a
 self-adjoint multiplication operator, that this stronger condition
-actually holds on the whole line. The shortcut wasn't wrong; it was
+does hold on the whole line. The shortcut wasn't wrong; it was
 incomplete in a way that happened not to matter for $\hat p$ on
 $\mathbb R$, because the missing piece (domain equality) turns out to
 hold there. Elsewhere the same incompleteness does matter: the half-line
@@ -160,7 +160,7 @@ strictly more general theorem that also has to cover $\hat x$'s
 continuous spectrum. The discrete formula was never wrong for a discrete
 spectrum: it's *exactly* what the general integral $\int\lambda\,dE(\lambda)$
 reduces to whenever $E(\lambda)$ happens to be a staircase, derived in
-full two lessons ago, not merely asserted to be analogous.
+full two lessons ago.
 
 ### 3. "Use $|p\rangle$ like any other ket: expand in it, integrate over it."
 
@@ -171,7 +171,7 @@ the Gelfand triple $\Phi\subset\mathcal H\subset\Phi'$ makes $|p\rangle$
 a fully legitimate object of a different, precisely-defined kind. Using
 it "like any other ket" was fine specifically because $\langle
 p|\psi\rangle$ is well-defined for every physically realizable $\psi$
-(built from Schwartz test functions), which is all any actual
+(built from Schwartz test functions), which is all any
 calculation ever needed.
 
 ### 4. "Match $\psi,\psi'$ at the boundary, solve, done."
@@ -229,7 +229,7 @@ operator), which sidesteps the problem entirely. A slightly different
 question, "what is the momentum-toward-the-wall observable for a
 particle in a box?", would have run straight into this, and no amount
 of physical intuition about "just require $\psi(0)=0$" would have
-produced a consistent answer, because none exists. Rigor's actual payoff
+produced a consistent answer, because none exists. Rigor's payoff
 is knowing, in advance, which future questions are the ones where
 instinct alone wouldn't be enough, not retroactively validating what
 already worked.
@@ -260,11 +260,11 @@ form at all.
   question="Three of these four rows (closed form, spectral-theorem sum, resolvent pole) are provably the same algebraic statement in disguise. The fourth (Sturm-Liouville) comes from an independent FFT-based numerical solver that never touches the n²π²/8a² formula. How closely do you expect that fourth row to match?"
   options={[
     { label: "Machine precision, same as the other three", value: "machine" },
-    { label: "Close, but only to within about a percent (grid spacing)", value: "percent" },
-    { label: "Not close at all — it's a different calculation", value: "off" },
+    { label: "Close, but short of it, with a small residual left by the grid", value: "percent" },
+    { label: "Not close at all, since it's a different calculation", value: "off" },
   ]}
   correctValue="percent"
-  explanation="The table below shows the top three rows agree to all six displayed digits, because they're the same statement proved three ways. The Sturm-Liouville row is a real numerical measurement on a discretized grid, and it lands within about a percent — a gap from grid spacing alone, shrinking with finer resolution, not a sign of disagreement."
+  explanation="The table below shows the top three rows agreeing to all six displayed digits, because they are the same statement proved three ways. The Sturm-Liouville row is a real numerical measurement on a discretized grid, so it lands close but not identical: high by 0.0369%, which is a discretization residual that shrinks with finer resolution, not a disagreement."
 />
 
 <MatrixGridExplorer
@@ -281,13 +281,17 @@ the discrete sum over projectors *is* the closed form once $E(\lambda)$
 is a staircase, and the resolvent's pole condition $\sin(2ka)=0$ reduces
 to exactly the same $k=n\pi/2a$. The bottom row is the one truly
 independent *numerical* check, an FFT-based kinetic-energy expectation
-on a discretized grid that never touches the $n^2\pi^2/8a^2$ formula,
-and it still lands within about a percent of the same numbers, a gap
-entirely attributable to grid spacing, one that shrinks with a finer
-grid rather than reflecting any real disagreement. That's what "four
-independent derivations converge" actually looks like up close: three
-that must agree because they're provably the same statement, and one
-that agrees because it was measured and came out that way.
+on a discretized grid that never touches the $n^2\pi^2/8a^2$ formula.
+It lands high, by $0.0369\%$. Worth noticing is that it lands high by
+$0.0369\%$ at *every* one of the four levels, the same figure to six
+decimal places, which is the signature of a systematic discretization
+bias rather than of numerical noise: noise would scatter, and a real
+disagreement would grow with $n$ as the eigenfunctions oscillate faster.
+A constant relative offset is the grid, and it shrinks when the grid is
+refined. That is what "four independent derivations converge" looks like
+up close: three that must agree because they are provably the same
+statement, and one that agrees to within a residual you can name and
+account for.
 </Callout>
 
 These four numbers are the same ladder already familiar from the rest
@@ -302,7 +306,7 @@ Convergence from different starting points onto the same numbers is what
 "this is true" looks like in mathematics, for the same reason independent
 replication is what it looks like in an experimental science.
 
-## Common Mistakes
+## Calling the Shortcut Cheating
 
 <Callout type="note">
 **Concluding this course means the earlier curriculum was "wrong" or
@@ -326,9 +330,121 @@ rather than after a calculation quietly breaks.
 1. For each of the four shortcuts reexamined above, name the specific
    lesson (in this course) that identified the precise extra condition
    the shortcut was implicitly relying on.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Shortcut 1, "check $\hat p=\hat p^\dagger$ by integration by parts":
+   **Hilbert Spaces and Self-Adjointness**. The missing condition is
+   $D(A)=D(A^\dagger)$ *exactly*. Integration by parts establishes only
+   symmetry, which gives $D(A)\subseteq D(A^\dagger)$ and says nothing
+   about leftover room. That lesson then closed the gap for the whole
+   line by a route that never touches a boundary term at all: the Fourier
+   transform carries $\hat p$ to multiplication by $\hbar k$, whose
+   natural maximal domain pulls back to exactly $H^1(\mathbb R)$.
+
+   Shortcut 2, "write $A=\sum_i\lambda_iP_i$ and move on": **The Spectral
+   Theorem for Unbounded Operators**. The condition is that the spectral
+   measure be a staircase, which is to say the spectrum is purely
+   discrete. Two smaller hypotheses ride along and that lesson names them
+   both: $\sum_iP_i=I$ can hold only in the strong sense once there are
+   infinitely many eigenvalues, and the $\lambda_i$ must have no finite
+   accumulation point for the integral to reduce to an elementary sum
+   over jumps. Hydrogen's bound states violate the second, accumulating
+   at $E=0$.
+
+   Shortcut 3, "use $|p\rangle$ like any other ket": **Continuous Spectra
+   and Rigged Hilbert Space**. The condition is that $|p\rangle$ be read
+   as an element of $\Phi'$, defined only by its pairing against Schwartz
+   test functions, with $\int|p\rangle\langle p|\,dp=I$ meaningful in
+   that pairing and not as an $\mathcal H$-completeness relation. The
+   load-bearing hypothesis of the Gelfand-Maurin theorem behind it is
+   nuclearity of $\Phi$, which is the one most often skipped.
+
+   Shortcut 4, "match $\psi,\psi'$ at the boundary and solve":
+   **Sturm-Liouville Theory**, with **Green's Functions and Resolvents**
+   supplying a second half. The condition is that the boundary term
+   $[p(y_2y_1'-y_1y_2')]_a^b$ vanish, with $p,w>0$, which is what forces
+   reality and orthogonality before any potential-specific algebra
+   begins; the Green's-function lesson showed the same domain choice is
+   what puts the resolvent's poles on the physical bound-state energies.
+
+   Worth noticing rather than just listing: the fourth is the only one
+   whose repair left a visible residue. The first three shortcuts turn
+   out to be incomplete statements that happen to be true in every case
+   the earlier curriculum met. The fourth is occasionally *false*.
+   Completeness of a discrete eigenbasis needs a finite interval with
+   $p,w>0$ at both endpoints, and hydrogen has neither, so its bound
+   states are orthogonal and are not a basis. "Expand in the bound
+   states" is the one move on the list that can produce a wrong answer.
+
+   The wrong turn is attaching shortcut 4 to Green's Functions and
+   Resolvents alone because that lesson is where boundary matching is
+   most visible in the algebra. The condition itself is identified in
+   Sturm-Liouville Theory, in Lagrange's identity; the resolvent lesson
+   uses that condition rather than isolating it.
+
+   </details>
+
 2. Explain, in your own words, why "physically sensible" boundary
    conditions and "mathematically self-adjoint" boundary conditions tend
    to coincide, using the shared idea of a vanishing boundary term.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Both are the same expression being set to zero, and the expression has
+   a physical name.
+
+   Integration by parts turns the symmetry check
+   $\langle\phi|A\psi\rangle-\langle A\phi|\psi\rangle$ into a boundary
+   term and nothing else. For a Hamiltonian $H=\hat p^2/2m+V$ that term
+   is built from $\big[\phi^*\psi'-\phi^{*\prime}\psi\big]$ evaluated at
+   the ends. Set $\phi=\psi$ and it becomes
+
+   $$
+   \psi^*\psi'-\psi^{*\prime}\psi=2i\,\mathrm{Im}\big(\psi^*\psi'\big)=\frac{2im}{\hbar}\,j,
+   $$
+
+   which is the probability current up to a constant. So "the boundary
+   term vanishes" and "no probability leaks out through the boundary" are
+   the same equation read by a mathematician and by a physicist. The
+   physicist's instinct that a bound state should be normalizable, that
+   nothing should escape through a hard wall, that the wavefunction
+   should stay finite at the origin, is in each case a way of forcing
+   that current to zero at the edge; and Stone's theorem then says a
+   self-adjoint generator is exactly what makes the evolution unitary,
+   which is probability conservation again. The agreement is not a
+   coincidence, it is one quantity with two vocabularies.
+
+   The word "tend" in the question is doing real work, though, and this
+   course supplies both ways the agreement fails.
+
+   It can fail because the physical condition is too *strong*. On the
+   half-line, $\psi(0)=0$ certainly kills the boundary term, and the
+   operator is symmetric, and there is still no self-adjoint operator
+   anywhere in reach because $n_+=1\ne n_-=0$. Killing the term is
+   necessary and nowhere near sufficient: self-adjointness needs the
+   domain to be exactly as large as $D(A^\dagger)$, and an
+   over-enthusiastic boundary condition shrinks it too far.
+
+   It can also fail because the physical condition is too *weak*. On a
+   ring, every twist $\psi(L)=e^{i\theta}\psi(0)$ conserves probability
+   and every one of them is self-adjoint, so "physically sensible" does
+   not single out an operator; the physics has to supply more
+   information, namely the magnetic flux through the ring. The
+   limit-circle endpoints of Sturm-Liouville Theory are the same
+   situation in another guise, where "require $y$ bounded" leaves the
+   domain undetermined.
+
+   The wrong turn is upgrading the observed agreement into a theorem and
+   concluding that physical reasoning can always be trusted to land on a
+   self-adjoint domain. What is actually true is narrower: physical
+   instinct is reliable at making the boundary term vanish, and
+   self-adjointness additionally demands that it vanish on a domain of
+   exactly the right size, which instinct has no way to check.
+
+   </details>
 3. Suppose a future course asked for the momentum operator's spectral
    decomposition for a particle confined to $[0,L]$ by hard walls on
    *both* ends (not a half-line). Using Hilbert Spaces and
@@ -336,6 +452,72 @@ rather than after a calculation quietly breaks.
    conditions, would you expect this to have a self-adjoint solution?
    Why might a hard wall on both ends still fail, even though a periodic
    condition succeeds?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Recompute the deficiency indices rather than reasoning from the wall,
+   because the wall is the misleading feature here.
+
+   On $L^2(0,L)$ with the double-Dirichlet domain
+   $D(\hat p)=\{\psi\in H^1(0,L):\psi(0)=\psi(L)=0\}$, the adjoint acts on
+   all of $H^1(0,L)$ with no boundary condition whatsoever. Solving
+   $\hat p^\dagger\psi=\pm i\psi$ gives $\psi=Ce^{\mp x}$ as always, and
+   both are continuous on a *bounded* interval, so both are in
+   $L^2(0,L)$. Therefore
+
+   $$
+   n_+=n_-=1 .
+   $$
+
+   Equal. Von Neumann's criterion is satisfied, so self-adjoint
+   extensions do exist, and they form the one-real-parameter family
+   $\psi(L)=e^{i\theta}\psi(0)$ that the earlier practice question named.
+   This is genuinely unlike the half-line, where $n_+=1\ne n_-=0$ closed
+   off every domain at once.
+
+   And yet the hard-wall answer is still no, for a different reason. The
+   Dirichlet domain itself is *not* self-adjoint; it is symmetric and
+   strictly too small. Von Neumann's decomposition puts $D(\hat p)$ at
+   codimension $n_++n_-=2$ inside $D(\hat p^\dagger)=H^1(0,L)$, since the
+   adjoint's domain is free at both endpoints, while each self-adjoint
+   extension sits at codimension $1$, adding back exactly one dimension.
+   Demanding $\psi=0$ at both walls kills the boundary term twice over
+   when the interval only ever needed it killed once, by cancellation
+   between the two ends.
+
+   So every self-adjoint operator available on $[0,L]$ relaxes the hard
+   wall into a twist, and a twist is a ring. The extension does not
+   describe a particle confined by impenetrable walls; it describes a
+   particle that leaves at $L$ and reappears at $0$. Physically that is
+   the correct verdict and the same one as the half-line: momentum
+   generates translations, translations are a symmetry of a circle and
+   not of a box with ends, so a genuinely walled box has no momentum
+   observable. The mathematics distinguishes the two cases only in *how*
+   it refuses. The half-line offers nothing at all; the box offers
+   operators that answer a different question.
+
+   The counting behind all three cases is worth keeping, because it is a
+   single rule: ask how many ends of the interval run to infinity. Two
+   infinite ends, the whole line, and neither exponential is
+   normalizable, so $n_+=n_-=0$ and $\hat p$ is essentially self-adjoint
+   with a unique answer. One infinite end, a half-line, and exactly one
+   exponential survives, so the indices are $(1,0)$ or $(0,1)$ and
+   nothing works. No infinite ends, a bounded interval, and both survive,
+   so the indices are $(1,1)$ and a $U(1)$ family appears.
+
+   The wrong turn is answering "no, same as the half-line," reasoning
+   from the hard wall rather than from the count. The indices are
+   different, $(1,1)$ against $(1,0)$, and that difference decides
+   whether extensions exist. The opposite wrong turn is answering "yes,
+   Dirichlet works, since $[\phi^*\psi]_0^L$ obviously vanishes when
+   $\psi$ vanishes at both ends." It does vanish, and the operator really
+   is symmetric, and that is precisely the incompleteness this entire
+   course exists to correct. A vanishing boundary term establishes
+   $D(\hat p)\subseteq D(\hat p^\dagger)$ and reports nothing about the
+   two dimensions of room left over.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -355,12 +537,12 @@ rather than after a calculation quietly breaks.
   question instinct alone cannot answer, rather than re-certifying past
   answers that were already right.
 - Completeness of a discrete eigenbasis is the one shortcut that can
-  actually fail. Hydrogen's bound states are orthogonal and are not a
+  fail outright. Hydrogen's bound states are orthogonal and are not a
   basis, because the scattering continuum is missing from them.
 - The infinite well's spectrum, reached from four independent derivations
   across this course, lands on the same four numbers every time.
 
-## Further Exploration
+## Where Rigor Goes Next
 
 <NextDiscovery>
   This closes Hilbert Space & Spectral Theory, and two courses continue

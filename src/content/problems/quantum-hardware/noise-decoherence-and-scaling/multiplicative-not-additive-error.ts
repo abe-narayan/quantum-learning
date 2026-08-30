@@ -16,10 +16,10 @@ export const multiplicativeNotAdditiveError: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "For N independent sequential gates each with success probability p, what is the correct overall success probability formula?",
     options: [
-      { id: "a", text: "p^N (multiplicative)" },
-      { id: "b", text: "1 - N(1-p) (additive/linear)" },
-      { id: "c", text: "p (unchanged regardless of N)" },
-      { id: "d", text: "1 - p^N (the chance the circuit does not run clean)" },
+      { id: "a", text: "p^N (multiplicative in depth)" },
+      { id: "b", text: "1 - N(1-p) (additive in depth)" },
+      { id: "c", text: "p (independent of the depth N)" },
+      { id: "d", text: "1 - p^N (one minus the product)" },
     ],
   },
   answer: {
@@ -33,8 +33,8 @@ export const multiplicativeNotAdditiveError: MultipleChoiceProblem = {
     defaultIncorrectFeedback: "Independent sequential events combine multiplicatively: overall success requires every gate to succeed, giving p×p×...×p, N times, which is p^N.",
   },
   hints: [
-    { text: "Overall success requires ALL N gates to succeed, not just one." },
-    { text: "For independent events, the probability all succeed is the PRODUCT of their individual probabilities." },
+    { text: "Overall success requires all N gates to succeed, not just one." },
+    { text: "For independent events, the probability that all succeed is the product of their individual probabilities." },
     { text: "p×p×...×p (N times) = p^N." },
   ],
   solution: {

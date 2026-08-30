@@ -1,10 +1,22 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
+import { Complex } from "@/lib/quantum/complex";
+import { classicalSumProbability, interferenceProbability } from "@/lib/quantum/amplitude";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/quantum-states-and-state-vectors"
 );
+
+export const amp1 = new Complex(Math.SQRT1_2, 0);
+export const amp2 = new Complex(-Math.SQRT1_2, 0);
+
+export const interferenceBars = [
+  { label: "|α₁|²", value: amp1.magnitudeSquared() },
+  { label: "|α₂|²", value: amp2.magnitudeSquared() },
+  { label: "sum of separate P's", value: classicalSumProbability(amp1, amp2) },
+  { label: "|α₁+α₂|² (actual)", value: interferenceProbability(amp1, amp2), highlight: true },
+];
 
 export const lessonMeta = {
   title: "Quantum States and State Vectors",
@@ -29,11 +41,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="A set has no addition">
 A qubit's state lives in ℂ². That is not a convenience of notation: the choice of mathematical object is the whole reason superposition can exist, and nothing like it is available to a classical bit.
 </LessonHook>
 
-## Motivation
+## Why a vector, and not something else
 
 Everything so far has treated $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$
 almost like a definition handed down from nowhere. It's time to ask a
@@ -42,7 +54,7 @@ physical fact is encoded in that choice? The answer is also the reason
 superposition is possible in the first place, and it has no classical
 counterpart.
 
-## Intuition
+## The state space a classical bit does not have
 
 A classical bit's state space is the *set* $\{0, 1\}$. Sets don't come
 with addition: "0 + 1" isn't a classical bit state, it's meaningless. A
@@ -54,7 +66,7 @@ $|1\rangle$" while a classical bit cannot be "part 0, part 1." Superposition
 isn't a strange add-on; it's a direct consequence of which kind of
 mathematical object we chose to represent the state.
 
-## Mathematical Development
+## The postulate, and counting what is left
 
 ### The state-space postulate
 
@@ -80,10 +92,11 @@ parameters:
   numbers ($a_1,a_2,b_1,b_2$).
 - Normalization, $a_1^2+a_2^2+b_1^2+b_2^2=1$, is **one** real equation,
   removing one degree of freedom: **3** remain.
-- In the next lesson we'll show that multiplying the *entire* state by
-  $e^{i\gamma}$ for any real $\gamma$ changes none of its physical
-  predictions. That's **one more** real parameter ($\gamma$) that carries
-  no physical information: **2** remain.
+- Multiplying the *entire* state by $e^{i\gamma}$ for any real $\gamma$
+  changes none of its physical predictions. The next lesson uses that fact
+  to build the sphere, and Global Phase vs. Relative Phase later in this
+  course proves it. That's **one more** real parameter ($\gamma$) that
+  carries no physical information: **2** remain.
 
 Two real numbers. That's not a coincidence: it's exactly the count you
 need to specify a point on the surface of a sphere (two angles, like
@@ -125,13 +138,9 @@ their own would give probability $\frac12$.
 />
 
 <BarChart
-  bars={[
-    { label: "|α₁|²", value: 0.5 },
-    { label: "|α₂|²", value: 0.5 },
-    { label: "sum of separate P's", value: 1 },
-    { label: "|α₁+α₂|² (actual)", value: 0, highlight: true }
-  ]}
-  ariaLabel="Classical probability addition would predict 1; the real quantum amplitude sum gives exactly 0"
+  bars={interferenceBars}
+  maxValue={1}
+  ariaLabel="Four bars. Each amplitude on its own carries probability 0.5, and adding those two probabilities the classical way gives 1. Adding the amplitudes first and squaring afterwards, the way quantum mechanics requires, gives 0: the fourth bar has no height at all."
 />
 
 Classical probability-addition would predict a combined probability of 1.
@@ -139,7 +148,7 @@ The actual quantum answer, squaring the *summed amplitude*
 $\alpha_1+\alpha_2=0$ first, is exactly 0: complete destructive
 interference. Nothing like this has a classical-probability analogue.
 
-## Physical Interpretation
+## What choosing this state space commits you to
 
 Treating $\mathbb{C}^2$ as the state space is a physical claim, not just a
 notational convenience. It says nature allows combinations a classical
@@ -147,13 +156,13 @@ description cannot represent, and it predicts measurable interference
 effects. Every one of those predictions has survived experimental test,
 which is the only reason to keep the formalism.
 
-## Interactive Experiment
+## A phase somewhere between the two extremes
 
 The bar chart above computed one specific case, a 180° relative phase,
 where interference is total. What about a phase in between?
 
 <PredictBeforeReveal
-  question="Same two amplitudes, α₁ = 1/√2 and α₂ = 1/√2, but now give α₂ a relative phase of 90° instead of 180°, so α₂ = i/√2. What is |α₁+α₂|²?"
+  question="Same two amplitude sizes, |α₁| = |α₂| = 1/√2, but now give α₂ a relative phase of 90° instead of 180°: α₁ = 1/√2 and α₂ = i/√2. What is |α₁+α₂|²?"
   options={[
     { label: "0 (still fully destructive)", value: "0" },
     { label: "0.5", value: "0.5" },
@@ -167,11 +176,11 @@ where interference is total. What about a phase in between?
 Reproduce both cases yourself, live, instead of only reading precomputed
 numbers.
 
-<InteractiveSection title="Make interference happen yourself" description="Switch to Two Amplitudes (α, β) mode. Set α's magnitude to about 0.71 (≈√½) so both amplitudes start out equal-sized, then drag the relative-phase slider to 180°. Watch the Quantum |α+β|² bar drop to zero while the Classical |α|²+|β|² bar stays pinned at 1, the same two bars compared above, now produced live from sliders instead of only computed once. Then drag the slider back to 90° and confirm the two bars meet exactly where you predicted.">
+<InteractiveSection title="Make interference happen yourself" description="Switch to Two Amplitudes (α, β) mode. Set α's magnitude to about 0.71 (≈√½) so both amplitudes start out equal-sized, then drag the relative-phase slider to 180°. Read the Quantum |α+β|² bar and the Classical |α|²+|β|² bar there, the same two bars compared above, now produced live from sliders instead of only computed once. Then drag the slider back to 90° and see whether the two bars meet where you expected them to.">
   <LazyComplexAmplitudeExplorer />
 </InteractiveSection>
 
-## Worked Example
+## Testing one candidate state
 
 **Is $|\psi\rangle = \frac{1}{2}|0\rangle + \frac{\sqrt3}{2}i\,|1\rangle$ a valid quantum state?**
 
@@ -194,7 +203,7 @@ $$
 (We took the positive root because we were told $\beta>0$; in general,
 normalization alone only pins down $|\beta|$, not $\beta$'s phase.)
 
-## Common Mistakes
+## Superposition against a classical mixture
 
 <Callout type="mistake">
 **Thinking superposition means "randomly 0 or 1, we just don't know
@@ -216,30 +225,149 @@ of the sum) before treating it as a physical state.
 
 1. Is $|\psi\rangle = \frac{1}{\sqrt3}|0\rangle + \frac{1}{\sqrt3}|1\rangle$ a
    valid quantum state? If not, what would fix it?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. The squared moduli come to
+
+   $$
+   \left|\tfrac{1}{\sqrt3}\right|^2 + \left|\tfrac{1}{\sqrt3}\right|^2 = \tfrac13 + \tfrac13 = \tfrac23,
+   $$
+
+   not 1. The vector is a perfectly good element of $\mathbb{C}^2$, it just
+   does not sit on the unit sphere the state-space postulate restricts you to.
+
+   The fix is to divide by its length. The vector's norm is
+   $\sqrt{2/3}$, so
+
+   $$
+   |\psi'\rangle = \frac{1}{\sqrt{2/3}}\left(\tfrac{1}{\sqrt3}|0\rangle + \tfrac{1}{\sqrt3}|1\rangle\right) = \tfrac{1}{\sqrt2}|0\rangle + \tfrac{1}{\sqrt2}|1\rangle = |+\rangle.
+   $$
+
+   Rescaling is always available, and it never changes which *direction* the
+   vector points, which is why normalization costs you nothing physical: it
+   is the one degree of freedom the counting argument above already discarded.
+
+   The reason $\tfrac{1}{\sqrt3}$ looks plausible is that $\tfrac13 + \tfrac13 + \tfrac13 = 1$.
+   That is the right constant for three equally likely outcomes. A qubit has
+   two, so the right constant is $\tfrac{1}{\sqrt2}$.
+
+   </details>
+
 2. A state is known to satisfy $|\alpha| = |\beta|$. What does this tell you
    about $\alpha$ and $\beta$ individually? Give two different valid states
    satisfying this.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It pins their *sizes* completely and their *phases* not at all. Combine
+   $|\alpha| = |\beta|$ with $|\alpha|^2 + |\beta|^2 = 1$ and you get
+   $2|\alpha|^2 = 1$, so
+
+   $$
+   |\alpha| = |\beta| = \frac{1}{\sqrt2}.
+   $$
+
+   Two different valid states:
+   $|+\rangle = \tfrac{1}{\sqrt2}(|0\rangle + |1\rangle)$ and
+   $|-\rangle = \tfrac{1}{\sqrt2}(|0\rangle - |1\rangle)$. Both satisfy the
+   condition; $|{+i}\rangle = \tfrac{1}{\sqrt2}(|0\rangle + i|1\rangle)$ is a
+   third, and there is a whole circle of them.
+
+   The wrong move is reading $|\alpha| = |\beta|$ as $\alpha = \beta$. The
+   bars are moduli, and a modulus throws away the sign and the phase, so the
+   condition says only "the two arrows are the same length", never "the two
+   arrows point the same way". That gap is exactly what separates $|+\rangle$
+   from $|-\rangle$: identical measurement statistics in the computational
+   basis, genuinely different states, and the next lesson is about how to tell
+   them apart.
+
+   </details>
+
 3. Suppose two amplitudes $\alpha_1 = \frac{1}{\sqrt2}$ and
    $\alpha_2 = -\frac{1}{\sqrt2}$ would each individually give probability
    $\frac12$. What is $|\alpha_1+\alpha_2|^2$? What does this illustrate?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Zero.
+
+   $$
+   \alpha_1 + \alpha_2 = \tfrac{1}{\sqrt2} - \tfrac{1}{\sqrt2} = 0, \qquad |\alpha_1+\alpha_2|^2 = 0.
+   $$
+
+   This is total destructive interference, and the point is the contrast with
+   what classical probability would have said. Adding the two *probabilities*
+   gives $\tfrac12 + \tfrac12 = 1$: certainty. Adding the two *amplitudes*
+   first and squaring afterwards gives 0: impossibility. The same two
+   contributions, and the two rules disagree as violently as it is possible to
+   disagree.
+
+   The order of operations is the whole content. Amplitudes add, then you
+   square. $|\alpha_1+\alpha_2|^2 \neq |\alpha_1|^2 + |\alpha_2|^2$ in general,
+   because squaring a sum produces a cross term
+   $2\operatorname{Re}(\alpha_1^*\alpha_2)$ that has no classical counterpart.
+   Here that cross term is $-1$, which cancels the $\tfrac12 + \tfrac12$
+   exactly.
+
+   Notice what did *not* matter: both amplitudes have modulus
+   $\tfrac{1}{\sqrt2}$, so on their own they are indistinguishable. Only the
+   relative minus sign, invisible to either one alone, produced the
+   cancellation.
+
+   </details>
+
 4. Explain in your own words why "a classical bit's state space is a set,
    not a vector space" is the reason classical bits can't be in
    superposition.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because superposition is a linear combination, and a set has no addition
+   to build one with.
+
+   The state space of a classical bit is $\{0, 1\}$: two elements, and nothing
+   else. To write "part 0, part 1" you would need to form something like
+   $\alpha \cdot 0 + \beta \cdot 1$, which requires two operations the set does
+   not have, adding two states and scaling a state by a number. The expression
+   is not false for a classical bit; it is not even well formed. A qubit's
+   state space is $\mathbb{C}^2$, which comes with both operations built in, so
+   $\alpha|0\rangle + \beta|1\rangle$ is automatically another element of the
+   same space. Superposition is not an extra postulate bolted on afterwards.
+   It is what you get for free the moment you choose a vector space.
+
+   The objection worth answering, because it is the one most readers reach
+   for: a classical bit *can* be described by a probability distribution, "70%
+   chance of 0, 30% chance of 1", and that looks like a mixture of the two.
+   The difference is which numbers are allowed to combine. A distribution
+   combines probabilities, which are non-negative and sum to 1, so nothing can
+   ever cancel; the most two contributions can do is share the total. A
+   superposition combines amplitudes, which are complex, so two nonzero
+   contributions can add to exactly zero, as question 3 just did. That
+   cancellation is measurable, it has no representation as a distribution over
+   $\{0,1\}$, and it is what the vector-space structure buys.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
 - A qubit's state is a normalized vector in the complex vector space
-  $\mathbb{C}^2$, a physical postulate, not just notation.
+  $\mathbb{C}^2$: a physical postulate, with notation following from it.
 - Because $\mathbb{C}^2$ has addition built in, superposition is a direct
   consequence of the vector-space structure.
 - Counting real parameters: 4 (from $\alpha,\beta$) $-$ 1 (normalization)
-  $-$ 1 (global phase, next lesson) $=$ **2** real degrees of freedom.
+  $-$ 1 (global phase, proved later in this course) $=$ **2** real degrees
+  of freedom.
 - Amplitudes add before squaring, which is what makes quantum interference
   possible. Probabilities alone could never do this.
 
-## Further Exploration
+## Turning two parameters into two angles
 
 <NextDiscovery>
 Up next, [The Bloch Sphere](/lessons/quantum-computing/qubits-and-quantum-states/the-bloch-sphere) turns those two real parameters into

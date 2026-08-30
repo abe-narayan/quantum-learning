@@ -75,11 +75,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="No observer anywhere in the argument">
 Why don't we see cats in superpositions of alive and dead, or coins spinning in superpositions of heads and tails? Decoherence is the standard, well-established (if partial) answer: a macroscopic system is never fully isolated.
 </LessonHook>
 
-## Motivation
+## The cat question, answered quantitatively
 
 The previous lesson's <Term id="kraus-operators-cptp-maps">Kraus-channel machinery</Term> is enough to answer the
 cat question quantitatively, and the answer needs no measurement and no
@@ -102,10 +102,10 @@ in one for an interval too short to matter.
   caption="Two beryllium ions held about 40 micrometres apart above a gold chip trap at NIST. Trapped ions are among the best-isolated systems available, which makes them the place where decoherence can be turned on deliberately and watched: shield the ions well and coherence survives for seconds, admit stray field noise and the off-diagonal decay computed below becomes a measured curve."
   credit="Y. Colombe / NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
-  license="Public domain (U.S. government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Mathematical Development
+## Tracking the off-diagonals as they go
 
 ### Off-diagonal coherence, tracked numerically
 
@@ -114,15 +114,20 @@ matrix (off-diagonal entries $\pm0.5$, <Term id="von-neumann-entropy-purity">pur
 consider applying the dephasing channel from the previous lesson
 ($\lambda=0.3$) over and over.
 
+The summary at the top of this page already gives away where the purity
+lands. The diagonal is the part it does not mention, so commit to that
+one first: $P(0)$ and $P(1)$ both start at $0.5$, and the channel is
+about to run thirty times.
+
 <PredictBeforeReveal
-  question="As dephasing is applied to |+⟩ again and again, where does the purity Tr(ρ²) end up?"
+  question="Under repeated dephasing of |+⟩, what happens to the diagonal entries P(0) and P(1)?"
   options={[
-    { label: "It drops all the way to 0", value: "zero" },
-    { label: "It settles at 0.5, the maximally mixed state", value: "half" },
-    { label: "It stays at 1, purity is unaffected by dephasing", value: "one" },
+    { label: "Both hold at exactly 0.5 for every application", value: "fixed" },
+    { label: "P(0) climbs toward 1 as the qubit relaxes to |0⟩", value: "relax" },
+    { label: "They drift apart as the coherence leaks away", value: "spread" },
   ]}
-  correctValue="half"
-  explanation="Purity bottoms out at exactly 0.5, not 0 (purity can never go below 1/d for a d-dimensional system) and not 1 (dephasing does destroy coherence). 0.5 is the maximally mixed single-qubit state: all phase information gone, populations untouched."
+  correctValue="fixed"
+  explanation="The dephasing Kraus operators are both diagonal, so the map ρ → (1-λ/2)ρ + (λ/2)ZρZ leaves ρ₀₀ and ρ₁₁ untouched and only flips the sign of the off-diagonals in the second term. Populations never move. Relaxation toward |0⟩ is what amplitude damping does, and it is a different channel."
 />
 
 Applying the channel repeatedly gives:
@@ -146,15 +151,16 @@ finitely many steps. In the laboratory this shows up as an exponential
 $T_2$ decay curve, and "decoherence time" always means the time constant
 of that exponential rather than a moment when something switches off.
 
-The table gives six snapshots. The full curve, computed at every step
-from $0$ to $30$ by the same `applyChannelRepeatedly` call:
+The table gives six snapshots. The same decay carried out to thirty
+applications, sampled across that range by the same
+`applyChannelRepeatedly` call:
 
 <InteractiveSection
   title="The same decay, plotted step by step"
-  description="Off-diagonal magnitude falls geometrically toward 0 while purity falls toward 0.5, the maximally mixed state, for the same dephasing channel (λ=0.3) and starting state |+⟩ as the table above, just computed at every n instead of six of them.">
+  description="Off-diagonal magnitude falls geometrically toward 0 while purity falls toward 0.5, the maximally mixed state, for the same dephasing channel (λ=0.3) and starting state |+⟩ as the table above, now followed out to thirty applications rather than stopping at twenty.">
   <ParametricCurve
     frames={decoherenceFrames}
-    ariaLabel="Off-diagonal magnitude and purity of a qubit starting in |+> under repeated dephasing with lambda=0.3, as the number of channel applications grows from 0 to 30"
+    ariaLabel="Two curves against the number of dephasing applications, 0 to 30, for a qubit starting in |+> with lambda=0.3. Purity starts at 1.0, falls steeply to 0.514 by the fifth application, then flattens onto the dashed reference line at 0.5 without ever crossing below it. Off-diagonal magnitude starts at 0.5 and shrinks by a factor 0.7 per step, passing 0.014 at ten applications and 0.00001 at thirty, approaching zero without arriving."
     referenceLines={[{ y: 0.5, label: "Maximally mixed (purity 0.5)" }]}
   />
 </InteractiveSection>
@@ -178,7 +184,7 @@ have brought it back.
 
 <InteractiveSection
   title="Step forward, watch phase die while population stays put"
-  description="Set channel to dephasing, start from |+⟩, step forward. Watch purity crawl from 1.0 toward 0.5 while P(0),P(1) never move; only phase is being destroyed. Compare against amplitude damping from the same starting state and see how differently it behaves.">
+  description="Set channel to dephasing, start from |+⟩, step forward. Read purity and P(0),P(1) before you step, then again after several steps, and see which of the three this channel has actually touched. Then run amplitude damping from the same starting state and compare.">
   <LazyNoiseExplorer />
 </InteractiveSection>
 
@@ -187,11 +193,11 @@ one channel at a time: the same $\lambda=0.3$ dephasing this lesson has
 tracked all along, next to amplitude damping at the same strength,
 both starting from $|+\rangle$ on the equator.
 
-<InteractiveSection title="Two channels, two different fates" description="Both panels start at |+⟩ and apply the same number of channel steps. Dephasing (right) shrinks straight toward the center, the vector's length dropping while it stays on the equator: phase lost, population untouched. Amplitude damping (left) shrinks toward the north pole instead: population itself relaxing toward |0⟩. Same starting point, same step count, structurally different decay.">
+<InteractiveSection title="Two channels, two different fates" description="Both panels start at |+⟩ and apply the same number of channel steps. Both vectors shrink; where each one shrinks toward is the whole comparison. For each panel, read off whether the vector is leaving the equator or staying on it, and translate that into whether the channel is taking phase, population, or both. Same starting point, same step count.">
   <DecoherenceBlochDecay gamma={0.3} lambda={0.3} maxSteps={16} ariaLabel="A qubit's Bloch vector, starting at |+⟩, shrinking under repeated amplitude damping toward the north pole versus repeated dephasing straight toward the center, at matched strength and step count." />
 </InteractiveSection>
 
-## Physical Interpretation
+## Coherence is spread, rather than destroyed
 
 Environmental interaction does not destroy superposition by any special
 mechanism. It spreads the coherence into correlations with degrees of
@@ -206,7 +212,7 @@ continuously, each collision recording its position, and the standard
 estimates (Joos and Zeh, 1985) put its coherence time many orders of
 magnitude below anything observable; removing the air leaves thermal
 photons doing the same job more slowly but still far too fast. Macroscopic
-superpositions are not forbidden. They are shortlived beyond any
+superpositions are not forbidden. They are short-lived beyond any
 possibility of noticing.
 
 **What decoherence does not do** is explain why a single definite outcome
@@ -216,7 +222,7 @@ an account of one occurring. Decoherence converts "both at once" into
 "one of these, unknown"; the step from there to "this one" remains open,
 and this course states that rather than papering over it.
 
-## Worked Example
+## How many applications to reach 0.01
 
 **After how many dephasing applications ($\lambda=0.3$) does $|+\rangle$'s
 off-diagonal magnitude first drop below 0.01?**
@@ -229,7 +235,7 @@ structure), the threshold is crossed at
 $n=\log(0.01/0.5)/\log(0.7)\approx10.9$, i.e. the 11th application,
 directly checkable against `applyChannelRepeatedly`'s engine output.
 
-## Common Mistakes
+## Coherence loss is not outcome selection
 
 <Callout type="mistake">
 **Confusing decoherence with <Term id="wavefunction-collapse">wavefunction collapse</Term>.** Decoherence turns a
@@ -254,14 +260,163 @@ optional.
 1. Verify that each dephasing application multiplies the off-diagonal
    magnitude by exactly $(1-\lambda)$, using the Kraus operators from the
    previous lesson.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $K_0=\sqrt{1-\lambda/2}\,I$ and $K_1=\sqrt{\lambda/2}\,Z$, the
+   channel is a weighted mixture of doing nothing and applying $Z$:
+
+   $$
+   \mathcal E(\rho) = \left(1-\frac\lambda2\right)\rho + \frac\lambda2\,Z\rho Z
+   $$
+
+   Now look at what $Z\rho Z$ does to a single entry. Since $Z$ is
+   diagonal with entries $+1$ and $-1$, the $(0,1)$ element picks up one
+   factor from each side:
+
+   $$
+   \left(Z\rho Z\right)_{01} = Z_{00}\,\rho_{01}\,Z_{11} = (+1)\rho_{01}(-1) = -\rho_{01}
+   $$
+
+   Substituting into the mixture, the two contributions partly cancel:
+
+   $$
+   \mathcal E(\rho)_{01} = \left(1-\frac\lambda2\right)\rho_{01} - \frac\lambda2\rho_{01} = (1-\lambda)\,\rho_{01}
+   $$
+
+   So each application scales the coherence by $(1-\lambda)$, and $n$
+   applications by $(1-\lambda)^n$. Starting from $|+\rangle$ with
+   $\rho_{01}=0.5$ and $\lambda=0.3$, that predicts
+   $0.5(0.7)^n$: $0.350$, $0.245$, $0.084$ at $n=1,2,5$, which is the
+   table.
+
+   Two things fall out of the same formula. The factor of two in
+   $\lambda/2$ is why maximal decay happens at $\lambda=1$ rather than
+   somewhere else, since $1-\lambda$ hits zero there. And the decay is
+   geometric, so the coherence never reaches zero in finitely many steps.
+   In the laboratory this is why $T_2$ is quoted as a time constant of an
+   exponential and never as a moment when coherence ends.
+
+   </details>
+
 2. Why does the diagonal of the density matrix stay exactly constant
    under repeated dephasing, while the off-diagonal decays?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because both Kraus operators are diagonal in the computational basis,
+   so neither can move population between $|0\rangle$ and $|1\rangle$.
+   Run the same calculation on the $(0,0)$ entry:
+
+   $$
+   \left(Z\rho Z\right)_{00} = Z_{00}\,\rho_{00}\,Z_{00} = (+1)\rho_{00}(+1) = \rho_{00}
+   $$
+
+   so $\mathcal E(\rho)_{00}=(1-\tfrac\lambda2)\rho_{00}+\tfrac\lambda2
+   \rho_{00}=\rho_{00}$, unchanged. The off-diagonal saw a relative minus
+   sign between the two branches and the diagonal did not, and that single
+   sign is the entire asymmetry.
+
+   Physically, dephasing is the environment learning *phase* without
+   exchanging *energy*. Nothing about the channel takes the qubit from
+   $|1\rangle$ toward $|0\rangle$, which is why relaxation is a separate
+   channel, amplitude damping, with a separate timescale $T_1$. A real
+   device measures both, and $T_2\le 2T_1$ precisely because energy loss
+   destroys phase as a side effect while phase loss costs no energy.
+
+   The deeper name for what is happening is worth having. The
+   computational basis here is the *pointer basis*: the basis the
+   environment is effectively monitoring, whose states are left untouched
+   while everything else decays. Which basis that is depends on the
+   coupling, not on anyone's choice, and it is why the classical world
+   comes out with a definite set of alternatives rather than an arbitrary
+   one. Explaining the selection of the basis is decoherence's real
+   achievement, and the next question is about what it still does not
+   explain.
+
+   </details>
+
 3. Explain in one sentence why "the system decohered into a probabilistic
    mixture" is not the same claim as "the system's measurement outcome
    was determined."
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a mixture is a description of not knowing which outcome
+   obtains, and saying "it is $|0\rangle$ or $|1\rangle$, each with
+   probability one half" is not saying that either one has happened.
+
+   The gap is easy to lose because the arithmetic is so convincing. After
+   enough dephasing, $\rho=\tfrac12|0\rangle\langle0|
+   +\tfrac12|1\rangle\langle1|$ is identical, entry for entry, to the
+   density matrix of a coin that was heads or tails all along, and no
+   measurement can tell the two situations apart. That much decoherence
+   genuinely delivers, and it is why nobody sees interference from a cat.
+
+   What it does not deliver is a mechanism producing one result. The
+   evolution that got you here was linear and unitary on system plus
+   environment; nothing anywhere in it ever discarded a branch. The
+   universal state still contains both, now correlated with an environment
+   too large to undo. Reading the resulting mixture as "one of these is
+   real and the others are not" is an additional claim, and it is exactly
+   the claim that different interpretations of quantum mechanics disagree
+   about.
+
+   So the honest ledger: decoherence explains why superpositions are
+   unobservable, why the classical alternatives come in the basis they do,
+   and why the transition is fast enough to be invisible. It does not
+   explain outcome selection, and treating it as if it did is the most
+   common overreach in this subject. The lesson says so above rather than
+   letting the tidy final density matrix imply otherwise.
+
+   </details>
+
 4. If $\lambda=1$ (maximal dephasing per application), how many
    applications are needed to reach purity 0.5? Why does this differ from
    the $\lambda=0.3$ case's gradual, many-application decay?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   One. At $\lambda=1$ the scaling factor $(1-\lambda)$ is zero, so a
+   single application sends the coherence to exactly zero and the state
+   is maximally mixed immediately.
+
+   Purity follows directly, since for this starting state
+   $\rho_{00}=\rho_{11}=\tfrac12$ throughout:
+
+   $$
+   \mathrm{Tr}(\rho^2) = \frac12 + 2|\rho_{01}|^2 = \frac12 + \frac12(1-\lambda)^{2n}
+   $$
+
+   At $\lambda=1$ and $n=1$ that is exactly $0.5$. At $\lambda=0.3$ it is
+   $0.5+0.5(0.7)^{2n}$, which is $0.5004$ at $n=10$ and
+   $0.5+2.5\times10^{-10}$ at $n=30$: approaching $0.5$ and never arriving.
+   The table's $0.500$ at ten applications is rounding, not an exact hit.
+
+   The difference between the two cases is the difference between
+   multiplying by zero and multiplying by a number less than one.
+   Repeatedly multiplying by $0.7$ is a geometric sequence, which has no
+   finite step at which it becomes zero; multiplying by $0$ finishes in
+   one step. Nothing qualitative changed in the channel, only the value of
+   one parameter, and the qualitative behaviour changed anyway, which is
+   the usual signature of a limit point rather than a smooth trend.
+
+   One thing worth being careful about: $\lambda=1$ is the *most*
+   destructive setting, and it does not mean "always apply $Z$." It means
+   applying $Z$ with probability $\lambda/2=\tfrac12$. A channel that
+   applied $Z$ with probability $1$ would be the deterministic unitary
+   $\rho\to Z\rho Z$, which preserves purity perfectly and destroys no
+   coherence at all. Maximal decoherence is maximal *randomness* about
+   whether the phase flip happened, not a maximally strong disturbance.
+   That is the same lesson as the previous one's amplitude-damping curve:
+   what mixes a state is the branch nobody tracked, never the size of the
+   kick.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -277,7 +432,7 @@ optional.
   itself explain *definite measurement outcomes*, an honest, explicitly
   stated scope limitation, not a resolved question.
 
-## Further Exploration
+## Mixing in other channels yourself
 
 <NextDiscovery>
 Want to push past a single dephasing channel and mix in amplitude

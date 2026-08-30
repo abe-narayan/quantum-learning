@@ -156,7 +156,7 @@ export function EntanglementCorrelation() {
         </Badge>
         <p className="text-sm text-muted-foreground">
           Alice and Bob each hold one qubit from the same entangled pair, prepared once and shared between
-          them. Neither qubit has a definite state on its own &mdash; press &ldquo;Measure both&rdquo; to sample
+          them. Neither qubit has a definite state on its own. Press &ldquo;Measure both&rdquo; to sample
           one real joint outcome from the shared state and watch both glyphs snap to a matching result at
           the same instant.
         </p>
@@ -192,9 +192,9 @@ export function EntanglementCorrelation() {
       />
       <p className="mt-2 text-xs text-muted-foreground">
         Each reduced state&rsquo;s purity of 0.5 is exactly the maximally-mixed value this lesson&rsquo;s
-        boxed identity predicts for a Bell state (|ad&minus;bc|=0.5) &mdash; computed here from the same
-        <code className="mx-1 rounded bg-surface-muted px-1 py-0.5 font-mono text-[11px]">reducedDensityMatrixQubit0/1</code>
-        and <code className="mx-1 rounded bg-surface-muted px-1 py-0.5 font-mono text-[11px]">purity</code> functions,
+        boxed identity predicts for a Bell state (|ad&minus;bc|=0.5), computed here from the same
+        <code className="mx-1 rounded bg-surface-muted px-1 py-0.5 font-mono text-meta">reducedDensityMatrixQubit0/1</code>
+        and <code className="mx-1 rounded bg-surface-muted px-1 py-0.5 font-mono text-meta">purity</code> functions,
         not a separately-asserted number.
       </p>
 
@@ -209,6 +209,7 @@ export function EntanglementCorrelation() {
 
       <div
         aria-live="polite"
+        aria-atomic="true"
         className="mt-4 rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground"
       >
         {narration}

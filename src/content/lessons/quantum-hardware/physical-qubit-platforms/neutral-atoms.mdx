@@ -13,7 +13,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Neutral Atoms",
   description:
-    "Uncharged atoms held in place by focused laser light (optical tweezers) rather than electric fields: trading trapped ions' Coulomb-based confinement for a scheme that scales to hundreds of individually-addressable qubits in reconfigurable 2D and 3D arrangements.",
+    "Uncharged atoms held in place by focused laser light (optical tweezers) rather than electric fields: trading trapped ions' Coulomb-based confinement for a scheme that scales to thousands of individually-trapped atoms in reconfigurable 2D and 3D arrangements.",
   course: "physical-qubit-platforms",
   module: "neutral-atoms",
   order: 1,
@@ -34,10 +34,10 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="No charge, no repulsion, no limit">
-An uncharged atom feels no long-range Coulomb repulsion from its neighbors — opening the door to a trapping scheme that scales to hundreds of individually-addressable qubits.
+An uncharged atom feels no long-range Coulomb repulsion from its neighbors, which opens the door to a trapping scheme that scales to thousands of individually-addressable traps.
 </LessonHook>
 
-## Motivation
+## Trapping Without Charge
 
 Trapped ions rely on the ion's electric charge, but that same charge
 means ions repel each other, limiting how densely they can be packed in
@@ -45,20 +45,20 @@ a single trap. <Term id="neutral-atoms">Neutral atoms</Term> sidestep this entir
 
 <AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/5e/1225_site_cold_cesium_atom_array.png"
-  alt="A false-color fluorescence image of 1225 individual cesium atoms, each held in its own optical tweezer, arranged in a square grid roughly 100 microns wide"
-  caption="A real optical tweezer array: 1225 individual laser-cooled cesium atoms, each in its own tweezer spaced 3 microns apart, imaged directly by camera. Every bright dot is one loaded trap — exactly the reconfigurable geometry this lesson describes."
+  alt="A false-color fluorescence image of a 1225-site optical tweezer array holding laser-cooled cesium atoms, arranged in a square grid roughly 100 microns wide"
+  caption="A real optical tweezer array: 1,225 trap sites on a 3-micron pitch, holding laser-cooled cesium atoms whose fluorescence is imaged directly by camera. Each bright dot is a site that caught an atom, in the reconfigurable geometry this lesson describes."
   aspect="aspect-square"
   pins={[
-    { id: "atom", x: 29, y: 55, label: "One bright dot is one cesium atom, held at the focus of its own optical tweezer — a tightly focused laser beam the atom is drawn toward, since no net charge means no electric field can grip it." },
+    { id: "atom", x: 29, y: 55, label: "One bright dot is one cesium atom, held at the focus of its own optical tweezer: a tightly focused laser beam the atom is drawn toward, since no net charge means no electric field can grip it." },
     { id: "spacing", x: 57, y: 37, label: "Neighboring traps sit about 3 μm apart. That separation is the design knob for Rydberg blockade: atoms meant to entangle go inside the blockade radius, atoms meant to stay independent go outside it." },
-    { id: "extent", x: 6, y: 93, label: "The array's outer edge: 1225 separately-steerable tweezers inside roughly 100 μm. Because each trap is its own steerable laser focus, the whole geometry can be rearranged between experiments, or even mid-experiment." },
+    { id: "extent", x: 6, y: 93, label: "The array's outer edge: 1,225 separately-steerable tweezers inside roughly 100 μm square, about the cross-section of a human hair. Because each trap is its own steerable laser focus, the whole geometry can be rearranged between experiments, or even mid-experiment." },
   ]}
   credit="Preston Huft / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:1225_site_cold_cesium_atom_array.png"
   license="CC BY 4.0"
 />
 
-## Engineering Development
+## Tweezers, Arrays, and the Rydberg Blockade
 
 ### Optical tweezers: trapping without charge
 
@@ -75,8 +75,8 @@ different scaling path from a trapped-ion chain's fixed linear geometry:
 <HardwarePlatformSchematic variant="neutral-atom" ariaLabel="A 2D optical tweezer array with some traps loaded (filled) and others empty" />
 
 Each dot above is one independently-steerable tweezer; the filled ones
-show a real array can be sparsely and arbitrarily loaded, not just fully
-packed.
+show a real array can be loaded sparsely and arbitrarily, in whatever
+pattern your experiment calls for.
 
 ### Reconfigurable arrays
 
@@ -85,8 +85,11 @@ tweezer, the *entire array geometry* can be reconfigured between
 experiments (or even mid-experiment): atoms can be rearranged, and
 individual defects (a trap that failed to load an atom) can sometimes be
 corrected by moving a neighboring atom into the gap. This flexibility
-has let neutral-atom platforms scale to hundreds of qubits, among the
-largest qubit counts of any platform to date.
+has let neutral-atom platforms scale to thousands of trapped atoms, the
+largest single-array particle counts of any platform to date. Count
+trapped atoms and count computational qubits separately, though: an
+array that holds thousands of atoms is not yet an array that runs
+thousands of high-fidelity entangling gates.
 
 ### Rydberg blockade: how two-qubit gates work
 
@@ -100,32 +103,32 @@ levels and prevent it from being excited to the same Rydberg state at
 the same time. This blockade effect, one atom's excitation
 conditionally suppressing its neighbor's, is what implements an
 entangling two-qubit gate, conceptually similar in spirit to Quantum
-Algorithms I's <Term id="cnot-controlled-gates">controlled-phase gates</Term>, but arising from genuine atomic
-physics rather than an abstract circuit element.
+Algorithms I's <Term id="cnot-controlled-gates">controlled-phase gates</Term>, with atomic physics here doing the
+work an abstract circuit element does there.
 
 <PredictBeforeReveal
   question="Atom B starts well outside atom A's blockade radius r_b and gets dragged steadily closer. What happens to its ability to be excited to the Rydberg state as it crosses r_b?"
   options={[
+    { label: "It excites normally until r_b, then is suppressed inside", value: "threshold" },
     { label: "It weakens gradually the whole way in, no sharp boundary", value: "gradual" },
-    { label: "It excites normally right up to r_b, then gets suppressed once inside it", value: "threshold" },
     { label: "Distance from atom A doesn't affect atom B's excitation at all", value: "no-effect" },
   ]}
   correctValue="threshold"
-  explanation="The blockade radius is a real distance threshold, not a gradual fade: outside r_b atom B excites to |r⟩ just like an isolated atom would, and inside r_b the interaction shifts its levels enough that the same laser can no longer reach |r⟩ at all. Drag the slider below across r_b and watch the crossover happen right at the boundary, not gradually before it."
+  explanation="The blockade radius is a real distance threshold, not a gradual fade: outside r_b atom B excites to |r⟩ just like an isolated atom would, and inside r_b the interaction shifts its levels enough that the same laser can no longer reach |r⟩ at all. Drag the slider below across r_b and watch the crossover land right at the boundary."
 />
 
 <RydbergBlockadeDiagram ariaLabel="Two neutral atoms: atom A excited to a Rydberg state with an enormously expanded orbital and a surrounding blockade radius; a separation slider moves atom B closer to or farther from atom A, crossing the blockade radius" />
 
 Atom A's expanded Rydberg orbital is what creates the blockade radius
 around it; atom B, sitting inside that radius, has its energy levels
-shifted enough that the same laser can no longer excite it to |r⟩ &mdash;
-its excitation attempt is suppressed, not merely weaker. The effect is
-*distance-limited*, not a blanket property of "being a nearby atom":
+shifted enough that the same laser can no longer excite it to |r⟩. Its
+excitation attempt is suppressed, not merely weaker. The effect is
+strictly *distance-limited*:
 drag the slider above to pull atom B away from atom A and
 find the separation at which its excitation stops being suppressed and
 starts succeeding. That crossover, right at the blockade radius r_b, is
-the boundary a real Rydberg-blockade gate is engineered around &mdash;
-atoms meant to interact are placed inside it, and atoms meant to stay
+the boundary a real Rydberg-blockade gate is engineered around: atoms
+meant to interact are placed inside it, and atoms meant to stay
 independent are placed outside it.
 
 The excitation step itself, driving an atom from its ground state up to
@@ -134,11 +137,11 @@ same two-level Rabi problem every other platform in this course uses to
 implement a <Term id="single-qubit-gates">single-qubit gate</Term>, just aimed at a different pair of levels
 here:
 
-<InteractiveSection title="Drive the ground-to-Rydberg transition" description="Set detuning to zero and vary the coupling strength V, playing the role of the laser's Rabi frequency driving the ground state up to the Rydberg state: watch the population sweep from 0 to 1 and back at t_π=π/(2V), exactly the resonant excitation step Rydberg-blockade gates rely on. Move detuning away from zero and see the achievable population drop below 1, the atomic-physics analog of an off-resonant control pulse on any platform.">
+<InteractiveSection title="Drive the ground-to-Rydberg transition" description="The transition being driven here is ground state to Rydberg state, the step a blockade gate opens with, and V plays the role of the exciting laser's Rabi frequency. Drive a full π-pulse on resonance first, then walk detuning off zero and read the achievable population ceiling again at each step. On this platform that ceiling is the gate: an atom the laser only half-excites neither reliably blockades its neighbour nor reliably stays out of the way, which is why the Rydberg laser's frequency stability is a gate-fidelity specification rather than a convenience.">
   <LazyRabiExplorer />
 </InteractiveSection>
 
-## Physical Interpretation
+## Reconfigurability as the Real Advantage
 
 Neutral atoms' central engineering advantage isn't raw speed, and it
 isn't per-qubit <Term id="coherence">coherence time</Term> alone. It's *scalable, flexible
@@ -146,13 +149,15 @@ geometry*: the ability to lay out and rearrange large numbers of
 identical, naturally-uniform qubits (since, like trapped ions, they're
 real atoms, not fabricated devices that vary chip-to-chip).
 
-This scaling path is not hypothetical: in September 2025, a Caltech team
-published a tweezer array holding 6,100 individual cesium atoms in
-Nature, keeping them in superposition for about 13 seconds (roughly ten
-times longer than prior arrays of comparable scale) while still
-manipulating individual qubits with 99.98% accuracy, evidence that
-scaling atom count doesn't have to come at the cost of qubit quality.
-It's also why this is the platform with actual paying customers today:
+This scaling path is not hypothetical. In September 2025 a Caltech group
+published, in Nature, a tweezer array holding more than 6,100 cesium
+atoms across roughly 12,000 sites, with a hyperfine coherence time of
+12.6 s and an imaging survival probability of 99.989% per round. Read
+those two numbers for what they are: coherence and non-destructive
+imaging at that scale, not entangling-gate fidelity, which the same
+paper does not claim. What they do establish is that adding atoms did
+not cost qubit quality. That is also why this is the platform with
+paying customers today:
 QuEra's Aquila system has been cloud-accessible for years, Pasqal sells
 neutral-atom systems directly to industrial and government labs in
 Europe, and Atom Computing and Harvard/QuEra collaborations have pushed
@@ -160,16 +165,18 @@ past 1,000 and then 3,000 atoms in a single array. The
 reconfigurable-tweezer argument this lesson makes about scaling is the
 argument each of those roadmaps is selling.
 
-### What this platform is bad at
+### What a tweezer array pays for
 
 Set against that, three costs are real and specific to tweezer arrays:
 
 - **Atoms fall out.** A tweezer holds an atom for seconds, not
   indefinitely, and a trap that loses its atom mid-circuit produces a
-  qubit that is neither $|0\rangle$ nor $|1\rangle$ but *absent* — a
-  leakage error, which error-correcting codes handle worse than a plain
-  bit flip. Loaded-site imaging and mid-circuit reloading exist to deal
-  with this, and both cost time.
+  qubit that is neither $|0\rangle$ nor $|1\rangle$ but *absent*. That is
+  a leakage error: it takes the qubit outside the computational
+  subspace, so a code built to catch bit flips and phase flips cannot
+  see it at all until the loss itself is detected. Loaded-site imaging
+  and mid-circuit reloading exist to detect and repair it, and both cost
+  time.
 - **The duty cycle is slow.** Loading, imaging, and rearranging an array
   into the requested geometry happens between shots, and takes far
   longer than the gates do. A neutral-atom device can be enormous and
@@ -181,7 +188,7 @@ Set against that, three costs are real and specific to tweezer arrays:
   separate axes; this platform leads on the first, not yet on the
   second.
 
-## Worked Example
+## Why There Is No Shared Bus Here
 
 **Why can't a plain (non-Rydberg) neutral atom implement a two-qubit
 gate as directly as an ion's shared vibrational mode?**
@@ -192,10 +199,10 @@ it easy to trap densely in the first place, but it also means
 two ordinary neutral atoms sitting near each other don't naturally
 influence one another's quantum state. Rydberg blockade solves this by
 *temporarily* creating a strong interaction on demand (via the Rydberg
-excitation), rather than relying on an always-on coupling the way trapped
-ions' shared vibrational mode does.
+excitation), where trapped ions rely on an always-on coupling through
+their shared vibrational mode.
 
-## Common Mistakes
+## Assuming Neutral Means Non-Interacting
 
 <Callout type="warning">
 **Assuming "neutral" means "no interactions, ever."** Neutral atoms have
@@ -216,24 +223,227 @@ light.
 
 1. Why does an ion trap need electric fields specifically, while a
    neutral atom cannot be trapped the same way?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because an ion trap grips *net charge*, and a neutral atom has none to
+   grip.
+
+   The force an electric field exerts on a charge is $\mathbf F=q\mathbf
+   E$. That is the entire mechanism a Paul trap runs on, and it is
+   linear in the charge. Set $q=0$ and the force is zero, no matter how
+   strong the field or how cleverly the electrodes are shaped. There is
+   nothing to fix.
+
+   An optical tweezer does something structurally different. Light is
+   also an electric field, but instead of pulling on a charge that is
+   already there, it *induces* a dipole in the atom, $\mathbf d=\alpha
+   \mathbf E$, and then acts on the dipole it just created. The
+   interaction energy goes as $U\propto-\alpha\langle E^2\rangle$, which
+   is proportional to intensity rather than to field, so the force is a
+   gradient of intensity and points toward the brightest spot. Focus a
+   beam tightly and the brightest spot is the focus, so that is where the
+   atom collects.
+
+   The wrong turn worth naming is "a neutral atom has no charge, so
+   electric fields do nothing to it." That is exactly backwards about
+   the mechanism actually used. A neutral atom has no net charge but is
+   very much polarizable, and the whole platform runs on that
+   polarizability. The correct statement is narrower: no *net* charge
+   means no first-order force, so trapping has to come from the
+   second-order, induced-dipole response instead.
+
+   That "second-order" is not a footnote, because it sets the platform's
+   costs. The field must first induce the dipole and then act on it, so
+   the trap is weak: tweezer depths are in the millikelvin range, and
+   an atom stays for seconds rather than indefinitely. When one leaves,
+   the site holds no qubit at all, which is the leakage-style error mode
+   the lesson describes.
+
+   A second, related mistake is picturing the beam as *pushing* the
+   atom. Radiation pressure does exist and does push, along the beam
+   direction. It is not the trapping force. Trapping is the dipole
+   gradient force, and a tweezer is engineered around it: the beam is
+   held far off resonance on purpose, so that it shifts the atom's
+   levels without exciting it, and it is focused tightly enough that
+   the intensity gradient at the focus dominates the scattering push.
+
+   </details>
+
 2. What specific engineering advantage do reconfigurable optical-tweezer
    arrays provide that a fixed trapped-ion chain does not?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The array's *geometry* is a control parameter, set by where the beams
+   are pointed rather than by physics or by fabrication, and it can be
+   changed between shots or even mid-experiment.
+
+   In a linear Paul trap the ions' positions are not chosen. They are the
+   equilibrium of mutual Coulomb repulsion against the trap's confinement,
+   which puts the ions in a line with a spacing the trap dictates. You
+   cannot decide that ion 3 should sit beside ion 17. In a tweezer array
+   every atom sits at its own separately steerable focus, so any 2D or
+   even 3D pattern is available and can be redrawn.
+
+   Three concrete payoffs follow.
+
+   **Defect repair.** Tweezer loading is stochastic: a given site catches
+   an atom or does not. Rather than accepting the holes, an experiment
+   images the array, sees which sites loaded, and moves atoms into the
+   target pattern before the circuit runs. A missing ion in a chain is
+   not repairable this way.
+
+   **Layout matched to the circuit.** Because Rydberg blockade is
+   distance-limited, which pairs can interact is decided by how far apart
+   they are placed. Pairs a circuit needs to entangle go inside the
+   blockade radius, pairs that must stay independent go outside it. The
+   connectivity graph is drawn to fit the algorithm instead of the
+   algorithm being routed onto a fixed graph.
+
+   **Site count.** Tweezer arrays have reached thousands of sites in one
+   plane, over 6,100 atoms across roughly 12,000 sites in a 2025 Caltech
+   result, while an ion chain gets harder to work with as it lengthens:
+   more ions share the trap's motional modes, the modes crowd together,
+   and gate fidelity and speed both degrade.
+
+   Two wrong turns are worth flagging, because both overstate the
+   advantage in ways the lesson explicitly guards against.
+
+   The first is reading "thousands of atoms" as "thousands of qubits."
+   The Caltech result reports coherence and non-destructive imaging at
+   that scale. It does not claim entangling-gate fidelity at that scale,
+   and the paper does not pretend otherwise. Trapped-atom count and
+   gate-ready qubit count are separate numbers.
+
+   The second is reading "reconfigurable" as "all-to-all." It is not the
+   same property. A trapped-ion chain genuinely has every edge available
+   at once, through the shared mode. A tweezer array has a graph you can
+   *redraw between runs*, which is a different and in some ways weaker
+   thing: within a single shot the available edges are still whatever the
+   current geometry provides. Rearrangement also happens between shots
+   and is slow compared with the gates, so a very large neutral-atom
+   machine can still return fewer shots per second than a small
+   superconducting chip.
+
+   </details>
+
 3. Explain Rydberg blockade in one or two sentences, focusing on what
-   happens to a neighboring atom's ability to also become excited.
+   happens to a neighboring atom's ability to also become excited. Then
+   state the condition, in terms of the interaction strength and the
+   exciting laser, that has to hold for the suppression to be complete.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Exciting atom A to a Rydberg state gives it an enormous electron orbit
+   and therefore a strong interaction with any nearby atom, and that
+   interaction shifts atom B's Rydberg level far enough that the laser
+   which was resonant for B no longer reaches it. So while A is excited,
+   B cannot be excited to the same state at all: suppressed, not merely
+   weakened.
+
+   **The condition.** Write the interaction energy between two Rydberg
+   atoms a distance $r$ apart as $V(r)$, and let $\Omega$ be the Rabi
+   frequency of the exciting laser. The laser can bridge a detuning of
+   roughly $\Omega$. Blockade is complete when the shift it has to bridge
+   is larger than that:
+
+   $$
+   V(r) \gg \hbar\Omega .
+   $$
+
+   The blockade radius $r_b$ is where those two are equal, $V(r_b)=\hbar
+   \Omega$. Inside it the shift wins and B stays in its ground state;
+   outside it the laser wins and B excites as though A were not there.
+   Since $V(r)$ falls off steeply with distance, typically as $1/r^6$ for
+   the van der Waals case, the crossover is sharp, which is why the
+   lesson's slider shows a threshold rather than a fade.
+
+   Notice what the condition implies about driving harder. A stronger
+   Rydberg laser raises $\Omega$, which shrinks $r_b$. Turning up the
+   power to get a faster gate shrinks the very radius the gate depends
+   on, so drive strength and blockade range trade against each other and
+   the array's spacing has to be designed against the drive you intend to
+   use.
+
+   Two wrong pictures to discard. The first is mechanical: the huge
+   Rydberg orbital does not push B away. Neither atom moves; what moves
+   is where B's energy levels sit. The second is global: blockade is not
+   a suppression across the whole array. It is radius-limited, and it has
+   to be, because a suppression that applied everywhere and always would
+   leave no conditional dependence between one specific pair, which is
+   precisely the thing the entangling gate is built out of.
+
+   </details>
+
 4. Is Rydberg blockade's interaction always-on (like ions' Coulomb
    repulsion) or switched on deliberately? Why does this distinction
    matter for gate design?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Switched on deliberately. Two ground-state neutral atoms sitting
+   micrometres apart have essentially no long-range interaction. The
+   strong interaction exists only while an atom is in the Rydberg state,
+   and that lasts only as long as the Rydberg laser says so. The coupling
+   is created for the gate and destroyed afterwards.
+
+   Ions are the opposite. Coulomb repulsion between two charges cannot be
+   turned off, and the shared motional mode it produces is there whether
+   the current circuit wants it or not.
+
+   Three consequences for gate design follow, and they cut in both
+   directions.
+
+   **Idle qubits are genuinely idle.** With no default coupling, an atom
+   not being addressed is not weakly coupled to anything, so there is no
+   accumulating spectator phase from its neighbours to undo. A large part
+   of trapped-ion gate design is about *not* exciting couplings you did
+   not ask for, and about closing the excursion into a mode that is
+   always available to be excited. Neutral atoms simply do not have that
+   bookkeeping when the Rydberg laser is off.
+
+   **The cost is concentrated into the gate window.** The Rydberg state
+   is a genuinely fragile place to keep an atom: it decays radiatively on
+   a timescale far shorter than the ground hyperfine coherence time the
+   platform advertises, and its enormous orbit that makes the interaction
+   strong also makes it very sensitive to stray electric fields. So the
+   entangling gate has to finish quickly compared with the Rydberg
+   lifetime, and it carries an error budget the idle qubit does not. This
+   is a large part of why a platform with seconds of coherence still has
+   entangling fidelities trailing trapped ions.
+
+   **Which pairs can interact is a geometry decision.** Because the
+   coupling only reaches inside $r_b$, the compiler's connectivity graph
+   is set by where the tweezers put the atoms. Combined with question 2,
+   that means the coupling graph is chosen twice over: once by placing
+   atoms inside or outside the blockade radius, and again by rearranging
+   them between shots.
+
+   The wrong turn is treating "no interaction by default" as unqualified
+   good news, the same overreach as "neutral means non-interacting."
+   Switchable coupling removes the always-on crosstalk problem and buys a
+   new one: every entangling operation now requires driving a transition
+   to a fragile state and getting back down cleanly, and the fidelity of
+   that round trip is the platform's binding constraint.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
-- Optical tweezers trap neutral atoms using focused laser light, not
-  electric fields, since neutral atoms carry no net charge for an
-  electric field to grip.
+- Optical tweezers trap neutral atoms with focused laser light. An ion
+  trap's electric fields have nothing to grip here, since a neutral atom
+  carries no net charge.
 - This enables large, flexible, reconfigurable 2D/3D arrays, a
-  different scaling path from trapped ions' linear chains, reaching
-  some of the largest qubit counts of any current platform.
+  different scaling path from trapped ions' linear chains, reaching the
+  largest trapped-atom counts of any current platform, which is not the
+  same claim as the largest count of gate-ready qubits.
 - Two-qubit gates use Rydberg blockade: a temporary, deliberately
   induced strong interaction between neighboring excited atoms, not an
   always-on coupling like trapped ions' shared vibrational mode.
@@ -241,7 +451,7 @@ light.
   load-image-rearrange cycle between shots, and entangling-gate
   fidelities that have historically trailed both ions and transmons.
 
-## Further Exploration
+## A Platform That Traps Nothing
 
 <NextDiscovery>
 [Photonic Qubits](/lessons/quantum-hardware/physical-qubit-platforms/photonic-qubits) is a platform that doesn't trap anything at all:

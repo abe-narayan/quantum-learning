@@ -15,26 +15,34 @@ export const fuchsVanDeGraafPureEquality: ConceptualProblem = {
   question: {
     type: "conceptual",
     prompt:
-      "The upper bound D(rho,sigma) <= sqrt(1-F(rho,sigma)^2) is proved via contractivity of trace distance under partial trace, applied to Uhlmann-optimal purifications. Explain why this bound becomes an EQUALITY exactly when rho and sigma are both already pure.",
+      "The upper bound D(rho,sigma) <= sqrt(1-F(rho,sigma)^2) is proved via contractivity of trace distance under partial trace, applied to Uhlmann-optimal purifications. Explain why this bound becomes an equality exactly when rho and sigma are both already pure.",
     placeholder: "Think about what 'purification' even means when the state is already pure...",
   },
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["own purification", "already pure", "trivial purification", "itself"],
+      {
+        phrases: ["own purification", "trivial purification", "purifies itself", "itself", "themselves", "trivial B", "one-dimensional"],
+        missingFeedback:
+          "Ask what the purifications used in the proof actually are when the states going in are already pure. Say what the reference system looks like in that case.",
+      },
       {
         phrases: ["contractivity", "contraction", "equality", "no partial trace needed", "nothing to trace out", "b is trivial", "no slack", "loses nothing", "tight"],
         missingFeedback:
-          "You have noticed that a pure state purifies itself. Say what that does to the proof: the only inequality in it is the contraction under tracing out B, and with B one-dimensional there is nothing to trace out, so that step loses nothing and the bound closes.",
+          "You have noticed what the construction hands back when the state carries no mixedness. Say what that does to the proof. There is exactly one lossy step in it, and it comes from discarding the auxiliary system. Ask how much gets discarded when that system has a single dimension.",
       },
     ],
     incorrectFeedback:
-      "If rho and sigma are already pure, their own Uhlmann-optimal purifications can be taken to be themselves (a trivial one-dimensional B system), so the contractivity step used to derive the upper bound involves no actual partial trace, and the pure-pure trace-distance identity applies directly with no loss.",
+      "Ask what the upper-bound proof actually does, step by step, and where the one lossy step in it sits. Then ask what the Uhlmann construction hands you for the auxiliary system when neither state carries any mixedness, and how much a trace over such a system can throw away.",
+    modelAnswers: [
+      "If rho and sigma are already pure, each one purifies itself: the reference system B is trivial, one-dimensional. The proof's only inequality is contractivity of trace distance under the partial trace over B, and with nothing to trace out that step loses nothing, so the bound is tight.",
+      "A pure state is its own purification, so B is trivial and there is no partial trace left to perform. The contractivity step becomes an equality rather than an inequality, which is why the bound is saturated.",
+    ],
   },
   hints: [
-    { text: "A pure state is trivially its own purification, using a one-dimensional (trivial) system B." },
-    { text: "The upper-bound proof used D(rho,sigma) <= D(purifications), a contraction under partial trace over B." },
-    { text: "If B is trivial, there's nothing to trace out, so the inequality in that step is automatically an equality." },
+    { text: "What is the smallest auxiliary system that will purify a state carrying no mixedness?" },
+    { text: "The upper bound came from D(rho,sigma) <= D(purifications). Which way does discarding the auxiliary system push the distance, and why?" },
+    { text: "If that system has a single dimension, how much is actually being discarded, and what does that do to the step you just described?" },
   ],
   solution: {
     steps: [
@@ -42,10 +50,10 @@ export const fuchsVanDeGraafPureEquality: ConceptualProblem = {
       { description: "The contractivity step D(rho,sigma) <= D(purifications) traces out B; with B trivial, there is nothing to trace out, so this step is an equality, not a strict inequality." },
       { description: "The pure-pure identity D(|psi>,|phi>)=sqrt(1-|<psi|phi>|^2) then applies directly, giving D(rho,sigma)=sqrt(1-F(rho,sigma)^2) exactly." },
     ],
-    finalAnswer: "For pure states, the purifications used in the proof ARE rho and sigma themselves (trivial B), so the contractivity inequality never actually loses anything, and the bound is exactly tight.",
+    finalAnswer: "For pure states, the purifications used in the proof are rho and sigma themselves (trivial B), so the contractivity inequality never loses anything and the bound is exactly tight.",
   },
   explanation: {
     correctIdea: "The upper bound's only source of slack is the partial trace over B in the contractivity step; a pure state's trivial purification means that step traces out nothing.",
-    whyCorrect: "This is exactly why the worked example's own numbers show real slack for the genuinely mixed rho_AD, rho_DP -- those states are not their own purifications, so B is nontrivial and information is genuinely lost tracing it out.",
+    whyCorrect: "The worked example's mixed rho_AD and rho_DP show real slack for the opposite reason: neither is its own purification, so B is nontrivial and tracing it out genuinely discards something.",
   },
 };

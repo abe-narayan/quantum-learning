@@ -3,7 +3,8 @@ import { Container } from "@/components/ui/Container";
 import { Wordmark } from "@/components/layout/Wordmark";
 import { ROUTE_TO_PILLAR } from "@/components/layout/pillarRoutes";
 import { PILLAR_ORDER } from "@/lib/design/pillars";
-import { NAV_ITEMS, TRACK_NAV_ITEMS } from "@/lib/nav";
+import { ENTRY_BAR_SHORT } from "@/lib/entryBar";
+import { FOOTER_REFERENCE_ITEMS, TRACK_NAV_ITEMS } from "@/lib/nav";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { cn } from "@/lib/utils";
 
@@ -38,16 +39,46 @@ export async function Footer() {
         <div className="max-w-xs">
           <Link
             href="/"
-            className={cn("inline-flex items-center rounded-(--radius-tight)", INTERACTIVE_CLASSES)}
+            // The wordmark's mark is 28px here, so the link is a 28px target.
+            // Padding cancelled by an equal negative margin lifts the hit area
+            // to 44px without moving the paragraph below it, and there is no
+            // adjacent target for the expanded box to collide with.
+            className={cn("-my-2 inline-flex items-center rounded-(--radius-tight) py-2", INTERACTIVE_CLASSES)}
           >
             <Wordmark markClassName="h-7 w-7" />
           </Link>
+          {/* "Built for advanced high-school and early-college students" was
+              the narrowest audience statement on the site, and it excluded by
+              name the adult self-learner the homepage spends three paragraphs
+              welcoming. The entry bar is the honest way to say who this is
+              for, and it is the same bar `lib/entryBar.ts` states everywhere
+              else.
+
+              It now *is* that bar, rather than a paraphrase of it. "Open to
+              anyone who can rearrange an equation" was the pre-correction
+              claim, copied here by hand: it promised algebra and nothing
+              more, and the corpus needs trigonometry in radians by the second
+              lesson of both roots and assumes single-variable calculus from
+              the second physics course on. Every other surface that makes
+              this claim (the hero, /learn, /about, the tier ladder) was moved
+              onto `lib/entryBar.ts`; this footer was the last hand-kept copy,
+              which is exactly how the claim came to exist in six incompatible
+              wordings the first time.
+
+              `ENTRY_BAR_SHORT` rather than `ENTRY_BAR`, per that module's own
+              note: the sentence before it already says what is being
+              described, so the footnote form is the grammatical fit, and the
+              full three-sentence version would be the longest paragraph in
+              the footer by some margin. */}
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            A research console for quantum mechanics and quantum computing — built for advanced high-school
-            and early-college students.
+            A research console for quantum mechanics and quantum computing. {ENTRY_BAR_SHORT}
           </p>
           <p className="tech-label mt-6 text-subtle-foreground">
-            {PILLAR_ORDER.length} pillars · {lessonCount} lessons
+            {/* "Tracks", not "pillars": /learn, the nav and the homepage all
+                say "track" to the reader now, and this footer line sits under
+                a column headed "Curriculum" listing those same six. `Pillar`
+                stays the internal data/CSS-token name everywhere. */}
+            {PILLAR_ORDER.length} tracks · {lessonCount} lessons
           </p>
         </div>
 
@@ -60,7 +91,7 @@ export async function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className={cn("group flex items-start gap-2 rounded-sm", INTERACTIVE_CLASSES)}
+                    className={cn("group flex min-h-11 items-start gap-2 rounded-sm", INTERACTIVE_CLASSES)}
                   >
                     <span
                       data-pillar={pillar}
@@ -82,14 +113,27 @@ export async function Footer() {
           </ul>
         </nav>
 
-        <nav aria-label="Explore">
-          <p className="tech-label text-subtle-foreground">Explore</p>
-          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:block sm:space-y-2">
-            {NAV_ITEMS.map((item) => (
+        <nav aria-label="Reference and tools">
+          <p className="tech-label text-subtle-foreground">Reference</p>
+          {/* `gap-y-0.5`, not `gap-y-2`: each link below now carries its own
+              44px box, so the row pitch comes from the targets themselves
+              rather than from a gap sized for 20px line boxes. */}
+          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-0.5 text-sm sm:block sm:space-y-0.5">
+            {FOOTER_REFERENCE_ITEMS.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className={cn("rounded-sm text-muted-foreground hover:text-foreground", INTERACTIVE_CLASSES)}
+                  // A bare 14px anchor is a 20px target. Not a WCAG 2.5.8
+                  // failure (the 8px gap kept the 24px circles from
+                  // intersecting) but well under the 44px floor this site
+                  // applies everywhere else, and this is the one place a
+                  // reader who scrolled past the whole page can still reach
+                  // every section. `inline-flex min-h-11` rather than the
+                  // padding-and-negative-margin trick used on baseline-aligned
+                  // links elsewhere: at a 28px row pitch that trick would have
+                  // made adjacent targets overlap by 16px, which mis-taps
+                  // worse than an undersized target does.
+                  className={cn("inline-flex min-h-11 items-center rounded-sm text-muted-foreground hover:text-foreground", INTERACTIVE_CLASSES)}
                 >
                   {item.label}
                 </Link>
@@ -100,7 +144,7 @@ export async function Footer() {
       </Container>
 
       <Container className="border-t border-border py-6">
-        <p className="text-xs text-muted-foreground">© {year} QuantumLearn. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground">© {year} StudyQuantum. All rights reserved.</p>
       </Container>
     </footer>
   );

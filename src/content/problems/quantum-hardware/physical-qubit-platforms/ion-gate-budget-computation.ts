@@ -42,7 +42,7 @@ export const ionGateBudgetComputation: NumericProblem = {
   },
   explanation: {
     correctIdea: "This applies the lesson's ratio method to a new set of numbers, confirming the technique generalizes beyond the specific worked example.",
-    whyCorrect: "Direct unit-consistent division, matching the lesson's own worked-example methodology.",
+    whyCorrect: "Coherence time over gate time counts how many gates fit before coherence is gone. Trapped ions' long coherence buys a large budget in spite of their slow gates, which is the whole point of comparing platforms on the ratio rather than on either duration.",
     whyWrong: ["Forgetting to convert units consistently (mixing seconds and microseconds without conversion) would give an answer off by a large, incorrect factor."],
   },
 };

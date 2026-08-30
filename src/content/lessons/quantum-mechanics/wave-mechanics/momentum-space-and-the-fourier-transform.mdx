@@ -28,23 +28,24 @@ export const lessonMeta = {
   objectives: [
     "Explain phi(k) as psi(x) expressed in the momentum eigenbasis, via the same basis-change logic as finite dimensions",
     "State the Fourier transform pair connecting psi(x) and phi(k), including why the normalization constant makes it norm-preserving",
+    "Trace how narrowing psi(x) necessarily widens phi(k), and why the Gaussian is the shape that saturates that trade-off",
     "Use the Wavefunction Explorer's momentum-space view to connect a wavefunction's spatial shape to its momentum content directly",
   ],
   related: [
     {
       slug: "quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform",
-      note: "The same unitary Fourier-transform basis change, discretized: e^{ikx} here becomes e^{2πijk/N} there, amplitudes on a continuum versus amplitudes on qubits.",
+      note: "The same unitary Fourier-transform basis change, discretized: the continuous kernel e^(ikx) here becomes e^(2πijk/N) there, amplitudes on a continuum versus amplitudes on qubits.",
     },
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="One state, two coordinate systems">
   ψ(x) and φ(k) are one state written in two bases, the way |+⟩ and
   |0⟩,|1⟩ describe one qubit. They are not two different things about a
   particle.
 </LessonHook>
 
-## Motivation
+## A basis change you have already done once
 
 Mathematical Foundations proved that changing basis in a finite-dimensional
 <Term id="hilbert-space">Hilbert space</Term> re-expresses the same vector in different coordinates,
@@ -64,7 +65,7 @@ transform.
   license="Public domain"
 />
 
-## Intuition
+## How much amplitude at each momentum?
 
 $\psi(x)$ answers "how much <Term id="amplitude">amplitude</Term> at each position?" $\phi(k)$ (using
 wavenumber $k=p/\hbar$, this platform's convention with $\hbar=1$) answers
@@ -73,7 +74,7 @@ are two different-basis descriptions of one vector $|\psi\rangle$.
 Neither is more fundamental, in the same way that $|+\rangle$ is no more
 fundamental than $|0\rangle,|1\rangle$.
 
-## Mathematical Development
+## The transform pair, and what it preserves
 
 ### The transform pair
 
@@ -129,36 +130,46 @@ $|\psi(x)|^2$. That recipe is how `Wavefunction1D.expectationMomentum()`
 and `.expectationKineticEnergy()` are implemented: transform to momentum
 space, then take the same weighted average as before.
 
-## Physical Interpretation
+## Squeeze in x and k pays for it
 
-A wavefunction narrow in $x$ (tightly localized position) is *necessarily*
-broad in $k$ (spread across many momenta), and vice versa, not as a
-mysterious "principle" but as an ordinary, provable fact about Fourier
-transforms (a signal concentrated in time has a broad frequency spectrum).
-The <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term> derived abstractly in the last course, and
-re-derived from calculus two lessons ago, is *this* fact, restated.
+Nothing said so far restricts a wavefunction's shape. $\psi(x)$ and
+$\phi(k)$ are two coordinate descriptions of one vector, and it is not
+obvious from that alone that squeezing the state in $x$ should do anything
+in particular to it in $k$. Commit to an answer before reading on.
 
 <PredictBeforeReveal
-  question="If you narrow a wave packet's spatial width σ (localize it more tightly in x), what happens to its momentum-space width?"
+  question="You narrow a wave packet's spatial width σ, localizing it more tightly in x, and take the Fourier transform. What happens to the width of φ(k)?"
   options={[
-    { label: "It narrows too: both get more localized", value: "narrows" },
-    { label: "It widens: position and momentum trade off", value: "widens" },
-    { label: "It is unaffected; the two are independent", value: "unaffected" },
+    { label: "It narrows too: the state gets more localized in both", value: "narrows" },
+    { label: "It widens: narrowing one width always broadens the other", value: "widens" },
+    { label: "It is unaffected; x and k are independent coordinates", value: "unaffected" },
+    { label: "It depends on the packet's shape, with no rule covering every case", value: "shape" },
   ]}
   correctValue="widens"
-  explanation="It widens. This is not a separate physical principle bolted onto the Fourier transform. It is an ordinary mathematical fact about Fourier transforms: a function narrow in one domain is broad in the transform domain. The worked example below makes it exact. Δx·Δp = 1/2 no matter how σ is chosen, so shrinking one side of the product always grows the other."
+  explanation="It widens, and it does so for every shape, not only Gaussians. This is not a physical principle bolted onto the Fourier transform. It is an ordinary mathematical fact about Fourier transforms: compressing a function in one domain stretches its transform in the other, the same reason a short pulse in time needs a broad band of frequencies. The worked example below makes it exact for the Gaussian, where Δx·Δp = 1/2 whatever σ is, so shrinking one factor must grow the other."
 />
 
-<InteractiveSection title="Narrow one, widen the other" description="Switch the Wavefunction Explorer's view mode to |φ(k)|² on any preset. The free Gaussian packet's momentum-space view is a Gaussian too (the Fourier transform of a Gaussian is a Gaussian, verified numerically in this course's engine tests), centered exactly at the packet's momentum parameter. Try narrowing the packet's spatial width and watch its momentum-space width grow wider in direct proportion: the uncertainty principle, live.">
+That trade-off is the whole content of the <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term>. A
+wavefunction narrow in $x$ is *necessarily* broad in $k$ and vice versa,
+not as a mysterious extra postulate but as a provable fact about Fourier
+transforms. The relation derived abstractly in the last course from the
+commutator, and re-derived from calculus in the last lesson, is *this* fact
+restated in the language of operators.
+
+<InteractiveSection title="Narrow one, then measure the other" description="Switch the Wavefunction Explorer's view mode to |φ(k)|² on any preset. The free Gaussian packet's momentum-space view is a Gaussian too (the Fourier transform of a Gaussian is a Gaussian, verified numerically in this course's engine tests), centered exactly at the packet's momentum parameter. Read the momentum-space width, then halve the packet's spatial width and read it again. Compare the two numbers, and then compare the two products: the uncertainty principle, live.">
   <LazyWavefunctionExplorer />
 </InteractiveSection>
 
-## Worked Example
+## The Gaussian's width in the other basis
 
 **A stationary ($p_0=0$) Gaussian packet has position-space width
 $\sigma$. What is its momentum-space width?**
 
-The Fourier transform of $\psi(x)\propto e^{-x^2/(4\sigma^2)}$ is
+Write the packet as $\psi(x)\propto e^{-x^2/(4\sigma^2)}$, the form in
+which $\sigma$ is the position spread itself, $\Delta x = \sigma$. This is
+the platform's `width` convention, and it is the one of the two flagged in
+the Expectation Values lesson that puts no stray $\sqrt2$ anywhere in what
+follows. Its Fourier transform is
 $\phi(k)\propto e^{-\sigma^2 k^2}$ (a standard transform pair, verified
 directly in `fourier.test.ts` against the platform's own FFT), which is a
 Gaussian in $k$ with variance $(\Delta k)^2 = 1/(4\sigma^2)$, so
@@ -168,7 +179,7 @@ Gaussian packet exactly saturates the uncertainty bound $\Delta x\Delta
 p\ge\hbar/2$, the minimum-uncertainty state referenced (but not derived)
 in the last course.
 
-<InteractiveSection title="The uncertainty box: saturating ħ/2" description="A box of width Δx = σ and height Δp = 1/(2σ), the same construction as the Position and Momentum lesson's uncertainty box, now driven by this lesson's own Gaussian-packet formulas. Drag σ and watch the box narrow horizontally while it stretches vertically. Its area Δx·Δp never changes, pinned at exactly 1/2 = ħ/2 in natural units, which is the worked example's saturation of the bound shown as a geometric constraint.">
+<InteractiveSection title="The uncertainty box: read the area as σ moves" description="A box of width Δx = σ and height Δp = 1/(2σ), the same construction as the Position and Momentum lesson's uncertainty box, now driven by this lesson's own Gaussian-packet formulas. Drag σ and watch the box narrow horizontally while it stretches vertically, reading the area Δx·Δp at each end of the range. In natural units ħ/2 is exactly 1/2, so the number you read is directly comparable to the bound the worked example saturates.">
   <PhaseSpacePanel
     mode="box"
     frames={gaussianPacketFrames}
@@ -177,7 +188,7 @@ in the last course.
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Two bases, one set of predictions
 
 <Callout type="note">
 **Treating $\phi(k)$ as a separate, unrelated function from $\psi(x)$.**
@@ -199,11 +210,141 @@ as this lesson pins down the platform's.
 1. If $\psi(x)$ is real and even (symmetric about $x=0$), what symmetry
    must $\phi(k)$ have? (Hint: consider what happens to the transform
    integral under $k\to -k$.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\phi(k)$ is also real and even.
+
+   Take the two properties separately, since they come from different
+   halves of the integrand.
+
+   **Even.** Put $-k$ into the transform and substitute $u=-x$, which
+   flips the direction of integration and hands back a minus sign that the
+   swapped limits immediately undo:
+
+   $$
+   \phi(-k) = \frac{1}{\sqrt{2\pi}}\int \psi(x)\,e^{ikx}\,dx = \frac{1}{\sqrt{2\pi}}\int \psi(-u)\,e^{-iku}\,du = \frac{1}{\sqrt{2\pi}}\int \psi(u)\,e^{-iku}\,du = \phi(k)
+   $$
+
+   the third equality being where $\psi(-u)=\psi(u)$ is used. So evenness
+   of $\psi$ transfers directly to $\phi$.
+
+   **Real.** Conjugate the transform, using $\psi^*=\psi$ because $\psi$ is
+   real:
+
+   $$
+   \phi(k)^* = \frac{1}{\sqrt{2\pi}}\int \psi(x)^*\,e^{ikx}\,dx = \frac{1}{\sqrt{2\pi}}\int \psi(x)\,e^{ikx}\,dx = \phi(-k)
+   $$
+
+   That identity, $\phi(k)^*=\phi(-k)$, holds for *any* real $\psi$. Now
+   combine it with evenness, $\phi(-k)=\phi(k)$, and you get
+   $\phi(k)^*=\phi(k)$, which says $\phi$ is real.
+
+   A cleaner way to see both at once: split $e^{-ikx}=\cos kx - i\sin kx$.
+   Against an even $\psi$ the $\sin$ piece is an odd integrand and
+   integrates to zero, killing the imaginary part outright, and what
+   survives is $\phi(k)\propto\int\psi(x)\cos(kx)\,dx$, manifestly real and
+   even in $k$.
+
+   The Gaussian is the standard illustration: real and even in $x$, and its
+   transform is real and even in $k$, which is why the worked example could
+   quote $\phi(k)\propto e^{-\sigma^2k^2}$ with no phase attached.
+
+   The trap is assuming realness alone is enough. It is not. A real but
+   *shifted* Gaussian, centred at $x_0\ne0$, is real and not even, and its
+   transform picks up a factor $e^{-ikx_0}$: complex, with
+   $|\phi(k)|$ unchanged. Displacing a packet in position changes only the
+   *phase* of its momentum amplitude, never the momentum distribution,
+   which is the same statement as a free packet's $\Delta p$ staying
+   constant while it moves.
+
+   </details>
+
 2. Using Parseval's theorem, explain why a normalized $\psi(x)$
    guarantees a normalized $\phi(k)$ without recomputing any integral.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because Parseval's theorem is the statement that the two integrals are
+   *the same number*, so fixing one fixes the other:
+
+   $$
+   \int|\phi(k)|^2\,dk = \int|\psi(x)|^2\,dx = 1
+   $$
+
+   There is nothing left to compute. The second equality is the assumption
+   that $\psi$ is normalized; the first is the theorem.
+
+   The reason the theorem holds is worth naming rather than treating as a
+   coincidence of Fourier analysis. The transform is a *change of basis*,
+   from the position eigenbasis to the momentum eigenbasis, and the
+   $1/\sqrt{2\pi}$ out front is chosen precisely to make that change of
+   basis unitary. A unitary map satisfies $\|Uv\|=\|v\|$, so it cannot
+   change the length of the vector it acts on; Parseval is that sentence
+   written for this particular unitary. The finite-dimensional analogue is
+   immediate: writing $|+\rangle$ in the $\{|0\rangle,|1\rangle\}$ basis
+   instead of its own does not change the fact that its coefficients'
+   squared magnitudes sum to $1$.
+
+   Physically the same fact reads: the particle is somewhere with
+   certainty, and it also has *some* momentum with certainty, and these are
+   not two independent claims to be checked separately. They are one claim
+   about one state, asked in two bases.
+
+   The specific misreading to avoid is treating $\phi(k)$ as a second,
+   independently-normalizable object, and imagining you might have to
+   rescale it after transforming. Rescaling it would break the pair: the
+   inverse transform of a rescaled $\phi$ is a rescaled $\psi$, no longer
+   normalized. If a numerical transform comes back with the wrong norm,
+   the fault is in the discrete normalization convention, not in the state,
+   which is exactly why the engine carries an explicit
+   $\Delta x/\sqrt{2\pi}$ factor and why its test suite checks Parseval
+   numerically instead of assuming it.
+
+   </details>
+
 3. For a momentum-space Gaussian of width $\Delta k = 2$, what is the
    corresponding position-space width, if the state saturates the
    uncertainty bound?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\Delta x = \sigma = 0.25$.
+
+   Saturation means the product sits exactly at the bound, which in these
+   natural units ($\hbar=1$, so $\Delta p=\Delta k$) is $\tfrac12$:
+
+   $$
+   \Delta x\,\Delta k = \frac12 \quad\Longrightarrow\quad \Delta x = \frac{1}{2\Delta k} = \frac{1}{2(2)} = \frac14
+   $$
+
+   Cross-check it against the worked example's relation the other way
+   round: it derived $\Delta k = 1/(2\sigma)$, so $\sigma = 1/(2\Delta k) =
+   0.25$, and then $\Delta x\,\Delta k = 0.25\times2 = 0.5$. Consistent.
+
+   Two things to keep straight.
+
+   The word "saturates" is doing real work in the question. For a general
+   wavefunction the relation is an inequality, $\Delta x\,\Delta k\ge
+   \tfrac12$, and knowing $\Delta k$ would then give only $\Delta x\ge0.25$
+   with no upper limit. It is the extra information that this state is
+   Gaussian, and therefore a minimum-uncertainty state, that turns the
+   inequality into an equation and makes a single answer possible. The
+   challenge below asks what happens for a top-hat, and the answer is a
+   product strictly larger than $\tfrac12$.
+
+   The direction of the relation is the other place to slip. $\Delta k = 2$
+   is a *wide* momentum distribution, so the state must be tightly
+   localized, and $0.25$ is indeed small. An answer of $\Delta x = 4$,
+   obtained by multiplying instead of dividing, would say a broad momentum
+   spread accompanies a broad position spread, which is the trade-off
+   backwards. Checking the product afterwards catches this every time:
+   $4\times2 = 8$, nowhere near $\tfrac12$.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -219,7 +360,7 @@ as this lesson pins down the platform's.
 - A Gaussian wave packet exactly saturates $\Delta x\Delta p=\hbar/2$,
   the tightest uncertainty allowed.
 
-## Further Exploration
+## What minimum uncertainty implies for every other shape
 
 <ChallengePrompt prompt="The worked example's Gaussian saturates Δx·Δp = ħ/2 exactly, the minimum the uncertainty principle allows. For a non-Gaussian wavefunction (say, a flat top-hat), would you expect Δx·Δp to still equal exactly ħ/2, or something larger?">
   The lesson calls the Gaussian "the minimum-uncertainty state." Think
@@ -236,5 +377,5 @@ as this lesson pins down the platform's.
   object $|p\rangle$ is, and of why every calculation built on it here was
   still valid, now exists in
   [Continuous Spectra and Rigged Hilbert Space](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space),
-  part of the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
+  part of the Quantum Mastery track's Hilbert Space & Spectral Theory course.
 </NextDiscovery>

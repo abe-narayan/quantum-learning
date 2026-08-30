@@ -30,8 +30,9 @@ export const postulateExpectationValue: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The Born rule gives P(+1) = cos²(π/3) = 0.25, and P(-1) = 1 - 0.25 = 0.75." },
-    { text: "⟨A⟩ = (+1)(0.25) + (-1)(0.75)." },
+    { text: "An expectation value is not the average of the eigenvalues. It is the average of the eigenvalues weighted by how likely each one is." },
+    { text: "Use the Born rule on the state's two coefficients to get the outcome probabilities, then weight each eigenvalue by its own probability and sum." },
+    { text: "Check that your two probabilities add to 1 before combining them. If the larger one sits on the negative eigenvalue, the answer has to come out negative." },
   ],
   solution: {
     steps: [

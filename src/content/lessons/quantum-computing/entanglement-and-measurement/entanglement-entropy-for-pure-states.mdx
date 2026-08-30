@@ -34,11 +34,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="One word is load-bearing">
 Two pieces are on the table. For a 2-qubit pure state, a reduced state's mixedness is equivalent to entanglement, and von Neumann entropy quantifies mixedness. Put them together and you have a number that measures entanglement. The word "pure" in the first piece is load-bearing, and this lesson shows what breaks without it.
 </LessonHook>
 
-## Motivation
+## Composing two earlier results
 
 Lesson 5 proved that a reduced state's mixedness is equivalent to
 entanglement for 2-qubit pure states, and Lesson 6 built von Neumann
@@ -50,10 +50,10 @@ Both halves of that sentence deserve scrutiny, and one of them is a trap.
 "How entangled" implies a graded quantity rather than a yes/no flag, which
 turns out to be right. "Pure bipartite state" looks like a technical
 precondition that could probably be relaxed later, which turns out to be
-wrong. Drop it and the formula reports maximal entanglement for a state
-with none, as the counterexample below shows.
+wrong. Drop it and the formula reports entanglement for a state that has
+none, and the size of the error is worth predicting before you see it.
 
-## Mathematical Development
+## The definition, then the case that breaks it
 
 ### The definition
 
@@ -64,11 +64,17 @@ $$
 E(|\psi\rangle) = S(\rho_A) = S(\rho_B)
 $$
 
-The two are always equal for a pure bipartite state (not asserted:
-`entanglementEntropy`'s tests check it directly for several states, and
-it follows from the fact that $\rho_A$ and $\rho_B$ share the same
-nonzero eigenvalues for any pure bipartite state, a standard consequence
-of the <Term id="schmidt-decomposition">Schmidt decomposition</Term>). `entanglementEntropy` in `entanglement.ts`
+The two are always equal for a pure bipartite state, and for the 2-qubit
+case this course works in that is already settled rather than borrowed.
+Lesson 5's identity gave
+$1-\text{Tr}(\rho_A^2)=1-\text{Tr}(\rho_B^2)=2|ad-bc|^2$, so the two
+reduced states have the same purity; and a $2\times2$ density matrix's
+eigenvalue pair is $\left(1\pm\sqrt{2\,\text{Tr}(\rho^2)-1}\right)/2$,
+fixed by the purity alone. Same purity, same eigenvalues, same entropy.
+(In any dimension it follows instead from $\rho_A$ and $\rho_B$ sharing
+their nonzero eigenvalues, a standard consequence of the <Term id="schmidt-decomposition">Schmidt
+decomposition</Term>; `entanglementEntropy`'s tests check the equality
+directly for several states either way.) `entanglementEntropy` in `entanglement.ts`
 computes $S(\rho_A)$ specifically: `pureStateDensityMatrix`, then
 `reducedDensityMatrixQubit0`, then `vonNeumannEntropy`, composing three
 pieces this course has already built and tested individually.
@@ -105,30 +111,32 @@ than asserted:
     }
   ]}
   referenceLines={[{ y: 1, label: "1 bit: Bell state at θ=π/4" }]}
+  xAxisLabel="theta (radians)"
+  yAxisLabel="Entanglement entropy E (bits)"
   ariaLabel="Entanglement entropy E(theta) plotted as a function of theta from 0 to pi/2, rising monotonically from 0 to 1 bit at theta equals pi/4 then falling back to 0"
 />
 
-<InteractiveSection title="Climb from 0 bits to 1 bit of entropy" description="Dial the mixing weight away from 1 toward 0.5, moving the point from the sphere's surface toward its center. Watch the entropy readout climb from 0 bits (pure, weight 1) toward 1 bit (maximally mixed, weight 0.5), the same climb this family's E(θ) makes as θ moves from 0 toward π/4.">
+<InteractiveSection title="Climb from 0 bits to 1 bit of entropy" description="Dial the mixing weight away from 1 toward 0.5, moving the point from the sphere's surface toward its center. Read the entropy at both ends of that dial, at weight 1 (pure) and at weight 0.5 (maximally mixed), and compare the pair of numbers against what this family's E(θ) does as θ moves from 0 toward π/4.">
   <LazyDensityMatrixExplorer />
 </InteractiveSection>
 
-### Why "pure" cannot be dropped: a counterexample
+### Dropping "pure": the I/4 test case
 
 Apply the same formula, $S(\rho_A)$, to a *mixed* 2-qubit global state and
-watch it break. Take $\rho_{AB}=I/4$, the maximally mixed state on two
+see what it reports. Take $\rho_{AB}=I/4$, the maximally mixed state on two
 qubits, which factors as $(I/2)\otimes(I/2)$: a product of two independent
-qubits, with zero entanglement by construction. Predict what its reduced
-entropy reports before computing it.
+qubits, with zero entanglement by construction.
 
 <PredictBeforeReveal
   question="ρ_AB = I/4 is a product state, with provably zero entanglement and no correlation between the two qubits. What will S(ρ_A) report?"
   options={[
     { label: "0 bits, correctly reflecting zero entanglement", value: "zero" },
-    { label: "Something between 0 and 1 bit", value: "partial" },
+    { label: "Something strictly between 0 and 1 bit", value: "partial" },
     { label: "1 bit, the same reading as a maximally entangled Bell state", value: "max" },
+    { label: "2 bits, one for each of the two maximally mixed qubits", value: "two" },
   ]}
   correctValue="max"
-  explanation="S(ρ_A) comes out to a full 1 bit, indistinguishable from a Bell state's reading, even though I/4 has provably zero entanglement. Applied to a mixed global state, reduced entropy cannot tell 'mixed because entangled' apart from 'mixed because the preparation was already a classical mixture.' That is why the definition above required the global state to be pure."
+  explanation="S(ρ_A) comes out to a full 1 bit, indistinguishable from a Bell state's reading, even though I/4 has provably zero entanglement. That is the largest error available, not a small one: the measure saturates on a state with nothing to measure. Applied to a mixed global state, reduced entropy cannot tell 'mixed because entangled' apart from 'mixed because the preparation was already a classical mixture.' That is why the definition above required the global state to be pure. (2 bits is out of reach for a different reason: S(ρ_A) is a single qubit's entropy, capped at 1 bit. The full 2-qubit ρ_AB=I/4 does have S=2 bits, but that is not the quantity being computed.)"
 />
 
 Its reduced state, computed by the same <Term id="partial-trace">partial trace</Term> as always, is
@@ -154,12 +162,12 @@ Lesson 5's proof work. For a mixed global state, the two sources add
 together in $S(\rho_A)$, and $\rho_A$ alone does not contain enough
 information to separate them again.
 
-This is a structural limitation, not a technicality, and it is why a real
+The limitation is structural, deep in how the quantity is defined, which is why a real
 measure of mixed-state entanglement (the mixed-state Wootters concurrence,
 mentioned but not implemented in the next lesson) needs substantially more
 machinery than "take the reduced entropy."
 
-## Physical Interpretation
+## When no other source of mixedness can confuse it
 
 Entanglement entropy is the right tool when there is no independent source
 of mixedness to confuse it with, and that is guaranteed only when the full
@@ -167,7 +175,7 @@ system starts in a definite, known pure state. The moment the global state
 carries classical uncertainty of its own, reduced entropy stops tracking
 entanglement specifically, as the $I/4$ counterexample shows.
 
-## Worked Example
+## Entropy of a ninety-ten split
 
 **Compute the entanglement entropy of $|\psi\rangle=\sqrt{0.9}|00\rangle+\sqrt{0.1}|11\rangle$,
 using Lesson 5's identity as a shortcut.**
@@ -179,7 +187,7 @@ of $(0.9,0.1)$: $E=-0.9\log_2(0.9)-0.1\log_2(0.1)\approx0.469$ bits,
 well above 0 (it's entangled) but well below 1 bit (less than maximally
 entangled), consistent with its lopsided $90\%/10\%$ amplitude split.
 
-## Common Mistakes
+## The mixed global state that reports a large number
 
 <Callout type="warning">
 **Computing $S(\rho_A)$ for a mixed global state and calling it
@@ -187,7 +195,7 @@ entangled), consistent with its lopsided $90\%/10\%$ amplitude split.
 report large values for states with zero entanglement. Entanglement
 entropy, as defined here, requires the global state to be pure:
 `entanglementEntropy`'s implementation works only with a `StateVector`
-for exactly this reason, not a general density matrix.
+for exactly this reason, and refuses a general density matrix.
 </Callout>
 
 <Callout type="note">
@@ -201,18 +209,192 @@ not merely "entangled, like any other entangled state."
 
 1. Compute $E(|\Psi^-\rangle)$ for the Bell state
    $|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $E(|\Psi^-\rangle) = 1$ bit, the maximum.
+
+   Take the shortest route. Lesson 5's identity gives
+   $\text{Tr}(\rho_A^2)=1-2|ad-bc|^2$, and for $|\Psi^-\rangle$ the
+   determinant is $\tfrac12$, so the purity is $0.5$. A $2\times2$ density
+   matrix with purity $0.5$ has eigenvalues
+   $\left(1\pm\sqrt{2(0.5)-1}\right)/2 = \left(1\pm0\right)/2$, both equal
+   to $\tfrac12$, and
+
+   $$
+   S = -2\left(\tfrac12\log_2\tfrac12\right) = 1 \text{ bit.}
+   $$
+
+   The partial trace confirms it directly: $\rho_A = I/2$, and
+   `entanglementEntropy` returns $0.9999999999999999$, one bit to within
+   floating-point noise.
+
+   All four Bell states give the same answer, for the same reason: all four
+   have $|ad-bc|=\tfrac12$, and the identity depends on nothing else. So
+   $|\Phi^+\rangle$, $|\Phi^-\rangle$, $|\Psi^+\rangle$ and $|\Psi^-\rangle$
+   are equally and maximally entangled, which is why any of them serves
+   equally well as the resource in teleportation or superdense coding, and
+   why the four are interconvertible by single-qubit gates.
+
+   One bit is not an arbitrary scale marker. It is the largest entropy a
+   single qubit's density matrix can have, from the last lesson, so
+   "maximally entangled pair" and "one ebit of entanglement" are the same
+   statement. The wrong turn is expecting a two-qubit maximally entangled
+   state to carry $2$ bits, one per qubit. $E$ is defined as the entropy of
+   *one* reduced state, not the sum over both, precisely so that the two
+   qubits do not get counted twice for a single shared resource.
+
+   </details>
+
 2. Using Lesson 5's identity as a shortcut, find the entanglement entropy
    of $|\psi\rangle=\sqrt{0.99}|00\rangle+\sqrt{0.01}|11\rangle$, and
-   confirm it's much closer to 0 than to 1 bit.
+   confirm it's much closer to 0 than to 1 bit. Then describe how $E$
+   behaves as the smaller weight shrinks further, and say whether it ever
+   reaches exactly $0$ before the state becomes an outright product state.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $|ad-bc| = \sqrt{0.99}\sqrt{0.01} = \sqrt{0.0099} \approx 0.0995$, so
+   the identity gives
+
+   $$
+   \text{Tr}(\rho_A^2) = 1 - 2(0.0099) = 0.9802 .
+   $$
+
+   Inverting the purity-to-eigenvalue relation,
+   $\lambda_\pm = \left(1\pm\sqrt{2(0.9802)-1}\right)/2 = (1\pm0.98)/2$,
+   which is $(0.99, 0.01)$: exactly the two weights, as it must be for a
+   state of the form $a|00\rangle+d|11\rangle$, whose reduced state is
+   $\mathrm{diag}(|a|^2,|d|^2)$. Then
+
+   $$
+   E = -0.99\log_2 0.99 - 0.01\log_2 0.01 = 0.0144 + 0.0664 = 0.0808 \text{ bits,}
+   $$
+
+   and `entanglementEntropy` returns $0.08079313589591124$. About one
+   twelfth of a bit, far nearer $0$ than $1$.
+
+   As the smaller weight $\varepsilon$ shrinks, $E \approx \varepsilon\log_2(1/\varepsilon) + \varepsilon\log_2 e$
+   and goes to zero, but not linearly. The $\log_2(1/\varepsilon)$ factor
+   makes the fall slower than $\varepsilon$ itself, so the derivative
+   $dE/d\varepsilon$ blows up at the origin: at $\varepsilon=0.01$ the
+   entropy is $0.0808$, at $\varepsilon=0.001$ it is $0.0114$, a tenfold
+   cut in weight buying only a sevenfold cut in entropy. It reaches exactly
+   $0$ only at $\varepsilon=0$, where the state is $|00\rangle$ and there is
+   genuinely no entanglement. There is no threshold below which a state is
+   "effectively unentangled" as far as the measure is concerned.
+
+   The wrong turn is reading $0.0808$ as "barely entangled, so essentially
+   a product state" and treating the two as interchangeable. They are not:
+   this state fails the separability test outright, and a small amount of
+   entanglement is qualitatively different from none, in the way a small
+   nonzero probability is different from an impossible event. What is true
+   is that using it as a teleportation resource would give a poor fidelity,
+   and that quantitative statement is what $0.0808$ bits is for.
+
+   </details>
+
 3. Construct your own mixed global 2-qubit state (different from $I/4$)
    that is manifestly a product state (i.e., $\rho_{AB}=\rho_A\otimes\rho_B$
    for some pair of single-qubit density matrices), and show its reduced
    entropy $S(\rho_A)$ is nonetheless nonzero whenever $\rho_A$ itself is
    mixed, reinforcing why this construction can't be trusted as an
    entanglement measure once $\rho_{AB}$ is mixed.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Take $\rho_A = \mathrm{diag}(0.7, 0.3)$ and $\rho_B = \mathrm{diag}(0.9, 0.1)$,
+   two independently prepared, independently biased coin-flip qubits, and
+   set $\rho_{AB} = \rho_A \otimes \rho_B = \mathrm{diag}(0.63, 0.07, 0.27, 0.03)$.
+   This is a product by construction, so the two qubits are uncorrelated in
+   every respect and the entanglement is zero, with nothing to prove.
+
+   Now apply the formula anyway. The engine's partial trace over qubit 1
+   returns $\mathrm{diag}(0.7,0.3)$, exactly $\rho_A$ back, as question 3
+   of the partial-trace lesson guarantees for any product. Its von Neumann
+   entropy is
+
+   $$
+   S(\rho_A) = -0.7\log_2 0.7 - 0.3\log_2 0.3 = 0.8813 \text{ bits,}
+   $$
+
+   which `vonNeumannEntropy` confirms. A reading of $0.88$ bits for a state
+   with zero entanglement, and it is not a rounding artefact but almost the
+   full scale. Choosing $\rho_A$ closer to $I/2$ pushes the reading to $1$
+   bit, which is the $I/4$ case in the lesson.
+
+   The construction generalizes to any $\rho_A$ you like, and that is the
+   point. $S(\rho_A)$ measures how mixed qubit A is, full stop. When
+   $\rho_{AB}$ is pure, there is only one way for A to be mixed, namely by
+   being entangled with B, so the measure is unambiguous. Once $\rho_{AB}$
+   is itself mixed, A can be mixed because it is entangled, or because the
+   preparation of A was already a classical coin flip, and $S(\rho_A)$
+   sums the two without labelling them. Here it is $100\%$ the second
+   source, and reduced entropy has no way to say so.
+
+   The wrong turn is trying to repair the measure by subtracting the global
+   entropy, $S(\rho_A) - S(\rho_{AB})$. Try it. Entropy is additive over a
+   tensor product, so $S(\rho_{AB}) = S(\rho_A)+S(\rho_B) = 0.8813 + 0.4690 = 1.3503$
+   bits, and the difference is $-0.469$: a negative "entanglement" for a
+   state with none, which is a new failure rather than a fix. The quantity
+   worth knowing about is the conditional entropy
+   $S(A|B) = S(\rho_{AB}) - S(\rho_B)$, which is $+0.8813$ here, as any
+   sensible conditional uncertainty should be for independent systems, and
+   $-1$ for a Bell state, where $S(\rho_{AB})=0$ and $S(\rho_B)=1$. Its
+   negativity really is a signature of entanglement, and it is still not a
+   measure. Honest entanglement measures for mixed states exist and cost
+   considerably more work, which is why this course stops at the pure case
+   and says so.
+
+   </details>
+
 4. Why does the diagnosis in "Diagnosing the failure" specifically fail
    to apply when $\rho_{AB}$ is pure? Point to the exact step in Lesson
    5's proof that breaks if $\rho_{AB}$ is allowed to be mixed.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Lesson 5's proof begins by writing
+   $|\psi\rangle = a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$ and
+   derives the identity $1-\text{Tr}(\rho_A^2)=2|ad-bc|^2$ from those four
+   amplitudes. That very first line is the step that breaks. A mixed
+   $\rho_{AB}$ has no state vector, so there are no $a,b,c,d$ to write
+   down, no determinant $ad-bc$ to form, and nothing for the right-hand
+   side of the identity to mean. Everything after it is downstream of a
+   quantity that does not exist.
+
+   When $\rho_{AB}$ *is* pure the line is available, and it does all the
+   work. The identity ties the reduced state's mixedness to $|ad-bc|$,
+   which is exactly the separability determinant, so "$\rho_A$ is mixed"
+   and "$|\psi\rangle$ does not factor" become two readings of a single
+   equation. There is only one possible source of mixedness in $\rho_A$,
+   because the global state has no uncertainty of its own to contribute:
+   $\text{Tr}(\rho_{AB}^2)=1$ says the pair is completely specified. If
+   part of a completely specified whole is uncertain, the uncertainty can
+   only be about the relationship, which is what entanglement is.
+
+   Drop purity and that last sentence fails, which is the honest statement
+   of why the $I/4$ case is not a defect in the formula. $I/4$ has
+   $\text{Tr}(\rho_{AB}^2)=0.25$, so the pair is not completely specified,
+   and $\rho_A=I/2$'s uncertainty is inherited from the global mixture
+   rather than created by correlation. The formula still computes the
+   entropy of $\rho_A$ correctly; what fails is the *interpretation* that
+   reduced mixedness can only have come from entanglement.
+
+   The wrong turn is to describe the requirement as a technicality that a
+   more careful implementation could relax. There is no version of
+   $S(\rho_A)$ that distinguishes the two sources, since $\rho_A$ is
+   literally the same matrix in both cases: $I/2$ from a Bell state and
+   $I/2$ from $I/4$ are indistinguishable, by the very result the
+   convex-combinations lesson proved. Any measure that tells them apart has
+   to look at $\rho_{AB}$, not only at $\rho_A$, which is why mixed-state
+   entanglement measures are a harder subject and not a footnote.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -221,7 +403,7 @@ not merely "entangled, like any other entangled state."
 - Entanglement entropy $E(|\psi\rangle)=S(\rho_A)$ is well-defined and
   meaningful only for a globally *pure* bipartite state.
 - It equals 0 for product states, 1 bit for Bell states, and varies
-  continuously in between: a genuine graded measure, not a flag.
+  continuously in between, which makes it a graded measure and never a flag.
 - $\rho_{AB}=I/4$ is a concrete, verified counterexample: a product
   (zero-entanglement) mixed global state whose reduced entropy is a
   full 1 bit, proving reduced entropy is not a valid entanglement
@@ -230,7 +412,7 @@ not merely "entangled, like any other entangled state."
   entropy conflate real entanglement with ordinary classical mixedness,
   something a pure global state cannot do.
 
-## Further Exploration
+## A second measure, derived independently
 
 <NextDiscovery>
 [Concurrence: A Two-Qubit Entanglement Measure](/lessons/quantum-computing/entanglement-and-measurement/concurrence-a-two-qubit-measure) is a second,

@@ -28,10 +28,12 @@ export const ghzFrames = ghzShotCounts.map((shots) => {
   };
 });
 
+export const ghzFractionAxisMax = Math.max(0.7, ...ghzFrames.flatMap((frame) => frame.bars.map((bar) => bar.value)));
+
 export const lessonMeta = {
   title: "Writing Your First Circuit",
   description:
-    "A complete, hands-on walkthrough: build a 3-qubit GHZ state circuit, run it exactly, then sample it 5000 times and watch the measured 000/111 split converge toward the exact 50/50 probabilities, the full build-run-sample workflow in one worked example.",
+    "A complete, hands-on walkthrough: build a 3-qubit GHZ circuit, run it exactly to get its true probabilities, then sample it 5000 times and watch the measured counts wander around those numbers by as much, and only as much, as binomial shot noise predicts. The full build-run-sample workflow in one worked example.",
   course: "programming-quantum-computers",
   module: "writing-your-first-circuit",
   order: 1,
@@ -49,7 +51,7 @@ export const lessonMeta = {
 Every previous lesson discussed the pattern conceptually. This one does it: build a real circuit, run it, and watch the measured counts converge toward the exact probabilities, end to end.
 </LessonHook>
 
-## Motivation
+## From Workflow to Working Code
 
 The previous lessons described the build-run-read workflow; this one
 performs it, start to finish. It builds a 3-qubit GHZ circuit, runs it
@@ -109,7 +111,7 @@ Now build the same three instructions yourself, on the interactive circuit below
 ### How this looks in Qiskit
 
 As a static comparison only (not run by this platform's own simulator),
-here's the exact same 3-qubit GHZ circuit built with real Qiskit syntax,
+here's the same 3-qubit GHZ circuit built with real Qiskit syntax,
 IBM's SDK, using only its long-stable circuit-construction API:
 
 ```python
@@ -133,12 +135,12 @@ differ from this platform's own `QuantumCircuit`.
 <PredictBeforeReveal
   question="Before running it, predict: what will state.probabilities() give for this 3-qubit GHZ circuit?"
   options={[
-    { label: "0.5 spread evenly across all 8 outcomes", value: "uniform" },
-    { label: "1.0 on |000⟩ only", value: "zero-only" },
-    { label: "0.5 on |000⟩, 0.5 on |111⟩, 0 everywhere else", value: "ghz" },
+    { label: "0.125 on each of the 8 outcomes", value: "uniform" },
+    { label: "0.5 on |000⟩ and 0.5 on |111⟩", value: "ghz" },
+    { label: "1.0 on |000⟩, 0 everywhere else", value: "zero-only" },
   ]}
   correctValue="ghz"
-  explanation="H puts qubit 0 into superposition, and each CNOT then copies that superposition onto the next qubit, entangling all three into 1/√2(|000⟩+|111⟩). Only the all-zeros and all-ones outcomes get any probability — 0.5 each — and every other 3-bit string stays at exactly 0."
+  explanation="H puts qubit 0 into superposition, and each CNOT then copies that superposition onto the next qubit, entangling all three into 1/√2(|000⟩+|111⟩). Only the all-zeros and all-ones outcomes get any probability (0.5 each), and every other 3-bit string stays at exactly 0."
 />
 
 ```
@@ -148,7 +150,7 @@ const state = runCircuit(circuit);
 This platform's engine confirms `state.probabilities()` gives exactly
 `[0.5, 0, 0, 0, 0, 0, 0, 0.5]`: probability $0.5$ each for
 $|000\rangle$ and $|111\rangle$, zero everywhere else, matching the GHZ
-state exactly.
+state.
 
 ### Step 3: Sample it like real hardware would
 
@@ -160,15 +162,15 @@ Real hardware (and honest simulators) don't hand back exact amplitudes.
 They report a finite number of individual measurement shots
 (Qubit Readout Techniques). Running this platform's `sampleMeasurements`
 with 5000 shots gives counts close to (but not exactly) a 2500/2500
-split between "000" and "111", e.g. one representative run gave 2521
-and 2479. The deviation from a perfectly even split is ordinary
-**statistical (shot) noise**, not a bug. It shrinks (relatively) as
+split between "000" and "111". The run rendered on this page landed on
+{ghzCount000} and {ghzCount111}. The deviation from a perfectly even
+split is ordinary **statistical (shot) noise**, not a bug. It shrinks (relatively) as
 shot count grows, following the standard $1/\sqrt{\text{shots}}$
 statistical scaling any repeated-sampling estimate obeys.
 
-Here's one real, live run of exactly that at 5000 shots: the exact
-probability is $0.5$ for each outcome by construction; the sampled
-fraction is this page's own actual `sampleMeasurements` call, jittering
+Here's one live run of that at 5000 shots: the exact probability is
+$0.5$ for each outcome by construction; the sampled fraction is this
+page's own `sampleMeasurements` call, jittering
 around 0.5 by whatever this particular run of 5000 shots happened to
 land on.
 
@@ -186,7 +188,7 @@ land on.
 Practice Question 2 asks whether statistical noise grows or shrinks
 with more shots, in absolute count versus as a fraction of shots. A
 single shot count can't show that; scrubbing across shot counts can.
-Below are this page's own actual `sampleMeasurements` calls (same GHZ
+Below are this page's own `sampleMeasurements` calls (same GHZ
 state, same two outcomes) run at 100, 500, 1000, 5000, 20,000, and
 100,000 shots. Slide across them and watch the sampled bars visibly
 tighten around the exact 0.5 line as shots grow, the $1/\sqrt{\text{shots}}$
@@ -197,11 +199,11 @@ represents converges.
 <BarChartExplorer
   ariaLabel="Sampled GHZ state fractions for 000 and 111 at increasing shot counts, converging toward the exact 0.5/0.5 split"
   sliderLabel="Shots"
-  maxValue={0.7}
+  maxValue={ghzFractionAxisMax}
   frames={ghzFrames}
 />
 
-## Physical Interpretation
+## Where Exact Probabilities Meet Finite Shots
 
 The gap between Step 2's exact probabilities and Step 3's sampled counts
 *is* the central practical fact of running anything on real quantum
@@ -211,7 +213,7 @@ top of whatever hardware error (Noise, Decoherence & Scaling) is also
 present.
 
 <HistoricalMoment date="2016">
-IBM offers free cloud access to real superconducting quantum processors — a circuit built the same way as this lesson's GHZ circuit can be sent to run on actual hardware, not just a simulator.
+IBM offers free cloud access to real superconducting quantum processors: a circuit built the same way as this lesson's GHZ circuit can be sent to run on actual hardware, not just a simulator.
 </HistoricalMoment>
 
 This isn't a hypothetical. IBM has offered free cloud access to real
@@ -219,7 +221,7 @@ superconducting quantum processors since 2016, and cloud platforms like
 Amazon Braket now offer similar (generally paid, pay-per-shot) access
 to real hardware across multiple vendors: submitting a circuit built the
 same way as this lesson's, choosing a shot count, and downloading a
-counts histogram that looks exactly like Step 3's, just with real
+counts histogram that looks like Step 3's, just with real
 hardware error mixed into the shot noise on top. The first histogram a beginner
 downloads from an actual queued hardware job looks structurally
 identical to the bar chart above, only noisier.
@@ -227,26 +229,30 @@ identical to the bar chart above, only noisier.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/ec/IBM_Quantum_Computer_Demo.jpg"
   alt="An IBM quantum computer demonstration unit on display at the ITU WTSA 2024 conference in Delhi"
-  caption="An IBM quantum computer shown at a 2024 conference in Delhi. Since 2016, IBM has offered cloud access to real superconducting processors; the circuit you just built here can be sent to one, and the histogram that comes back looks like the bar chart above with hardware error added on top of the shot noise."
+  caption="An IBM system on a conference floor in Delhi, 2024. The distance between a demonstration unit like this one and a queue slot is smaller than the photograph suggests: the same three chained calls built above, submitted with a shot count, come back as a counts dictionary in exactly the shape sampleMeasurements returns. What changes is the accounting. Some of the deviation from 2500 is no longer sampling, and nothing in the returned object tells you which part."
   credit="Dev Jadiya / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_Computer_Demo.jpg"
   license="CC BY-SA 4.0"
 />
 
-## Worked Example
+## How Far Should a Count Drift
 
-**Using this platform's confirmed test-suite result (5000 shots on a
-Bell state, `00`/`11` split), what range of `00` counts is expected 95%
-of the time, treating this as a binomial sampling process?**
+**Step 3 sampled this GHZ circuit 5000 times and got a `000` count that
+missed 2500. How far from 2500 should the count be allowed to drift
+before it stops being ordinary shot noise? Treat it as a binomial
+sampling process.**
 
 For $p=0.5$, $n=5000$: standard deviation
 $\sigma=\sqrt{np(1-p)}=\sqrt{5000\times0.25}=\sqrt{1250}\approx35.4$.
 A 95% range is roughly $\pm2\sigma\approx\pm71$ around the expected
 mean of 2500, so counts between about 2429 and 2571 are expected 95% of
 the time, purely from statistical shot noise, with a perfect,
-noiseless simulator and an exact 50/50 underlying probability.
+noiseless simulator and an exact 50/50 underlying probability. Check
+this page's own run ({ghzCount000} and {ghzCount111}) against that
+window: a count inside it is the sampler behaving exactly as it should,
+not a circuit that needs debugging.
 
-## Common Mistakes
+## Blaming Noise for Sampling
 
 <Callout type="warning">
 **Expecting sampled counts to exactly match the underlying probabilities.**
@@ -268,16 +274,208 @@ results; only shot noise is present in this lesson's idealized
 
 1. Write out (conceptually) the three `GateInstruction`s the GHZ
    circuit's `.h(0).cnot(0,1).cnot(1,2)` chain produces.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   An H instruction on qubit 0; a CNOT instruction with control 0 and
+   target 1; a CNOT instruction with control 1 and target 2. In the
+   engine's own words:
+
+   `[{"gate":"H","targets":[0]},{"gate":"CNOT","targets":[0,1]},{"gate":"CNOT","targets":[1,2]}]`
+
+   Three things in that list repay a second look.
+
+   **The second CNOT's control is qubit 1, not qubit 0.** It is a chain,
+   not a fan-out from a single control. That works because after the
+   first CNOT, qubit 1 is already perfectly correlated with qubit 0, so
+   conditioning on qubit 1 conditions on qubit 0 too, and the correlation
+   propagates down the line.
+
+   **A fan-out would also work, and is not what was written.** Building
+   `.h(0).cnot(0,1).cnot(0,2)` produces the same GHZ state. The chain
+   version is preferred because every gate in it acts on physically
+   adjacent qubits, so it needs only nearest-neighbour connectivity,
+   while the fan-out version needs qubit 0 coupled to qubit 2 as well.
+   On a linear chip that difference is the SWAP overhead the Compilation
+   course computes. The instruction list is where such a choice is
+   visible, and where a router can act on it.
+
+   **Nothing has run.** These are three data objects sitting in an array.
+   The state does not exist until `runCircuit`, at which point
+   `state.probabilities()` returns exactly
+   $[0.5,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0.5]$.
+
+   The wrong turn is writing the CNOT's two qubits as an unordered pair.
+   `targets` is positional: entry zero is the control and entry one is
+   the target. `{gate:"CNOT", targets:[1,0]}` is a different gate, and on
+   this circuit it would not build a GHZ state at all.
+
+   </details>
+
 2. Using the same $\sqrt{np(1-p)}$ formula, estimate the standard
    deviation for 10,000 shots instead of 5000. Does statistical noise
    grow or shrink (in absolute count) with more shots? What about as a
    FRACTION of total shots?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \sigma = \sqrt{np(1-p)} = \sqrt{10000\times0.5\times0.5} = \sqrt{2500} = 50 \text{ counts}.
+   $$
+
+   **In absolute count, noise grows.** From 35.4 counts at 5000 shots to
+   50 at 10,000. Doubling the shots multiplied $\sigma$ by
+   $\sqrt2\approx1.414$, which is exactly what $\sigma\propto\sqrt n$
+   predicts.
+
+   **As a fraction of the total, noise shrinks.**
+
+   $$
+   \frac{35.4}{5000} = 0.708\%, \qquad \frac{50}{10{,}000} = 0.500\%.
+   $$
+
+   Down by the same factor of $\sqrt2$, because
+   $\sigma/n\propto1/\sqrt n$.
+
+   Both statements are true at once, and the apparent tension is the
+   whole point of the question. The count wanders further from its
+   expected value as you take more shots; the *estimate of the
+   probability* gets better. Nothing is contradictory, because they are
+   ratios of different things.
+
+   The practical consequence is the one worth memorizing, and it is
+   discouraging. Precision improves as $1/\sqrt n$, so halving your error
+   bar costs four times the shots, and a tenfold improvement costs a
+   hundredfold. Going from 0.7% to 0.07% would take five million shots
+   rather than five thousand. This is why the sampling cost, and not the
+   circuit depth, is what stalls a great deal of real variational work,
+   and it is a statistical fact rather than a hardware limitation: a
+   perfect quantum computer obeys the same scaling.
+
+   The wrong turn is answering only one half. "More shots means less
+   noise" is the intuition everyone has, and it is right about the
+   fraction and wrong about the count. Look at the shot-count slider
+   above: the captioned raw counts swing by more at 100,000 shots than at
+   100, while the bars visibly tighten onto the 0.5 line.
+
+   </details>
+
 3. Why does real hardware always report sampled counts, never exact
    amplitudes directly?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a measurement returns one classical outcome, and an amplitude
+   is not an outcome of anything.
+
+   The measurement postulate says a measurement yields one eigenvalue of
+   the measured observable, with a probability set by the state. There is
+   no observable whose measured value is "the amplitude of $|000\rangle$."
+   A single run of the GHZ circuit gives you the three-bit string `000`
+   or the three-bit string `111`, and nothing else, and afterwards the
+   superposition is gone.
+
+   From there, everything follows.
+
+   **Magnitudes need repetition.** $|\alpha|^2$ is a probability, and
+   estimating a probability from samples is the only route to it, with
+   the $1/\sqrt n$ tax question 2 just computed.
+
+   **Phases need different circuits entirely.** A relative phase is
+   invisible to a measurement in the computational basis, because it does
+   not change any of those probabilities. It shows up only through
+   interference, so learning it means rotating the basis before measuring
+   and running the whole thing again. Reconstructing a full state that
+   way is tomography, and the number of measurement settings it needs
+   grows exponentially with the qubit count.
+
+   **You cannot dodge this by copying the state.** The no-cloning theorem
+   forbids duplicating an unknown state, so measuring "the same" state in
+   several bases at once is not available. Each run gives you exactly one
+   basis and exactly one outcome.
+
+   **And there would be too many of them anyway.** A 50-qubit state has
+   $2^{50}$ amplitudes. Even granting a magic amplitude-reading
+   instrument, that is not a quantity of numbers a device could report.
+
+   The clean inversion to carry away is about the simulator, not the
+   hardware. `runCircuit` can hand back exact amplitudes only because it
+   is *holding them*, as ordinary classical numbers in an array. That is
+   the same reason it costs $2^n$ memory, which is the wall the
+   Simulating Quantum Systems course runs into. Real hardware never
+   stores those numbers anywhere, which is precisely why it is not
+   subject to the memory wall and also why it cannot show you its state.
+   The two facts are one fact.
+
+   The wrong turn is treating this as a temporary engineering shortfall,
+   as though a better readout circuit might one day report amplitudes
+   directly. Readout fidelity can improve without limit and this does not
+   change, because the constraint is the measurement postulate rather
+   than the instrument.
+
+   </details>
+
 4. If a sampled experiment gave 4000 "000" counts and 1000 "111" counts
    out of 5000 shots (badly off from the expected 50/50 split), would
    this most likely indicate shot noise alone, or something else?
-   Explain your reasoning using the worked example's expected range.
+   Explain your reasoning using the worked example's expected range,
+   then use which outcomes did and did not appear to name the most
+   likely specific cause.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Not shot noise. Not remotely.**
+
+   The worked example gives $\sigma=\sqrt{5000\times0.25}\approx35.4$
+   counts around an expected 2500, so ordinary sampling lands between
+   about 2429 and 2571 roughly 95% of the time. The observed count misses
+   by 1500, which is
+
+   $$
+   \frac{1500}{35.4} \approx 42\ \sigma .
+   $$
+
+   A 42-sigma excursion has a probability somewhere around $10^{-390}$.
+   No number of experiments anyone will ever run makes that a live
+   possibility. Something is different about the experiment, and the
+   useful question is what.
+
+   **Now the diagnostic part, which the numbers answer surprisingly
+   precisely.** Notice what did *not* happen: no counts appeared in
+   `001`, `010`, `011`, `100`, `101` or `110`. The state is still
+   perfectly correlated, all three qubits agreeing on every single shot.
+   Only the *weighting* between the two surviving outcomes is wrong.
+
+   That rules out most of the usual suspects. A miswired CNOT chain would
+   break the correlation and scatter counts into the other six strings. A
+   readout error on one qubit would flip one bit and produce strings like
+   `011` or `110`. Relaxation during readout would do the same. All of
+   those show up as *new outcomes*, and there are none.
+
+   What fits exactly is an underlying probability of 0.8 rather than 0.5
+   on `000`. That is what you get if the first gate is not a Hadamard but
+   a rotation through the wrong angle: an $R_y(\theta)$ with
+   $\cos^2(\theta/2)=0.8$, so $\theta\approx0.927$ rad instead of the
+   $\pi/2$ a Hadamard delivers. The two CNOTs then faithfully copy that
+   unbalanced superposition onto the other two qubits, and you get a
+   perfectly entangled, perfectly correlated, perfectly wrong GHZ state.
+   Check it: at $p=0.8$ and $n=5000$, the expected count is 4000 with
+   $\sigma=\sqrt{5000\times0.8\times0.2}\approx28$. The observation sits
+   dead on the mean.
+
+   So the answer is a miscalibrated or misspecified first gate, and the
+   evidence is not merely that 42 sigma is too far but that the *pattern*
+   of the deviation points at one specific cause.
+
+   The wrong turn is stopping at "that's outside the $\pm71$ window, so
+   something is wrong." True, and it leaves you no better off. The window
+   tells you to keep looking; which outcomes are missing tells you where.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -286,16 +484,16 @@ results; only shot noise is present in this lesson's idealized
 - Building a circuit (`.h(0).cnot(0,1).cnot(1,2)`) creates instructions
   as data; `runCircuit` executes them, giving exact GHZ-state
   probabilities `[0.5,...,0.5]`.
-- `sampleMeasurements` illustrates what real hardware actually reports:
-  shot-based counts with real statistical fluctuation around the
+- `sampleMeasurements` illustrates what real hardware reports:
+  shot-based counts with statistical fluctuation around the
   exact probabilities.
 - At 5000 shots on a perfect 50/50 state, roughly $\pm71$ counts of
   deviation is expected 95% of the time from shot noise alone.
 
-## Further Exploration
+## Adding a Real Device to the Picture
 
 <NextDiscovery>
 [Simulators vs. Real Hardware](/lessons/quantum-software/programming-quantum-computers/simulators-vs-real-hardware) adds actual hardware
 error on top of this lesson's pure shot noise, completing the picture of
-what a real device's output actually looks like.
+what a real device's output looks like.
 </NextDiscovery>

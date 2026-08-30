@@ -90,8 +90,8 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  *
  *   RAISED (`relative z-10`, selectable, independently clickable):
  *     description · "Requires …" line and each prerequisite link · the
- *     right-hand stats block (DifficultyMark, hours, "N/M lessons",
- *     CourseProgressBadge) · the "Content available — N%" caption (`w-fit`,
+ *     right-hand stats block (DifficultyMark, hours, CourseProgressBadge) ·
+ *     the "N of M lessons written" caption (`w-fit`,
  *     so only the words leave the card target) · every module row, authored
  *     (a link to its lesson) and unauthored (a plain span) alike.
  *
@@ -141,6 +141,13 @@ export function CourseList({
           <Panel
             key={course.slug}
             as="article"
+            // `article` is one of the roles a screen reader announces on
+            // entry, and a page of ten of them announced "article" ten times
+            // with nothing to tell them apart. `<article>` takes a name (unlike
+            // the bare `div` this primitive defaults to, where ARIA forbids
+            // one and the attribute is dropped), so naming it costs nothing
+            // and makes the card list navigable by container.
+            aria-label={course.title}
             className={cn(
               "isolate overflow-hidden border-l-2 border-l-pillar-edge p-5 transition-colors duration-(--dur-fast) ease-instrument sm:p-6",
               // `border-l-pillar`, not `border-l-pillar-accent`: the pillar
@@ -179,7 +186,7 @@ export function CourseList({
                   // 44px target rule doesn't apply (WCAG 2.5.8's inline
                   // exception) and inflating them would break the line.
                   <p className="relative z-10 mt-3 text-xs text-subtle-foreground">
-                    <span className="font-tech uppercase tracking-[0.1em]">Requires </span>
+                    <span className="font-tech uppercase tracking-meta">Requires </span>
                     {prerequisiteCourses.map((prerequisite, prerequisiteIndex) => (
                       <span key={prerequisite.slug}>
                         {prerequisiteIndex > 0 ? ", " : null}
@@ -197,13 +204,16 @@ export function CourseList({
 
               <div className="relative z-10 flex shrink-0 flex-col items-end gap-2.5">
                 <DifficultyMark difficulty={course.difficulty} />
-                <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1 font-tech text-xs text-subtle-foreground">
-                  <span>{course.estimatedHours}h</span>
-                  <span aria-hidden="true">·</span>
-                  <span>
-                    {authoredModules}/{totalModules} lessons{isContentComplete ? " · complete" : ""}
-                  </span>
-                </div>
+                {/* Just the length here. The "N/M lessons" fraction that used
+                    to sit beside it said exactly what the progress bar and its
+                    caption below already say, two inches apart and in a
+                    different phrasing, which is what made the two numbers on
+                    this card read as one confusing signal. One statement of
+                    how much is written (the bar), one of how much *you* have
+                    read (the badge). */}
+                <span className="font-tech text-xs text-subtle-foreground">
+                  {course.estimatedHours}h<span className="sr-only"> of study</span>
+                </span>
                 <CourseProgressBadge lessonSlugs={authoredLessonSlugs} />
               </div>
             </div>
@@ -228,8 +238,15 @@ export function CourseList({
               {/* `w-fit` keeps the raised box tight around the caption text
                   rather than spanning the panel, so only the words — not the
                   empty strip beside them — come out of the card click target. */}
-              <p className="relative z-10 mt-1.5 w-fit font-tech text-[0.65rem] uppercase tracking-[0.1em] text-subtle-foreground">
-                Content available — {progressPercent}%
+              {/* "Content available — 47%" named neither whose progress this
+                  is nor what the missing 53% would be. The counts say it
+                  outright, in the same words the module manifest below uses,
+                  and the visitor's own progress is the separately-labelled
+                  badge above. */}
+              <p className="relative z-10 mt-1.5 w-fit tech-label text-subtle-foreground">
+                {isContentComplete
+                  ? `All ${totalModules} lessons written`
+                  : `${authoredModules} of ${totalModules} lessons written`}
               </p>
             </div>
 
@@ -237,20 +254,34 @@ export function CourseList({
               {course.modules.map((module, moduleIndex) => {
                 const lesson = lessonByModule.get(module.slug);
                 return (
+                  // No `overflow-hidden` here, and that is the whole point of
+                  // this comment. The `<Link>` below is a block-level flex that
+                  // fills this element's content box exactly, and the site's
+                  // one focus treatment is an *outline* with a 2px offset
+                  // (globals.css §5), so a focused module row painted its
+                  // indicator in the band from 2px to 4px outside the link's
+                  // border box — which is 1px to 3px outside this `<li>`'s
+                  // padding box, i.e. entirely in the region `overflow: hidden`
+                  // clips. Every lesson link in every course card was therefore
+                  // focusable with no visible focus indicator at all (WCAG
+                  // 2.4.7), and the only remaining cue was a background tint
+                  // identical to the hover state. The radius moves onto the
+                  // link itself, which is what `overflow-hidden` was rounding
+                  // in the first place.
                   <li
                     key={module.slug}
                     className={cn(
-                      "overflow-hidden rounded-(--radius-tight) border text-sm",
+                      "rounded-(--radius-tight) border text-sm",
                       lesson ? "border-border bg-surface-muted/40" : "border-border/60 bg-transparent"
                     )}
                   >
                     {lesson ? (
                       <Link
                         href={`/lessons/${lesson.slug}`}
-                        className="group/module relative z-10 flex min-h-11 items-center justify-between gap-3 px-3 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted"
+                        className="group/module relative z-10 flex min-h-11 items-center justify-between gap-3 rounded-(--radius-tight) px-3 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted"
                       >
                         <span className="flex min-w-0 items-baseline gap-2">
-                          <span className="font-tech text-[0.65rem] text-subtle-foreground">
+                          <span className="font-tech text-micro text-subtle-foreground">
                             {String(moduleIndex + 1).padStart(2, "0")}
                           </span>
                           {/* The *lesson's* title, not the module's. They
@@ -262,19 +293,46 @@ export function CourseList({
                               destination's own title wins; the module title is
                               the fallback for the "coming soon" branch below,
                               where there is no lesson to name. */}
-                          <span className="truncate text-foreground group-hover/module:text-pillar-text">
+                          {/* Wraps; it used to `truncate`, and the arithmetic
+                              says truncation ate the title at every width the
+                              site targets. At a 320px viewport `Container`
+                              leaves 288px, this `Panel` takes 2px + 1px of
+                              border and 2 x 20px of `p-5`, so the `<ol>` cell
+                              is 245px; the `<li>` border leaves 243px and the
+                              link's `px-3` leaves 219px. The right-hand group
+                              ("45 min" is 6 monospace characters at 0.65rem,
+                              about 37px, plus a 10px gap and the arrow) takes
+                              54px, the `gap-3` takes 12px and the "01" index
+                              plus its gap takes 21px, leaving 132px. At 14px
+                              body text that is about 19 characters, so
+                              "Superposition and Interference" arrived as
+                              "Superposition an...". The two-column grid at `sm`
+                              is no better: 640px gives a 266px cell and the
+                              same clamp at about 22 characters. A module
+                              manifest exists to name its lessons, so the row
+                              grows to two lines instead of the name being
+                              destroyed. `min-h-11` already sized the row for
+                              touch, and `items-baseline` on this group keeps
+                              the "01" on the first line's baseline. */}
+                          <span className="text-foreground group-hover/module:text-pillar-text">
                             {lesson.title}
                           </span>
                         </span>
                         <span className="flex shrink-0 items-center gap-2.5">
                           <LessonCompletionMark slug={lesson.slug} />
-                          <span className="font-tech text-[0.65rem] tabular-nums text-subtle-foreground">
+                          <span className="font-tech text-micro tabular-nums text-subtle-foreground">
                             {lesson.estimatedMinutes} min
                           </span>
+                          {/* `max-sm:hidden`: this is a hover affordance, and a
+                              phone has no hover, so below `sm` it was 17px of
+                              permanently invisible glyph (6.7px of arrow plus a
+                              10px gap) taken out of a 132px title budget — more
+                              than two characters of every lesson name, spent on
+                              something no touch reader can ever see. */}
                           <span
                             aria-hidden="true"
                             data-decorative=""
-                            className="font-tech text-[0.7rem] text-pillar-text opacity-0 transition-opacity duration-(--dur-fast) group-hover/module:opacity-100"
+                            className="font-tech text-meta text-pillar-text opacity-0 transition-opacity duration-(--dur-fast) max-sm:hidden group-hover/module:opacity-100 group-focus-visible/module:opacity-100"
                           >
                             →
                           </span>
@@ -287,12 +345,20 @@ export function CourseList({
                       // the same reason the paragraphs above are.
                       <span className="relative z-10 flex min-h-11 items-center justify-between gap-3 px-3 py-2">
                         <span className="flex min-w-0 items-baseline gap-2">
-                          <span className="font-tech text-[0.65rem] text-subtle-foreground">
+                          <span className="font-tech text-micro text-subtle-foreground">
                             {String(moduleIndex + 1).padStart(2, "0")}
                           </span>
-                          <span className="truncate text-muted-foreground">{module.title}</span>
+                          {/* Wraps, for the same measurement as the authored
+                              row above: "Coming soon" is 11 monospace
+                              characters in the `.tech-label` voice (0.6875rem
+                              at 0.14em), about 90px, so this branch leaves the
+                              module title even less room than the lesson link
+                              does. `shrink-0` here plus `min-w-0` on the title
+                              means the title absorbs the difference rather
+                              than the row overflowing. */}
+                          <span className="text-muted-foreground">{module.title}</span>
                         </span>
-                        <span className="shrink-0 font-tech text-[0.65rem] uppercase tracking-wide text-subtle-foreground">
+                        <span className="shrink-0 tech-label text-subtle-foreground">
                           Coming soon
                         </span>
                       </span>

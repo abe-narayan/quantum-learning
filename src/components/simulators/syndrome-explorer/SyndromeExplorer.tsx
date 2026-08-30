@@ -29,7 +29,7 @@ const COPY_CONFIRMATION_MS = 1500;
 
 // Minimal shareable state is the SET of qubits (possibly empty) that have
 // an injected error. This component renders twice on the same /simulators
-// page — once per `mode` — so the two instances need distinct param names,
+// page (once per `mode`), so the two instances need distinct param names,
 // not just a shared prefix, or they'd stomp on each other's URL state.
 function paramNameForMode(mode: "bit-flip" | "phase-flip"): string {
   return mode === "bit-flip" ? "syn_bf" : "syn_pf";
@@ -37,8 +37,8 @@ function paramNameForMode(mode: "bit-flip" | "phase-flip"): string {
 
 /**
  * First-contact default when no URL param is present: one real error already
- * injected (on qubit 1), so the instrument opens mid-phenomenon — a nonzero
- * syndrome on screen, correction visibly at work — instead of the blank
+ * injected (on qubit 1), so the instrument opens mid-phenomenon: a nonzero
+ * syndrome on screen, correction visibly at work, instead of the blank
  * "nothing is wrong" state. "Clear all errors" still reaches the undisturbed
  * reference state, and a shared link with `syn_bf`/`syn_pf` set (including
  * an explicit "none") always wins over this default.
@@ -78,7 +78,7 @@ function formatQubitList(qubits: readonly number[]): string {
  * encoded qubits and watch the platform's actual `runBitFlipCorrectionCycle`
  * / `runPhaseFlipCorrectionCycle` extract the syndrome via genuine
  * ancilla CNOTs and partial measurement, decode it, and apply the
- * correction — the real 3-qubit repetition code, not a scripted
+ * correction: the real 3-qubit repetition code, not a scripted
  * animation. Shares one component between both lessons via the `mode`
  * prop, since the phase-flip code is the bit-flip code conjugated by H
  * on every qubit (documented in `errorCorrection.ts`).
@@ -134,7 +134,7 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
       if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
       copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
     } catch {
-      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+      // Clipboard access can be denied in some browser security contexts, so no crash and no link copied.
     }
   }, []);
 
@@ -161,17 +161,17 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
   let outcomeNote = "";
   if (injected.length >= 2) {
     if (result.correctedQubit !== null && !injected.includes(result.correctedQubit)) {
-      outcomeNote = ` — recovery mis-applies a correction to qubit ${result.correctedQubit}, converting this weight-${injected.length} error into a full logical ${logicalErrorLabel} flip`;
+      outcomeNote = `: recovery mis-applies a correction to qubit ${result.correctedQubit}, converting this weight-${injected.length} error into a full logical ${logicalErrorLabel} flip`;
     } else if (result.correctedQubit === null) {
-      outcomeNote = ` — this weight-${injected.length} error is undetectable at the syndrome stage (syndrome stays (0,0)), yet the state is already a full logical ${logicalErrorLabel} flip`;
+      outcomeNote = `: this weight-${injected.length} error is undetectable at the syndrome stage (syndrome stays (0,0)), yet the state is already a full logical ${logicalErrorLabel} flip`;
     }
   }
 
   return (
     <SimulatorInstrument
-      label={`Syndrome extraction — ${mode === "bit-flip" ? "bit-flip" : "phase-flip"} code`}
+      label={`Syndrome extraction: ${mode === "bit-flip" ? "bit-flip" : "phase-flip"} code`}
       readout={<Readout label="Syndrome" value={`(${result.syndrome[0]}, ${result.syndrome[1]})`} />}
-      footnote="Next: real codes correct both error types at once — see why the repetition code alone can't in the Error Correction lesson."
+      footnote="Next: real codes correct both error types at once; see why the repetition code alone can't in the Error Correction lesson."
       // StateInspector's amplitude table reads 8 basis-state rows across
       // three columns; full-width stage instead of splitting against a
       // 320px rail keeps it legible rather than merely non-overflowing.
@@ -180,13 +180,17 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
       stage={
         <>
           <p className="text-sm text-muted-foreground">
-            You cannot check a qubit for errors by looking at it — looking destroys it. The trick is to spread
+            You cannot check a qubit for errors by looking at it; looking destroys it. The trick is to spread
             one qubit&rsquo;s worth of information across three, then ask only whether they still{" "}
             <em>agree with each other</em>. That question has an answer you can safely read out, and it
             names the broken qubit without ever revealing what was being stored.
           </p>
 
-          <div aria-live="polite" className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+          {/* `role="status"` + `aria-atomic="true"`: a role-less live region's
+              implicit `aria-atomic` is `false`, so an update announces only
+              the text nodes that actually changed. This one swaps a whole
+              sentence, so it was safe in practice but not by construction. */}
+          <div role="status" aria-live="polite" aria-atomic="true" className="rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {injected.length === 0
               ? "No error injected. The encoded state is exactly the logical state, undisturbed."
               : `${errorLabel} error${injected.length > 1 ? "s" : ""} injected on ${formatQubitList(injected)}. Syndrome (${result.syndrome[0]}, ${result.syndrome[1]}) decodes to ${
@@ -196,17 +200,17 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
           <StateInspector state={result.corrected} />
 
           <SimulatorFraming
-            shows="Error correction detects and fixes a bit/phase flip without ever measuring — let alone disturbing — the encoded logical qubit."
+            shows="Error correction detects and fixes a bit/phase flip without ever measuring (let alone disturbing) the encoded logical qubit."
             tryThis={
               <ul>
                 <li>
-                  Check one qubit at a time — 0, then 1, then 2 — and confirm the decoded correction target
-                  always matches the qubit you picked — the logical state (top panel) never changes regardless.
+                  Check one qubit at a time (0, then 1, then 2) and confirm the decoded correction target
+                  always matches the qubit you picked. The logical state (top panel) never changes regardless.
                 </li>
                 <li>
                   Now check two qubits at once (e.g. 0 and 1): the syndrome is still nonzero, but the decode
                   table points at the third, uninjected qubit, so the standard recovery step actively converts
-                  the two-qubit error into a full logical {logicalErrorLabel} flip — checkable directly in the
+                  the two-qubit error into a full logical {logicalErrorLabel} flip, checkable directly in the
                   amplitude table above.
                 </li>
                 <li>
@@ -229,7 +233,7 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
           <ControlSection
             id="syndrome-inject"
             title={`Inject ${errorLabel} error(s)`}
-            description="Check any combination of qubits — checking two or more drives a weight-2+ error."
+            description="Check any combination of qubits; checking two or more drives a weight-2+ error."
           >
             <div role="group" aria-label="Qubits to error" className="flex flex-wrap gap-2">
               {INJECTABLE_QUBITS.map((qubit) => {
@@ -240,7 +244,7 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
                     className={cn(
                       // `min-h-11` (44px): the real checkbox is `sr-only`, so
                       // this label *is* the whole hit area, and at `py-1.5`
-                      // around 12px text it stood about 28px tall — the
+                      // around 12px text it stood about 28px tall, the
                       // smallest tap target in any of these instruments, on
                       // the control the reader is meant to toggle repeatedly.
                       // `border` unconditional, matching
@@ -248,7 +252,7 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
                       // `simulators/shared/controls.tsx`'s `PillGroup`. Only
                       // the unchecked pill used to have one, so checking a
                       // qubit shrank that pill by 2px in each axis and shoved
-                      // every pill after it along this `flex-wrap` row — and
+                      // every pill after it along this `flex-wrap` row, and
                       // this is a *multi-select*, so the reader is expected to
                       // check several in a row and watch the row twitch under
                       // the pointer each time. Worse than the single-select
@@ -289,7 +293,7 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
           <ControlSection
             id="syndrome-readout"
             title="Syndrome"
-            description="The two agreement checks, read out. This is the only thing measured — the encoded data itself is never touched."
+            description="The two agreement checks, read out. This is the only thing measured; the encoded data itself is never touched."
           >
             <p className="font-mono text-sm text-foreground">
               ({result.syndrome[0]}, {result.syndrome[1]})
@@ -299,7 +303,7 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
               {result.correctedQubit !== null
                 ? `apply ${errorLabel} to qubit ${result.correctedQubit}`
                 : injected.length > 0
-                  ? "none applied — syndrome reads (0,0)"
+                  ? "none applied, syndrome reads (0,0)"
                   : "none needed"}
             </p>
             <SymbolGloss
@@ -317,7 +321,7 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
                   means:
                     mode === "bit-flip"
                       ? "the error being injected: a qubit's 0 and 1 get swapped. Applying the same flip again undoes it, which is why the correction is just a second X."
-                      : "the error being injected: the qubit's phase gets reversed. Invisible to a plain 0-or-1 measurement, and lethal to interference — which is why it needs its own code.",
+                      : "the error being injected: the qubit's phase gets reversed. Invisible to a plain 0-or-1 measurement, and lethal to interference, which is why it needs its own code.",
                   glossaryId: "pauli-matrices",
                 },
               ]}

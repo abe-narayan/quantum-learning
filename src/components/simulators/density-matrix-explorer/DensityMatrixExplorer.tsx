@@ -18,7 +18,7 @@ const DEFAULT_COMPONENT_1: BlochAngles = { theta: 0, phi: 0 };
 const DEFAULT_COMPONENT_2: BlochAngles = { theta: Math.PI, phi: 0 };
 /**
  * A 90/10 mixture, not weight 1. Weight 1 is a *pure* state sitting exactly on
- * the sphere's surface — in an instrument built to show mixedness, that's the
+ * the sphere's surface. In an instrument built to show mixedness, that's the
  * one setting with no mixedness in it. At 0.9 the point already sits visibly
  * inside the surface and purity/entropy read something other than their pure
  * values on mount, per the bench's "open mid-phenomenon" rule. The pure
@@ -31,7 +31,7 @@ const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
 
 // Minimal shareable state is the mixing weight plus the two components' Bloch
-// angles — together they fully determine ρ via the same convex-combination
+// angles; together they fully determine ρ via the same convex-combination
 // formula used below. Params are prefixed (`dm_`) because this simulator
 // shares /simulators with other URL-stateful simulators.
 function clampTheta(value: number): number {
@@ -48,7 +48,7 @@ function clampWeight(value: number): number {
   return Math.min(1, Math.max(0, value));
 }
 
-/** Reads and validates `?dm_t1=&dm_p1=&dm_t2=&dm_p2=&dm_w=`. Never throws — returns null on anything malformed or absent. */
+/** Reads and validates `?dm_t1=&dm_p1=&dm_t2=&dm_p2=&dm_w=`. Never throws; returns null on anything malformed or absent. */
 function parseDensityMatrixParams(
   params: { get(key: string): string | null }
 ): { component1: BlochAngles; component2: BlochAngles; weight: number } | null {
@@ -87,7 +87,7 @@ function matchMixturePresetId(component1: BlochAngles, component2: BlochAngles, 
  * A single-qubit density matrix built live from ρ = p·ρ₁ + (1−p)·ρ₂, where
  * ρ₁, ρ₂ come from two independently-adjustable points on the Bloch sphere.
  * Deliberately single-qubit in scope (matching this course's engine, which
- * has no general N-dimensional eigensolver) — the payoff is that mixedness
+ * has no general N-dimensional eigensolver). The payoff is that mixedness
  * becomes something you can literally see: pure states sit exactly on the
  * sphere's surface, and every real mixture pulls the point strictly inside,
  * by exactly the amount `purity` and `vonNeumannEntropy` predict.
@@ -110,7 +110,7 @@ export function DensityMatrixExplorer() {
   const [narration, setNarration] = useState(() =>
     initialFromUrl
       ? "Restored the shared mixture from your link."
-      : "A 90/10 mixture of |0⟩ and |1⟩ — mostly |0⟩, but not certainly. The point has already left the sphere's surface: that gap is the missing certainty."
+      : "A 90/10 mixture of |0⟩ and |1⟩: mostly |0⟩, but not certainly. The point has already left the sphere's surface: that gap is the missing certainty."
   );
   const [copied, setCopied] = useState(false);
 
@@ -141,7 +141,7 @@ export function DensityMatrixExplorer() {
   const validation = useMemo(() => validateDensityMatrix(rho), [rho]);
 
   // Keep the URL in sync with the settled mixture so the page is always shareable.
-  // Debounced so dragging a slider doesn't spam `history.replaceState` — only the
+  // Debounced so dragging a slider doesn't spam `history.replaceState`; only the
   // value it settles on after a short pause gets written. Skips the very first run
   // so mounting doesn't immediately rewrite the URL we just read from.
   useEffect(() => {
@@ -176,7 +176,7 @@ export function DensityMatrixExplorer() {
       if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
       copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
     } catch {
-      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+      // Clipboard access can be denied in some browser security contexts, so no crash and no link copied.
     }
   }, []);
 
@@ -195,8 +195,8 @@ export function DensityMatrixExplorer() {
     setActivePresetId(null);
     setNarration(
       weight === 0
-        ? "Adjusted component 1 — but the mixing weight is entirely on component 2 right now, so ρ hasn't changed. Move the weight slider to see it."
-        : "Adjusted component 1 — the density matrix updates live."
+        ? "Adjusted component 1, but the mixing weight is entirely on component 2 right now, so ρ hasn't changed. Move the weight slider to see it."
+        : "Adjusted component 1. The density matrix updates live."
     );
   }
 
@@ -205,8 +205,8 @@ export function DensityMatrixExplorer() {
     setActivePresetId(null);
     setNarration(
       weight === 1
-        ? "Adjusted component 2 — but the mixing weight is entirely on component 1 right now, so ρ hasn't changed. Move the weight slider to see it."
-        : "Adjusted component 2 — the density matrix updates live."
+        ? "Adjusted component 2, but the mixing weight is entirely on component 1 right now, so ρ hasn't changed. Move the weight slider to see it."
+        : "Adjusted component 2. The density matrix updates live."
     );
   }
 
@@ -215,8 +215,8 @@ export function DensityMatrixExplorer() {
     setActivePresetId(null);
     setNarration(
       nextWeight === 0 || nextWeight === 1
-        ? "Weight is entirely on one component — the mixture is pure again."
-        : "Adjusted the mixing weight — watch the point move toward or away from the center."
+        ? "Weight is entirely on one component: the mixture is pure again."
+        : "Adjusted the mixing weight. Watch the point move toward or away from the center."
     );
   }
 
@@ -226,14 +226,14 @@ export function DensityMatrixExplorer() {
 
   return (
     <SimulatorInstrument
-      label="Density matrix — mixed states"
+      label="Density matrix: mixed states"
       readout={<Readout label="Purity" value={purityValue.toFixed(3)} />}
-      footnote="Next: see what happens when a real noise channel — not a hand-picked mixture — pulls a pure state toward the center → try the Noise &amp; Decoherence Explorer."
+      footnote="Next: see what happens when a real noise channel (not a hand-picked mixture) pulls a pure state toward the center → try the Noise &amp; Decoherence Explorer."
       stage={
         <>
           <p className="mb-4 text-sm text-muted-foreground">
             There are two different ways not to know what a qubit will do. In a superposition, the qubit
-            genuinely has no answer yet. In a <em>mixture</em>, it does have one — you just weren&rsquo;t
+            genuinely has no answer yet. In a <em>mixture</em>, it does have one; you just weren&rsquo;t
             told which. This instrument builds the second kind: pick two states, set how often each one is
             the true one, and the density matrix ρ is what an experimenter who only knows those odds can
             say. Distance from the sphere&rsquo;s surface is exactly how much they don&rsquo;t know.
@@ -246,7 +246,11 @@ export function DensityMatrixExplorer() {
             Drag to rotate the view. A mixed state&rsquo;s point sits strictly inside the sphere, not on its surface.
           </p>
 
-          <div aria-live="polite" className="mt-4 rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
+          {/* `role="status"` + `aria-atomic="true"`: a role-less live region's
+              implicit `aria-atomic` is `false`, so an update announces only
+              the text nodes that actually changed. This one swaps a whole
+              sentence, so it was safe in practice but not by construction. */}
+          <div role="status" aria-live="polite" aria-atomic="true" className="mt-4 rounded-panel border border-pillar/25 bg-pillar/5 px-4 py-3 text-sm text-foreground">
             {narration}
           </div>
 
@@ -255,10 +259,10 @@ export function DensityMatrixExplorer() {
           </div>
 
           <SimulatorFraming
-            shows="The Bloch vector of a mixture is the probability-weighted average of its components&rsquo; own vectors — that&rsquo;s why the point moves smoothly toward the center as the mixing weight balances out, rather than jumping discontinuously."
+            shows="The Bloch vector of a mixture is the probability-weighted average of its components&rsquo; own vectors. That&rsquo;s why the point moves smoothly toward the center as the mixing weight balances out, rather than jumping discontinuously."
             watchFor={
               <>
-                Try the two 50/50 presets — {"{"}|0⟩,|1⟩{"}"} and {"{"}|+⟩,|−⟩{"}"} — and check the density
+                Try the two 50/50 presets, {"{"}|0⟩,|1⟩{"}"} and {"{"}|+⟩,|−⟩{"}"}, and check the density
                 matrix panel: both land on the exact same ρ = I/2, even though they mix completely different
                 states.
               </>

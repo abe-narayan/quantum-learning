@@ -43,7 +43,7 @@ export const recommendPlatformForNetworking: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Matching a platform to an application means matching the application's binding requirement, here mobility, rather than picking the platform with the best headline number.",
-    whyCorrect: "Matches the Photonic Qubits lesson's closing point about hybrid architectures using photons for inter-processor links.",
+    whyCorrect: "The task is transport, and only one of these carriers moves on its own. A photon can be launched down a fibre to a second machine, while the other three platforms hold their qubits in place by design, which is what suits them to computing and not to linking.",
     whyWrong: [
       { optionId: "b", text: "Cites a real trapped-ion strength that applies to a stationary qubit. Coherence does not transport a state." },
       { optionId: "c", text: "Cites density at the endpoints, which is a fabrication property rather than a link property." },

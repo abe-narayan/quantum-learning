@@ -36,11 +36,11 @@ export const amplitudesFor20Qubits: NumericProblem = {
     { text: "Multiply 1024 by itself. Sanity check the scale: it should come out near a million, which is why 20 qubits is still comfortable for a laptop." },
   ],
   solution: {
-    steps: [{ description: "2^20 = 1,048,576 amplitudes — about a million, still very manageable classically." }],
+    steps: [{ description: "2^20 = 1,048,576 amplitudes, about a million, still very manageable classically." }],
     finalAnswer: "1,048,576 (≈10⁶)",
   },
   explanation: {
-    correctIdea: "This is still small (a modern computer handles a million complex numbers trivially) — the exponential wall becomes serious only much later (30-50+ qubits), exactly the point the lesson makes about WHERE the limit actually bites.",
+    correctIdea: "This is still small, since a modern computer handles a million complex numbers trivially. The exponential wall becomes serious only much later, around 30 to 50 qubits, which is the lesson's point about where the limit actually bites.",
     whyCorrect: "Direct computation of 2^20.",
     whyWrong: ["Confusing 2^n growth with linear growth would badly underestimate how fast this quantity grows for larger n, even though 20 qubits alone is still tractable."],
   },

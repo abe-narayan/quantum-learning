@@ -11,7 +11,7 @@ import { TechLabel } from "@/components/ui/Typography";
  * word you're missing, useless when you don't know which words you're
  * missing. This page's first screen previously opened on "Amplitude,
  * Adiabatic Theorem, Amplitude Estimation (QPE-Free)…", which tells a reader
- * with no background nothing about where to begin — the entries they need
+ * with no background nothing about where to begin, the entries they need
  * are scattered from A to W among a hundred research-level ones.
  *
  * So the page opens on a short, ordered path instead: the fifteen terms
@@ -23,7 +23,7 @@ import { TechLabel } from "@/components/ui/Typography";
  *
  * Two constraints force it, and they happen to agree:
  *
- *   1. `/glossary#<id>` is a real deep link — lessons use it, and every
+ *   1. `/glossary#<id>` is a real deep link, lessons use it, and every
  *      `<Term>` gloss ends with "Full glossary entry →" pointing at it. A DOM
  *      `id` must be unique, so an entry rendered twice on one page (once here,
  *      once in its letter section) would make the anchor ambiguous and, in
@@ -49,17 +49,31 @@ export function GlossaryStartHere({ terms }: { terms: GlossaryEntry[] }) {
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
         <div>
           <TechLabel className="text-pillar">Start here</TechLabel>
-          <h2 id="start-here" className="mt-1.5 scroll-mt-40 font-display text-xl font-semibold text-foreground">
+          {/* `scroll-mt-40` used to be here and could never fire. globals.css
+              declares `[id] { scroll-margin-top: 6rem }` outside any cascade
+              layer, and unlayered CSS beats every layered rule regardless of
+              specificity, so a `scroll-mt-*` utility on an element that also
+              carries an `id` is always overridden. Nothing links to
+              `#start-here` today, but the offset has to be right the first
+              time something does, and the inline style is the only
+              declaration that outranks the unlayered rule. Same custom
+              property, and the same two values, as the entry anchors in
+              GlossaryFilter, which is where the arithmetic is written down. */}
+          <h2
+            id="start-here"
+            style={{ scrollMarginTop: "var(--anchor-top)" }}
+            className="mt-1.5 [--anchor-top:13rem] font-display text-xl font-semibold text-foreground [@media(max-height:34rem)]:[--anchor-top:5rem]"
+          >
             The first {terms.length} terms
           </h2>
         </div>
         <p className="tech-label">Reading order · foundational</p>
       </div>
 
-      <p className="mt-3 max-w-[46rem] text-sm leading-relaxed text-muted-foreground">
-        Read in this order, these are the words the introductory lessons assume you already have.
-        Everything else on this page is alphabetical and can wait until you meet it. Each one links
-        to its full entry below.
+      <p className="mt-3 max-w-reading text-sm leading-relaxed text-muted-foreground">
+        Read them in this order. These are the words the introductory lessons assume you already
+        have; everything else on this page is alphabetical and can wait until you meet it. Each
+        card links to the full entry below.
       </p>
 
       <ol className="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -73,7 +87,7 @@ export function GlossaryStartHere({ terms }: { terms: GlossaryEntry[] }) {
               // characters for "Quantum State (State Vector)", read out in
               // full before a screen-reader user can decide whether to
               // activate it. `aria-label` stops the name computation, and the
-              // preview stays exactly as visible content for everyone else —
+              // preview stays exactly as visible content for everyone else,
               // it is a preview, not a label. Measured across all 15 cards;
               // 12 exceeded 170 characters.
               aria-label={term.title}
@@ -83,7 +97,18 @@ export function GlossaryStartHere({ terms }: { terms: GlossaryEntry[] }) {
                 <span aria-hidden="true" className="tech-value text-xs text-subtle-foreground">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="font-display text-sm font-semibold text-foreground group-hover:text-pillar-text">
+                {/* Body face, not `font-display`. Fraunces is the "moment"
+                    voice (globals.css section 7: page and lesson titles,
+                    section openings), and nowhere else in the app does it run
+                    below `text-base`. This is one of fifteen rows in a list,
+                    at 14px, distinguished from the definition under it only by
+                    weight: not a moment, and at that size the display face's
+                    whole reason for existing does not survive anyway. The
+                    section's own `font-display text-xl` heading above is the
+                    moment here, and it reads as one because these fifteen do
+                    not compete with it. Weight and colour still separate the
+                    term from its preview. */}
+                <span className="text-sm font-semibold text-foreground group-hover:text-pillar-text">
                   {term.title}
                 </span>
               </div>

@@ -55,11 +55,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Not a gap in what we know">
 A qubit does not keep a definite value in reserve, waiting for you to look. It can be in a combination of "0" and "1" at once. That is a claim about the system itself, not a polite way of saying we don't yet know which one it is.
 </LessonHook>
 
-## Motivation
+## Two spots, and nothing between them
 
 Right now, every bit in your phone or laptop has a definite value. Nobody
 needs to check it for that to be true: it's 0, or it's 1, sitting there
@@ -83,11 +83,32 @@ They got two spots. Not a band, not a bright middle with faint edges: two,
 with nothing between them. Measure that atom's compass needle along any axis
 you like and you get one of two answers, and only two.
 
-Here is the part that rules out the easy explanation. Take the atoms from the
-upper spot, so every one of them measured "up" along the vertical axis, and
-send them through a second magnet turned on its side. Half come out left,
-half right. Now take the "left" half and measure vertically again. Half are
-up and half are down. The vertical answer you carefully sorted for is gone.
+Two spots on their own still admit an easy explanation: perhaps each atom
+was simply born carrying a hidden "up" or "down" label, and the magnet
+only reads it off. Ruling that out takes one more magnet.
+
+Take the atoms from the upper spot, so every one of them has measured
+"up" along the vertical axis. Send that filtered beam through a second
+magnet turned on its side, measuring left-versus-right instead. It splits
+evenly, half left and half right, which is unsurprising: a vertical label
+says nothing about horizontal. Now keep only the "left" half and send it
+through a *third* magnet, vertical again. Every atom in this beam has been
+confirmed "up" once already, and nothing since has touched the vertical
+axis.
+
+<PredictBeforeReveal
+  question="Atoms measured up, then filtered to left. Measure vertically a third time. What comes out?"
+  options={[
+    { label: "All up. They were sorted for that already", value: "allup" },
+    { label: "Mostly up, with a few strays from imperfect magnets", value: "mostly" },
+    { label: "Half up, half down", value: "half" },
+    { label: "All down. The sideways magnet flipped them", value: "alldown" },
+  ]}
+  correctValue="half"
+  explanation="Half up, half down. The vertical answer you carefully sorted for is gone, wiped out by a measurement along a different axis, and no amount of engineering the magnets improves it. That is what kills the hidden-label story: a label the atom carried all along would still be there, because a label does not change when you ask an unrelated question. There is no third property being disturbed either. The atom simply does not carry a vertical answer and a horizontal answer at the same time."
+/>
+
+Half up, half down. The vertical answer you carefully sorted for is gone.
 No fixed label the atom was carrying all along can survive that, because a
 label wouldn't change when you asked an unrelated question.
 
@@ -101,7 +122,7 @@ polarized photons in optical fibre, among others (the
 each in turn). The mathematics below describes all of them at once, which
 is why it is worth learning before any particular hardware.
 
-## Intuition
+## The coin analogy, and where it breaks
 
 A useful (if imperfect) way to start: imagine a coin that hasn't landed yet.
 While it's spinning in the air, it isn't heads and it isn't tails; it's in a
@@ -124,7 +145,7 @@ definite value until it's measured. That's a physical fact, not a gap in
 your knowledge.
 </Callout>
 
-## Mathematical Development
+## Two amplitudes, and one condition on them
 
 We write a qubit's state using <Term id="dirac-notation">Dirac notation</Term>. The two basis states are
 written $|0\rangle$ and $|1\rangle$, corresponding to the classical bit
@@ -163,7 +184,7 @@ bars in $|\alpha|^2$ as "square the size, ignore the sign." The next lesson
 builds the complex case from scratch; nothing here depends on it yet.
 </Callout>
 
-## Physical Interpretation
+## The Born rule, and the one place randomness enters
 
 The connection between the math and what you can observe is the
 <Term id="born-rule">Born rule</Term>: if you measure a qubit in state $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$,
@@ -186,11 +207,11 @@ into probabilities in real time, and lets you measure it: each click samples
 an outcome using the probabilities shown, then snaps the state to a single
 definite ket.
 
-<InteractiveSection title="Amplitudes to probabilities to collapse" description="Set α with the slider; β is then fixed by normalization. Press Measure several times without touching the slider. You are re-preparing the same superposition each time, so the running tally shows how random each individual outcome is even though the probabilities never move.">
+<InteractiveSection title="Amplitudes to probabilities to collapse" description="Set α with the slider; β is then fixed by normalization. Press Measure several times without touching the slider. You are re-preparing the same superposition each time, so watch the running tally and the probability readout side by side and decide which of the two the randomness actually lives in.">
   <LazySuperpositionJourney />
 </InteractiveSection>
 
-## Interactive Visualization
+## Every state as a point on a sphere
 
 Every qubit state can be pictured as a point on the surface of a sphere, the
 <Term id="bloch-sphere-term">Bloch sphere</Term>, where the north pole is $|0\rangle$, the south pole is
@@ -200,7 +221,7 @@ equator, exactly halfway between the poles, is where the two are equally
 likely.
 
 <PredictBeforeReveal
-  question="Start from |0⟩ and apply a Hadamard gate (the gate below turns the vector to point straight out to the equator). If you then measure many times, what fraction of measurements will read |1⟩?"
+  question="Start from |0⟩ and apply a Hadamard gate, which takes |0⟩ to the state (1/√2)|0⟩ + (1/√2)|1⟩. If you then measure many times, what fraction of measurements will read |1⟩?"
   options={[
     { label: "0%", value: "0" },
     { label: "25%", value: "25" },
@@ -211,11 +232,11 @@ likely.
   explanation="A Hadamard gate takes |0⟩ to the equal superposition (1/√2)|0⟩ + (1/√2)|1⟩. By the Born rule, P(1) = |1/√2|² = 1/2, so measurement reads |1⟩ on about half your attempts and |0⟩ on the other half. Never something in between, even though the state you measured was a combination of both. This is the Stern-Gerlach screen again: two spots, no smear."
 />
 
-<InteractiveSection title="Apply a gate, then measure" description="Apply a gate below and watch α, β, and the measurement probabilities update as the vector moves. Then hit Measure a few times from the same state: the outcomes are random, but they always land on 0 or 1 with the probabilities shown.">
+<InteractiveSection title="Apply a gate, then measure" description="Apply a gate below and watch α, β, and the measurement probabilities update as the vector moves. Then hit Measure a few times from the same state, noting which values come back and how often each one does relative to the probabilities shown.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
-## Worked Example
+## The equal superposition, checked twice
 
 Consider the state:
 
@@ -242,7 +263,7 @@ produces from $|0\rangle$, and it is, up to the sign on one amplitude, the state
 Stern-Gerlach atoms were in after the sideways magnet, when the vertical
 measurement came back half up and half down.
 
-## Common Mistakes
+## Squaring, and the split that need not be even
 
 <Callout type="warning">
 **Forgetting to square the amplitude.** The probability of an outcome is
@@ -278,9 +299,83 @@ even split is one point in that range rather than the meaning of the word.
 
 1. Is $|\psi\rangle = \tfrac{1}{2}|0\rangle + \tfrac{\sqrt3}{2}|1\rangle$ a
    valid qubit state? Show your work.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes. Normalization asks for $|\alpha|^2 + |\beta|^2 = 1$, so square each
+   amplitude's size and add:
+
+   $$
+   \left|\tfrac{1}{2}\right|^2 + \left|\tfrac{\sqrt3}{2}\right|^2 = \tfrac{1}{4} + \tfrac{3}{4} = 1 \checkmark
+   $$
+
+   It is valid, and the Born rule then reads off $P(0) = \tfrac14 = 25\%$ and
+   $P(1) = \tfrac34 = 75\%$. A lopsided superposition, not a fair coin.
+
+   The usual way to get "no" here is to add the amplitudes instead of their
+   squares: $\tfrac12 + \tfrac{\sqrt3}{2} \approx 1.37$, which is not 1, so the
+   state looks broken. Nothing in quantum mechanics ever asks the amplitudes
+   themselves to sum to 1. They are not probabilities. Squaring is the step
+   that turns them into probabilities, and it is the squares that must sum
+   to 1.
+
+   </details>
+
 2. A qubit has a 25% probability of measuring 0. Give one possible pair of
    amplitudes $(\alpha, \beta)$ consistent with this.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $(\alpha, \beta) = \left(\tfrac{1}{2}, \tfrac{\sqrt3}{2}\right)$ works, which
+   is exactly the state from question 1.
+
+   Run it backwards from the Born rule. $P(0) = |\alpha|^2 = 0.25$ forces
+   $|\alpha| = 0.5$. Normalization then fixes the other one:
+   $|\beta|^2 = 1 - 0.25 = 0.75$, so $|\beta| = \sqrt{0.75} = \tfrac{\sqrt3}{2} \approx 0.866$.
+
+   Note "one possible pair". The Born rule pins down the *sizes* of the two
+   amplitudes and says nothing about their signs or their complex phases, so
+   $\left(-\tfrac12, \tfrac{\sqrt3}{2}\right)$ and
+   $\left(\tfrac12, \tfrac{\sqrt3}{2}i\right)$ are equally correct answers to
+   this question. They are genuinely different states, they just happen to be
+   indistinguishable by this one measurement. Two lessons from now that
+   leftover freedom turns out to be the whole subject.
+
+   The common wrong answer is $\alpha = 0.25$: reading "25%" straight into the
+   amplitude slot without squaring. That state has $P(0) = 0.25^2 = 6.25\%$
+   instead.
+
+   </details>
+
 3. Why can't a qubit's amplitudes both be negative real numbers close to $-1$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because normalization would fail badly. With $\alpha \approx -1$ and
+   $\beta \approx -1$,
+
+   $$
+   |\alpha|^2 + |\beta|^2 \approx 1 + 1 = 2,
+   $$
+
+   which would say the two outcomes together happen 200% of the time. There is
+   no such state.
+
+   The trap in this question is the word "negative", and it is worth being
+   clear that the sign is not what breaks it.
+   $\alpha = \beta = -\tfrac{1}{\sqrt2}$ is a perfectly good qubit state: both
+   amplitudes are negative, both squares are $\tfrac12$, and they sum to 1. It
+   is the *size* that is illegal, not the sign. Squaring throws the sign away,
+   so an amplitude near $-1$ is exactly as oversized as one near $+1$.
+
+   Geometrically: normalization says the vector $(\alpha, \beta)$ has length 1.
+   Both components close to $-1$ puts it at length $\approx\sqrt2$, off the unit
+   circle. Which quadrant it points into was never the constraint.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -294,7 +389,7 @@ even split is one point in that range rather than the meaning of the word.
 - Measurement collapses the superposition to a single classical outcome.
 - Every qubit state corresponds to a point on the Bloch sphere.
 
-## Further Exploration
+## Where the complex part starts mattering
 
 <NextDiscovery>
 We've been using $\alpha$ and $\beta$ as complex numbers without really using

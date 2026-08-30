@@ -17,8 +17,8 @@ export const whatPhaseProvides: MultipleChoiceProblem = {
     prompt: "What does a complex phase provide for interference that a real signed amplitude's sign (±) cannot?",
     options: [
       { id: "a", text: "A continuum of values continuously tuning interference strength" },
-      { id: "b", text: "A way to make probabilities negative" },
-      { id: "c", text: "A way to avoid the normalization condition" },
+      { id: "b", text: "A way to let an interference term drive a probability negative" },
+      { id: "c", text: "A way to sidestep the normalization condition on the amplitudes" },
       { id: "d", text: "A second discrete two-valued choice, like the sign itself" },
     ],
   },
@@ -26,9 +26,9 @@ export const whatPhaseProvides: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Probabilities are still always |amplitude|² ≥ 0 — phase never makes a probability negative.",
+      b: "Probabilities are always |amplitude|² ≥ 0, so phase never makes a probability negative.",
       c: "Phase and normalization are unrelated; |z| (not the phase) is what normalization constrains.",
-      d: "A sign already provides a two-valued choice — the point of phase is that it's a *continuum*, not another binary option.",
+      d: "A sign already provides a two-valued choice. The point of phase is that it is a *continuum*, not another binary option.",
     },
     defaultIncorrectFeedback: "Think about how many distinct interference outcomes a sign bit can produce, versus a continuously adjustable angle.",
   },
@@ -39,14 +39,14 @@ export const whatPhaseProvides: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [
-      { description: "A real sign is a 2-valued choice — full constructive or full destructive interference only." },
+      { description: "A real sign is a 2-valued choice: full constructive or full destructive interference only." },
       { description: "A complex phase θ∈[0,2π) is continuously adjustable, and the interference cross term depends on cos(θ), sweeping smoothly through every intermediate value." },
     ],
     finalAnswer: "A continuum of interference strengths, which a two-valued sign cannot supply.",
   },
   explanation: {
     correctIdea: "The smooth fringe pattern seen in experiment needs an interference term that varies continuously, and a sign offers only two settings.",
-    whyCorrect: "Matches the lesson's central derivation: the cross term carries cos(θ), which sweeps every value between −1 and 1 as θ turns.",
+    whyCorrect: "The interference term carries cos(θ), and as θ turns that runs smoothly across the whole interval from −1 to 1. A sign can only ever select the two endpoints of that interval.",
     whyWrong: [
       { optionId: "b", text: "Probabilities stay |amplitude|² and so stay non-negative, whatever the phase." },
       { optionId: "c", text: "Normalization constrains the magnitude |z|, which a phase leaves untouched." },

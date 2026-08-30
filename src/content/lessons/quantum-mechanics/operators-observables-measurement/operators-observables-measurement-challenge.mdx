@@ -53,11 +53,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Four postulates, rebuilt at full generality">
 Eigenvalues as measurement outcomes, the Born rule, uncertainty relations, compatible observables: the earlier quantum-mechanics courses introduced all four in a specific, sometimes quietly special-cased form. This course rebuilt each one at full generality.
 </LessonHook>
 
-## Motivation
+## What each upgrade actually replaced
 
 The upgrades were concrete: projectors instead of bare eigenvectors,
 degenerate eigenspaces instead of assuming they don't exist, a proven
@@ -91,11 +91,13 @@ this course fixed.
 | "Incompatible observables disturb each other" (stated) | A fully numeric $Z\to X\to Z$ sequence, tracking the disturbance step by step (Sequential Measurements) |
 | $\Delta x\Delta p\ge\hbar/2$ specifically (Wave Mechanics) | $\Delta E\,\Delta t_A\ge\hbar/2$ for *any* observable $A$, derived via Ehrenfest's theorem (Energy-Time Uncertainty) |
 
-Nothing in the right column contradicts the left column, every general
-result reduces exactly to the specific one in the nondegenerate,
-single-observable case already covered.
+Nothing in the right column contradicts the left column. Wherever a row's
+general version was reached by dropping a hidden nondegeneracy assumption,
+putting that assumption back recovers the specific version on the left
+exactly. Exactly one row does not work that way, and practice question 1
+asks you to find it.
 
-## Worked Synthesis Examples
+## Problems that need degeneracy handled properly
 
 **1. A <Term id="hermitian-operator">Hermitian operator</Term> has a triply-degenerate eigenvalue. Using this
 course's tools, how many *additional*, mutually-compatible observables
@@ -142,7 +144,7 @@ $B$ then $A$. Is the claim right as stated?**
   options={[
     { label: "Yes: commuting observables make order irrelevant in every sense", value: "same" },
     { label: "No, and compatibility says nothing about repeated measurements either", value: "nothing" },
-    { label: "The joint probabilities match, but the individual outcomes are still random", value: "probabilities" },
+    { label: "The joint probabilities match; the outcomes are still random", value: "probabilities" },
   ]}
   correctValue="probabilities"
   explanation="Compatibility fixes the statistics, not the individual draws. The joint probability of any outcome pair is the same in either order, which is the real content of [A,B] = 0, but each measurement still collapses a superposition and each outcome is still random. What compatibility does buy is repeatability: measure A, then B, then A again, and the third measurement reproduces the first outcome with certainty, because collapsing onto a shared eigenbasis for B leaves the state an eigenstate of A."
@@ -158,7 +160,7 @@ reproduces $A$'s *first* outcome with certainty, because
 <Term id="wavefunction-collapse">collapse</Term> onto a shared eigenbasis for one operator leaves the state an
 eigenstate of the other too.
 
-## Common Mistakes, Revisited
+## Generalizations, not replacements
 
 <Callout type="note">
 **Treating this course's generalizations as replacing the earlier
@@ -180,15 +182,172 @@ content, not a mathematical nicety.
 
 1. Using the recap table, identify the one lesson in this course whose
    result was *not* a strict generalization of something already proven,
-   i.e., which lesson introduced content with no earlier "special case"
-   version at all?
+   and say what the word "generalization" fails to capture about it. Then
+   name the two earlier results its derivation actually leans on, and say
+   what would break if either were unavailable.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The Energy-Time Uncertainty Relation, the table's last row.
+
+   **Why it is the odd one out.** Every other row takes an earlier
+   statement and removes a hidden assumption. $A=\sum_i\lambda_i|e_i\rangle
+   \langle e_i|$ becomes $A=\sum_i\lambda_iP_i$ by dropping
+   nondegeneracy; $P(a_i)=|c_i|^2$ becomes
+   $\langle\psi|P_i|\psi\rangle$ the same way; a single eigenvalue as a
+   label becomes a complete set; a stated compatibility criterion becomes
+   a proven equivalence. In each case the general version reduces exactly
+   to the earlier one when the assumption is put back, which the recap's
+   closing line calls out as a requirement each derivation had to meet.
+
+   $\Delta E\,\Delta t_A\ge\hbar/2$ does not do that. Setting anything to
+   a special value does not turn it back into $\Delta x\,\Delta p\ge
+   \hbar/2$, and the left column pairs the two only because the table needs
+   an entry there. The two are different kinds of statement:
+   $\Delta x\,\Delta p$ is a product of two *operator* uncertainties,
+   while $\Delta t_A$ is not an operator uncertainty at all. There is no
+   time operator, so there is no earlier special case for this result to
+   be the general version of.
+
+   **What it leans on instead.** Two results, both imported from *other*
+   courses rather than generalized from this one.
+
+   The general operator uncertainty bound $\Delta A\,\Delta B\ge
+   \tfrac12|\langle[A,B]\rangle|$, proved from Cauchy-Schwarz in From
+   Classical to Quantum, applied here to the pair $H$ and $A$. Without it
+   there is no inequality to start from, and the derivation has nothing to
+   convert.
+
+   Ehrenfest's theorem $d\langle A\rangle/dt=(i/\hbar)\langle[H,A]\rangle$,
+   proved in Wave Mechanics, which is what turns $\langle[H,A]\rangle$
+   into a rate of change. Without it the bound stays a statement relating
+   two spreads through a commutator, with no time in it anywhere, and the
+   quantity $\Delta t_A$ never appears.
+
+   So the honest description is that this lesson *derives a new result*
+   from two old ones, where the rest of the course *restates old results*
+   without the fine print. Both are worth doing, and only one of them is
+   generalization.
+
+   </details>
+
 2. A CSCO has three observables. Explain, in your own words, what
-   "complete" is doing in that name, complete with respect to what,
-   exactly?
-3. If $\Delta E=0$ for a state (from the Energy-Time Uncertainty lesson),
-   what does this course's collapse formalism predict happens if you
-   measure *any* observable $A$ twice in a row, separated by some time
-   $\Delta t$? (Combine two results from this course.)
+   "complete" is doing in that name: complete with respect to what,
+   exactly? Then describe two genuinely different ways a set of three
+   mutually commuting observables could fail to be complete.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Complete with respect to *labelling the basis*: the joint eigenvalue
+   tuple $(a,b,c)$ has to pick out one basis state and no other. Nothing
+   else is being claimed.
+
+   Say what "complete" is not, since the word invites three wrong readings.
+   It does not mean the set contains every observable of the system, or
+   every observable that commutes with the others, and adding more members
+   to a complete set leaves it complete. It does not mean each member is
+   individually informative; a member can be badly degenerate on its own,
+   as $Z_0$ is on two qubits, and still be indispensable to the set. And
+   it does not mean the set is minimal, since a complete set can carry
+   redundant members. The whole condition is: run down the list of basis
+   states, write each one's tuple, and check that no tuple appears twice.
+
+   That leaves exactly one way to fail, two orthogonal states sharing a
+   tuple, but it arrives by two genuinely different routes.
+
+   **A member that is trivial where it is needed.** Take
+   $A=\mathrm{diag}(1,1,2)$ on $\mathbb{C}^3$ with $B=C=I$. All three
+   commute, and $B$ and $C$ take the value $1$ on everything, so
+   $|0\rangle$ and $|1\rangle$ both carry $(1,1,1)$. This is the Complete
+   Sets lesson's warning in its purest form: commuting is easy, and an
+   observable that is constant across a degenerate eigenspace resolves
+   nothing inside it. The identity is the extreme case, but any $B$ that
+   happens to be a multiple of the identity *on that eigenspace* fails the
+   same way while looking perfectly nontrivial elsewhere.
+
+   **Members that are non-trivial but redundant.** Take
+   $A=\mathrm{diag}(1,1,2)$, $B=A^2=\mathrm{diag}(1,1,4)$ and
+   $C=A^3=\mathrm{diag}(1,1,8)$. Now every member has two distinct
+   eigenvalues, none is a multiple of the identity, and all three commute.
+   They still fail, because each is a function of $A$: wherever $A$ repeats
+   a value, so does any function of it, and $|0\rangle$ and $|1\rangle$
+   share the tuple $(1,1,1)$ again. Three observables carrying one
+   observable's worth of information.
+
+   The second case is the more instructive of the two, because it shows
+   that counting members proves nothing. What matters is whether the
+   degeneracies *overlap*, and the test is the table, not the tally. The
+   two-qubit example makes the same point positively: $Z_0$ and $Z_1$ are
+   each degenerate, and they are complete together precisely because their
+   repeated values fall in different patterns, $(+,+,-,-)$ against
+   $(+,-,+,-)$.
+
+   </details>
+
+3. A state has $\Delta E=0$. You measure an observable $A$, wait a time
+   $\Delta t$, then measure $A$ again. Combining this course's
+   repeated-measurement result with the energy-time relation, work out
+   when the second reading is guaranteed to match the first. Show that the
+   guarantee needs a hypothesis about $A$, and give an explicit two-level
+   counterexample for an $A$ that fails it.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The guarantee holds for every $\Delta t$ exactly when $[A,H]=0$. For an
+   $A$ incompatible with $H$ it fails, and the second reading can even be
+   *certain to disagree*.
+
+   **The two ingredients, stated carefully.** The repeated-measurement
+   result says an *immediate* second measurement of $A$ reproduces the
+   first outcome with certainty, because collapse leaves the state inside
+   the $a_i$-eigenspace and $P_i$ is idempotent. The energy-time relation
+   says $\Delta E=0$ forces $\Delta t_A=\infty$ for every observable, so
+   nothing evolves and the waiting costs nothing.
+
+   **Where the naive combination goes wrong.** The second ingredient is a
+   statement about $|\psi\rangle$, and the waiting happens *after* the
+   first measurement, to a different state: $|\psi'\rangle =
+   P_i|\psi\rangle/\|P_i|\psi\rangle\|$. There is no reason in general for
+   $|\psi'\rangle$ to still have $\Delta E=0$. The measurement has
+   projected the state, and projecting an energy eigenstate can leave
+   something that is not one.
+
+   **The hypothesis that repairs it.** If $[A,H]=0$ then $H$ commutes with
+   each of $A$'s spectral projectors, so
+   $H P_i|\psi\rangle = P_i H|\psi\rangle = E\,P_i|\psi\rangle$: the
+   collapsed state is still an $H$-eigenstate with the same energy, still
+   has $\Delta E=0$, and is therefore stationary. Nothing changes during
+   the wait, and the second reading reproduces the first with certainty for
+   any $\Delta t$. Compatibility with $H$ is what the informal argument was
+   silently assuming.
+
+   **The counterexample.** Take $H=\tfrac{\hbar\omega}{2}Z$ and
+   $|\psi\rangle=|0\rangle$, an exact energy eigenstate, so $\Delta E=0$.
+   Measure $A=X$, which does not commute with $H$. The outcome is $\pm1$
+   with probability $\tfrac12$ each; say $+1$, leaving $|+\rangle$. In
+   $|+\rangle$ the energy spread is $\Delta E=\hbar\omega/2$, no longer
+   zero, so the state precesses:
+
+   $$
+   |\psi(\Delta t)\rangle \;\propto\; \frac{1}{\sqrt2}\left(|0\rangle + e^{i\omega\Delta t}|1\rangle\right), \qquad P(X{=}{+}1\text{ again}) = \cos^2\!\left(\frac{\omega\Delta t}{2}\right)
+   $$
+
+   computed with the platform's own `rotationZ` and inner products. At
+   $\omega\Delta t=\pi$ that probability is exactly $0$: the second
+   measurement is certain to return $-1$, the opposite of the first. At
+   $\omega\Delta t=\pi/2$ it is $\tfrac12$, a coin flip. Only at
+   $\omega\Delta t=0,2\pi,4\pi,\ldots$ does it return $1$.
+
+   So the correct statement has three parts. For $\Delta t=0$ the second
+   reading always matches, whatever $A$ is, by idempotence alone. For any
+   $\Delta t$ it matches when $[A,H]=0$. And for an incompatible $A$ it
+   generally does not, because $\Delta E=0$ described the state you started
+   with and the first measurement is what destroyed it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -198,15 +357,17 @@ content, not a mathematical nicety.
   measurement, and energy-time uncertainty are five faces of the same
   underlying idea: the earlier courses' postulates, made precise for
   degenerate spectra and multi-observable systems.
-- Every general result in this course reduces exactly to its
-  already-proven nondegenerate special case, which is a consistency
-  requirement each derivation had to meet, not a coincidence.
+- Each of those generalizations reduces exactly to its already-proven
+  nondegenerate special case, a consistency requirement the derivations had
+  to meet rather than a coincidence. The energy-time relation is the one
+  result here that is not a generalization at all: it is new, derived from
+  two results imported from earlier courses.
 - Degeneracy is the generic situation for real physical systems with
   enough symmetry, not a mathematical edge case to note in passing, and
   this course's tools are the honest prerequisite for describing them
   correctly.
 
-## Further Exploration
+## On to potentials in one dimension
 
 <NextDiscovery>
 This completes **Operators, Observables & Measurement**. The natural next
@@ -214,7 +375,7 @@ step is **One-Dimensional Quantum Systems**, extending Wave Mechanics'
 solvable potentials to the finite square well and scattering off a step
 potential. The density-matrix and partial-trace machinery this recap
 table doesn't yet cover (needed for mixed states and the reduced state of
-an entangled subsystem) arrives later, in the Quantum Computing pillar's
+an entangled subsystem) arrives later, in the Quantum Computing track's
 Entanglement, Mixed States & Bell Tests course, and gets extended again
 in this course's own Advanced Quantum Mechanics material on open systems
 and decoherence.

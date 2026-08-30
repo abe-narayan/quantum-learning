@@ -133,7 +133,7 @@ function renderNode(value, displayMode, file, settings, sourceElement) {
     // rehype-katex.)
     throw new Error(
       "rehypeKatexHtml: display-math output did not start with the expected " +
-        `'${DISPLAY_OPEN}' wrapper — the tabindex injection would silently ` +
+        `'${DISPLAY_OPEN}' wrapper, so the tabindex injection would silently ` +
         "stop working. Update DISPLAY_OPEN to match this KaTeX version/config."
     );
   }

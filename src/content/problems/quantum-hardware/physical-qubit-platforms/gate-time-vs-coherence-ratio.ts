@@ -16,10 +16,10 @@ export const gateTimeVsCoherenceRatio: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "Per this lesson, what actually determines how many gate operations can be performed before decoherence dominates?",
     options: [
-      { id: "a", text: "The ratio of coherence time to gate time" },
-      { id: "b", text: "Coherence time alone: the longer the qubit lives, the more gates fit" },
-      { id: "c", text: "Gate time alone: the faster each gate, the more of them get done" },
-      { id: "d", text: "The difference, coherence time minus gate time" },
+      { id: "a", text: "The ratio of coherence time to gate time, which counts how many fit" },
+      { id: "b", text: "The coherence time on its own, since a longer-lived qubit does more" },
+      { id: "c", text: "The gate time on its own, since faster gates get more done per second" },
+      { id: "d", text: "The difference, coherence time minus gate time, in the same units" },
     ],
   },
   answer: {
@@ -43,7 +43,7 @@ export const gateTimeVsCoherenceRatio: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "The number of operations before decoherence dominates is a count, and a count of fixed-length intervals inside a fixed window is a quotient of the two times.",
-    whyCorrect: "Matches the worked example's ratio calculation, and the units check out: seconds divided by seconds is a pure number.",
+    whyCorrect: "Two durations only become a count of operations when one is divided by the other. A long-lived qubit with slow gates and a short-lived one with fast gates can reach the same total, which is why neither duration on its own answers the question.",
     whyWrong: [
       { optionId: "b", text: "Reads coherence time as the budget. It is only the numerator." },
       { optionId: "c", text: "Reads gate speed as the budget. It is only the denominator." },

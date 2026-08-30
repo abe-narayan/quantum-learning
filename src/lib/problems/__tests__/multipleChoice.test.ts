@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { validateMultipleChoice } from "../validators/multipleChoice";
-import { seededShuffle } from "@/components/problems/optionOrder";
-import type { MultipleChoiceAnswer, MultipleChoiceQuestion } from "../types";
+import { displayLetters, seededShuffle } from "@/components/problems/optionOrder";
+import { PROBLEMS } from "../registry.generated";
+import { validateAnswer } from "../validators";
+import type { MultipleChoiceAnswer, MultipleChoiceQuestion, MultipleChoiceProblem } from "../types";
 
 const question: MultipleChoiceQuestion = {
   type: "multiple-choice",
@@ -79,5 +81,112 @@ describe("validateMultipleChoice", () => {
     expect(validateMultipleChoice(reordered, answer, "10").message).toBe("Order matters.");
     expect(validateMultipleChoice(reordered, answer, "00").message).toBe("Try again.");
     expect(validateMultipleChoice(reordered, answer, "01").status).toBe("correct");
+  });
+});
+
+/**
+ * The shuffle is only safe if nothing downstream of it resolves an option by
+ * position. `registry.test.ts` already checks that every `correctOptionId`,
+ * `optionFeedback` key and `whyWrong.optionId` names a real option; this
+ * checks the other half — that the display order those ids are rendered in
+ * cannot change what any of them means, for every real problem, under its own
+ * slug seed rather than a seed chosen to make the test pass.
+ */
+describe("seeded display order — corpus invariants", () => {
+  const multipleChoiceProblems = PROBLEMS.filter(
+    (problem): problem is MultipleChoiceProblem => problem.answer.type === "multiple-choice"
+  );
+
+  it("has a corpus worth measuring", () => {
+    // The invariants below all assert an empty list, which is what an empty
+    // corpus produces. A floor, not the count: see `CLAUDE.md`.
+    expect(multipleChoiceProblems.length).toBeGreaterThanOrEqual(100);
+  });
+
+  /**
+   * Targeted feedback is a *diagnosis of a wrong turn*: `optionFeedback[id]` is
+   * reached only when `id` was chosen and was not the answer, and a `whyWrong`
+   * entry is rendered under the heading "Common mistakes". Attaching either to
+   * the correct option produces a page that contradicts itself — the solution
+   * explaining why the right answer is a mistake — and neither the validator
+   * nor the renderer can notice, because both look the id up and find it.
+   * Currently zero across the corpus; this is what keeps it there.
+   */
+  it("never aims a wrong-answer explanation at the correct option", () => {
+    const misaimed = multipleChoiceProblems.flatMap((problem) => {
+      const correct = problem.answer.correctOptionId;
+      const found: string[] = [];
+      if (Object.prototype.hasOwnProperty.call(problem.answer.optionFeedback ?? {}, correct)) {
+        found.push(`${problem.meta.slug}: optionFeedback is keyed on the correct option "${correct}"`);
+      }
+      for (const entry of problem.explanation?.whyWrong ?? []) {
+        if (typeof entry !== "string" && entry.optionId === correct) {
+          found.push(`${problem.meta.slug}: a "common mistakes" entry points at the correct option "${correct}"`);
+        }
+      }
+      return found;
+    });
+    expect(misaimed).toEqual([]);
+  });
+
+  it("shuffles every problem's options into a permutation of themselves", () => {
+    const broken = multipleChoiceProblems.flatMap((problem) => {
+      const shuffled = seededShuffle(problem.question.options, problem.meta.slug);
+      const before = problem.question.options.map((option) => option.id).sort();
+      const after = shuffled.map((option) => option.id).sort();
+      return JSON.stringify(before) === JSON.stringify(after)
+        ? []
+        : [`${problem.meta.slug}: the shuffle lost or duplicated an option`];
+    });
+    expect(broken).toEqual([]);
+  });
+
+  it("is a pure function of the slug — same order every call", () => {
+    for (const problem of multipleChoiceProblems) {
+      const first = seededShuffle(problem.question.options, problem.meta.slug).map((option) => option.id);
+      const second = seededShuffle(problem.question.options, problem.meta.slug).map((option) => option.id);
+      expect(second, problem.meta.slug).toEqual(first);
+    }
+  });
+
+  it("gives every option a distinct display letter", () => {
+    const broken = multipleChoiceProblems.flatMap((problem) => {
+      const letters = displayLetters(problem.question.options, problem.meta.slug);
+      const distinct = new Set(letters.values());
+      if (letters.size !== problem.question.options.length || distinct.size !== letters.size) {
+        return [`${problem.meta.slug}: display letters are not a bijection over its options`];
+      }
+      return [];
+    });
+    expect(broken).toEqual([]);
+  });
+
+  it("grades every real problem the same before and after its own shuffle", () => {
+    const drifted = multipleChoiceProblems.flatMap((problem) => {
+      const shuffled: MultipleChoiceProblem = {
+        ...problem,
+        question: { ...problem.question, options: seededShuffle(problem.question.options, problem.meta.slug) },
+      };
+      return problem.question.options.flatMap((option) => {
+        const before = validateAnswer(problem, option.id);
+        const after = validateAnswer(shuffled, option.id);
+        return before.status === after.status && before.message === after.message
+          ? []
+          : [`${problem.meta.slug}: option "${option.id}" grades differently once the options are reordered`];
+      });
+    });
+    expect(drifted).toEqual([]);
+  });
+
+  it("does not shuffle the correct answer into a fixed slot across the corpus", () => {
+    // The defect the shuffle exists for: the authored order put the correct
+    // option first in the large majority of problems. If the shuffled order
+    // did the same thing, nothing would have been fixed.
+    const firstSlotHits = multipleChoiceProblems.filter(
+      (problem) =>
+        seededShuffle(problem.question.options, problem.meta.slug)[0].id === problem.answer.correctOptionId
+    ).length;
+    const share = firstSlotHits / multipleChoiceProblems.length;
+    expect(share).toBeLessThan(0.45);
   });
 });

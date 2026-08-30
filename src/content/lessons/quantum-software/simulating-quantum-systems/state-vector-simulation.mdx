@@ -23,7 +23,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "State-Vector Simulation",
   description:
-    "Every StateVector calculation this platform has ever run, from the first Bell state through Quantum Algorithms II's Shor's-algorithm period finding, IS state-vector simulation, the exact technique this lesson names and examines as a technique, not a fact about qubits.",
+    "Every StateVector calculation this platform has ever run, from the first Bell state through Quantum Algorithms II's Shor's-algorithm period finding, IS state-vector simulation, the technique this lesson names and examines as a technique, not a fact about qubits.",
   course: "simulating-quantum-systems",
   module: "state-vector-simulation",
   order: 1,
@@ -32,38 +32,39 @@ export const lessonMeta = {
   prerequisites: ["quantum-software/programming-quantum-computers/simulators-vs-real-hardware"],
   objectives: [
     "Identify state-vector simulation as the specific technique this platform's engine has used throughout, not a new algorithm",
-    "State exactly what a state-vector simulator computes and guarantees (exact amplitudes, up to floating-point precision)",
+    "State what a state-vector simulator computes and guarantees (exact amplitudes, up to floating-point precision)",
     "Distinguish 'simulating a quantum computer' from 'being a quantum computer' precisely",
   ],
   related: [
     {
       slug: "quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors",
-      note: "The 2^n-amplitude StateVector object this lesson names as a simulation technique is exactly the state space built and reasoned about there.",
+      note: "The 2^n-amplitude StateVector object this lesson names as a simulation technique is the state space built and reasoned about there.",
     },
   ],
 };
 
 <LessonHook eyebrow="A technique you already know">
-You've been simulating quantum systems since this platform's very first lesson. This opening lesson doesn't introduce new machinery — it stops and names the technique you've been using all along.
+You've been simulating quantum systems since this platform's very first lesson. This opening lesson doesn't introduce new machinery. It stops and names the technique you've been using all along.
 </LessonHook>
 
-## Motivation
+## The Engine Behind Every Result So Far
 
 Every circuit this platform has ever executed was run by a state-vector
-simulator, the technique this course is named for. This opening lesson
-names that technique explicitly, pins down its specific guarantees and
-specific limits, and sets up the rest of this course's cost analysis.
+simulator, the technique this course is named for. Naming it raises the
+question the rest of the course spends its time on: if this method is
+exact, and it has been exact for every lesson so far, why does anyone
+need another one?
 
-## Engineering Development
+## One Amplitude Array, Watched Through a Gate
 
-### What state-vector simulation actually is
+### What state-vector simulation is
 
 A **state-vector simulator** represents an $n$-qubit <Term id="quantum-state">quantum state</Term> as a
-list of $2^n$ complex <Term id="amplitude">amplitudes</Term> — this platform's `StateVector` class,
-used without exception in every Quantum Computing pillar course.
+list of $2^n$ complex <Term id="amplitude">amplitudes</Term>, this platform's `StateVector` class,
+used without exception in every Quantum Computing track course.
 Applying a gate updates these amplitudes directly via ordinary linear
 algebra (`applySingleQubitGate`, `applyCNOT`): exact matrix
-multiplication, not an approximation of any kind.
+multiplication, with no approximation anywhere in it.
 
 Written out, the whole technique is four boxes wide, with the second one
 repeated once per gate. Nothing in it is quantum: it is an array of
@@ -127,7 +128,7 @@ Notice what it cost. One gate, on one qubit, touched every one of the
 in the array announces in advance which slots happen to be zero. That
 is this course's entire cost story in miniature. A gate on a single
 qubit is an operation over the whole $2^n$-entry array, which is
-exactly why the next lesson's scaling analysis comes out exponential
+why the next lesson's scaling analysis comes out exponential
 in the qubit count.
 
 ### What it guarantees
@@ -136,14 +137,14 @@ A state-vector simulator computes the *exact* quantum state (up to
 ordinary floating-point rounding, the same kind of error present in any
 numerical computation). Every amplitude, every probability, every
 <Term id="expectation-value">expectation value</Term> this platform has ever displayed came from this
-technique. That's fundamentally different from *sampling* (Writing
+technique. That's different in kind from *sampling* (Writing
 Your First Circuit's `sampleMeasurements`), which only estimates
 probabilities statistically by drawing finite outcomes; a state-vector
 simulation instead reads the probabilities straight off the amplitudes,
 no draws involved.
 
 Watching both side by side on the same circuit makes the distinction
-concrete rather than just asserted: the "exact" bars below never move
+concrete: the "exact" bars below never move
 (they ARE the state-vector answer), while the "sampled" bars are this
 page's own live `sampleMeasurements` calls against that exact state,
 landing closer to 0.5 as shot count grows, the same statistical
@@ -152,14 +153,14 @@ made explorable across five different shot counts on a fresh Bell
 circuit.
 
 <PredictBeforeReveal
-  question="Keep sliding the shot count up — 5000, 50,000, 5 million. Does the sampled bar ever land on exactly 0.500, or just get closer without arriving?"
+  question="Keep sliding the shot count up: 5000, 50,000, 5 million. Does the sampled bar ever land on exactly 0.500, or just get closer without arriving?"
   options={[
-    { label: "It reaches exactly 0.500 once shots are high enough", value: "reaches" },
-    { label: "It gets arbitrarily close but essentially never lands on exactly 0.500", value: "never-lands" },
-    { label: "It overshoots past 0.500 and oscillates around it", value: "oscillates" },
+    { label: "It reaches exactly 0.500 once the shot count is high enough", value: "reaches" },
+    { label: "It overshoots 0.500, then oscillates evenly around it", value: "oscillates" },
+    { label: "It closes in on 0.500 without landing on it", value: "never-lands" },
   ]}
   correctValue="never-lands"
-  explanation="Sampling is a random process — sampleMeasurements is drawing finite outcomes from a probability distribution, not reading the distribution off directly. The count of 00-outcomes divided by shots converges toward 0.5 in probability, but landing on exactly 0.500 at some specific finite shot count would itself be a coincidence. The exact bar, by contrast, was never sampled at all: runCircuit computed 0.5 directly from the state vector's amplitudes, with no randomness involved."
+  explanation="Sampling is a random process: sampleMeasurements is drawing finite outcomes from a probability distribution, not reading the distribution off directly. The count of 00-outcomes divided by shots converges toward 0.5 in probability, but landing on exactly 0.500 at some specific finite shot count would itself be a coincidence. The exact bar, by contrast, was never sampled at all: runCircuit computed 0.5 directly from the state vector's amplitudes, with no randomness involved."
 />
 
 <InteractiveSection title="What the array gives you vs. what hardware would give" description="The exact bars are what the amplitude array gives you: runCircuit computed this Bell circuit's two 1/√2 amplitudes once, and squaring them reads off 0.5 directly, no randomness involved. The sampled bars are what hardware would give: a fresh finite-shot draw at each shot count. Slide from 10 shots up to 5000 and ask, at each stop, how many shots it takes before the hardware-style answer becomes a trustworthy stand-in for the array's exact one.">
@@ -177,23 +178,23 @@ circuit.
 entire engine) and "being a quantum computer" (Physical Qubit Platforms'
 actual hardware) compute the *same* mathematical answer for a given
 circuit, but by *completely different physical means*. Nothing about
-this platform's engine is somehow "not really" quantum mechanics — the
+this platform's engine is somehow "not really" quantum mechanics: the
 linear algebra is exact. It's just being carried out by classical
 hardware instead of a physical qubit (Simulators vs. Real Hardware's
 opposite-failure-modes framing), and that distinction is what makes
 this course's cost question (next lesson) a real one, not a
 formality.
 
-## Physical Interpretation
+## Simulating Against Being
 
 Every numerical claim this entire platform has ever verified, Grover's
 algorithm's success probability, the Bell state's entanglement, the
 hydrogen atom's energy levels via a truncated basis, rests on this
-exact technique, used without ever being named as such until now. This
+one technique, used without ever being named as such until now. This
 lesson's contribution is entirely conceptual: recognizing the common
 thread, not adding new capability.
 
-## Worked Example
+## Is This Quantum Computing?
 
 **Is running `runCircuit` on this platform's `QuantumCircuit` "real
 quantum computing," or "just simulation"?**
@@ -202,11 +203,11 @@ It's state-vector simulation: exact quantum-mechanical calculation,
 computed on ordinary classical hardware. It isn't running on an actual
 quantum device (Physical Qubit Platforms), so it carries none of real
 hardware's physical noise (Noise, Decoherence & Scaling). It also isn't
-an approximation of the underlying physics — the amplitudes it computes
+an approximation of the underlying physics. The amplitudes it computes
 are what an ideal, noiseless quantum computer would produce for the
 same circuit, down to floating-point precision.
 
-## Common Mistakes
+## Confusing Exact With Approximate
 
 <Callout type="note">
 **Thinking "simulation" means "approximation."** State-vector simulation
@@ -227,14 +228,209 @@ and transistors, vs. Physical Qubit Platforms' actual qubits) differs.
 
 1. In one sentence, define what a state-vector simulator computes and
    what precision it achieves.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   A state-vector simulator holds an $n$-qubit state as an array of
+   $2^n$ complex amplitudes and updates it by exact matrix
+   multiplication, so it computes the state, and every probability and
+   expectation value read off it, exactly, to within ordinary
+   floating-point rounding.
+
+   The clause worth defending is "exactly." It is a strong claim, so here
+   is its scope.
+
+   **What is exact:** the linear algebra. Applying a gate is a genuine
+   matrix multiplication over the amplitude array, with no truncation, no
+   sampling, no basis cut-off and no perturbative expansion anywhere.
+   The amplitudes that come out are the amplitudes quantum mechanics
+   specifies.
+
+   **What the error actually is:** IEEE double-precision rounding, about
+   one part in $10^{16}$ per operation. You can see the whole error
+   budget in the engine's own trailing digits. A Bell circuit returns
+   probabilities of $0.5000000000000001$; $HZH$ on $|0\rangle$ returns
+   $[0,\ 1.0000000000000004]$. Those final digits *are* the
+   inexactness, and there is nothing else.
+
+   **What "exact" does not mean.** It computes what an *ideal, noiseless*
+   quantum computer would produce for that circuit. It is not modelling
+   any particular device, and it contains none of the $T_1$, $T_2$,
+   crosstalk or readout error a real machine has, unless a noise model is
+   deliberately added, which is what the Noise Simulation lesson does.
+   Exactness is about faithfulness to the mathematics, not about
+   faithfulness to a piece of hardware.
+
+   The wrong turn is the word "simulation" itself, which in most of
+   science implies approximation. Here it does not. The approximations in
+   this course arrive later, with tensor networks, and they arrive as a
+   deliberate trade of exactness for tractability.
+
+   </details>
+
 2. Contrast state-vector simulation with shot-based sampling
    (`sampleMeasurements`): which one gives EXACT probabilities, and
    which only estimates them?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   `runCircuit` is exact; `sampleMeasurements` estimates.
+
+   **The test that settles it in one question:** would a second call with
+   identical inputs return identical numbers? `runCircuit` is
+   deterministic, so yes, bit for bit. `sampleMeasurements` draws random
+   outcomes, so no, and the difference between two calls is the estimate's
+   error made visible.
+
+   **What each actually does.** `runCircuit` multiplies matrices through
+   to the final amplitude array and reads probabilities off it by
+   squaring magnitudes. Nothing is drawn; the Bell circuit's
+   $1/\sqrt2$ amplitudes give $0.5$ directly.
+   `sampleMeasurements` starts from that same exact distribution and then
+   draws individual outcomes from it, one shot at a time, so what it
+   returns is a frequency, carrying shot noise that shrinks only as
+   $1/\sqrt{n}$.
+
+   Three wrong turns, each of which gets close and then slips.
+
+   **"Both are exact, since the sampler reads its frequencies off the
+   same amplitudes `runCircuit` computed."** It notices the shared
+   starting point and misses the draw that follows. The amplitudes are
+   the sampler's *input*; its output is a random variable.
+
+   **"Both estimate, because `runCircuit`'s repeated matrix
+   multiplications accumulate rounding error."** This promotes
+   floating-point rounding into statistical error, and the two are not
+   comparable in either kind or size. Rounding is deterministic, so it is
+   a bias rather than noise, and at 1000 shots it is around fourteen
+   orders of magnitude smaller: shot noise contributes about 1.6% to an
+   estimated probability, rounding about $10^{-16}$.
+
+   **"`sampleMeasurements` is exact and `runCircuit` estimates by
+   truncating small amplitudes."** It reverses the two roles and invents
+   a truncation the engine does not perform. Nothing is thresholded away;
+   the worked H-on-a-3-qubit-register example above rewrites all eight
+   slots, zeros included, precisely because nothing announces in advance
+   which ones are zero.
+
+   The reason the contrast matters beyond bookkeeping is that only one of
+   the two is available on hardware. A device can only ever give you the
+   sampled version, because measurement returns outcomes rather than
+   amplitudes. The exact column exists solely because a classical machine
+   is holding the numbers.
+
+   </details>
+
 3. Is a state-vector simulation running on a classical computer "doing
-   real quantum mechanics"? Explain your answer precisely.
+   real quantum mechanics"? Explain your answer precisely, then name the
+   measurable consequence that makes your answer more than a matter of
+   wording.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Yes to the mathematics, no to the physics**, and the gap between
+   those two answers is not a quibble. It is measurable, and it is what
+   the rest of this course is about.
+
+   **Yes to the mathematics.** The state lives in the same Hilbert space,
+   evolves by the same unitary operators, and yields outcomes by the same
+   Born rule. Nothing is approximated, nothing is a model of quantum
+   mechanics standing in for the thing itself. The amplitudes computed
+   are the amplitudes an ideal quantum computer would have, to
+   floating-point precision. Calling this "not really quantum mechanics"
+   would require pointing at a step where the physics was replaced by
+   something else, and there is no such step.
+
+   **No to the physics.** The substrate is classical: transistors,
+   ordinary memory, ordinary arithmetic. Nothing inside the machine is in
+   superposition or entangled with anything. The amplitudes are numbers
+   written down in an array, the way a weather model's temperatures are
+   numbers rather than weather.
+
+   **Why the distinction is operational rather than philosophical.**
+   Because storing the state explicitly costs something, and being the
+   state does not. A classical machine must hold all $2^n$ amplitudes, so
+   it pays memory that doubles with every qubit, and stops somewhere in
+   the forties. A real quantum computer holds the same state while
+   storing none of those numbers anywhere, which is exactly why it does
+   not pay that cost, and, in the same breath, exactly why it cannot show
+   the amplitudes to anyone.
+
+   That is the whole argument for building the hardware. If simulating
+   and being were the same thing, there would be no cost gap and no
+   reason for the machines to exist. The gap is the subject of the next
+   lesson, and it is real, computed, and exponential.
+
+   Two wrong turns pull in opposite directions and are worth naming
+   together.
+
+   Downward: "it is a simulation, so it is an approximation of quantum
+   mechanics." It is not. The approximation in this course is tensor
+   networks, and it is introduced deliberately.
+
+   Upward: "the linear algebra is exact, so this is quantum computing and
+   hardware is redundant." Also no. Exactness is what makes it expensive,
+   and expensive at an exponential rate.
+
+   </details>
+
 4. Name three specific prior-course results (from anywhere in this
    platform) that were computed via state-vector simulation, even though
    the term wasn't used at the time.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Three, with the numbers the engine returns:
+
+   **Grover's success probability** (Quantum Algorithms I). `runGrover`
+   allocates the uniform superposition over $2^n$ amplitudes and applies
+   an oracle and a diffusion operator to the whole array once per
+   iteration. On $n=3$ with one marked item, `optimalGroverIterations`
+   gives 2, and the marked outcome's probability comes back as
+   $0.9453125$.
+
+   **The Bell state's entanglement** (Entanglement & Measurement). Build
+   `h(0).cnot(0,1)`, run it, and hand the resulting amplitude array to
+   `entanglementEntropy`, which returns $0.9999999999999999$, one full
+   ebit, with `concurrenceOfPureState` giving $1.0000000000000002$. Both
+   are functions of the amplitudes; there is nothing else for them to
+   read.
+
+   **The GHZ state's probabilities** (Writing Your First Circuit).
+   `runCircuit` on `.h(0).cnot(0,1).cnot(1,2)` returns
+   $[0.5,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0,\ 0.5]$, eight amplitudes squared, six
+   of them exactly zero.
+
+   Others qualify equally: $HZH$ on $|0\rangle$ giving
+   $[0,\ 1.0000000000000004]$, Shor's period-finding peaks after the
+   quantum Fourier transform, and any Bloch-sphere coordinate this
+   platform has ever plotted.
+
+   **The test that decides membership**, which is more useful than the
+   list, is whether a vector of amplitudes had to be built, evolved by a
+   sequence of operators, and then read for probabilities. Plenty of
+   numbers in this platform look like quantum results and fail that test:
+
+   $\gcd(7,15)$ from the classical post-processing step of Shor's
+   algorithm is Euclid's algorithm on two integers, sitting inside a
+   quantum algorithm without being a quantum computation;
+
+   the thermal photon occupation $\bar n$ from Cryogenic Systems is one
+   closed-form expression evaluated at a given $\omega$ and $T$;
+
+   a trapped-ion gate budget is a coherence time divided by a gate time,
+   characterizing a quantum device rather than simulating one.
+
+   The wrong turn is treating "appears in a quantum context" as the
+   criterion. A great deal of ordinary classical arithmetic lives inside
+   quantum algorithms and quantum engineering, and none of it touches a
+   state vector.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -244,15 +440,15 @@ and transistors, vs. Physical Qubit Platforms' actual qubits) differs.
   complex amplitudes, updated via exact linear algebra, precisely this
   platform's `StateVector` engine, used throughout every prior course.
 - It computes exact probabilities (up to floating-point precision),
-  fundamentally different from statistical sampling.
+  different in kind from statistical sampling.
 - It is exact quantum-mechanical calculation executed on
   classical hardware, not an approximation, but also not physically
   "being" a quantum computer.
 
-## Further Exploration
+## What This Costs at Scale
 
 <NextDiscovery>
 [Computational Cost & Scaling](/lessons/quantum-software/simulating-quantum-systems/computational-cost-and-scaling) quantifies precisely what this
-technique costs — the $2^n$ growth Simulators vs. Real Hardware already
+technique costs: the $2^n$ growth Simulators vs. Real Hardware already
 previewed, developed here in full.
 </NextDiscovery>

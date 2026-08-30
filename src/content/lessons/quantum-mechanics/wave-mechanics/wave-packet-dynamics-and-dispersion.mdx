@@ -10,7 +10,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Wave Packet Dynamics and Dispersion",
   description:
-    "Deriving Ehrenfest's theorem (why <x> obeys Newton's law on average), and explaining, from the momentum-space phase evolution directly, why a free wave packet spreads over time.",
+    "Deriving Ehrenfest's theorem (why ⟨x⟩ obeys Newton's law on average), and explaining, from the momentum-space phase evolution directly, why a free wave packet spreads over time.",
   course: "wave-mechanics",
   module: "wave-packet-dynamics-and-dispersion",
   order: 1,
@@ -18,19 +18,19 @@ export const lessonMeta = {
   estimatedMinutes: 22,
   prerequisites: ["quantum-mechanics/wave-mechanics/the-harmonic-oscillator-in-position-space"],
   objectives: [
-    "Derive Ehrenfest's theorem d<x>/dt = <p>/m from the abstract time-evolution machinery",
+    "Derive Ehrenfest's theorem d⟨x⟩/dt = ⟨p⟩/m from the abstract time-evolution machinery",
     "Explain, from momentum-space phase evolution, why a free wave packet's position spread grows with time",
     "Verify the dispersion formula numerically against the Wavefunction Explorer's live variance readout",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Exact evolution, and it still spreads">
   Leave a free wave packet alone and it does more than drift. It spreads,
   and nothing about a classical free particle does. This is exact unitary
   quantum mechanics, not noise or decoherence.
 </LessonHook>
 
-## Motivation
+## The claim the packet lesson left unproved
 
 The Free-Particle Wave Packets lesson asserted the packet's *average*
 position obeys $d\langle x\rangle/dt=\langle p\rangle/m$ without proof.
@@ -38,7 +38,7 @@ This lesson proves it (Ehrenfest's theorem), and goes further: explaining
 *why* the packet doesn't just move. It spreads, growing wider over time,
 a quantum effect with no classical counterpart for a free particle.
 
-## Intuition
+## Fast components pull ahead, slow ones fall behind
 
 A wave packet is a superposition of plane waves with a spread of momenta
 $\Delta p$ (<Term id="heisenberg-uncertainty-principle">uncertainty principle</Term>, unavoidable for any localized state).
@@ -48,7 +48,7 @@ packet inevitably stretches out, like a group of runners with
 slightly different speeds spreading apart over a long race, even though
 each individual runner just moves in a straight line.
 
-## Mathematical Development
+## Ehrenfest's theorem, then the width formula
 
 ### Ehrenfest's theorem
 
@@ -84,7 +84,7 @@ $$
 [\hat H,\hat x] = \frac{1}{2m}[\hat p^2,\hat x]
 $$
   </DerivationStep>
-  <DerivationStep annotation="Expand [p̂²,x̂] using the product rule for commutators, then substitute [p̂,x̂]=−iħ, the antisymmetric partner of the commutator derived two lessons ago.">
+  <DerivationStep annotation="Expand [p̂²,x̂] using the product rule for commutators, then substitute [p̂,x̂]=−iħ, the antisymmetric partner of the commutator derived in The Position and Momentum Operators.">
 $$
 [\hat p^2,\hat x] = \hat p[\hat p,\hat x]+[\hat p,\hat x]\hat p = \hat p(-i\hbar)+(-i\hbar)\hat p = -2i\hbar\hat p
 $$
@@ -101,8 +101,8 @@ $$
   </DerivationStep>
 </DerivationSteps>
 
-the group-velocity result from two lessons ago, now derived from the
-general time-evolution machinery rather than assumed.
+the group-velocity result from the Free-Particle Wave Packets lesson, now
+derived from the general time-evolution machinery rather than assumed.
 
 ### Why a free packet spreads
 
@@ -126,7 +126,7 @@ engine's split-operator method has its `variancePosition()` match this
 formula directly. The simulator is reproducing dispersive physics, not
 merely sliding a fixed shape across the screen.
 
-## Physical Interpretation
+## Spreading, decoherence, and the difference
 
 Dispersion is not decoherence, noise, or numerical error. It's exact,
 unitary quantum mechanics. A free particle's wavefunction spreading is as
@@ -163,10 +163,10 @@ electron or otherwise.
     { label: "Grows, spreading out over time", value: "spread" },
   ]}
   correctValue="spread"
-  explanation="It spreads: σ(t)² = σ₀² + (ħt/(2mσ₀))², derived above from each momentum component's k-dependent phase e^{-iħk²t/(2m)}. The variance grows quadratically in t, so the width itself grows linearly once t is large, which the Worked Example below evaluates numerically (σ₀=1 grows to σ(5)≈2.69) and which timeEvolution.test.ts checks the platform's own split-operator simulator against."
+  explanation="It spreads: σ(t)² = σ₀² + (ħt/(2mσ₀))², derived above from the k-dependent phase e^(-iħk²t/2m) each momentum component picks up. The variance grows quadratically in t, so the width itself grows linearly once t is large, which the Worked Example below evaluates numerically (σ₀=1 grows to σ(5)≈2.69) and which timeEvolution.test.ts checks the platform's own split-operator simulator against."
 />
 
-<InteractiveSection title="Spreading without leaking" description="Play the Free Gaussian Packet preset and watch the density curve visibly widen and flatten over time, even though the total probability (norm) stays exactly 1. Probability is not lost; it is redistributed over a larger region, at the rate the formula above predicts.">
+<InteractiveSection title="Widening, and what the norm does while it happens" description="Play the Free Gaussian Packet preset and watch the density curve change shape over time, with the Norm readout in view the whole way. Whether the packet is losing probability or merely redistributing it over a larger region is exactly what those two things together settle, and the formula above predicts the rate.">
   <LazyWavefunctionExplorer />
 </InteractiveSection>
 
@@ -195,7 +195,7 @@ electron or otherwise.
   ]}
 />
 
-## Worked Example
+## The width after five time units
 
 **A packet starts with $\sigma_0=1$ (natural units, $\hbar=m=1$). What is
 $\sigma(t)$ at $t=5$?**
@@ -211,7 +211,7 @@ $$
 more than doubling the packet's width in 5 time units, and matching the
 platform's own dispersion regression test in `timeEvolution.test.ts`.
 
-## Common Mistakes
+## What spreading does to the norm
 
 <Callout type="warning">
 **Thinking dispersion means the wavefunction is losing probability.**
@@ -232,11 +232,170 @@ rates.
 1. Using Ehrenfest's theorem's general form, what would
    $d\langle p\rangle/dt$ equal for a particle in a potential $V(x)$?
    (This is Ehrenfest's second theorem, a direct analogue of Newton's
-   second law.)
+   second law.) Compute the commutator explicitly, then say what has to
+   be true of $V$ for the analogy with Newton's law to be *exact* rather
+   than approximate.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \frac{d\langle p\rangle}{dt} = -\left\langle V'(x)\right\rangle
+   $$
+
+   the average of the force. The analogy with Newton's law is exact only
+   when $V$ is a polynomial of degree at most two.
+
+   **The commutator.** Start from the general identity
+   $d\langle A\rangle/dt = (i/\hbar)\langle[\hat H,A]\rangle$ with
+   $A=\hat p$. The kinetic term commutes with $\hat p$ (it is built from
+   $\hat p$), so only $V$ contributes: $[\hat H,\hat p] = [V,\hat p]$.
+   Evaluate that on an arbitrary $\psi$, using the product rule on the
+   second term:
+
+   $$
+   [V,\hat p]\psi = V\left(-i\hbar\,\psi'\right) - \left(-i\hbar\right)\frac{d}{dx}\left(V\psi\right) = -i\hbar V\psi' + i\hbar\left(V'\psi + V\psi'\right) = i\hbar\,V'(x)\,\psi
+   $$
+
+   The $V\psi'$ terms cancel and what survives is the term the product rule
+   generated, exactly as in the $[\hat x,\hat p]$ calculation. So
+   $[V,\hat p] = i\hbar V'(x)$, and
+
+   $$
+   \frac{d\langle p\rangle}{dt} = \frac{i}{\hbar}\left\langle i\hbar V'\right\rangle = -\left\langle V'(x)\right\rangle
+   $$
+
+   Combined with $d\langle x\rangle/dt = \langle p\rangle/m$ from the
+   lesson, this gives $m\,d^2\langle x\rangle/dt^2 = -\langle V'\rangle$,
+   which is why it is called Newton's second law for averages.
+
+   **Where the analogy is only an analogy.** Newton's law says the force is
+   evaluated *at* the particle's position: $-V'(\langle x\rangle)$.
+   Ehrenfest gives the *average of the force over the packet*:
+   $-\langle V'(x)\rangle$. Those are different numbers whenever the packet
+   is wide enough to sample places where the force differs. Expanding
+   $V'$ about $\langle x\rangle$ makes the gap explicit:
+
+   $$
+   \left\langle V'(x)\right\rangle = V'(\langle x\rangle) + \tfrac12 V'''(\langle x\rangle)\,(\Delta x)^2 + \cdots
+   $$
+
+   the first-order term vanishing because $\langle x - \langle
+   x\rangle\rangle = 0$ by construction. So the leading discrepancy is
+   $\tfrac12 V'''(\Delta x)^2$, and it vanishes for every state, of every
+   width, exactly when $V'''\equiv0$: that is, when $V$ is at most
+   quadratic. Free particle, uniform force, harmonic oscillator. For those
+   three, a quantum packet's centre traces the classical trajectory
+   exactly, forever, no matter how spread out it becomes.
+
+   For anything else, and the Coulomb potential of the hydrogen atom is the
+   case that matters most, the two part company as soon as $\Delta x$ grows
+   comparable to the scale over which the force varies. That is the precise
+   sense in which classical mechanics is recovered: not because quantum
+   averages obey Newton's laws, which they generally do not, but because
+   for a macroscopic object $\Delta x$ is small enough that the correction
+   term is unmeasurable.
+
+   </details>
+
 2. For $\sigma_0=2$, at what time $t$ does $\sigma(t)$ first exceed
    $2\sigma_0$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   At $t = 8\sqrt3 \approx 13.86$ (natural units, $\hbar=m=1$).
+
+   Set the dispersion formula equal to the target width $2\sigma_0=4$:
+
+   $$
+   \sigma(t)^2 = \sigma_0^2 + \left(\frac{t}{2\sigma_0}\right)^{\!2} = 4 + \frac{t^2}{16} = 16
+   $$
+
+   $$
+   \frac{t^2}{16} = 12 \quad\Longrightarrow\quad t^2 = 192 \quad\Longrightarrow\quad t = \sqrt{192} = 8\sqrt3 \approx 13.856
+   $$
+
+   Substituting back gives $\sigma = \sqrt{4+12} = 4$ exactly, which is the
+   check worth doing.
+
+   The mistake this question is shaped to catch is subtracting in the wrong
+   place: writing $t/(2\sigma_0) = 2\sigma_0$ and solving for
+   $t = 4\sigma_0^2 = 16$. That treats the *width* as doubling when the
+   spreading term alone doubles, forgetting that the initial width adds in
+   quadrature and so already accounts for part of the target. The two
+   contributions combine as squares, not linearly, which is what makes the
+   answer $8\sqrt3$ rather than $16$.
+
+   Two structural features are visible in the algebra.
+
+   The doubling time scales as $\sigma_0^2$. Repeating the calculation for
+   general $\sigma_0$ gives $t = 2\sqrt3\,\sigma_0^2$ (in these units), so
+   a packet twice as wide takes four times as long to double. That is the
+   next question's point in reverse, and it is why a macroscopic object,
+   whose $\sigma_0$ is enormous in atomic units, never visibly spreads.
+
+   The early behaviour is not linear. For $t\ll2\sigma_0^2$ the quadratic
+   term is a small correction and $\sigma(t)\approx\sigma_0$, nearly flat;
+   only for $t\gg2\sigma_0^2$ does $\sigma(t)\approx t/(2\sigma_0)$ and the
+   growth become a straight line. So "the packet spreads linearly" is the
+   long-time limit, not a description of the whole motion, and reading it
+   as the whole motion would predict the wrong answer here by a wide
+   margin.
+
+   </details>
+
 3. Explain briefly why a *narrower* initial packet ($\sigma_0$ small)
    disperses *faster*. Connect this to the uncertainty principle.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a narrow packet is forced to contain a wide spread of momenta,
+   and it is the momentum spread that drives the spreading.
+
+   Read it off the formula first. The growth term is
+   $\left(\hbar t/(2m\sigma_0)\right)^2$, with $\sigma_0$ in the
+   *denominator*, so halving the initial width quadruples the rate at
+   which the variance grows. The packet that started better localized ends
+   up worse localized, and quickly.
+
+   The mechanism is the uncertainty principle supplying the momentum
+   spread. A Gaussian saturates the bound, so
+   $\Delta p = \hbar/(2\sigma_0)$: narrow in $x$ means broad in $p$. The
+   components of the packet travel at speeds $v=p/m$ spread over
+   $\Delta v = \Delta p/m = \hbar/(2m\sigma_0)$, so after time $t$ the
+   fastest and slowest parts have separated by roughly $\Delta v\,t$. That
+   is exactly the growth term:
+
+   $$
+   \sigma(t)^2 = \sigma_0^2 + \left(\Delta v\,t\right)^2
+   $$
+
+   an initial width and a velocity-spread contribution, added in
+   quadrature the way independent spreads combine. The runners in the
+   lesson's analogy start bunched, and the tighter you bunch them the wider
+   the range of speeds you are forced to give them.
+
+   Three clarifications keep this from being over-read.
+
+   The momentum spread itself does *not* change with time. Each momentum
+   component picks up only a phase $e^{-i\hbar k^2t/(2m)}$, which leaves
+   $|\phi(k)|^2$ untouched, so $\Delta p$ is constant for a free particle
+   forever. Only $\Delta x$ grows, which means the uncertainty *product*
+   grows too: the packet starts at the minimum $\hbar/2$ and drifts above
+   it. A minimum-uncertainty state does not stay one.
+
+   None of this is decay or noise. The norm is exactly $1$ throughout;
+   probability is being spread over a wider region, not lost.
+
+   And it does not happen in a bound state. An energy eigenstate of the
+   well or the oscillator has a stationary density and does not spread at
+   all, however narrow it is, because the potential keeps returning the
+   fast components rather than letting them run away. Dispersion is a
+   free-particle statement, and the potential is what defeats it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -251,7 +410,7 @@ rates.
 - This is exact, unitary (norm-preserving) quantum dynamics, numerically
   verified against the platform's split-operator time evolution.
 
-## Further Exploration
+## Does a pure phase change the momentum distribution?
 
 <ChallengePrompt prompt="The position spread σ(t) grows without bound for a free packet. What about the momentum spread Δp: does it grow, shrink, or stay exactly constant over time?">
   Reread the "Why a free packet spreads" derivation. Each momentum

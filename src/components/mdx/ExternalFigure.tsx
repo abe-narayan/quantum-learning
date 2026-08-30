@@ -178,7 +178,7 @@ export function ExternalFigure({
           </p>
         )}
         <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-subtle-foreground">
-          <TechLabel className="!text-[0.625rem] text-subtle-foreground">Source</TechLabel>
+          <TechLabel className="!text-micro text-subtle-foreground">Source</TechLabel>
           <span>
             {creditUrl ? (
               <a
@@ -198,7 +198,7 @@ export function ExternalFigure({
             )}
           </span>
           <span aria-hidden="true">·</span>
-          <TechLabel className="!text-[0.625rem] text-subtle-foreground">{license}</TechLabel>
+          <TechLabel className="!text-micro text-subtle-foreground">{license}</TechLabel>
         </p>
       </figcaption>
     </figure>

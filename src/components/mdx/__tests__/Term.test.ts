@@ -17,6 +17,23 @@ import { GLOSSARY_TERMS } from "@/lib/content/glossary";
  * free-text title), and that a real id renders without throwing and carries
  * both the glossary definition and a link back to the full entry.
  */
+/**
+ * React escapes `&`, `<`, `>`, `"` and `'` on the way into static markup, so a
+ * definition containing any of them can never appear verbatim in the output.
+ * Asserting on the raw string made these tests depend on which entry happens to
+ * sort first in GLOSSARY_TERMS and on whether that entry's prose happens to be
+ * punctuation-free: adding a term with an earlier title, or an apostrophe to the
+ * current first one, broke the test for a reason that had nothing to do with
+ * `Term`. Escaping here pins what the component actually owes the reader.
+ */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
 describe("Term", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -74,7 +91,7 @@ describe("Term", () => {
       const term = GLOSSARY_TERMS[0];
       const html = renderToStaticMarkup(createElement(Term, { id: term.id, children: "the term" }));
 
-      expect(html).toContain(term.definition);
+      expect(html).toContain(escapeHtml(term.definition));
       expect(html).toContain('type="checkbox"');
     });
   });
@@ -84,7 +101,7 @@ describe("Term", () => {
     const html = renderToStaticMarkup(createElement(Term, { id: term.id, children: "the term" }));
 
     expect(html).toContain("the term");
-    expect(html).toContain(term.definition);
+    expect(html).toContain(escapeHtml(term.definition));
     expect(html).toContain(`/glossary#${term.id}`);
   });
 
@@ -133,7 +150,7 @@ describe("Term", () => {
         createElement(Term, { id: term.id, children: term.title.toLowerCase() })
       );
 
-      expect(html).toContain(" — show glossary definition");
+      expect(html).toContain(", show glossary definition");
       expect(html).not.toContain(`${term.title}: show glossary definition`);
     });
 

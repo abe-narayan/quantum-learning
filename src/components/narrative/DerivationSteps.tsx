@@ -46,9 +46,30 @@ export function DerivationStep({ annotation, children, stepNumber }: DerivationS
           {stepNumber}
         </span>
         <div className="min-w-0 flex-1">
-          <div className="overflow-x-auto">{children}</div>
+          {/* No `overflow-x-auto` here, for the reason `QuantumStateDisplay`
+              documents at the same shape. A step's content is display math:
+              `.katex-display` is block-level, fills this content box, and
+              carries its own `overflow-x: auto` plus the `tabindex="0"`
+              `rehypeKatexHtml.mjs` injects — so it takes every pixel of the
+              overflow and this wrapper never had anything to scroll. It was
+              therefore an `overflow-x: auto` box that no keyboard could
+              reach, which is exactly the un-reachable scroll container the
+              design brief rules out, on the 237 call sites of this
+              component. Worse, `overflow-x: auto` with `overflow-y: visible`
+              computes the y axis to `auto` too, so a tall step (a stacked
+              matrix product, a multi-line fraction — the exact content a
+              derivation is made of) was one line away from being silently
+              clipped or given a spurious vertical scrollbar. The real scroll
+              container, its focus stop and its overflow indicator all
+              already live on `.katex-display` (globals.css §6). */}
+          {children}
+          {/* `text-sm`, not `text-xs`. `not-prose` on the `<ol>` does not
+              reset the inherited `font-size`, so `text-xs` set the one
+              sentence that says why the step is legal at 0.67x the lesson
+              body. It stays a step below `text-base` on purpose: the display
+              math is the step, this is its gloss. */}
           {annotation ? (
-            <p className="mt-1.5 text-xs text-subtle-foreground">
+            <p className="mt-1.5 text-sm text-subtle-foreground">
               <span className="sr-only">Why this step is legal: </span>
               {annotation}
             </p>
@@ -70,7 +91,51 @@ export function DerivationStep({ annotation, children, stepNumber }: DerivationS
  * role rather than coming free from the element).
  */
 export function DerivationSteps({ children, className }: { children: ReactNode; className?: string }) {
-  const steps = Children.toArray(children).filter(isValidElement);
+  // `element.type === DerivationStep`, not "any element". `Children.toArray`
+  // drops the whitespace strings between MDX blocks, but not a stray *element*
+  // — and a stray element is exactly what MDX hands over when an author writes
+  // a line of prose between two steps, or leaves a blank line where a step's
+  // children should be: that block parses as markdown and arrives as a plain
+  // `<p>`. Cloning `stepNumber` onto a `<p>` makes React warn about an
+  // unrecognised DOM attribute in development and, in production, emit a
+  // literal `stepnumber="3"` into the HTML; either way the numbering silently
+  // skips, because that `<p>` consumed an index no visible step wears. Filter
+  // first, number second, so a stray block is left exactly as the author wrote
+  // it and the badges stay 1..n over the real steps.
+  const blocks = Children.toArray(children).filter(isValidElement);
+  // Numbers assigned up front rather than with a counter mutated inside the
+  // `map` below: `react-hooks/immutability` rejects reassigning a variable
+  // during render, and a precomputed index is clearer about what "position"
+  // means here anyway — position among the *real* steps, not among all
+  // children.
+  const numberOf = new Map<number, number>();
+  blocks.forEach((child, index) => {
+    if (child.type === DerivationStep) numberOf.set(index, numberOf.size + 1);
+  });
+
+  const rendered = blocks.map((child, index) => {
+    {
+      if (child.type === DerivationStep) {
+        return cloneElement(child as ReactElement<DerivationStepProps>, {
+          stepNumber: numberOf.get(index),
+          key: child.key ?? index,
+        });
+      }
+      // A stray block still renders, in place. Dropping an author's paragraph
+      // on the floor would be a worse failure than showing it unnumbered, and
+      // moving it to the end would silently reorder a derivation. `<li>`
+      // because the parent is an `<ol>` with `role="list"`, and a non-`<li>`
+      // child of a list is markup assistive tech is free to ignore.
+      return (
+        <li
+          key={child.key ?? `stray-${index}`}
+          className="list-none text-base leading-relaxed text-muted-foreground"
+        >
+          {child}
+        </li>
+      );
+    }
+  });
 
   return (
     <ol
@@ -88,17 +153,20 @@ export function DerivationSteps({ children, className }: { children: ReactNode; 
       // role — so this does not flatten the derivation into an unordered
       // list.
       role="list"
+      // `data-math-plain` opts every step's display math out of
+      // `.katex-display`'s own frame (globals.css §6). This `<ol>` is already a
+      // bordered panel and each step already carries a numbered pillar-edge
+      // badge, so the per-equation frame put a second repeating structure
+      // inside the one this component exists to draw, across 193 steps in 55
+      // instances. Frame only: the scroll box, the `tabindex` focus stop from
+      // rehypeKatexHtml.mjs and `overscroll-behavior-x` are untouched.
+      data-math-plain
       className={cn(
         "not-prose my-8 space-y-5 rounded-panel border border-border bg-surface p-5 sm:p-6",
         className
       )}
     >
-      {steps.map((step, index) =>
-        cloneElement(step as ReactElement<DerivationStepProps>, {
-          stepNumber: index + 1,
-          key: (step as ReactElement).key ?? index,
-        })
-      )}
+      {rendered}
     </ol>
   );
 }

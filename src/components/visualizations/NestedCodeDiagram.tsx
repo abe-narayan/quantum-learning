@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { PresetToggle } from "@/components/visualizations/PresetToggle";
 
 const WIDTH = 520;
@@ -32,10 +32,10 @@ const QUBIT_OPTIONS: { label: string }[] = Array.from({ length: GROUPS * QUBITS_
 function outcomeText(errorType: ErrorType, qubit: number): string {
   const group = Math.floor(qubit / QUBITS_PER_GROUP) + 1;
   if (errorType === "X") {
-    return `An X error on qubit ${qubit} is caught by that qubit's own bit-flip group (group ${group}) — the outer phase-flip structure is irrelevant to it.`;
+    return `An X error on qubit ${qubit} is caught by that qubit's own bit-flip group (group ${group}). The outer phase-flip structure is irrelevant to it.`;
   }
   if (errorType === "Z") {
-    return `A Z error on qubit ${qubit} flips the relative phase within its group of three identical qubits — equivalent to a single logical Z on group ${group} as a whole, exactly what the outer phase-flip code is built to catch, applied at the level of the three groups.`;
+    return `A Z error on qubit ${qubit} flips the relative phase within its group of three identical qubits, equivalent to a single logical Z on group ${group} as a whole, exactly what the outer phase-flip code is built to catch, applied at the level of the three groups.`;
   }
   return `A Y error on qubit ${qubit} (both X and Z at once) is caught by both mechanisms simultaneously and independently: the inner code (group ${group}) doesn't care that an outer-level phase problem also exists, and vice versa.`;
 }
@@ -54,6 +54,14 @@ function outcomeText(errorType: ErrorType, qubit: number): string {
 export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
   const [errorType, setErrorType] = useState<ErrorType>("X");
   const [targetQubit, setTargetQubit] = useState(0);
+  // `useId()` rather than a literal id string. Two instances of this figure
+  // on one page emitted duplicate ids, which is invalid HTML and leaves
+  // every reference ambiguous: an `id` lookup resolves to the first match in
+  // document order, so the second instance's references silently pointed at
+  // the first instance's element. Harmless while both are identical, wrong
+  // the moment they are not. Matches `ProjectionShadow`, which already does
+  // this.
+  const idBase = useId();
 
   const errorIndex = ERROR_TYPES.indexOf(errorType);
   const targetGroup = Math.floor(targetQubit / QUBITS_PER_GROUP);
@@ -118,10 +126,17 @@ export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
               a sentence with its tail cut off teaches nothing — "inside a"
               carries the nesting the words "inner"/"outer" were carrying,
               and the boxes themselves carry the rest. */}
-          <text x={WIDTH / 2} y={22} textAnchor="middle" fontSize={19} className="fill-axis font-mono">
+          {/* `fill-muted-foreground`, not `fill-axis`. These two lines are the
+              figure's title and subtitle: prose about the picture, with nothing
+              measured against them and no value read off them. `--axis` is the
+              4.5:1 token and `--muted-foreground` the 6.78:1 one, so a prose
+              line on `--axis` is a contrast *cut*, not a promotion. `--axis`
+              stays on the marks that earn it in this figure: the box outlines,
+              the group names and the per-qubit identifiers. */}
+          <text x={WIDTH / 2} y={22} textAnchor="middle" fontSize={19} className="fill-muted-foreground font-mono">
             3 groups of 3 physical qubits
           </text>
-          <text x={WIDTH / 2} y={46} textAnchor="middle" fontSize={19} className="fill-axis font-mono">
+          <text x={WIDTH / 2} y={46} textAnchor="middle" fontSize={19} className="fill-muted-foreground font-mono">
             bit-flip boxes inside a phase-flip box
           </text>
 
@@ -223,8 +238,8 @@ export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <section aria-labelledby="nested-error-heading">
-          <h3 id="nested-error-heading" className="text-sm font-semibold text-foreground">
+        <section aria-labelledby={`${idBase}-error-heading`}>
+          <h3 id={`${idBase}-error-heading`} className="text-sm font-semibold text-foreground">
             Error type
           </h3>
           <div className="mt-2">
@@ -237,8 +252,8 @@ export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
           </div>
         </section>
 
-        <section aria-labelledby="nested-qubit-heading">
-          <h3 id="nested-qubit-heading" className="text-sm font-semibold text-foreground">
+        <section aria-labelledby={`${idBase}-qubit-heading`}>
+          <h3 id={`${idBase}-qubit-heading`} className="text-sm font-semibold text-foreground">
             Target qubit
           </h3>
           <div className="mt-2">
@@ -252,7 +267,7 @@ export function NestedCodeDiagram({ ariaLabel }: { ariaLabel: string }) {
         </section>
       </div>
 
-      <div aria-live="polite" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      <div aria-live="polite" aria-atomic="true" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {outcomeText(errorType, targetQubit)}
       </div>
     </div>

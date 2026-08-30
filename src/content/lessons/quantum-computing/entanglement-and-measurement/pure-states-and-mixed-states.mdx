@@ -41,11 +41,11 @@ export const rhoMix = convexCombination([
 export const purityPlus = purity(rhoPlus);
 export const purityMix = purity(rhoMix);
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Decoration, or something a ket cannot say">
 The last lesson's ρ=|ψ⟩⟨ψ| agreed with |ψ⟩ on every prediction. That raises the natural next question: is ρ just decoration, or can it express something |ψ⟩ cannot? It can.
 </LessonHook>
 
-## Motivation
+## A coin flip, and a qubit handed over
 
 Lesson 1 built $\rho=|\psi\rangle\langle\psi|$ from a single known state
 vector.
@@ -66,7 +66,7 @@ suggests. A few lessons from now, one qubit of an entangled pair will turn
 out to need exactly this kind of description, with nobody flipping any
 coins.
 
-## Mathematical Development
+## Building a mixture, then telling it from a superposition
 
 ### Building a mixture
 
@@ -140,17 +140,18 @@ highlighted diagonals are what a computational-basis measurement can see:
 />
 
 **Identical diagonal entries.** Both predict $P(0)=P(1)=0.5$ in the
-computational basis, so a single computational-basis measurement can
-never tell them apart. But the **off-diagonal entries differ**: $0.5$
+computational basis. No number of computational-basis measurements tells
+them apart, because the statistics they generate are identical, not
+merely similar. But the **off-diagonal entries differ**: $0.5$
 for $|+\rangle$, $0$ for the mixture. Those off-diagonal terms
 are called **coherences**, and they carry real physical content: measure
 $X$ instead of $Z$. $|+\rangle$ is an <Term id="eigenvalue-eigenvector">eigenstate</Term> of $X$ with eigenvalue
 $+1$, so it gives $P(+)=1$ deterministically in the $X$ basis. The
 maximally mixed state gives $P(+)=P(-)=0.5$ in *every* basis, $X$
-included: no measurement basis distinguishes its two "halves." A single
-$X$-basis measurement, repeated enough times to build statistics,
-cleanly separates the two states, something the computational basis
-alone could never do.
+included: no measurement basis distinguishes its two "halves." Switching
+to the $X$ basis and collecting a modest number of shots separates the
+two states, which the computational basis cannot do with any number of
+shots at all.
 
 ### Purity foreshadowed
 
@@ -160,21 +161,26 @@ $$
 \text{Tr}(\rho_{|+\rangle}^2) = 1 \qquad \text{Tr}(\rho_{\text{mix}}^2) = 0.5
 $$
 
-$\text{Tr}(\rho^2)=1$ for every pure state and nothing else (proven next
-lesson). Anything less signals a mixture, with $\text{Tr}(\rho^2)=1/d$ the
+$\text{Tr}(\rho^2)=1$ for every pure state and nothing else. Anything less
+signals a mixture, with $\text{Tr}(\rho^2)=1/d$ the
 minimum, reached only by the maximally mixed state. Both numbers above come
-from the engine's `purity` function and are checked as regression tests.
-Lesson 6 derives *why* $\text{Tr}(\rho^2)$ behaves this way in general,
-rather than for this one pair of examples.
+from the engine's `purity` function, which returns {purityPlus.toFixed(2)}
+and {purityMix.toFixed(2)} for these two matrices, and they are checked as
+regression tests. The next section proves the pure-state claim for a single
+qubit; Lesson 6, Purity, Entropy and Information, handles the general
+$d$-dimensional case and the entropy that goes with it.
 
 ### The Bloch ball, derived
 
 The explorer below, and several interactives later in this course,
 describe a mixed state as a point that pulls inward off the Bloch
 sphere's surface. That picture deserves a derivation, and a few lines of
-Pauli algebra deliver it. Write a general qubit density matrix in the
-basis $\{I,\sigma_x,\sigma_y,\sigma_z\}$, which spans the 2×2 Hermitian
-matrices with real coefficients:
+Pauli algebra deliver it. Write $\sigma_x,\sigma_y,\sigma_z$ for the
+gates this curriculum has been calling $X$, $Y$ and $Z$ (the $\sigma$
+notation is standard once they are being treated as observables rather
+than as gates). Together with the identity they span the 2×2 Hermitian
+matrices with real coefficients, so every qubit density matrix can be
+written in that basis:
 
 <DerivationSteps>
   <DerivationStep annotation="Any 2×2 Hermitian matrix is a real combination of I and the three Pauli matrices. Fixing the I coefficient at 1/2 (forced by the trace, next step) leaves three real numbers: the Bloch vector r = (r_x, r_y, r_z).">
@@ -192,7 +198,7 @@ $$
 \langle\sigma_i\rangle = \operatorname{Tr}(\rho\,\sigma_i) = \tfrac12\operatorname{Tr}\sigma_i + \tfrac12\textstyle\sum_j r_j\operatorname{Tr}(\sigma_j\sigma_i) = \tfrac12(2r_i) = r_i
 $$
   </DerivationStep>
-  <DerivationStep annotation="Square the expansion. The anticommutation relation sigma_i sigma_j + sigma_j sigma_i = 2 delta_ij I kills every cross term, leaving (r·sigma)^2 = |r|^2 I.">
+  <DerivationStep annotation="Square the expansion. The anticommutation relation sigma_i sigma_j + sigma_j sigma_i = 2 delta_ij I kills every cross term, leaving (r·sigma)² = |r|² I.">
 $$
 \rho^2 = \tfrac14\left(I + 2\,\vec r\cdot\vec\sigma + |\vec r|^2 I\right)
 $$
@@ -211,11 +217,13 @@ lives strictly inside the ball. Both examples above check out.
 $\rho_{|+\rangle}$ has $\vec r=(1,0,0)$, on the surface, while
 $\rho_{\text{mix}}=I/2$ has $\vec r=0$, dead center, giving
 $\operatorname{Tr}(\rho^2)=(1+0)/2=0.5$ as computed. Positivity is what
-closes the ball: the eigenvalues of $\rho$ work out to
-$(1\pm|\vec r|)/2$, nonnegative only when $|\vec r|\leq1$, so a point
-outside the unit ball is not a state at all.
+closes the ball. Since $(\vec r\cdot\vec\sigma)^2=|\vec r|^2I$, the
+operator $\vec r\cdot\vec\sigma$ has eigenvalues $\pm|\vec r|$, so
+$\rho=\tfrac12(I+\vec r\cdot\vec\sigma)$ has eigenvalues
+$(1\pm|\vec r|)/2$. Those are nonnegative only when $|\vec r|\leq1$, so a
+point outside the unit ball is not a state at all.
 
-## Physical Interpretation
+## Two words that do not mean the same thing
 
 A quantum superposition and a classical mixture are not two words for the
 same idea. $|+\rangle$ is one definite quantum state, in which "0 or 1"
@@ -227,22 +235,22 @@ because there is none to show. The density matrix is the first tool this
 course has built that can tell these two situations apart.
 
 <PredictBeforeReveal
-  question="A 50/50 mixture of |0⟩,|1⟩ and a 50/50 mixture of |+⟩,|−⟩ are both prepared. Where do their Bloch-sphere points land?"
+  question="You know the 50/50 mixture of |0⟩,|1⟩ sits at the center of the Bloch ball. Someone now prepares a 50/50 mixture of |+⟩,|−⟩ instead. Where does that second mixture's point land?"
   options={[
-    { label: "Same spot: both land dead center", value: "same-center" },
-    { label: "Different spots, on opposite sides", value: "opposite" },
-    { label: "Different spots, same latitude", value: "same-latitude" },
-    { label: "Same spot, but off-center", value: "same-offcenter" },
+    { label: "On the X axis, halfway out, since it was mixed along X", value: "x-axis" },
+    { label: "On the surface, since |+⟩ and |−⟩ are both pure states", value: "surface" },
+    { label: "Also dead center, the same point as the first mixture", value: "center" },
+    { label: "On the X axis, at a position set by the phase convention for |−⟩", value: "phase" },
   ]}
-  correctValue="same-center"
-  explanation="Both mixtures compute to ρ=I/2, the same matrix, so both land at the same point: dead center. As the worked example shows, this holds for mixing any orthogonal pair with equal weight, in any basis. The maximally mixed state has no memory of which basis produced it."
+  correctValue="center"
+  explanation="Both mixtures compute to ρ=I/2, the same matrix, so both land at the same point: dead center. The Bloch vectors of |+⟩ and |−⟩ are (1,0,0) and (−1,0,0), and averaging them with equal weight gives the zero vector, just as averaging |0⟩'s (0,0,1) with |1⟩'s (0,0,−1) does. As the worked example shows, this holds for any orthogonal pair mixed 50/50, in any basis. The maximally mixed state has no memory of which basis produced it."
 />
 
 <InteractiveSection title="Two different mixtures, one center point" description="Try the two 50/50 presets below (mixing |0⟩,|1⟩, then mixing |+⟩,|−⟩) and watch the Bloch-sphere point land on the same spot both times, dead center: ρ=I/2. Then drag the weight slider away from 0.5 on either preset and watch the point move smoothly off-center, back toward the surface; purity and entropy update live as it does.">
   <LazyDensityMatrixExplorer />
 </InteractiveSection>
 
-## Worked Example
+## Mixing plus and minus, and what comes out
 
 **A qubit is prepared as $|+\rangle$ with probability 0.5 and $|-\rangle$
 with probability 0.5. Find $\rho$, and identify what familiar state it
@@ -260,11 +268,14 @@ that can tell a $\{|0\rangle,|1\rangle\}$-prepared maximally mixed qubit
 from a $\{|+\rangle,|-\rangle\}$-prepared one: they are the same
 physical state.
 
-## Common Mistakes
+## A mixture is not a weighted sum of kets
 
 <Callout type="warning">
-**Treating $\tfrac12|0\rangle+\tfrac1{\sqrt2}|1\rangle$-style thinking as
-the same as a mixture.** A superposition $\alpha|0\rangle+\beta|1\rangle$
+**Writing a mixture as a weighted sum of kets, such as
+$\tfrac12|0\rangle+\tfrac12|1\rangle$ for the 50/50 mix.** That
+expression is not even a normalized state, and if you fix the
+normalization you get $|+\rangle$, which is the *other* state in this
+lesson's comparison. A superposition $\alpha|0\rangle+\beta|1\rangle$
 is one specific pure ket. It has its own density matrix
 $|\psi\rangle\langle\psi|$, generally with nonzero coherence terms. A
 mixture is a probability-weighted sum of *entire density matrices*, not
@@ -282,17 +293,162 @@ a different basis (or, equivalently, by their different <Term id="von-neumann-en
 
 1. A qubit is $|0\rangle$ with probability 0.8 and $|1\rangle$ with
    probability 0.2. Write down $\rho$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Weight each possibility's own density matrix by its probability and add:
+
+   $$
+   \rho = 0.8\begin{pmatrix}1&0\\0&0\end{pmatrix} + 0.2\begin{pmatrix}0&0\\0&1\end{pmatrix} = \begin{pmatrix}0.8&0\\0&0.2\end{pmatrix}
+   $$
+
+   The engine's `convexCombination` returns exactly this. Trace is
+   $0.8+0.2=1$, as the general proof in the lesson requires, and the matrix
+   is diagonal, so trivially Hermitian.
+
+   The zeros off the diagonal are the content here. They say this qubit has
+   no coherence between $|0\rangle$ and $|1\rangle$: the technician's coin
+   landed one way or the other, and there is no phase relationship between
+   two branches because there are not two branches, only two possibilities
+   one of which is the case. Compare the superposition
+   $\sqrt{0.8}|0\rangle+\sqrt{0.2}|1\rangle$, which has the same diagonal
+   and off-diagonal entries $\sqrt{0.16}=0.4$. Identical
+   computational-basis statistics, different states, and the difference
+   shows up the moment you measure in the $X$ basis.
+
+   The wrong turn is writing $0.8|0\rangle+0.2|1\rangle$ and calling it the
+   state. That vector is not normalized, and normalizing it gives
+   $\sqrt{0.8}|0\rangle+\sqrt{0.2}|1\rangle$, which is the superposition,
+   the other object in this comparison. Probabilities weight density
+   matrices; amplitudes weight kets, and the two weightings are not the same
+   operation.
+
+   </details>
+
 2. Compute $\text{Tr}(\rho^2)$ for the state in question 1, and confirm
-   it's strictly between 0.5 and 1.
+   it's strictly between 0.5 and 1. Then locate its Bloch vector, and check
+   both numbers against the identity $\text{Tr}(\rho^2)=(1+|\vec r|^2)/2$
+   derived above.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Squaring a diagonal matrix squares its entries, so
+   $\rho^2 = \mathrm{diag}(0.64, 0.04)$ and
+
+   $$
+   \text{Tr}(\rho^2) = 0.64 + 0.04 = 0.68 .
+   $$
+
+   Strictly between $0.5$ and $1$, so the state is mixed but not maximally
+   mixed: partial ignorance, not total. The engine's `purity` returns
+   $0.68$.
+
+   The Bloch vector comes from the three Pauli expectation values.
+   $\langle X\rangle = \text{Tr}(\rho X) = 0$ and $\langle Y\rangle = 0$,
+   because both Paulis are purely off-diagonal and $\rho$ has nothing
+   there, while $\langle Z\rangle = 0.8 - 0.2 = 0.6$. So
+   $\vec r = (0,0,0.6)$, pointing along $+z$ toward $|0\rangle$ but stopping
+   well short of the surface.
+
+   The identity checks out on the nose: $(1+0.6^2)/2 = (1+0.36)/2 = 0.68$.
+   Read it the other way and it says the purity alone fixes $|\vec r|$,
+   here $|\vec r| = \sqrt{2(0.68)-1} = 0.6$, which happens to be exactly the
+   probability gap $0.8-0.2$. That is not a coincidence for a
+   $Z$-basis mixture: $|\vec r|$ is the imbalance between the two
+   probabilities, and it goes to $0$ precisely when they are equal.
+
+   The wrong turn is computing $\text{Tr}(\rho)^2 = 1$ instead of
+   $\text{Tr}(\rho^2)$. Squaring the trace gives $1$ for every density
+   matrix, pure or mixed, so it can never distinguish anything. The
+   ordering matters: square the matrix first, then trace.
+
+   </details>
+
 3. A qubit is $|+\rangle$ with probability $p$ and $|-\rangle$ with
    probability $1-p$. Predict, then verify: for which values of $p$ does
    $\rho$ equal $I/2$? (Compute $\rho$ for general $p$ and find its
    off-diagonal entry; the worked example above is the special case where
    that entry vanishes. Locate the state's Bloch vector for general $p$
    too.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Only $p = \tfrac12$.
+
+   Combine the two matrices with weights $p$ and $1-p$:
+
+   $$
+   \rho(p) = p\begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix} + (1-p)\begin{pmatrix}0.5&-0.5\\-0.5&0.5\end{pmatrix} = \begin{pmatrix}0.5 & p-0.5\\ p-0.5 & 0.5\end{pmatrix}
+   $$
+
+   The diagonal is $0.5$ for every $p$, which is worth pausing on: no
+   mixture of $|+\rangle$ and $|-\rangle$ has any $Z$-basis preference at
+   all, since neither ingredient does. All the $p$-dependence sits in the
+   coherence $p-\tfrac12$, which vanishes exactly at $p=\tfrac12$ and
+   nowhere else. The engine confirms the whole family:
+   $p = 0, 0.25, 0.5, 0.75, 1$ give off-diagonals
+   $-0.5, -0.25, 0, 0.25, 0.5$ and purities $1, 0.625, 0.5, 0.625, 1$.
+
+   The Bloch vector is $\vec r = (2p-1, 0, 0)$: the expectation
+   $\langle X\rangle = 2(p-\tfrac12) = 2p-1$, with $\langle Y\rangle$ and
+   $\langle Z\rangle$ both zero. So the state slides along the $x$-axis
+   from $|-\rangle$ at $(-1,0,0)$ through the center at $p=\tfrac12$ to
+   $|+\rangle$ at $(1,0,0)$, and the purity identity gives
+   $\text{Tr}(\rho^2) = (1+(2p-1)^2)/2$, matching all five engine values.
+
+   The trap is answering "every $p$", reasoning that any mixture of two
+   orthogonal states has lost the phase information and must be maximally
+   mixed. Mixing does not destroy coherence; it averages it. At $p=0.75$
+   the mixture is still $75\%$ $|+\rangle$, and a measurement in the $X$
+   basis returns $+$ three times in four, which $I/2$ would never do. Only
+   the perfectly balanced average cancels the two contributions exactly.
+
+   </details>
+
 4. Explain why no single measurement, in any one fixed basis, can ever
    distinguish $\rho_{\text{mix}}=I/2$ from any other $I/2$-producing
    mixture.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the object a measurement's statistics depend on is $\rho$, and
+   the two preparations produce the same $\rho$. Every prediction the
+   theory makes runs through $\langle A\rangle = \text{Tr}(\rho A)$, or the
+   outcome probability $\text{Tr}(\rho P)$ for a projector $P$, and both
+   formulas take $\rho$ as their only input. Feed the same matrix in and
+   the same numbers come out, for every observable and every basis, with no
+   exception to look for.
+
+   The question's phrasing is worth sharpening, because the truth is
+   stronger than "no single measurement in one fixed basis". No sequence of
+   measurements in any set of bases, on any number of identically prepared
+   copies, distinguishes them either. Restricting to one basis would leave
+   the door open, since $\rho_{|+\rangle}$ and $I/2$ agree in the $Z$ basis
+   and are told apart by the $X$ basis, so a one-basis limitation would be
+   a weak claim. The claim here is that two preparations giving the same
+   $\rho$ agree in *all* bases at once, and no amount of statistics on
+   either side helps.
+
+   Concretely, $I/2$ arises from mixing $|0\rangle,|1\rangle$ equally, from
+   mixing $|+\rangle,|-\rangle$ equally, from mixing $|{+i}\rangle,|{-i}\rangle$
+   equally, and from every other orthonormal pair mixed equally. All of
+   these are the same physical state. Its Bloch vector is the origin, so it
+   has no preferred direction for a measurement to detect, which is the
+   geometric version of the same statement.
+
+   The reasoning to avoid is "you cannot tell because you would need to
+   know which state each individual qubit is really in, and measurement
+   disturbs it". That treats the answer as an epistemic limitation and
+   predicts, wrongly, that a gentler probe might succeed. The lesson's
+   result is not about the limits of measurement. It is that the question
+   has no answer to find: the ensemble story is not part of the physics,
+   and $\rho$ is the whole of the physical description.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -311,7 +467,7 @@ a different basis (or, equivalently, by their different <Term id="von-neumann-en
   pair with equal weight, in any basis: it has no memory of which basis
   produced it.
 
-## Further Exploration
+## Generalizing past fifty-fifty
 
 <NextDiscovery>
 [Convex Combinations and Physical Mixtures](/lessons/quantum-computing/entanglement-and-measurement/convex-combinations-and-physical-mixtures) generalizes

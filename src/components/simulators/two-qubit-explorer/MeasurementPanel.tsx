@@ -17,7 +17,7 @@ export function MeasurementPanel({
         Measurement
       </h3>
       <p className="mt-1 text-xs text-muted-foreground">
-        Measuring collapses the state — randomly, weighted by the probabilities above, and irreversibly.
+        Measuring collapses the state: randomly, weighted by the probabilities above, and irreversibly.
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         <Button size="sm" disabled={disabled} onClick={() => onMeasureQubit(0)}>

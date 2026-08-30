@@ -47,7 +47,7 @@ export const hzhEqualsXCheck: NumericProblem = {
   },
   explanation: {
     correctIdea: "This confirms the circuit-as-data representation reproduces a known matrix identity exactly, since runCircuit just dispatches to the same gate functions in sequence.",
-    whyCorrect: "Matches the circuitBuilder test suite result.",
+    whyCorrect: "Conjugating Z by Hadamards rotates the axis of rotation: HZH = X. Starting from |0⟩ the circuit therefore ends on |1⟩ with certainty, which is why the measured probability is exactly 1 rather than merely close to it.",
     whyWrong: ["Answering 0 would suggest confusing this with HH=I (which would leave |0⟩ unchanged) rather than HZH=X."],
   },
 };

@@ -23,10 +23,15 @@ export const stationaryProbabilityCheck: NumericProblem = {
     value: 1,
     tolerance: 0.001,
     incorrectFeedback: "An energy eigenstate only ever accumulates an overall phase, and a pure phase never changes any measurement probability. If your answer varies with t, you are treating the state as a superposition of different energies, which it is not.",
+    nearMisses: [
+      { value: 0.5, feedback: "0.5 is what a Z eigenstate gives when measured in the X basis, or what a two-energy superposition averages to. Here the measurement basis contains the state itself." },
+      { value: 0, feedback: "0 is the probability of the orthogonal outcome |0⟩. The prompt asks for the outcome the system started in." },
+    ],
   },
   hints: [
     { text: "Ask what time evolution does to an energy eigenstate: it multiplies the state by a phase factor and nothing else. The vector itself never rotates into anything new." },
-    { text: "A global phase has unit modulus, so it drops out of every Born-rule probability. What does that leave for the probability of finding the initial state?" },
+    { text: "A global phase has unit modulus, so it drops out of every Born-rule probability. Write $|\\psi(t)\\rangle$ out and check which parts of it can survive into the modulus." },
+    { text: "The question asks for the probability of finding the same state you began in. If the state vector never leaves the ray it started on, that probability has nowhere to move to." },
   ],
   solution: {
     steps: [

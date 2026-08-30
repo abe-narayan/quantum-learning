@@ -20,16 +20,28 @@ export const yErrorDoubleDetection: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["y = ixz", "y=ixz", "ixz", "both x and z", "x and z", "x and a z", "combination", "product of x and z", "simultaneously an x", "x part and", "x component"],
-      ["inner code", "outer code", "each mechanism", "each code", "both mechanisms", "own component", "own piece", "separately", "independently"],
+      {
+        phrases: ["y = ixz", "y=ixz", "ixz", "both x and z", "x and z", "x and a z", "combination", "product of x and z", "simultaneously an x", "x part and", "x component"],
+        missingFeedback:
+          "Start with the algebra. Write Y in terms of the other two Paulis, because that decomposition is the whole argument.",
+      },
+      {
+        phrases: ["inner code", "outer code", "each mechanism", "each code", "both mechanisms", "own component", "own piece", "separately", "independently"],
+        missingFeedback:
+          "You have the decomposition. Now say who catches what: name the two layers of the code and pair each with the piece of the error it is responsible for.",
+      },
     ],
-    incorrectFeedback: "Start from the decomposition of Y given in the first lesson. What two simpler errors does it bundle together, and which mechanism notices each one?",
-    partialFeedback: "Good. Now explain why neither mechanism needs to know what the other one saw.",
+    incorrectFeedback: "You said the Shor code 'handles arbitrary single-qubit errors', which is the theorem rather than the mechanism. Write Y in terms of the other two Paulis, then walk each factor to the layer that was designed for it.",
+    partialFeedback: "Now explain why neither mechanism needs to know what the other one saw.",
+    modelAnswers: [
+      "Y is iXZ, so a Y error is simultaneously an X error and a Z error on that qubit. The inner bit-flip code sees the X part and the outer phase-flip code sees the Z part, and each fixes its own component independently.",
+      "Because Y decomposes as a product of X and Z, each mechanism sees only the piece it is built to catch. The inner code corrects the X and the outer code corrects the Z, separately.",
+    ],
   },
   hints: [
-    { text: "Y=iXZ means a Y error acts like both an X error and a Z error at once." },
-    { text: "The inner bit-flip code within that qubit's group responds to the X component." },
-    { text: "The outer phase-flip code (across the three groups) responds to the Z component." },
+    { text: "Look up the identity from the first lesson that writes Y in terms of the other two Paulis. Write it down." },
+    { text: "The Shor code has two layers. Say which kind of error each layer was built to catch, before thinking about Y at all." },
+    { text: "Now apply your identity. A Y error carries one of each kind at once. Ask whether either layer needs to know what the other one saw." },
   ],
   solution: {
     steps: [

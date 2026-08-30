@@ -21,27 +21,46 @@ export const interferenceWithoutEntanglement: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["bell state", "entangled", "phi+", "φ+"],
-      ["unchanged", "same state", "itself", "returns"],
-      ["concentrate", "single outcome", "one outcome", "certain"],
+      {
+        phrases: ["bell state", "entangled", "phi+", "φ+"],
+        missingFeedback:
+          "You have described this lesson's result. The question also asks you to recall the earlier calculation; name the state it was performed on.",
+        anchors: {
+          "φ+": "The Bell-state label written in symbols strips to nothing, so it is matched raw; it is what a student types who names the state rather than describing it.",
+        },
+      },
+      {
+        phrases: ["unchanged", "same state", "itself", "returns"],
+        missingFeedback:
+          "You have named the earlier calculation's starting point. Now say what came out the other side of it, which is the whole point of the comparison.",
+      },
+      {
+        phrases: ["concentrate", "single outcome", "one outcome", "certain"],
+        missingFeedback:
+          "You have the earlier result. Now contrast it with this lesson's: say what this derivation's interference does to the spread over possible results.",
+      },
     ],
     incorrectFeedback:
-      "Be specific about both results: what $(H\\otimes H)|\\Phi^+\\rangle$ equals, and how that compares to this lesson's product-state circuit ending in one certain outcome.",
-    partialFeedback: "You have part of it — make sure your answer names both results and contrasts them explicitly.",
+      "You said both circuits 'show interference', which the question grants. Name the two end results as vectors: what the earlier lesson's calculation produced, and where this lesson's circuit lands. Then contrast them.",
+    partialFeedback: "Name both results and contrast them explicitly.",
+    modelAnswers: [
+      "Applying H to both qubits of the Bell state gives back the same entangled state, unchanged. In this lesson the product state's phases instead concentrate everything onto one outcome, which you then get with certainty. Both are interference, but the starting states are structurally different.",
+      "(H tensor H) on the Bell state returns |Phi+> itself, so nothing visible happens to the entangled superposition. Here the analogous phase manipulation on a product state concentrates the amplitude onto a single outcome.",
+    ],
   },
   hints: [
-    { text: "The Bell-states lesson showed $(H\\otimes H)|\\Phi^+\\rangle = |\\Phi^+\\rangle$ — the state comes back to itself." },
-    { text: "This lesson's product-state circuit instead ends at a single definite basis state, not a superposition at all." },
-    { text: "Both are genuine interference (phases rearranging amplitudes); they just land in qualitatively different places." },
+    { text: "Go back to the earlier lesson and find what $(H\\otimes H)$ did to the two-qubit state it studied there. Write the answer down." },
+    { text: "Now write down where this lesson's product-state circuit ends. Is it a superposition at all?" },
+    { text: "Put the two answers side by side. One circuit ends where it began; the other ends somewhere very specific. Say which is which." },
   ],
   solution: {
     steps: [
       { description: "$(H\\otimes H)|\\Phi^+\\rangle = |\\Phi^+\\rangle$: applying $H$ to both qubits of the Bell state reproduces the exact same entangled superposition, still spread over $|00\\rangle$ and $|11\\rangle$." },
-      { description: "This lesson's product-state circuit instead ends at a single, definite basis state with probability 1 — a superposition collapsing (through interference, not measurement) onto one outcome." },
+      { description: "This lesson's product-state circuit instead ends at a single definite basis state with probability 1: a superposition concentrated onto one outcome through interference, not measurement." },
       { description: "Both are interference: phases rearranging where amplitude ends up. They just produce very different kinds of results, because they start from different kinds of states (entangled vs. product)." },
     ],
     finalAnswer:
-      "On the Bell state, $H\\otimes H$ reproduces the same entangled superposition; on this lesson's product state, the analogous phase manipulation concentrates everything onto one definite outcome — both are interference, applied to structurally different starting states.",
+      "On the Bell state, $H\\otimes H$ reproduces the same entangled superposition; on this lesson's product state, the analogous phase manipulation concentrates everything onto one definite outcome. Both are interference, applied to structurally different starting states.",
   },
   explanation: {
     correctIdea: "Interference is a general phenomenon (phases combining constructively or destructively); what specific outcome it produces depends heavily on whether the state going in is entangled or a product state.",

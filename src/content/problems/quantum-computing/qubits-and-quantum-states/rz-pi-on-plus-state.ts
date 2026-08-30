@@ -40,8 +40,8 @@ export const rzPiOnPlusState: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "That's the result of $R_z(\\pi/2)$ (worked out in the lesson's own worked example), not $R_z(\\pi)$ — you've applied half the rotation angle asked for.",
-      c: "$R_z$ never changes $\\theta$, so the result must stay on the equator like $|+\\rangle$ did — it can't land on a pole.",
+      b: "That's the result of $R_z(\\pi/2)$ (worked out in the lesson's own worked example), not $R_z(\\pi)$. That is half the rotation angle the question asks for.",
+      c: "$R_z$ never changes $\\theta$, so the result stays on the equator where $|+\\rangle$ began and cannot land on a pole.",
       d: "That would correspond to adding $3\\pi/2$ (or $-\\pi/2$) to $\\varphi$, not $\\pi$.",
     },
     defaultIncorrectFeedback: "Rz(θ) adds θ to φ and leaves θ (the latitude) fixed. |+⟩ starts at φ=0; add π to it and identify the resulting equatorial state.",
@@ -54,7 +54,7 @@ export const rzPiOnPlusState: MultipleChoiceProblem = {
   solution: {
     steps: [
       { description: "$|+\\rangle$ has $\\theta=\\pi/2$, $\\varphi=0$." },
-      { description: "$R_z(\\pi)$ adds $\\pi$ to $\\varphi$, giving $\\theta=\\pi/2$, $\\varphi=\\pi$ — exactly the coordinates of $|-\\rangle$." },
+      { description: "$R_z(\\pi)$ adds $\\pi$ to $\\varphi$, giving $\\theta=\\pi/2$, $\\varphi=\\pi$, the coordinates of $|-\\rangle$." },
       { description: `Confirmed directly by applying the gate: the result is $${ketLatex(result)}$.` },
     ],
     finalAnswer: "$|-\\rangle$",

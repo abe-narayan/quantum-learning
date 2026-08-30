@@ -29,8 +29,9 @@ export const minimumTimescaleFromEnergySpread: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Start from the bound Delta E * Delta t_A >= hbar/2 (hbar=1)." },
-    { text: "Solve for the smallest Delta t_A consistent with this, given Delta E = 2." },
+    { text: "The bound constrains a product from below, so fixing one factor forces the other to be at least something. No new physics is needed beyond that." },
+    { text: "Write the energy-time bound with hbar = 1 and rearrange so the timescale stands alone on one side." },
+    { text: "There is a factor of 2 on the right-hand side before you divide by the energy spread. If your answer came out as 0.5, only one of the two divisions was applied." },
   ],
   solution: {
     steps: [
@@ -40,8 +41,8 @@ export const minimumTimescaleFromEnergySpread: NumericProblem = {
     finalAnswer: "$\\Delta t_A \\ge 0.25$, minimum $0.25$",
   },
   explanation: {
-    correctIdea: "A larger energy spread forces a shorter minimum characteristic timescale — consistent with sharply-defined-energy states changing slowly.",
+    correctIdea: "A larger energy spread forces a shorter minimum characteristic timescale, consistent with sharply-defined-energy states changing slowly.",
     whyCorrect: "Direct algebraic rearrangement of the bound.",
-    whyWrong: ["Computing 2*0.5=1 confuses which direction the inequality needs to be solved — the bound is a product, so isolating Delta t_A requires dividing, not multiplying."],
+    whyWrong: ["Computing 2*0.5=1 confuses which direction the inequality has to be solved. The bound is a product, so isolating Delta t_A requires dividing, not multiplying."],
   },
 };

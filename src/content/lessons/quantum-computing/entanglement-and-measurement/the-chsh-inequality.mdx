@@ -3,7 +3,7 @@ import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { StateVector } from "@/lib/quantum/state";
 import { HADAMARD, applySingleQubitGate, applyCNOT } from "@/lib/quantum/gates";
 import { pureStateDensityMatrix, convexCombination, maximallyMixedState } from "@/lib/quantum/densityMatrix";
-import { chshValue, spinObservableInXZPlane } from "@/lib/quantum/chsh";
+import { chshValue, spinObservableInXZPlane, CHSH_CLASSICAL_BOUND, CHSH_QUANTUM_BOUND } from "@/lib/quantum/chsh";
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { LazyCHSHBellTestExplorer } from "@/components/simulators/chsh-bell-test/LazyCHSHBellTestExplorer";
 
@@ -38,7 +38,7 @@ export const lessonMeta = {
 The last lesson proved no local hidden-variable model can push S past 2. An entangled qubit pair, measured at the right angles, reaches 2√2. Classical correlation has no way to produce that number.
 </LessonHook>
 
-## Motivation
+## A hard bound to measure against
 
 The last lesson proved $|S|\leq2$ for *every* local hidden-variable model.
 That is a wall, not an estimate, and it holds no matter how baroque the
@@ -64,7 +64,7 @@ than staying a philosophical dispute.
 Alain Aspect's experiments are among the first real laboratory tests of this kind of inequality. Repeated many times since, with progressively more loopholes closed, the tests keep confirming the S=2√2 quantum violation this lesson derives by hand.
 </HistoricalMoment>
 
-## Mathematical Development
+## The correlation formula, and the angles that maximize it
 
 ### The quantum correlation
 
@@ -109,7 +109,7 @@ E(a,b) = \tfrac12\big[c_ac_b + s_as_b + s_as_b + c_ac_b\big] = c_ac_b+s_as_b = \
 $$
 
 using the angle-difference identity. A complete, exact derivation for
-$|\Phi^+\rangle$ specifically, not a numerical fit. It is additionally
+$|\Phi^+\rangle$ specifically, with nothing fitted to data. It is additionally
 checked directly against `correlationExpectation`'s numerical output for
 several angle pairs, as a regression test.
 
@@ -140,7 +140,7 @@ fine-grained numerical search over $\theta_b,\theta_{b'}$ with
 $\theta_a,\theta_{a'}$ held fixed) to be the true maximum reachable by
 *any* choice of $B,B'$ for this state, not merely a locally good guess.
 
-<InteractiveSection title="Run the experiment yourself" description="Four sliders, one live |Φ+⟩ pair, and the real chshValue engine computing S on every drag; nothing here is precomputed. First, set a=0°, a′=90°, b=45°, b′=−45° (the 'quantum-optimal' preset lands on this) and confirm the gauge reads S=2.8284, matching the by-hand derivation above. Then swap Bob's two angles to b=−45°, b′=45° (the same physical settings, just relabeled) and confirm S collapses to 0, reproducing the Worked Example below. Finally, drag freely through the rest of the angle space: no combination ever pushes the gauge past the 2√2 mark on either side, just as Tsirelson's bound predicts.">
+<InteractiveSection title="Run the experiment yourself" description="Four sliders, one live |Φ+⟩ pair, and the real chshValue engine computing S on every drag; nothing here is precomputed. It opens on a=0°, a′=90°, b=45°, b′=−45°, the configuration derived above, so the first thing to do is confirm the gauge reads S=2.8284. Then swap Bob's two angles to b=−45°, b′=45° (the same physical settings, just relabeled) and read S again before checking it against the swap walkthrough below. Finally, drag freely through the rest of the angle space and try to push the gauge past the 2√2 mark on either side; Tsirelson's bound has a prediction about how that attempt goes.">
   <LazyCHSHBellTestExplorer />
 </InteractiveSection>
 
@@ -170,7 +170,7 @@ margin over the classical bound of 2 can absorb.
   options={[
     { label: "Still comfortably above 2", value: "above" },
     { label: "Still above 2, but only barely", value: "barely" },
-    { label: "Exactly 2, right at the boundary", value: "boundary" },
+    { label: "Exactly 2, sitting right on the classical boundary", value: "boundary" },
     { label: "Already below 2, with no violation left", value: "below" },
   ]}
   correctValue="below"
@@ -212,9 +212,11 @@ setting, is worth seeing continuously:
   ]}
   sliderLabel="Measurement configuration"
   referenceLines={[
-    { y: 2, label: "classical bound" },
-    { y: 2.828, label: "Tsirelson bound (2√2)" },
+    { y: CHSH_CLASSICAL_BOUND, label: "classical bound" },
+    { y: CHSH_QUANTUM_BOUND, label: "Tsirelson bound (2√2)" },
   ]}
+  xAxisLabel="Noise fraction eta"
+  yAxisLabel="CHSH value S"
   ariaLabel="S as a function of noise eta, for the standard and swapped-Bob measurement configurations"
 />
 
@@ -225,7 +227,7 @@ flat at 0 for every $\eta$: a bad choice of angles can't be rescued by
 adding more or less noise, because it never violated the bound in the
 first place.
 
-## Physical Interpretation
+## Every local model ruled out at once
 
 A CHSH violation, observed in a real laboratory (this has been done,
 repeatedly, closing progressively more loopholes over decades), rules
@@ -239,7 +241,7 @@ classical correlation with some extra detail hidden inside it. It is a
 stronger kind of correlation, bounded away by a measurable margin from
 anything locality permits.
 
-## Worked Example
+## Swapping Bob's two settings
 
 **Using $E(a,b)=\cos(\theta_a-\theta_b)$, compute $S$ if Bob's settings
 are swapped ($\theta_b=-\pi/4,\theta_{b'}=\pi/4$) instead of the standard
@@ -254,10 +256,10 @@ $=\cos(\pi/4)+\cos(3\pi/4) = \frac{\sqrt2}2-\frac{\sqrt2}2=0$. Swapping
 which angle is called $b$ versus $b'$ changes which correlations get a $+$
 and which get a $-$ in $S$'s definition. The four physical measurement
 angles are the same as before; the violation is gone entirely. Which
-angle plays which role in the expression is part of the experiment, not a
-labelling convention.
+angle plays which role in the expression is itself part of the experiment,
+and treating it as a labelling convention throws the violation away.
 
-## Common Mistakes
+## Entangled is not enough; the angles matter
 
 <Callout type="warning">
 **Assuming any entangled state violates CHSH at any angles.** As the
@@ -280,19 +282,199 @@ ordinary floating-point rounding, not by any physical approximation.
 1. Using $E(a,b)=\cos(\theta_a-\theta_b)$, compute $S$ for
    $\theta_a=0,\theta_{a'}=\pi/2,\theta_b=0,\theta_{b'}=\pi/2$ (i.e., Bob
    uses the same two settings as Alice), and explain why this
-   configuration cannot show any violation.
+   configuration cannot show any violation. Then find a change to Bob's
+   angles alone that restores the maximum, and state the general rule the
+   two configurations illustrate.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Term by term:
+   $E(a,b)=\cos 0 = 1$, $E(a,b')=\cos(-\pi/2)=0$,
+   $E(a',b)=\cos(\pi/2)=0$, $E(a',b')=\cos 0 = 1$. So
+
+   $$
+   S = 1 + 0 + 0 - 1 = 0 .
+   $$
+
+   `chshValue` returns exactly $0$ for this configuration. Not merely below
+   the classical bound: as far from a violation as it is possible to be.
+
+   The cancellation is structural. Aligning Bob's settings with Alice's
+   makes two of the four correlations perfect, and the CHSH combination
+   enters one of them with a plus and the other with a minus, so they
+   annihilate. The two surviving terms pair settings $\pi/2$ apart, and
+   $\cos(\pi/2)=0$, so they contribute nothing. Perfect correlation, used
+   twice with opposite signs, is worth exactly as much as no correlation at
+   all.
+
+   To restore the maximum, move Bob to $\theta_b=\pi/4$ and
+   $\theta_{b'}=-\pi/4$, leaving Alice untouched. Then all four
+   correlations have magnitude $\cos(\pi/4)=\tfrac{\sqrt2}{2}$: the first
+   three are $+\tfrac{\sqrt2}{2}$ and the fourth is $\cos(3\pi/4)=-\tfrac{\sqrt2}{2}$,
+   whose minus sign meets the combination's own minus and flips positive.
+   Four equal positive contributions give $S = 4\cdot\tfrac{\sqrt2}{2} = 2\sqrt2$,
+   which the engine confirms as $2.8284271247461903$.
+
+   The rule the pair illustrates: the violation comes from Bob's settings
+   *bisecting* Alice's, not matching them. What CHSH rewards is four
+   moderately strong correlations with the signs arranged so nothing
+   cancels, and what it punishes is a strong correlation appearing on both
+   sides of the minus sign. Optimizing each term separately would say
+   "align everything", and that is precisely the configuration scoring
+   zero.
+
+   One more trap sits nearby. Swapping the labels of Bob's optimal angles,
+   to $\theta_b=-\pi/4$ and $\theta_{b'}=\pi/4$, gives $S=0$ again, engine
+   confirmed, even though the two physical settings are identical. $S$ is
+   not symmetric in $b$ and $b'$, since only one of them carries the minus
+   sign, so which measurement you call $b$ is part of the configuration.
+
+   </details>
+
 2. Confirm, from the noise table, that $S$ crosses the classical bound
    of 2 somewhere between $\eta=0.2$ and $\eta=0.3$, and explain why $S$
    decreasing with $\eta$ is consistent with $\rho(\eta)$ becoming less
    entangled (tie this to a specific quantity from an earlier lesson).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The table gives $S=2.263$ at $\eta=0.2$ and $S=1.980$ at $\eta=0.3$, so
+   the curve passes through $2$ between them. The crossing can be located
+   exactly, because $S$ is linear in $\eta$: mixing is linear, the
+   correlation is a trace against a fixed observable, and $I/4$ contributes
+   $S=0$ on its own, so
+
+   $$
+   S(\eta) = (1-\eta)\,2\sqrt2 .
+   $$
+
+   Every table entry matches, and setting $S=2$ gives
+   $\eta^\ast = 1 - \tfrac{1}{\sqrt2} \approx 0.2929$. The engine returns
+   $S = 2.000000$ at that value.
+
+   The tie to an earlier quantity is purity, and through it the whole
+   mixedness story. `purity` on $\rho(\eta)$ falls from $1$ at $\eta=0$ to
+   $0.730$ at $\eta=0.2$ and $0.625$ at the crossing, so the global state
+   is drifting away from the pure Bell state toward $I/4$. Each unit of
+   noise replaces some of the entangled component with an uncorrelated one,
+   and the uncorrelated component contributes nothing to any of the four
+   correlations. The linear falloff of $S$ is literally the linear dilution
+   of the entangled fraction.
+
+   There is a sharper point hiding in the arithmetic, and it is the reason
+   this question is worth doing. $\rho(\eta)$ remains genuinely entangled
+   well past the crossing. The standard partial-transpose test puts the
+   separability threshold for this family at $\eta = 2/3$: below that the
+   state cannot be written as any mixture of product states. So for
+   $0.293 < \eta < 0.667$ the state is entangled and yet violates no CHSH
+   inequality at any angles. Failing this test is not the same as being
+   unentangled, and reading "$S<2$" as "not entangled" is the mistake to
+   avoid.
+
+   The other wrong turn is expecting the crossing to sit at a round number
+   because the table samples round values of $\eta$. The table is five
+   samples of a straight line, and $1-\tfrac{1}{\sqrt2}$ is where it
+   actually crosses.
+
+   </details>
+
 3. Using this lesson's derivation, show that $E(a,a)=1$ always (measuring
    the same setting on both sides of a $|\Phi^+\rangle$ pair gives
    perfect correlation), consistent with Bell States and Entanglement's
    original observation.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Set $\theta_b=\theta_a$ in the derived formula:
+
+   $$
+   E(a,a) = \cos(\theta_a - \theta_a) = \cos 0 = 1
+   $$
+
+   for every $\theta_a$, with no exceptions and no dependence on the angle.
+   The engine confirms it numerically at $\theta=0.9$, returning
+   $1.0000000000000002$.
+
+   A correlation of $+1$ between two $\pm1$-valued outcomes means they
+   agree with probability one: no run of the experiment ever produces
+   opposite results when both parties measure along the same axis. That is
+   exactly the observation Bell States and Entanglement made twice, once in
+   the $Z$ basis ($\theta=0$) and once in the $X$ basis ($\theta=\pi/2$),
+   and this derivation covers not just those two but the entire continuum
+   of axes in the $X$-$Z$ plane at once.
+
+   Where the earlier lesson had to say that two matching bases do not yet
+   convict a hidden-variable model, the reason is now visible in the
+   formula. Perfect correlation at every shared angle is a strong
+   constraint and still a satisfiable one: a source that hands both
+   particles the same predetermined answer for every axis reproduces
+   $E(a,a)=1$ everywhere. What no such source can reproduce is the
+   correlation at *unequal* angles, $\cos(\theta_a-\theta_b)$, and the CHSH
+   combination is built entirely out of unequal-angle terms for that
+   reason.
+
+   The wrong turn is reading $E(a,a)=1$ as "the outcomes are both $+1$".
+   They are equally likely to be both $-1$; each party's own marginal is
+   $50/50$, since $\rho_A=I/2$. The correlation says the two agree, and
+   says nothing about which value they agree on, which is precisely why
+   this perfect correlation transmits no signal.
+
+   </details>
+
 4. Explain, in your own words, why a measured $|S|>2$ in a real
    laboratory experiment is a stronger conclusion than "quantum mechanics
    is confirmed": what specific class of alternative theories does it
-   rule out, and which class does it leave untouched?
+   rule out, and which class does it leave untouched? Name one assumption
+   the mathematics cannot supply, which the experiment has to close by
+   other means.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The bound $|S|\leq2$ was proved without using quantum mechanics
+   anywhere. It follows from two assumptions alone: that each outcome is a
+   definite function of the local setting and a shared variable
+   (definiteness), and that neither outcome depends on the distant setting
+   (locality). So measuring $|S|>2$ refutes the conjunction of those two
+   assumptions directly, as a fact about nature, and it would do so even if
+   quantum mechanics were replaced tomorrow by something better. Confirming
+   a theory is weaker: theories are confirmed by many experiments and
+   eventually superseded, whereas this rules out an entire class of
+   possible successors in advance.
+
+   Ruled out: every local hidden-variable theory, however elaborate the
+   variable and however it is distributed. That includes theories nobody has
+   written down. Left untouched: non-local hidden-variable theories, where
+   the outcome may depend on the distant setting, with Bohmian mechanics as
+   the worked example. Those survive Bell tests and pay a different price,
+   needing to explain why their non-locality can never be used to signal.
+   Also left untouched are theories that deny definiteness while staying
+   local, which is broadly where quantum mechanics itself sits.
+
+   The assumption the mathematics cannot supply is that the experiment
+   really instantiates the setup the proof assumes, and this is where the
+   loopholes live. Three matter. The *locality* loophole: the two
+   measurement events must be spacelike separated, with settings chosen
+   late enough that no light-speed signal could carry one setting to the
+   other side, which needs fast random switching and real distance.
+   The *detection* loophole: if only a small fraction of pairs is detected,
+   a local model can exploit the undetected ones, so the efficiency has to
+   clear a threshold. And *freedom of choice*: the settings must be
+   independent of $\lambda$, or the source could have anticipated them.
+   Experiments since 2015 have closed the first two simultaneously; the
+   third can be pushed back but not eliminated, since it is not
+   experimentally decidable in full.
+
+   The wrong turn is reporting a violation as proof that entanglement sends
+   information faster than light. Nothing in the data does that, and the
+   local marginals in the same experiment are the usual featureless
+   $50/50$. What the violation rules out is a picture of the world, not a
+   speed limit.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -310,7 +492,7 @@ ordinary floating-point rounding, not by any physical approximation.
   unentangled, a quantitative link between mixedness and the strength
   of nonlocal correlation.
 
-## Further Exploration
+## Every tool at once, on one state
 
 <NextDiscovery>
 Next, and last: **Capstone: Analyzing Quantum Correlations**, which

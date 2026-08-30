@@ -24,7 +24,7 @@ export const offDiagonalAfterThreeApplications: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "Starting from |+⟩ (off-diagonal magnitude 0.5), and using the fact that each dephasing application (λ=0.3) multiplies the off-diagonal by (1-λ)=0.7, what is the off-diagonal magnitude after 3 applications?",
-    inputHint: "as a decimal",
+    inputHint: "as a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",

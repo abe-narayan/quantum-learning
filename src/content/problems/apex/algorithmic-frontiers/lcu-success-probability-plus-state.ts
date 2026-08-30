@@ -23,7 +23,7 @@ export const lcuSuccessProbabilityPlusState: NumericProblem = {
     value: 0.5,
     tolerance: 0.01,
     incorrectFeedback:
-      "Use the eigenstate relations X|+>=|+> and Z|+>=|-> to get A|+> = (X+Z)/2 |+> = (|+>+|->)/2. Expand |+> and |-> in the computational basis, simplify (the |1> components cancel), then take the squared norm of the result -- that norm-squared IS the success probability, exactly as this lesson derived (||alpha||_1 = 1 here, so there's no extra rescaling).",
+      "Use the eigenstate relations X|+>=|+> and Z|+>=|-> to get A|+> = (X+Z)/2 |+> = (|+>+|->)/2. Expand |+> and |-> in the computational basis, simplify (the |1> components cancel), then take the squared norm of the result. That norm-squared is the success probability, as this lesson derived (||alpha||_1 = 1 here, so there is no extra rescaling).",
     nearMisses: [
       {
         value: Math.SQRT1_2,
@@ -38,7 +38,7 @@ export const lcuSuccessProbabilityPlusState: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The success probability of post-selecting the ancilla on |0> is exactly |A|psi>|^2 whenever ||alpha||_1 = 1, as here (alpha_0=alpha_1=1/2 sum to 1) -- this lesson derived that fact directly, not just asserted it." },
+    { text: "The success probability of post-selecting the ancilla on |0> is |A|psi>|^2 whenever ||alpha||_1 = 1, as it is here (alpha_0=alpha_1=1/2 sum to 1). This lesson derived that fact rather than asserting it." },
     { text: "X and Z each have |+> and |-> as eigenstates: X|+>=|+>, Z|+>=|->." },
     { text: "A|+> = (|+>+|->)/2. Writing both in the computational basis, the |1> components cancel and only a |0> component survives." },
   ],
@@ -52,11 +52,11 @@ export const lcuSuccessProbabilityPlusState: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "The ancilla-|0> success probability of a normalized (||alpha||_1=1) block encoding is exactly |A|psi>|^2, computed directly from A's action on the input state -- no need to re-simulate the whole circuit.",
+      "The ancilla-|0> success probability of a normalized (||alpha||_1=1) block encoding is |A|psi>|^2, computed directly from A's action on the input state, with no need to re-simulate the whole circuit.",
     whyCorrect:
-      "This is exactly the general formula this lesson derives via the PREPARE/SELECT/PREPARE-dagger sandwich, specialized to this lesson's own A and ||alpha||_1=1.",
+      "This is the general formula this lesson derives via the PREPARE/SELECT/PREPARE-dagger sandwich, specialized to this lesson's own A and ||alpha||_1=1.",
     whyWrong: [
-      "Assuming the success probability is always the same 1/2 seen in the lesson's own worked example for every operator A would be wrong in general -- it happens to be a constant 1/2 here for every input specifically because A^2=I/2 for this particular A (since X and Z anticommute), not as a general property of block encodings.",
+      "Carrying the 1/2 from the lesson's worked example over to every operator A is wrong in general. It is a constant 1/2 here for every input because A^2=I/2 for this particular A (X and Z anticommute), not because block encodings behave that way.",
     ],
   },
 };

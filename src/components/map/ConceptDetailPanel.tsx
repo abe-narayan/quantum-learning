@@ -10,7 +10,7 @@ import { type ConceptNode, type SimulatorId } from "@/lib/content/concepts";
 // Meta-only, deliberately: this panel renders a date, a category chip and a
 // title, and nothing else from an entry. `registry.ts`/`data.ts` carry the
 // summary prose, citations and image metadata for the full cards, and are
-// server-only — importing them here would ship the whole collection into the
+// server-only, importing them here would ship the whole collection into the
 // concept map's client chunk. See `metaRegistry.ts`'s header.
 import {
   getCurrentQuantumMetaForLesson,
@@ -37,19 +37,19 @@ export function ConceptDetailPanel({
   /**
    * The full prerequisite route to `node` from `getPrerequisitePath`: every
    * concept that has to come first, in an order where nothing precedes its
-   * own prerequisites, with `node` itself last. Rendering the whole chain —
-   * not just the one or two direct prerequisites — is what turns "you need
+   * own prerequisites, with `node` itself last. Rendering the whole chain,
+   * not just the one or two direct prerequisites, is what turns "you need
    * Entanglement first" into an actual study route someone can follow.
    */
   path: ConceptNode[];
-  /** Direct dependents — concepts that list `node` as a prerequisite — so
+  /** Direct dependents, concepts that list `node` as a prerequisite, so
    *  the panel can point *forward*, not just back. */
   dependents: ConceptNode[];
   /** Real lesson slug -> real lesson title, sourced from getAllLessonsMeta() on the server. */
   lessonTitles: Record<string, string>;
   /** This concept's resolved difficulty, if `ConceptMapExplorer` was given
    *  lesson difficulty data. `undefined` renders no mark rather than a
-   *  guess — see that component's prop doc. */
+   *  guess, see that component's prop doc. */
   difficulty?: Difficulty;
   /** concept id -> resolved difficulty, so each "Leads to" row can show
    *  whether the next step is a step up. */
@@ -93,20 +93,20 @@ export function ConceptDetailPanel({
           {/* The pillar badge shows the short label ("Computing") because the
               chip is 2.5rem of chrome next to a difficulty mark, but the
               accessible name has to be the pillar's real title ("Quantum
-              Computing") — and an `aria-label` on this `<span>` could never
+              Computing"), and an `aria-label` on this `<span>` could never
               deliver it. No `role` means the implicit `generic` role, which
               ARIA prohibits naming, so the attribute was dropped by every
               major screen reader and the full pillar name simply never
               reached the reader; all they heard was the abbreviation, with
-              nothing saying it was a pillar at all. Swapping the two — the
+              nothing saying it was a pillar at all. Swapping the two, the
               visible short form `aria-hidden`, the full title as real
-              `sr-only` text — puts the intended name in the tree without
+              `sr-only` text, puts the intended name in the tree without
               changing a pixel, and without the double announcement
               ("Computing, Quantum Computing") that leaving both visible to AT
               would produce. */}
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-pillar-edge bg-pillar-wash px-2.5 py-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-pillar-text">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-pillar-edge bg-pillar-wash px-2.5 py-0.5 text-meta font-medium uppercase tracking-wide text-pillar-text">
             <span aria-hidden="true">{visual.short}</span>
-            <span className="sr-only">{pillarInfo?.title ?? node.pillar} pillar</span>
+            <span className="sr-only">{pillarInfo?.title ?? node.pillar} track</span>
           </span>
           {difficulty ? <DifficultyMark difficulty={difficulty} /> : null}
         </span>
@@ -131,7 +131,7 @@ export function ConceptDetailPanel({
             Try the simulator
           </Button>
         ) : null}
-        {/* Every concept on the map has a matching glossary entry — GLOSSARY_TERMS
+        {/* Every concept on the map has a matching glossary entry, GLOSSARY_TERMS
             is built directly from CONCEPT_NODES plus additional terms, sharing the
             same `id`, so this link is never a guess or a fabricated route. */}
         <Link
@@ -187,8 +187,8 @@ export function ConceptDetailPanel({
                   className="block rounded-(--radius-tight) border border-border bg-surface-muted/50 p-3 transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:bg-surface-muted"
                 >
                   <span className="flex items-center justify-between gap-2">
-                    <span className="tech-label text-[0.65rem]">{formatEntryDate(entry.date)}</span>
-                    <span className="rounded-full bg-pillar-wash px-2 py-0.5 text-[0.65rem] font-medium capitalize text-pillar-text">
+                    <span className="tech-label">{formatEntryDate(entry.date)}</span>
+                    <span className="rounded-full bg-pillar-wash px-2 py-0.5 text-meta font-medium capitalize text-pillar-text">
                       {entry.category}
                     </span>
                   </span>
@@ -200,7 +200,7 @@ export function ConceptDetailPanel({
         </div>
       ) : null}
 
-      {/* "What do I need to learn before this?" — the one question a
+      {/* "What do I need to learn before this?", the one question a
           dependency graph is uniquely able to answer, so it gets the whole
           chain back to a root, in order, not just the direct parents. */}
       <div className="mt-6">
@@ -223,13 +223,13 @@ export function ConceptDetailPanel({
                   >
                     <span
                       aria-hidden="true"
-                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border font-mono text-[0.625rem] tabular-nums text-muted-foreground"
+                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border font-mono text-micro tabular-nums text-muted-foreground"
                     >
                       {index + 1}
                     </span>
                     <span className="min-w-0 flex-1">{prereq.title}</span>
                     {directPrerequisiteIds.has(prereq.id) ? (
-                      <span className="shrink-0 rounded-full border border-pillar-edge bg-pillar-wash px-1.5 py-0.5 text-[0.5625rem] font-semibold uppercase tracking-[0.08em] text-pillar-text">
+                      <span className="shrink-0 rounded-full border border-pillar-edge bg-pillar-wash px-1.5 py-0.5 text-micro font-semibold uppercase tracking-meta text-pillar-text">
                         Direct
                       </span>
                     ) : null}
@@ -240,13 +240,13 @@ export function ConceptDetailPanel({
           </>
         ) : (
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Nothing comes before this one — it is a starting point on the map, and you can begin
+            Nothing comes before this one. It is a starting point on the map, and you can begin
             here with no background.
           </p>
         )}
       </div>
 
-      {/* Points *forward*, not just back — what this concept unlocks, so the
+      {/* Points *forward*, not just back, what this concept unlocks, so the
           panel invites the next click instead of ending the thought here. */}
       <div className="mt-6 border-t border-border pt-5">
         <span className="tech-label">Leads to</span>
@@ -261,7 +261,24 @@ export function ConceptDetailPanel({
                     onClick={() => onSelectConcept(dependent.id)}
                     className="group flex min-h-11 w-full items-center justify-between gap-3 rounded-(--radius-tight) border border-border bg-surface-muted/40 px-3 py-2 text-left text-sm text-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:bg-pillar-wash"
                   >
-                    <span className="min-w-0 truncate">{dependent.title}</span>
+                    {/* Wraps, never truncates. `truncate` here was a defect
+                        dressed as a safety net: it can only ever have hidden
+                        the ends of these titles, because the box is too
+                        narrow for a whole one at any width this panel is ever
+                        drawn at. Below `lg` the panel is the full column, so
+                        at a 320px viewport it is 320 - 32 (Container `px-4`)
+                        - 2 (the `.instrument` hairline) = 286px, less `p-5`
+                        = 246px, less the row's `px-3` = 222px. Take off the
+                        `gap-3` and the right-hand group (a DifficultyMark
+                        plus its `gap-2.5` and the hover arrow, ~90px) and
+                        the title has ~120px, which at `text-sm` is about 17
+                        characters. "Quantum Error Correction" is 24. And
+                        because the button carries no `aria-label`, a screen
+                        reader read the whole title while a sighted reader
+                        could not, so the two were being told different
+                        things. `min-h-11` is a floor, not a fixed height, so
+                        a second line grows the row. */}
+                    <span className="min-w-0">{dependent.title}</span>
                     <span className="flex shrink-0 items-center gap-2.5">
                       {dependentLevel ? <DifficultyMark difficulty={dependentLevel} /> : null}
                       <span aria-hidden="true" className="text-pillar-text opacity-0 transition-opacity group-hover:opacity-100">

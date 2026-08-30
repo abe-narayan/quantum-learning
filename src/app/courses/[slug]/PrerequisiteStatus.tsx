@@ -4,29 +4,29 @@ import { useCompletedLessonSlugs } from "@/lib/content/progress";
 
 /**
  * ============================================================
- * "Do I already have this prerequisite?" — a readout, not a control
+ * "Do I already have this prerequisite?", a readout, not a control
  * ============================================================
  * Answers the beginner question the course page's server component cannot.
- * A thin client leaf, per docs/DESIGN_SYSTEM.md §10 — it only imports
+ * A thin client leaf, per docs/DESIGN_SYSTEM.md §10, it only imports
  * `lib/content/progress` (explicitly allowed there; client-side storage by
  * design), never a content registry. The caller resolves the prerequisite
  * course's authored lesson slugs server-side and passes only that flat array
  * down.
  *
  * Three constraints this component has to hold, all of them consequences of
- * *where* it renders — inline inside a prerequisite row that is itself a
+ * *where* it renders, inline inside a prerequisite row that is itself a
  * `<Link>` to that course:
  *
  *   1. **Nothing interactive.** Only `<span>` and `<svg>` come out of here.
  *      A `<button>`, an `<a>`, or anything with a click handler would be an
- *      interactive element nested inside an anchor — invalid HTML, and
+ *      interactive element nested inside an anchor, invalid HTML, and
  *      unreachable-or-duplicated for keyboard and screen-reader users.
  *   2. **Nothing that *looks* interactive.** It deliberately does not use
  *      the filled pill shape that `CourseProgressBadge` and the site's
  *      `Badge` use: sitting inside a clickable row, a bordered pill with a
  *      wash fill reads as a second, smaller button. This is drawn in the
  *      plain technical-readout voice instead (`font-tech`, uppercase, no
- *      border, no fill) — the same register as `Readouts`, which is what it
+ *      border, no fill), the same register as `Readouts`, which is what it
  *      actually is.
  *   3. **Never color alone.** Done vs. not-done is carried by three
  *      redundant channels: the word ("Completed" / "Not started" / "3/8
@@ -34,7 +34,7 @@ import { useCompletedLessonSlugs } from "@/lib/content/progress";
  *      and only then the color. Matches `PrerequisiteReadout`'s CheckGlyph
  *      on the lesson pages so the two never teach different vocabulary.
  *
- * Renders nothing for a prerequisite with no authored lessons yet — there is
+ * Renders nothing for a prerequisite with no authored lessons yet, there is
  * no reader progress to report, and a permanent "not started" chip on a
  * course with zero content would just be noise (mirrors CourseProgressBadge's
  * same call). The caller's row degrades cleanly to title + difficulty. A
@@ -52,7 +52,7 @@ export function PrerequisiteStatus({ lessonSlugs }: { lessonSlugs: string[] }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 font-tech text-[0.6875rem] font-medium uppercase tracking-[0.1em]",
+        "inline-flex items-center gap-1.5 tech-label",
         isComplete ? "text-pillar-text" : "text-subtle-foreground"
       )}
     >
@@ -67,7 +67,7 @@ export function PrerequisiteStatus({ lessonSlugs }: { lessonSlugs: string[] }) {
 
 /**
  * Filled check-in-circle when done, half-marked circle when part-way, hollow
- * circle when untouched — three distinguishable *shapes*, so the state
+ * circle when untouched, three distinguishable *shapes*, so the state
  * survives grayscale, forced-colors mode, and every form of color blindness
  * without depending on the text alone either.
  */
@@ -96,7 +96,7 @@ function StatusGlyph({ done, started }: { done: boolean; started: boolean }) {
   );
 }
 
-// Local, dependency-free class joiner — pulling in `@/lib/utils` here would
+// Local, dependency-free class joiner, pulling in `@/lib/utils` here would
 // be fine size-wise, but this component's whole point is to be the smallest
 // possible client leaf, so it avoids even that import.
 function cn(...classes: Array<string | false | null | undefined>) {

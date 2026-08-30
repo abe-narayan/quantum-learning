@@ -131,13 +131,13 @@ export const logicalXCommutesWithAllStabilizers = Object.values(generators).ever
 export const logicalZCommutesWithAllStabilizers = Object.values(generators).every((g) => logicalZ.mul(g).equals(g.mul(logicalZ), 1e-9));
 export const logicalXZAnticommute = logicalX.mul(logicalZ).equals(logicalZ.mul(logicalX).scale(-1), 1e-9);
 
-<LessonHook eyebrow="A code that actually corrects everything">
+<LessonHook eyebrow="A code that corrects both kinds of error">
   The 3-qubit bit-flip code corrects one bit-flip error but detects no
   phase errors at all. The Steane code, built here from a single
   classical error-correcting code, corrects both kinds at once.
 </LessonHook>
 
-## Motivation
+## Two Syndromes, Then a General Construction
 
 Stabilizer Formalism Basics renamed two syndrome measurements the
 3-qubit bit-flip code already had. That code has $n=3$ physical qubits,
@@ -145,12 +145,12 @@ $1$ logical qubit, distance $1$: it corrects one bit-flip error and
 detects no phase error at all, since a repetition code offers no
 protection against $Z$. This lesson builds the general theory of
 <Term id="css-stabilizer-codes">$[[n,k,d]]$ stabilizer codes</Term>, then
-constructs the **Steane code**, $[[7,1,3]]$, which actually corrects
+constructs the **Steane code**, $[[7,1,3]]$, which corrects
 *any* single-qubit error, $X$, $Z$, or both, entirely from a single
 classical error-correcting code most of this platform's readers have
 never needed to think about: the Hamming$[7,4,3]$ code.
 
-## Mathematical Development
+## From Classical Hamming Codes to the Steane Code
 
 ### General $[[n,k,d]]$ stabilizer codes
 
@@ -168,14 +168,14 @@ undetectable logical error. This is the direct generalization of
 Stabilizer Formalism Basics' syndrome-flip mechanism. An error *is*
 detected whenever it anticommutes with some generator (flipping that syndrome
 bit), so only errors commuting with *every* generator can possibly go
-undetected, and among those, only ones actually outside $S$ change the
+undetected, and among those, only ones outside $S$ change the
 encoded logical state.
 
 ### The CSS construction
 
 Given two classical linear codes $C_2\subseteq C_1\subseteq\mathbb F_2^n$
-(dimensions $k_2\leq k_1$), the **CSS(C_1,C_2)** construction builds a
-$[[n,k_1-k_2]]$ stabilizer code:
+(dimensions $k_2\leq k_1$), the **CSS** construction $\text{CSS}(C_1,C_2)$
+builds an $[[n,k_1-k_2]]$ stabilizer code:
 
 - **$Z$-type generators**: one $Z^h$ (a tensor product of $Z$ on every
   qubit where $h$ has a $1$) for each row $h$ of a parity-check matrix
@@ -195,7 +195,14 @@ qubit), and likewise two $X$-type generators. So the only condition to
 check is $g\cdot h=0$ for every $g\in C_2$, $h\in C_1^\perp$. Since
 $h\in C_1^\perp$ means $h\cdot c=0$ for *every* $c\in C_1$, and
 $C_2\subseteq C_1$ puts every $g$ among those $c$'s, $g\cdot h=0$
-automatically. $\blacksquare$
+automatically.
+
+The converse takes one more line, and it is the half saying the nesting
+condition is forced rather than merely convenient. If every pair
+commutes, then $g\cdot h=0$ for every $g\in C_2$ and every
+$h\in C_1^\perp$, which says exactly $C_2\subseteq(C_1^\perp)^\perp$, and
+$(C_1^\perp)^\perp=C_1$ for any linear code over $\mathbb F_2$. So
+$C_2\subseteq C_1$. $\blacksquare$
 
 ### Building the Steane code from the Hamming$[7,4,3]$ code
 
@@ -240,7 +247,18 @@ confirmed directly, not merely inferred from the classical argument.
 
 ### Code distance: computed, not assumed
 
-The minimum-weight nontrivial logical operator's support is a
+A general CSS code has two independent families of logical operators,
+$X$-type and $Z$-type, so its distance is
+$d=\min\big\{\text{wt}(C_1\setminus C_2),\ \text{wt}(C_2^\perp\setminus C_1^\perp)\big\}$
+and both sets must be searched. The Steane code is the case where that
+caveat costs nothing, and it is worth seeing why rather than skipping
+it: here $C_2$ is *exactly* $C_1^\perp$ (the $HH^\top=0$ computation
+above, plus $\dim C_2=3=7-4$), so $C_2^\perp=C_1$ and $C_1^\perp=C_2$,
+which makes the second set $C_1\setminus C_2$ again. One enumeration
+settles both. Do not carry that shortcut to a CSS code where
+$C_2\subsetneq C_1^\perp$.
+
+So the minimum-weight nontrivial logical operator's support is a
 minimum-weight vector of $C_1\setminus C_2$ (a codeword of $C_1$ that
 isn't already a stabilizer element of $C_2$; anything in $C_2$ acts as
 the identity on the codespace, since it's already a product of
@@ -248,8 +266,7 @@ stabilizer generators). Enumerating all $16$ codewords of $C_1$ and all
 $8$ codewords of $C_2$ directly (brute force over $2^4$ and $2^3$
 generator combinations respectively, small enough to check exhaustively) gives $|C_1\setminus C_2|=8$, with minimum weight
 $\boxed{d=3}$, matching the classical Hamming code's own minimum
-distance exactly, confirmed by direct enumeration, not simply asserted
-by analogy.
+distance exactly, confirmed by direct enumeration.
 
 ### Logical operators
 
@@ -263,7 +280,7 @@ operator) and **anticommute with each other**
 ($\bar X\bar Z=-\bar Z\bar X$, checked exactly), the correct symplectic
 structure for a single encoded qubit's own $X$ and $Z$.
 
-## Physical Interpretation
+## Why Distance Is Computed, Not Chosen
 
 The Steane code is not a bigger, more complicated version of the
 3-qubit bit-flip code: it's a structurally different object built by
@@ -277,7 +294,7 @@ code built this same way, from a different, application-suited pair of
 classical codes; the Steane code is the smallest instance where the
 whole machinery is fully visible end to end.
 
-## Worked Example
+## The Full Syndrome Table
 
 **Confirm $X_1$ (a physical bit-flip error on qubit 1 alone) is
 detected by this code, and identify which syndrome bits flip.**
@@ -285,8 +302,8 @@ detected by this code, and identify which syndrome bits flip.**
 <PredictBeforeReveal
   question="X1 is a bit-flip error. Will it anticommute with (and so be caught by) one of the X-type generators (g1,g2,g3) or one of the Z-type generators (g4,g5,g6)?"
   options={[
-    { label: "An X-type generator — X errors and X-type checks are the same kind of operator", value: "x-type" },
-    { label: "A Z-type generator — X and Z anticommute, so a Z-type check is what notices an X error", value: "z-type" },
+    { label: "A Z-type generator, since X and Z anticommute, so a Z-type check is what notices an X error", value: "z-type" },
+    { label: "An X-type generator, since X errors and X-type checks are the same kind of operator", value: "x-type" },
     { label: "Both kinds equally", value: "both" },
   ]}
   correctValue="z-type"
@@ -303,7 +320,7 @@ others, a nonzero, uniquely-identifying syndrome pattern (checked
 against $H$'s three rows directly: column $1$ of $H$ is $(0,0,1)^\top$,
 matching that only the third row, $g_6$'s row, has a $1$ there),
 the mechanism Stabilizer Formalism Basics established for the
-3-qubit code, now running on an actual $[[7,1,3]]$ code capable of
+3-qubit code, now running on a $[[7,1,3]]$ code capable of
 also catching phase errors, which the bit-flip code could not detect at
 all.
 
@@ -329,9 +346,17 @@ computed from the generator patterns above:
   <table className="w-full border-collapse text-sm">
     <thead>
       <tr className="border-b border-border bg-surface-muted">
-        <th className="px-3 py-2 text-left font-semibold">Error</th>
+        {/* `scope="col"` written by hand, and it has to be. Every other
+            table in the corpus is a Markdown table, so its header cells go
+            through the `th` mapping in src/mdx-components.tsx, which adds the
+            scope for free. Literal JSX in MDX does not touch the component
+            map at all: a `<th>` written out like this one is passed straight
+            to React as the intrinsic element, so that mapping cannot reach it
+            and these seven cells were the last unscoped headers on the site.
+            Any future literal-JSX table in a lesson has to carry its own. */}
+        <th scope="col" className="px-3 py-2 text-left font-semibold">Error</th>
         {generatorEntries.map((entry) => (
-          <th key={entry.label} className="px-3 py-2 text-center font-semibold">{entry.label}</th>
+          <th scope="col" key={entry.label} className="px-3 py-2 text-center font-semibold">{entry.label}</th>
         ))}
       </tr>
     </thead>
@@ -357,7 +382,7 @@ All {syndromeStrings.length} syndromes are nonzero
 ({allSyndromesNonzero ? "verified" : "FAILED"}) and all
 {" "}{distinctSyndromeCount} are distinct
 ({allSyndromesDistinct ? "verified" : "FAILED"}), both computed by
-enumeration rather than asserted. That pair of facts *is* the
+enumeration. That pair of facts *is* the
 distance-3 property in operational form: the decoder can invert the
 syndrome map on single-qubit errors, so every one of them is correctable,
 not merely noticeable.
@@ -371,7 +396,7 @@ classical code's distinctness property is doing the work directly; the
 quantum code inherits correctability from it rather than earning it
 separately. This is the CSS construction paying out.
 
-## Common Mistakes
+## Where the Containment Condition Bites
 
 <Callout type="warning">
 **Assuming any pair of classical codes $C_1,C_2$ can be used in the CSS
@@ -396,17 +421,190 @@ concept.
 1. Verify by hand that $Z_1$ (a physical phase-flip error on qubit 1)
    anticommutes with exactly one $X$-type generator, and identify which
    one, using the same column-of-$H$ argument as the worked example.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $g_3$, and only $g_3$.
+
+   $Z_1$ is the identity everywhere except qubit $1$, so it can only
+   anticommute with a generator that carries a non-$Z$ Pauli at qubit $1$.
+   That rules out $g_4,g_5,g_6$ immediately, since they are built from
+   $Z$'s and $I$'s and commute with $Z_1$ at every site. Among the
+   $X$-type generators, the test is simply whether qubit $1$ is in the
+   support:
+
+   $g_1=IIIXXXX$, support $\{4,5,6,7\}$: qubit $1$ carries $I$, so it
+   commutes.
+
+   $g_2=IXXIIXX$, support $\{2,3,6,7\}$: qubit $1$ carries $I$, so it
+   commutes.
+
+   $g_3=XIXIXIX$, support $\{1,3,5,7\}$: qubit $1$ carries $X$, one
+   anticommuting site, an odd count, so it anticommutes.
+
+   The column-of-$H$ reading gives the same answer with no case work.
+   Column $1$ of $H$ is $(0,0,1)^\top$, and the three $X$-type generators
+   are rows $1,2,3$ of $H$, so the syndrome $Z_1$ produces on
+   $(g_1,g_2,g_3)$ is exactly that column: $(0,0,1)$, meaning $g_3$ alone.
+
+   Set this beside the worked example and the CSS structure is on display.
+   $X_1$ lit up $g_6$; $Z_1$ lights up $g_3$. Both syndromes are the same
+   column of $H$, read against the other family of generators, because the
+   Steane code uses one matrix $H$ in two roles. That symmetry is why the
+   full syndrome table splits so cleanly into an upper-left and lower-right
+   block, and it is also why the code corrects $X$ and $Z$ errors equally
+   well rather than favouring one.
+
+   Since column $1$ is $(0,0,1)$, no other column of $H$ equals it (the
+   Hamming code's seven columns are the seven distinct nonzero three-bit
+   strings), which is the same distinctness fact that makes the syndrome
+   uniquely decodable. Detection needs the column to be nonzero;
+   correction needs it to be different from every other column. The
+   classical code supplies both.
+
+   </details>
+
 2. Using $HH^\top=0$, explain in one sentence why $g_1$ (an $X$-type
    generator) and $g_4$ (a $Z$-type generator, both from row $1$ of $H$)
    must commute even though their supports are *identical*
    ($\{4,5,6,7\}$ for both).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $X$ and $Z$ anticommute at each of the four shared sites, and
+   four sign flips is an even number, so the overall sign is
+   $(-1)^4=+1$.
+
+   Unpacking that sentence against $HH^\top=0$: the number of sites where
+   $g_1$ and $g_4$ both act non-trivially is $h_1\cdot h_1$, the
+   $(1,1)$ entry of $HH^\top$, which over $\mathbb F_2$ is the *parity of
+   the weight* of row $1$. Setting that entry to zero is exactly the
+   statement that $\mathrm{wt}(h_1)=4$ is even, and even overlap means
+   commutation.
+
+   Identical support is not the danger it looks like, then. Overlap is
+   what matters, and total overlap with an even-weight row is as harmless
+   as no overlap at all. What would break the construction is an *odd*
+   weight row: a hypothetical parity-check row of weight $3$ would give
+   $X$-type and $Z$-type generators that anticommute, the stabilizer group
+   would be non-abelian, and there would be no simultaneous $+1$ eigenspace
+   to call a codespace.
+
+   This is worth separating from the off-diagonal content of $HH^\top=0$.
+   The off-diagonal entries $h_i\cdot h_j$ for $i\neq j$ are what make
+   *different* rows' $X$- and $Z$-generators commute, and together with the
+   diagonal they are the statement $C_2\subseteq C_1^\perp$, that the
+   Hamming code's dual is contained in the code itself. The one matrix
+   equation $HH^\top=0$ therefore certifies all $9$ cross-family
+   commutations at once, the same-row cases included. The
+   $\binom62=15$ operator-level checks at $128\times128$ scale reported
+   above are the brute-force confirmation of what this one line of
+   $\mathbb F_2$ arithmetic already guarantees.
+
+   </details>
+
 3. The code space has dimension $2^k=2^1=2$. Using the general counting
    argument ("each independent generator halves the dimension"), verify
    this is consistent with $n-k=6$ independent generators acting on a
    $2^7=128$-dimensional space.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \dim(\text{codespace})=\frac{2^n}{2^{\,n-k}}=\frac{2^7}{2^6}=\frac{128}{64}=2=2^1=2^k. \checkmark
+   $$
+
+   The halving is exact rather than approximate, and it is worth seeing
+   why. Each generator $g$ is a non-identity Pauli string, so $g^2=I$ and
+   $\mathrm{Tr}\,g=0$. Eigenvalues $\pm1$ with zero trace forces the two
+   eigenspaces to have equal dimension, $64$ each, so imposing $g=+1$
+   halves exactly. Independence of the six generators (no one of them is a
+   product of the others) is what makes each successive constraint cut the
+   remaining space in half again rather than being implied by the earlier
+   ones.
+
+   The same count read the other way is the more useful picture. The six
+   generators' joint eigenvalues take $2^6=64$ possible sign patterns, and
+   these **syndrome sectors** partition the full $128$-dimensional space
+   into $64$ subspaces of dimension $2$ each. They all have the same
+   dimension because for any syndrome $s$ there is a Pauli operator mapping
+   the codespace onto that sector unitarily, which is precisely what error
+   correction exploits: measure the syndrome, learn which of the $64$
+   sectors you are in, apply the Pauli that maps it back.
+
+   That accounting also shows how much slack the Steane code has. There
+   are $63$ nonzero syndromes available and only $14$ single-qubit errors
+   to distinguish, so the code is not tightly packed. The relevant bound
+   is the quantum Hamming bound, $1+3n\leq2^{\,n-k}$ for a nondegenerate
+   distance-$3$ code encoding one qubit: here $1+21=22\leq64$, satisfied
+   with room to spare. At $n=5$ it reads $1+15=16\leq2^4=16$, an exact
+   equality, which is why the $[[5,1,3]]$ code is the smallest possible
+   code correcting an arbitrary single-qubit error and why the Steane
+   code's extra two qubits buy structure (CSS form, transversal gates)
+   rather than efficiency.
+
+   </details>
+
 4. Why does $\bar X\bar Z=-\bar Z\bar X$ (rather than $\bar X\bar Z=\bar Z\bar X$)
    matter physically for $\bar X,\bar Z$ to correctly represent a single
    logical qubit's Pauli operators?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because anticommutation is the *only* thing that makes $\bar X$ flip the
+   logical bit. Without it the codespace would store a classical bit, not
+   a qubit.
+
+   The argument is two lines. Suppose $|\bar0\rangle$ is the logical state
+   with $\bar Z|\bar0\rangle=+|\bar0\rangle$. Then
+
+   $$
+   \bar Z\big(\bar X|\bar0\rangle\big)=-\bar X\bar Z|\bar0\rangle=-\bar X|\bar0\rangle,
+   $$
+
+   so $\bar X|\bar0\rangle$ sits in the $\bar Z=-1$ eigenspace: it is
+   $|\bar1\rangle$. That is exactly what a logical bit flip is supposed to
+   do. Had the two commuted, $\bar X|\bar0\rangle$ would still be a
+   $\bar Z=+1$ state, hence proportional to $|\bar0\rangle$ itself in a
+   two-dimensional codespace, and $\bar X$ would be a phase rather than a
+   gate.
+
+   Stated algebraically, two commuting operators are simultaneously
+   diagonalizable, so a commuting $\bar X,\bar Z$ pair would generate a
+   commutative algebra. The full operator algebra of one qubit is
+   $2\times2$ complex matrices, four-dimensional and non-commutative, and
+   it is generated by $I,\bar X,\bar Z$ together with
+   $\bar Y=i\bar X\bar Z$ only because of the anticommutation relation.
+   Lose it and there is no logical $\bar Y$, no logical Hadamard, no way to
+   rotate anywhere off the logical $Z$ axis: the codespace has two
+   distinguishable states and no coherence between them, which is a
+   classical bit.
+
+   This is also the general definition of what "$k$ logical qubits" means.
+   The logical Pauli group is the quotient $N(S)/S$, and encoding $k$
+   qubits means finding $2k$ representatives that pair up into $k$
+   anticommuting couples $(\bar X_i,\bar Z_i)$ with every other pair
+   commuting. That symplectic pairing is the structure being checked, and
+   it is a separate check from "commutes with every stabilizer". Both
+   $\bar X$ and $\bar Z$ commuting with all of $S$ says only that they
+   preserve the codespace; it says nothing at all about their relation to
+   each other, and that is the wrong turn to avoid.
+
+   One detail that makes the check well-posed. Logical operators are
+   defined only up to multiplication by a stabilizer, so one might worry
+   the sign depends on which representative was picked. It does not: for
+   $s\in S$, $(\bar Xs)\bar Z=\bar X\bar Zs=-\bar Z\bar Xs=-\bar Z(\bar Xs)$,
+   using that $s$ commutes with $\bar Z\in N(S)$. The anticommutation is a
+   property of the cosets, which is what allows the lesson to verify it
+   once on the representatives $X_1X_2X_3$ and $Z_1Z_2Z_3$, whose three
+   overlapping sites give $(-1)^3=-1$, and conclude it for the logical
+   operators themselves.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -429,14 +627,14 @@ concept.
   operators commute with every stabilizer, and $\bar X,\bar Z$
   anticommute correctly.
 
-## Further Exploration
+## Beyond the CSS Restriction
 
 <NextDiscovery>
   This completes **Rigorous Quantum Information Theory**. The Schmidt
   decomposition, trace distance and fidelity, the Choi–Jamiołkowski
   isomorphism, the Lindblad master equation, mixed-state entanglement
   measures, and channel-formalism teleportation were each stated as fact
-  somewhere in the Quantum Mechanics or Quantum Computing pillars; this
+  somewhere in the Quantum Mechanics or Quantum Computing tracks; this
   course supplied the proofs, and marked clearly the few places where it
   had to cite rather than derive.
 </NextDiscovery>

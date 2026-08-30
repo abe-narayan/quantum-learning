@@ -43,10 +43,10 @@ export const normalizingAFourOutcomeQubitPovm: NumericProblem = {
     finalAnswer: "c = 0.5.",
   },
   explanation: {
-    correctIdea: "Each E_i must be positive semi-definite (automatic here, since c > 0 and each |phi_i><phi_i| is already a projector) and the full set must sum to exactly I -- not just to some positive multiple of I.",
+    correctIdea: "Each E_i must be positive semi-definite (automatic here, since c > 0 and each |phi_i><phi_i| is already a projector) and the full set must sum to exactly I, not merely to some positive multiple of I.",
     whyCorrect: "Recognizing {|0>,|1>} and {|+>,|-> } as two separate orthonormal bases, each already summing to I on its own, immediately gives the unscaled total as 2I without needing to expand any matrix entries by hand.",
     whyWrong: [
-      "Choosing c=1 (leaving the projectors unscaled) gives sum_i E_i = 2I, not I -- this assigns total outcome probability 2 instead of 1 for every state, which is not a valid probability distribution.",
+      "Choosing c=1 (leaving the projectors unscaled) gives sum_i E_i = 2I, not I. That assigns total outcome probability 2 instead of 1 for every state, which is not a valid probability distribution.",
       "Choosing c=1/4 (dividing evenly by the outcome count) is a common but unjustified guess; the correct normalization depends on how the outcomes' projectors actually overlap, not just how many outcomes there are.",
     ],
   },

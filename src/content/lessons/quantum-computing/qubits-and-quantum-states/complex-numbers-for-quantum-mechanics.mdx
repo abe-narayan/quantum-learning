@@ -1,10 +1,29 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { LazyComplexAmplitudeExplorer } from "@/components/simulators/complex-amplitude-explorer/LazyComplexAmplitudeExplorer";
+import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagramExplorer";
+import { Complex } from "@/lib/quantum/complex";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/qubits-and-quantum-states/complex-numbers-for-quantum-mechanics"
 );
+
+export const productZ1 = Complex.fromPolar(1.2, Math.PI / 6);
+
+export const productSweepPhases = Array.from({ length: 13 }, (_, i) => (i / 12) * 2 * Math.PI);
+
+export const productFrames = productSweepPhases.map((theta2) => {
+  const z2 = Complex.fromPolar(0.8, theta2);
+  const product = productZ1.mul(z2);
+  return {
+    paramLabel: `θ₂ = ${Math.round((theta2 * 180) / Math.PI)}°, |z₁z₂| = ${product.magnitude().toFixed(2)}`,
+    vectors: [
+      { label: "z₁", x: productZ1.re, y: productZ1.im, color: "muted", dashed: true },
+      { label: "z₂", x: z2.re, y: z2.im, color: "accent" },
+      { label: "z₁z₂", x: product.re, y: product.im, color: "brand" },
+    ],
+  };
+});
 
 export const lessonMeta = {
   title: "Complex Numbers for Quantum Mechanics",
@@ -42,7 +61,17 @@ amplitudes, then continue straight to
 [Dirac Notation](/lessons/quantum-computing/qubits-and-quantum-states/dirac-notation).
 </Callout>
 
-## Motivation
+<Callout type="note">
+**What this lesson assumes.** Algebra, plus trigonometry in radians:
+$\sin$, $\cos$, and the unit circle. That is the first point in this course
+where school algebra alone is not enough, and it is the same bar the
+Quantum Mechanics track's Complex Numbers for Physics states for itself. No
+calculus: the three power series Euler's formula is derived from are
+written out and checked numerically here before the derivation uses them,
+and nothing in this course needs a derivative or an integral.
+</Callout>
+
+## The gentle part is about to end
 
 In the last lesson, $\alpha$ and $\beta$ showed up as "complex numbers" and
 we mostly left it at that: every example used real values like
@@ -54,7 +83,7 @@ geometrically picture complex numbers. If you've seen this before, treat
 the lesson as a fast, quantum-flavored refresher. The polar form and
 Euler's formula sections are the parts that matter most going forward.
 
-## Intuition
+## A line, and then a plane
 
 A real number lives on a line. A complex number lives on a **plane**: one
 axis for its real part, one for its imaginary part. That's really it. A
@@ -66,7 +95,7 @@ entire rulebook. Everything else, every identity in this lesson, follows
 from treating $i$ like any other algebraic symbol, except that whenever
 $i^2$ shows up, you replace it with $-1$.
 
-## Mathematical Development
+## Rectangular, polar, and what multiplication does
 
 ### Rectangular form: addition and multiplication
 
@@ -122,7 +151,7 @@ $$
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Leonhard_Euler_-_Jakob_Emanuel_Handmann_%28Kunstmuseum_Basel%29.jpg"
   alt="1753 pastel portrait of Leonhard Euler by Jakob Emanuel Handmann"
-  caption="Leonhard Euler (1707–1783), whose identity e^{iθ} = cos θ + i sin θ, derived below, is the single most-used piece of mathematics in this entire course."
+  caption="Leonhard Euler (1707–1783), whose identity e^(iθ) = cos θ + i sin θ, derived below, is the single most-used piece of mathematics in this entire course."
   credit="Jakob Emanuel Handmann, Kunstmuseum Basel / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Leonhard_Euler_-_Jakob_Emanuel_Handmann_(Kunstmuseum_Basel).jpg"
   license="Public domain"
@@ -219,7 +248,7 @@ form: they're the same information, viewed two ways. It's easier to feel
 that equivalence by moving a number between the two forms yourself than
 by reading it in equations alone:
 
-<InteractiveSection title="Trace a circle at fixed modulus" description="Set a complex number to 0.6+0.8i using the rectangular sliders. Read off its modulus and phase in the polar readout. Then sweep the phase slider through a full turn (0 to 2π) and watch the point trace a circle while the modulus stays fixed. That circle *is* what 'multiplying by e^{iθ} rotates the point' means.">
+<InteractiveSection title="Trace a circle at fixed modulus" description="Set a complex number to 0.6+0.8i using the rectangular sliders. Read off its modulus and phase in the polar readout. Then sweep the phase slider through a full turn (0 to 2π), watching the point's path and the modulus readout together. What that path turns out to be is what 'multiplying by e^(iθ) rotates the point' means.">
   <LazyComplexAmplitudeExplorer />
 </InteractiveSection>
 
@@ -231,7 +260,7 @@ by reading it in equations alone:
     { label: "It depends on the phases involved", value: "depends" },
   ]}
   correctValue="stays"
-  explanation="Moduli multiply: |z1 z2| = |z1||z2| = 1 × 1 = 1, regardless of the phases. Only the phase moves, to θ1+θ2; the point stays on the unit circle no matter how far you rotate it there. This is why a phase gate, which only ever multiplies an amplitude by some e^{iθ}, never by itself changes a probability."
+  explanation="Moduli multiply: |z1 z2| = |z1||z2| = 1 × 1 = 1, regardless of the phases. Only the phase moves, to θ1+θ2; the point stays on the unit circle no matter how far you rotate it there. This is why a phase gate, which only ever multiplies an amplitude by some e^iθ, never by itself changes a probability."
 />
 
 ### Why polar form matters: multiplication adds phases
@@ -250,11 +279,24 @@ identity is what tells you the *new* phase is the old phase plus
 $\theta$, with nothing about the probability (which depends on $r$)
 changing.
 
+The claim is easier to believe once you watch it. Below, $z_1$ is pinned
+at modulus $1.2$ and phase $30°$, while $z_2$ keeps modulus $0.8$ and
+sweeps its phase through a full turn. Every arrow is one `Complex.mul`
+call, so the product is computed, not drawn by hand.
+
+<InteractiveSection title="Watch the product's arrow" description="z₁ is fixed (dashed). Drag the slider to swing z₂'s phase from 0° to 360° and watch the product z₁z₂ swing with it. Measure the angle between z₁z₂ and z₂ at two or three points in the sweep, and read the product's length off the frame label while you are there. z₁ has a phase of 30° and a length of 1.2 of its own; both should turn up somewhere in what you measure.">
+  <VectorDiagramExplorer
+    frames={productFrames}
+    sliderLabel="Phase of z₂"
+    ariaLabel="Three arrows in the complex plane: a fixed z₁ at phase 30 degrees and modulus 1.2, a sweeping z₂ at modulus 0.8, and their product, which stays at constant length 0.96 while its angle tracks 30 degrees ahead of z₂ through a full turn."
+  />
+</InteractiveSection>
+
 Conjugation is simple in polar form too: $z^* = re^{-i\theta}$, same
 modulus, negated phase. You can check this matches
 $\cos(-\theta)+i\sin(-\theta) = \cos\theta - i\sin\theta$.
 
-## Physical Interpretation
+## Modulus sets probability; phase sets interference
 
 In quantum mechanics, an amplitude's **modulus** will always turn out to
 control a probability (through $|\alpha|^2$), while its **phase** carries
@@ -262,10 +304,10 @@ information that never shows up in a probability by itself, only in how
 one amplitude compares to another. That split, "how much" versus "in what
 phase," is $r$ and $\theta$ in $z = re^{i\theta}$. You'll see this written
 out when we reach the Bloch sphere: the
-$e^{i\varphi}$ you'll write there is not a decoration, it is this
+$e^{i\varphi}$ you'll write there is not a decoration; it is this
 lesson's polar form, unchanged.
 
-## Worked Example
+## One product, and its modulus
 
 **Multiply $(3+4i)(1-2i)$ directly, and find its modulus.**
 
@@ -294,7 +336,7 @@ $$
 So $e^{i\pi/2} = i$, a fact you'll meet again the moment we define
 the $S$ gate.
 
-## Common Mistakes
+## i squared, and two things the modulus is not
 
 <Callout type="warning">
 **Writing $i^2 = +1$.** This is the single most common slip, and it
@@ -316,15 +358,140 @@ $-a+bi$.
 
 ## Practice Questions
 
-1. Compute $(2-i) + (−3+5i)$ and $(2-i)(-3+5i)$.
+1. Compute $(2-i) + (-3+5i)$ and $(2-i)(-3+5i)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Addition works componentwise, real with real and imaginary with imaginary:
+
+   $$
+   (2-i) + (-3+5i) = (2-3) + (-1+5)i = -1 + 4i.
+   $$
+
+   Multiplication is ordinary expansion, with $i^2 = -1$ applied at the end:
+
+   $$
+   (2-i)(-3+5i) = -6 + 10i + 3i - 5i^2 = -6 + 13i + 5 = -1 + 13i.
+   $$
+
+   The step that goes wrong most often is the last one. $-5i^2$ becomes $+5$,
+   not $-5$: the minus sign in front and the minus sign hiding in $i^2$ cancel.
+   Dropping that gives $-11 + 13i$, and it is the single most common arithmetic
+   slip in this whole lesson.
+
+   </details>
+
 2. Find the modulus and phase (in radians) of $z = -1 + i$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   |z| = \sqrt{(-1)^2 + 1^2} = \sqrt2 \approx 1.414, \qquad \theta = \frac{3\pi}{4} \approx 2.356.
+   $$
+
+   The modulus is just Pythagoras on the rectangular components. The phase
+   needs care: $z$ sits in the second quadrant (negative real part, positive
+   imaginary part), so the angle is between $\pi/2$ and $\pi$.
+
+   Reaching for $\arctan(b/a) = \arctan(1/-1) = \arctan(-1)$ gives $-\pi/4$,
+   which is the fourth quadrant, pointing the opposite way. That is the trap:
+   $\arctan$ has a range of only $(-\pi/2, \pi/2)$, half a turn, so it cannot
+   distinguish $-1+i$ from $1-i$. Either sketch the point first, or add $\pi$
+   to the $\arctan$ result whenever the real part is negative:
+   $-\pi/4 + \pi = 3\pi/4 \checkmark$. This is exactly why programming
+   languages ship a two-argument `atan2(b, a)` rather than making you divide.
+
+   </details>
+
 3. Using Euler's formula, show that $e^{i\pi} = -1$. (This is the
    famous identity connecting $e$, $i$, and $\pi$ in one equation.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Euler's formula says $e^{i\theta} = \cos\theta + i\sin\theta$. Set
+   $\theta = \pi$:
+
+   $$
+   e^{i\pi} = \cos\pi + i\sin\pi = -1 + i(0) = -1.
+   $$
+
+   Nothing deeper is required; the identity is one substitution. What makes it
+   worth doing is the picture. $e^{i\theta}$ is the point on the unit circle at
+   angle $\theta$, so $e^{i\pi}$ is the point half a turn from $1$, which is
+   $-1$. Multiplying a state by $e^{i\pi}$ therefore means "rotate every
+   amplitude by 180 degrees", and that is exactly the operation you will meet
+   again as a global phase flip.
+
+   Radians, not degrees. $\cos(\pi)$ here means $\cos(180°) = -1$, and a
+   calculator left in degree mode returns $\cos(\pi°) \approx 0.9985$ instead,
+   giving a wrong answer that looks suspiciously close to 1.
+
+   </details>
+
 4. If $z_1$ has phase $\pi/6$ and $z_2$ has phase $\pi/3$, what is the
    phase of $z_1 z_2$? What if you multiply $z_1$ by $z_1^*$ instead?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Phases add under multiplication:
+
+   $$
+   \arg(z_1 z_2) = \frac{\pi}{6} + \frac{\pi}{3} = \frac{\pi}{2}.
+   $$
+
+   In polar form $z_1 z_2 = (r_1 e^{i\pi/6})(r_2 e^{i\pi/3}) = r_1 r_2 e^{i\pi/2}$:
+   moduli multiply, phases add, which is the entire reason polar form is worth
+   the trouble.
+
+   Conjugating negates the phase, so $z_1^*$ has phase $-\pi/6$ and
+
+   $$
+   z_1 z_1^* = r_1 e^{i\pi/6} \cdot r_1 e^{-i\pi/6} = r_1^2 e^{0} = |z_1|^2,
+   $$
+
+   phase zero: a non-negative real number. This is not a coincidence you can
+   afford to forget, because it *is* the Born rule. Every probability in
+   quantum mechanics is an amplitude times its own conjugate, which is why
+   probabilities come out real and non-negative no matter how complex the
+   amplitudes were.
+
+   The common slip is multiplying the phases ($\pi/6 \times \pi/3$) instead of
+   adding them. Adding is right: exponents add when you multiply powers of the
+   same base, and $e^{i\theta}$ is a power of $e$.
+
+   </details>
+
 5. A complex number has modulus $1$. What does its rectangular form
    $(a, b)$ satisfy geometrically? (Hint: revisit the definition of
    modulus.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It lies on the unit circle: $|z| = \sqrt{a^2+b^2} = 1$, so
+
+   $$
+   a^2 + b^2 = 1.
+   $$
+
+   That is the equation of a circle of radius 1 centred at the origin, and it
+   means a modulus-1 complex number carries exactly one piece of information,
+   the angle $\theta$ around that circle. Every such number can be written
+   $z = e^{i\theta} = \cos\theta + i\sin\theta$, so $(a,b) = (\cos\theta,\sin\theta)$.
+
+   This is the shape every phase factor in the rest of the course lives on.
+   When a later lesson says a gate "multiplies an amplitude by a phase", it
+   means it moves that amplitude around this circle without changing its
+   length, which is why phases can never alter a probability on their own.
+
+   The wrong reading is $a + b = 1$, a straight line rather than a circle.
+   Modulus is a distance, and distances are Pythagorean.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -339,7 +506,7 @@ $-a+bi$.
 - Multiplying complex numbers multiplies their magnitudes and **adds**
   their phases, the reason phase gates compose the way they do.
 
-## Further Exploration
+## Packaging vectors into an algebra
 
 <NextDiscovery>
 [Dirac Notation](/lessons/quantum-computing/qubits-and-quantum-states/dirac-notation) packages complex-valued vectors like

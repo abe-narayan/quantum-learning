@@ -30,12 +30,17 @@ export const jxJyCommutatorJ2: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
+    nearMisses: [
+      { value: 1, tolerance: 0.01, feedback: "1 would be a surviving discrepancy of order the matrix entries themselves. The commutation relation is an exact operator identity, so the difference has to vanish rather than merely be small." },
+      { value: 6, tolerance: 0.01, feedback: "6 is j(j+1) at j=2, the eigenvalue of J². It belongs to a different operator than the one this difference is built from." },
+      { value: 2, tolerance: 0.01, feedback: "2 is the (0,0) entry of J_z at j=2. The prompt asks for the difference between two matrices that agree in that entry, not for the entry itself." },
+    ],
     incorrectFeedback: "The check asks for the difference between two things the algebra says are equal. If you computed something nonzero, compare orderings: the commutator is JxJy minus JyJx, in that order, and the right side carries the factor of i.",
   },
   hints: [
     { text: "The commutation relation [Jx,Jy]=iħJz (ħ=1 here) was derived to hold for any j, not just orbital angular momentum." },
-    { text: "If the derivation and the engine's implementation both agree, [Jx,Jy]-iJz should be the zero matrix." },
-    { text: "So if theory and implementation agree, the difference matrix has no surviving entries anywhere, and the top-left entry is no exception. Report its value." },
+    { text: "The prompt asks for a difference between the two sides of that relation. What does an exact identity say about how its two sides compare, entry by entry?" },
+    { text: "Build [Jx,Jy]-iJz at j=2 and read off its (0,0) entry, remembering the commutator is JxJy minus JyJx in that order and the right side carries the i." },
   ],
   solution: {
     steps: [{ description: "Since [Jx,Jy]=iJz holds exactly for any j (derived from the ladder-operator matrix elements), every matrix entry of the difference is exactly 0." }],

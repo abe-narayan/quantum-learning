@@ -24,7 +24,13 @@ export const orderOf2Mod21: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.5,
-    incorrectFeedback: "Compute 2^1, 2^2, 2^3, ... mod 21 until you get back to 1.",
+    nearMisses: [
+      { value: 3, feedback: "2³ is 8 mod 21, not 1. The search has to continue past this exponent." },
+      { value: 4, feedback: "2⁴ is 16 mod 21. Still not back to 1, so keep multiplying." },
+      { value: 12, feedback: "2¹² is indeed 1 mod 21, but 12 is a multiple of the order rather than the order itself. The prompt asks for the smallest positive exponent that works." },
+      { value: 21, feedback: "21 is the modulus, not the order. The order has to divide φ(21) = 12, so it can never exceed 12." },
+    ],
+    incorrectFeedback: "Either the sequence was stopped before it returned to 1, or a multiple of the order was reported instead of the order. Reduce mod 21 after every doubling rather than at the end, and take the first exponent that lands back on 1.",
   },
   hints: [
     { text: "The order r is defined as the first exponent at which the power cycles back to where it started. The plan: repeatedly double, reduce mod 21, and watch for the return." },

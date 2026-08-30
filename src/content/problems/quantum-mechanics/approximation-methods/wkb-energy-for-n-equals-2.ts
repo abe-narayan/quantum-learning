@@ -21,13 +21,18 @@ export const wkbEnergyForNEquals2: NumericProblem = {
   },
   question: {
     type: "numeric",
-    prompt: "Using the WKB quantization condition on the harmonic oscillator (m=ω=1), what energy does it predict for n=2, and how does it compare to the exact E₂=2.5?",
+    prompt: "Using the WKB quantization condition on the harmonic oscillator (m=ω=1), what energy does it predict for n=2? Work the exact eigenvalue out from the oscillator's own energy ladder as well, so you can say how far apart the two are.",
     inputHint: "as a decimal",
   },
   answer: {
     type: "numeric",
     value,
     tolerance: 0.01,
+    nearMisses: [
+      { value: 2, tolerance: 0.005, feedback: "2 is ħω·n with the zero-point offset dropped. The WKB quantization condition carries the same half-integer offset the exact spectrum does, which is why the two agree so closely." },
+      { value: 3, tolerance: 0.005, feedback: "3 is ħω(n+1), a whole level too high. Check whether the offset added to n was 1 rather than 1/2." },
+      { value: 0.5, tolerance: 0.005, feedback: "0.5 is the ground-state energy. The prompt asks for n = 2." },
+    ],
     incorrectFeedback: "Two things to check. First the exact reference: the ladder formula gives Eₙ as n plus a half, times ℏω, in these units. Second, whether your WKB search bracketed that value: a result far from the exact eigenvalue means the root was missed, not that WKB fails here.",
   },
   hints: [

@@ -18,7 +18,7 @@ const BlochSphereExplorer = dynamic(
  * it renders wherever a lesson author drops `<InteractiveSection>`, and a
  * lesson can carry several embeds down its length. Without a gate,
  * `next/dynamic(..., { ssr: false })` fires the chunk `import()` for every
- * one of them the instant the lesson mounts, regardless of scroll position —
+ * one of them the instant the lesson mounts, regardless of scroll position,
  * see `useDeferredMount`'s doc comment. The visibility gate defaults on here
  * (unlike the hero variants) because this component's position on the page
  * is unknown at authoring time; most embeds are below the fold on mount.

@@ -15,17 +15,29 @@ export const whyConcurrenceNeedsStatevector: ConceptualProblem = {
   question: {
     type: "conceptual",
     prompt:
-      "Explain, citing the specific type signatures involved, why concurrenceOfPureState takes a StateVector rather than a Matrix (density matrix) as its argument — and why this is a feature, not an oversight.",
+      "Explain, citing the specific type signatures involved, why concurrenceOfPureState takes a StateVector rather than a Matrix (density matrix) as its argument, and why that is a feature rather than an oversight.",
     placeholder: "Think about what formula concurrenceOfPureState actually implements...",
   },
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["amplitudes", "a,b,c,d", "ad-bc", "ad - bc", "2|ad", "pure-state formula", "pure state formula", "determinant"],
-      ["mixed", "wrong answer", "not defined", "undefined", "meaningless", "prevent", "impossible", "cannot be called", "can't be called", "type error", "compile", "silently", "misuse", "no amplitudes"],
+      {
+        phrases: ["amplitudes", "a,b,c,d", "ad-bc", "ad - bc", "2|ad", "pure-state formula", "pure state formula", "determinant"],
+        missingFeedback:
+          "You have said what the type stops you doing. Say why: name the formula the function implements and the objects that formula is written in terms of.",
+      },
+      {
+        phrases: ["mixed", "wrong answer", "not defined", "undefined", "meaningless", "prevent", "impossible", "cannot be called", "can't be called", "type error", "compile", "silently", "misuse"],
+        missingFeedback:
+          "You have named the formula. Now say what would go astray if the function accepted a density matrix, and why catching that at the type level beats catching it at runtime.",
+      },
     ],
     incorrectFeedback: "Ask what the function's formula reads off from its argument, and whether every density matrix can supply that.",
-    partialFeedback: "You're close. Add the design payoff: say what the strict signature rules out before the program ever runs.",
+    partialFeedback: "Add the design payoff: say what the strict signature rules out before the program ever runs.",
+    modelAnswers: [
+      "The formula it implements, 2|ad - bc|, is written in terms of the four pure-state amplitudes, so a StateVector is the only input it makes sense for. Taking a Matrix would let you hand it a mixed state and get a silently wrong answer; the type signature makes that misuse impossible instead.",
+      "concurrenceOfPureState computes the pure state formula from a, b, c, d. A density matrix has no such amplitudes, so on a mixed state the result would be meaningless. Requiring a StateVector turns that into a compile-time type error rather than a silent bug.",
+    ],
   },
   hints: [
     { text: "Look at the formula the function implements. What ingredients does it read directly from its input?" },

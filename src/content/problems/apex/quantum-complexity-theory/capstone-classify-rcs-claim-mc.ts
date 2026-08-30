@@ -19,19 +19,19 @@ export const capstoneClassifyRcsClaimMc: MultipleChoiceProblem = {
     options: [
       {
         id: "a",
-        text: "The experiment provides strong empirical evidence, consistent with a real Tier 2 conjecture, that efficient quantum computation is separated from efficient classical simulation -- for this one specific, carefully engineered sampling task, resting on the plausible but unproven assumption that the polynomial hierarchy does not collapse. It does not constitute an unconditional proof.",
+        text: "Strong evidence for a Tier 2 conjecture about one engineered sampling task, conditional on the polynomial hierarchy not collapsing",
       },
       {
         id: "b",
-        text: "The claim is correct as stated: sampling from a random circuit's output distribution faster than any classical computer can is, by definition, an unconditional proof that BQP strictly contains P.",
+        text: "A Tier 1 result for this one task: the sampling separation is proven, though it does not extend to problems anyone wanted solved",
       },
       {
         id: "c",
-        text: "The claim is meaningless publicity and should be dismissed outright, since the classical-hardness margin for specific instances has since been narrowed or contested by improved classical algorithms.",
+        text: "A Tier 2 conjecture about quantum computing in general, since a separation on one engineered task evidences separation broadly",
       },
       {
         id: "d",
-        text: "The experiment resolves whether NP is contained in BQP, since random circuit sampling is itself an NP-complete problem.",
+        text: "A Tier 3 open question, since improved classical simulations have contested the runtime margin the experiment originally claimed",
       },
     ],
   },
@@ -39,21 +39,21 @@ export const capstoneClassifyRcsClaimMc: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Sampling faster than a specific classical algorithm on a specific instance is an empirical, experimental fact, not a mathematical proof. Turning it into an unconditional separation theorem would require proving the polynomial-hierarchy assumption the classical-hardness argument itself rests on, which nobody has done.",
-      c: "This overcorrects in the opposite direction. A later classical algorithm narrowing or contesting a specific hardness margin is normal, healthy scientific self-correction -- it doesn't retroactively make the original empirical result meaningless, it's exactly how the field checks extraordinary claims.",
-      d: "Random circuit sampling is a sampling task chosen for its believed classical hardness, not an NP-complete decision problem, and the experiment says nothing about NP subseteq BQP at all.",
+      b: "The scope caveat is right and the tier is not. The classical-hardness argument for this sampling task is conditional on the polynomial hierarchy failing to collapse, so nothing in it is unconditionally proven.",
+      c: "The tier is right and the scope is not. The hardness argument is built around this particular circuit family, chosen for that property; nothing in it carries over to a task anyone wanted the answer to.",
+      d: "A contested runtime margin is ordinary self-correction, and it lowers confidence in one number rather than emptying the evidence. Tier 3 is for questions with no strong evidence either way, which is not this one.",
     },
     defaultIncorrectFeedback:
-      "Recall the lesson's worked example: classify the underlying theoretical claim (Tier 1, 2, or 3), name the real evidence and the assumption it rests on, and be precise about what the experiment does and does not establish -- neither dismissing it nor overclaiming it.",
+      "Two things have to come out right at once: which tier the underlying claim belongs in, and how wide the claim is. Getting one and missing the other is not the most precise assessment.",
   },
   hints: [
     { text: "Is this claim a mathematical proof (Tier 1), a conjecture with stated evidence (Tier 2), or an open question (Tier 3)?" },
     { text: "What specific, named theoretical assumption does random circuit sampling's classical-hardness argument rest on?" },
-    { text: "The correct answer should neither dismiss the experiment as meaningless nor accept it as an unconditional proof." },
+    { text: "Two things have to be right at once here: the tier the claim belongs in, and how wide the claim is. An answer that lands one and misses the other is not the best assessment." },
   ],
   solution: {
     steps: [
-      { description: "Random circuit sampling's classical hardness rests on a real, citable argument: if a classical computer could efficiently sample the same distribution, the polynomial hierarchy would collapse to a finite level -- itself an unproven, if widely disbelieved, assumption." },
+      { description: "Random circuit sampling's classical hardness rests on a real, citable argument: if a classical computer could efficiently sample the same distribution, the polynomial hierarchy would collapse to a finite level. That non-collapse is itself an unproven, if widely believed, assumption." },
       { description: "This places the underlying theoretical claim in Tier 2 (strongly-evidenced conjecture), not Tier 1 (proven theorem): the experiment is empirical evidence consistent with the conjecture, for one specific engineered task." },
       { description: "Subsequent classical algorithms narrowing or contesting specific instances' hardness margins are a normal part of testing a Tier 2 claim, not evidence the whole enterprise is invalid." },
     ],
@@ -61,13 +61,13 @@ export const capstoneClassifyRcsClaimMc: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea:
-      "A random circuit sampling experiment is genuine, strong empirical evidence for a real but unproven complexity-theoretic conjecture, on one specific task -- not a proof, and not noise.",
+      "A random circuit sampling experiment is strong empirical evidence for a real but unproven complexity-theoretic conjecture, on one specific task. It is neither a proof nor noise.",
     whyCorrect:
       "The Tier 2 reading names the conjecture at stake, names the real theoretical basis for it (the polynomial hierarchy not collapsing), and declines to call the experiment an unconditional proof: this capstone's worked example, step for step.",
     whyWrong: [
-      { optionId: "b", text: "Conflates an empirical demonstration with a mathematical proof, ignoring that the classical-hardness argument itself rests on an unproven assumption." },
-      { optionId: "c", text: "Overcorrects. Contested or narrowed hardness margins are healthy self-correction, not proof the original result was meaningless." },
-      { optionId: "d", text: "Misidentifies random circuit sampling as an NP-complete decision problem, then applies it to an unrelated open question." },
+      { optionId: "b", text: "Reads a conditional separation as an unconditional one. The hardness argument itself assumes the polynomial hierarchy does not collapse, which nobody has established." },
+      { optionId: "c", text: "Generalises past the evidence. The circuit family was engineered for hardness, and the argument does not travel to tasks that were not." },
+      { optionId: "d", text: "Confuses a contested margin with an absence of evidence. Improved classical simulation narrows a number; it does not return the question to open." },
     ],
   },
 };

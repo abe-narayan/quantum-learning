@@ -23,7 +23,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Simulators vs. Real Hardware",
   description:
-    "Writing Your First Circuit isolated pure shot noise; real hardware adds actual physical error (Noise, Decoherence & Scaling) on top, plus queue time and a hard qubit-count ceiling a simulator doesn't have, while an ideal noiseless simulator hits an entirely different wall: exponential memory cost in qubit count.",
+    "Writing Your First Circuit isolated pure shot noise; real hardware adds physical error (Noise, Decoherence & Scaling) on top, plus queue time and a hard qubit-count ceiling a simulator doesn't have, while an ideal noiseless simulator hits an entirely different wall: exponential memory cost in qubit count.",
   course: "programming-quantum-computers",
   module: "simulators-vs-real-hardware",
   order: 1,
@@ -38,27 +38,27 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Two different walls">
-A noiseless simulator strips away real hardware's physical error and access constraints — but it hits a very different wall of its own: exponential memory cost in qubit count.
+A noiseless simulator strips away real hardware's physical error and access constraints. It hits a different wall of its own: exponential memory cost in qubit count.
 </LessonHook>
 
-## Motivation
+## Shot Noise Was the Easy Part
 
 Writing Your First Circuit showed shot noise alone, on a perfect,
 noiseless simulator. This closing lesson puts back what that simulator
-left out — physical error, and the practical constraints of getting time
-on a real device — and is equally honest about the wall simulators run
+left out (physical error, and the practical constraints of getting time
+on a real device), and is equally honest about the wall simulators run
 into themselves.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c7/QuEra_System_Delivery_UKRI.jpg"
   alt="QuEra's neutral-atom testbed system being delivered to the UK's National Quantum Computing Centre"
-  caption="A quantum computer arriving at the UK's National Quantum Computing Centre. This is what 'real hardware' means in this lesson: one physical machine, in one building, that has to be built, shipped, installed and then shared — which is where queue time comes from. A simulator is a process you start."
+  caption="A quantum computer arriving at the UK's National Quantum Computing Centre. This is what 'real hardware' means in this lesson: one physical machine, in one building, that has to be built, shipped, installed and then shared, which is where queue time comes from. A simulator is a process you start."
   credit="QuEra Computing, Inc., via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:QuEra_System_Delivery_UKRI.jpg"
   license="CC BY 4.0"
 />
 
-## Engineering Development
+## What Hardware Adds, and Where Simulators Stop
 
 ### What real hardware adds on top of shot noise
 
@@ -90,18 +90,10 @@ complex <Term id="amplitude">amplitudes</Term> (this platform's own `StateVector
 every additional qubit. At $n=30$ qubits, that's over a billion
 amplitudes; well before $n=50$, the memory requirement exceeds any
 existing classical computer's capacity. That is why exact state-vector
-simulation cannot stand in for real hardware at large qubit counts — a
+simulation cannot stand in for real hardware at large qubit counts, a
 different kind of limitation from anything on the "real hardware" side of
 this comparison, developed in full in Simulating Quantum Systems'
 Computational Cost & Scaling lesson.
-
-<Callout type="note">
-**A preview of the exact numbers.** That later lesson computes this
-precisely via `stateVectorMemoryBytes`: about 16.8 MB at 20 qubits (a
-laptop handles this easily), already 17.2 GB at 30 qubits, and 18.0 PB
-at 50 qubits, beyond any existing classical system's storage. The wall
-is an exact, computed curve, not a rough estimate.
-</Callout>
 
 <PredictBeforeReveal
   question="At n=30 qubits, roughly how much memory does exact state-vector simulation need to store every amplitude?"
@@ -115,7 +107,15 @@ is an exact, computed curve, not a rough estimate.
   explanation="17.2 GB at 30 qubits, already beyond a typical laptop's RAM. The curve climbs from 16.8 MB at n=20 to 18.0 PB at n=50, purely from the amplitude count doubling with every added qubit (2ⁿ). Slide the Explorer below up to n=30 and check its caption against this number."
 />
 
-<InteractiveSection title="Feel the exponential wall yourself" description="Slide n from 10 up to 50 qubits, then toggle between a log10 scale (readable at every n, but smooths the climb into a gentle slope) and a linear scale (unreadable at large n, but the one that actually looks like a wall). Captions always show the real numbers, computed live by this platform's own stateVectorAmplitudeCount and stateVectorMemoryBytes, the exact same functions behind the 16.8 MB, 17.2 GB, and 18.0 PB figures quoted above.">
+<Callout type="note">
+**A preview of the exact numbers.** That later lesson computes this
+precisely via `stateVectorMemoryBytes`: about 16.8 MB at 20 qubits (a
+laptop handles this easily), already 17.2 GB at 30 qubits, and 18.0 PB
+at 50 qubits, beyond any existing classical system's storage. The wall
+is an exact, computed curve, not a rough estimate.
+</Callout>
+
+<InteractiveSection title="Feel the exponential wall yourself" description="Slide n from 10 up to 50 qubits, then toggle between a log10 scale (readable at every n, but smooths the climb into a gentle slope) and a linear scale (unreadable at large n, but the one that actually looks like a wall). Captions always show the real numbers, computed live by this platform's own stateVectorAmplitudeCount and stateVectorMemoryBytes, the same functions behind the 16.8 MB, 17.2 GB, and 18.0 PB figures quoted above.">
   <ToggleView
     options={["Log scale", "Linear scale"]}
     ariaLabel="Choose the vertical scale for the state-vector cost chart"
@@ -147,17 +147,17 @@ is an exact, computed curve, not a rough estimate.
           }))}
         />
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">
+      <div className="mt-2 text-xs text-muted-foreground">
         Bars for n = 35 and above run off the top of this chart, clipped at
         the border. That is the wall, not a rendering bug: the axis is fixed
         to n = 30&apos;s memory requirement (about 17.2 GB), so nothing past
         it fits on screen. Fine, fine, fine, then gone.
-      </p>
+      </div>
     </div>
   </ToggleView>
 </InteractiveSection>
 
-## Physical Interpretation
+## Two Tools That Fail in Opposite Directions
 
 Simulators and real hardware fail in *opposite* ways: a simulator is
 perfectly accurate (no physical error) but limited by classical memory,
@@ -168,7 +168,7 @@ physical error and limited access. Neither is simply "better." The
 right choice depends on the specific development stage and question
 being asked.
 
-## Worked Example
+## Choosing the Target for a Given Job
 
 **A researcher is debugging a new 4-qubit circuit's logic. Should they
 use a simulator or real hardware?**
@@ -176,13 +176,13 @@ use a simulator or real hardware?**
 Simulator. At 4 qubits the state is 16 amplitudes ($2^4$), so exact
 simulation costs nothing worth measuring. It returns the ideal
 probabilities rather than sampled counts, it runs immediately with no
-queue, and — the decisive point at this stage — it contributes no
-physical error of its own, so any deviation from what the circuit should
-do is a bug in the circuit. Hardware becomes the right target later,
+queue, and, the decisive point at this stage, it contributes no physical
+error of its own, so any deviation from what the circuit should do is a
+bug in the circuit. Hardware becomes the right target later,
 once the logic is settled and the question changes to how the circuit
 holds up under real physical conditions.
 
-## Common Mistakes
+## Debugging Logic Against Noise
 
 <Callout type="note">
 **Assuming real hardware is always the "more real" or "better" choice.**
@@ -203,15 +203,200 @@ increase.
 
 1. List three practical constraints real hardware has that a local
    simulator does not.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Queue time.** A quantum computer is one physical machine in one
+   building, shared among everyone with access, so a job waits before it
+   runs. A simulator is a process you start, and it starts now.
+
+   **A fixed qubit-count ceiling.** A device has the number of physical
+   qubits it was built with, and no amount of patience adds one. A
+   simulator's limit is memory, which is a different kind of wall and one
+   you can push on by renting a bigger machine, at least for a few more
+   qubits.
+
+   **Connectivity constraints.** Real hardware typically supports
+   two-qubit gates only between specific physical pairs, so a circuit
+   asking for a gate between distant qubits has to be routed with extra
+   SWAP gates before it can run. A simulator applies a CNOT between any
+   two indices at the same cost.
+
+   Several more belong on the list if you want them. Physical error on
+   top of shot noise, which the rest of this lesson is about. Cost, since
+   hardware access is often metered per shot. Calibration drift, so a
+   circuit submitted today and run after a queue may meet a differently
+   calibrated device. And the loss of introspection: on a simulator you
+   can print the state after every gate, and on hardware you cannot look
+   at an intermediate state without destroying it.
+
+   The wrong turn is putting "it is noisy" as all three entries in
+   different words. Noise is one constraint, and the three above are
+   logistical and architectural rather than physical. A perfectly
+   noiseless quantum computer would still have a queue, a fixed qubit
+   count, and a connectivity graph.
+
+   </details>
+
 2. How many complex amplitudes does an exact state-vector simulation of
    a 20-qubit circuit require? (Express as a power of 2, and roughly in
-   scientific notation.)
+   scientific notation.) Then state the memory that implies, and what
+   ten more qubits would cost.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   2^{20} = 1{,}048{,}576 \approx 1.05\times10^{6} \text{ complex amplitudes.}
+   $$
+
+   `stateVectorAmplitudeCount(20)` returns exactly 1,048,576.
+
+   In memory that is about 16.8 MB, at 16 bytes for a complex number
+   stored as two 64-bit floats, which any laptop holds without noticing.
+
+   The reason for $2^n$ rather than anything smaller is worth restating,
+   because it is the fact the whole Simulating Quantum Systems course
+   turns on. A general $n$-qubit state assigns an independent complex
+   amplitude to every one of the $2^n$ computational basis strings, and
+   there are $2^n$ of those because each qubit contributes a binary
+   choice. The count is a property of quantum mechanics, not of this
+   engine.
+
+   And a million amplitudes for twenty qubits is the *comfortable* end of
+   the curve. Ten more qubits multiplies it by $2^{10}$: at $n=30$ it is
+   $1.07\times10^{9}$ amplitudes and about 17.2 GB, past a typical
+   laptop. Twenty more beyond that gives about 18.0 PB at $n=50$.
+
+   The wrong turn is reading "20 qubits" as a small problem because the
+   number 20 is small. In an exponential the input is the exponent, and
+   intuitions calibrated on the base do not transfer. The useful habit is
+   to convert every qubit count into its amplitude count before reasoning
+   about whether something is feasible.
+
+   </details>
+
 3. For the worked example's 4-qubit debugging scenario, explain
    specifically why hardware noise would make it HARDER, not easier, to
-   isolate an actual circuit-logic bug.
+   isolate a circuit-logic bug. Then say what simulating 4 qubits
+   actually costs, and what that settles about the tradeoff.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because it breaks the inference the debugging depends on.
+
+   On a noiseless simulator, the reasoning is a clean implication: the
+   only thing that could make the output differ from what the circuit
+   should produce is the circuit. Deviation means bug. That single
+   implication is the entire value of a simulator at this stage, and it
+   is not a convenience, it is what makes the observation informative at
+   all.
+
+   On hardware the implication becomes a disjunction: deviation means bug
+   *or* noise, and the returned counts do not say which. Separating them
+   requires characterizing the device's error independently, or comparing
+   against a simulator, which is the tool you declined to use.
+
+   Three specific ways the ambiguity bites.
+
+   **Noise masks a bug.** A small logic error, a rotation slightly off or
+   a gate on the wrong qubit, shifts the distribution by an amount that
+   can sit comfortably inside the noise floor. On a simulator the same
+   error is visible immediately, because there is no floor.
+
+   **Noise mimics a bug.** Readout error and decoherence put counts into
+   outcomes that should have probability zero. That is exactly the
+   signature a miswired gate produces, so the most useful diagnostic
+   available, which outcomes appeared that should not have, stops
+   discriminating.
+
+   **Results stop being reproducible.** Hardware error drifts between
+   calibrations, so the same circuit submitted twice gives measurably
+   different distributions. Debugging is the practice of changing one
+   thing and seeing what changes, and it needs everything else to hold
+   still.
+
+   There is also a tooling loss. On a simulator you can read the state
+   after every gate and see exactly where the circuit first departs from
+   expectation. On hardware, measuring an intermediate state destroys it,
+   so the equivalent means running a separate truncated circuit for each
+   prefix, and each of those returns sampled statistics rather than a
+   state.
+
+   And nothing is being paid for the simulator's advantages. At 4 qubits
+   the state is 16 amplitudes, 256 bytes. There is no cost, no queue, and
+   no scale argument on the other side.
+
+   The wrong turn is the appeal to realism: hardware is the real thing,
+   so surely testing on it is more honest. It is more honest about a
+   different question. "Does my circuit compute what I meant?" and "does
+   my circuit survive this device?" are two questions, and answering the
+   second before the first means debugging two unknowns at once.
+
+   </details>
+
 4. Explain why simulators and real hardware are described as failing in
    "opposite ways," rather than one simply being more limited than the
    other overall.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because each one's limitation is the direct cost of the other one's
+   strength, and the two limits sit on different axes.
+
+   **A simulator is exact and pays in memory.** It does honest linear
+   algebra, so its answer is right to floating-point precision and no
+   physical error enters anywhere. Being exact is precisely what makes it
+   expensive: representing a general $n$-qubit state requires holding all
+   $2^n$ amplitudes, so the binding limit is *width*. Somewhere in the
+   forties of qubits it stops, and no realistic hardware upgrade moves
+   that far, since a thousandfold more memory buys just under ten more
+   qubits.
+
+   **Hardware has no memory wall and pays in error.** It does not store
+   amplitudes anywhere; it *is* the state. That is why an extra qubit
+   costs one more qubit rather than doubling anything. And being a
+   physical system means being coupled to a physical environment, so
+   every gate is a real operation with a real error rate, and the binding
+   limit is *depth against error rate*, the $p^N$ compounding of the
+   hardware course.
+
+   So the two strengths and the two weaknesses are the same two facts
+   read twice. The simulator is exact because it holds the numbers, and
+   expensive for the same reason. The device is cheap in memory because
+   it holds nothing, and noisy for the same reason.
+
+   Three ways this question is commonly answered wrongly, each of which
+   collapses that structure.
+
+   Reversing which one is exact: "simulators approximate to stay fast,
+   hardware is exact because it is the physics." An exact state-vector
+   simulator approximates nothing, and hardware is subject to $T_1$,
+   $T_2$, crosstalk and readout error.
+
+   Collapsing the two limits into one: "both run out at qubit count."
+   Qubit count binds the simulator. What binds the device is how deep a
+   circuit it can run before error accumulates, and a device with plenty
+   of qubits can be useless at depth.
+
+   Or attributing the wrong failure to each: floating-point rounding is
+   deterministic and vastly smaller than shot noise, and hardware never
+   pays a $2^n$ storage cost.
+
+   One qualification, so the contrast is not overdrawn. "No memory limit"
+   is scoped to memory. Adding physical qubits still costs control lines,
+   cooling power and fridge space, which the Scaling Challenges lesson
+   works out in detail. That cost is linear rather than exponential, and
+   linear is not free.
+
+   The practical upshot is that neither substitutes for the other, and
+   the honest workflow uses both: the simulator to establish that the
+   circuit is right, the device to find out whether it survives.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -226,7 +411,7 @@ increase.
   depends on development stage: simulators for isolating logic bugs at
   small qubit count, hardware for evaluating real physical performance.
 
-## Further Exploration
+## Simulating the Noise on Purpose
 
 <NextDiscovery>
 This closes **Programming Quantum Computers**. The next course,

@@ -1,46 +1,87 @@
 import type { NumericProblem } from "@/lib/problems/types";
 
+/** Nodes fix the quantum number; the quantum number fixes the energy. */
+const nodes = 6;
+const n = nodes + 1;
+const value = n ** 2;
+
 export const infiniteWellNodeCount: NumericProblem = {
   meta: {
     slug: "infinite-well-node-count",
-    title: "Counting Nodes in an Infinite Well Eigenstate",
+    title: "From a Node Count to an Energy",
     course: "wave-mechanics",
     lesson: "quantum-mechanics/wave-mechanics/the-infinite-square-well",
-    difficulty: "beginner",
-    estimatedMinutes: 4,
+    difficulty: "intermediate",
+    estimatedMinutes: 6,
     problemType: "numeric",
-    tags: ["infinite-square-well", "eigenstates"],
+    tags: ["infinite-square-well", "eigenstates", "energy-levels"],
     prerequisites: ["quantum-mechanics/wave-mechanics/the-infinite-square-well"],
   },
   question: {
     type: "numeric",
-    prompt: "The n-th infinite well eigenstate is psi_n(x) = sqrt(2/L)*sin(n*pi*x/L). How many internal nodes (zero crossings strictly inside the well, not counting the boundaries) does psi_5 have?",
+    prompt:
+      "An infinite-well eigenstate is sketched and found to cross zero 6 times strictly inside the well, not counting the two walls. Its energy is what multiple of that well's ground-state energy?",
     inputHint: "an integer",
   },
   answer: {
     type: "numeric",
-    value: 4,
+    value,
     tolerance: 0.001,
-    incorrectFeedback: "sin(n*pi*x/L) crosses zero n-1 times strictly between the boundaries — count where n*pi*x/L equals pi, 2*pi, ..., (n-1)*pi.",
+    incorrectFeedback:
+      "Two steps have to happen in order, and skipping either one lands somewhere plausible. The node count identifies which eigenstate this is; only then does the level formula convert that label into an energy, and it does not do so linearly.",
     nearMisses: [
-      { value: 5, feedback: "5 is n itself, or the count with one boundary included. Both walls are forced zeros by the boundary conditions and do not count as internal nodes." },
-      { value: 6, feedback: "6 counts all n+1 zeros, including both walls. The question asks only for the ones strictly inside." },
+      {
+        value: 36,
+        feedback:
+          "36 squares the node count itself. The walls are forced zeros too, so a state crossing zero 6 times inside is not the 6th eigenstate.",
+      },
+      {
+        value: 7,
+        feedback:
+          "7 is the quantum number, which is the right halfway point. The energy is not proportional to it, so one step remains.",
+      },
+      { value: 6, feedback: "6 is the node count handed back. Neither of the two steps has been taken yet." },
+      {
+        value: 64,
+        feedback:
+          "64 comes from n=8, which counts the walls as internal nodes as well. Only the crossings strictly between them were counted.",
+      },
     ],
   },
   hints: [
-    { text: "sin(theta) is zero at theta = 0, pi, 2*pi, 3*pi, ... — the endpoints theta=0 and theta=n*pi are the well's boundaries, not internal nodes." },
-    { text: "Count the zeros strictly between theta=0 and theta=n*pi." },
+    {
+      text: "A sine that vanishes at both walls has its zeros evenly spaced across the well, and two of those zeros are the walls themselves. That relationship is what turns a node count into a quantum number.",
+    },
+    {
+      text: "Work out the quantum number first. Then recall what the level formula attaches to it, and note that the ground state is the same formula at n=1.",
+    },
+    {
+      text: "Forming the ratio against the ground state cancels the width and every constant, leaving a pure number built from the two quantum numbers. Check what power the formula puts on them.",
+    },
   ],
   solution: {
     steps: [
-      { description: "$\\sin(n\\pi x/L)=0$ at $x=0, L/n, 2L/n, \\ldots, L$ — that's $n+1$ zeros total, including both boundaries." },
-      { description: "Excluding the two boundary zeros leaves $n-1$ internal nodes.", latex: "n-1 = 5-1 = 4" },
+      {
+        description:
+          "$\\sin(n\\pi x/L)$ vanishes at $x = 0, L/n, 2L/n, \\ldots, L$: that is $n+1$ zeros, of which two are the walls. So a state with 6 internal nodes has $n-1 = 6$.",
+        latex: "n = 7",
+      },
+      {
+        description: "Energies go as the square of the quantum number, and the ground state is the same expression at $n=1$.",
+        latex: "\\frac{E_7}{E_1} = \\frac{7^2\\pi^2\\hbar^2/(2mL^2)}{1^2\\pi^2\\hbar^2/(2mL^2)} = 7^2",
+      },
+      { description: "Every constant, and the width with them, cancels in the ratio." },
     ],
-    finalAnswer: "$4$ internal nodes",
+    finalAnswer: "$49$ times the ground-state energy.",
   },
   explanation: {
-    correctIdea: "The n-th eigenstate has exactly n-1 internal nodes — more nodes for higher energy levels.",
-    whyCorrect: "Direct counting of sin's zeros within the well, excluding the two boundary zeros that are required by the boundary conditions anyway.",
-    whyWrong: ["Counting all n+1 zeros including the two boundaries (reporting 6 instead of 4) miscounts what 'internal' means in the question."],
+    correctIdea:
+      "A node count is a complete label for an infinite-well eigenstate: it fixes n, and n fixes everything else about the state, including an energy that grows as its square.",
+    whyCorrect:
+      "Counting nodes is how the shape of a numerically-computed eigenstate is identified in practice, since the solver returns a vector of numbers rather than a quantum number. The n² growth is then what makes highly excited states so much stiffer to resolve on a grid: each successive level adds more oscillation into the same width.",
+    whyWrong: [
+      "Reading the node count as n directly forgets that the two walls are zeros as well, which puts the state one rung too low.",
+      "Reporting 7 stops at the quantum number. The prompt asks for an energy, and energy is not linear in n.",
+    ],
   },
 };

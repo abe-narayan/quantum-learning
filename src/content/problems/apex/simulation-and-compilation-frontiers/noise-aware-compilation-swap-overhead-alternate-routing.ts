@@ -62,12 +62,12 @@ export const noiseAwareCompilationSwapOverheadAlternateRouting: NumericProblem =
   },
   explanation: {
     correctIdea:
-      "Only the pairs that are NOT already physically adjacent under the chosen mapping contribute SWAP overhead, and the amount each contributes depends purely on how far apart they sit on the chain, exactly the same 2(d-1) formula the lesson's own five-interaction example used.",
+      "Only the pairs that are not already physically adjacent under the chosen mapping contribute SWAP overhead, and the amount each contributes depends only on how far apart they sit on the chain, via the same 2(d-1) formula the lesson's own five-interaction example used.",
     whyCorrect:
-      "This is the identical method the lesson applied, run on a different set of required interactions: (q0,q3) is the chain's worst-case pair (the two endpoints), so it dominates the total even though it's only one of five interactions.",
+      "This is the method the lesson applied, run on a different set of required interactions. (q0,q3) is the chain's worst-case pair, the two endpoints, so it dominates the total even though it is only one of five interactions.",
     whyWrong: [
-      "Counting d-1 SWAPs per pair instead of 2(d-1) halves the total to 3: the formula is doubled because each qubit walked toward its partner has to be walked back afterwards, or the mapping the rest of the circuit assumes is destroyed.",
-      "Using d instead of d-1 in the formula (i.e. 2d) overstates the cost: bridging a gap of distance d only requires walking d-1 intermediate steps each way, not d.",
+      "Counting d-1 SWAPs per pair instead of 2(d-1) halves the total to 3. The formula is doubled because each qubit walked toward its partner has to be walked back afterwards, or the mapping the rest of the circuit assumes is destroyed.",
+      "Using d instead of d-1 in the formula (that is, 2d) overstates the cost. Bridging a gap of distance d requires walking d-1 intermediate steps each way, not d.",
     ],
   },
 };

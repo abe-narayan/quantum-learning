@@ -16,10 +16,10 @@ export const higherFrequencyLowerOccupation: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "At a FIXED temperature, does increasing the qubit's transition frequency ω make thermal photon occupation n̄ larger or smaller?",
     options: [
-      { id: "a", text: "Smaller: raising ω raises ħω/k_BT, so the exponential in the denominator grows" },
+      { id: "a", text: "Smaller: raising ω raises the ratio ħω/k_BT, so the exponential in the denominator grows" },
       { id: "b", text: "Larger: a higher-frequency mode carries more energy per photon, so it holds more thermal energy" },
-      { id: "c", text: "No effect: n̄ is fixed by the fridge temperature alone, with ω entering only the qubit's gate speed" },
-      { id: "d", text: "Larger: ħω sits in the numerator of the exponent, and n̄ grows with the exponent" },
+      { id: "c", text: "No effect: n̄ is set by the fridge temperature alone, with ω fixing only the qubit's gate speed" },
+      { id: "d", text: "Smaller: n̄ falls because a higher-frequency photon leaks away into the fridge's cold stages faster" },
     ],
   },
   answer: {
@@ -28,7 +28,7 @@ export const higherFrequencyLowerOccupation: MultipleChoiceProblem = {
     optionFeedback: {
       b: "Energy per photon is not occupation. n̄ counts how many photons the bath puts in the mode, and a mode costing more per photon is harder for a fixed k_BT to populate, not easier.",
       c: "n̄ depends on ω and T together, through the single ratio ħω/k_BT. Holding T fixed and moving ω moves n̄.",
-      d: "The exponent grows, but it grows in the denominator: n̄ = 1/(exp(ħω/k_BT) − 1), so a larger exponent pushes n̄ down, not up.",
+      d: "Right direction, wrong mechanism. This is a statement about T1, how fast an already-present excitation leaves. n̄ is the steady-state count the bath maintains, and it is set by ħω/k_BT alone.",
     },
     defaultIncorrectFeedback: "Raising ω raises ħω/k_BT, which makes exp(ħω/k_BT) larger, which makes n̄ = 1/(exp(ħω/k_BT) − 1) smaller.",
   },
@@ -43,11 +43,11 @@ export const higherFrequencyLowerOccupation: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Thermal occupation is set by the ratio ħω/k_BT, so at fixed temperature a higher-frequency mode is quieter, not noisier.",
-    whyCorrect: "Follows from the structure of the Bose-Einstein formula: ω enters only through an exponential in the denominator.",
+    whyCorrect: "In the Bose-Einstein formula ω appears only inside exp(ħω/k_BT), which sits in the denominator. Raising ω at fixed T therefore drives that denominator up and n̄ down: a higher-frequency mode is one the bath can afford to populate less often.",
     whyWrong: [
       { optionId: "b", text: "Trades occupation for energy per photon. A costlier photon is one the bath supplies less often." },
       { optionId: "c", text: "Drops ω from the formula. It appears there alongside T, in the ratio ħω/k_BT." },
-      { optionId: "d", text: "Gets the direction of the exponent right and its position wrong. It grows the denominator, which shrinks n̄." },
+      { optionId: "d", text: "Lands on the right direction through a decay-rate argument. n̄ is a steady-state occupation, not a rate, and the Bose-Einstein formula reaches it with no reference to how fast excitations leave." },
     ],
   },
 };

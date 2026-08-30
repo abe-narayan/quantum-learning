@@ -1,4 +1,17 @@
-# QuantumLearn — Performance & Build Audit
+# StudyQuantum — Performance & Build Audit
+
+> **This file is a findings log, not a guide.** It records measured build and
+> bundle numbers from specific runs, each dated, plus the punch list that
+> came out of them. **Nothing in it is a rule.** The performance rules that
+> bind live in [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) §10 (the client-bundle
+> boundary and its budgets) and [`DEPLOYMENT.md`](DEPLOYMENT.md) (the build's
+> memory profile).
+>
+> **Every number here belongs to the run it was taken in.** Sections B, H and
+> I are measurement records and are appended to over time rather than
+> rewritten; do not update a number in place, and do not assume a figure from
+> one run is comparable to one from another unless the run says so. §G now
+> carries a dated code-inspection status for each of its open items.
 
 Run: 2026-08-26. First production build (`npm run build`, Next.js 16.3.2 /
 Turbopack) of this sprint's visual reinvention, against a tree with other
@@ -254,7 +267,11 @@ that looks like in practice for the Hero's explorer specifically.
   built (two CSS chunks). No `backdrop-filter` anywhere in the file (grep
   returned zero matches) — consistent with §4 of `DESIGN_SYSTEM.md` ("No
   glassmorphism. No blur stacks over the canvas field."). No universal `*`
-  selector overrides found.
+  selector overrides found. *(The line count is from this run and has since
+  grown substantially, because a later design-system sprint added the type,
+  tracking, container and rhythm token scales. The zero-`backdrop-filter`
+  property still holds, re-checked 2026-08-29; the built size has not been
+  re-measured here.)*
 - Fonts: see §B — self-hosted, subset, Unicode-range-split, Fraunces limited
   to three axes. No `fonts.googleapis.com`/`fonts.gstatic.com` in the CSP or
   in any built output.
@@ -321,6 +338,33 @@ manufacturing a change.
 Nothing above blocks shipping — the build is green, every route is static,
 and the field/motion machinery this sprint most put at risk is built
 correctly.
+
+> **Status of this list, re-checked against the code 2026-08-29** (code
+> inspection only, with no numbers re-measured, so nothing below contradicts
+> any measurement in §B, §H or §I):
+>
+> 1. **`ReadingProgressBar.tsx`: resolved.** It now drives off
+>    `useScrollSubscription` rather than a private `scroll`/`resize` pair,
+>    and computes `top - scrollY` instead of calling
+>    `getBoundingClientRect()` per frame. It still re-measures on `resize`,
+>    which is the correct remaining listener rather than the duplicate one
+>    the finding named.
+> 2. **`Hero.tsx` bundle: addressed in §H**, which measured what was
+>    actually in the chunk rather than inferring it, and shipped the
+>    `DailyPuzzle` client/server split. See §H.1–§H.3 and §I for the numbers;
+>    they are not restated here.
+> 3. **`TableOfContents.tsx`: resolved.** One `IntersectionObserver`, not
+>    two.
+> 4. **Static-generation timeouts: superseded, not fixed as written.** The
+>    suggested levers (`staticGenerationMaxConcurrency`,
+>    `staticGenerationRetryCount`) are not set in `next.config.ts`. What
+>    happened instead is a much larger build-memory effort against a
+>    different root cause (the corpus being held in memory per worker), and
+>    that work is documented in [`DEPLOYMENT.md`](DEPLOYMENT.md) and
+>    `ARCHITECTURE.md` §5, not here. `next.config.ts` now carries
+>    `enablePrerenderSourceMaps: false` and
+>    `experimental.turbopackRustReactCompiler` for the same campaign. Read
+>    `DEPLOYMENT.md` before touching build concurrency.
 
 ---
 
@@ -572,3 +616,596 @@ matching `workedSolution`/`whyCorrect` are 7 KB and 11 KB gzip — the
 `SolutionPanel`/`HintPanel` *component code* that reads those fields, not the
 data. `src/lib/design/__tests__/clientBoundary.test.ts` now enforces this by
 walking the real import graph from every `"use client"` entry point.
+
+---
+
+## J. End-of-sprint build & performance audit (2026-08-29, measured)
+
+Run against the tree as it stood at the close of the ~20-agent sprint, with
+other agents still writing under `src/components/**` and `src/content/**`.
+Everything below is measured on this machine (Node 24.19.0, 7 static-generation
+workers) unless a line says otherwise. **Result: green.** Two builds, exit 0,
+821/821 routes; 100 test files / 1504 tests passing; every budget in the repo
+still under its ceiling.
+
+*Provenance:* the tree kept moving throughout — 113 files under `src/` were
+written between the cold build's `prebuild` and the end of this audit,
+`lib/content/curriculum.ts` among them. Every budget in §J.4 was re-measured
+after the last of those writes and came back byte-identical, so the numbers
+below describe the tree as it stands, not a snapshot that has since drifted.
+
+### J.1 — Build, cold and warm
+
+Cold = `.next` deleted entirely first. Warm = immediately after, reusing
+`.next/cache/turbopack`. Peak memory is the summed working set of every `node`
+process, sampled at 700 ms — an over-estimate, since shared pages are counted
+once per worker.
+
+| Phase | Cold | Warm | §I / earlier-sprint baseline (cold) |
+| --- | --- | --- | --- |
+| `prebuild` generate (3 scripts) | ~4s | ~4s | — |
+| Compile (Turbopack) | **27.6s** | **9.4s** | 31.6s |
+| TypeScript | **13.8s** | **8.0s** | 13.9s |
+| Static generation (821 pages) | **44s** | **54s** | 36.7s |
+| Wall clock, `npm run build` | **113.2s** | **114.5s** | — |
+| Peak node RSS (all workers) | **3451 MB** | 2911 MB | ~3.1 GB (architecture note) |
+| Peak node RSS (single worker) | 1936 MB | 971 MB | — |
+| `.next/cache` after | **213.3 MB** | — | 210 MB |
+| `.next` total | 771.7 MB | — | — |
+
+No errors, no warnings, and — unlike the §A run — **no 60-second prerender
+retries at all**. The `Failed to build … (attempt 1 of 3)` contention §A
+recorded did not reproduce on either build.
+
+Route count is exactly right: `prerender-manifest.json` lists **821** routes —
+219 lessons, 547 problems, 32 courses, 23 other. 815 of them emit an `.html`
+file; the remaining six are the non-HTML routes (`robots.txt`, `sitemap.xml`,
+`manifest.webmanifest`, `favicon.ico`, `opengraph-image`, `apple-icon`).
+
+Two things worth noting rather than acting on. Warm builds save 18.2s in
+compile and 5.8s in TypeScript and give it all back in static generation
+(+10s), which is re-run in full every time and is the phase that dominates:
+wall clock is within 1.3s across the two. And static generation is the noisy
+phase — 44s vs 36.7s vs 54s across three runs of the same corpus is machine
+load, not a regression in any one concern.
+
+### J.2 — The build-memory invariants, re-verified
+
+All four hold. Checked, not assumed:
+
+1. **Generated registries are never executed at build time.** All three
+   (`lessonMeta.generated.ts`, `problemMeta.generated.ts`,
+   `registry.generated.ts`) are produced by `scripts/lib/extract.mjs`, which
+   brace-scans the source text and evaluates *only the extracted literal*
+   (`new Function('"use strict"; return (' + literal + ');')`, extract.mjs:270)
+   — never the surrounding module. The two meta registries import nothing but
+   a type.
+2. **Nothing imports the whole corpus.** The only `import()` of a compiled
+   `.mdx` module in the entire tree is the pair inside `loadLesson()`
+   (`src/lib/content/lessons.ts:74,82`), reached only from
+   `app/lessons/[...slug]/page.tsx`. Every other consumer —
+   `getAllLessonsMeta()` in the root-layout `Footer`, 14 catalog pages, both
+   problem routes — reads `LESSON_METAS`, a plain array.
+3. **`rehypeKatexHtml.mjs` is still in the pipeline and still collapsing.**
+   Wired in `next.config.ts` (absolute path) and in `vitest.config.mts`, so
+   tests exercise the real pipeline. It still emits
+   `{type: mdxJsx*Element, name: "KatexHtml", attributes: [html], children: []}`
+   — one node, no descendants (rehypeKatexHtml.mjs:145–149). Measured directly
+   by compiling three of the heaviest lessons through both pipelines:
+
+   | Lesson | With `rehypeKatexHtml` | With plain `rehype-katex` |
+   | --- | --- | --- |
+   | `three-dimensional-scattering-and-the-s-matrix` | 210.8 KB, 194 JSX calls, 122 `<KatexHtml/>` | 655.7 KB, 4,843 JSX calls |
+   | `quantum-signal-processing` | 447.4 KB, 547 JSX calls, 312 `<KatexHtml/>` | 1,455.3 KB, 10,777 JSX calls |
+   | `hamiltonian-simulation-and-trotterization` | 432.4 KB, 443 JSX calls, 255 `<KatexHtml/>` | 1,361.4 KB, 10,063 JSX calls |
+   | **Total** | **1,090.5 KB / 293 ms** | **3,472.4 KB / 761 ms** |
+
+   **3.18× the compiled JS and 2.60× the compile time** if it were removed, on
+   these three files. The lever is intact.
+4. **`src/mdx-components.tsx` is under its ≤30 budget.** The count the test
+   actually makes (`importedNames`, mdxMapping.test.ts:114) is **27 of 30** —
+   25 component imports plus two erased type-only imports — for 26 mapped
+   entries (25 imports + the local `Table`). **Headroom: 3 more import
+   statements, or 5 more components.** Tighter than it reads, because the
+   budget counts import statements and two of the 27 ship nothing.
+
+### J.3 — What ships to the browser
+
+Measured by parsing the emitted HTML of each route for `<script src>`,
+`rel=preload as=script` and `modulepreload`, then gzipping the referenced files
+at level 9. This is ground truth per route, not a manifest estimate — Next 16
+no longer prints the size columns in the route table.
+
+One correction the numbers need: the 110.0 KB / 38.6 KB gz polyfill chunk is
+emitted with `noModule`, so **no modern browser downloads it**. Both figures
+are given.
+
+| Route | Files | Raw | First Load JS (gz) | …minus `noModule` polyfill | Route-owned (gz) | CSS (gz) |
+| --- | --- | --- | --- | --- | --- | --- |
+| `/` | 12 | 916.4 KB | 289.1 KB | **250.5 KB** | 123.4 KB | 26.0 KB |
+| lesson (`/lessons/…/what-is-a-qubit`) | 14 | 925.2 KB | 292.7 KB | **254.1 KB** | 127.0 KB | 26.0 KB |
+| problem (`/problems/…`) | 14 | 941.0 KB | 297.4 KB | **258.8 KB** | 131.7 KB | 26.0 KB |
+| `/simulators` | 14 | 907.6 KB | 286.5 KB | **247.9 KB** | 120.8 KB | 26.0 KB |
+| `/problems` (heaviest realistic) | 16 | 986.1 KB | 311.5 KB | **272.9 KB** | 145.8 KB | 26.0 KB |
+| `/map` (lightest content route) | 13 | 905.7 KB | 285.5 KB | **246.9 KB** | 119.9 KB | 26.0 KB |
+| mean, all 815 pages | — | — | 296.0 KB | **257.4 KB** | — | 26.0 KB |
+
+The shared chunk — the five files present on literally every emitted page — is
+**539.6 KB raw / 165.7 KB gz**, or **127.1 KB gz** discounting the `noModule`
+polyfill:
+
+| Chunk | Raw | gz | What it is |
+| --- | --- | --- | --- |
+| `354-*.js` | 228.9 KB | 71.5 KB | React + React DOM |
+| `0gpuh00-*.js` | 158.0 KB | 42.9 KB | Next App Router client runtime |
+| `0cz1d0mv5g_q7.js` | 110.0 KB | 38.6 KB | polyfills — **`noModule`, not fetched by modern browsers** |
+| `3qq9fjtagffmo.js` | 32.1 KB | 8.6 KB | bootstrap |
+| `turbopack-*.js` | 10.7 KB | 4.2 KB | chunk loader |
+
+Spread across route shapes is small: 246.9 → 272.9 KB gz, a 26 KB band. There
+is no outlier route.
+
+**KaTeX has not crept back.** The runtime is exactly one chunk —
+`2seuyohx86c8u.js`, 257.3 KB raw / **74.7 KB gz** — and it is referenced from
+**0 of 815** emitted HTML files. It is reachable only as a lazily-loaded chunk
+(`Promise.all(["…2seuyohx86c8u.js"].map(e.l))`) behind
+`EquationReveal.tsx`'s `import("katex")` misuse-fallback. `KATEX_IN_EAGER_CLIENT_GRAPH`
+in clientBoundary.test.ts is still `{}`, and the byte-parity suite
+(`src/components/problems/__tests__/renderedMath.test.ts`, 4 assertions across
+the whole 547-problem corpus against `MathText`, the pre-refactor
+`ScrollableMathText`, and `KatexMath`) passes.
+
+Nor has anything else crept back. Scanning all 65 emitted client JS files
+(2,223.7 KB raw / 744.3 KB gz total) for corpus fingerprints:
+
+| Fingerprint | Chunks |
+| --- | --- |
+| `meta:{slug` (serialized `Problem`) | **0** (0 occurrences) |
+| `workedSolution` | **0** |
+| `LESSON_METAS` / `PROBLEM_METAS` | **0** |
+| glossary definitions | **0** |
+| inlined search index | **0** |
+
+### J.4 — Every budget in the repo, with its headroom
+
+| Budget | Ceiling | Now | Headroom | Owner |
+| --- | --- | --- | --- | --- |
+| Client-reachable data total | 100 KB gz | **92.7 KB** (87 modules) | 7.3 KB (7.3%) | clientBoundary.test.ts |
+| `lib/content/curriculum.ts` | 12 KB | **11.58 KB** | **0.42 KB (3.5%)** | clientBoundary.test.ts |
+| `lib/content/concepts.ts` | 14 KB | 12.79 KB | 1.21 KB | clientBoundary.test.ts |
+| `lib/content/currentQuantum/metaRegistry.ts` | 4 KB | 2.83 KB | 1.17 KB | clientBoundary.test.ts |
+| `components/layout/problemPillarIndex.ts` | 9 KB | 7.08 KB | 1.92 KB | clientBoundary.test.ts |
+| `lib/content/types.ts` | 1 KB | 0.43 KB | 0.57 KB | clientBoundary.test.ts |
+| `lib/problems/types.ts` | 2 KB | 1.07 KB | 0.93 KB | clientBoundary.test.ts |
+| `lib/content/progress` | 3 KB | 1.85 KB | 1.15 KB | clientBoundary.test.ts |
+| `lib/problems/progress` | 3 KB | 2.17 KB | 0.83 KB | clientBoundary.test.ts |
+| `search-index.json` raw | 560 KB | **539.8 KB** | **20.2 KB (3.6%)** | generate-search-index.mjs |
+| `search-index.json` gzip | 140 KB | **135.6 KB** | **4.4 KB (3.2%)** | clientBoundary.test.ts |
+| `mdx-components.tsx` imports | 30 | 27 | 3 | mdxMapping.test.ts |
+
+The search index is 552,732 bytes across 1,090 entries (272 glossary terms,
+219 lessons, 547 problems, plus courses/simulators/pillar links). **At the cap
+the build fails, not the test suite**: `MAX_INDEX_BYTES` is asserted inside
+`generate-search-index.mjs`, which runs as `prebuild`, so the generator throws
+and `next build` never starts. That is the correct failure mode and it is
+working; it is also the tightest ceiling in the repo in relative terms
+alongside `curriculum.ts`.
+
+Movement against the sprint baselines:
+
+| | Baseline | Now | Δ |
+| --- | --- | --- | --- |
+| Client-boundary total | 90.1 KB / 85 modules | 92.7 KB / 87 modules | **+2.6 KB, +2 modules** |
+| Tests | 1499 / 100 files | 1504 / 100 files | +5 tests, 0 failures |
+| Cold-build cache | 210 MB | 213.3 MB | +3.3 MB |
+
++2.6 KB against 7.3 KB of remaining headroom is the number to watch: at this
+sprint's rate, roughly three more sprints of this size consume the ceiling.
+
+### J.5 — Fonts: the built output matches what `layout.tsx` claims
+
+Verified against the emitted CSS and HTML, not the source comment.
+
+- **Exactly two `rel=preload as=font` tags on every page**: Geist latin
+  (23,108 B) and Geist Mono latin (29,288 B) = **51.2 KB**, against the
+  comment's stated 52.4 KB. Fraunces is **not** preloaded.
+- **Fraunces ships without SOFT/WONK.** Its latin subset is **67,388 B**,
+  matching the documented "opsz + wght = 67.3 KB" row and ruling out the
+  121.0 KB `opsz + SOFT + WONK + wght` file.
+- **`adjustFontFallback` did emit the metric overrides**, so `preload: false`
+  costs no layout shift. The built CSS contains, byte for byte, what the
+  comment says it does:
+  `@font-face{font-family:Fraunces Fallback;src:local(Times New Roman);ascent-override:84.71%;descent-override:22.09%;line-gap-override:0.0%;size-adjust:115.45%}`
+  (plus `Geist Fallback` and `Geist Mono Fallback` against `local(Arial)`).
+- 37 `@font-face` rules total, all three families at `font-display:swap`.
+
+### J.6 — Runtime characteristics, read statically
+
+**`QuantumField` — no layout read in the frame loop.** Confirmed by reading
+the whole effect. `getBoundingClientRect` appears exactly once, inside
+`measureStops()` (QuantumField.tsx:218), which is called from `resize()`, from
+the `ResizeObserver` on `document.documentElement`, and once at effect setup —
+never from `paint()` or `loop()`. `paint()` reads only the precomputed `stops`
+array, a `useRef` scroll position, and cached colors, so `journeyProgress()`
+costs an array scan and no synchronous layout. The `ResizeObserver` cannot
+loop, because `measureStops` writes nothing. It is also only constructed at all
+when `stops.length > 1`. Data-saver (`connection.saveData`) returns before the
+canvas context is even acquired; `prefersReducedMotion` paints exactly one
+frame and starts no loop, with `frame.time`, `frame.scroll` and `frame.scrollY`
+all pinned to 0.
+
+**`[data-reveal]` has four escape hatches, all intact.** (1) the `<noscript>`
+style block in `layout.tsx:152–154`; (2) the `prefers-reduced-motion` override
+in globals.css §11 (line 1342); (3) the print override in §12 (line 1442);
+(4) the `revealAfterMs = 2500` timer in `Reveal.tsx:148`. There is a fifth:
+when `IntersectionObserver` is undefined, `observe()` calls its handler
+synchronously so content reveals immediately, and the `released` flag added
+for that path is what keeps it from throwing a TDZ `ReferenceError`. Nothing
+here is broken.
+
+**Lazy simulator boundaries: 22 wrappers, every one with an error boundary and
+a skeleton, but the skeletons do not match the real components' heights.** All
+22 `Lazy*` files import both `SimulatorErrorBoundary` and `SimulatorSkeleton`;
+20 use `variant="standard"`, one `"hero"`, one `"heroWide"`. The shapes do not
+match, and this is structural rather than marginal:
+
+- The `standard` skeleton is a bare `.instrument` box at
+  `aspect-[4/3] sm:aspect-[2/1]` — it models *only the stage*. The real
+  component is `SimulatorInstrument` → `Instrument`, which adds a header row
+  (`px-5 py-2.5` + `border-b`, ≈37 px), body padding (`sm:p-5`, 40 px), and an
+  always-rendered `SimulatorFraming` block (`mt-6 pt-6` + a two-column
+  "What this shows"/"What to watch for" grid + a "Try this" list — no
+  `<details>`, never collapsed). Computing from the CSS at a 704 px column:
+  the skeleton is 352 px tall, while the real component's *non-stage chrome
+  alone* is ≈340 px before the canvas contributes a single pixel.
+- The `hero` skeleton pins `aspect-square` inside `max-w-sm`, i.e. 384 px. The
+  real `BlochSphereHeroExplorer` shares the wrapper classes exactly but is
+  content-sized: a square `max-w-xs` canvas (≈318 px) plus a `min-h-[2.5rem]`
+  narration line, a wrapping gate-button row (`min-h-11`), a bordered rotate
+  hint and a link, inside `sm:p-8` — ≈600 px.
+- `heroWide` pins `aspect-[16/10]`; `WavefunctionHeroExplorer` is an eyebrow,
+  an `sm:text-3xl` h2, a `min-h-11` preset row and a simulation block, and
+  carries no `shadow-sm` where the skeleton does.
+
+This matters more than "it's below the fold", because `useDeferredMount`'s
+first trigger is **idle-after-paint with `idleTimeoutMs = 1200`**, independent
+of visibility — every gated simulator on a page swaps within ~1.2 s of paint,
+not when scrolled to.
+
+*Caveat on the pixel figures:* no browser was available in this environment
+(the Chrome extension is not connected), so the heights above are computed
+from the CSS with stated assumptions, not measured. The **structural**
+claim — that the skeleton models the stage box only, while the real component
+adds an instrument header, body padding and an always-visible framing
+block — is certain from reading both files, and is the part that needs
+fixing. Whoever owns the simulator shell should measure the two in a browser
+and either give the skeleton the same chrome or drop the fixed aspect ratio
+for a `min-height` taken from the real component.
+
+### J.7 — The largest thing left, and it is not a regression
+
+`2q4cp180nuxzo.js` — **232.2 KB raw / 72.5 KB gz** — is an eager
+`<script async>` on **814 of 815** pages (all but `_global-error`), and is the
+single largest chunk any visitor actually downloads. Probing it for strings, it
+carries the MDX-mapped client visualization components (`StaticCircuitDiagram`,
+`BarChartExplorer`, `MatrixGridExplorer`, `InteractiveSection`,
+`EquationReveal` — it is the module that holds the dynamic edge to the KaTeX
+chunk), alongside `SimulatorSkeleton`/`SimulatorErrorBoundary`, the field
+regimes, the search UI, and the `lib/quantum` `Complex` kernel.
+
+The policy comment in `src/mdx-components.tsx` says every mapped component
+lands in "every lesson page's client bundle". The built output says the blast
+radius is wider than that: it lands on **every route**, including `/problems`
+and `/map`, which never render a lesson. Lesson-specific code is a separate
+7.0 KB chunk, so the visualization set is genuinely in the universal one.
+
+No prior per-route number exists in this document, so **this is not
+attributable to the sprint** — it is recorded here as the standing largest
+lever, with a number, for whoever owns the MDX mapping. Splitting it would take
+roughly 72 KB gz off `/problems`, `/map`, `/glossary` and the other non-lesson
+routes.
+
+### J.8 — Test state
+
+`npx vitest run`: **100 test files, 1504 tests, all passing**, exit 0, 76.88 s.
+No failures, no skips, nothing flaky, and nothing that looked like another
+agent mid-write. Against the 1499/100 baseline: +5 tests, same file count.
+
+---
+
+## K. Second verification pass, same day, later tree (2026-08-29, measured)
+
+A re-run of §J's checks several hours later, against a tree that had moved
+underneath it: **556 problems (was 547), 830 routes (was 821), 1,042
+uncommitted files**, and roughly a dozen agents still writing. Run on the same
+workstation, but **not under the same conditions**: a second agent's
+`next build` and `vitest run` were in flight when this pass began, the `next
+dev` server held 0.8–1.9 GB throughout, and the machine was contended for the
+whole window. **Wall-clock numbers here are therefore not comparable with
+§J's**; the memory and byte numbers are, and those are the ones this section is
+for.
+
+**Result: green, after two real breaks were found and fixed** (§K.2). Every
+budget still under its ceiling. Peak build memory *fell* against §J.
+
+*Method note, because it differs from §J's and matters for reproducing it:*
+Next 16 gives `next dev` its own tree (`.next/dev`), so "cold" here means
+deleting `.next/{cache,build,static,server,types,trace,trace-build,diagnostics,turbopack}`
+and the root manifests while leaving `.next/dev` alone — the running dev server
+was never disturbed. Peak memory is the summed working set of **build-owned
+processes only** (the `next build` process, its Turbopack loader pool under
+`.next/build`, and the `jest-worker` children), matched by command line so the
+dev server and its own pool are excluded, sampled every 700 ms.
+
+### K.1 — Build, cold and warm
+
+| Phase | Cold | Warm | §J (cold) |
+| --- | --- | --- | --- |
+| Compile (Turbopack) | 96s | 35.2s | 27.6s |
+| TypeScript | 34.4s | 20.5s | 13.8s |
+| Static generation | **74s (830/830)** | 91s (830/830) | 44s (821/821) |
+| Wall clock, `npm run build` | 284.8s | 234.7s | 113.2s |
+| **Peak node RSS (build-owned)** | **2875 MB** | **2237 MB** | 3451 MB |
+| Peak occurred at | t=55s (compile) | t=164s (static gen) | — |
+| `.next/cache` after | — | **272.1 MB** (43 files) | 213.3 MB |
+| `.next` total, excluding `.next/dev` | — | 838.5 MB | 771.7 MB |
+
+Both builds exited 0 with no warnings and **no 60-second prerender retries**. A
+third, confirmation build was run after the two fixes in §K.2 landed: green as
+well — exit 0, 830/830, compile 53s, TypeScript 36.9s, static generation 68s,
+wall 324.3s, **peak 2544 MB**. Three peaks on the same corpus within one
+evening: **2875 / 2237 / 2544 MB**.
+
+The number that matters for Vercel is the peak, and it moved the right way:
+**2875 MB cold against §J's 3451 MB**, on a corpus that has grown by 9 problems
+and 9 routes since. That is 36% of the 8 GB container, and further from the
+4 GB line than §J was. Nothing in this pass moves the build toward the ceiling.
+Read the three-way spread (2875 / 3451 / ~3100 in DEPLOYMENT.md) as the
+measurement noise band of a contended workstation, not as a trend.
+
+The wall-clock inflation is contention, and it is visible in a phase Next does
+not time: the three `prebuild` generators took ~13s in the cold run and ~56s in
+the warm one, against ~4s in §J. Compile and TypeScript inflated by roughly the
+same factor. Static generation is the one phase that did **not** inflate (74s
+for 830 pages, against 44s for 821), which is consistent with it being the
+phase that saturates all 7 workers either way.
+
+`.next/cache` at 272.1 MB is up 58.8 MB on §J. Still far under the 1 GB
+build-cache cap DEPLOYMENT.md records for Vercel's Standard tier, but it is
+growing with the corpus and is worth a number in the next audit.
+
+### K.2 — Two build breaks found by this pass
+
+Both were live in the tree, both would have failed a Vercel build, and neither
+was visible to `tsc` or the test suite at the moment it appeared.
+
+1. **`src/components/simulators/qaoa-explorer/QAOAExplorer.tsx` — JSX comment
+   in expression position.** A `{/* … */}` block was placed directly inside
+   `tryThis={ … }`. Inside a JSX *attribute expression* that is not a comment:
+   it parses as an empty object literal, and the parser then reads the
+   following `<ul>` children as JavaScript, failing at the first keyword in the
+   prose (`Expected '</', got 'switch'`). The cold build at the start of this
+   pass compiled fine; the next two builds both failed here. Fixed — the
+   comment now sits in JSX *children* position above `<SimulatorFraming>`,
+   where `{/* … */}` is valid. Worth knowing generally: a JSX comment is only a
+   comment where JSX children are expected.
+2. **`src/lib/problems/validators/numeric.ts` — orphaned statement fragment.**
+   The module ended correctly at `parseNumericSubmission`, then carried ~82
+   blank CRLF lines and a dangling `    .replace(/[s_]/g, "");` — a partially
+   applied edit. `tsc` reported `TS1128` at 173:5. The live copy of that
+   `.replace` (with the correct `[\s_]`) is still on line 83 inside the
+   function, so the trailing fragment was dead text; it was truncated away.
+   This one appeared *after* both measured builds, which is why they were
+   green and the next build would not have been.
+
+### K.3 — The four build-memory invariants, re-verified
+
+All four still hold.
+
+1. **Registries by text extraction, never execution.** `extract.mjs`'s
+   `extractObjectLiteral` still brace-scans and evaluates only the extracted
+   literal (`new Function('"use strict"; return (' + literal + ');')`,
+   extract.mjs:270). The generators `import()` nothing from `src/content/**`;
+   the only `await import()`s in `generate-search-index.mjs` are three plain
+   data/utility modules (`curriculum.ts`, `glossary.ts`, `lib/search/index.ts`).
+   Output sizes: `lessonMeta.generated.ts` 297 KB, `problemMeta.generated.ts`
+   289 KB, `registry.generated.ts` 95 KB, all plain data plus type imports.
+2. **Nothing imports the corpus.** A repo-wide scan finds **zero** static
+   imports of a `.mdx` file and exactly **two** dynamic ones — the pair inside
+   `loadLesson()` (`lib/content/lessons.ts:74,82`), reached only from
+   `app/lessons/[...slug]/page.tsx:47`. Every other consumer reads
+   `LESSON_METAS`.
+3. **`rehypeKatexHtml.mjs` is wired into both configs and still collapsing.**
+   `next.config.ts` (absolute path) and `vitest.config.mts` both load it, and
+   `renderNode` still returns `children: []` on a single
+   `mdxJsxFlowElement`/`mdxJsxTextElement` named `KatexHtml`
+   (rehypeKatexHtml.mjs:141–149). The display-math tabindex guard that throws
+   if KaTeX's wrapper markup ever changes is intact.
+4. **`src/mdx-components.tsx`: 27 of 30.** Unchanged from §J — 25 component
+   imports plus 2 erased type-only imports, mapping 26 entries (the 25 plus the
+   local `Table`). Headroom: 3 import statements.
+
+### K.4 — What ships to the browser (measured from the emitted HTML)
+
+Same method as §J.3: parse every emitted page for `<script src>` /
+`rel=preload as=script` / `modulepreload`, gzip the referenced files at level 9.
+**824 HTML files** for 830 routes (six routes are non-HTML). The polyfill chunk
+still carries `noModule`, so both figures are given.
+
+| Route | Files | Raw | First Load JS (gz) | …minus `noModule` polyfill | CSS (gz) |
+| --- | --- | --- | --- | --- | --- |
+| `/` | 12 | 923.4 KB | 290.7 KB | **252.1 KB** | 26.2 KB |
+| lesson (`what-is-a-qubit`) | 14 | 932.2 KB | 294.3 KB | **255.7 KB** | 26.2 KB |
+| problem | 15 | 951.1 KB | 300.8 KB | **262.2 KB** | 26.2 KB |
+| `/simulators` | 14 | 914.2 KB | 288.0 KB | **249.4 KB** | 26.2 KB |
+| `/problems` (heaviest) | 16 | 993.9 KB | 313.2 KB | **274.7 KB** | 26.2 KB |
+| `/map` (lightest) | 13 | 912.4 KB | 287.0 KB | **248.5 KB** | 26.2 KB |
+| mean, all 824 pages | — | — | 298.9 KB | **260.3 KB** | 26.2 KB |
+
+Against §J: every route is up 1.6–2.9 KB gz, the mean by 2.9 KB. The band
+between lightest and heaviest route is 26.2 KB, unchanged in shape.
+
+Shared chunk (present on all 824 pages): **539.6 KB raw / 165.7 KB gz**, or
+**127.1 KB gz** discounting the polyfill — byte-identical to §J.
+
+| Chunk | Raw | gz | What it is |
+| --- | --- | --- | --- |
+| `354-n7p7labpn.js` | 228.9 KB | 71.5 KB | React + React DOM |
+| `0gpuh00-wx325.js` | 158.0 KB | 42.9 KB | Next App Router client runtime |
+| `0cz1d0mv5g_q7.js` | 110.0 KB | 38.6 KB | polyfills — **`noModule`** |
+| `3qq9fjtagffmo.js` | 32.1 KB | 8.6 KB | bootstrap |
+| `turbopack-10vv8jq72z_pd.js` | 10.7 KB | 4.2 KB | chunk loader |
+
+All emitted client JS: **66 files, 2220.0 KB raw / 743.8 KB gz**.
+
+**KaTeX is still out of every eager graph**, verified against the built output
+rather than the imports: the runtime is one chunk (`2seuyohx86c8u.js`, 257.3 KB
+raw / **74.7 KB gz**) and it is referenced by **0 of 824** emitted HTML files —
+not as a script, not as a preload, not anywhere in the markup. The only edge to
+it is the string reference inside the universal chunk, i.e.
+`EquationReveal`'s `import("katex")` fallback. The source-graph check agrees:
+no route entry's eager client graph reaches `katex`, and
+`KATEX_IN_EAGER_CLIENT_GRAPH` is still `{}`. The third copy of the KaTeX call
+(`components/problems/renderProblemMath.ts`) still passes its byte-parity suite
+against `MathText`/`KatexMath` — `renderedMath.test.ts` is green in the full
+run below.
+
+Corpus fingerprints in shipped JS, unchanged from §J: `meta:{slug` **0**,
+`workedSolution` **0**, `LESSON_METAS` **0**, `PROBLEM_METAS` **0**.
+
+### K.5 — Every budget, with its ceiling and headroom
+
+| Budget | Ceiling | Now | Headroom | §J |
+| --- | --- | --- | --- | --- |
+| Client-reachable data total | 100 KB gz | **96.99 KB** (89 modules) | **3.01 KB (3.0%)** | 92.7 KB / 87 |
+| `lib/content/curriculum.ts` | 12 KB | **11.77 KB** | **0.23 KB (1.9%)** | 11.58 KB |
+| `lib/content/concepts.ts` | 14 KB | 13.13 KB | 0.87 KB | 12.79 KB |
+| `lib/content/currentQuantum/metaRegistry.ts` | 4 KB | 2.83 KB | 1.17 KB | 2.83 KB |
+| `components/layout/problemPillarIndex.ts` | 9 KB | 7.22 KB | 1.78 KB | 7.08 KB |
+| `lib/content/types.ts` | 1 KB | 0.43 KB | 0.57 KB | 0.43 KB |
+| `lib/problems/types.ts` | 2 KB | 1.12 KB | 0.88 KB | 1.07 KB |
+| `lib/content/progress` | 3 KB | 2.03 KB | 0.97 KB | 1.85 KB |
+| `lib/problems/progress` | 3 KB | 2.40 KB | 0.60 KB | 2.17 KB |
+| `search-index.json` raw | 560 KB | **533.71 KB** | 26.29 KB | 539.8 KB |
+| `search-index.json` gzip | 145 KB | **138.85 KB** | 6.15 KB | 135.6 KB (ceiling was 140) |
+| `mdx-components.tsx` imports | 30 | 27 | 3 | 27 |
+
+Two things to say plainly about this table.
+
+**The client-boundary total is the budget under pressure.** 92.7 → 96.99 KB
+between §J and here, in a few hours, leaving 3.01 KB. It was measured three
+times during this pass — 96.05, 96.40, 96.99 — so it is still moving while
+this is being written. Nothing in it is waste: against `HEAD`, the growth is
+`lib/problems/validators/conceptual.ts` +1.87 KB, `lib/content/concepts.ts`
++0.66, the new `components/pillar/tiers.ts` +0.65, `lib/content/curriculum.ts`
++0.48, `lib/problems/validators/numeric.ts` +0.26, the two `progress`
+localStorage stores +0.40 together, and the new `lib/entryBar.ts` +0.18. Each
+is a real feature. But the ceiling is 100 and the tree is at 96.99, so the next
+agent to add a 3 KB client-reachable data module fails the suite. The lever if
+that happens is not raising the number: it is the split `currentQuantum` already
+demonstrated — the link-shaped fields in a meta module the client imports, the
+prose in a module marked `SERVER_ONLY`.
+
+**`curriculum.ts` is the tightest single budget in the repo** at 11.77 / 12 KB
+(0.23 KB, ~2%). It is not over. It is one paragraph of new course data away
+from being over.
+
+The search index is **533.71 KB of its 560 KB hard cap** and **138.85 KB of its
+145 KB gzip ceiling** (that ceiling was raised 140 → 145 earlier the same day,
+recorded in `clientBoundary.test.ts`, with `LESSON_KEYWORD_BUDGET` pulled
+600 → 540 first). The raw cap is asserted inside `generate-search-index.mjs`,
+which runs as `prebuild` — so hitting it **fails the build**, not the test
+suite, which is the correct failure mode and it is working (the generator
+prints `533.7KB of 560KB` on every run). `LESSON_KEYWORD_BUDGET` is at its
+recall floor and cannot absorb more: 520 breaks the `RECOVERY_QUERIES` test
+pinning "factorial" to the lesson that teaches it. So the next lever, if the
+index keeps growing, is **not** the keyword cap and **not** the ceiling — it is
+the index's shape: the glossary rows carry whole definitions so a term is
+findable by what it says, and those are the largest per-entry payload in the
+file. Truncating a definition to its first sentence in the index (not on the
+page) is the cheapest byte left that costs no recall on the term itself.
+
+### K.6 — Runtime, re-read against the current files
+
+- **`QuantumField` reads no layout in the frame loop.**
+  `getBoundingClientRect` appears exactly once, in `measureStops()`
+  (QuantumField.tsx:219), called from effect setup, from `onResize`, and from a
+  `ResizeObserver` on `document.documentElement` that is only constructed when
+  `stops.length > 1`. `paint()` reads the precomputed `stops` array, a ref, and
+  cached colors. `getComputedStyle` (`readColors`) is called on setup, on
+  resize and on a theme change, never per frame. Data-saver returns before the
+  canvas context is acquired. One correction to the brief this was checked
+  against: under `prefers-reduced-motion` the component paints **one static
+  frame** and starts no loop, rather than drawing nothing — that is deliberate
+  and documented in the file ("a still image of the physics is informative",
+  with `frame.time`/`scroll`/`scrollY` pinned to 0). One paint, no rAF, no
+  scroll listener.
+- **`[data-reveal]`: all four escape hatches intact.** `<noscript><style>` in
+  `layout.tsx:174–176`; the reduced-motion override in globals.css §11
+  (line 1348); the print override in §12 (line 1448); `revealAfterMs = 2500`
+  in `Reveal.tsx:126,148`. The synchronous-`observe` path for a missing
+  `IntersectionObserver` is still guarded by the `released` flag.
+- **Simulator skeleton arithmetic still matches.** Re-derived after this
+  sprint's edits to `ui/Panel.tsx` (+47 lines) and `shared/SimulatorInstrument.tsx`:
+  Panel's changes are `aria`/`role` only (a `nameableRole` helper), and the
+  Instrument diff is comment punctuation, so no spacing class moved. The three
+  variants' inputs all still hold — Panel `px-4 py-2.5` label strip, `p-4
+  sm:p-5` body, `py-2.5 text-xs` footnote; `Framing` `mt-6 border-t pt-6`,
+  `grid gap-5 sm:grid-cols-2`, `mt-5`; the Bloch hero's `max-w-xs` square
+  canvas, `min-h-[2.5rem]` narration, `mt-6 border-t pt-4` hint, `mt-3
+  min-h-11` link; the wavefunction hero's 640×280 `viewBox` (WavefunctionCanvas
+  `WIDTH`/`HEIGHT`) and `min-h-11` preset pills. **656 / 613 / 554 stand.**
+- **Lazy boundaries: 23 `Lazy*` wrappers, 21 with both an error boundary and a
+  skeleton.** Two exceptions, both outside the simulator set:
+  `map/LazyConceptMapExplorer.tsx` has a height-matched `loading` placeholder
+  but **no error boundary**, so a failed chunk fetch on `/map` has nothing to
+  catch it; `problems/LazyCourseCheckpoint.tsx` has a skeleton (via
+  `React.lazy` + Suspense) and no error boundary either. Neither is a
+  regression from §J; both are recorded here with a number for their owners.
+- **Figures: 142 total, all with reserved space.** 134 `<ExternalFigure>` and 8
+  `<AnnotatedFigure>` across the lesson corpus; both components set
+  `loading="lazy"` and `decoding="async"` on the `<img>`. All 8
+  `AnnotatedFigure` call sites pass an explicit `aspect`, which is what holds
+  their pins off the top edge before the image lands — the component's own
+  comment claiming "all eight call sites pass `aspect`" is still true. None of
+  the 134 `ExternalFigure` call sites passes one, which is *fine* rather than a
+  finding: that component defaults to `aspect-video` + `object-contain`, so the
+  box is reserved (no CLS) and a non-16:9 image letterboxes rather than
+  stretching. The cost is whitespace, not layout shift.
+
+### K.7 — The universal chunk, re-measured
+
+§J.7's finding stands and has grown slightly. The largest chunk any visitor
+downloads is now `2cbolnt3q4ca6.js` — **237.0 KB raw / 73.4 KB gz** (was
+72.5 KB) — eager on **823 of 824** emitted pages. Probing its string literals
+confirms the same contents: `SimulatorSkeleton` ("Initializing instrument") and
+`SimulatorErrorBoundary` ("Fault: instrument offline"), the figure components'
+class strings, `StaticCircuitDiagram`, the `lib/quantum` `Complex` kernel, and
+the dynamic edge to the KaTeX chunk (the literal
+`"static/chunks/2seuyohx86c8u.js"` lives here). Two more chunks ride along on
+823/824 pages: the search overlay (`14751kuw3dvce.js`, 23.0 KB gz) and
+`PredictBeforeReveal` + `ExternalFigure` (`0cspgt-olatkg.js`, 15.9 KB gz).
+
+That is ~112 KB gz of lesson-shaped code on `/problems`, `/map` and every other
+route that never renders a lesson. Still not attributable to any one sprint,
+still the standing largest lever, and still owned by whoever owns the MDX
+mapping rather than by a performance pass: the only way to split it is to make
+the mapped components dynamic, which changes how lesson prose server-renders,
+and that is a pedagogy decision before it is a byte one.
+
+### K.8 — Test, typecheck and lint state
+
+- `npx vitest run`: **100 files, 1513 tests, 1 failed**. The failure is
+  `scripts/__tests__/crossGenerator.test.ts › every lesson registry entry still
+  re-extracts to the same meta`, and it is **transient by construction**: it
+  asserts `lessonMeta.generated.ts` matches the `.mdx` corpus, and other agents
+  are editing lesson `description` fields continuously. Re-running
+  `npm run generate` cleared the reported lesson (`cryogenic-systems`) and the
+  next run failed on a *different* one (`interference-in-quantum-circuits`),
+  which is the signature of a moving corpus rather than a defect. `npm test`
+  cannot hit it — `pretest` regenerates first. Everything else passes,
+  including `renderedMath.test.ts` (the KaTeX byte-parity suite),
+  `clientBoundary.test.ts` and `mdxMapping.test.ts`.
+- `npx tsc --noEmit`: **clean**, after the `numeric.ts` truncation in §K.2. It
+  was the only error.
+- `npx eslint`: **clean**, no errors or warnings.

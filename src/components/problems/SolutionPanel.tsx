@@ -103,8 +103,8 @@ export function SolutionPanel({
       >
         <p className="text-sm text-muted-foreground">
           {attempted
-            ? "Every step worked out, plus the final answer and the usual wrong turns. Taking it costs nothing — the problem stays here."
-            : "Every step worked out, plus the final answer and the usual wrong turns. Submit something first, even a guess — reading the solution before attempting it is the one way to get nothing out of it."}
+            ? "Every step worked out, plus the final answer and the usual wrong turns. Taking it costs nothing: the problem stays here."
+            : "Every step worked out, plus the final answer and the usual wrong turns. Submit something first, even a guess: reading the solution before attempting it is the one way to get nothing out of it."}
         </p>
       </Instrument>
     );
@@ -203,7 +203,7 @@ export function SolutionPanel({
                           <span className="sr-only">Option {letter}: </span>
                           <span
                             aria-hidden="true"
-                            className="tech-value mr-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-(--radius-tight) border border-border-strong px-1 align-[-0.05em] text-[0.65rem] font-medium text-subtle-foreground"
+                            className="tech-value mr-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-(--radius-tight) border border-border-strong px-1 align-[-0.05em] text-micro font-medium text-subtle-foreground"
                           >
                             {letter}
                           </span>

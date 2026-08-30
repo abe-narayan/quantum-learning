@@ -10,6 +10,17 @@ export const practiceProblems = getProblemMetaForLesson(
 
 export const IDEAL_STATE = applySingleQubitGate(StateVector.zero(2), PAULI_X, 0);
 
+export const EPSILON_MAX = 0.25;
+export const crosstalkFidelity = (epsilon) =>
+  IDEAL_STATE.innerProduct(
+    applySingleQubitGate(IDEAL_STATE, rotationAboutAxis({ x: 1, y: 0, z: 0 }, epsilon), 1)
+  ).magnitudeSquared();
+export const crosstalkCurvePoints = Array.from({ length: 50 }, (_, i) => {
+  const x = (i / 49) * EPSILON_MAX;
+  return { x, y: crosstalkFidelity(x) };
+});
+export const FIDELITY_FLOOR = crosstalkFidelity(EPSILON_MAX);
+
 export const lessonMeta = {
   title: "Crosstalk",
   description:
@@ -23,22 +34,22 @@ export const lessonMeta = {
   objectives: [
     "Explain crosstalk as an unwanted multi-qubit effect, distinct from T1/T2's single-qubit picture",
     "Compute the fidelity loss from a small unwanted rotation leaking onto a spectator qubit",
-    "Explain why crosstalk gets structurally worse as qubit count and density increase",
+    "Trace why crosstalk gets structurally worse as qubit count and density increase",
   ],
 };
 
 <LessonHook eyebrow="No single-qubit version of this story">
-Driving a gate on one qubit unintentionally disturbs a different qubit sitting nearby — and past a handful of qubits, crosstalk, not T1/T2, is usually what limits real gate fidelity.
+Driving a gate on one qubit unintentionally disturbs a different qubit sitting nearby. Past a handful of qubits, crosstalk, not T1/T2, is usually what limits real gate fidelity.
 </LessonHook>
 
-## Motivation
+## What Actually Limits Two-Qubit Fidelity
 
-Ask a hardware team what limits their two-qubit <Term id="gate-fidelity">gate fidelity</Term> and <Term id="t1-t2-coherence-times">T1/T2</Term>
-usually isn't the first answer once the chip gets past a handful of
-qubits, <Term id="crosstalk">crosstalk</Term> is. Every noise source this course has covered so
-far, T1, T2, lives on one qubit coupled to its own environment.
-Crosstalk breaks that picture: there's no single-qubit
-version of that story to fall back on.
+Ask a hardware team what limits their two-qubit <Term id="gate-fidelity">gate fidelity</Term>. Once the
+chip gets past a handful of qubits, <Term id="t1-t2-coherence-times">T1/T2</Term> usually isn't the first
+answer; <Term id="crosstalk">crosstalk</Term> is. Every noise source this course has covered so
+far, T1 and T2, lives on one qubit coupled to its own environment.
+Crosstalk breaks that picture: there's no single-qubit version of that
+story to fall back on.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/A_quantum_simulator_based_on_11_superconducting_qubits.png/1280px-A_quantum_simulator_based_on_11_superconducting_qubits.png"
@@ -49,7 +60,7 @@ version of that story to fall back on.
   license="CC BY 4.0"
 />
 
-## Engineering Development
+## Spectator Rotations, Quantified
 
 ### What crosstalk physically is
 
@@ -86,31 +97,33 @@ machine precision for every tested $\epsilon$ (0.01 through 0.2 radians).
 <PredictBeforeReveal
   question="ε doubles from 0.05 to 0.1 radians. Does the fidelity LOSS (1 − F) roughly double too, or does something else happen?"
   options={[
-    { label: "Roughly doubles (linear in ε)", value: "linear" },
-    { label: "Roughly quadruples (quadratic in ε)", value: "quadratic" },
     { label: "Stays about the same", value: "same" },
+    { label: "Roughly doubles (linear in ε)", value: "linear" },
+    { label: "Roughly quadruples (quadratic)", value: "quadratic" },
   ]}
   correctValue="quadratic"
-  explanation="F(ε) = cos²(ε/2), so 1 − F = sin²(ε/2) ≈ (ε/2)² for small ε — quadratic, not linear. Doubling ε roughly quadruples the fidelity loss. That's why the curve below looks almost flat near ε = 0 and then drops off faster than a straight line would: a small leak angle costs disproportionately less than twice that angle does."
+  explanation="F(ε) = cos²(ε/2), so 1 − F = sin²(ε/2) ≈ (ε/2)² for small ε: quadratic, not linear. Doubling ε roughly quadruples the fidelity loss. That's why the curve below looks almost flat near ε = 0 and then drops off faster than a straight line would: a small leak angle costs disproportionately less than twice that angle does."
 />
 
-<InteractiveSection title="Drag the leak angle and watch fidelity fall" description="Drag ε from 0 up toward 0.2 radians and watch fidelity fall away from 1, slowly at first (it's an even function of ε near 0) then more steeply. The marker's exact value always matches cos²(ε/2), computed fresh at every position, not read off a lookup table.">
+<InteractiveSection title="Drag the leak angle and watch fidelity fall" description="Drag ε from 0 up toward 0.2 radians. The vertical accent line marks the current leak angle, and where it crosses the curve is that gate's fidelity, printed to four decimals in the slider label. Note the vertical axis: it spans only 0.984 to 1, the range the curve actually covers, which is what makes the shape readable at all. Flat near ε=0 because the loss is quadratic, then falling away faster the further you drag.">
   <ParametricCurve
     frames={[0, 0.02, 0.05, 0.08, 0.1, 0.15, 0.2].map((epsilon) => ({
-      paramLabel: `ε = ${epsilon.toFixed(2)} rad (F = ${IDEAL_STATE.innerProduct(applySingleQubitGate(IDEAL_STATE, rotationAboutAxis({ x: 1, y: 0, z: 0 }, epsilon), 1)).magnitudeSquared().toFixed(4)})`,
+      paramLabel: `ε = ${epsilon.toFixed(2)} rad (F = ${crosstalkFidelity(epsilon).toFixed(4)})`,
       series: [
-        { label: "F(ε) = cos²(ε/2)", color: "brand", points: Array.from({ length: 50 }, (_, i) => ({ x: (i / 49) * 0.25, y: IDEAL_STATE.innerProduct(applySingleQubitGate(IDEAL_STATE, rotationAboutAxis({ x: 1, y: 0, z: 0 }, (i / 49) * 0.25), 1)).magnitudeSquared() })) },
+        { label: "F(ε) = cos²(ε/2)", color: "brand", points: crosstalkCurvePoints },
         {
           label: "current ε",
           color: "accent",
           points: [
-            { x: epsilon, y: 0 },
+            { x: epsilon, y: FIDELITY_FLOOR },
             { x: epsilon, y: 1 }
           ]
         }
       ]
     }))}
     sliderLabel="Leak angle ε"
+    xAxisLabel="leak angle ε (rad)"
+    yAxisLabel="fidelity F"
     referenceLines={[{ y: 1, label: "F = 1 (no crosstalk)" }]}
     ariaLabel="Fidelity F(ε) = cos²(ε/2) as a function of the unwanted rotation angle ε on the spectator qubit"
   />
@@ -125,7 +138,7 @@ route more control lines past each other, and the opportunities for
 unwanted leakage multiply. That's a different scaling concern from
 decoherence, and it's the one the next lesson develops further.
 
-## Physical Interpretation
+## An Error That Grows With Neighbors
 
 Crosstalk sits at the intersection of Control Electronics (imperfect
 pulse localization) and Physical Qubit Platforms (device geometry/density).
@@ -134,7 +147,7 @@ physical limit. Crosstalk is different in kind: an engineering problem in
 pulse shaping, filtering, and qubit layout, one that can be reduced,
 though not eliminated, with better design.
 
-## Worked Example
+## Fidelity Loss From a Small Angle
 
 **A device's crosstalk causes $\epsilon=0.05$ radians of unwanted
 rotation on a spectator qubit for every gate on its neighbor. What's the
@@ -151,7 +164,7 @@ Tolerance's threshold discussion), which is why real hardware invests
 in active crosstalk suppression, pulse shaping, frequency detuning
 between neighbors, rather than shrugging off a fraction of a percent.
 
-## Common Mistakes
+## Filing Crosstalk Under Decoherence
 
 <Callout type="warning">
 **Treating crosstalk as just another form of T1/T2 decoherence.**
@@ -174,13 +187,226 @@ per-operation errors are what error correction exists to manage.
 
 1. Compute the fidelity loss for $\epsilon=0.1$ radians, and compare it
    to the worked example's $\epsilon=0.05$ result.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   F(0.1)=\cos^2(0.05)\approx0.9975021, \qquad 1-F \approx 2.4979\times10^{-3},
+   $$
+
+   a loss of about 0.250% per gate, against $6.2487\times10^{-4}$, about
+   0.0625%, at $\epsilon=0.05$. Both computed with the lesson's own
+   engine path, `applySingleQubitGate` composed with
+   `rotationAboutAxis` on a two-qubit `StateVector`, which reproduces
+   $\cos^2(\epsilon/2)$ to the last digit at both angles.
+
+   **The comparison is the point: the loss went up by a factor of 3.998,
+   not 2.** Doubling the leak angle roughly quadrupled the damage. The
+   reason is in the small-angle expansion:
+
+   $$
+   1-F = \sin^2(\epsilon/2) \approx \left(\frac{\epsilon}{2}\right)^2,
+   $$
+
+   so the loss is quadratic in $\epsilon$, not linear. At
+   $\epsilon=0.1$ the exact $2.4979\times10^{-3}$ sits within 0.1% of the
+   quadratic estimate $(\epsilon/2)^2=2.5\times10^{-3}$, which is why the
+   curve looks almost flat near the origin and then falls away.
+
+   The wrong turn is reading "quadratic" as reassuring, on the grounds
+   that a small leak costs disproportionately little. It cuts the other
+   way too, and that is the direction hardware actually lives in: a leak
+   that gets *worse* costs disproportionately more. Question 4 is about
+   exactly that.
+
+   And a per-gate number is not the number that matters. Fidelities
+   multiply along a circuit, so at $\epsilon=0.1$ a spectator that sits
+   through 100 gates on its neighbour retains $F^{100}\approx0.779$, and
+   through 1000 gates $\approx0.082$. At $\epsilon=0.05$ the same two
+   depths give $0.939$ and $0.535$. A quarter of a percent per gate is
+   not a rounding error once you count the depth of a real circuit, which
+   is why devices invest in pulse shaping and in detuning neighbours from
+   each other in frequency rather than shrugging it off.
+
+   </details>
+
 2. Why is crosstalk described as a matter of "proximity and density,"
    unlike T1/T2?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because crosstalk is a statement about a *relationship between two
+   qubits*, while $T_1$ and $T_2$ are statements about *one qubit and its
+   environment*.
+
+   The mechanism makes this concrete. Crosstalk exists because a pulse
+   aimed at one qubit is never perfectly localized: some fraction of it
+   reaches a neighbour. How large that fraction is depends on how close
+   the neighbour sits, both in space, since the coupling falls off with
+   distance, and in frequency, since a pulse's spectrum has finite width
+   and a neighbour whose transition sits nearby in frequency catches more
+   of it. Both of those are geometric facts about the *layout*, not about
+   either qubit alone.
+
+   $T_1$ and $T_2$ are different in kind. They describe how strongly one
+   qubit couples to an uncontrolled environment: lossy dielectric,
+   two-level-system defects, fluctuating flux, thermal photons. Every one
+   of those is present for a single qubit sitting alone on a chip, which
+   is precisely how they are measured. Put ninety-nine more qubits
+   elsewhere on the same die and the isolated qubit's $T_1$ is
+   unchanged, because none of those quantities referred to a neighbour.
+
+   The cleanest way to state the difference is by asking how many qubits
+   each error needs in order to be defined at all. $T_1$ and $T_2$ need
+   one. Crosstalk needs two and a geometry: there is no single-qubit
+   version of the story to fall back on.
+
+   Two consequences worth carrying forward.
+
+   The scaling behaviours are opposite in character. Decoherence does not
+   inherently worsen when a device grows, because each qubit still faces
+   its own environment. Crosstalk does, because growth means more
+   neighbours, packed closer, with more control lines routed past one
+   another. That is why this lesson sits immediately before Scaling
+   Challenges.
+
+   The remedies are different too. $T_1$ and $T_2$ trace back to
+   unavoidable environmental coupling and are attacked with materials,
+   shielding and cooling. Crosstalk is an engineering problem in pulse
+   shaping, filtering, frequency allocation and layout, reducible by
+   better design in a way a physical decoherence limit is not.
+
+   One honest qualification, so the contrast is not overdrawn. Packing a
+   chip more densely can degrade $T_1$ in practice as well, through more
+   nearby lossy material and interfaces. That is a real effect, but it is
+   incidental rather than structural. Crosstalk's dependence on density
+   is the definition of the error; $T_1$'s is a side effect of how the
+   denser chip happened to be built.
+
+   </details>
+
 3. Is crosstalk generally a coherent or incoherent error, per Sources of
    Noise's classification? Explain your reasoning.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Generally coherent,** with a real qualification about what "coherent
+   in principle" buys you in practice.
+
+   The reasoning: the leak is a drive field, and a drive field acting on
+   a qubit produces a rotation. This lesson's own model is a
+   `rotationAboutAxis` by angle $\epsilon$, which is a unitary. It is
+   deterministic given the pulse and the layout, it happens the same way
+   every time that pulse is applied in that context, and it is
+   invertible. That is the definition of a coherent error, and it is why
+   the fidelity comes out as an exact closed form $\cos^2(\epsilon/2)$
+   rather than as a channel that mixes the state. Nothing has been lost
+   to an environment; the state has been moved somewhere wrong, and in
+   principle it can be moved back.
+
+   Correcting it is a control-side job, matching that classification.
+   Characterize the leaked rotation once, then compensate: add a
+   corrective rotation on the spectator, reshape the pulse envelope so
+   less power reaches the neighbour's frequency, detune neighbours from
+   each other, or schedule the offending pair's gates so they never fire
+   together.
+
+   **The qualification.** "Deterministic" is doing conditional work.
+   The leak a spectator picks up depends on what *all* of its neighbours
+   are doing at that instant: which are being driven, with what pulses,
+   simultaneously. So the error is deterministic given the full
+   simultaneous-operation context, and the number of contexts grows with
+   the device. There is no single leaked angle to calibrate away; there
+   is a table indexed by context.
+
+   Two things follow that are worth being precise about.
+
+   First, a coherent error can *look* incoherent when you average over a
+   variable you are not tracking. Run many circuits with different
+   neighbour activity and never model it, and the spectator's
+   accumulated rotations point in effectively random directions, so the
+   ensemble average resembles a depolarizing channel. That appearance is
+   a fact about your bookkeeping, not about the physics, and it is
+   exactly why crosstalk characterization protocols deliberately vary
+   what the neighbours are doing rather than benchmarking one qubit in
+   isolation.
+
+   Second, coherent does not mean mild. As Calibration showed, coherent
+   errors accumulate in the rotation angle, so infidelity grows
+   quadratically with depth, while stochastic errors accumulate linearly.
+   A deterministic crosstalk rotation repeated identically through a
+   structured circuit is more damaging than a random error of the same
+   per-gate size, not less.
+
+   In practice a real device shows a mixture: a characterizable coherent
+   part, plus a residual that drifts with the same parameters everything
+   else on the chip drifts with.
+
+   </details>
+
 4. If a device's qubit count quadruples while keeping the same physical
    chip area (denser packing), would you expect crosstalk to get better,
    worse, or stay the same? Justify using this lesson's discussion.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Worse, on three independent counts at once**, which is what makes
+   density a structural scaling problem rather than a tuning problem.
+
+   **More neighbours.** Four times the qubits in the same area means
+   roughly four times as many adjacent pairs on the layout, so four times
+   as many opportunities for a pulse to land somewhere it was not aimed.
+   Every gate now has more spectators listening.
+
+   **Each neighbour is closer.** Four times the density in two dimensions
+   halves the typical spacing. Whatever the falloff law of the particular
+   coupling mechanism, and it differs between a coplanar capacitance and
+   a dipole-dipole interaction, it decreases with distance, so halving
+   the spacing increases every pairwise leak. Combine that with question
+   1: the loss is quadratic in the leak angle, so a leak angle that
+   merely doubles quadruples the per-gate fidelity cost.
+
+   **Frequencies crowd too.** Crosstalk is spectral as well as spatial. A
+   device has a finite usable frequency band, and putting four times as
+   many qubits in it forces their transition frequencies closer together.
+   A pulse's spectrum has finite width, so a neighbour sitting closer in
+   frequency catches more of it, and the frequency collisions the
+   Superconducting Qubits lesson named become likelier. Denser packing
+   crowds both axes.
+
+   An illustrative arithmetic, flagged as illustrative because the
+   coupling law is device-specific: if halving the spacing doubles the
+   leak angle from 0.05 to 0.1 rad, each gate's spectator loss goes from
+   $6.2\times10^{-4}$ to $2.5\times10^{-3}$, a factor of 4, and with
+   roughly four times as many spectator pairs the total leaked
+   disturbance per layer of gates rises by something like sixteen. From a
+   change that was described only as "more qubits in the same box."
+
+   Set that against $T_1$ and $T_2$, which do not inherently degrade for
+   this reason at all, since each qubit still faces its own environment.
+   That contrast is the whole reason crosstalk gets its own lesson: it is
+   the noise source whose severity is a function of how big the device
+   is.
+
+   The wrong turn is to expect the tradeoff to net out, on the reasoning
+   that shorter distances also mean faster gates, so fewer nanoseconds of
+   exposure per operation. Exposure time is not what sets this error.
+   The leak angle $\epsilon$ is accumulated over the gate, and a stronger
+   coupling driven for a shorter time delivers a comparable rotation.
+   Nothing here is bought back by speed.
+
+   Real devices do not simply accept the sixteen. They spend the density
+   back: deliberate frequency allocation so neighbours are detuned,
+   shaped and filtered pulses, tunable couplers that can be switched off
+   between gates, and schedulers that refuse to fire particular pairs
+   simultaneously. All of that is engineering effort that a sparser chip
+   does not have to spend, which is the real price of density.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -194,10 +420,10 @@ per-operation errors are what error correction exists to manage.
 - Unlike T1/T2, crosstalk worsens with qubit density, a structurally
   different scaling concern, central to the next lesson.
 
-## Further Exploration
+## Adding Crosstalk to the Scaling Budget
 
 <NextDiscovery>
 [Scaling Challenges](/lessons/quantum-hardware/noise-decoherence-and-scaling/scaling-challenges) puts T1/T2, crosstalk, and readout
-error together into the question of what it actually takes to build a
+error together into the question of what it takes to build a
 much larger quantum device.
 </NextDiscovery>

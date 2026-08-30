@@ -52,11 +52,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="One sign, two families of matter">
 Every particle in three-dimensional space belongs to one of two families, and the choice is made by a single sign. One sign lets a billion particles pile into the same state, which is what a laser beam and a superfluid are. The other forbids even two, which is why matter is solid.
 </LessonHook>
 
-## Motivation
+## What the last lesson left to be built
 
 The previous lesson ruled out the obvious candidate: a bare product state
 carries a fact about which particle is where, so it cannot describe two
@@ -80,7 +80,7 @@ specific case. That failure is the Pauli exclusion principle.
   license="Public domain"
 />
 
-## Mathematical Development
+## Symmetrize, antisymmetrize, then check
 
 ### Symmetric combination: bosons
 
@@ -126,7 +126,7 @@ function has no knowledge of how the two combinations were constructed,
 this tests the eigenvalue claim rather than retracing the algebra that
 motivated it.
 
-## Physical Interpretation
+## The theorem that assigns the signs
 
 Nothing so far says which particles take which sign. The algebra permits
 both and is silent about the assignment.
@@ -145,18 +145,22 @@ was derived in an earlier course from a commutator, exchange symmetry in
 the last lesson from a relabelling, and the theorem welds two apparently
 unrelated results into one.
 
+The rule is stated for particles, and the photograph at the top of this
+lesson is of helium, which is not one. A helium-4 nucleus is two protons
+and two neutrons bound together, and every one of those is spin-$\tfrac12$.
+
 <PredictBeforeReveal
-  question="ψ_A = antisymmetrize(e0, e1). What do you expect exchangeParticles(ψ_A) to return?"
+  question="A helium-4 nucleus is built from four spin-½ constituents. Under exchange of two whole nuclei, does it behave as a boson or a fermion?"
   options={[
-    { label: "ψ_A itself, unchanged", value: "same" },
-    { label: "−ψ_A, every entry sign-flipped", value: "negative" },
-    { label: "The zero vector", value: "zero" },
+    { label: "A fermion: it is built entirely out of fermions", value: "fermion" },
+    { label: "Neither: the rule applies only to elementary particles", value: "neither" },
+    { label: "A boson: four half-integer spins add to an integer", value: "boson" },
   ]}
-  correctValue="negative"
-  explanation="Every entry comes back with its sign flipped: exchangeParticles(ψ_A) = −ψ_A, to floating-point precision. That is the −1 eigenvalue defining a fermion, read off the numbers rather than asserted. The zero-vector option is the right answer to a different question: it is what antisymmetrize(e0, e0) returns, with both particles in the same state."
+  correctValue="boson"
+  explanation="A boson. Spins combine, and four half-integer spins can only add to an integer, so spin-statistics puts helium-4 in the boson family. The general rule: swapping two composites swaps each constituent pair in turn, so a composite of an even number of fermions picks up an even number of minus signs and comes back with a plus. That is what the flask in the photograph is showing. Helium-3 is the control experiment: one neutron fewer, five fermions per atom counting electrons, an odd number, so a fermion. It does become superfluid, but not until about 2.5 millikelvin and only by pairing up first, roughly a thousand times colder than helium-4's 2.17 K."
 />
 
-## Worked Example
+## Confirming a minus-one eigenstate on the engine
 
 **Using a 3-dimensional single-particle basis $\{|0\rangle,|1\rangle,|2\rangle\}$,
 confirm `antisymmetrize(e0,e1)` is a genuine $-1$ eigenstate.**
@@ -169,18 +173,21 @@ between `antisymmetrize(e0,e1)` and
 $-$`exchangeParticles(antisymmetrize(e0,e1))`, so the $-1$ eigenvalue is
 confirmed numerically and not merely by construction.
 
-Now repeat it with `antisymmetrize(e0,e0)`. Every entry cancels and the
-result is the zero vector, which no normalization can rescue. Two
-fermions in the same single-particle state have no state to occupy.
+Now repeat it with `antisymmetrize(e0,e0)`. Every entry cancels, and
+`normalizeVector` is handed the zero vector and throws rather than
+returning anything. The engine does not have a special case for Pauli
+exclusion; the exception *is* the exclusion principle, arriving as the
+absence of a state rather than as a rule about one. Two fermions in the
+same single-particle state have nothing to occupy.
 
 <InteractiveSection title="Compare the two constructions directly" description="Switch between ψ_S and ψ_A, both built from the same e0 and e1. Exchange leaves ψ_S's grid unchanged, the +1 eigenvalue. For ψ_A every entry flips sign, the −1 eigenvalue. Both grids have their weight off the diagonal, since a ≠ b here; the diagonal cells are where a = b would sit, and they are exactly the cells the antisymmetric construction cannot fill.">
   <ExchangeDiagramExplorer
     presets={eigenstatePresets}
-    ariaLabel="Choose between the symmetric and antisymmetric combinations of e0 and e1 to see each one's coefficient grid before and after exchange"
+    ariaLabel="Two 3-by-3 coefficient grids side by side, before and after exchange, rows and columns labelled 0, 1, 2. The symmetric preset has +0.707 at row 0 column 1 and +0.707 at row 1 column 0, and the after grid is identical: eigenvalue +1. The antisymmetric preset has +0.707 at row 0 column 1 and −0.707 at row 1 column 0, and the after grid has those two signs swapped, so every entry is negated: eigenvalue −1. All remaining cells are zero in both, including the whole diagonal."
   />
 </InteractiveSection>
 
-## Common Mistakes
+## The normalization step is doing real work
 
 <Callout type="warning">
 **Forgetting the normalization step matters.** $|a\rangle\otimes|b\rangle\pm|b\rangle\otimes|a\rangle$
@@ -202,15 +209,145 @@ pair may be treated as symmetric.
 1. Show that $|\psi_S\rangle$ is a valid (normalizable) state for
    *every* choice of $a,b$, including $a=b$, while $|\psi_A\rangle$ is
    not.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The whole difference lives in the case $a=b$, where the two terms
+   coincide and a sum doubles while a difference cancels:
+
+   $$
+   |a\rangle\otimes|a\rangle + |a\rangle\otimes|a\rangle = 2\,|a\rangle\otimes|a\rangle, \qquad |a\rangle\otimes|a\rangle - |a\rangle\otimes|a\rangle = 0
+   $$
+
+   The symmetric result has norm $2$, so dividing by $\mathcal N^{-1}=2$
+   gives the perfectly good normalized state $|a\rangle\otimes|a\rangle$.
+   The antisymmetric result is the zero vector, whose norm is $0$, and no
+   choice of $\mathcal N$ makes a unit vector out of it. Normalization is
+   division by the norm, and there is no dividing by zero.
+
+   Both are normalizable whenever $a\neq b$, so the failure is confined to
+   the coincident case. Computing the norms in general shows how the
+   failure arrives, which is more illuminating than the special case
+   alone. With $|a\rangle$ and $|b\rangle$ each normalized and
+   $s=\langle a|b\rangle$ their overlap:
+
+   $$
+   \big\||a\rangle\otimes|b\rangle \pm |b\rangle\otimes|a\rangle\big\|^2 = 2\left(1 \pm |s|^2\right)
+   $$
+
+   The symmetric norm *squared* runs from $2$ up to $4$ as the two states
+   approach each other, never in trouble. The antisymmetric one runs from
+   $2$ down to $0$, reaching zero exactly when $|s|=1$, which is when $a$
+   and $b$ are the same state up to a phase.
+
+   That continuity is the part worth carrying away. The exclusion
+   principle is not a switch thrown when two labels happen to match. The
+   antisymmetric state shrinks smoothly toward nothing as the two
+   single-particle states are brought into alignment, and two fermions in
+   *nearly* the same state are already strongly suppressed relative to two
+   bosons. Exclusion at $a=b$ is the endpoint of a gradient, not an
+   isolated prohibition.
+
+   </details>
+
 2. If $a$ and $b$ are orthogonal and each individually normalized, what
    is $\||a\rangle\otimes|b\rangle+|b\rangle\otimes|a\rangle\|^2$, before
    normalizing? (This is exactly what `normalizeVector` divides out.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $2$, so the norm is $\sqrt2$ and $\mathcal N=1/\sqrt2$.
+
+   Expanding the inner product gives four terms:
+
+   $$
+   \big\||ab\rangle+|ba\rangle\big\|^2 = \underbrace{\langle ab|ab\rangle}_{1} + \underbrace{\langle ba|ba\rangle}_{1} + \underbrace{\langle ab|ba\rangle}_{|\langle a|b\rangle|^2} + \underbrace{\langle ba|ab\rangle}_{|\langle a|b\rangle|^2} = 2
+   $$
+
+   The two cross terms each carry a factor $\langle a|b\rangle\langle
+   b|a\rangle=|\langle a|b\rangle|^2$, which orthogonality sends to zero.
+
+   Orthogonality is a hypothesis here, not decoration, and dropping it
+   breaks the familiar answer. The general result is $2(1+|s|^2)$ from the
+   previous question, so a non-orthogonal pair needs a different
+   $\mathcal N$: at $s=1$ the norm squared is $4$ and the constant is
+   $1/2$, not $1/\sqrt2$. This is exactly why the platform calls
+   `normalizeVector` on the constructed vector rather than multiplying by
+   a hard-coded $1/\sqrt2$. The hard-coded factor is right for the
+   orthonormal case and quietly wrong everywhere else, and a state that is
+   off by a constant factor produces probabilities that do not sum to one
+   with no error to announce it.
+
+   </details>
+
 3. Photons have spin 1; electrons have spin 1/2. Which symmetrization
    rule applies to each, per the spin-statistics connection?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Photons have integer spin, so they are bosons and their states are
+   symmetric, $P_{12}|\psi\rangle=+|\psi\rangle$. Electrons have
+   half-integer spin, so they are fermions and their states are
+   antisymmetric, $P_{12}|\psi\rangle=-|\psi\rangle$.
+
+   The consequences are visible without any apparatus. Photons piling into
+   one mode is what makes a laser a laser: many photons in the identical
+   single-particle state, which the symmetric construction permits at any
+   occupation number. Electrons refusing to do the same is why atoms have
+   shells, why the periodic table repeats, and why one solid object cannot
+   pass through another.
+
+   One caution about applying the rule. It is stated for the *total* spin
+   of whatever is being exchanged, so it applies to composites as well,
+   and the parity of the constituent count decides. Helium-4, with an even
+   number of fermions, is a boson and becomes superfluid at $2.17$ K.
+   Helium-3, one neutron lighter and therefore an odd number, is a fermion
+   and needs about a thousand times lower temperature and a pairing
+   mechanism first. Same element, same chemistry, entirely different
+   low-temperature physics, decided by a count of spin-$\tfrac12$ parts.
+
+   </details>
+
 4. Why is checking `exchangeParticles(antisymmetrize(a,b))` against
    $-$`antisymmetrize(a,b)` numerically a stronger confirmation than just
    re-deriving the algebra that built `antisymmetrize` in the first
    place?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because re-deriving the algebra can only tell you the derivation agrees
+   with itself. It has no way to catch an error in the derivation, and no
+   way at all to catch an error in the code that the rest of the course
+   actually runs.
+
+   The two routes are genuinely different pieces of work.
+   `antisymmetrize` constructs a vector from a formula. `exchangeParticles`
+   takes a flat amplitude vector and permutes its entries, with no
+   knowledge of where the vector came from or what it is supposed to
+   satisfy. So the test asks whether an object built one way has a
+   property verified another way, which is the situation in which
+   agreement carries information.
+
+   It rules out a specific and realistic class of mistakes: a sign written
+   the wrong way round in the construction, a normalization applied to the
+   wrong quantity, and above all an index-ordering slip in flattening a
+   two-particle amplitude into one vector, which is the sort of error that
+   produces plausible-looking numbers and no exception.
+
+   The honest limit of the argument, since independence is a matter of
+   degree rather than a binary. If both functions shared the *same* wrong
+   convention for which index runs fastest, they could agree with each
+   other and disagree with the physics, and this test would pass. What
+   would catch that is a third check against something outside the pair,
+   such as computing an observable both ways or comparing against a
+   hand-worked small case. A test's value is exactly the set of errors it
+   could have detected, and it is worth knowing where that set ends.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -226,7 +363,7 @@ pair may be treated as symmetric.
   checks the ±1 eigenvalue claims against `exchangeParticles` directly,
   rather than resting on the construction alone.
 
-## Further Exploration
+## When the antisymmetric combination vanishes
 
 <NextDiscovery>
 [The Pauli Exclusion Principle](/lessons/quantum-mechanics/identical-particles/the-pauli-exclusion-principle) treats the $a=b$

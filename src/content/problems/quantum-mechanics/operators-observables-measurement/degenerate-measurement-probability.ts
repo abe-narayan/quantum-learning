@@ -15,21 +15,22 @@ export const degenerateMeasurementProbability: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "For N = diag(1,1,2) and |psi> = (1/sqrt(3))(|0> + |1> + |2>), find P(N = 1).",
-    inputHint: "a decimal",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
     value: 0.666667,
     tolerance: 0.001,
-    incorrectFeedback: "P(N=1) sums |c_i|^2 over every basis state sharing eigenvalue 1 — that's |0> and |1> here, each with coefficient 1/sqrt(3).",
+    incorrectFeedback: "P(N=1) sums |c_i|^2 over every basis state sharing eigenvalue 1, which here means |0> and |1>, each with coefficient 1/sqrt(3).",
     nearMisses: [
       { value: 1 / 3, tolerance: 0.002, feedback: "1/3 counts only one of the two degenerate basis states. Both |0⟩ and |1⟩ carry eigenvalue 1, so both contribute to this outcome." },
       { value: 1 / Math.sqrt(3), tolerance: 0.002, feedback: "That is an amplitude, not a probability. Square each coefficient before summing." },
     ],
   },
   hints: [
-    { text: "Which basis states share the eigenvalue 1?" },
-    { text: "Sum |c|^2 for each of those states' coefficients." },
+    { text: "The eigenvalue 1 is degenerate here, so this outcome collects contributions from more than one basis state." },
+    { text: "Find which basis states carry that eigenvalue on N's diagonal, then read off their coefficients in the given state." },
+    { text: "Square each of those coefficients, then add. Adding the coefficients first and squaring afterwards gives a different, larger number." },
   ],
   solution: {
     steps: [

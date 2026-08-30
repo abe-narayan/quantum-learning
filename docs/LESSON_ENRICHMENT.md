@@ -1,33 +1,54 @@
 # Lesson corpus enrichment plan
 
+> **This file is a findings log, not a guide, and its central premise has
+> since been overturned.** It is a corpus census taken on **2026-08-26**,
+> when the narrative components existed and **no lesson used any of them**.
+> That is no longer the state of the corpus: recounted 2026-08-30, the
+> narrative vocabulary is used **691 times across all 219 lessons**, and its
+> single biggest recommendation, "apply the narrative components to
+> content", has been carried out. `LessonHook` and `NextDiscovery` are both
+> in all 219, up from zero.
+>
+> **Do not read the census tables below as current.** They are a snapshot of
+> a corpus that has moved under them, and several headline figures are now
+> wrong in both directions (`<ExternalFigure>` is down from 200 to 133,
+> `<PredictBeforeReveal>` up from 194 to 229). What is still worth having is
+> the **method**: the shape of the census, and the specific diagnostic
+> questions it asks (words-per-visual by pillar, lessons with no interactive
+> element, mislabeled "Interactive Visualization" sections, recurring
+> concepts with no interactive treatment anywhere). Re-run it rather than
+> trusting it.
+>
+> Status of the five top recommendations, checked 2026-08-29:
+>
+> | # | Recommendation | Status |
+> | --- | --- | --- |
+> | 1 | Apply the narrative components to content | **Done.** 0 → 691 uses across all 219 lessons. |
+> | 2 | Fix Apex's visual starvation | **Not re-measured.** Re-run §A1 before acting. |
+> | 3 | Fix six mislabeled "Interactive Visualization" sections | **Not re-verified.** |
+> | 4 | Give `capstone-what-we-know-and-dont.mdx` any visual at all | **Done.** It is no longer the zero-visual lesson. |
+> | 5 | Build a complexity-class containment diagram | **Done.** `src/components/visualizations/ComplexityClassDiagram.tsx`, used in 4 lessons. |
+
 Survey of all 219 MDX lessons in `src/content/lessons/`, done by shell/Python
 census (word counts, component tags, `$$` blocks) plus close reading of a
 sample across all six pillars. Read `docs/DESIGN_SYSTEM.md` §8 ("Visuals
 must teach") and `docs/NARRATIVE_COMPONENTS.md` before acting on this.
 
-**State as of this survey (2026-08-26):** the narrative-component pass
-(`src/components/narrative/`, 11 components) is fully built AND wired into
-`src/mdx-components.tsx` — imported and registered. **Zero lessons use any
-of them.** This is the single biggest lever available: the infrastructure
-this doc would otherwise be recommending you build already exists and is
-sitting unused. Don't rebuild it — apply it.
+**State as of this survey (2026-08-26), superseded; see the note above:**
+the narrative-component pass (`src/components/narrative/`, 11 components) is
+fully built AND wired into `src/mdx-components.tsx` — imported and
+registered. **Zero lessons use any of them.** This is the single biggest
+lever available: the infrastructure this doc would otherwise be recommending
+you build already exists and is sitting unused. Don't rebuild it — apply it.
 
 ## MDX hazards — read before editing any lesson file
 
-Repeating verbatim, per instructions, because whoever acts on this plan will
-touch every file below and both are silent-failure traps:
-
-1. **`//` comments inside an `.mdx` top-level export block break every
-   subsequent export in that file, causing silent 404s.** (Checked: none
-   currently in the corpus — grep for `^\s*//` before the first `##` heading
-   before you add one.)
-2. **A `$$` display-math delimiter sharing a line with formula content
-   *inside a custom JSX component* breaks closing-tag detection.** (Checked:
-   none currently in the corpus. The 8 same-line `$$...$$` instances that do
-   exist, e.g. `decoding-surface-codes.mdx:232`, are plain top-level Markdown
-   math, not inside JSX children, so they're fine — but don't move one of
-   those blocks inside a `<Callout>`/`<DerivationStep>` without splitting the
-   delimiters onto their own lines.)
+This section used to restate two of the corpus's silent-failure traps. There
+are more than two now, and a partial copy of a hazard list is worse than a
+pointer to the whole one, so: read the hazards section at the top of
+[`NARRATIVE_COMPONENTS.md`](NARRATIVE_COMPONENTS.md), which is the guide that
+binds, and run `src/lib/content/__tests__/mdxHazards.test.ts` afterwards. All
+of them fail silently; none is caught by `tsc` or the linter.
 
 ---
 

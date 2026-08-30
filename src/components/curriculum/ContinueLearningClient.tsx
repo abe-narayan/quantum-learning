@@ -50,16 +50,28 @@ export function ContinueLearningClient({ lessons }: { lessons: OrderedLesson[] }
   if (!next) return null;
 
   return (
+    // The whole box is one link, so without a label its accessible name is
+    // every string inside it run together: "Continue learning <title>
+    // <course> Resume →". The label states the one thing a link name has to
+    // say — what happens and where it goes — and the rest stays readable in
+    // browse mode. The arrow is decoration; announcing "right arrow" after
+    // the lesson title adds nothing.
     <Link
       href={`/lessons/${next.slug}`}
+      aria-label={`Continue learning: ${next.title}, in ${next.courseTitle}`}
       className="mt-6 flex items-center justify-between gap-3 rounded-panel border border-brand/30 bg-brand/5 px-4 py-3 transition-colors hover:border-brand/50"
     >
-      <div>
+      <div className="min-w-0">
         <p className="text-xs font-medium uppercase tracking-wide text-brand">Continue learning</p>
         <p className="mt-0.5 text-sm font-medium text-foreground">{next.title}</p>
         <p className="text-xs text-muted-foreground">{next.courseTitle}</p>
       </div>
-      <Badge tone="brand">Resume →</Badge>
+      <Badge tone="brand" className="shrink-0">
+        Resume{" "}
+        <span aria-hidden="true" data-decorative="">
+          →
+        </span>
+      </Badge>
     </Link>
   );
 }

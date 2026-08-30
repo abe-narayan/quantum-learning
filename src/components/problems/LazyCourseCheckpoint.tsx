@@ -3,6 +3,7 @@
 import { lazy, Suspense } from "react";
 import type { Problem } from "@/lib/problems/types";
 import { Instrument } from "@/components/ui/Panel";
+import { ComponentErrorBoundary } from "@/components/ui/ComponentErrorBoundary";
 import { useDeferredMount } from "@/components/motion/useDeferredMount";
 
 /**
@@ -36,7 +37,11 @@ function CheckpointSkeleton({ problemCount }: { problemCount: number }) {
       <div role="status">
         <span className="sr-only">Loading checkpoint…</span>
         <div aria-hidden="true">
-          <div className="h-4 w-full max-w-md rounded bg-surface-muted motion-safe:animate-pulse" />
+          {/* `rounded-(--radius-tight)`, not a bare `rounded`: the skeleton
+              stands in for the real body text block below it, and Tailwind's
+              default 0.25rem is off the system's radius scale, so the
+              placeholder's corners did not match what replaces it. */}
+          <div className="h-4 w-full max-w-md rounded-(--radius-tight) bg-surface-muted motion-safe:animate-pulse" />
           <div className="mt-5 space-y-3">
             {Array.from({ length: problemCount }, (_, index) => (
               <div
@@ -105,9 +110,20 @@ export function LazyCourseCheckpoint(props: LazyCourseCheckpointProps) {
   return (
     <div ref={ref}>
       {ready ? (
-        <Suspense fallback={skeleton}>
-          <CourseCheckpoint {...props} />
-        </Suspense>
+        // Boundary inside the `ready` gate and outside `Suspense`, so it
+        // catches both a failed chunk fetch and a throw from the loaded
+        // component's own render. Without it the nearest boundary is the
+        // lesson route's error.tsx, which would replace a whole lesson the
+        // reader has just finished with an error page over one optional
+        // practice block at the very bottom of it.
+        <ComponentErrorBoundary
+          status="Fault: checkpoint offline"
+          what="This checkpoint failed to load."
+        >
+          <Suspense fallback={skeleton}>
+            <CourseCheckpoint {...props} />
+          </Suspense>
+        </ComponentErrorBoundary>
       ) : (
         skeleton
       )}

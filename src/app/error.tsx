@@ -37,9 +37,9 @@ export default function Error({
       <SectionTitle level={1} size="xl" className="mt-4">
         This calculation collapsed
       </SectionTitle>
-      <Lede className="mt-5 max-w-[42rem]">
-        An unexpected error interrupted this page — likely a bug in one of the interactive
-        simulators, not something you did. You can try again, or head back to a known-good state.
+      <Lede className="mt-5 max-w-lede">
+        Something on this page threw an error. It is almost certainly a bug in one of the
+        interactive simulators rather than anything you did. Try again, or go back to the home page.
       </Lede>
 
       <div className="mt-8 flex flex-wrap gap-3">

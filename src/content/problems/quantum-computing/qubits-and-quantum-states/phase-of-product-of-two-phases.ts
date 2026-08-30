@@ -33,11 +33,11 @@ export const phaseOfProductOfTwoPhases: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "That's what you'd get by multiplying the phases together (π/6 × π/3), not adding them — phases add under multiplication, they don't multiply.",
-      c: "That's just z₁'s own phase, unchanged — multiplying by z₂ has to do something.",
+      b: "That comes from multiplying the phases (π/6 × π/3) rather than adding them. Multiplying two complex numbers adds their phases.",
+      c: "That is z₁'s own phase, unchanged. Multiplying by z₂ rotates it by z₂'s phase.",
       d: "Check the addition: π/6 + π/3 needs a common denominator (sixths), not ninths.",
     },
-    defaultIncorrectFeedback: "Recall the polar-form multiplication rule: z₁z₂ = r₁r₂ e^{i(θ₁+θ₂)} — the phases add.",
+    defaultIncorrectFeedback: "Recall the polar-form multiplication rule: z₁z₂ = r₁r₂ e^{i(θ₁+θ₂)}, so the phases add.",
   },
   hints: [
     { text: "In polar form, z₁z₂ = r₁r₂ e^{i(θ₁+θ₂)}: magnitudes multiply, phases add." },
@@ -52,7 +52,7 @@ export const phaseOfProductOfTwoPhases: MultipleChoiceProblem = {
     finalAnswer: "$\\pi/2$",
   },
   explanation: {
-    correctIdea: "Multiplying complex numbers in polar form multiplies their magnitudes and adds their phases — this is a direct consequence of the exponent rule $e^{a}e^{b}=e^{a+b}$.",
+    correctIdea: "Multiplying complex numbers in polar form multiplies their magnitudes and adds their phases, a direct consequence of the exponent rule $e^{a}e^{b}=e^{a+b}$.",
     whyCorrect: `Directly verified: z₁ = e^{iπ/6}, z₂ = e^{iπ/3}, and their product's computed phase is ${productPhase.toFixed(4)} ≈ π/2 (${(Math.PI / 2).toFixed(4)}).`,
     whyWrong: [
       { optionId: "b", text: "Multiplies the phases, applying the magnitude rule to the wrong quantity. Magnitudes multiply; phases add." },

@@ -20,20 +20,32 @@ export const isolationVsCouplingTradeoff: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["isolated", "well-shielded", "atomic levels", "not easily perturbed"],
-      ["slow", "weak coupling", "laser-driven", "microseconds"],
+      {
+        phrases: ["isolated", "isolation", "well-shielded", "atomic levels", "not easily perturbed"],
+        missingFeedback:
+          "Start with the coherence side. Say what it is about a trapped ion that keeps the environment from disturbing it.",
+      },
+      {
+        phrases: ["slow", "weak coupling", "laser-driven", "microseconds"],
+        missingFeedback:
+          "You have the coherence side. Now say what that same property costs you when you want to drive a gate, and how it shows up in the gate time.",
+      },
     ],
-    incorrectFeedback: "Address both halves: why the isolation that helps coherence exists, and why that same property makes fast coupling harder to achieve.",
-    partialFeedback: "Good — now be explicit about the causal link between the isolation property and the resulting SLOW gate mechanism.",
+    incorrectFeedback: "The two halves are the same fact seen twice, and the answer has to say so. Name the property of a trapped ion's energy levels that keeps the environment from reaching them, then point out that a gate drive is also part of the environment. Whatever makes the first true makes the second hard, and the answer should say what that costs in gate duration.",
+    partialFeedback: "Good. Now make the causal link explicit rather than listing the two facts side by side: say why the very thing that protects the qubit is what forces the gate mechanism to be feeble and to take as long as it does.",
+    modelAnswers: [
+      "Trapped ions are extremely well isolated: the qubit lives in atomic levels that the environment barely touches, which is exactly why coherence times are so long. But the same isolation means external fields couple to them weakly, so gates have to be laser-driven and end up slow, in the microseconds.",
+      "You cannot have it both ways. Good isolation from noise is also isolation from your control fields, so the coupling is weak and gates take microseconds rather than nanoseconds.",
+    ],
   },
   hints: [
-    { text: "Trapped ions' atomic energy levels are naturally well-isolated from environmental noise — this is exactly what gives them long coherence times." },
-    { text: "But that same isolation means the qubit doesn't easily couple to anything, including the fields used to drive gates." },
-    { text: "Gates then rely on comparatively weak, slow laser-driven mechanisms (and collective motion) rather than fast, strong, always-on coupling." },
+    { text: "A trapped ion's energy levels sit deep inside the atom and the surroundings barely reach them. That is where the long coherence comes from." },
+    { text: "A gate drive has to reach them too. Ask what the same protection does to the drive." },
+    { text: "The result is a gate mechanism that is comparatively feeble, relying on light and on collective motion rather than on a strong, always-on link. Ask what that means for gate duration." },
   ],
   solution: {
     steps: [
-      { description: "Trapped ions' atomic energy levels are naturally well-isolated from environmental perturbation — exactly the property that gives them long coherence times." },
+      { description: "Trapped ions' atomic energy levels are naturally well-isolated from environmental perturbation, which is the property that gives them long coherence times." },
       { description: "This same isolation means the qubit doesn't readily couple to external fields either, including the ones used to drive gates." },
       { description: "As a result, gates rely on comparatively weak, laser-driven coupling through the shared motional mode, which is inherently slower (microseconds) than a strongly, directly coupled system like a superconducting circuit's fast (nanosecond) but noise-sensitive gates." },
     ],
@@ -41,7 +53,7 @@ export const isolationVsCouplingTradeoff: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "This makes the abstract 'no free lunch' pattern concrete with a specific causal mechanism, using a platform this course already covered in detail.",
-    whyCorrect: "Matches the general physical principle underlying every platform comparison in this course, applied specifically to trapped ions as requested.",
-    whyWrong: ["Simply restating 'there's always a tradeoff' without identifying the SPECIFIC causal link (isolation weakens coupling) doesn't demonstrate the mechanism."],
+    whyCorrect: "Coherence and controllability are the same coupling seen from two sides. An ion's levels are hard for stray fields to reach, and a gate laser is a field too, so the protection that buys long coherence is what forces gates to take microseconds.",
+    whyWrong: ["Restating 'there's always a tradeoff' without identifying the specific causal link, that isolation weakens coupling, does not demonstrate the mechanism."],
   },
 };

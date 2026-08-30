@@ -39,6 +39,7 @@ export const ghzMeasurementProbability111: NumericProblem = {
   hints: [
     { text: "The GHZ state has exactly two nonzero terms: $|000\\rangle$ and $|111\\rangle$, each with amplitude $\\frac{1}{\\sqrt2}$." },
     { text: "The Born rule says $P(\\text{outcome}) = |\\text{amplitude}|^2$." },
+    { text: "Square that amplitude, then check the total: only two outcomes have nonzero probability, and the two must sum to 1." },
   ],
   solution: {
     steps: [

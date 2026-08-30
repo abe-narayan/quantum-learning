@@ -37,6 +37,19 @@ export type FilterOption<T extends string> = {
   label: string;
   /** How many items this option would leave. Rendered as a quiet readout. */
   count?: number;
+  /**
+   * An optional glyph for options that already have one elsewhere on the page,
+   * so the chip and the thing it filters read as the same category. Added for
+   * `/current-quantum`, whose category chips carry the same icon its cards do;
+   * that page used to render its own copy of this control with a
+   * `fieldset`/`legend` (see the note in `CurrentQuantumCatalog`) and the icon
+   * was the one thing it had that this component did not.
+   *
+   * Decoration only, never a state or meaning channel: the label beside it
+   * always says the same thing in words, and the selected state stays the
+   * filled disc plus `aria-pressed`. Pass an already-`aria-hidden` node.
+   */
+  icon?: ReactNode;
 };
 
 export function FilterChips<T extends string>({
@@ -46,6 +59,7 @@ export function FilterChips<T extends string>({
   onChange,
   className,
   action,
+  countNoun = "results",
 }: {
   label: string;
   options: FilterOption<T>[];
@@ -54,6 +68,16 @@ export function FilterChips<T extends string>({
   className?: string;
   /** Optional trailing control (e.g. a "Clear filter" button). */
   action?: ReactNode;
+  /**
+   * What `count` counts, e.g. "courses" or "lessons". Rendered `sr-only`
+   * after the number: visually the bare figure is unambiguous beside a
+   * heading that already says what the page lists, but a screen reader
+   * otherwise announces the chip as "All, 12" — a number with no
+   * unit, which is the same defect as an unlabelled readout. Always plural;
+   * a count of 1 is rare enough here that a singular form is not worth a
+   * second prop.
+   */
+  countNoun?: string;
 }) {
   return (
     <div className={className}>
@@ -77,8 +101,13 @@ export function FilterChips<T extends string>({
                   ? "border-pillar bg-pillar-wash font-medium text-pillar-text"
                   : "border-border bg-surface text-muted-foreground hover:border-border-strong hover:text-foreground",
                 // A level with nothing behind it stays selectable (choosing it
-                // is how you find that out for certain) but reads as thin.
-                !isSelected && isEmpty && "opacity-60"
+                // is how you find that out for certain) but reads as
+                // provisional. A dashed edge, not the `opacity-60` this used
+                // to carry: fading the whole chip dimmed its *text* too, which
+                // pushed `text-muted-foreground` on `--surface` under the 4.5:1
+                // floor to say something the "0" beside it already says.
+                // Dashed is a shape channel and costs no contrast.
+                !isSelected && isEmpty && "border-dashed"
               )}
             >
               {/* The shape channel. `aria-hidden` because `aria-pressed`
@@ -94,10 +123,12 @@ export function FilterChips<T extends string>({
               >
                 {isSelected ? <span className="h-1.5 w-1.5 rounded-full bg-pillar" /> : null}
               </span>
+              {option.icon}
               {option.label}
               {typeof option.count === "number" ? (
-                <span className="font-tech text-[0.65rem] tabular-nums text-subtle-foreground">
+                <span className="font-tech text-micro tabular-nums text-subtle-foreground">
                   {option.count}
+                  <span className="sr-only"> {countNoun}</span>
                 </span>
               ) : null}
             </button>

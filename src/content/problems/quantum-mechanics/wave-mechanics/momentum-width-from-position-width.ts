@@ -14,14 +14,14 @@ export const momentumWidthFromPositionWidth: NumericProblem = {
   },
   question: {
     type: "numeric",
-    prompt: "A Gaussian wave packet has position-space width sigma = 1.5. Find its momentum-space width Delta k = 1/(2*sigma).",
-    inputHint: "a decimal",
+    prompt: "A Gaussian wave packet has position-space width sigma = 1.5. Find its momentum-space width Delta k.",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
     value: 0.333333,
     tolerance: 0.001,
-    incorrectFeedback: "Delta k = 1/(2*sigma) directly — substitute sigma=1.5.",
+    incorrectFeedback: "Delta k = 1/(2*sigma). Substitute sigma=1.5 and divide.",
     nearMisses: [
       { value: 3, feedback: "3 is 2σ. The relationship is inverse: a wider packet in position is narrower in momentum." },
       { value: 1 / 1.5, tolerance: 0.002, feedback: "That is 1/σ, missing the factor of 2 in the denominator." },
@@ -29,7 +29,9 @@ export const momentumWidthFromPositionWidth: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Use the direct formula Delta k = 1/(2*sigma) derived from the Gaussian Fourier transform pair." },
+    { text: "A Gaussian's Fourier transform is another Gaussian, and the two widths move in opposite directions: narrow the packet in position and it broadens in momentum." },
+    { text: "The lesson's transform pair fixes the product $\\sigma\\,\\Delta k$ at a constant. Write that constant down, then solve for $\\Delta k$." },
+    { text: "That constant is one half, not one. Settle the factor of 2 before dividing." },
   ],
   solution: {
     steps: [

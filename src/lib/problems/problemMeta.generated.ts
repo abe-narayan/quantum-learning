@@ -55,6 +55,24 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     ]
   },
   {
+    "slug": "block-encoding-subnormalization-factor-of-a-unitary-block",
+    "title": "Reading the Subnormalization Factor Off a Block",
+    "course": "algorithmic-frontiers",
+    "lesson": "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries",
+    "difficulty": "master",
+    "estimatedMinutes": 8,
+    "problemType": "numeric",
+    "tags": [
+      "block-encoding",
+      "lcu",
+      "subnormalization",
+      "operator-norm"
+    ],
+    "prerequisites": [
+      "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries"
+    ]
+  },
+  {
     "slug": "capstone-toolbox-honest-unification-mc",
     "title": "What QSVT Does and Doesn't Prove",
     "course": "algorithmic-frontiers",
@@ -96,7 +114,7 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     "title": "Sizing the PREPARE Ancilla Register",
     "course": "algorithmic-frontiers",
     "lesson": "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries",
-    "difficulty": "master",
+    "difficulty": "intermediate",
     "estimatedMinutes": 5,
     "problemType": "numeric",
     "tags": [
@@ -212,6 +230,25 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     ]
   },
   {
+    "slug": "qsvt-three-polynomials-three-special-cases-mc",
+    "title": "Three Polynomials, Three Algorithms",
+    "course": "algorithmic-frontiers",
+    "lesson": "apex/algorithmic-frontiers/the-quantum-singular-value-transformation",
+    "difficulty": "master",
+    "estimatedMinutes": 8,
+    "problemType": "multiple-choice",
+    "tags": [
+      "qsvt",
+      "quantum-signal-processing",
+      "hamiltonian-simulation",
+      "amplitude-amplification",
+      "linear-systems"
+    ],
+    "prerequisites": [
+      "apex/algorithmic-frontiers/the-quantum-singular-value-transformation"
+    ]
+  },
+  {
     "slug": "qsvt-versus-trotter-asymptotic-claim",
     "title": "Does QSVT Make Trotterization Obsolete?",
     "course": "algorithmic-frontiers",
@@ -247,6 +284,24 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     ]
   },
   {
+    "slug": "decoding-mwpm-four-defect-matching-weight",
+    "title": "Minimum Matching Weight for a Four-Defect Syndrome",
+    "course": "fault-tolerance-frontiers",
+    "lesson": "apex/fault-tolerance-frontiers/decoding-surface-codes",
+    "difficulty": "master",
+    "estimatedMinutes": 8,
+    "problemType": "numeric",
+    "tags": [
+      "surface-codes",
+      "decoding",
+      "minimum-weight-perfect-matching",
+      "graph-matching"
+    ],
+    "prerequisites": [
+      "apex/fault-tolerance-frontiers/decoding-surface-codes"
+    ]
+  },
+  {
     "slug": "decoding-threshold-scaling-ratio",
     "title": "Comparing Logical Error Rates Across Code Distances",
     "course": "fault-tolerance-frontiers",
@@ -264,6 +319,25 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     ]
   },
   {
+    "slug": "gottesman-knill-which-circuit-is-simulable-mc",
+    "title": "Which Circuit Gottesman-Knill Covers",
+    "course": "fault-tolerance-frontiers",
+    "lesson": "apex/fault-tolerance-frontiers/magic-states-and-distillation",
+    "difficulty": "master",
+    "estimatedMinutes": 7,
+    "problemType": "multiple-choice",
+    "tags": [
+      "gottesman-knill",
+      "clifford-group",
+      "stabilizer-circuits",
+      "t-gate",
+      "magic-states"
+    ],
+    "prerequisites": [
+      "apex/fault-tolerance-frontiers/magic-states-and-distillation"
+    ]
+  },
+  {
     "slug": "lattice-surgery-cnot-merge-count",
     "title": "Counting Merges in the Lattice-Surgery CNOT",
     "course": "fault-tolerance-frontiers",
@@ -277,7 +351,26 @@ export const PROBLEM_METAS: ProblemMeta[] = [
       "fault-tolerance"
     ],
     "prerequisites": [
-      "apex/fault-tolerance-frontiers/surface-codes-in-depth"
+      "apex/fault-tolerance-frontiers/surface-codes-in-depth",
+      "apex/fault-tolerance-frontiers/lattice-surgery"
+    ]
+  },
+  {
+    "slug": "lattice-surgery-merge-split-measured-operator-mc",
+    "title": "What a Rough-Boundary Merge and Split Measured",
+    "course": "fault-tolerance-frontiers",
+    "lesson": "apex/fault-tolerance-frontiers/lattice-surgery",
+    "difficulty": "master",
+    "estimatedMinutes": 7,
+    "problemType": "multiple-choice",
+    "tags": [
+      "lattice-surgery",
+      "surface-codes",
+      "logical-measurement",
+      "measurement-back-action"
+    ],
+    "prerequisites": [
+      "apex/fault-tolerance-frontiers/lattice-surgery"
     ]
   },
   {
@@ -294,7 +387,8 @@ export const PROBLEM_METAS: ProblemMeta[] = [
       "fault-tolerance"
     ],
     "prerequisites": [
-      "apex/fault-tolerance-frontiers/surface-codes-in-depth"
+      "apex/fault-tolerance-frontiers/surface-codes-in-depth",
+      "apex/fault-tolerance-frontiers/lattice-surgery"
     ]
   },
   {
@@ -379,6 +473,24 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     "tags": [
       "surface-codes",
       "css-codes",
+      "stabilizer-formalism"
+    ],
+    "prerequisites": [
+      "apex/fault-tolerance-frontiers/surface-codes-in-depth"
+    ]
+  },
+  {
+    "slug": "surface-code-logical-string-minimum-weight",
+    "title": "Weight of the Shortest Boundary-to-Boundary String",
+    "course": "fault-tolerance-frontiers",
+    "lesson": "apex/fault-tolerance-frontiers/surface-codes-in-depth",
+    "difficulty": "master",
+    "estimatedMinutes": 7,
+    "problemType": "numeric",
+    "tags": [
+      "surface-codes",
+      "code-distance",
+      "logical-operators",
       "stabilizer-formalism"
     ],
     "prerequisites": [
@@ -474,6 +586,25 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     "prerequisites": [
       "apex/quantum-complexity-theory/capstone-what-we-know-and-dont",
       "apex/quantum-complexity-theory/query-complexity-and-lower-bounds"
+    ]
+  },
+  {
+    "slug": "capstone-tiering-nlts-against-quantum-pcp-mc",
+    "title": "Tiering NLTS Against the Quantum PCP Conjecture",
+    "course": "quantum-complexity-theory",
+    "lesson": "apex/quantum-complexity-theory/capstone-what-we-know-and-dont",
+    "difficulty": "master",
+    "estimatedMinutes": 7,
+    "problemType": "multiple-choice",
+    "tags": [
+      "complexity-theory",
+      "quantum-pcp",
+      "nlts",
+      "claim-evaluation",
+      "proven-vs-conjectured"
+    ],
+    "prerequisites": [
+      "apex/quantum-complexity-theory/capstone-what-we-know-and-dont"
     ]
   },
   {
@@ -585,6 +716,24 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     ]
   },
   {
+    "slug": "query-lower-bound-versus-wall-clock-time",
+    "title": "What the √N Bound Does and Does Not Fix",
+    "course": "quantum-complexity-theory",
+    "lesson": "apex/quantum-complexity-theory/query-complexity-and-lower-bounds",
+    "difficulty": "master",
+    "estimatedMinutes": 9,
+    "problemType": "conceptual",
+    "tags": [
+      "query-complexity",
+      "lower-bounds",
+      "oracle-model",
+      "scope-of-a-theorem"
+    ],
+    "prerequisites": [
+      "apex/quantum-complexity-theory/query-complexity-and-lower-bounds"
+    ]
+  },
+  {
     "slug": "shors-algorithm-does-not-prove-p-neq-bqp",
     "title": "Why Shor's Algorithm Does Not Prove P ≠ BQP",
     "course": "quantum-complexity-theory",
@@ -639,6 +788,26 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     "prerequisites": [
       "apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today",
       "apex/fault-tolerance-frontiers/the-threshold-theorem"
+    ]
+  },
+  {
+    "slug": "capstone-landscape-logical-qubits-from-a-physical-count",
+    "title": "What 1,121 Physical Qubits Actually Buys",
+    "course": "research-methods-and-synthesis",
+    "lesson": "apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today",
+    "difficulty": "master",
+    "estimatedMinutes": 9,
+    "problemType": "numeric",
+    "tags": [
+      "state-of-the-field",
+      "resource-estimation",
+      "fault-tolerance",
+      "claim-evaluation",
+      "synthesis"
+    ],
+    "prerequisites": [
+      "apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today",
+      "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm"
     ]
   },
   {
@@ -3924,14 +4093,15 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "crosstalk-fidelity-at-0.1",
-    "title": "Crosstalk Fidelity Loss for ε=0.1 Radians",
+    "title": "How Long a Spectator Survives ε=0.1 Crosstalk",
     "course": "noise-decoherence-and-scaling",
     "lesson": "quantum-hardware/noise-decoherence-and-scaling/crosstalk",
-    "difficulty": "intermediate",
-    "estimatedMinutes": 5,
+    "difficulty": "advanced",
+    "estimatedMinutes": 7,
     "problemType": "numeric",
     "tags": [
-      "crosstalk"
+      "crosstalk",
+      "scaling"
     ],
     "prerequisites": [
       "quantum-hardware/noise-decoherence-and-scaling/crosstalk"
@@ -3973,8 +4143,8 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     "title": "How Many Gates at 99.99% Fidelity Before 50% Success?",
     "course": "noise-decoherence-and-scaling",
     "lesson": "quantum-hardware/noise-decoherence-and-scaling/scaling-challenges",
-    "difficulty": "intermediate",
-    "estimatedMinutes": 5,
+    "difficulty": "advanced",
+    "estimatedMinutes": 7,
     "problemType": "numeric",
     "tags": [
       "scaling"
@@ -4078,8 +4248,8 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     "title": "Why Misclassifying an Error Wastes Engineering Effort",
     "course": "noise-decoherence-and-scaling",
     "lesson": "quantum-hardware/noise-decoherence-and-scaling/sources-of-noise",
-    "difficulty": "intermediate",
-    "estimatedMinutes": 5,
+    "difficulty": "advanced",
+    "estimatedMinutes": 7,
     "problemType": "conceptual",
     "tags": [
       "noise-sources",
@@ -4463,11 +4633,11 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "gradient-variance-at-n4-recall",
-    "title": "Recalling the Measured Gradient Variance at n=4",
+    "title": "Extrapolating Gradient Variance from n=4 to n=6",
     "course": "advanced-algorithms-and-complexity",
     "lesson": "quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability",
-    "difficulty": "beginner",
-    "estimatedMinutes": 3,
+    "difficulty": "master",
+    "estimatedMinutes": 6,
     "problemType": "numeric",
     "tags": [
       "barren-plateaus",
@@ -4511,15 +4681,16 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "quantum-walk-displacement-at-10000",
-    "title": "Quantum Walk Typical Displacement at T=10000",
+    "title": "Classical Steps Needed to Match 10000 Quantum Walk Steps",
     "course": "advanced-algorithms-and-complexity",
     "lesson": "quantum-mastery/advanced-algorithms-and-complexity/quantum-walks",
-    "difficulty": "intermediate",
-    "estimatedMinutes": 5,
+    "difficulty": "master",
+    "estimatedMinutes": 7,
     "problemType": "numeric",
     "tags": [
       "quantum-walks",
-      "ballistic-spreading"
+      "ballistic-spreading",
+      "diffusive-spreading"
     ],
     "prerequisites": [
       "quantum-mastery/advanced-algorithms-and-complexity/quantum-walks"
@@ -5291,15 +5462,16 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "coherent-state-mean-photon-number",
-    "title": "Mean Photon Number of a Coherent State",
+    "title": "Second Moment of the Photon Number in a Coherent State",
     "course": "symmetry-scattering-and-semiclassical-methods",
     "lesson": "quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states",
-    "difficulty": "beginner",
-    "estimatedMinutes": 4,
+    "difficulty": "master",
+    "estimatedMinutes": 7,
     "problemType": "numeric",
     "tags": [
       "coherent-states",
-      "harmonic-oscillator"
+      "harmonic-oscillator",
+      "ladder-operators"
     ],
     "prerequisites": [
       "quantum-mastery/symmetry-scattering-and-semiclassical-methods/coherent-and-squeezed-states"
@@ -5340,16 +5512,17 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "hard-sphere-cross-section-at-ka-half",
-    "title": "Hard-Sphere s-Wave Cross Section at ka=0.5",
+    "title": "Where the Hard Sphere Reaches Half Its Unitarity Bound",
     "course": "symmetry-scattering-and-semiclassical-methods",
     "lesson": "quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix",
-    "difficulty": "intermediate",
-    "estimatedMinutes": 6,
+    "difficulty": "master",
+    "estimatedMinutes": 7,
     "problemType": "numeric",
     "tags": [
       "scattering",
       "partial-waves",
-      "s-matrix"
+      "s-matrix",
+      "unitarity"
     ],
     "prerequisites": [
       "quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix"
@@ -5357,16 +5530,17 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "j1-j1-top-multiplet-size",
-    "title": "Coupling Two j=1 Systems: Size of the Top Multiplet",
+    "title": "Selection Rules Inside the Top Multiplet of j=1 ⊗ j=1",
     "course": "symmetry-scattering-and-semiclassical-methods",
     "lesson": "quantum-mastery/symmetry-scattering-and-semiclassical-methods/clebsch-gordan-coefficients-and-the-wigner-eckart-theorem",
-    "difficulty": "beginner",
-    "estimatedMinutes": 4,
+    "difficulty": "master",
+    "estimatedMinutes": 7,
     "problemType": "numeric",
     "tags": [
       "clebsch-gordan",
-      "angular-momentum",
-      "triangle-rule"
+      "wigner-eckart",
+      "selection-rules",
+      "angular-momentum"
     ],
     "prerequisites": [
       "quantum-mastery/symmetry-scattering-and-semiclassical-methods/clebsch-gordan-coefficients-and-the-wigner-eckart-theorem"
@@ -5441,14 +5615,16 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "channels-reused-in-hardware-pillar",
-    "title": "Which Engine Functions Get Reused in Noise, Decoherence & Scaling?",
+    "title": "What Amplitude Damping and Dephasing Each Leave Behind",
     "course": "advanced-quantum-mechanics",
     "lesson": "quantum-mechanics/advanced-quantum-mechanics/capstone-operators-and-paths",
-    "difficulty": "beginner",
-    "estimatedMinutes": 3,
+    "difficulty": "intermediate",
+    "estimatedMinutes": 5,
     "problemType": "multiple-choice",
     "tags": [
-      "capstone"
+      "capstone",
+      "open-systems",
+      "decoherence"
     ],
     "prerequisites": [
       "quantum-mechanics/advanced-quantum-mechanics/capstone-operators-and-paths"
@@ -5676,15 +5852,16 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "l-equals-2-degeneracy-count",
-    "title": "How Many m-States Share an l=2 Energy Level?",
+    "title": "From the Commutation Relations to Hydrogen's Shell Degeneracy",
     "course": "angular-momentum-and-spin",
     "lesson": "quantum-mechanics/angular-momentum-and-spin/capstone-from-abstract-algebra-to-the-hydrogen-atom",
-    "difficulty": "beginner",
-    "estimatedMinutes": 3,
+    "difficulty": "advanced",
+    "estimatedMinutes": 7,
     "problemType": "numeric",
     "tags": [
       "capstone",
-      "degeneracy"
+      "degeneracy",
+      "synthesis"
     ],
     "prerequisites": [
       "quantum-mechanics/angular-momentum-and-spin/capstone-from-abstract-algebra-to-the-hydrogen-atom"
@@ -6431,15 +6608,16 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "zero-point-energy",
-    "title": "The Ground-State (Zero-Point) Energy",
+    "title": "Why the Ground State Cannot Sit at the Bottom",
     "course": "classical-to-quantum",
     "lesson": "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator",
-    "difficulty": "beginner",
-    "estimatedMinutes": 3,
+    "difficulty": "intermediate",
+    "estimatedMinutes": 6,
     "problemType": "multiple-choice",
     "tags": [
       "harmonic-oscillator",
-      "zero-point-energy"
+      "zero-point-energy",
+      "uncertainty"
     ],
     "prerequisites": [
       "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator"
@@ -7957,15 +8135,16 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "infinite-well-node-count",
-    "title": "Counting Nodes in an Infinite Well Eigenstate",
+    "title": "From a Node Count to an Energy",
     "course": "wave-mechanics",
     "lesson": "quantum-mechanics/wave-mechanics/the-infinite-square-well",
-    "difficulty": "beginner",
-    "estimatedMinutes": 4,
+    "difficulty": "intermediate",
+    "estimatedMinutes": 6,
     "problemType": "numeric",
     "tags": [
       "infinite-square-well",
-      "eigenstates"
+      "eigenstates",
+      "energy-levels"
     ],
     "prerequisites": [
       "quantum-mechanics/wave-mechanics/the-infinite-square-well"
@@ -8440,14 +8619,16 @@ export const PROBLEM_METAS: ProblemMeta[] = [
   },
   {
     "slug": "total-swaps-500-iterations",
-    "title": "Total SWAP Gates Across a 500-Iteration VQE Run",
+    "title": "How Many VQE Iterations the Routing Overhead Survives",
     "course": "compilation-and-hybrid-algorithms",
     "lesson": "quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows",
-    "difficulty": "beginner",
-    "estimatedMinutes": 3,
+    "difficulty": "advanced",
+    "estimatedMinutes": 7,
     "problemType": "numeric",
     "tags": [
-      "hybrid-workflows"
+      "hybrid-workflows",
+      "routing",
+      "noise"
     ],
     "prerequisites": [
       "quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows"
@@ -8536,7 +8717,7 @@ export const PROBLEM_METAS: ProblemMeta[] = [
     "title": "Is a 4000/1000 Split Shot Noise or Something Else?",
     "course": "programming-quantum-computers",
     "lesson": "quantum-software/programming-quantum-computers/writing-your-first-circuit",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "estimatedMinutes": 6,
     "problemType": "conceptual",
     "tags": [

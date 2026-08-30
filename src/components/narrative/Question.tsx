@@ -24,9 +24,13 @@ import { cn } from "@/lib/utils";
 export function Question({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div className={cn("not-prose my-10 border-l-4 border-pillar pl-5 sm:pl-7", className)}>
-      <p className="font-display text-2xl font-medium leading-snug text-foreground sm:text-3xl">
+      {/* `div`, not `p`: MDX wraps a block of prose between this component's
+          tags in its own `<p>`, and `<p><p>` is not parseable HTML. See
+          LessonHook for the full note; every style here is inherited, so the
+          rendering is unchanged. */}
+      <div className="space-y-4 font-display text-2xl font-medium leading-snug text-foreground sm:text-3xl">
         {children}
-      </p>
+      </div>
     </div>
   );
 }

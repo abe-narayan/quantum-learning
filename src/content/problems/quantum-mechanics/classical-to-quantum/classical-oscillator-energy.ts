@@ -43,8 +43,8 @@ export const classicalOscillatorEnergy: NumericProblem = {
     finalAnswer: "$E = 13$",
   },
   explanation: {
-    correctIdea: "A classical observable is just a function evaluated at the known state — no probability involved.",
-    whyCorrect: "Both terms are exact given exact x, p — there's no ambiguity in a classical observable's value.",
+    correctIdea: "A classical observable is a function evaluated at the known state, with no probability involved.",
+    whyCorrect: "Both terms are determined once x and p are known, so a classical observable's value carries no ambiguity.",
     whyWrong: ["Forgetting to divide p² by 2m, or squaring x incorrectly, are the most common arithmetic slips here."],
   },
 };

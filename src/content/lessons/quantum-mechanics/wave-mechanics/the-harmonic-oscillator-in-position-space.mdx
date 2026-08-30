@@ -22,16 +22,15 @@ export const lessonMeta = {
   ],
   objectives: [
     "Verify by direct substitution that the Gaussian ground state solves the position-space Schrödinger equation with E_0 = hbar*omega/2",
-    "Connect the position-space eigenstates to the ladder-operator treatment from the last course as two representations of the same physics",
-    "Identify the physical potential V(x) = (1/2) m omega^2 x^2 the abstract H = hbar*omega(N+1/2) from the last course was standing in for",
+    "Recognize the ladder-operator spectrum and the position-space one as two routes to the same oscillator, and name the physical potential V(x) = (1/2) m omega^2 x^2 that the abstract H was standing in for",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="A promise the last course made">
 The last course solved the harmonic oscillator with ladder operators, a commutator, and nothing but linear algebra, promising that the connection to the physical potential ½mω²x² would come once continuous position was developed. This lesson is that promise kept.
 </LessonHook>
 
-## Motivation
+## The same spectrum by a completely different route
 
 That promise was stated precisely: "the connection between this $H$ and
 the physical potential $\tfrac12m\omega^2x^2$ is made precise once
@@ -51,7 +50,7 @@ not: which potential the abstract $H$ was standing in for all along.
   license="Public domain"
 />
 
-## Intuition
+## Every stable minimum is a parabola up close
 
 The classical harmonic oscillator's potential energy is
 $V(x)=\tfrac12m\omega^2x^2$, a parabola, the potential every stable
@@ -60,7 +59,7 @@ potential's Taylor expansion around a minimum starts with a quadratic
 term). The ground state should be some localized "blob" centered at the
 minimum; a Gaussian is the natural guess, and this lesson checks it works.
 
-## Mathematical Development
+## Guess a Gaussian, then make it verify itself
 
 ### The candidate ground state
 
@@ -161,7 +160,7 @@ widened without limit. The same diagram component draws two different
 spectra because the potentials differ: a quadratic well produces evenly
 spaced levels, a hard box does not.
 
-## Physical Interpretation
+## Where the turning points show up in the shape
 
 The Gaussian shape reflects the classical turning points: the harmonic
 potential rises steeply away from $x=0$, so the wavefunction decays
@@ -169,11 +168,11 @@ smoothly into the classically forbidden region, visibly different from
 the infinite well's abrupt, hard cutoff to zero (compare the two
 Explorer presets directly).
 
-<InteractiveSection title="Soft tails vs. hard walls" description="Compare the Harmonic Oscillator presets' shapes to the Infinite Well's. The harmonic ground state's Gaussian tails extend smoothly outward (classically forbidden but quantum-mechanically present, however small), where the well's eigenstates are hard-clipped to zero at the boundary. Both are numerically confirmed stationary, and both match their respective analytical energies in the comparison panel.">
+<InteractiveSection title="Soft tails vs. hard walls" description="Compare the Harmonic Oscillator presets' shapes to the Infinite Well's. The harmonic ground state's Gaussian tails extend smoothly outward (classically forbidden but quantum-mechanically present, however small), where the well's eigenstates are hard-clipped to zero at the boundary. Check each against its own analytical energy in the comparison panel, and check whether each is genuinely stationary while you are there.">
   <LazyWavefunctionExplorer initialPresetId="harmonic-ground" />
 </InteractiveSection>
 
-## Worked Example
+## Three levels at omega = 2 and the gap between them
 
 **For $\omega=2$ (natural units, $\hbar=m=1$), find $E_0,E_1,E_2$ and
 confirm the spacing is exactly $\omega$.**
@@ -189,7 +188,7 @@ $$
 matching `harmonicOscillatorEnergyLevel(n, omega)` and the last
 course's algebraic result.
 
-## Common Mistakes
+## Two derivations, one oscillator
 
 <Callout type="note">
 **Thinking this derivation and the ladder-operator one describe
@@ -211,10 +210,146 @@ differentiating the exponent.
 1. Confirm $\psi_0(x)$ as given is properly <Term id="normalization">normalized</Term> by checking the
    prefactor against the general Gaussian normalization worked out in the
    Probability Density lesson (with $\sigma^2=\hbar/(m\omega)$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The two expressions are the same function, once $\sigma^2$ is
+   substituted.
+
+   The Probability Density lesson normalized
+   $\psi(x) = A\,e^{-x^2/(2\sigma^2)}$ and found $A=(\pi\sigma^2)^{-1/4}$.
+   Put $\sigma^2 = \hbar/(m\omega)$ into both halves of that.
+
+   The exponent:
+
+   $$
+   -\frac{x^2}{2\sigma^2} = -\frac{x^2}{2\hbar/(m\omega)} = -\frac{m\omega x^2}{2\hbar}
+   $$
+
+   which is exactly the exponent in the lesson's $\psi_0$.
+
+   The prefactor:
+
+   $$
+   A = \left(\pi\sigma^2\right)^{-1/4} = \left(\frac{\pi\hbar}{m\omega}\right)^{-1/4} = \left(\frac{m\omega}{\pi\hbar}\right)^{1/4}
+   $$
+
+   which is exactly the lesson's prefactor. So $\psi_0$ is normalized, and
+   no new integral was needed: the Gaussian integral was done once, three
+   lessons ago, and this is that result with a physical width substituted
+   in.
+
+   Worth reading off what $\sigma^2 = \hbar/(m\omega)$ says on its own.
+   The ground state's width shrinks as $\omega$ or $m$ grows, and it is the
+   only length that can be built out of $\hbar$, $m$ and $\omega$ at all.
+   That is why the oscillator has no free length scale to tune: unlike the
+   infinite well, whose width $L$ is imposed from outside, this system
+   manufactures its own.
+
+   Note also the width of the *density* is not $\sigma$ but $\sigma/\sqrt2$,
+   for the same reason the earlier lesson flagged: squaring
+   $e^{-x^2/(2\sigma^2)}$ gives $e^{-x^2/\sigma^2}$, a Gaussian of standard
+   deviation $\sigma/\sqrt2$. So $\Delta x = \sqrt{\hbar/(2m\omega)}$ for
+   the ground state, and the corresponding $\Delta p =
+   \sqrt{\hbar m\omega/2}$, whose product is exactly $\hbar/2$. The
+   oscillator's ground state is a minimum-uncertainty state, which is the
+   same fact the momentum-space lesson proved for a Gaussian packet, now
+   arriving as a property of a physical system rather than of a chosen
+   shape.
+
+   </details>
+
 2. Without redoing the full calculation, argue from the shape of the
    equation why doubling $\omega$ should roughly double the energy
    spacing.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $\hbar\omega$ is the only energy that can be built from the
+   three constants the problem contains, so every eigenvalue has to be a
+   pure number times $\hbar\omega$, and every *gap* scales linearly with
+   $\omega$ as a result.
+
+   The equation is
+
+   $$
+   -\frac{\hbar^2}{2m}\psi'' + \frac12 m\omega^2 x^2\psi = E\psi
+   $$
+
+   and the only constants in it are $\hbar$, $m$ and $\omega$. Their
+   dimensions are energy times time, mass, and inverse time, so the sole
+   combination with units of energy is $\hbar\omega$; $m$ cannot appear in
+   an energy on its own without dragging in a length, and the equation
+   supplies no external length. Hence $E_n = c_n\hbar\omega$ for
+   dimensionless numbers $c_n$ that depend on nothing but $n$. Doubling
+   $\omega$ doubles every $E_n$ and therefore every difference
+   $E_{n+1}-E_n$, whatever the $c_n$ turn out to be.
+
+   That is stronger than "roughly": the scaling is exact, and it holds
+   without ever solving for a single $c_n$. Filling them in afterwards
+   ($c_n = n+\tfrac12$) confirms it but adds nothing to the argument.
+
+   The mechanical reading is available too, and worth having beside the
+   dimensional one. Doubling $\omega$ steepens the potential by a factor of
+   four, which narrows the ground state's width $\sigma=\sqrt{\hbar/m\omega}$
+   by $\sqrt2$. A narrower state has more curvature, and the kinetic term
+   charges for curvature, so the levels move up. The two effects, a
+   stiffer potential and a tighter state, combine to give a linear rather
+   than quadratic dependence on $\omega$.
+
+   The contrast that makes the argument bite is the infinite well, where
+   the same style of reasoning gives a different answer. There the
+   available constants are $\hbar$, $m$ and the imposed width $L$, whose
+   only energy combination is $\hbar^2/(mL^2)$, so
+   $E_n \propto n^2\hbar^2/(mL^2)$ and the spacing grows with $n$. Same
+   method, different ingredient list, different spectrum. Dimensional
+   analysis does not guess which spectrum you have; it tells you how the
+   one you have must scale.
+
+   </details>
+
 3. In natural units, if $\omega=0.5$, what is $E_3$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $E_3 = 1.75$.
+
+   With $\hbar=1$, $E_n = \omega\left(n+\tfrac12\right)$, so
+
+   $$
+   E_3 = 0.5\left(3+\tfrac12\right) = 0.5\times3.5 = 1.75
+   $$
+
+   matching `harmonicOscillatorEnergyLevel(3, 0.5)`.
+
+   Two errors are worth separating, because they differ by different
+   amounts and only one of them is visible in the spacing.
+
+   Dropping the $\tfrac12$ gives $E_3 = 1.5$. The zero-point energy is
+   $\omega/2 = 0.25$ here, and it is added to every level equally, so the
+   gaps come out right ($0.5$ either way) and only the absolute values are
+   wrong. Checking the ladder's spacing will not catch this; checking
+   $E_0$ will, since the correct ground state is $0.25$ and the incorrect
+   one is $0$.
+
+   Counting from $n=1$ gives $E_3 = 0.5\times2.5 = 1.25$, borrowing the
+   infinite well's convention. The oscillator's ladder starts at $n=0$,
+   because that is where $a|n\rangle$ returns the zero vector, and the well's
+   starts at $n=1$, because $n=0$ there gives $\psi\equiv0$. The two
+   conventions come from genuinely different terminating conditions and do
+   not transfer.
+
+   For the whole ladder at this $\omega$: $E_0=0.25$, $E_1=0.75$,
+   $E_2=1.25$, $E_3=1.75$, spaced by $\omega=0.5$ throughout. Compare the
+   infinite well at $L=5$, whose first four levels are $0.197$, $0.790$,
+   $1.777$, $3.158$: gaps of $0.59$, $0.99$, $1.38$, widening steadily.
+   Same course, same method, two potentials, two entirely different
+   spectra.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -230,7 +365,7 @@ differentiating the exponent.
 - This confirms, via an entirely independent method, the energy spectrum
   the last course derived algebraically from $[a,a^\dagger]=1$.
 
-## Further Exploration
+## What a packet does when nothing confines it
 
 <NextDiscovery>
 [Wave Packet Dynamics and Dispersion](/lessons/quantum-mechanics/wave-mechanics/wave-packet-dynamics-and-dispersion) returns to the free

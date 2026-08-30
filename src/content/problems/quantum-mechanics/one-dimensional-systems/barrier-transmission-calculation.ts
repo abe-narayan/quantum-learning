@@ -15,7 +15,7 @@ export const barrierTransmissionCalculation: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "For E = 6, V0 = 3, and barrier width L = 1 (natural units), find the transmission probability T.",
-    inputHint: "a decimal",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -28,8 +28,9 @@ export const barrierTransmissionCalculation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "k2 = sqrt(2*(6-3)) = sqrt(6) ≈ 2.4495." },
-    { text: "Substitute into T = [1 + V0^2*sin^2(k2*L)/(4*E*(E-V0))]^(-1)." },
+    { text: "The energy sits above the barrier top here, so the wavenumber inside the barrier is real. Transmission oscillates with the width rather than decaying exponentially." },
+    { text: "Get the inside wavenumber from the reduced kinetic energy $E-V_0$, then form the barrier's phase: that wavenumber times the width." },
+    { text: "The transmission is the reciprocal of one plus a term built from $\\sin^2$ of that phase. Take the sine of an argument in radians, not degrees." },
   ],
   solution: {
     steps: [
@@ -41,6 +42,6 @@ export const barrierTransmissionCalculation: NumericProblem = {
   explanation: {
     correctIdea: "Away from resonance, transmission is high but not exactly 1 for this moderately thin barrier.",
     whyCorrect: "Direct substitution into the derived closed-form formula.",
-    whyWrong: ["Using the E<V0 tunneling formula (exponential decay) instead of this E>V0 formula would give a qualitatively wrong (and much smaller) answer — the physics genuinely differs between the two regimes."],
+    whyWrong: ["Using the E<V0 tunneling formula (exponential decay) instead of this E>V0 formula would give a qualitatively wrong, and much smaller, answer. The physics differs between the two regimes."],
   },
 };

@@ -51,9 +51,10 @@ const KATEX_HTML_PLUGIN = path.resolve(
 //   `/search-index.json`. There is no analytics/GTM script and no
 //   <iframe>/<form> usage anywhere in src/.
 // - `img-src` DOES allow-list two external hosts: `ExternalFigure`
-//   (src/components/mdx/ExternalFigure.tsx) deliberately renders a plain
-//   `<img>` pointing at real external photos/illustrations (Wikimedia
-//   Commons for nearly every lesson, plus one NIST-hosted image), not
+//   (src/components/mdx/ExternalFigure.tsx) and `AnnotatedFigure`
+//   (src/components/narrative/AnnotatedFigure.tsx) both deliberately render a
+//   plain `<img>` pointing at real external photos/illustrations (Wikimedia
+//   Commons for 138 of the 141, plus three NIST-hosted images), not
 //   next/image — see that file's own comment for why. A bare `img-src
 //   'self' data: blob:` (no external hosts) silently blocks every one of
 //   those images at the browser level: the request never reaches the
@@ -65,8 +66,13 @@ const KATEX_HTML_PLUGIN = path.resolve(
 //   ExternalFigure.tsx has its own warning comment about this coupling, and
 //   src/lib/content/__tests__/lessonImages.test.ts enforces it via `npm
 //   test`: it parses this exact `img-src` directive back out of this file
-//   and fails if any lesson's <ExternalFigure src="..."> points at a host
-//   this list doesn't allow — update both together.
+//   and fails if any lesson's <ExternalFigure src="..."> or
+//   <AnnotatedFigure src="..."> points at a host this list doesn't allow —
+//   update both together. Note the limit of that guard: it walks
+//   src/content/lessons only. `imageUrl` on a current-quantum entry
+//   (src/lib/content/currentQuantum/data.ts) renders through the same
+//   <ExternalFigure> from CurrentQuantumCard and is NOT checked against this
+//   directive by any test; all 10 of those are in-list today by hand.
 const isDev = process.env.NODE_ENV === "development";
 const cspHeader = `
   default-src 'self';

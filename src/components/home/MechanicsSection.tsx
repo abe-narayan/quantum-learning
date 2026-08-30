@@ -1,16 +1,15 @@
 import Link from "next/link";
 import { Section } from "@/components/ui/Section";
-import { Eyebrow, SectionTitle, Lede, Readouts, TechLabel } from "@/components/ui/Typography";
+import { Eyebrow, SectionTitle, Lede, TechLabel } from "@/components/ui/Typography";
 import { Reveal } from "@/components/motion/Reveal";
 import { PillarBand } from "@/components/home/PillarBand";
-import { getCoursesByPillar } from "@/lib/content/curriculum";
-import { PILLAR_VISUALS } from "@/lib/design/pillars";
+import { PillarFooter } from "@/components/home/PillarFooter";
 
 const PILLAR = "quantum-mechanics" as const;
 
 /**
  * Small, accurate, static sketches of what the lessons behind them actually
- * derive — plain SVG, no canvas. Teasers for the real interactive versions
+ * derive, plain SVG, no canvas. Teasers for the real interactive versions
  * inside the lessons and at /simulators, not a second copy of them.
  *
  * Both are `aria-hidden`: each one draws exactly what its card's own
@@ -65,40 +64,41 @@ const PHENOMENA = [
   {
     title: "Superposition",
     description:
-      "A state can be a weighted combination of two outcomes at once — written c_a|a⟩ + c_b|b⟩ — carrying a relative phase invisible in one basis and decisive in another.",
+      "A state can be a weighted combination of two outcomes at once, written c_a|a⟩ + c_b|b⟩, carrying a relative phase invisible in one basis and decisive in another.",
     href: "/lessons/quantum-mechanics/classical-to-quantum/superposition-interference-and-phase",
     Glyph: SuperpositionGlyph,
   },
   {
     title: "Tunneling",
     description:
-      "A particle aimed at a barrier taller than its own energy doesn't stop at it — its wavefunction decays smoothly through the barrier, leaving a real chance of appearing on the far side.",
+      "A particle aimed at a barrier taller than its own energy doesn't stop at it. Its wavefunction decays smoothly through the barrier, leaving a real chance of appearing on the far side.",
     href: "/lessons/quantum-mechanics/wave-mechanics/tunneling-and-the-finite-barrier",
     Glyph: TunnelingGlyph,
   },
 ];
 
 /**
- * Pillar 1 of 6 — placed where the background field's `journey` crossfade is
- * still dominated by `wave`, right after the hero's own wave-packet demo.
+ * Track 1 of 6, and the first stop in the background field's `journey`
+ * crossfade, which holds on `wave` from the top of the page until this section
+ * reaches the middle of the screen (see PillarBand's `data-journey-stop`).
  * Composition: a measured reading column, the plainest of the page's
- * alternating layouts (deliberately — the loudest compositions are saved for
- * pillars further down).
+ * alternating layouts, deliberately, since the loudest compositions are saved
+ * for tracks further down.
+ *
+ * `level={3}` because the six track sections now sit inside three `ActPlate`
+ * h2s. The visual size is unchanged: `SectionTitle` keeps `level` and `size`
+ * separate exactly so a heading can move in the outline without shrinking.
  */
 export function MechanicsSection() {
-  const courses = getCoursesByPillar(PILLAR);
-  const hours = courses.reduce((sum, course) => sum + course.estimatedHours, 0);
-  const visual = PILLAR_VISUALS[PILLAR];
-
   return (
     <PillarBand pillar={PILLAR}>
       <Section width="reading" aria-labelledby="mechanics-heading">
         <Reveal>
           <Eyebrow>01 · Quantum Mechanics</Eyebrow>
-          <SectionTitle id="mechanics-heading" className="mt-3">
+          <SectionTitle id="mechanics-heading" level={3} className="mt-3">
             Reality, from first principles
           </SectionTitle>
-          <Lede className="mt-4 max-w-none">
+          <Lede width="none" className="mt-4">
             Quantum theory on its own terms, not a computing prerequisite: the actual
             mathematics reality obeys. Linear algebra and complex numbers first, then state
             vectors, operators, and the Schrödinger equation, built up rigorously through the
@@ -106,7 +106,7 @@ export function MechanicsSection() {
           </Lede>
         </Reveal>
 
-        {/* The page's first contact with Dirac notation — the two cards
+        {/* The page's first contact with Dirac notation, the two cards
             directly below print `c_a|a⟩ + c_b|b⟩`, and ComputingSection
             prints a Bell state after that. The notation stays (it is what
             the material actually looks like, and sanding it off would make
@@ -119,8 +119,8 @@ export function MechanicsSection() {
         <Reveal delay={60} className="mt-8 border-l-2 border-pillar-edge pl-4">
           <TechLabel>Notation</TechLabel>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            <span className="font-tech text-foreground">|0⟩</span> — spoken &ldquo;ket
-            zero&rdquo; — is just a name for a state, the way <em>x</em> is a name for a
+            <span className="font-tech text-foreground">|0⟩</span>, spoken &ldquo;ket
+            zero&rdquo;, is just a name for a state, the way <em>x</em> is a name for a
             number. The cards below and the rest of this page write quantum states that
             way.{" "}
             <Link
@@ -137,13 +137,13 @@ export function MechanicsSection() {
             const Glyph = phenomenon.Glyph;
             return (
               <Reveal key={phenomenon.title} delay={index * 90}>
-                {/* The link wraps the whole card — figure, heading, description
-                    and CTA — so the accessible name would otherwise be computed
+                {/* The link wraps the whole card, figure, heading, description
+                    and CTA, so the accessible name would otherwise be computed
                     by concatenating all of it: the heading, then the whole
                     description sentence, then "See the derivation →",
                     announced as one run-on name before the reader can decide
                     whether to follow it. `aria-label` here replaces that with
-                    the one thing a name should be — where the link goes. The
+                    the one thing a name should be, where the link goes. The
                     label is the visible heading verbatim, so speech input
                     still matches what a sighted user says (WCAG 2.5.3, label
                     in name). The glyph contributes nothing either way: it is
@@ -153,7 +153,7 @@ export function MechanicsSection() {
                   <div className="text-pillar">
                     <Glyph className="h-16 w-full" />
                   </div>
-                  <h3 className="mt-3 text-base font-semibold text-foreground">{phenomenon.title}</h3>
+                  <h4 className="mt-3 text-base font-semibold text-foreground">{phenomenon.title}</h4>
                   <p className="mt-1 text-sm text-muted-foreground">{phenomenon.description}</p>
                   <span className="mt-2 inline-block text-sm font-medium text-pillar group-hover:underline">
                     See the derivation →
@@ -164,25 +164,7 @@ export function MechanicsSection() {
           })}
         </div>
 
-        <Reveal delay={120} className="mt-12 flex flex-wrap items-end justify-between gap-6 border-t border-border pt-8">
-          <Readouts
-            items={[
-              { label: "Courses", value: courses.length },
-              { label: "Est. time", value: hours, unit: "hrs" },
-            ]}
-          />
-          <Link
-            href={visual.route}
-            className="inline-flex min-h-11 items-center text-sm font-semibold text-pillar hover:underline"
-          >
-            Enter {visual.short} →
-          </Link>
-        </Reveal>
-
-        <p className="mt-8 flex items-baseline gap-2">
-          <TechLabel>Field</TechLabel>
-          <span className="text-xs text-subtle-foreground">{visual.fieldCaption}</span>
-        </p>
+        <PillarFooter pillar={PILLAR} />
       </Section>
     </PillarBand>
   );

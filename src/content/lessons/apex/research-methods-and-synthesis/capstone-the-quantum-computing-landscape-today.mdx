@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { ScrollableFigure } from "@/components/mdx/ScrollableFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "apex/research-methods-and-synthesis/capstone-the-quantum-computing-landscape-today"
@@ -8,7 +9,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Capstone: The Quantum Computing Landscape Today",
   description:
-    "The last lesson of the entire QuantumLearn curriculum: a full retracing of the journey from the postulates of quantum mechanics to today's research frontier, an honest and calibrated map of what quantum computing has actually proven, credibly evidenced, and still left open, and the platform's closing statement of what completing it actually equips you to do.",
+    "The last lesson of the entire StudyQuantum curriculum: a full retracing of the journey from the postulates of quantum mechanics to today's research frontier, an honest and calibrated map of what quantum computing has actually proven, credibly evidenced, and still left open, and the platform's closing statement of what completing it actually equips you to do.",
   course: "research-methods-and-synthesis",
   module: "capstone-the-quantum-computing-landscape-today",
   order: 5,
@@ -16,14 +17,14 @@ export const lessonMeta = {
   estimatedMinutes: 90,
   prerequisites: ["apex/research-methods-and-synthesis/reproducing-and-designing-experiments", "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm"],
   objectives: [
-    "Synthesize the ENTIRE QuantumLearn curriculum's journey, from the postulates of quantum mechanics through algorithms, hardware, error correction, complexity theory, and research methods, into one coherent narrative",
+    "Synthesize the ENTIRE StudyQuantum curriculum's journey, from the postulates of quantum mechanics through algorithms, hardware, error correction, complexity theory, and research methods, into one coherent narrative",
     "Give an honest, current, well-calibrated map of the quantum computing field's actual state: what is built, what is proven, what is believed, and what remains genuinely open",
     "Articulate, as the platform's final message, what a student who has completed this entire curriculum is now actually equipped to do",
   ],
   related: [
     {
       slug: "quantum-mechanics/classical-to-quantum/the-postulates-of-quantum-mechanics",
-      note: "The four postulates stated there — state, observable, measurement, evolution — are the same four objects this capstone's entire state-of-the-field map is ultimately still about: a physical qubit realizing postulate 1, a logical qubit's syndrome measurement realizing postulate 3, a fault-tolerant gate realizing postulate 4. Nothing since has replaced them; everything since has been what it takes to engineer and reason about them at scale.",
+      note: "The four postulates stated there (state, observable, measurement, evolution) are the same four objects this capstone's entire state-of-the-field map is ultimately still about: a physical qubit realizing postulate 1, a logical qubit's syndrome measurement realizing postulate 3, a fault-tolerant gate realizing postulate 4. Nothing since has replaced them; everything since has been what it takes to engineer and reason about them at scale.",
     },
   ],
 };
@@ -34,7 +35,7 @@ export const lessonMeta = {
   being completely lost."
 </LessonHook>
 
-## Motivation
+## A Lesson With No Next Lesson
 
 Until now, each lesson has opened by connecting to what came
 immediately before it. This one is different: it opens by looking back
@@ -68,7 +69,7 @@ Then came the question those algorithms leave dangling: built out of
 *what*, physically? **Quantum Hardware** answered it four different
 ways. Superconducting transmons, trapped ions, neutral atoms, and
 photonic qubits are each an engineered two-level system standing in for
-a postulate. That pillar was also frank, from its first lesson on
+a postulate. That track was also frank, from its first lesson on
 decoherence onward, about what the engineering costs: $T_1$ and $T_2$
 times, crosstalk, and the compounding, multiplicative arithmetic of
 Scaling Challenges' own $p^N$, which is what makes "just add more
@@ -92,7 +93,7 @@ than a textbook exercise, demands.
 And then **APEX**, which took every one of those threads to research
 depth at once. Algorithmic Frontiers showed that the individual
 algorithms Quantum Computing built one at a time (Grover's search,
-phase estimation, Hamiltonian simulation) are really one construction,
+phase estimation, Hamiltonian simulation) are one construction,
 the quantum singular value transformation, wearing different clothes.
 Fault Tolerance Frontiers carried error correction from a conceptual
 introduction to a real 2D surface-code lattice, a real decoder, lattice
@@ -138,7 +139,7 @@ actually demonstrated, and where simulation and chemistry stand.
 | Domain | Proven | Strongly-evidenced (not proven) | Genuinely open |
 |---|---|---|---|
 | **Hardware** | Multiple physical platforms (superconducting circuits, trapped ions, neutral atoms, photonics) can implement individually-characterized, coherent single- and two-qubit gates; this is the postulates of quantum mechanics engineered into hardware, not a theoretical possibility. | The best reported two-qubit gate fidelities in leading platforms are, under optimized conditions, comfortably into the "several nines" range (in some cases below commonly cited code thresholds in isolated benchmarks), though sustained, system-wide error rates during a real algorithm are typically worse than a best-case isolated gate. | Whether any device has run a full, sustained, universal fault-tolerant computation (not an isolated demonstration) at the qubit counts and error rates a useful algorithm's own resource estimate requires. Raw physical qubit count, by itself, answers none of this; the Scaling Challenges lesson already made that point about noisy qubits, and it applies with equal force to qubit-count headlines about "progress toward fault tolerance." |
-| **Algorithms** | Grover's $\Theta(\sqrt N)$ optimality (proven twice, independently, in the black-box model; Query Complexity and Lower Bounds); Shor's algorithm runs in polynomial time on a quantum computer (a proven fact about the algorithm itself). | Factoring's classical intractability (the live cryptographic assumption Shor's significance depends on); a real, structural quantum speedup for the broad class of problems the quantum singular value transformation unifies, wherever a good block encoding exists. | The ceiling on achievable quantum advantage for problems people actually want solved (chemistry, optimization, materials science), as opposed to problems engineered specifically to be classically hard. This is Quantum Complexity Theory's own Tier 3 question, restated here at the scale of the entire field. |
+| **Algorithms** | Grover's $\Theta(\sqrt N)$ optimality (proven twice, independently, in the black-box model; Query Complexity and Lower Bounds); Shor's algorithm runs in polynomial time on a quantum computer (a proven fact about the algorithm itself). | Factoring's classical intractability (the live cryptographic assumption Shor's significance depends on); a structural quantum speedup for the broad class of problems the quantum singular value transformation unifies, wherever a good block encoding exists. | The ceiling on achievable quantum advantage for problems people actually want solved (chemistry, optimization, materials science), as opposed to problems engineered specifically to be classically hard. This is Quantum Complexity Theory's own Tier 3 question, restated here at the scale of the entire field. |
 | **Error correction** | The threshold theorem: below a threshold physical error rate, a code of sufficient distance suppresses logical error rate arbitrarily far below the physical rate, at only polylogarithmic qubit overhead. | More than one hardware group has reported the qualitative signature the threshold theorem predicts on real devices: logical error rate going *down*, not up, as code distance increases. That is real evidence of operating below threshold, not a simulation of it. | Whether that favorable scaling can be sustained through a complete, universal, fault-tolerant computation at the code distances, magic-state supply rates, and decoder throughput a real algorithm's resource estimate (Fault Tolerance Frontiers' own capstone) actually requires, as opposed to a research demonstration on one or a few logical qubits in isolation. |
 | **Simulation & chemistry** | A quantum computer can, in principle, efficiently simulate the time evolution of any local Hamiltonian: a proven complexity-theoretic fact, and BQP's own defining example. | Certain molecular and materials simulations are believed to need exponential classical resources (Simulation & Compilation Frontiers' classical-simulability boundary) while staying efficient for a quantum computer: chemistry's original, Feynman-era motivating argument for building one at all. | Whether, and when, a quantum simulation reaches a molecule or material that is simultaneously large enough to be classically intractable and practically significant. Every demonstration to date is small enough to remain checkable classically, which is why it counts as evidence for the *promise* of the approach rather than proof that the promise has been cashed in. |
 
@@ -149,7 +150,24 @@ would actually matter*?") sits at the other end. That shape is not a
 coincidence. Recognizing it on sight, in a domain this table didn't
 even cover, is the skill this lesson is trying to leave you with.
 
-## Physical Interpretation: On Not Knowing When
+Try the framework on a headline before reading further. "New 1,200-qubit
+processor achieves quantum advantage on an industrially relevant catalyst
+molecule; fault-tolerant quantum computing is five years away." Three
+claims, one sentence.
+
+<PredictBeforeReveal
+  question="Three claims in one sentence: a 1,200-qubit processor, a quantum advantage on an industrially relevant molecule, and fault tolerance five years away. Which of the three cannot be placed anywhere in the three-tier framework at all?"
+  options={[
+    { label: "The qubit count: a number with no error rate attached says nothing", value: "count" },
+    { label: "The advantage claim: 'industrially relevant' is too vague to evaluate", value: "advantage" },
+    { label: "The timeline: a forecast is not a claim the framework can tier", value: "timeline" },
+    { label: "All three can be tiered once each is stated precisely", value: "all" },
+  ]}
+  correctValue="timeline"
+  explanation="The first two are underspecified, which is a different failure: state the gate error rate and connectivity, name the classical baseline and the molecule, and each becomes a claim the framework tiers cleanly. The timeline is not underspecified. It is a different kind of statement. Tier 2 requires specific, namable evidence, and a date rests on an assumed rate of future engineering improvement, which is an extrapolation rather than evidence about the world. That is why this lesson's table carries no date, and why the right response to a timeline is to ask which resource estimate it was derived from rather than to argue about the number."
+/>
+
+## On Not Knowing When
 
 <InsightBlock>
   These lessons are frozen at the moment they were written, and the
@@ -173,7 +191,7 @@ needs *specific, namable evidence*, and a timeline forecast usually
 rests on extrapolating an engineering trend rather than on anything
 with the evidentiary weight of, say, factoring's cryptographic track
 record. A resource estimate, built the way Fault Tolerance Frontiers'
-own capstone builds one, is a real, checkable, valuable thing: it tells
+own capstone builds one, is a valuable thing: it tells
 you how many physical qubits, at what code distance and error rate, a
 target algorithm needs. Converting that number into a calendar date
 requires an *additional*, separate assumption (a rate of future
@@ -198,25 +216,11 @@ that you now know how to update the table yourself.
 
 ## Worked Example: Classifying a New Claim
 
-**A hypothetical (but realistic) headline: "New 1,200-qubit processor
+Back to the headline from two sections ago: **"New 1,200-qubit processor
 achieves quantum advantage on an industrially relevant catalyst molecule;
-fault-tolerant quantum computing is five years away."**
-
-This single sentence bundles three separate claims. Pulling them apart,
-and classifying each one, is the exercise this whole capstone, and this
-whole course, was built to make routine.
-
-<PredictBeforeReveal
-  question="Three claims in one sentence: a 1,200-qubit processor, a quantum advantage on an industrially relevant molecule, and fault tolerance five years away. Which of the three cannot be placed anywhere in the three-tier framework at all?"
-  options={[
-    { label: "The qubit count — a number with no error rate attached says nothing", value: "count" },
-    { label: "The advantage claim — 'industrially relevant' is too vague to evaluate", value: "advantage" },
-    { label: "The timeline — a forecast is not a claim the framework can tier", value: "timeline" },
-    { label: "All three can be tiered once each is stated precisely", value: "all" },
-  ]}
-  correctValue="timeline"
-  explanation="The first two are underspecified, which is a different failure: state the gate error rate and connectivity, name the classical baseline and the molecule, and each becomes a claim the framework tiers cleanly. The timeline is not underspecified — it is a different kind of statement. Tier 2 requires specific, namable evidence, and a date rests on an assumed rate of future engineering improvement, which is not evidence about the world so much as an extrapolation of one. That is why this lesson's table carries no date, and why the right response to a timeline is to ask which resource estimate it was derived from rather than to argue about the number."
-/>
+fault-tolerant quantum computing is five years away."** Pulling its three
+claims apart and classifying each is the exercise this whole capstone was
+built to make routine.
 
 **Claim 1: "1,200-qubit processor."** A qubit count alone establishes
 almost nothing on its own (the Hardware row above, and Scaling
@@ -242,7 +246,7 @@ absence of that statement is itself informative.
 
 **Claim 3: "fault-tolerant quantum computing is five years away."**
 This is a timeline forecast, not a theorem or an evidenced conjecture:
-the category the Physical Interpretation section above just named. The
+the category just named above. The
 right response isn't to believe it or dismiss it. Ask what resource
 estimate, if any, it's built on, and whether that estimate carries
 forward the magic-state distillation, routing overhead, and
@@ -304,11 +308,11 @@ that you did not have when you started.
 
 ## The Whole Curriculum, One Map
 
-<div className="not-prose my-8 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-  <svg viewBox="0 0 1000 590" width="100%" role="img" aria-label="A map of the entire QuantumLearn curriculum: five foundational pillars (Quantum Mechanics, Quantum Computing, Quantum Hardware, Quantum Software, and Quantum Mastery) flow into APEX, whose five courses (Algorithmic Frontiers, Fault Tolerance Frontiers, Quantum Complexity Theory, Simulation and Compilation Frontiers, and Research Methods and Synthesis) converge into this final capstone lesson.">
+<ScrollableFigure label="Map of the whole StudyQuantum curriculum across its five tracks" className="my-8">
+  <svg viewBox="0 0 1000 590" width="1000" height="590" role="img" aria-label="A map of the entire StudyQuantum curriculum: five foundational tracks (Quantum Mechanics, Quantum Computing, Quantum Hardware, Quantum Software, and Quantum Mastery) flow into APEX, whose five courses (Algorithmic Frontiers, Fault Tolerance Frontiers, Quantum Complexity Theory, Simulation and Compilation Frontiers, and Research Methods and Synthesis) converge into this final capstone lesson.">
     <text x={500} y={26} textAnchor="middle" className="fill-foreground" style={{ font: "600 15px var(--font-display, sans-serif)" }}>The Whole Curriculum, One Map</text>
 
-    <text x={20} y={54} className="fill-muted-foreground text-[11px] font-semibold uppercase" style={{ letterSpacing: "0.08em" }}>The five foundational pillars</text>
+    <text x={20} y={54} className="fill-muted-foreground text-[11px] font-semibold uppercase" style={{ letterSpacing: "0.08em" }}>The five foundational tracks</text>
     <rect x={20} y={62} width={176} height={92} rx={10} className="fill-surface stroke-border" strokeWidth={1.5} />
     <rect x={214} y={62} width={176} height={92} rx={10} className="fill-surface stroke-border" strokeWidth={1.5} />
     <rect x={408} y={62} width={176} height={92} rx={10} className="fill-surface stroke-border" strokeWidth={1.5} />
@@ -337,7 +341,7 @@ that you did not have when you started.
     <line x1={884} y1={154} x2={884} y2={196} className="stroke-brand" strokeWidth={2} markerEnd="url(#capArrow)" />
 
     <rect x={20} y={200} width={952} height={44} rx={8} className="fill-brand/10 stroke-brand/40" strokeWidth={1.5} />
-    <text x={500} y={227} textAnchor="middle" className="fill-brand text-[12px] font-semibold" style={{ letterSpacing: "0.04em" }}>APEX: every pillar above, extended to research depth</text>
+    <text x={500} y={227} textAnchor="middle" className="fill-brand text-[12px] font-semibold" style={{ letterSpacing: "0.04em" }}>APEX: every track above, extended to research depth</text>
 
     <line x1={108} y1={252} x2={108} y2={294} className="stroke-brand" strokeWidth={2} markerEnd="url(#capArrow)" />
     <line x1={302} y1={252} x2={302} y2={294} className="stroke-brand" strokeWidth={2} markerEnd="url(#capArrow)" />
@@ -386,12 +390,12 @@ that you did not have when you started.
       </marker>
     </defs>
   </svg>
-</div>
+</ScrollableFigure>
 
 Read top to bottom, this is the entire curriculum in one image: five
-foundational pillars, each contributing its own concepts upward into
-APEX as a whole (not one narrow pillar-to-course line each; every APEX
-course draws on more than one earlier pillar, which is why the diagram
+foundational tracks, each contributing its own concepts upward into
+APEX as a whole (not one narrow track-to-course line each; every APEX
+course draws on more than one earlier track, which is why the diagram
 funnels through a shared APEX band rather than five separate private
 pipes); APEX's own five courses, each extending that foundation to
 research depth; and all five of those courses converging on the single
@@ -399,7 +403,7 @@ capstone lesson you are reading right now. The highlighted course and
 box mark where you are. Nothing above it was optional, and nothing
 above it was wasted.
 
-## Common Mistakes
+## Timelines and Other Things Nobody Knows
 
 <Callout type="note">
 **Treating "strongly evidenced" as "proven," in either direction.**
@@ -428,19 +432,199 @@ substitute for a stated resource estimate and its assumptions.
    (beyond qubit count) would be needed to support that stronger claim,
    and name the proven theorem whose conditions that evidence would need
    to satisfy.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The theorem is the **threshold theorem**, and the first thing to
+   notice about it is that physical qubit count appears nowhere in its
+   hypotheses. A qubit count is not weak evidence for fault tolerance; it
+   is evidence about a quantity the theorem does not mention. A million
+   qubits above threshold are worse than a thousand below it, since above
+   threshold a larger code makes the logical error rate exponentially
+   worse.
+
+   Before anything else, ask whether the number is physical or logical.
+   Twelve hundred *logical* qubits would be a transformative claim.
+   Twelve hundred physical qubits is an ordinary contemporary device.
+
+   **What the theorem's conditions actually demand as evidence.**
+
+   *A per-gate error rate below threshold, measured the right way.* Not a
+   best-case isolated two-qubit benchmark, which is the number press
+   releases quote. The sustained, system-wide rate during a running
+   circuit, including idling, measurement, and reset errors, all of which
+   are error locations the code has to correct. And the comparison has to
+   name *which* threshold, since it is decoder- and noise-model-specific
+   and quoted values differ by a factor of several.
+
+   *Noise that is local and not too correlated.* The proof's two-fault
+   counting assumes faults are roughly independent. Evidence needed:
+   characterization of crosstalk, of leakage out of the computational
+   subspace, and of burst events. Cosmic rays are the concrete worry for
+   superconducting devices, producing correlated multi-qubit failures
+   that a local code has no defence against, and getting more likely as
+   patches get larger.
+
+   *The scaling signature, sustained.* Logical error rate falling as code
+   distance rises, measured across several distances, with a fitted
+   suppression factor per two steps of distance, held over many rounds
+   rather than observed once.
+
+   *A universal logical gate set, running.* A logical CNOT between two
+   logical patches by lattice surgery, and a magic-state factory
+   producing distilled states at the rate the circuit consumes them.
+   Clifford-only fault tolerance is, by Gottesman-Knill, classically
+   simulable and therefore not fault-tolerant *computing*.
+
+   *A decoder keeping up in real time.* Syndrome rounds arrive on the
+   order of a microsecond, indefinitely. A decoder slower than that
+   accumulates an unbounded backlog and is operationally not a decoder.
+
+   **The sentence the announcement could honestly have written** is
+   something like: "sustained two-qubit error rate of $X$ under
+   algorithmic conditions, below the $Y$ threshold for decoder $Z$, with
+   logical error rate suppressed by a factor $\Lambda$ per two steps of
+   code distance across distances 3, 5, and 7." That is a real and
+   impressive claim, it is checkable, and it is a different sentence from
+   the one that led with a qubit count.
+
+   </details>
+
 2. Pick any one of the four domains in this lesson's state-of-the-field
    table (hardware, algorithms, error correction, simulation/chemistry)
    and explain why its "genuinely open" entry is open: what specific
    thing would have to be demonstrated to resolve it, and why that
    hasn't happened yet.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Taking the **error-correction** row, whose open entry asks whether the
+   favourable distance scaling can be sustained through a complete,
+   universal, fault-tolerant computation at the parameters a real
+   resource estimate demands.
+
+   **What would resolve it.** One demonstration, running a nontrivial
+   algorithm on several logical qubits, for a duration set by a published
+   resource estimate rather than by what the apparatus can manage, with
+   four things happening at once: logical two-qubit gates by lattice
+   surgery between separate patches, a magic-state factory delivering
+   distilled states at the rate the circuit consumes them, a real-time
+   decoder that never falls behind over the whole run, and a final
+   logical error rate matching what the distance predicted. All four
+   simultaneously, sustained, on one machine.
+
+   **Why it has not happened, in the numbers this course computed.**
+
+   *Scale.* The Simulation and Compilation capstone's deliberately tiny
+   circuit, two logical qubits and 600 T gates, needed 4097 physical
+   qubits at distance 11. That is a toy with no purpose. Published
+   estimates for cryptographically relevant factoring run into the
+   millions of physical qubits. Devices today are in the hundreds to low
+   thousands.
+
+   *The factory dominates and has never run.* In that same estimate
+   $88\%$ of the machine was magic-state factory. No experiment has yet
+   operated a distillation factory feeding a live logical computation at
+   rate, which means the single largest line item in every resource
+   estimate is the one with the least experimental grounding.
+
+   *Decoder throughput.* Minimum-weight matching is polynomial-time and
+   that is not the same as fast enough for a microsecond cycle,
+   indefinitely, at distance 11 or more. The Decoding lesson is explicit
+   that this is live engineering rather than a settled footnote.
+
+   *Correlated and leakage errors.* Every demonstration so far has been
+   short enough that burst events are rare. A computation running for
+   hours will meet them, and they violate the independence the whole
+   analysis rests on.
+
+   *Duration.* Existing results run tens to hundreds of syndrome rounds
+   on one or a few logical qubits. An algorithm needs billions of rounds
+   across thousands of them.
+
+   **Why this is the right shape of open question, and not pessimism.**
+   Every individual ingredient has been demonstrated: below-threshold
+   scaling, lattice surgery, distillation, real-time decoding. What has
+   never been demonstrated is all of them composed, at scale, for a
+   duration. So the open question is about *composition and endurance*
+   rather than about any missing mechanism, and that is a genuinely
+   different kind of uncertainty from "we do not know if this is
+   possible." Nobody expects a new theorem to be needed. Nobody can tell
+   you what the composition costs until someone builds it either.
+
+   </details>
+
 3. Explain why this lesson declines to give a specific year by which
    large-scale fault-tolerant quantum computing will exist, and what kind
    of evidence (as opposed to what kind of confident phrasing) would
    actually change that answer.
 
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a date is not the kind of claim the three-tier framework can
+   hold. Tier 1 requires a proof. Tier 2 and Tier 3 require specific,
+   namable evidence about the world. A date requires an assumed rate of
+   future engineering improvement, which is neither.
+
+   Decompose a timeline claim and the seam is obvious. It is the product
+   of two factors.
+
+   **A resource requirement:** how many physical qubits at what error
+   rate a target algorithm needs. This half is real, derivable, and
+   exactly what the two fault-tolerance capstones compute. It is
+   evidenced.
+
+   **A closure rate:** how fast hardware will cover the remaining
+   distance. This half is an extrapolation of a trend, for a process
+   nobody has run to completion, over a range nobody has observed.
+
+   And the second factor is unstable in a way that is easy to miss,
+   because **the target moves too.** Published estimates for factoring
+   RSA-2048 have fallen by roughly two orders of magnitude over about
+   fifteen years, from something like a billion physical qubits to
+   something like twenty million, driven by better circuit constructions
+   and better factory designs rather than by any hardware progress at
+   all. So the gap is closing from both ends at rates neither of which
+   anybody can forecast, and multiplying two unforecastable rates does
+   not produce a date, it produces a mood with a number attached.
+
+   **What would actually move the answer.** Not a longer trend line and
+   not a more confident speaker. Three things, in order of how much each
+   would settle.
+
+   *Data on the logical quantities.* The relevant curves are logical
+   qubits per year and logical error rate per year, not physical qubit
+   count per year. There is barely enough history on either to fit a
+   line, and those are the quantities a date depends on.
+
+   *A resource estimate that has stopped falling.* A stable target for a
+   specific, useful algorithm would make the distance a fixed number
+   rather than a moving one.
+
+   *The composition demonstration from question 2.* The dominant
+   remaining uncertainty is what it costs to run every ingredient
+   together, sustained. Until someone does it once, at any scale, the
+   error bar on that cost is not small, it is unknown.
+
+   **What declining to give a date is not.** It is not doubt that this
+   will happen. The threshold theorem proves it can, and multiple groups
+   have now demonstrated the below-threshold signature it requires. The
+   uncertainty is entirely about schedule, and being unwilling to name a
+   schedule is a different thing from doubting the destination. The
+   useful response to any timeline claim is therefore one question, not
+   an argument: **which resource estimate is that derived from, and what
+   improvement rate does it assume?** A claim that can answer both is
+   worth discussing. A claim that can answer neither has told you
+   everything you needed to know about it.
+
+   </details>
+
 <PracticeLinks problems={practiceProblems} />
 
-<ChallengePrompt prompt="Find the most recent hardware or algorithms result you can — this week's, if possible — and write the row it would occupy in this lesson's state-of-the-field table.">
+<ChallengePrompt prompt="Find the most recent hardware or algorithms result you can, this week's if possible, and write the row it would occupy in this lesson's state-of-the-field table.">
   Four columns: the domain, what the result proves, what it evidences
   without proving, and what it leaves open. A result that fills all four
   columns is a well-scoped result. If a column comes out empty, that is
@@ -453,7 +637,7 @@ substitute for a stated resource estimate and its assumptions.
 
 ## Summary
 
-- Five foundational pillars (Quantum Mechanics, Quantum Computing,
+- Five foundational tracks (Quantum Mechanics, Quantum Computing,
   Quantum Hardware, Quantum Software, and Quantum Mastery) built, in
   order, the mathematical postulates of quantum theory, the algorithms
   and information theory built on them, the real physical devices that
@@ -494,7 +678,7 @@ kit, chosen so that every item extends something you have already built.
 Information* is the field's standard reference and the natural place to
 see this curriculum's material in its canonical adult form. Wilde's
 *Quantum Information Theory* (2nd ed., Cambridge, 2017) deepens the
-Shannon-theory thread the Mastery pillar opened: channels, capacities,
+Shannon-theory thread the Mastery track opened: channels, capacities,
 and entropies with full proofs. Watrous's *The Theory of Quantum
 Information* (Cambridge, 2018) is the mathematically strictest of the
 three, and the right companion for the semidefinite-programming and
@@ -548,9 +732,15 @@ does.
 toward rather than papers to read, the course's own map already
 contains them:
 
-1. **Is $\mathsf{BQP}\subseteq\mathsf{NP}$?** Genuinely open, with no
-   consensus either way; even a strong heuristic argument would be
-   progress.
+1. **Is $\mathsf{BQP}\subseteq\mathsf{NP}$?** Unconditionally open, and
+   a good final test of this course's own vocabulary. Most researchers
+   expect the answer is no, and that expectation rests on real evidence
+   rather than taste: Raz and Tal exhibited an oracle relative to which
+   $\mathsf{BQP}\not\subseteq\mathsf{PH}$, and $\mathsf{NP}$ sits inside
+   $\mathsf{PH}$. Read that the way How to Read a Quantum Computing
+   Paper taught you to and the shape is familiar: rigorous evidence
+   *in the query model*, supporting a Tier 3 belief, with the
+   unrelativized question still untouched.
 2. **The quantum PCP conjecture.** Open; the NLTS theorem (2022) proved
    one necessary consequence, so the conjecture survived a real test
    without becoming any less open.
@@ -564,14 +754,14 @@ contains them:
    million-physical-qubit factory-fed computation remains the field's
    central engineering question.
 
-## Further Exploration
+## Back to Where This Started
 
 <NextDiscovery>
   There is no next lesson. Instead, go back to where this all
   began: [The Postulates of Quantum
   Mechanics](/lessons/quantum-mechanics/classical-to-quantum/the-postulates-of-quantum-mechanics).
-  Read it again, now. It will look different, not because it changed,
-  but because you did. Every one of its four postulates is still
+  Read it again. It will look different, not because it changed, but
+  because you did. Every one of its four postulates is still
   exactly what it always was: a state, an observable, a measurement, an
   evolution. What's different is that you now know everything those
   four objects turn into, from a superconducting chip's dispersive

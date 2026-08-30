@@ -170,7 +170,7 @@ export const capacityFrames = [
   between those two numbers is this course's most dramatic single fact.
 </LessonHook>
 
-## Motivation
+## Six Modules, One Vocabulary
 
 Six modules in this course built one continuous vocabulary. POVMs and
 Naimark's theorem showed every generalized measurement is a projective
@@ -183,13 +183,13 @@ inequality supplied the real content behind "a channel can't manufacture
 information," bounding what any physical process can do to correlations
 it didn't have a hand in creating. Entanglement distillation gave
 entanglement itself an operational price tag: how many near-perfect
-Bell pairs a noisy supply of them is actually worth. Every one of those
+Bell pairs a noisy supply of them is worth. Every one of those
 results was a statement about a single quantum system or a single use
 of a resource. This capstone asks the question that was always waiting
 underneath all of them, and names the two resulting numbers the
 channel's <Term id="quantum-channel-capacity">**classical capacity** and **quantum capacity**</Term>.
 
-## Mathematical Development
+## Holevo, HSW, and LSD
 
 ### The Holevo quantity and Holevo's theorem
 
@@ -220,14 +220,14 @@ channel uses at all.
 </TheoremBox>
 
 $\chi\geq 0$ always (a direct consequence of the concavity of von
-Neumann entropy, the same inequality Entropy and Mutual Information
-proved), and $\chi=0$ exactly when every $\rho_i$ is identical, the case
-in which no label-dependent signal survives at all.
+Neumann entropy, a standard property cited rather than proved anywhere in
+this track), and $\chi=0$ exactly when every $\rho_i$ is identical, the
+case in which no label-dependent signal survives at all.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/38/Holevo%2C_Alexander2.jpg"
   alt="Alexander Holevo in a head-and-shoulders portrait from the Oberwolfach research institute's photo collection, looking toward the camera against a plain background"
-  caption="Alexander Holevo, whose 1973 bound on how much classical information a quantum measurement can extract from an ensemble gives this section's quantity its name, and whose work with Schumacher and Westmoreland later turned that single-measurement bound into the full channel-capacity theorem (HSW) this lesson uses to compute C(p) below."
+  caption="Alexander Holevo, whose 1973 bound on how much classical information a quantum measurement can extract from an ensemble gives this section's quantity its name, and whose later capacity theorem, proved independently of Schumacher and Westmoreland's, turned that single-measurement bound into the full channel-capacity result (HSW) this lesson uses to compute C(p) below."
   credit="Renate Schmid / Mathematisches Forschungsinstitut Oberwolfach, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Holevo,_Alexander2.jpg"
   license="CC BY-SA 2.0 DE"
@@ -240,6 +240,13 @@ the largest Holevo quantity achievable by any input ensemble sent
 through $\mathcal N$ once.
 
 <TheoremBox title="Holevo-Schumacher-Westmoreland theorem" provenance="cited">
+
+**Hypotheses.** $\mathcal N$ is CPTP on a finite-dimensional system. The
+encoder may prepare *any* state of $n$ inputs, entangled across channel
+uses included, and the decoder may perform *any* joint POVM on all $n$
+outputs at once. Those two freedoms are exactly why the limit below
+cannot be dropped: restricting to product inputs and per-use
+measurements gives a strictly smaller quantity for some channels.
 
 The classical capacity of $\mathcal N$, the number of classical bits
 per channel use reliably transmittable in the limit of arbitrarily many
@@ -269,8 +276,8 @@ checkable computation rather than a hand-wave.
 ### The quantum capacity: LSD
 
 The quantum analogue replaces the Holevo quantity with the **coherent
-information**, first defined in Entropy and Mutual Information's
-extension of these ideas to channels:
+information**, first defined in Quantum Entropy and Information Measures
+and extended here to channels:
 
 $$
 I_c(\rho,\mathcal N) \;=\; S(\mathcal N(\rho)) - S_e(\rho,\mathcal N)
@@ -282,8 +289,8 @@ exactly, not just in spirit: purify the channel's action by coupling
 input to environment via a reference system $A$, so the joint
 reference-output-environment state is pure. In a pure global state, a
 subsystem and its complement always share the same entropy, so
-$S(\rho_{AB}) = S_e$ — meaning $I_c(\rho,\mathcal N) = S(\rho_B) -
-S(\rho_{AB}) = -S(A|B)$, Entropy and Mutual Information's
+$S(\rho_{AB}) = S_e$. That gives $I_c(\rho,\mathcal N) = S(\rho_B) -
+S(\rho_{AB}) = -S(A|B)$, exactly that lesson's
 coherent information, just with $S_e$ standing in for $S(\rho_{AB})$
 because the environment is easier to reason about for a channel than an
 explicit reference system. Unlike $\chi$, $I_c$ can be negative, itself
@@ -314,7 +321,7 @@ capacities in general is an actively researched, unresolved problem in
 quantum Shannon theory, not a solved textbook exercise, and this
 capstone is an honest place to say so plainly rather than paper over it.
 
-## Physical Interpretation: why this is the question that matters
+## The Question the Whole Course Was Building Toward
 
 This is, in exact technical language, the question "how much can I
 trust this noisy qubit, fiber link, or gate to carry information
@@ -332,27 +339,25 @@ rather than only in a $T_1$/$T_2$ number. The worked example below shows
 why that fight is so much harder for quantum information than for
 classical information sent down the identical physical wire.
 
-## Worked Example
+## Both Capacities, Computed on One Channel
 
 **Send the BB84-style ensemble $\{\tfrac12,|0\rangle\langle0|;\ \tfrac12,|+\rangle\langle+|\}$
 (the same two conjugate-basis states BB84: Quantum Key Distribution
-encodes bit $1$ in) through the depolarizing channel
+encodes bit $0$ in, one per basis) through the depolarizing channel
 $\mathcal N_p(\rho)=(1-p)\rho+p\,I/2$, compute the exact Holevo quantity
 $\chi(p)$, then find exactly where the channel's quantum capacity hits
 zero.**
 
-### The classical side: $\chi(p)$ for a real, non-orthogonal ensemble
+### The classical side: $\chi(p)$ for a non-orthogonal ensemble
 
 `vonNeumannEntropy`, `convexCombination`, and `maximallyMixedState`, all
 this platform's real density-matrix engine, give directly:
 
-$$
-\chi(0) = {chiAt0.toFixed(5)}\text{ bits}
-$$
+$\chi(0) =$ {chiAt0.toFixed(5)} bits.
 
 Notice this is **not** $1$ bit, even at zero noise. An *orthogonal*
 ensemble like $\{|0\rangle,|1\rangle\}$ does reach exactly the
-noiseless maximum, $\chi(0)={orthogonalChiAt0.toFixed(0)}$ bit, computed
+noiseless maximum, $\chi(0)=$ {orthogonalChiAt0.toFixed(0)} bit, computed
 the identical way; BB84's whole security argument rests on using
 $|0\rangle$ and $|+\rangle$ precisely because they are **not**
 orthogonal ($|\langle0|+\rangle|^2=\tfrac12$), which is why
@@ -362,9 +367,8 @@ even added.
 
 Turning on the channel:
 
-$$
-\chi(0.2)={chiAt02.toFixed(5)},\qquad\chi(0.5)={chiAt05.toFixed(5)},\qquad\chi(1)={chiAt1.toFixed(5)}
-$$
+$\chi(0.2)=$ {chiAt02.toFixed(5)}, $\chi(0.5)=$ {chiAt05.toFixed(5)},
+$\chi(1)=$ {chiAt1.toFixed(5)}.
 
 $\chi(p)\to0$ exactly at $p=1$: full depolarization erases every trace
 of which state was sent, so no measurement can recover any information,
@@ -375,19 +379,19 @@ computation, but by HSW's proven additivity for the depolarizing
 channel, the *actual* classical capacity $C(p)=\chi^*(p)$ is achieved
 by an **orthogonal** ensemble instead (a cited symmetry result, not
 re-derived here): $C(p)=1-S(\mathcal N_p(|0\rangle\langle0|))$, giving
-$C(0.2)={capacityAt02.toFixed(5)}$, $C(0.5)={capacityAt05.toFixed(5)}$,
-$C(0.8)={capacityAt08.toFixed(5)}$, strictly positive for every
+$C(0.2)=$ {capacityAt02.toFixed(5)}, $C(0.5)=$ {capacityAt05.toFixed(5)},
+$C(0.8)=$ {capacityAt08.toFixed(5)}, strictly positive for every
 $p<1$, hitting exactly zero only at full depolarization $p=1$.
 
 <PredictBeforeReveal
   question="At depolarizing strength p=0.5, this lesson's own C(0.5) shows the classical capacity is still clearly positive. Do you expect the same channel, at that same noise level, to still carry quantum information reliably (positive quantum capacity)?"
   options={[
-    { label: "Yes — if classical bits get through, qubits should too, just at a lower rate", value: "yes" },
-    { label: "No — the certified quantum rate is already zero well before classical capacity gets anywhere near zero", value: "no" },
+    { label: "Yes, since if classical bits get through, qubits should too, just at a lower rate", value: "yes" },
+    { label: "No, the certified quantum rate is already zero well before classical capacity gets anywhere near zero", value: "no" },
     { label: "No information of any kind survives past p=0.5", value: "nothing" },
   ]}
   correctValue="no"
-  explanation="The hashing-bound lower bound on Q(p) is already negative (clamped to 0) by around p≈0.25, and the channel is proven entanglement-breaking — hence Q=0 exactly — from p=2/3 onward. Meanwhile C(0.5) computed below is still comfortably positive. The same physical channel, at the same noise level, keeps carrying classical bits long after it can no longer carry any quantum information at all. That is this course's central fact."
+  explanation="The hashing-bound lower bound on Q(p) is already negative (clamped to 0) by around p≈0.25, and the channel is proven entanglement-breaking (hence Q=0 exactly) from p=2/3 onward. Meanwhile C(0.5) computed below is still comfortably positive. The same physical channel, at the same noise level, keeps carrying classical bits long after it can no longer carry any quantum information at all. That is this course's central fact."
 />
 
 ### The quantum side: exactly where $Q(p)$ dies
@@ -404,12 +408,12 @@ $$
 Q(p)\;\geq\;1-H_2\!\left(\tfrac{3p}{4}\right)-\tfrac{3p}{4}\log_2 3
 $$
 
-a real, closed-form, computed quantity (not a fit or an approximation),
+a closed-form quantity (not a fit or an approximation),
 using $\mathcal N_p(I/2)=I/2$ exactly and the fact that, for a Pauli
 channel acting on the maximally mixed input, the environment ends up in
 a classical mixture over "which error happened," diagonal with exactly
 the Kraus probabilities. This bound is positive only for
-$p\lesssim{hashingZeroCrossing.toFixed(4)}$, and strictly negative (hence
+$p\lesssim$ {hashingZeroCrossing.toFixed(4)}, and strictly negative (hence
 uninformative, clamped to $0$ in the figure below) beyond that.
 
 **An exact zero.** Separately, and completely rigorously: a channel is
@@ -423,20 +427,21 @@ $(1-p)|\Phi^+\rangle\langle\Phi^+|+p\,I_4/4$ with this platform's real
 partial transpose over the channel's output qubit, gives (by the
 Peres-Horodecki criterion, exact for two qubits) eigenvalues
 $\tfrac12-\tfrac p4$ (three-fold) and $\tfrac{3p}4-\tfrac12$ (the
-singlet direction). The singlet eigenvalue, computed directly here via
+singlet direction). The singlet eigenvalue is the only candidate for
+negativity, and it is computed directly here via
 `densityMatrixExpectationValue` against the exact $|\Psi^-\rangle$
-projector, is
+projector.
 
-$$
-\text{singlet eigenvalue}(p=0.5) = {singletEigenvalueBelowThreshold.toFixed(5)} \quad(\text{negative: entangled, not yet entanglement-breaking})
-$$
+At $p=0.5$ the singlet eigenvalue is
+{singletEigenvalueBelowThreshold.toFixed(5)}: negative, so the state is
+still entangled and the channel is not yet entanglement-breaking. At
+$p=\tfrac23$ it is {singletEigenvalueAtThreshold.toFixed(5)}, exactly
+zero, which is the threshold.
 
-$$
-\text{singlet eigenvalue}\!\left(p=\tfrac23\right) = {singletEigenvalueAtThreshold.toFixed(5)} \quad(\text{exactly zero, the threshold})
-$$
-
-so $Q(p)=0$ **exactly and provably** for every
-$p\geq\tfrac23\approx{entanglementBreakingThreshold.toFixed(4)}$.
+Past that threshold the eigenvalue turns positive, the Choi state is PPT
+and therefore (for two qubits) separable, so $Q(p)=0$ **exactly and
+provably** for every
+$p\geq\tfrac23\approx$ {entanglementBreakingThreshold.toFixed(4)}.
 
 Put the two facts side by side: the certified achievable rate already
 hits $0$ by $p\approx0.25$, while classical capacity $C(p)$ computed
@@ -450,6 +455,8 @@ research question, not a hole in this lesson's derivation.
 
 <ParametricCurve
   frames={capacityFrames}
+  xAxisLabel="depolarizing strength p"
+  yAxisLabel="bits per channel use"
   referenceLines={[{ y: 0, label: "capacity = 0" }]}
   ariaLabel="Classical Holevo chi(p) for the BB84 ensemble through a depolarizing channel, an exact computed curve decreasing from about 0.601 bits to 0 only at p=1, plotted against the hashing-bound certified lower bound on quantum capacity, which is also an exact closed-form quantity but only a lower bound, clamped to zero once it goes negative near p=0.25; the true quantum capacity is proven exactly zero only at the separately derived entanglement-breaking threshold p=2/3, well before the classical curve approaches zero"
 />
@@ -462,7 +469,7 @@ picture: the same physical channel, at the same noise level, can still
 reliably carry classical bits long after it has stopped being able to
 carry any quantum information at all.
 
-## Common Mistakes
+## What a Capacity Bound Does Not Say
 
 <Callout type="mistake">
 **Treating $\chi(\{p_i,\rho_i\})$ itself as "the capacity."** $\chi$ is
@@ -470,7 +477,7 @@ an upper bound on what *any single measurement* on *one* copy of the
 ensemble can extract (Holevo's theorem); the *channel's* classical
 capacity is the maximum of $\chi$ over input ensembles, in the
 many-uses limit, and HSW is the (nontrivial) theorem that this
-maximum is actually achievable, not merely an upper bound on it.
+maximum is achievable, not merely an upper bound on it.
 </Callout>
 
 <Callout type="warning">
@@ -497,15 +504,180 @@ proves an exact zero, and only from $p=\tfrac23$ onward.
    $\chi(0)\approx0.601$ bits for the BB84 ensemble $\{|0\rangle,|+\rangle\}$
    rather than the full $1$ bit an orthogonal ensemble achieves, tying
    the answer directly to $|\langle0|+\rangle|^2=\tfrac12$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $\chi$ measures how much the *average* state
+   $\bar\rho=\tfrac12(|0\rangle\langle0|+|{+}\rangle\langle{+}|)$ knows
+   about which member was sent, and two states that overlap produce an
+   average that is less mixed than two that do not.
+
+   Both members are pure, so $\sum_ip_iS(\rho_i)=0$ and
+   $\chi=S(\bar\rho)$ outright. In Bloch language,
+   $\vec r_0=(0,0,1)$ and $\vec r_+=(1,0,0)$ average to
+   $\vec{\bar r}=(0.5,0,0.5)$ with $|\vec{\bar r}|=1/\sqrt2$, giving
+   eigenvalues $(1\pm1/\sqrt2)/2=0.853553$ and $0.146447$, hence
+
+   $$
+   \chi(0)=S(\bar\rho)=H_2(0.853553)=0.600876\ \text{bits}.
+   $$
+
+   The overlap enters through that Bloch length, and the connection is
+   exact rather than approximate. Two pure qubit states with overlap
+   $s=|\langle\psi_1|\psi_2\rangle|$ sit at Bloch angle $2\theta$ with
+   $\cos\theta=s$, so their average vector has length exactly
+   $\cos\theta=s$. Therefore for any equal mixture of two pure qubit
+   states,
+
+   $$
+   \chi=H_2\!\left(\frac{1+s}{2}\right).
+   $$
+
+   Here $s=|\langle0|{+}\rangle|=1/\sqrt2$, matching
+   $|\langle0|{+}\rangle|^2=\tfrac12$, and the formula returns $0.6009$.
+   The two limits check out: $s=0$ gives $H_2(\tfrac12)=1$ bit, the
+   orthogonal ensemble's full bit, and $s=1$ gives $H_2(1)=0$, since two
+   identical states carry no information about which was sent. The BB84
+   ensemble sits between, and $0.601$ is not a rounding artifact of any
+   kind but the exact value of a binary entropy at $(1+1/\sqrt2)/2$.
+
+   The physical reading is that Alice put a full bit of randomness in and
+   the channel is noiseless, so nothing was lost in transit. What limits
+   the receiver is that the two signals are not perfectly
+   distinguishable: a measurement cannot separate states that are not
+   orthogonal, and Holevo's bound quantifies the resulting shortfall at
+   $1-0.601=0.399$ bits.
+
+   For BB84 that shortfall is the entire point rather than a defect. The
+   protocol's legitimate parties recover the bit by publicly reconciling
+   bases and keeping only the rounds where Alice and Bob used the same one,
+   in which the two possible states *are* orthogonal. An eavesdropper who
+   does not know the basis faces exactly the $\{|0\rangle,|{+}\rangle\}$
+   ensemble computed here, and $\chi=0.601$ bits is a hard ceiling on what
+   she can learn per qubit.
+
+   A number worth having beside $\chi$, because it shows Holevo's bound is
+   not tight: the best *actual* measurement on this ensemble is the
+   Helstrom one, with error probability
+   $\tfrac12(1-\sqrt{1-s^2})=0.1464$, conveying
+   $1-H_2(0.1464)=0.3991$ bits. The accessible information is well below
+   $\chi=0.6009$. Holevo bounds what a single measurement on a single copy
+   can extract; reaching $\chi$ requires block coding over many uses, which
+   is precisely what HSW's theorem supplies. (That $0.3991$ happens to
+   equal $1-\chi$ here is a coincidence of $s=1/\sqrt2$, where the trace
+   distance equals the overlap, and not a general identity.)
+
+   </details>
+
 2. The hashing bound goes negative for $p\gtrsim0.25$, but the channel
    is only proven entanglement-breaking (hence $Q=0$ exactly) at
    $p=\tfrac23$. In your own words, what would it take to close that
    gap, either way, and why is doing so a hard problem rather
    than a routine calculation?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Closing it from below means exhibiting a protocol that beats the hashing
+   bound; closing it from above means proving an upper bound on a
+   *regularized* quantity. Both are hard, and they are hard for different
+   reasons.
+
+   **From below.** The hashing bound is the coherent information of a
+   single channel use with the maximally mixed input. Beating it requires
+   either a better input state or, more importantly, codes that entangle
+   inputs across many uses, since coherent information is superadditive and
+   the capacity is the regularized limit. This direction has genuinely
+   moved: DiVincenzo, Shor and Smolin showed in 1998 that random
+   *degenerate* codes achieve positive rates for the depolarizing channel
+   past the hashing bound's zero crossing, so $Q(p)>0$ is known for some
+   $p$ above $0.2524$. Degenerate codes work by mapping distinct errors
+   onto the same syndrome, so the code does not have to identify which
+   error occurred, only undo it. That trick has no classical counterpart,
+   which is part of why the classical intuition of "hashing is
+   essentially optimal" fails here.
+
+   **From above.** Every upper bound must hold for all $n$ at once, which
+   rules out simply computing coherent information at $n=1$ and calling it
+   a ceiling. What is needed is a quantity that is (i) additive by
+   construction, (ii) provably above $Q$, and (iii) computable. The
+   available families are entanglement-breaking and PPT arguments (which is
+   what gives $p=\tfrac23$ here), antidegradability plus no-cloning, and
+   Rains-type and approximate-degradability bounds, and the best known
+   upper bounds for the depolarizing channel do sit strictly below the
+   entanglement-breaking threshold. But none of them close on the lower
+   bound, so a genuine interval remains where the value is unknown.
+
+   **Why it is not routine.** The obstruction is structural rather than
+   computational. $Q$ is defined by a limit over $n$, and the quantity
+   being maximized is neither additive nor concave in the input state, so
+   no finite computation is known to certify the limit. Worse, zero
+   capacity is not even a local property: Smith and Yard exhibited two
+   channels each with $Q=0$ whose joint use has $Q>0$, so "this channel
+   cannot carry quantum information" does not compose the way intuition
+   demands. A method that settled the depolarizing channel would have to
+   handle all of that, which is why the exact quantum capacity of the
+   single most-studied qubit channel is still open.
+
+   Worth keeping in view: this is the one place in the course where the
+   answer is genuinely unknown rather than merely uncomputed here. The
+   classical capacity of the same channel is known in closed form. The
+   quantum capacity is not, and the gap between $0.2524$ and $0.6667$ is
+   the honest width of that ignorance.
+
+   </details>
+
 3. Explain why $Q(\mathcal N)=0$ is a much stronger, more final
    statement about a channel than "error correction for this channel
    would need a very high-rate code": connect your answer to the
    quantum noisy-channel coding theorem's converse direction.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the two statements quantify differently. "Would need a very
+   high-rate code" is about the codes we currently have, and might be
+   overturned tomorrow. $Q(\mathcal N)=0$ quantifies over *every* code, at
+   every rate, at every block length, forever.
+
+   The converse direction of the coding theorem is what supplies the
+   "forever". A coding theorem has two halves: achievability, that any rate
+   below the capacity is attainable with vanishing error, and the converse,
+   that any rate strictly above it is not, no matter what the code is. The
+   converse is a proof about all possible encoders and decoders, obtained
+   from monotonicity of coherent information under the channel rather than
+   from any property of a particular construction. So when the capacity is
+   zero, the converse applies to every positive rate at once: the set of
+   achievable rates is empty, and no sequence of codes has error going to
+   zero.
+
+   That is a different kind of claim from "expensive". For a channel with
+   $Q>0$ but small, a low rate is a resource problem: more physical qubits
+   per logical qubit, longer blocks, more syndrome extraction, but the
+   threshold theorem says the fight is winnable by spending. For $Q=0$
+   there is nothing to spend. The channel is on the far side of a boundary,
+   and adding qubits moves you along a line that never crosses it.
+
+   The mechanism at this lesson's own threshold makes the finality
+   tangible. At $p\geq\tfrac23$ the channel is entanglement-breaking, which
+   means it is equivalent to measuring the input, sending a classical
+   description of the outcome, and preparing a fresh state from that
+   description. Written that way, the impossibility needs no capacity
+   theory at all: a classical description can be copied, so a channel that
+   factors through one could clone quantum states, and no-cloning forbids
+   it. The channel is a classical channel wearing a quantum costume, and
+   the costume is the only quantum thing about it.
+
+   One qualification keeps "final" honest, and it is a genuinely surprising
+   one. $Q(\mathcal N)=0$ is final for $\mathcal N$ used *alone*. Smith and
+   Yard showed that two channels each of zero quantum capacity can, used
+   together, have strictly positive capacity, a phenomenon with no
+   classical analogue at all. So the correct reading of $Q=0$ is "this
+   channel transmits no quantum information by itself", which is exactly as
+   strong as the theorem says and no stronger.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -523,7 +695,7 @@ proves an exact zero, and only from $p=\tfrac23$ onward.
   orthogonal-basis classical capacity $C(p)$ stays strictly positive
   for every $p<1$.
 - The **quantum capacity**, via LSD's regularized coherent information,
-  is far more fragile: a real, computed hashing-bound lower bound goes
+  is far more fragile: a computed hashing-bound lower bound goes
   to zero by $p\approx0.25$, and the depolarizing channel is proven
   **exactly** zero-capacity from $p=\tfrac23$ onward via the
   entanglement-breaking criterion, derived and numerically verified
@@ -535,7 +707,7 @@ proves an exact zero, and only from $p=\tfrac23$ onward.
   research area in quantum Shannon theory, not a closed textbook
   question. That is an honest note to end the course on.
 
-## Further Exploration
+## The Gap Between the Two Capacities
 
 <NextDiscovery>
   This completes **Quantum Shannon Theory**. The gap between classical

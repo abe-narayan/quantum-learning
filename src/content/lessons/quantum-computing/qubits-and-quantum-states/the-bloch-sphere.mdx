@@ -18,7 +18,7 @@ export const lessonMeta = {
   estimatedMinutes: 30,
   prerequisites: ["quantum-computing/qubits-and-quantum-states/quantum-states-and-state-vectors"],
   objectives: [
-    "Derive the canonical form |ψ⟩ = cos(θ/2)|0⟩ + e^{iφ}sin(θ/2)|1⟩",
+    "Derive the canonical form |ψ⟩ = cos(θ/2)|0⟩ + e^(iφ) sin(θ/2)|1⟩",
     "Convert between amplitudes (α, β) and Bloch coordinates (θ, φ) and (x, y, z)",
     "Read the geometric meaning of a state directly off its position on the sphere",
   ],
@@ -34,7 +34,7 @@ export const lessonMeta = {
 A qubit's physical state has exactly two real degrees of freedom, and two real numbers are what it takes to locate a point on a sphere.
 </LessonHook>
 
-## Motivation
+## Counting to two, then building the sphere
 
 The last lesson counted the parameters and stopped there. Counting to two
 is not the same as producing the sphere, though, and the derivation below
@@ -56,7 +56,7 @@ picture instead of multiplying matrices.
 Felix Bloch publishes the theory of nuclear induction: how nuclear spins tip and precess in a magnetic field. His equations track a magnetization vector moving on a sphere, and the geometric picture this lesson derives for a qubit inherits both the mathematics and his name.
 </HistoricalMoment>
 
-## Intuition
+## Latitude and longitude, reused
 
 Picture a globe. Latitude tells you how far from the equator you are;
 longitude tells you which way you're facing around the vertical axis. The
@@ -67,7 +67,7 @@ the <Term id="global-relative-phase">relative phase</Term>, information invisibl
 computational basis but very much physically real, as you'll see in a
 later lesson.
 
-## Mathematical Development
+## From two amplitudes to two angles
 
 ### Removing the redundant parameters
 
@@ -82,9 +82,10 @@ e^{-i\gamma}|\psi\rangle = |\alpha|\,|0\rangle + \beta e^{-i\gamma}|1\rangle
 $$
 
 The new coefficient of $|0\rangle$, $|\alpha|$, is now real and
-non-negative. (We're allowed to do this because, as the next-lesson
-preview noted and as we'll prove properly soon, multiplying a state by an
-overall phase changes nothing physical.) Relabel the new coefficients
+non-negative. (We're allowed to do this because multiplying a state by an
+overall phase changes nothing physical: a fact borrowed here, flagged as
+borrowed in the last lesson's parameter count, and proved in Global Phase
+vs. Relative Phase later in this course.) Relabel the new coefficients
 $\alpha' = |\alpha| \geq 0$ and $\beta' = \beta e^{-i\gamma}$, so
 $|\psi\rangle$'s *physics* is fully captured by $\alpha'|0\rangle+\beta'|1\rangle$
 with $\alpha'$ real.
@@ -137,28 +138,35 @@ $$
 x = \langle\psi|X|\psi\rangle, \quad y = \langle\psi|Y|\psi\rangle, \quad z = \langle\psi|Z|\psi\rangle
 $$
 
-A matrix wedged between a bra and a ket is the
-$\langle\phi|A|\psi\rangle$ form from Dirac Notation: apply the matrix to
-the ket first, then take the ordinary inner product of the bra with the
-result, and a single number comes out. The three matrices here are the
-<Term id="pauli-matrices">Pauli matrices</Term>, which you'll meet
-properly in the Quantum Gates lesson; all this section needs from them is
-what each does to the two basis states, which follows from writing them
-out:
+Both halves of that are already on the table. A matrix wedged between a
+bra and a ket is the $\langle\phi|A|\psi\rangle$ form from Dirac Notation:
+apply the matrix to the ket first, then take the ordinary inner product of
+the bra with the result, and a single number comes out. The three matrices
+are the <Term id="pauli-matrices">Pauli matrices</Term> $X$, $Y$ and $Z$,
+written out and read off their columns in that same lesson:
 
 $$
 X = \begin{pmatrix}0&1\\1&0\end{pmatrix}, \qquad Y = \begin{pmatrix}0&-i\\i&0\end{pmatrix}, \qquad Z = \begin{pmatrix}1&0\\0&-1\end{pmatrix}
 $$
 
-Working out $z$ for $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$: reading
-$Z$'s columns off directly gives $Z|0\rangle=|0\rangle$ and
-$Z|1\rangle=-|1\rangle$, so
+Nothing here needs more of them than their action on the two basis states,
+which Dirac Notation lists in full; the Quantum Gates lesson takes up the
+separate question of what makes these three legal gates.
+
+Working out $z$ for $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$: from
+$Z|0\rangle=|0\rangle$ and $Z|1\rangle=-|1\rangle$,
 
 $$
 \langle\psi|Z|\psi\rangle = \alpha^*\alpha\langle0|0\rangle - \beta^*\beta\langle1|1\rangle = |\alpha|^2 - |\beta|^2
 $$
 
-Substituting the canonical form and using the double-angle identity,
+Two standard trigonometric identities finish each of the three
+calculations, so they are worth having in front of you:
+$\cos^2 A - \sin^2 A = \cos 2A$ and $2\sin A\cos A = \sin 2A$. Both are
+read here with $A = \theta/2$, which is where the sphere's full angle
+$\theta$ comes back out of the half-angles in the amplitudes.
+
+Substituting the canonical form and using the first of those,
 $|\alpha|^2-|\beta|^2 = \cos^2(\theta/2) - \sin^2(\theta/2) = \cos\theta$,
 which is the $z=\cos\theta$ promised above.
 
@@ -173,7 +181,7 @@ $$
 Substituting the canonical form, $\alpha=\cos(\theta/2)$ real and
 $\beta=e^{i\varphi}\sin(\theta/2)$, gives
 $2\operatorname{Re}(\alpha^*\beta) = 2\cos(\theta/2)\sin(\theta/2)\cos\varphi = \sin\theta\cos\varphi$
-by the same double-angle identity, matching $x$ below. $y$ follows
+by the second identity, matching $x$ below. $y$ follows
 identically using $Y|0\rangle=i|1\rangle$, $Y|1\rangle=-i|0\rangle$, giving
 $2\operatorname{Im}(\alpha^*\beta) = \sin\theta\sin\varphi$. All three:
 
@@ -184,7 +192,8 @@ $$
 work directly from *any* $\alpha,\beta$. You never need to remove the
 global phase by hand first, because (as you can check) these three
 formulas don't change if you multiply $\alpha,\beta$ by a common phase.
-That cancellation is the content of the next lesson, not a coincidence.
+That cancellation is the content of Global Phase vs. Relative Phase,
+later in this course, not a coincidence.
 
 ### Reading the sphere
 
@@ -198,7 +207,7 @@ That cancellation is the content of the next lesson, not a coincidence.
   $|-\rangle$, $|{+i}\rangle$, $|{-i}\rangle$ all live here, at
   $\varphi = 0, \pi, \pi/2, 3\pi/2$ respectively.
 
-## Physical Interpretation
+## What each angle controls
 
 $\theta$ alone determines the measurement statistics
 ($P(0)=\cos^2(\theta/2)$, $P(1)=\sin^2(\theta/2)$, you'll derive this
@@ -208,7 +217,7 @@ information: it is what makes $|+\rangle$ and $|-\rangle$, same $\theta$
 and different $\varphi$, behave differently once gates get involved.
 Geometrically, latitude is "how much," longitude is "in what phase."
 
-## Interactive Experiment
+## Drag to any point and read the amplitudes
 
 <PredictBeforeReveal
   question="Apply a π rotation about the z-axis (the Z gate) to |+⟩, sitting at θ=π/2, φ=0 on the equator. Where does it end up?"
@@ -237,7 +246,7 @@ lesson defines them.
   <LazyCompareStatesExplorer />
 </InteractiveSection>
 
-## Worked Example
+## The state at one specific latitude and longitude
 
 **Find the state and Bloch point for $\theta=\pi/3$, $\varphi=\pi/2$.**
 
@@ -264,7 +273,7 @@ degrees: $\theta=60°$, $\varphi=90°$) and confirm $\alpha \approx 0.87$,
 $\beta \approx 0.50i$, matching $\frac{\sqrt3}{2}\approx0.87$ and
 $\frac12=0.50$.
 
-## Common Mistakes
+## Theta is a probability, not a phase
 
 <Callout type="note">
 **Confusing the Bloch angle $\theta$ with a phase.** $\theta$ is a
@@ -284,12 +293,131 @@ phase *relative to*.
 
 1. Find $(\theta,\varphi)$ for the state $|\psi\rangle = \frac{1}{2}|0\rangle + \frac{\sqrt3}{2}|1\rangle$
    (assume both coefficients are real and positive).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \theta = \frac{2\pi}{3} = 120°, \qquad \varphi = 0.
+   $$
+
+   Match the state against the canonical form
+   $|\psi\rangle = \cos(\theta/2)|0\rangle + e^{i\varphi}\sin(\theta/2)|1\rangle$.
+   The first coefficient gives $\cos(\theta/2) = \tfrac12$, so
+   $\theta/2 = \pi/3$ and $\theta = 2\pi/3$. Check it against the second:
+   $\sin(\pi/3) = \tfrac{\sqrt3}{2} \checkmark$. Both coefficients are real and
+   positive, so $e^{i\varphi} = 1$ and $\varphi = 0$: the state sits in the
+   $x$-$z$ plane, on the front of the sphere.
+
+   The half-angle is where this goes wrong. Reading $\cos\theta = \tfrac12$
+   instead of $\cos(\theta/2) = \tfrac12$ gives $\theta = \pi/3 = 60°$, exactly
+   half the right latitude, and it will then disagree with every probability
+   you compute from it. The factor of two is not decoration: amplitudes live on
+   a sphere of half-angles precisely so that two *orthogonal* states, which are
+   $90°$ apart in amplitude space, land at antipodal points $180°$ apart on the
+   Bloch sphere. Without it, $|0\rangle$ and $|1\rangle$ would not be opposite
+   poles.
+
+   Sanity check with the Born rule: $P(0) = \cos^2(\theta/2) = \tfrac14$ and
+   $P(1) = \sin^2(\theta/2) = \tfrac34$, which is what the amplitudes say
+   directly.
+
+   </details>
+
 2. Two states have the same $\theta$ but $\varphi$ differing by $\pi$.
    Where do they sit relative to each other on the sphere?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Same latitude, opposite longitudes: directly across the sphere from each
+   other *horizontally*, on the same horizontal circle. If one has Bloch
+   vector $(x, y, z)$, the other has $(-x, -y, z)$. The $z$-coordinate is set
+   by $\theta$ alone and does not move.
+
+   The tempting wrong answer is "antipodal", and it is worth being precise
+   about why not. Antipodal means $(-x,-y,-z)$, which needs $\theta \to \pi-\theta$
+   as well; here the latitude is held fixed. So these two are antipodal only in
+   the one case where $z=0$ already, the equator, $\theta = \pi/2$. That case is
+   familiar: $\varphi = 0$ gives $|+\rangle$ and $\varphi = \pi$ gives
+   $|-\rangle$, genuinely opposite points, and genuinely orthogonal.
+
+   Off the equator they are *not* orthogonal. Take $\theta = \pi/3$: the two
+   states are $\tfrac{\sqrt3}{2}|0\rangle \pm \tfrac12|1\rangle$, and their
+   overlap is $\tfrac34 - \tfrac14 = \tfrac12$, not 0. This is the payoff of
+   the half-angle again. Orthogonality on the Bloch sphere means antipodal, and
+   a longitude flip alone is not antipodal.
+
+   </details>
+
 3. A state sits at Bloch point $(x,y,z) = (0, 0, -1)$. Write down
    $|\psi\rangle$ in terms of $|0\rangle$ and $|1\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $|\psi\rangle = |1\rangle$.
+
+   The point is the south pole, so $z = \cos\theta = -1$ gives $\theta = \pi$.
+   Substituting into the canonical form:
+
+   $$
+   |\psi\rangle = \cos\!\left(\tfrac{\pi}{2}\right)|0\rangle + e^{i\varphi}\sin\!\left(\tfrac{\pi}{2}\right)|1\rangle = 0\cdot|0\rangle + e^{i\varphi}|1\rangle.
+   $$
+
+   The $|0\rangle$ amplitude vanishes, so the only surviving coefficient is
+   $e^{i\varphi}$ on $|1\rangle$, and a phase multiplying the *whole* state is a
+   global phase with no physical content. Drop it and the state is $|1\rangle$.
+
+   That is also the answer to "which $\varphi$?": none of them, and all of
+   them. At the pole, longitude is undefined, exactly as it is at the Earth's
+   North Pole, where every meridian meets. Question 4 is this same fact stated
+   as a general principle.
+
+   The mistake to avoid is reading $z=-1$ as "probability $-1$" or as needing a
+   negative amplitude. $z$ is $\langle Z\rangle$, the *expectation value* of the
+   $Z$ measurement, and $z = P(0)-P(1) = 0-1 = -1$ means outcome 1 with
+   certainty. Nothing about the amplitude is negative.
+
+   </details>
+
 4. Explain, using the canonical form, why the north and south poles are
    the *only* points on the sphere where $\varphi$ has no physical effect.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Look at where $\varphi$ appears:
+
+   $$
+   |\psi\rangle = \cos\!\left(\tfrac{\theta}{2}\right)|0\rangle + e^{i\varphi}\sin\!\left(\tfrac{\theta}{2}\right)|1\rangle.
+   $$
+
+   $e^{i\varphi}$ sits on exactly one of the two terms. That makes it a
+   *relative* phase, and a relative phase is physical, so long as there really
+   are two terms to be relative between. It stops being physical in precisely
+   the two cases where one of the coefficients is zero.
+
+   At the north pole, $\theta = 0$, so $\sin(\theta/2) = 0$. The $e^{i\varphi}$
+   multiplies zero, and the state is $|0\rangle$ whatever $\varphi$ is.
+
+   At the south pole, $\theta = \pi$, so $\cos(\theta/2) = 0$. Now
+   $e^{i\varphi}$ is the only coefficient left, so it multiplies the entire
+   state: it has been promoted from a relative phase to a global one, and
+   global phases are unobservable.
+
+   Anywhere else, $0 < \theta < \pi$, both $\cos(\theta/2)$ and $\sin(\theta/2)$
+   are strictly nonzero, so $e^{i\varphi}$ is genuinely relative and moving
+   $\varphi$ moves the state to a different point. That is the "only": the two
+   escape routes are "the phase multiplies nothing" and "the phase multiplies
+   everything", and each needs one coefficient to vanish, which happens at one
+   pole each.
+
+   The count agrees with the geometry. A sphere needs two coordinates, and the
+   poles are the two points where the second one degenerates, the same
+   coordinate singularity that makes longitude meaningless at the Earth's poles.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -306,7 +434,7 @@ phase *relative to*.
 - The poles are $|0\rangle$ and $|1\rangle$; the equator is the set of
   equal-probability superpositions, distinguished only by phase.
 
-## Further Exploration
+## Deriving the probabilities properly
 
 <NextDiscovery>
 [Measurement and Probability](/lessons/quantum-computing/qubits-and-quantum-states/measurement-and-probability) derives $P(0)=\cos^2(\theta/2)$ and

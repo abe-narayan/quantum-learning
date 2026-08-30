@@ -1,13 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { ComponentErrorBoundary } from "@/components/ui/ComponentErrorBoundary";
 
 const ConceptMapExplorer = dynamic(
   () => import("./ConceptMapExplorer").then((mod) => mod.ConceptMapExplorer),
   {
     ssr: false,
     // `ssr: false`, so this placeholder is what a cold visit to /map actually
-    // renders until the explorer chunk arrives — it is the state readers see,
+    // renders until the explorer chunk arrives, it is the state readers see,
     // not a formality. Its height therefore has to match the explorer's, and
     // the explorer is not just a viewport: it stacks an orientation block, a
     // legend/zoom row and a status line above the graph, ~220px of chrome that
@@ -25,4 +26,20 @@ const ConceptMapExplorer = dynamic(
   }
 );
 
-export { ConceptMapExplorer as LazyConceptMapExplorer };
+/**
+ * Wrapped, because `ssr: false` means the explorer arrives over the network
+ * after paint: a dropped connection or a stale hashed filename after a deploy
+ * throws during render, and the nearest boundary is `/map`'s own error.tsx,
+ * which would blank the entire route. Scoped here, the page keeps its heading,
+ * its orientation copy and the rest of its chrome, and only the graph is
+ * replaced by something that says so and offers a retry.
+ */
+function LazyConceptMapExplorer(props: React.ComponentProps<typeof ConceptMapExplorer>) {
+  return (
+    <ComponentErrorBoundary status="Fault: map offline" what="The concept map failed to load.">
+      <ConceptMapExplorer {...props} />
+    </ComponentErrorBoundary>
+  );
+}
+
+export { LazyConceptMapExplorer };

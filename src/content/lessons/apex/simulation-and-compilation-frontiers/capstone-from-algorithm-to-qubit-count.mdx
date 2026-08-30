@@ -72,11 +72,12 @@ export const lessonMeta = {
   order: 6,
   difficulty: "master",
   estimatedMinutes: 70,
-  prerequisites: ["apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation", "apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules"],
+  prerequisites: ["apex/simulation-and-compilation-frontiers/noise-aware-compilation-and-resource-estimation", "apex/simulation-and-compilation-frontiers/quantum-simulation-of-molecules", "apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm"],
   objectives: [
     "Combine every ingredient of this course (classical-simulability boundary, T-count synthesis, routing/noise-aware compilation) with the Fault Tolerance Frontiers course's own resource-estimation methodology into one complete, end-to-end pipeline",
     "Walk a small toy molecular-simulation problem through every stage of this pipeline: algorithm gate count → T-count via synthesis → routing overhead → fault-tolerant physical-qubit estimate",
     "State honestly which parts of this pipeline are well-established engineering practice versus where genuine, active research uncertainty remains",
+    "Check first whether the circuit is classically simulable at all, and recognize that a negative answer at that stage makes every later stage moot",
   ],
   related: [
     {
@@ -91,13 +92,13 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="One number, four stages">
-  Five lessons built one running capability, each answering a different
-  question about the same circuit. This capstone's only job is to chain
-  those stages together into a single final number: how many physical
-  qubits an algorithm actually costs.
+  Five lessons, five different questions about the same circuit. Chain
+  them and one number falls out: the physical qubit count a quantum
+  algorithm actually costs. It is nowhere near the number of qubits the
+  algorithm asks for.
 </LessonHook>
 
-## Motivation
+## Five Lessons, One Pipeline
 
 Five lessons built one running capability: **Tensor Networks and Matrix
 Product States** gave a classical simulation method and a number, bond
@@ -116,7 +117,7 @@ Hamiltonian, whose gate count every earlier stage in this list can be
 applied to.
 
 This capstone's only job is to chain those stages together, then hand the
-result to the *other* capstone this pillar already built.
+result to the *other* capstone this track already built.
 
 <PipelineDiagram
   ariaLabel="The four-stage pipeline this capstone chains together: Stage 1, check classical simulability; Stage 2, count T-gates via Clifford+T synthesis; Stage 3, apply routing and noise-aware compilation overhead; Stage 4, apply the Fault Tolerance Frontiers capstone's own error-budget, code-distance, distillation, and qubit-count methodology, producing a final total physical qubit count"
@@ -128,11 +129,8 @@ result to the *other* capstone this pillar already built.
   ]}
 />
 
-*The shape of this whole lesson, stated before a single number is
-computed*: four stages, each handed off from a specific earlier lesson,
-chained in sequence into a single physical-qubit estimate. The Worked
-Example's table and bar chart below fill in this same four-stage shape
-with this lesson's own toy circuit's actual numbers.
+Each stage is handed off from a specific earlier lesson, and each one
+changes the number the next stage receives.
 
 **Capstone:
 Resource Estimation for a Real Algorithm**, the closing lesson of the
@@ -142,7 +140,7 @@ from "a circuit has $N_T$ T gates and $N_2$ two-qubit Clifford gates" to
 $N_T$ and $N_2$ as inputs. This course's five lessons are exactly the
 machinery that produces them, honestly, from an actual algorithm. Put the
 two together and the result is the full, practical pipeline this whole
-APEX pillar has been building toward: **read about a quantum algorithm,
+APEX track has been building toward: **read about a quantum algorithm,
 and estimate whether it is realistically achievable, and at what qubit
 count.**
 
@@ -157,9 +155,9 @@ $30$, or $20$ is derived from a real compiled molecular circuit; they
 are chosen to be small enough to walk by hand while still exercising
 every stage this course and the fault-tolerance course together built.
 
-## Mathematical Development
+## Four Stages From Circuit to Qubit Count
 
-### Stage 1 — is this classically simulable at all?
+### Stage 1: is this classically simulable at all?
 
 Before spending one more line of arithmetic on compiling this circuit,
 When Classical Simulation Works demands the first, often-skipped
@@ -167,7 +165,7 @@ question: *can a classical computer already do this?* A state vector
 for `toyQubitCount` = **{toyQubitCount}** qubits has
 `hilbertSpaceDimension` = **{hilbertSpaceDimension}** complex amplitudes.
 That is not merely "efficiently simulable" in the asymptotic sense that
-lesson formalized — it is trivial, well within what a laptop simulates
+lesson formalized; it is trivial, well within what a laptop simulates
 in microseconds, for any circuit depth. **A real quantum computer would
 be entirely the wrong tool for this exact toy circuit.** This is stated
 plainly, not glossed over: the point of an example this small is
@@ -178,7 +176,7 @@ qubits, are what actually cross this boundary; this toy circuit is
 deliberately kept on the classically-trivial side of it so its numbers
 stay checkable by hand through every remaining stage.
 
-### Stage 2 — raw T-count via synthesis
+### Stage 2: raw T-count via synthesis
 
 Treat the rest of this pipeline as a hypothetical: *if* this circuit's
 shape were scaled up to a regime past Stage 1's boundary, what would
@@ -205,7 +203,7 @@ $$
 types gives the circuit's raw, pre-compilation gate count,
 `rawTotalGateCount` = **{rawTotalGateCount}**.
 
-### Stage 3 — routing overhead
+### Stage 3: routing overhead
 
 Noise-Aware Compilation and Resource Estimation showed that a device's
 limited connectivity, not an idealized fully-connected graph, forces a
@@ -235,15 +233,26 @@ nearly doubled the circuit's total gate count, from
 connectivity constraint, before a single fault-tolerance
 consideration has entered the calculation.
 
-### Stage 4 — the Fault Tolerance Frontiers capstone's own methodology, reused exactly
+<PredictBeforeReveal
+  question="Stage 4 turns those 3100 routed gates into a physical-qubit count. The algorithm itself needs only 2 logical qubits. Before working through the four steps, predict how many physical qubits the fault-tolerant version demands once code distance and the magic-state factory are both accounted for."
+  options={[
+    { label: "A modest multiple of 2, a few dozen", value: "few-dozen" },
+    { label: "A few hundred, comparable to a couple of surface-code patches", value: "few-hundred" },
+    { label: "Thousands, dominated by the magic-state factory rather than the compute qubits", value: "thousands-factory" },
+  ]}
+  correctValue="thousands-factory"
+  explanation="The 2 logical qubits themselves need only a few hundred physical data-plus-ancilla qubits, two surface-code patches at the distance Step (b) will select. But keeping a T-gate-hungry circuit supplied with magic states needs a separate distillation factory built from many more patches than that, and Step (d) below shows that factory alone dominating the final total: thousands of qubits where the 'algorithm' asked for 2."
+/>
+
+### Stage 4: the Fault Tolerance Frontiers capstone's own methodology, reused exactly
 
 This is the handoff. Capstone: Resource Estimation for a Real
 Algorithm derived a four-step pipeline from "$N_T$ T gates, $N_2$
 two-qubit gates, target overall success probability" to "total physical
 qubits," and nothing about that derivation was specific to its own toy
 $N_T=100$, $N_2=500$ pair. Plugging in *this* lesson's Stage 2/3 outputs
-instead — $N_T = 600$, $N_2 = N_2^{\text{routed}} = 2500$, so
-$N_T+N_2 = 3100$ — and the same $99\%$ overall-success target used
+instead ($N_T = 600$, $N_2 = N_2^{\text{routed}} = 2500$, so
+$N_T+N_2 = 3100$), with the same $99\%$ overall-success target used
 there:
 
 **Step (a), per-gate error budget (union bound):**
@@ -252,9 +261,9 @@ $$
 p_L^{\text{target}} = \frac{0.01}{3100} \approx 3.226\times10^{-6},
 $$
 
-`perGateBudget` = **{perGateBudget.toExponential(3)}** — noticeably
+`perGateBudget` = **{perGateBudget.toExponential(3)}**, noticeably
 tighter than the fault-tolerance capstone's own $1.667\times10^{-5}$,
-simply because this pipeline's routing overhead left more gates that
+because this pipeline's routing overhead left more gates that
 all have to succeed.
 
 **Step (b), code distance from the threshold scaling law.** At the
@@ -267,7 +276,7 @@ $$
 
 `minCodeDistanceRaw` = **{minCodeDistanceRaw.toFixed(3)}**, so the
 smallest odd admissible distance is `codeDistance` =
-**{codeDistance}** (one step up from that capstone's $d=9$ — the
+**{codeDistance}** (one step up from that capstone's $d=9$; the
 tighter budget here costs two extra rows and columns of the lattice).
 Checking: `achievedLogicalErrorRate` =
 **{achievedLogicalErrorRate.toExponential(3)}**, comfortably under the
@@ -283,8 +292,8 @@ $$
 
 `distillationOutputError` = **{distillationOutputError.toExponential(2)}**,
 still `magicStateHeadroom` = **{magicStateHeadroom.toFixed(0)}×** below
-the tighter {perGateBudget.toExponential(3)} target — smaller headroom
-than the fault-tolerance capstone's $476\times$, exactly because this
+the tighter {perGateBudget.toExponential(3)} target. That is smaller
+headroom than the fault-tolerance capstone's $476\times$, because this
 pipeline's budget is tighter, but still enough that one level of
 $15$-to-$1$ distillation suffices; no second level is needed for this
 toy circuit's $600$ T gates.
@@ -314,17 +323,31 @@ $$
 N_{\text{physical}} = 242+240+3615 = 4097,
 $$
 
-`totalPhysicalQubits` = **{totalPhysicalQubits}** — the single number
+`totalPhysicalQubits` = **{totalPhysicalQubits}**, the single number
 this entire five-lesson-plus-capstone pipeline was built to produce.
 The factory alone is `factoryShareOfTotal` =
 **{(factoryShareOfTotal * 100).toFixed(1)}%** of the total, an even
 larger share than the fault-tolerance capstone's own $71.4\%$, because
 this toy circuit's logical-qubit count ($2$) is smaller relative to the
-fixed $15$-patch factory than that capstone's ($6$) was — the same
-$15/(15+L)$ relationship derived there, just evaluated at a smaller
-$L$.
+fixed $15$-patch factory than that capstone's ($6$) was. It is the same
+$15/(15+L)$ relationship derived there, evaluated at a smaller $L$.
 
-## Physical Interpretation: what's solid, and what's still research
+<BarChart
+  bars={[
+    { label: `Data (${logicalQubitCount} patches)`, value: totalDataQubits, caption: `${totalDataQubits}` },
+    { label: `Ancilla (${logicalQubitCount} patches)`, value: totalAncillaQubits, caption: `${totalAncillaQubits}` },
+    { label: "Magic-state factory (15 patches)", value: factoryQubits, highlight: true, caption: `${factoryQubits}` },
+  ]}
+  maxValue={totalPhysicalQubits}
+  ariaLabel={`Composition of the ${totalPhysicalQubits} physical qubits, all three bars drawn against a fixed scale whose full height is that total: ${totalDataQubits} data qubits and ${totalAncillaQubits} ancilla qubits for the ${logicalQubitCount} logical patches, and ${factoryQubits} qubits for the 15-patch magic-state factory, which is ${(factoryShareOfTotal * 100).toFixed(1)} percent of the total and taller than the other two bars combined by a factor of about ${(factoryQubits / computeQubits).toFixed(1)}`}
+/>
+
+Drawn against the total, the split is the whole point: the factory bar is
+about {(factoryQubits / computeQubits).toFixed(1)} times the data and
+ancilla bars put together. Every qubit in it exists to manufacture
+$600$ T states, and none of it holds the algorithm's data.
+
+## What Is Solid, and What Is Still Research
 
 <Callout type="warning">
 **Not every stage of this pipeline carries the same epistemic weight,
@@ -342,7 +365,7 @@ implemented, engineering problems.
 
 Stage 4 is a different kind of claim. The four-step
 error-budget/code-distance/distillation/qubit-count methodology itself
-is solid, real published estimates use exactly this structure. But the
+is solid; real published estimates use exactly this structure. But the
 *numbers that methodology outputs* depend on assumptions that are still
 moving targets as the field's engineering matures: the achieved
 physical error rate $p$ a real device reaches (this lesson assumed
@@ -352,7 +375,7 @@ ratio is achieved at scale), the real-time decoder's throughput and
 accuracy (a decoder too slow to keep up with syndrome extraction stalls
 the whole computation, regardless of what the code distance formula
 says on paper), and the specific code and architecture choice (surface
-codes are what this pillar derived, but qLDPC and other code families
+codes are what this track derived, but qLDPC and other code families
 under active research promise substantially lower physical-to-logical
 qubit ratios, which would shrink every qubit count in Stage 4 without
 changing Stages 1 through 3 at all). A reader who takes away "physical
@@ -374,12 +397,12 @@ real uncertainty and the real research lives" has read it correctly.
   storing 12 logical qubits in 288 physical qubits at a threshold
   comparable to the surface code's, which is roughly an order of
   magnitude better in qubits per logical qubit than the surface-code
-  numbers Stage 4 assumes. The trade is connectivity — the code's checks
-  are not planar-local — so it is a claim about a different hardware
+  numbers Stage 4 assumes. The trade is connectivity: the code's checks
+  are not planar-local, so it is a claim about a different hardware
   target, not a free improvement on this one.
 </ResearchConnection>
 
-This full pipeline, Stages 1 through 4 together, is the APEX pillar's
+This full pipeline, Stages 1 through 4 together, is the APEX track's
 practical answer to a question popular accounts of quantum computing
 routinely skip: *given a quantum algorithm I've just read about, how
 would I actually estimate whether it's realistically achievable, and on
@@ -388,24 +411,13 @@ T-gates. Account for real device connectivity. Then, and only then,
 apply fault-tolerance overhead, honestly labeling which of those four
 answers is engineering fact and which is a current best guess.
 
-## Worked Example
-
-<PredictBeforeReveal
-  question="This toy algorithm only needs 2 logical qubits. Roughly how many physical qubits do you expect the full fault-tolerant pipeline to demand once code distance and the magic-state factory are accounted for?"
-  options={[
-    { label: "A modest multiple of 2 — a few dozen", value: "few-dozen" },
-    { label: "A few hundred — comparable to a couple of surface-code patches", value: "few-hundred" },
-    { label: "Thousands — dominated by the magic-state factory, not the compute qubits", value: "thousands-factory" },
-  ]}
-  correctValue="thousands-factory"
-  explanation="The 2 logical qubits themselves need only a few hundred physical data-plus-ancilla qubits (two distance-11 surface-code patches). But keeping a T-gate-hungry circuit supplied with magic states needs a separate distillation factory built from many more patches than that, and the table below shows that factory alone dominating the final total — thousands of qubits where the 'algorithm' only asked for 2."
-/>
+## The Toy Circuit, Costed Stage by Stage
 
 The full pipeline, stage by stage, for this lesson's toy circuit:
 
 | Stage | Quantity | Value |
 |---|---|---|
-| 1 | Hilbert space dimension ({toyQubitCount} qubits) | {hilbertSpaceDimension} — classically trivial |
+| 1 | Hilbert space dimension ({toyQubitCount} qubits) | {hilbertSpaceDimension} (classically trivial) |
 | 2 | Two-qubit gates, raw | {totalTwoQubitGates} |
 | 2 | T-count $N_T$ | {totalTGates} |
 | 2 | Raw total gate count | {rawTotalGateCount} |
@@ -422,15 +434,20 @@ Watching the number transform stage by stage is the real content of
 this capstone: {rawTotalGateCount} raw gates become {totalTGates} T
 gates worth tracking separately, routing inflates the total to
 {routedTotalGateCount}, and the fault-tolerance methodology then
-expands that into a {totalPhysicalQubits}-physical-qubit estimate —
-over two thousand times the {logicalQubitCount} logical qubits the
+expands that into a {totalPhysicalQubits}-physical-qubit estimate, over
+two thousand times the {logicalQubitCount} logical qubits the
 algorithm itself needed, almost entirely driven by the magic-state
 factory's {(factoryShareOfTotal * 100).toFixed(1)}% share.
 
 <BarChart
   bars={pipelineBars}
-  ariaLabel={`Pipeline funnel for the toy molecular-simulation circuit: ${rawTotalGateCount} raw gates, ${totalTGates} T-count, ${routedTotalGateCount} gates after routing overhead, growing to ${totalPhysicalQubits} total physical qubits after fault-tolerant compilation, of which the magic-state factory is ${(factoryShareOfTotal * 100).toFixed(1)}%`}
+  maxValue={totalPhysicalQubits}
+  ariaLabel={`Pipeline funnel for the toy molecular-simulation circuit, all four bars drawn against a fixed scale whose full height is the final total of ${totalPhysicalQubits}. Note the unit change at the last bar: ${rawTotalGateCount} raw gates, ${totalTGates} T-count, and ${routedTotalGateCount} gates after routing overhead are gate counts, while the final ${totalPhysicalQubits} is a physical qubit count, of which the magic-state factory is ${(factoryShareOfTotal * 100).toFixed(1)} percent`}
 />
+
+The last bar changes units, from gates to qubits, so its height is not a
+continuation of the first three so much as a new quantity the first three
+are inputs to.
 
 Notice the shape: the first three bars grow by modest, explainable
 multiplicative factors (routing added $2.5\times$ to the two-qubit
@@ -439,7 +456,7 @@ step up from the routed gate count. The real asymmetry is hidden
 *inside* that last bar, not in how tall it is:
 {(factoryShareOfTotal * 100).toFixed(1)}% of those
 {totalPhysicalQubits} physical qubits are magic-state factory, not
-logical compute — the algorithm's own $2$ logical qubits account for
+logical compute. The algorithm's own $2$ logical qubits account for
 only a sliver of the total. That split, not a dramatic jump in bar
 height, is this lesson's central quantitative point: the
 *compilation* side of this pipeline (Stages 1–3) costs modest,
@@ -447,7 +464,7 @@ well-understood overhead, while the *fault-tolerance* side (Stage 4)
 is where nearly all of the qubit budget, and nearly all of the
 remaining uncertainty this lesson flags below, actually lives.
 
-## Common Mistakes
+## Counting Gates and Calling It an Estimate
 
 <Callout type="warning">
 **Skipping Stage 1 and jumping straight to compiling.** It is tempting
@@ -473,7 +490,7 @@ physical reason.
 
 <Callout type="note">
 **Treating the {totalPhysicalQubits}-qubit answer as equally certain
-across all four stages.** As the Physical Interpretation section
+across all four stages.** As the discussion above
 argued, Stages 1–3 are routine engineering with essentially no
 methodological uncertainty; Stage 4's *method* is solid but its
 specific numeric inputs ($p$, decoder performance, code choice) are
@@ -491,18 +508,168 @@ still under active research.
    the resulting per-gate error budget for the same $99\%$
    overall-success target, and compare all three to the lesson's own
    $2500$, $3100$, and $3.226\times10^{-6}$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   N_2 = 1000\times1.5 = 1500, \qquad N_T + N_2 = 600 + 1500 = 2100,
+   $$
+
+   $$
+   p_L^{\text{target}} = \frac{0.01}{2100} = 4.762\times10^{-6}.
+   $$
+
+   Against the lesson's $2500$, $3100$, and $3.226\times10^{-6}$: the
+   two-qubit count falls by $40\%$, the total by about $32\%$, and the
+   budget loosens by a factor of $3100/2100 = 1.48$.
+
+   Notice the routing improvement is diluted on its way through. The
+   multiplier applies to the $1000$ two-qubit gates and not to the $600$
+   T gates, so a $40\%$ saving on one term becomes a $32\%$ saving on the
+   sum. As a circuit's T-count grows relative to its Clifford content,
+   which is what happens when a real algorithm is synthesized to tight
+   precision, connectivity improvements matter less and less to the total.
+
+   **And now the part that matters, which the question deliberately stops
+   one step short of.** Push the looser budget through Stage 4b:
+
+   $$
+   d \ge 2\,\frac{\ln(4.762\times10^{-6})}{\ln(0.1)} - 1 = 9.64,
+   $$
+
+   and the smallest odd integer at or above $9.64$ is $11$. **The same
+   code distance the lesson already had.** The patch size does not
+   change, the factory does not change, and the final physical-qubit
+   estimate stays at $4097$. Better connectivity bought a shorter,
+   faster circuit and not one qubit.
+
+   The reason is the shape of Stage 4b: $d$ depends on the *logarithm* of
+   the budget and is quantized to odd integers, so each admissible
+   distance covers a full order of magnitude in $p_L$. A factor of $1.48$
+   is well inside one step. To reach $d=9$ the budget would have to
+   loosen to $10^{-5}$, which needs the routed gate count down near
+   $1000$, so the routing multiplier alone cannot get there from $1.5$
+   even if it fell to $1$.
+
+   That is worth carrying as a general habit when reading a resource
+   estimate. Improvements to the *circuit* show up in runtime, which is
+   real and is priced in spacetime volume. Improvements to the *qubit
+   count* come only from changes big enough to move the code distance,
+   and the distance moves in steps of two with a factor of ten per step.
+
+   </details>
 2. Redo Stage 4a–4b using the lesson's own routed gate count of $3100$,
    but a laxer overall-success target of $95\%$ (i.e. a $5\%$ allowed
    overall failure) instead of $99\%$. Compute the new per-gate error
    budget and the resulting minimum code distance $d$, and state
-   whether it comes out larger or smaller than the lesson's $d = 11$ —
+   whether it comes out larger or smaller than the lesson's $d = 11$,
    and which of the two capstones' code distances it matches.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   p_L^{\text{target}} = \frac{0.05}{3100} = 1.613\times10^{-5},
+   $$
+
+   $$
+   d \ge 2\,\frac{\ln(1.613\times10^{-5})}{\ln(0.1)} - 1 = 8.59 \;\Longrightarrow\; d = 9 .
+   $$
+
+   Smaller than the lesson's $d=11$, and it lands exactly on the Fault
+   Tolerance Frontiers capstone's $d=9$.
+
+   Check the rounding rather than trusting it, since $8.59$ is close to
+   the boundary. At $d=9$ the achieved logical error rate is
+   $(0.1)^{5}=10^{-5}$, comfortably under the $1.613\times10^{-5}$
+   budget. At $d=7$ it would be $10^{-4}$, six times over. So $9$ is both
+   necessary and sufficient.
+
+   **What that one step costs, or rather saves.** A distance-9 patch
+   holds $2(81)-1=161$ physical qubits against distance-11's $241$. Two
+   compute patches plus a 15-patch factory is 17 patches either way, so
+   the total falls from $17\times241=4097$ to $17\times161=2737$, a
+   saving of a third. The factory share is unchanged at $15/17=88.2\%$,
+   because both terms scale with the same per-patch cost.
+
+   **The comparison worth drawing** is with question 1. There a $32\%$
+   reduction in gate count moved the distance not at all. Here a
+   five-fold relaxation of the overall failure allowance moved it by a
+   full step. Both act on the budget through the same logarithm, and only
+   the second was large enough to cross a quantization boundary. A design
+   knob that changes the budget by less than an order of magnitude will
+   usually change nothing about the machine's size.
+
+   **And the reason the answer coincides with the other capstone's
+   $d=9$** is not a coincidence worth being pleased about, it is the same
+   arithmetic reached from a different direction. That capstone had 600
+   gates at a $1\%$ failure target, giving a budget of
+   $1.667\times10^{-5}$; this one has 3100 gates at a $5\%$ target,
+   giving $1.613\times10^{-5}$. Nearly the same number, so nearly the
+   same distance. Only the ratio of allowed failure to gate count enters
+   Stage 4b, and two circuits with very different gate counts and very
+   different reliability targets can land on identical hardware.
+
+   </details>
+
 3. If this toy circuit needed `logicalQubitCount` $= 6$ logical qubits
    instead of $2$ (holding the code distance, patch size, and
    $15$-patch factory fixed), recompute the compute qubits, the total
    physical qubits, and the factory's share of the total. Which of the
    two capstones' own reported factory-share percentages does your
    answer land on, and why?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   At $d=11$ a patch costs $121+120=241$ qubits, so six logical qubits
+   give
+
+   $$
+   726 \text{ data} + 720 \text{ ancilla} = 1446 \text{ compute qubits},
+   $$
+
+   $$
+   N_{\text{physical}} = 1446 + 3615 = 5061, \qquad \frac{3615}{5061} = 71.4\% .
+   $$
+
+   That is the Fault Tolerance Frontiers capstone's figure exactly, and
+   the reason is that the share never depended on the code distance at
+   all. Both the compute register and the factory are counted in units of
+   the same $2d^2-1$ patch, so the per-patch cost cancels out of the
+   ratio and only the patch *count* survives:
+
+   $$
+   \text{factory share} = \frac{15}{15+L}.
+   $$
+
+   At $L=2$ that is $15/17=88.2\%$, this lesson's number. At $L=6$ it is
+   $15/21=5/7=71.4\%$, the other capstone's. The two lessons ran at
+   different code distances, $9$ against $11$, and different absolute
+   totals, and landed on the same percentage purely because they assumed
+   the same six logical qubits. The share is a statement about how many
+   patches the algorithm needs, and nothing else.
+
+   **Read the direction carefully, because it flatters the wrong
+   conclusion.** Going from 2 logical qubits to 6 dropped the factory's
+   share from $88.2\%$ to $71.4\%$, and it did not save a single qubit:
+   the factory still costs $3615$, and the machine grew from $4097$ to
+   $5061$. The percentage fell because the denominator rose. Nothing
+   improved.
+
+   **And the deeper caveat, which applies to both capstones.** This model
+   holds the factory fixed at one 15-patch round while tripling the size
+   of the computation. A circuit on 6 logical qubits is a bigger circuit
+   with more T gates, needing magic states faster, and a single
+   sequential factory delivers at a fixed rate regardless. In a real
+   design the response is more factories running in parallel, which
+   pushes the share back up rather than down. The $15/(15+L)$ formula is
+   exact for the qubit count and silent about time, and every published
+   estimate argues about factory throughput for precisely this reason.
+
+   </details>
+
 4. The lesson's magic-state factory achieves a $\approx 92\times$
    headroom below the per-gate budget by distilling at
    $p_{\text{in}} = p_{\text{th}}/10 = 0.001$. Recompute
@@ -511,13 +678,64 @@ still under active research.
    state whether a single round of $15$-to-$1$ distillation still
    clears the lesson's per-gate budget of $3.226\times10^{-6}$.
 
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   p_{\text{out}} = 35\,(0.002)^3 = 35\times8\times10^{-9} = 2.8\times10^{-7},
+   $$
+
+   $$
+   \text{headroom} = \frac{3.226\times10^{-6}}{2.8\times10^{-7}} = 11.5 .
+   $$
+
+   Yes, one round still clears the budget, with about $11.5\times$ to
+   spare instead of $92\times$. No second distillation round is needed.
+
+   **The cubic law is what makes that arithmetic dramatic.** Doubling the
+   input error rate multiplies the output error by $2^3=8$, and the
+   headroom falls by the same factor of $8$, from $92$ to $11.5$. Every
+   factor of two in the injected state's quality is worth a factor of
+   eight at the factory's output, which is the single strongest argument
+   for spending effort on the injection protocol rather than on adding
+   distillation rounds.
+
+   **How far this can be pushed before the answer changes.** One round
+   suffices while $35p_{\text{in}}^3 < 3.226\times10^{-6}$, that is,
+   while
+
+   $$
+   p_{\text{in}} < \left(\frac{3.226\times10^{-6}}{35}\right)^{1/3} = 4.5\times10^{-3},
+   $$
+
+   which is $0.45\,p_{\text{th}}$. So this circuit tolerates a raw
+   magic-state error rate up to nearly half the threshold before a second
+   round becomes necessary, and the second round would take the output to
+   about $35(2.8\times10^{-7})^3 \approx 7.7\times10^{-19}$, twelve
+   orders of magnitude past what is required. The recursion offers no
+   middle setting, which is the same granularity the fault-tolerance
+   capstone runs into.
+
+   **What does not survive the change to $p_{\text{in}}=0.002$.** The
+   distillation stage is fine, and the rest of the estimate is not. If
+   the device's physical error rate really is $0.002$ rather than
+   $0.001$, then $p/p_{\text{th}}=0.2$ instead of $0.1$, and Stage 4b's
+   code distance has to be recomputed against a base of $0.2$ rather than
+   $0.1$, which raises $d$ substantially and enlarges every patch in the
+   machine, factory included. Answering this question in isolation is
+   correct as asked and would be a mistake in practice: $p_{\text{in}}$
+   and $p$ are the same hardware number, and moving it moves two stages
+   at once.
+
+   </details>
+
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
 - The full pipeline this capstone connects has four stages: (1) check
-  classical simulability first (When Classical Simulation Works) —
-  this lesson's own $2$-qubit toy circuit fails this check trivially,
+  classical simulability first (When Classical Simulation Works), which
+  this lesson's own $2$-qubit toy circuit fails trivially,
   by design; (2) count T-gates via Clifford+T synthesis, a simple
   multiplication here giving $N_T=600$; (3) apply a device's
   routing/SWAP overhead (Noise-Aware Compilation), inflating the
@@ -527,9 +745,9 @@ still under active research.
   capstone's own four-step methodology unchanged, producing a code
   distance of {codeDistance} and a final estimate of
   {totalPhysicalQubits} total physical qubits.
-- That last number is over a thousand times the circuit's own
+- That last number is over two thousand times the circuit's own
   {logicalQubitCount} logical qubits, and the magic-state factory alone
-  is {(factoryShareOfTotal * 100).toFixed(1)}% of it — the same
+  is {(factoryShareOfTotal * 100).toFixed(1)}% of it: the same
   factory-dominance finding the fault-tolerance capstone reached,
   recurring here at a different logical-qubit count.
 - Stages 1–3 are solved, routine engineering practice; Stage 4's
@@ -538,20 +756,17 @@ still under active research.
   active research, and an honest resource estimate says so explicitly
   rather than presenting every stage as equally certain.
 
-## Further Exploration
+## How Much of This Pipeline Is Literature
 
 Every number in this pipeline, on both the compilation side and the
 fault-tolerance side, came from a chosen toy circuit and a chain of
-explicitly stated assumptions. The last remaining skill this pillar
-builds is knowing how to evaluate someone *else's* pipeline, run on a
-real algorithm, when the assumptions aren't handed to you as cleanly as
-they were here. That's exactly where [How to Read a Quantum Computing
-Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper)
-picks up.
+assumptions stated out loud. Someone else's estimate will not hand you
+the assumptions that cleanly, and reading one well means finding them
+yourself.
 
 <NextDiscovery>
-  Next: the last remaining skill this pillar builds is knowing how to
-  evaluate someone else's pipeline, run on a real algorithm, when the
-  assumptions aren't handed to you as cleanly as they were here — that's
-  exactly where How to Read a Quantum Computing Paper picks up.
+  [How to Read a Quantum Computing Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper)
+  takes up the last skill this track builds: evaluating someone else's
+  pipeline, run on a real algorithm, when its assumptions are buried in
+  the methods section rather than listed for you.
 </NextDiscovery>

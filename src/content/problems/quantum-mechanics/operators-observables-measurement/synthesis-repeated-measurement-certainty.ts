@@ -27,8 +27,9 @@ export const synthesisRepeatedMeasurementCertainty: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The state after the first measurement is P_i|psi>/||P_i|psi>|| — already entirely inside the a_i eigenspace." },
-    { text: "Apply P_i to this already-projected state and use P_i^2 = P_i." },
+    { text: "The question is about the state the first measurement left behind, not the state that went into it." },
+    { text: "Write down that post-measurement state and ask where it sits relative to the eigenspace of the observed outcome." },
+    { text: "Now apply the projector to a state that already lies entirely inside its own range. What a projector does to something already projected is the whole of the answer." },
   ],
   solution: {
     steps: [
@@ -40,6 +41,6 @@ export const synthesisRepeatedMeasurementCertainty: NumericProblem = {
   explanation: {
     correctIdea: "Repeated immediate measurement of the same observable never disturbs its own outcome, degenerate or not.",
     whyCorrect: "A direct consequence of projector idempotence, established in the first lesson of this course.",
-    whyWrong: ["Assuming degeneracy somehow makes the second measurement's outcome uncertain confuses degeneracy (multiple states sharing an eigenvalue) with incompatibility (a different observable disturbing this one) — repeating the *same* measurement is always certain."],
+    whyWrong: ["Assuming degeneracy somehow makes the second measurement's outcome uncertain confuses degeneracy (multiple states sharing an eigenvalue) with incompatibility (a different observable disturbing this one). Repeating the *same* measurement is always certain."],
   },
 };

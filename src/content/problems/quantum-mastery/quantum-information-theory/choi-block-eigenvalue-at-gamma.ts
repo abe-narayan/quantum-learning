@@ -44,6 +44,6 @@ export const choiBlockEigenvalueAtGamma: NumericProblem = {
   },
   explanation: {
     correctIdea: "Amplitude damping's Choi matrix has rank exactly 2 for every gamma (matching its 2-Kraus-operator minimal representation), and one of that 2x2 block's two eigenvalues is always identically zero.",
-    whyCorrect: "This is exactly why the lesson's Choi-eigenvector reconstruction recovers only two nonzero-weight Kraus operators, matching amplitude damping's own original K0, K1.",
+    whyCorrect: "That vanishing eigenvalue is why the Choi-eigenvector reconstruction returns only two Kraus operators carrying any weight, recovering amplitude damping's own K0 and K1 rather than a redundant set of four.",
   },
 };

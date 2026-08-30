@@ -15,13 +15,13 @@ export const finiteWellGroundStateCalculation: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "For a finite well with half-width a = 2 and depth V0 = 3 (natural units), find the ground-state energy E (relative to V=0 outside).",
-    inputHint: "a decimal (negative)",
+    inputHint: "a negative decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
     value: -2.788155,
     tolerance: 0.001,
-    incorrectFeedback: "This requires solving the transcendental equation numerically (bisection) — it has no closed form. Use the platform's finiteSquareWellGroundStateEnergy approach: find k where tan(k*a) = sqrt(2*V0-k^2)/k, then E = k^2/2 - V0.",
+    incorrectFeedback: "This has no closed form, so the transcendental equation has to be solved numerically by bisection: find k where tan(k*a) = sqrt(2*V0-k^2)/k, then E = k^2/2 - V0.",
     nearMisses: [
       { value: 2.788155, tolerance: 0.001, feedback: "The sign is wrong. A bound state sits below the V = 0 asymptote outside the well, so its energy is negative on this reference." },
       { value: Math.PI ** 2 / (2 * 16), tolerance: 0.005, feedback: "That is the infinite well's ground state for the same width, which ignores V₀ entirely. A finite well leaks into the walls, lowering k and hence the energy." },
@@ -29,8 +29,9 @@ export const finiteWellGroundStateCalculation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "This cannot be solved algebraically — it requires the bisection method from this lesson." },
-    { text: "The engine's finiteSquareWellGroundStateEnergy(2, 3) computes this directly." },
+    { text: "This cannot be solved algebraically. Use the bisection method from this lesson." },
+    { text: "Bisect on g(k) = k*tan(k*a) - sqrt(2*V0 - k^2), staying on the first tangent branch where k*a < pi/2." },
+    { text: "Once you have k, convert it to an energy with E = k^2/2 - V0. Both terms matter: the answer sits above the well floor at -3." },
   ],
   solution: {
     steps: [
@@ -40,8 +41,8 @@ export const finiteWellGroundStateCalculation: NumericProblem = {
     finalAnswer: "$E \\approx -2.7882$",
   },
   explanation: {
-    correctIdea: "This is a genuine numerical result — no closed-form shortcut exists.",
-    whyCorrect: "Directly matches this platform's tested finiteSquareWellGroundStateEnergy function.",
-    whyWrong: ["Using the infinite-well formula instead (E_1 = pi^2/(2*(2a)^2) ≈ 0.308, ignoring V0 entirely) confuses the two different systems — the finite well requires the transcendental equation, not the infinite well's closed form."],
+    correctIdea: "This is a numerical result; no closed-form shortcut exists.",
+    whyCorrect: "Matches this platform's tested finiteSquareWellGroundStateEnergy function.",
+    whyWrong: ["Using the infinite-well formula instead (E_1 = pi^2/(2*(2a)^2) ≈ 0.308, ignoring V0 entirely) confuses the two systems. The finite well requires the transcendental equation, not the infinite well's closed form."],
   },
 };

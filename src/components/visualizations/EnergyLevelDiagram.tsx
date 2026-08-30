@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { usePrefersReducedMotion } from "@/components/motion/usePrefersReducedMotion";
 import { easeInOutCubic } from "@/components/simulators/bloch-sphere/useAnimatedBlochPoint";
 
@@ -10,14 +10,26 @@ export type EnergyLevel = {
   highlight?: boolean;
 };
 
-const WIDTH = 340;
+/**
+ * 340 -> 380, and the level lines moved right by LEVEL_X0, to make room for the
+ * energy axis added below. The extra 40 units are spent entirely on the axis
+ * gutter: the label column is still 380 - 174 = 206 units wide, exactly what it
+ * was at 340 - 134, so no caller's level label loses room. This SVG has no
+ * `w-full` (see the wrapper note), so a unit is a real CSS pixel and widening it
+ * costs a little more horizontal scroll on a phone, not any type size.
+ */
+const WIDTH = 380;
 const LEVEL_WIDTH = 120;
 const PAD_TOP = 16;
 const PAD_BOTTOM = 28;
-const LABEL_X = LEVEL_WIDTH + 14;
+/** Vertical energy axis, in the gutter left of the level lines. */
+const AXIS_X = 24;
+/** Left end of every level line, clear of the axis and its rotated name. */
+const LEVEL_X0 = 40;
+const LABEL_X = LEVEL_X0 + LEVEL_WIDTH + 14;
 /** One full from->to->from cycle of the traveling transition dot. */
 const TRANSITION_PERIOD_MS = 1400;
-/** Cycles before the dot settles rather than ping-ponging forever — "brief,
+/** Cycles before the dot settles rather than ping-ponging forever - "brief,
  *  not a loop," the same framing `TunnelingIntroVisual`'s autoplay uses:
  *  nothing should animate indefinitely next to body text. */
 const MAX_TRANSITION_CYCLES = 3;
@@ -73,7 +85,7 @@ function formatEnergy(value: number): string {
  * text stays legible while the (unmoved) level lines still show the real,
  * possibly-tied, energies.
  */
-function computeLabelYs(ys: number[]): number[] {
+function computeLabelYs(ys: number[], minY: number, maxY: number): number[] {
   const order = ys.map((_, i) => i).sort((a, b) => ys[a] - ys[b]);
   const labelYs = new Array(ys.length).fill(0);
 
@@ -88,7 +100,15 @@ function computeLabelYs(ys: number[]): number[] {
       labelYs[group[0]] = ys[group[0]];
     } else {
       const mean = group.reduce((sum, idx) => sum + ys[idx], 0) / group.length;
-      const start = mean - ((group.length - 1) / 2) * LABEL_MIN_GAP_PX;
+      const spread = (group.length - 1) * LABEL_MIN_GAP_PX;
+      // Clamp the spread group into the plot box before laying it out. A cluster
+      // of degenerate levels sitting at the very top or bottom of the range (four
+      // degenerate levels at the maximum energy, say) used to be spread
+      // symmetrically about its own mean, which put its first label at
+      // PAD_TOP - 16.5, above the viewBox, where the SVG clips silently and the
+      // level simply had no label at all. Shifting the whole group keeps the
+      // spacing that made it legible in the first place.
+      const start = Math.min(Math.max(mean - spread / 2, minY), Math.max(minY, maxY - spread));
       group.forEach((idx, k) => {
         labelYs[idx] = start + k * LABEL_MIN_GAP_PX;
       });
@@ -122,6 +142,18 @@ export function EnergyLevelDiagram({
   transition?: { fromLabel: string; toLabel: string; caption?: string };
   height?: number;
 }) {
+  // Scopes this instance's SVG `<marker>` ids. They used to be the bare,
+  // global `energy-axis-arrow` / `energy-transition-arrow`, so a lesson with
+  // two of these diagrams shipped duplicate `id`s and the second diagram's
+  // arrowheads were resolved out of the FIRST diagram's `<defs>` (a rendered
+  // HTML scan found exactly that on
+  // `quantum-hardware/physical-qubit-platforms/superconducting-qubits`).
+  // Duplicate ids are invalid HTML, and the dependency is invisible: the
+  // second figure's arrowheads survive only while the first figure is present
+  // and rendered. Same `useId()` treatment `ProjectionShadow`,
+  // `RydbergBlockadeDiagram`, `PathPhasorSum` and `SternGerlachScreen`
+  // already use.
+  const idBase = useId();
   const energies = levels.map((l) => l.energy);
   const min = Math.min(...energies);
   const max = Math.max(...energies);
@@ -129,7 +161,11 @@ export function EnergyLevelDiagram({
   const plotHeight = height - PAD_TOP - PAD_BOTTOM;
 
   const yOf = (energy: number) => PAD_TOP + (1 - (energy - min) / span) * plotHeight;
-  const labelYs = computeLabelYs(levels.map((l) => yOf(l.energy)));
+  const labelYs = computeLabelYs(
+    levels.map((l) => yOf(l.energy)),
+    PAD_TOP,
+    height - PAD_BOTTOM
+  );
 
   const from = transition ? levels.find((l) => l.label === transition.fromLabel) : undefined;
   const to = transition ? levels.find((l) => l.label === transition.toLabel) : undefined;
@@ -155,7 +191,7 @@ export function EnergyLevelDiagram({
     const frame = (now: number) => {
       const elapsed = now - start;
       if (elapsed >= totalDurationMs) {
-        // Settle at `to` — the transition has visibly completed — instead of
+        // Settle at `to` - the transition has visibly completed - instead of
         // ping-ponging forever beside the lesson's prose.
         setDotT(1);
         rafRef.current = null;
@@ -185,20 +221,58 @@ export function EnergyLevelDiagram({
     // on a 320px phone and this wrapper takes the overflow. `overflow-x-auto`
     // is focusable by default in no browser except Firefox, so a keyboard-only
     // reader could not scroll to the right-hand energy labels and transition
-    // arrows — the numbers the diagram exists to let you read off. No
+    // arrows - the numbers the diagram exists to let you read off. No
     // `role`/`aria-label` on the wrapper: the `<svg>` is already `role="img"`
     // with the label, and naming this too would announce the figure twice.
     <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
       <svg width={WIDTH} height={height} viewBox={`0 0 ${WIDTH} ${height}`} role="img" aria-label={ariaLabel}>
+        {/* THE ENERGY AXIS.
+            This component's whole claim is that a level's height on the page is its
+            real computed energy, "so unequal spacing (hydrogen's levels crowding
+            near 0, a harmonic oscillator's perfectly even rungs, an anharmonic
+            transmon ladder) is visually honest rather than schematic". Until now
+            nothing in the drawing said so: there was no axis, no direction and no
+            named quantity, so a reader had no way to tell this apart from the
+            deliberately schematic LevelSplittingDiagram, which is evenly spaced by
+            construction and carries a caption saying so. An arrowed, named axis is
+            what turns "these lines are at different heights" into "these lines are
+            at different energies, and up is more".
+
+            `stroke-axis` / `fill-axis`: this is the one mark in the figure that IS
+            an axis, and `--axis` is the token for an axis line and its name. The
+            level labels stay on `--muted-foreground` (6.78:1, a step higher than
+            `--axis`) because they are annotations, not tick labels. */}
+        <line
+          x1={AXIS_X}
+          y1={height - PAD_BOTTOM}
+          x2={AXIS_X}
+          y2={PAD_TOP - 6}
+          className="stroke-axis"
+          strokeWidth={1}
+          markerEnd={`url(#${idBase}-axis-arrow)`}
+        />
+        {/* rotate(-90) sends the text's advance direction to -y (up the page) and
+            its descender direction to +x, so glyphs sit LEFT of the baseline: an
+            11px cap height off a baseline at x = 13 occupies x = 2..16, clear of
+            both the viewBox edge and the axis line at x = 24. */}
+        <text
+          x={13}
+          y={(PAD_TOP + height - PAD_BOTTOM) / 2}
+          textAnchor="middle"
+          transform={`rotate(-90 13 ${(PAD_TOP + height - PAD_BOTTOM) / 2})`}
+          className="fill-axis text-[11px]"
+        >
+          {unit ? `energy (${unit})` : "energy"}
+        </text>
         {levels.map((level, i) => {
           const y = yOf(level.energy);
           const labelY = labelYs[i];
           return (
             <g key={i}>
               <line
-                x1={0}
+                x1={LEVEL_X0}
                 y1={y}
-                x2={LEVEL_WIDTH}
+                x2={LEVEL_X0 + LEVEL_WIDTH}
                 y2={y}
                 strokeWidth={level.highlight ? 3 : 2}
                 className={level.highlight ? "stroke-accent" : "stroke-brand/70"}
@@ -213,23 +287,23 @@ export function EnergyLevelDiagram({
         {from && to && (
           <g>
             <line
-              x1={LEVEL_WIDTH / 2}
+              x1={LEVEL_X0 + LEVEL_WIDTH / 2}
               y1={yOf(from.energy)}
-              x2={LEVEL_WIDTH / 2}
+              x2={LEVEL_X0 + LEVEL_WIDTH / 2}
               y2={yOf(to.energy)}
               className={prefersReducedMotion ? "stroke-foreground" : "stroke-foreground/40"}
               strokeWidth={1.5}
-              markerEnd={prefersReducedMotion ? "url(#energy-transition-arrow)" : undefined}
+              markerEnd={prefersReducedMotion ? `url(#${idBase}-transition-arrow)` : undefined}
             />
             {!prefersReducedMotion && dotY !== undefined && (
-              <circle cx={LEVEL_WIDTH / 2} cy={dotY} r={3.5} className="fill-accent" />
+              <circle cx={LEVEL_X0 + LEVEL_WIDTH / 2} cy={dotY} r={3.5} className="fill-accent" />
             )}
             {transition?.caption && (
               <text
-                x={LEVEL_WIDTH / 2 + 6}
+                x={LEVEL_X0 + LEVEL_WIDTH / 2 + 6}
                 y={(yOf(from.energy) + yOf(to.energy)) / 2}
                 // 10 -> 11 units. This SVG has no `w-full`, so it renders at its
-                // intrinsic 340px and a unit is a real CSS pixel — 10px was legible
+                // intrinsic 340px and a unit is a real CSS pixel - 10px was legible
                 // rather than broken. But the transition caption names the physical
                 // process the animated dot is acting out, and it was the only text in
                 // the figure smaller than the level labels' 12px; matching them costs
@@ -242,7 +316,10 @@ export function EnergyLevelDiagram({
           </g>
         )}
         <defs>
-          <marker id="energy-transition-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+          <marker id={`${idBase}-axis-arrow`} markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+            <path d="M0,0 L7,3.5 L0,7 Z" className="fill-axis" />
+          </marker>
+          <marker id={`${idBase}-transition-arrow`} markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
             <path d="M0,0 L8,4 L0,8 Z" className="fill-foreground" />
           </marker>
         </defs>

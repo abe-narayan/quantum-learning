@@ -18,7 +18,7 @@ export const euclideanPropagatorAtOrigin: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "Using K_E(xf,xi;τ)=√(m/2πħτ)exp(-m(xf-xi)²/2ħτ) with xf=xi=0, τ=1, m=ħ=1, what is K_E(0,0;1)?",
-    inputHint: "as a decimal",
+    inputHint: "as a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",

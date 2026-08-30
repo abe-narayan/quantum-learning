@@ -49,15 +49,15 @@ export const lessonMeta = {
   objectives: [
     "Describe a classical system's state as a point in phase space",
     "Explain why classical observables are ordinary functions of the state",
-    "Distinguish probability from ignorance (epistemic) from the different kind of probability quantum mechanics needs",
+    "Distinguish epistemic probability, which records ignorance about one definite state, from the different kind of probability quantum mechanics needs",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Nothing hidden, nothing waiting">
 Drop a ball. At any instant, everything there is to know about it, where it is, how fast it's moving, is two numbers: position and momentum. Nothing about the ball is hidden, approximate, or waiting to be resolved.
 </LessonHook>
 
-## Motivation
+## What the toolkit is replacing
 
 Eleven lessons of linear algebra built a powerful mathematical toolkit
 without saying much about physics at all. Before applying that toolkit,
@@ -74,7 +74,7 @@ coming aren't differences of degree, but differences of kind.
   license="CC BY-SA 4.0"
 />
 
-## Intuition
+## The picture that held for centuries
 
 That confidence, that a system has a definite, complete state at every
 instant, and every physical quantity is just some function of that
@@ -90,7 +90,7 @@ anyone looks. Measuring is reading off a value that was already sitting
 there. Neither commitment survives contact with an electron, so it helps
 to see them stated plainly while they still feel obvious.
 
-## Mathematical Development
+## Phase space, functions, and where probability enters
 
 ### Phase space
 
@@ -162,7 +162,7 @@ if not in practice, a classical system always has one exact, definite
 state, whether or not you know what it is. This is called **epistemic**
 probability, from the Greek for knowledge.
 
-## Physical Interpretation
+## Accurate, right up until it isn't
 
 The classical picture, definite states, observables as their functions,
 probability as ignorance, is an extraordinarily accurate description of
@@ -175,7 +175,7 @@ strategy of patching the classical picture with hidden variables: what is
 needed is a different kind of probability, not better bookkeeping for the
 classical kind.
 
-## Worked Example
+## The energy of one oscillator at one instant
 
 **A classical harmonic oscillator has mass $m=1$, spring constant $k=4$,
 and is in the state $x=1$, $p=2$. Find its total energy.**
@@ -198,7 +198,7 @@ about evaluating a function at a known point.
   explanation="½kx² depends only on x, which is held fixed at 1, so it stays at 2 no matter what p does. Only the kinetic term p²/2m responds to the slider below. That is what it means for E to be a function of the whole state rather than one dial that moves everything at once."
 />
 
-<InteractiveSection title="Slide p, watch E(x,p) respond deterministically" description="x is held fixed at 1. Drag p and watch the kinetic term, potential term, and total energy recompute instantly, with no spread and no probability distribution anywhere. p = 2 is marked, reproducing the worked example's E = 4 exactly.">
+<InteractiveSection title="Slide p, watch E(x,p) respond deterministically" description="x is held fixed at 1. Drag p and watch the kinetic term, potential term, and total energy recompute instantly, with no spread and no probability distribution anywhere. p = 2 is marked; read the total energy there and compare it against the worked example.">
   <BarChartExplorer
     frames={classicalEnergyFrames}
     sliderLabel="p (momentum)"
@@ -207,7 +207,7 @@ about evaluating a function at a known point.
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Ignorance is not the only kind of probability
 
 <Callout type="note">
 **Treating classical probability and quantum probability as the same kind
@@ -227,11 +227,149 @@ same kind viewed at different scales.
 ## Practice Questions
 
 1. A classical particle of mass $2$ has state $x=3, p=4$, moving under
-   $V(x) = x^2$. Find its total energy.
+   $V(x) = x^2$. Find its total energy. Then find a *different* state
+   $(x', p')$ with that same energy, and describe the set of all states
+   sharing it as a curve in phase space.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $E = 13$.
+
+   Evaluate the function at the point, exactly as the lesson's definition
+   says to:
+
+   $$
+   E(x,p) = \frac{p^2}{2m} + V(x) = \frac{4^2}{2(2)} + 3^2 = \frac{16}{4} + 9 = 4 + 9 = 13
+   $$
+
+   The two commonest slips are both in the kinetic term. Writing $p^2/2m$
+   as $(p/2m)^2$ gives $1$ instead of $4$, and forgetting that $m=2$ sits
+   in the denominator gives $8$. The potential term is safer here only
+   because $V(x)=x^2$ happens to look like a kinetic energy; it is not
+   one, and nothing in this problem divides it by anything.
+
+   For a second state with the same energy, pick any $x'$ you like and
+   solve for $p'$. Taking $x'=1$ gives $V=1$, so $p'^2/4 = 12$ and
+   $p' = \sqrt{48} = 4\sqrt3 \approx 6.93$. The state
+   $(1, 4\sqrt3)$ is a completely different point of phase space with the
+   same energy as $(3,4)$.
+
+   The set of all of them is the level curve $E(x,p)=13$:
+
+   $$
+   \frac{p^2}{4} + x^2 = 13 \quad\Longleftrightarrow\quad \frac{x^2}{13} + \frac{p^2}{52} = 1
+   $$
+
+   an ellipse centered on the origin with semi-axis $\sqrt{13}\approx3.61$
+   along $x$ and $\sqrt{52}\approx7.21$ along $p$. That is the same kind of
+   object as the brand-colored contour in the phase-space panel above,
+   drawn there for a different oscillator.
+
+   The part worth taking away is the direction of the logic. The state
+   determines the energy uniquely, but the energy does not determine the
+   state: a whole one-dimensional curve of states shares the value $13$.
+   Knowing $E$ alone therefore leaves you ignorant of *which* point the
+   system occupies, and that ignorance is the only kind of uncertainty
+   classical mechanics has. It is a statement about your information, not
+   about the particle, which is sitting at one definite point on that
+   ellipse the entire time.
+
+   </details>
+
 2. A weather forecaster says "70% chance of rain tomorrow." Is this
    epistemic probability, in the classical sense? Justify your answer.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes. It is epistemic through and through.
+
+   Apply the lesson's test: does the number describe ignorance about one
+   underlying definite fact, or genuine indeterminacy in the system? The
+   atmosphere is an enormous classical system with a definite state, and
+   tomorrow either rain falls or it does not. The forecaster cannot
+   measure every parcel of air, and the equations amplify small errors
+   fast, so the $70\%$ records how much of the possible-initial-conditions
+   space leads to rain given what was actually measured. Two forecasters
+   with different data will quote different numbers for the same
+   tomorrow, which is the signature of a probability that lives in the
+   description rather than in the weather.
+
+   The seductive wrong answer is "no, because weather is chaotic, so it is
+   genuinely random." Chaos is exactly the wrong reason. A chaotic system
+   is still deterministic: the same initial state produces the same future
+   every time. What chaos does is make the ignorance grow explosively, so
+   a tiny gap in your knowledge becomes a large gap in your prediction.
+   That makes the epistemic probability *large*, not non-epistemic.
+
+   A second wrong turn is to object that $70\%$ is really a long-run
+   frequency over many similar past days, not anybody's ignorance. That
+   is a claim about how the number was *estimated*, not about what it
+   describes. Counting past analogues is one method of quantifying
+   ignorance about which state today's atmosphere is in, and the
+   probability still refers to a single definite outcome that has not
+   been observed yet.
+
+   One honest caveat, since the next lesson turns on precisely this. The
+   air molecules are quantum systems, so at the bottom the world is not
+   epistemic. But nothing in the forecast needs that: no amplitude has to
+   be added before squaring anywhere in meteorology, and the classical
+   addition rule for "rain" and "no rain" holds. That is the contrast the
+   next lesson breaks, and it breaks it with an experiment, not with an
+   appeal to complexity.
+
+   </details>
+
 3. Explain why, classically, knowing a system's exact state at one instant
    is (in principle) enough to know its state at every future instant.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the classical equations of motion are first-order in time in
+   the phase-space variables, and a state is precisely the data those
+   equations need to start.
+
+   Hamilton's equations, the form the lesson mentions without needing in
+   detail, say that the rate of change of the state is a function of the
+   state:
+
+   $$
+   \dot x = \frac{\partial E}{\partial p}, \qquad \dot p = -\frac{\partial E}{\partial x}
+   $$
+
+   Read the right-hand sides. They contain $x$ and $p$ and nothing else.
+   So the point $(x,p)$ at one instant fixes the direction the point is
+   moving at that instant, which fixes where it is a moment later, which
+   fixes the direction there, and so on. Nothing outside the state is ever
+   consulted, which is exactly what "the state is complete" meant in the
+   lesson's first commitment.
+
+   Two conditions are doing real work here, and dropping either one breaks
+   the claim.
+
+   The first is that the state is the *full* phase-space point. Position
+   alone will not do it: two particles at $x=3$ with momenta $+4$ and
+   $-4$ have identical positions and opposite futures. This is why the
+   classical state has two numbers per degree of freedom rather than one.
+
+   The second is regularity of the force law. Uniqueness of the solution
+   is a theorem about differential equations, and it needs the right-hand
+   sides to be well enough behaved (Lipschitz continuity is the usual
+   sufficient condition). Contrived potentials exist for which two
+   different trajectories leave the same point, and determinism genuinely
+   fails for them. The claim is a theorem with a hypothesis, not a slogan.
+
+   Finally, note what "in principle" is protecting. Real measurements have
+   finite precision, and in a chaotic system that error grows fast enough
+   that long-range prediction is impossible in practice. That is a
+   limitation on knowledge, not on the trajectory. The particle still has
+   one, and that is the commitment the next lesson attacks: not that
+   trajectories are hard to compute, but that experiment rules out any
+   theory in which a definite one exists at all.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -245,7 +383,7 @@ same kind viewed at different scales.
   definite state a system occupies, never genuine indeterminacy in the
   system itself.
 
-## Further Exploration
+## The experiment no ignorance can explain
 
 <NextDiscovery>
 [From Classical to Quantum Probability](/lessons/quantum-mechanics/classical-to-quantum/from-classical-to-quantum-probability) introduces the

@@ -20,11 +20,24 @@ export const whyMeasurementWouldCollapseSuperposition: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["collapse", "forces a definite", "definite outcome", "definite state", "definite value", "projects", "picks one outcome", "snaps to"],
-      ["superposition", "amplitude", "coefficient", "alpha", "beta", "α", "β"],
+      {
+        phrases: ["collapse", "forces a definite", "definite outcome", "definite state", "definite value", "projects", "picks one outcome", "snaps to"],
+        missingFeedback:
+          "You have named what gets lost, but not the mechanism. Say what the Born rule actually does to the qubit at the instant you look at it.",
+      },
+      {
+        phrases: ["destroys the superposition", "destroy the superposition", "destroying the superposition", "kills the superposition", "no longer in superposition", "no longer a superposition", "out of superposition", "destroys the amplitude", "destroying the amplitude", "loses the amplitude", "lose the amplitude", "lost the amplitude", "amplitudes are gone", "wipes out", "erases", "alpha and beta", "the exact values", "the relative weights", "the relative phase", "cannot be recovered", "can not be recovered", "irreversible", "gone for good", "lost for good"],
+        missingFeedback:
+          "You have said what measurement does. Now say what that costs: name the quantities that were carrying the protected information, and what is left of them afterwards.",
+      },
     ],
     incorrectFeedback: "Recall what the measurement postulate does to a general single-qubit state, and ask what survives of the two numbers that described it.",
-    partialFeedback: "Good. Be explicit that what gets destroyed is precisely the information the code exists to protect.",
+    partialFeedback: "Now name what gets destroyed: the very information the code exists to protect.",
+    modelAnswers: [
+      "If you just measure the qubit it collapses to a definite outcome, and the exact values of alpha and beta are gone for good. Those amplitudes were the information you were trying to protect in the first place.",
+      "Measuring projects the qubit onto |0> or |1>, so it is no longer in superposition. That destroys the superposition you wanted to keep, and it is irreversible.",
+      "The Born rule forces one definite value out of the qubit. Once that has happened the relative weights of the two branches are wiped out, and they cannot be recovered.",
+    ],
   },
   hints: [
     { text: "Write down what the measurement postulate says happens to a general qubit state measured in the computational basis." },

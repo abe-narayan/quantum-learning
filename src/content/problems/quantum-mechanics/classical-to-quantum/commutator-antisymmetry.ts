@@ -21,10 +21,16 @@ export const commutatorAntisymmetry: NumericProblem = {
     type: "numeric",
     value: -1,
     tolerance: 0.001,
-    incorrectFeedback: "The commutator is antisymmetric: [B,A] = -[A,B] for any A, B.",
+    incorrectFeedback: "You carried the given value across unchanged, as though the bracket did not care about the order of its entries. Rebuild both brackets from the definition and compare which product each one subtracts.",
+    nearMisses: [
+      { value: 1, feedback: "You reported the same value the prompt gave for $[\\hat x,\\hat p]$, treating the bracket as symmetric. Expand both from $AB-BA$ and the two orderings do not agree." },
+      { value: 0, feedback: "Zero says the two operators commute. The prompt already states they do not; the question is only about the sign." },
+    ],
   },
   hints: [
-    { text: "[p,x] = px - xp = -(xp - px) = -[x,p]." },
+    { text: "Nothing specific to position or momentum is needed here. The question is what happens to any commutator when its two entries trade places." },
+    { text: "Write out $[\\hat p,\\hat x]$ and $[\\hat x,\\hat p]$ from the definition $[A,B]=AB-BA$. Both are built from the same two products." },
+    { text: "The two expressions differ only in which product carries the minus sign, so one is a fixed numerical multiple of the other. Apply that multiple to the given $i\\hbar$." },
   ],
   solution: {
     steps: [

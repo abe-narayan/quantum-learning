@@ -20,16 +20,17 @@ export const lessonMeta = {
   prerequisites: ["quantum-mechanics/angular-momentum-and-spin/ladder-operators-and-the-angular-momentum-spectrum"],
   objectives: [
     "Derive why single-valuedness under φ→φ+2π restricts orbital angular momentum to integer l only",
+    "Say why the same argument leaves spin untouched, and what that difference rests on",
     "State the explicit spherical harmonics Y_l^m for l=0,1,2 and their physical meaning",
     "Verify Y_l^m's normalization and orthogonality directly by numerical integration",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Half the allowed values quietly vanish">
 Solve the angular momentum algebra abstractly and nothing forbids half-integer values. Ask the same algebra to describe a particle actually orbiting in space, and half of the previously allowed values quietly vanish: only integer l survives.
 </LessonHook>
 
-## Motivation
+## The algebra meant what it said
 
 The previous lesson's algebra permitted $j=0,\tfrac12,1,\tfrac32,\dots$,
 and it meant it: $j=\tfrac12$ is a perfectly good representation of the
@@ -47,10 +48,23 @@ That one requirement cuts the allowed list in half. This lesson shows
 how, then builds the surviving position-space wavefunctions,
 $Y_l^m(\theta,\varphi)$.
 
-## Intuition
+## One full lap, and where the function lands
 
-The candidate function is $e^{im\varphi}$, and a full lap multiplies it by
-$e^{2\pi i m}$. For whole-number $m$ that factor is $1$ and the function
+The candidate function is $e^{im\varphi}$, and a full lap around the
+$z$-axis multiplies it by $e^{2\pi im}$.
+
+<PredictBeforeReveal
+  question="Walk all the way around the z-axis (φ → φ+2π) and arrive back at the same physical point. Does e^(im·φ) with m = 1/2 return to its starting value?"
+  options={[
+    { label: "No: e^(iφ/2) comes back negated", value: "no" },
+    { label: "Yes, e^(im·φ) returns to its start for any m", value: "yes" },
+    { label: "It depends which way around you walk", value: "depends" },
+  ]}
+  correctValue="no"
+  explanation="e^(i(1/2)(φ+2π)) = e^(i(1/2)φ)·e^(iπ) = −e^(i(1/2)φ). The lap factor is e^(2πi·1/2) = e^(iπ) = −1, so the function comes back holding a different value at a point it never left, and no position-space wavefunction is allowed to do that. Walking the other way gives e^(−iπ) = −1 as well, so direction changes nothing. This is why half-integer m, and therefore half-integer l, is excluded for orbital motion while remaining perfectly available to spin."
+/>
+
+For whole-number $m$ that factor is $1$ and the function
 is back where it started. For half-integer $m$ the factor is $-1$: the
 function has come back pointing the opposite way in the complex plane,
 disagreeing with itself about the value it takes at a point it never
@@ -60,18 +74,7 @@ No additional physical law is needed to rule that out. It is a
 contradiction on its own terms, and the derivation below is that
 observation written carefully.
 
-<PredictBeforeReveal
-  question="Walk all the way around the z-axis (φ → φ+2π) and arrive back at the same physical point. Does e^(im·φ) with m = 1/2 return to its starting value?"
-  options={[
-    { label: "Yes, e^(im·φ) always returns to its starting value", value: "yes" },
-    { label: "No, it comes back negated: a contradiction for a real wavefunction", value: "no" },
-    { label: "It depends on which direction you walk around", value: "depends" },
-  ]}
-  correctValue="no"
-  explanation="e^(i(1/2)(φ+2π)) = e^(i(1/2)φ)·e^(iπ) = −e^(i(1/2)φ). The function returns multiplied by −1, contradicting the value it started with at a point it never left. A position-space wavefunction cannot do that, which is why half-integer m, and therefore half-integer l, is excluded for orbital motion while remaining perfectly available to spin."
-/>
-
-## Mathematical Development
+## Single-valuedness, and what survives it
 
 ### Why orbital l must be an integer
 
@@ -98,7 +101,7 @@ describes. Toggle $m$ between the integer and half-integer presets, drag
 the slider all the way to $\varphi=2\pi$, and read off where the marker
 actually lands.
 
-<PhaseWindingCircle ariaLabel="Marker at angle m times phi on the unit circle, tracing e^(i m phi) as phi sweeps from 0 to 2 pi" />
+<PhaseWindingCircle ariaLabel="A marker on the unit circle at angle m times phi, tracing e^(i m phi) as phi is scrubbed from 0 to 2 pi, with a preset toggle for m. For an integer m the marker completes one or more whole laps and finishes exactly on the start point at 1. For a half-integer m it completes only half a lap in the same sweep and finishes at -1, diametrically opposite the start point, while phi itself has returned to where it began." />
 
 For integer $m$ the marker returns to the start point: same physical
 location, same wavefunction value. For half-integer $m$ it lands
@@ -148,7 +151,7 @@ operator with distinct eigenvalues are orthogonal, as Operators,
 Observables & Measurement proved. The numerical check confirms the
 implementation, not the theorem.
 
-## Physical Interpretation
+## The shapes chemistry calls s, p and d
 
 $Y_0^0$ is spherically symmetric (an $s$-orbital's angular shape,
 central to the next course's hydrogen atom); $Y_1^0$ is largest along the
@@ -162,7 +165,7 @@ anyone choosing.
 The plot below is computed from the $Y_l^m$ formulas above rather than
 sketched:
 
-<OrbitalShapePlot ariaLabel="Orbital angular momentum shape, |Y_l^m(theta)|^2" />
+<OrbitalShapePlot ariaLabel="A polar cross-section of |Y_l^m(θ)|² for a chosen (l, m), nine choices from l=0 to l=2. At l=0 it is a plain circle, the same in every direction. At l=1, m=0 it is two lobes stacked along the vertical z axis, pinched to zero across the equator. At l=1, m=±1 the same pair of lobes lies flat in the equatorial plane and is zero along z. At l=2 the shapes get finer: m=0 gives two long z lobes plus a small equatorial ring, m=±1 gives four lobes tilted between the axes, and m=±2 gives a single flattened equatorial disc." />
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/cf/HAtomOrbitals.png"
@@ -181,7 +184,7 @@ $\varphi$-dependence lives entirely in the phase $e^{im\varphi}$, which
 $|Y_l^m|^2$ discards, and which is exactly the part that carries the
 angular momentum.
 
-## Worked Example
+## Normalizing one spherical harmonic by hand
 
 **Confirm $Y_1^0$'s normalization by hand, using
 $\int_0^\pi\cos^2\theta\sin\theta\,d\theta=\tfrac23$ and
@@ -197,7 +200,7 @@ $\approx1.0000308$; the residual is the integration grid's discretization
 error, and it shrinks with a finer grid rather than converging to
 something other than $1$.
 
-## Common Mistakes
+## Multi-valued is not a function at all
 
 <Callout type="note">
 **Assuming half-integer $l$ is merely "not yet observed" rather than
@@ -216,16 +219,167 @@ other choice would fail to diagonalize one or both operators.
 
 1. Confirm $e^{im2\pi}=1$ fails for $m=3/2$ specifically, by direct
    substitution.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   e^{i(3/2)(2\pi)} = e^{3\pi i} = e^{2\pi i}e^{\pi i} = (1)(-1) = -1 \neq 1
+   $$
+
+   The lap factor is $-1$, so $\Phi_{3/2}(\varphi+2\pi)=-\Phi_{3/2}(\varphi)$
+   and the function disagrees with itself at every point.
+
+   What is worth extracting is that the answer is $-1$ and not something
+   else. Write the lap factor as $e^{2\pi i m}=e^{i\pi(2m)}$. For any
+   half-integer $m$, $2m$ is an odd integer, so the factor is
+   $e^{i\pi}=-1$ every time: $m=\tfrac12$, $m=\tfrac32$, $m=\tfrac{101}{2}$
+   all fail identically. There is no sense in which $m=\tfrac32$ is "more
+   wrong" than $m=\tfrac12$, and no half-integer sneaks through by being
+   large. Integer $m$ gives $2m$ even and a factor of $+1$.
+
+   That the failure is a clean sign flip is also why spin can live with
+   it. A minus sign on a *whole state vector* is unobservable, so an
+   object with no position-space wavefunction to be single-valued is free
+   to pick one up under a $2\pi$ rotation. The contradiction here is
+   specific to a function of position taking two values at one point.
+
+   </details>
+
 2. Using $\int_0^\pi\sin^3\theta\,d\theta=\tfrac43$, verify $Y_1^1$'s
    normalization coefficient $\sqrt{3/8\pi}$ by hand (the $\varphi$
    integral of $|e^{i\varphi}|^2=1$ over $[0,2\pi)$ is just $2\pi$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $Y_1^1=-\sqrt{3/8\pi}\,\sin\theta\,e^{i\varphi}$, the modulus
+   squared is $|Y_1^1|^2=\tfrac{3}{8\pi}\sin^2\theta$, since
+   $|e^{i\varphi}|^2=1$ and the leading minus sign squares away. The
+   measure $d\Omega=\sin\theta\,d\theta\,d\varphi$ supplies the third
+   power of $\sin\theta$:
+
+   $$
+   \int|Y_1^1|^2\,d\Omega = \frac{3}{8\pi}\int_0^{2\pi}\!d\varphi\int_0^\pi \sin^2\theta\,\sin\theta\,d\theta = \frac{3}{8\pi}(2\pi)\left(\frac43\right) = \frac{3}{8\pi}\cdot\frac{8\pi}{3} = 1
+   $$
+
+   Two things in that calculation are the ones people drop.
+
+   The first is the $\sin\theta$ in the measure. Integrating
+   $\sin^2\theta$ instead of $\sin^3\theta$ over $[0,\pi]$ gives
+   $\pi/2$, not $4/3$, and the normalization comes out to
+   $\tfrac{3}{8\pi}(2\pi)(\pi/2)=3\pi/8$, which is not $1$. The extra
+   factor is geometry, not algebra: a band of fixed $d\theta$ near the
+   pole covers far less solid angle than one at the equator, and
+   $\sin\theta$ is that shrinkage.
+
+   The second is the sign. The $-$ in front of $Y_1^{+1}$ is the
+   Condon-Shortley phase convention, fixed so that the ladder operators
+   $L_\pm$ connect the $Y_l^m$ with positive coefficients throughout.
+   It cannot be detected in $|Y_1^1|^2$ and has no effect here, but it is
+   not decoration: drop it and the ladder-operator matrix elements pick up
+   sign errors that do show up in superpositions.
+
+   The independent check is the platform's numerical integration over the
+   sphere, which returns $1.000$ for this harmonic to grid precision
+   without ever using the closed-form coefficient.
+
+   </details>
+
 3. Why must $Y_l^m$ and $Y_l^{m'}$ (same $l$, different $m$) automatically
    be orthogonal, using only the fact that they're eigenfunctions of the
    <Term id="hermitian-operator">Hermitian operator</Term> $L_z$ with different eigenvalues (a fact from
    Operators, Observables & Measurement)?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the standard Hermitian-operator argument applies verbatim, with
+   $L_z$ as the operator: evaluate $\langle Y_l^m|L_z|Y_l^{m'}\rangle$ two
+   ways and the two answers can only agree if the overlap vanishes.
+
+   Let $L_z$ act to the right, then to the left:
+
+   $$
+   \langle Y_l^m|L_z|Y_l^{m'}\rangle = m'\hbar\,\langle Y_l^m|Y_l^{m'}\rangle, \qquad \langle Y_l^m|L_z|Y_l^{m'}\rangle = (m\hbar)^*\langle Y_l^m|Y_l^{m'}\rangle = m\hbar\,\langle Y_l^m|Y_l^{m'}\rangle
+   $$
+
+   Subtracting, $(m-m')\hbar\,\langle Y_l^m|Y_l^{m'}\rangle=0$, and
+   $m\neq m'$ forces the overlap to zero.
+
+   Two hypotheses did real work and both are worth stating out loud,
+   because the result is false without either.
+
+   Hermiticity was used twice, not once. It let $L_z$ move onto the bra in
+   the second evaluation, and it made the eigenvalue real so that
+   $(m\hbar)^*=m\hbar$. If $m$ were complex the subtraction would give
+   $(m^*-m')$ and no conclusion follows. Hermiticity is also relative to a
+   specific inner product: the one with $d\Omega=\sin\theta\,d\theta\,
+   d\varphi$ over the sphere. $L_z$ is not Hermitian under some other
+   weighting, and orthogonality would fail there too.
+
+   Distinct eigenvalues did the rest. Nothing here says $Y_l^m$ and
+   $Y_{l'}^{m}$ with the same $m$ are orthogonal, and that case needs the
+   same argument run with $\vec L^{\,2}$ instead, using $l\ne l'$. Two
+   functions sharing both labels are the same function.
+
+   You can see the machinery working in the $\varphi$ integral alone. All
+   the $m$-dependence sits in $e^{im\varphi}$, so
+
+   $$
+   \int_0^{2\pi} e^{-im\varphi}e^{im'\varphi}\,d\varphi = \int_0^{2\pi} e^{i(m'-m)\varphi}\,d\varphi = 0 \quad\text{for integer } m\neq m'
+   $$
+
+   and the $\theta$ integral never has to be looked at. That is the same
+   fact in explicit clothing, and notice that it needs $m'-m$ to be a
+   nonzero *integer*, which single-valuedness has already guaranteed.
+
+   </details>
+
 4. Explain physically why $|Y_0^0|^2$ being constant (independent of
    $\theta,\varphi$) means an electron in an $l=0$ state has no preferred
    direction at all.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the probability of finding the electron inside a small cone of
+   solid angle $d\Omega$ is $|Y_0^0|^2\,d\Omega=\tfrac{1}{4\pi}d\Omega$,
+   the same number whichever way the cone points. No direction is
+   distinguishable from any other by any measurement of where the electron
+   is.
+
+   The stronger statement is available here and is worth having, because
+   it is what actually rules out a hidden axis. $Y_0^0=1/(2\sqrt\pi)$ is
+   constant as a *function*, not merely constant in modulus, so rotating
+   the state about any axis returns the identical function, phase
+   included. The state is invariant, not just its density. Compare
+   $Y_1^{\pm1}$, whose modulus depends only on $\theta$ and is therefore
+   symmetric about the $z$ axis, while the phase $e^{\pm i\varphi}$
+   changes under a rotation about $z$. Azimuthal symmetry of the density
+   is a much weaker property than rotational invariance of the state, and
+   only $l=0$ has the latter.
+
+   Where this connects back to Lesson 1: $l=0$ means $\vec L^{\,2}$ has
+   eigenvalue $0$, and since $\vec L^{\,2}=L_x^2+L_y^2+L_z^2$ is a sum of
+   non-negative terms, each of $L_x,L_y,L_z$ must be zero on this state.
+   The $j=0$ state is the single case where all three components are
+   simultaneously sharp, and the noncommutation of $L_x$ and $L_y$
+   permits it only because all three sharp values are zero.
+
+   The misconception to avoid: reading isotropy as "the angular momentum
+   points somewhere, we just do not know where." For $l=0$ there is no
+   angular momentum to have a direction. That reading would be closer to
+   right for $l=1,m=0$, where the length is $\sqrt2\,\hbar$ and only the
+   transverse orientation is indefinite, but even there the transverse
+   part is a spread rather than an unknown arrow.
+
+   A second thing not to conclude: $|Y_0^0|^2$ constant says nothing about
+   the radial distribution. A hydrogen $1s$ electron is emphatically not
+   equally likely at all distances. Only the angular factor is flat, and
+   the radial factor is where all the structure of the next course lives.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -242,7 +396,7 @@ other choice would fail to diagonalize one or both operators.
 - The specific shapes of $s$, $p$, $d$ orbitals in the next course follow
   directly from these functions.
 
-## Further Exploration
+## The qubit engine, relabelled
 
 <NextDiscovery>
 [Spin-1/2 Systems](/lessons/quantum-mechanics/angular-momentum-and-spin/spin-one-half-systems) shows this platform's entire qubit

@@ -66,20 +66,20 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="A sign bit is not enough">
   A signed real number can only ever fully agree or fully cancel. The
   double-slit pattern dims smoothly, not in one jump, so whatever an
   <Term id="amplitude">amplitude</Term> is, a sign alone cannot be enough.
 </LessonHook>
 
-## Motivation
+## Signed reals add and cancel too
 
 The last lesson showed amplitudes have to add before squaring. It didn't
 explain why those amplitudes need to be *complex* specifically. Signed
 real numbers can also add constructively ($(+1)+(+1)=2$) or destructively
 ($(+1)+(-1)=0$). This lesson makes that question precise, and answers it.
 
-## Intuition
+## One bit of direction, and no in-between
 
 A signed real number carries one bit of "direction" information: its
 sign. Two same-signed amplitudes always reinforce fully; two
@@ -101,7 +101,7 @@ number's phase gives you.
   license="Public domain"
 />
 
-## Mathematical Development
+## The knob a sign cannot supply
 
 Before formalizing the intuition above, pin down a prediction about the
 algebra itself.
@@ -193,7 +193,7 @@ important point is structural: *some* continuously-variable phase is
 required by the data, and complex numbers are the minimal, natural
 mathematical object that has such a phase built in.
 
-## Physical Interpretation
+## Could a real vector space fake it?
 
 <Callout type="note">
 A deeper question, could a real (but higher-dimensional) <Term id="vector-space">vector space</Term>
@@ -210,13 +210,13 @@ experimentally-tested answer for the scenarios tried, not just a
 mathematical convenience.
 </Callout>
 
-## Interactive Experiment
+## Turn the phase and watch the fringe slide
 
 <InteractiveSection title="Phase alone, then phase between two" description={`Try the explorer below to build direct intuition: with a single amplitude, notice that rotating the phase slider (magnitude held fixed) never changes the probability readout. Phase alone carries no probability information for a lone amplitude. Switch to two-amplitude mode and watch the relative phase between α and β sweep the combined probability continuously between the "quantum" and "classical" values, the exact continuum this lesson just derived the necessity of.`}>
   <LazyComplexAmplitudeExplorer />
 </InteractiveSection>
 
-## Worked Example
+## Three paths, all carrying the same sign
 
 **Three paths contribute equal-magnitude real amplitudes
 $\psi_1=\psi_2=\psi_3=0.4$. What is $(\psi_1+\psi_2+\psi_3)^2$, and why
@@ -234,7 +234,7 @@ value per *pair*. Complex phases, one continuously-adjustable angle per
 amplitude, supply exactly that: $\theta_1-\theta_2$ and $\theta_1-\theta_3$
 can be tuned independently to any relative interference strength at all.
 
-## Common Mistakes
+## A minus sign is one phase out of a continuum
 
 <Callout type="warning">
 **Treating "negative amplitude" and "complex phase" as the same idea.** A
@@ -256,13 +256,139 @@ above demonstrates directly.
    $(\psi_1+\psi_2)^2$. Is any value strictly between full constructive
    and full destructive interference reachable by changing only the sign
    of $\psi_2$?
-2. For $\psi_1=0.5$, $\psi_2=0.5e^{i\theta}$, find the value of $\theta$
-   (other than $0$ and $\pi$) where the interference term contributes
-   exactly zero, i.e., where the quantum and classical predictions
-   coincide.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $(0.5-0.5)^2 = 0$. And no, nothing in between is reachable.
+
+   The sign of $\psi_2$ is a two-valued choice, so flipping it gives
+   exactly two outcomes and no others:
+
+   $$
+   (0.5+0.5)^2 = 1, \qquad (0.5-0.5)^2 = 0
+   $$
+
+   Those are the two dashed reference lines on the plot above. Every
+   height between them, which is most of a real fringe pattern, is
+   unreachable by any choice of sign.
+
+   The reason is structural rather than arithmetic. Expanding gives
+   $\psi_1^2+\psi_2^2+2\psi_1\psi_2$, and the sign flip changes only the
+   third term, from $+0.5$ to $-0.5$. There is no third option, because
+   there is no third sign. Nothing continuous is being varied.
+
+   The tempting objection is that you could reach intermediate values by
+   changing the *magnitude* of $\psi_2$ instead, and that is true but
+   answers a different question. Setting $\psi_2 = -0.3$ gives
+   $(0.5-0.3)^2 = 0.04$, an intermediate number. But the individual
+   probabilities moved too: $\psi_2^2$ went from $0.25$ to $0.09$, so one
+   path's own brightness changed. The fringe pattern in the experiment
+   does not work that way. Sweep across the screen and each slit's
+   individual intensity stays essentially constant while the combined
+   brightness runs through every value. That is the knob the sign cannot
+   supply, and the magnitude cannot supply it either without violating the
+   condition that $|\psi_1|$ and $|\psi_2|$ hold still.
+
+   </details>
+
+2. For $\psi_1=0.5$, $\psi_2=0.5e^{i\theta}$, find every value of $\theta$
+   in $[0,2\pi)$ at which the interference term contributes exactly zero,
+   so the quantum and classical predictions coincide. How many are there,
+   and why is that count neither zero, nor one, nor infinite?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Exactly two: $\theta = \pi/2$ and $\theta = 3\pi/2$. At both, the two
+   predictions agree at $0.5$.
+
+   The interference term derived above is
+
+   $$
+   \psi_1^*\psi_2+\psi_2^*\psi_1 = 2|\psi_1||\psi_2|\cos\theta = 2(0.5)(0.5)\cos\theta = 0.5\cos\theta
+   $$
+
+   With both magnitudes fixed and nonzero, the term vanishes exactly where
+   $\cos\theta = 0$, which on one full turn happens at $\pi/2$ and
+   $3\pi/2$ and nowhere else. Check either one directly: at
+   $\theta=\pi/2$, $\psi_1+\psi_2 = 0.5+0.5i$, whose squared magnitude is
+   $0.25+0.25=0.5$, matching the classical
+   $|\psi_1|^2+|\psi_2|^2 = 0.25+0.25 = 0.5$.
+
+   The count is worth thinking about, because each of the three wrong
+   counts corresponds to a different misreading.
+
+   Not zero, because $\cos\theta$ is continuous and runs from $+1$ to
+   $-1$, so it cannot get from the fully constructive end to the fully
+   destructive end without passing through zero. Agreement between the
+   quantum and classical rules is forced somewhere, not accidental.
+
+   Not one, because $\cos\theta$ crosses zero twice per turn, once on the
+   way down and once on the way back up. This is the point the previous
+   lesson's three-row table could not show, and it is why the parametric
+   plot above sweeps a full $2\pi$ rather than stopping at $\pi$: the
+   second crossing is the mirror image of the first, and a table that
+   stops halfway makes the agreement look like an endpoint rather than a
+   crossing.
+
+   Not infinite, because $\cos\theta$ is not identically zero. It would
+   be identically zero only if $|\psi_1|$ or $|\psi_2|$ were zero, that
+   is, if one of the two paths were closed. With both open, agreement is
+   confined to two isolated angles out of a continuum, and everywhere else
+   the quantum prediction and the classical one are genuinely different
+   numbers.
+
+   </details>
+
 3. Explain in your own words why "a continuous knob that doesn't change
    $|\psi_1|$ or $|\psi_2|$" is something a sign bit structurally cannot
    provide, but a phase angle can.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a sign has two values and an angle has a continuum of them, and
+   in both cases the magnitude is left untouched, so the difference is
+   entirely in how many settings the knob has.
+
+   Look at what each object is. A nonzero real number factors as
+   (magnitude) times (sign), where the sign is drawn from a two-element
+   set $\{+1,-1\}$. A nonzero complex number factors as (magnitude) times
+   $e^{i\theta}$, where $e^{i\theta}$ is drawn from the whole unit circle.
+   Both factorizations separate "how big" from "which direction," and in
+   both cases turning the direction knob leaves the magnitude alone, so
+   $|\psi_1|^2$ and $|\psi_2|^2$ hold still either way. The two-element
+   set is simply a very small subset of the circle: $\{+1,-1\}$ is the
+   pair of points $\theta = 0$ and $\theta = \pi$.
+
+   Now feed each into the cross term. For real amplitudes it is
+   $2\psi_1\psi_2$, which takes exactly two values as the sign flips. For
+   complex ones it is $2|\psi_1||\psi_2|\cos\theta$, and as $\theta$ turns
+   once around the circle $\cos\theta$ sweeps continuously through every
+   value in $[-1,1]$, hitting the two real cases at the two ends and
+   filling in everything between them. The complex version does not
+   replace the real one; it interpolates it.
+
+   The experiment is what forces the larger set. Moving across the screen
+   changes the path-length difference smoothly, so whatever the direction
+   knob is, it has to be adjustable smoothly, and the resulting brightness
+   has to vary smoothly with it. A quantity with two settings can produce
+   two brightnesses. The fringe pattern shows a continuum of them, at
+   fixed single-slit intensities. So the direction knob has more than two
+   settings, and the unit circle is the smallest and most natural object
+   that supplies them.
+
+   The wrong turn worth naming is treating a minus sign as "the same idea
+   as a phase, just written more simply." It is not a simplification, it
+   is one point of the circle. Any argument that only ever needs full
+   reinforcement and full cancellation can indeed get by with signs, which
+   is why the real-number picture survives for so long in introductory
+   wave optics. The moment partial interference at fixed intensities has
+   to be accounted for, the two-element set runs out of values and there
+   is nothing to fall back on.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -281,7 +407,7 @@ above demonstrates directly.
   genuine, now experimentally settled question. Complex amplitudes are
   confirmed necessary, not merely convenient.
 
-## Further Exploration
+## The same sum, done with Euler's formula
 
 <ChallengePrompt prompt="The worked example used three equal, all-real amplitudes and found only 'fully constructive' was reachable by flipping signs. Now try genuinely complex ones: ψ1=0.4, ψ2=0.4e^(iπ/3), ψ3=0.4e^(i2π/3). Does this land at fully constructive, fully destructive, or somewhere in between?">
   Add the three complex numbers directly (Euler's formula for each), then

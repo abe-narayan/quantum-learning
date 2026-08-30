@@ -22,7 +22,7 @@ const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
 const TWO_PI = 2 * Math.PI;
 
-// Minimal shareable state for this simulator is the pair of Bloch angles —
+// Minimal shareable state for this simulator is the pair of Bloch angles:
 // they fully determine the point on the sphere (global phase is invisible
 // on the sphere and doesn't affect anything rendered here).
 function clampTheta(value: number): number {
@@ -39,7 +39,7 @@ function phiDelta(a: number, b: number): number {
   return Math.min(d, TWO_PI - d);
 }
 
-/** Reads and validates `?theta=&phi=` from the URL. Never throws — returns null on anything malformed or absent. */
+/** Reads and validates `?theta=&phi=` from the URL. Never throws; returns null on anything malformed or absent. */
 function parseAnglesFromParams(params: { get(key: string): string | null }): BlochAngles | null {
   const rawTheta = params.get("theta");
   const rawPhi = params.get("phi");
@@ -74,7 +74,7 @@ export function BlochSphereExplorer() {
     initialAngles ? matchPresetId(initialAngles) : "0"
   );
   const [narration, setNarration] = useState<string>(() =>
-    initialAngles ? "Restored the shared state from your link." : "Prepared |0⟩ — the north pole of the Bloch sphere."
+    initialAngles ? "Restored the shared state from your link." : "Prepared |0⟩, the north pole of the Bloch sphere."
   );
   const [lastMeasurement, setLastMeasurement] = useState<0 | 1 | null>(null);
   const [collapseFlash, setCollapseFlash] = useState(false);
@@ -125,7 +125,7 @@ export function BlochSphereExplorer() {
 
       setActivePresetId(null);
       setLastMeasurement(null);
-      setNarration(`Applied ${axisId}(${degrees}°) — a ${degrees}° rotation about the ${axisId.slice(1)} axis.`);
+      setNarration(`Applied ${axisId}(${degrees}°): a ${degrees}° rotation about the ${axisId.slice(1)} axis.`);
 
       animateAlong(
         (t) => stateToBlochVector(startState.applyMatrix(rotationAboutAxis(axis, angleRadians * t))),
@@ -181,10 +181,10 @@ export function BlochSphereExplorer() {
     setActivePresetId(null);
     setLastMeasurement(outcomeIndex);
     setNarration(
-      `Measured |${outcomeIndex}⟩ (this was random, weighted by the probabilities). The superposition is gone — the state has collapsed to |${outcomeIndex}⟩.`
+      `Measured |${outcomeIndex}⟩ (this was random, weighted by the probabilities). The superposition is gone: the state has collapsed to |${outcomeIndex}⟩.`
     );
 
-    // Collapse is a discontinuous physical event, not a unitary rotation — use a much faster
+    // Collapse is a discontinuous physical event, not a unitary rotation, so use a much faster
     // settle than gate/rotation animations so it reads as a snap, plus a brief flash at the pole.
     animateTo(endPoint, COLLAPSE_MS, () => {
       setState(collapsed);
@@ -203,7 +203,7 @@ export function BlochSphereExplorer() {
 
   // Keep the URL in sync with the settled state so the page is always shareable.
   // Debounced so a slider drag (which updates `state` on every input event) doesn't
-  // spam `history.replaceState` — only the value it settles on after a short pause
+  // spam `history.replaceState`; only the value it settles on after a short pause
   // gets written. Skips the very first run so mounting doesn't immediately rewrite
   // the URL we just read from.
   useEffect(() => {
@@ -235,13 +235,13 @@ export function BlochSphereExplorer() {
       if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
       copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
     } catch {
-      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+      // Clipboard access can be denied in some browser security contexts, so no crash and no link copied.
     }
   }, []);
 
   return (
     <SimulatorInstrument
-      label="Bloch sphere — single qubit"
+      label="Bloch sphere: single qubit"
       readout={
         <Readouts
           items={[
@@ -250,7 +250,7 @@ export function BlochSphereExplorer() {
           ]}
         />
       }
-      footnote="Drag the sphere, or focus it and use the arrow keys, to rotate the view — the vector&rsquo;s position is the quantum state itself."
+      footnote="Drag the sphere, or focus it and use the arrow keys, to rotate the view. The vector&rsquo;s position is the quantum state itself."
       stage={
         <>
           <div className="mx-auto max-w-sm">
@@ -272,16 +272,16 @@ export function BlochSphereExplorer() {
           </div>
 
           <SimulatorFraming
-            shows="Every single-qubit state is a point on this sphere — gates are rotations of that point, and measurement is a random snap to a pole."
+            shows="Every single-qubit state is a point on this sphere. Gates are rotations of that point, and measurement is a random snap to a pole."
             watchFor="Rotations move the point smoothly; measurement is the only discontinuous jump you&rsquo;ll ever see on this sphere."
             tryThis={
               <ul>
                 <li>
-                  Apply H, then S, then H again — watch the state trace a path that never repeats a previous
+                  Apply H, then S, then H again, and watch the state trace a path that never repeats a previous
                   point, then hit Measure and see it collapse anyway.
                 </li>
                 <li>
-                  Drag θ and φ directly to the equator (θ=90°) and Measure ten times — notice the 50/50 split
+                  Drag θ and φ directly to the equator (θ=90°) and Measure ten times, and notice the 50/50 split
                   even though nothing here is a coin flip.
                 </li>
               </ul>

@@ -61,11 +61,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Measuring a state with no state vector">
 ρ can be evolved by a gate and measured, the way a state vector can, and with the same formulas. The difference shows up in one case a state vector cannot reach: measuring a state that has no state vector at all.
 </LessonHook>
 
-## Motivation
+## Fixed states are not enough
 
 Every density-matrix tool built so far in this course has described a
 *fixed* state, sitting still. Real qubits get acted on by gates and
@@ -85,7 +85,7 @@ formulas keep working on $I/2$, a state no ket describes.
   license="CC BY 2.0"
 />
 
-## Mathematical Development
+## Evolution and the Born rule, both by linearity
 
 ### Unitary evolution: ρ' = UρU†
 
@@ -162,8 +162,8 @@ afterward.
   question="ρ=I/2 has no state vector at all: total ignorance about the qubit's basis state. What happens when you measure P₀=|0⟩⟨0|?"
   options={[
     { label: "p₀ is undefined, since there is no |ψ⟩ to apply the Born rule to", value: "undefined" },
-    { label: "p₀=0.5, but the post-measurement state stays mixed", value: "half-mixed" },
-    { label: "p₀=0.5, and the post-measurement state collapses to the pure state |0⟩⟨0|", value: "half-pure" },
+    { label: "p₀=0.5, but the state stays mixed afterward, because no measurement can remove classical ignorance", value: "half-mixed" },
+    { label: "p₀=0.5, and the state collapses to the pure |0⟩⟨0|", value: "half-pure" },
   ]}
   correctValue="half-pure"
   explanation="Both p=Tr(ρP) and the collapse formula ρ_after=PρP/p are defined for any valid density matrix, not only pure ones, which is the point of rederiving them through the trace trick above. p₀ comes out to 0.5, and the post-measurement state collapses all the way to the pure state |0⟩⟨0|, even though the state you began with had no state vector. Measurement can turn a mixed state pure; a unitary never can."
@@ -224,7 +224,7 @@ both computed live by this lesson's own `evolveDensityMatrix` and
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## No new postulates were needed
 
 Gates and measurement extend to density matrices with no new physical
 postulates. Every formula here is an algebraic consequence of the ordinary
@@ -232,7 +232,7 @@ state-vector rules, extended to mixtures by linearity. What is new is
 scope: the formulas apply to states like $I/2$, or one qubit of an
 entangled pair, that no state vector represents.
 
-## Worked Example
+## Hadamard applied to the maximally mixed state
 
 **Apply the Hadamard gate to $\rho=I/2$, and explain the result.**
 
@@ -244,7 +244,7 @@ ignorance about which of any orthonormal basis's two states the qubit is
 in, and rotating total ignorance leaves total ignorance, re-expressed in a
 basis that looks identical to $I/2$ anyway.
 
-## Common Mistakes
+## The dagger is what keeps rho Hermitian
 
 <Callout type="warning">
 **Forgetting the dagger in ρ'=UρU†.** It's $U\rho U^\dagger$, not
@@ -263,14 +263,181 @@ matrix, mixed or pure, which is what makes the $I/2$ example meaningful.
 
 1. Apply $X$ to $\rho=\begin{pmatrix}0.75&0\\0&0.25\end{pmatrix}$ using
    $\rho'=X\rho X^\dagger$, and interpret the result physically (Hint:
-   $X$ swaps $|0\rangle\leftrightarrow|1\rangle$).
+   $X$ swaps $|0\rangle\leftrightarrow|1\rangle$). Then say what happens
+   to the state's purity and entropy, and why that had to happen.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $X$ is its own adjoint, so $\rho' = X\rho X$:
+
+   $$
+   X\rho X = \begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}0.75&0\\0&0.25\end{pmatrix}\begin{pmatrix}0&1\\1&0\end{pmatrix} = \begin{pmatrix}0.25&0\\0&0.75\end{pmatrix}
+   $$
+
+   `evolveDensityMatrix` returns exactly this. Physically, the ensemble was
+   "$|0\rangle$ three quarters of the time, $|1\rangle$ one quarter"; $X$
+   turns every $|0\rangle$ into $|1\rangle$ and vice versa, so the new
+   ensemble is "$|1\rangle$ three quarters, $|0\rangle$ one quarter". The
+   two weights have traded places, which is what a bit flip should do to a
+   biased coin. On the Bloch ball the point moves from $(0,0,0.5)$ to
+   $(0,0,-0.5)$, a half turn about the $x$-axis.
+
+   Purity and entropy are unchanged: $\text{Tr}(\rho^2)=0.5625+0.0625=0.625$
+   before and after, and the entropy is $0.8113$ bits both times, which the
+   engine confirms. That had to happen because a unitary conjugation
+   preserves eigenvalues. $X\rho X^\dagger$ is a similarity transformation,
+   so its characteristic polynomial is the same as $\rho$'s, and every
+   function of the eigenvalues alone, purity and entropy included, comes
+   out identical.
+
+   Read geometrically it is the same statement: a unitary rotates the Bloch
+   ball rigidly about its centre, so radii are preserved, and purity and
+   entropy both depend only on $|\vec r|$. A gate can point a state
+   anywhere on its sphere of fixed radius and cannot move it to a different
+   sphere.
+
+   The wrong turn is writing $\rho' = X\rho$ and stopping. That gives
+   $\begin{pmatrix}0&0.25\\0.75&0\end{pmatrix}$, which is not Hermitian,
+   has trace $0$, and is not a state at all. The sandwich is not decoration:
+   $\rho$ carries a ket *and* a bra, so a gate has to act on both sides,
+   $U$ on the ket and $U^\dagger$ on the bra.
+
+   </details>
+
 2. Measure $P_1=|1\rangle\langle1|$ on $\rho=\begin{pmatrix}0.75&0\\0&0.25\end{pmatrix}$:
    find $p_1$ and the post-measurement state.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The generalized Born rule gives
+
+   $$
+   p_1 = \text{Tr}(\rho P_1) = \text{Tr}\begin{pmatrix}0&0\\0&0.25\end{pmatrix} = 0.25 ,
+   $$
+
+   and the collapse rule gives
+
+   $$
+   \rho_{\text{after}} = \frac{P_1\rho P_1}{p_1} = \frac{1}{0.25}\begin{pmatrix}0&0\\0&0.25\end{pmatrix} = \begin{pmatrix}0&0\\0&1\end{pmatrix} = |1\rangle\langle1| .
+   $$
+
+   `densityMatrixMeasurementProbability` returns $0.25$ and
+   `densityMatrixCollapse` returns $\mathrm{diag}(0,1)$.
+
+   Two things happened at once and they are worth separating. The
+   probability came straight off the diagonal, because $\rho$ is diagonal
+   and $P_1$ picks out one entry; $0.25$ is exactly the classical
+   probability the ensemble assigned to $|1\rangle$, as it must be for a
+   mixture of computational basis states. And the state went from mixed,
+   with purity $0.625$ and entropy $0.811$ bits, to pure, with purity $1$
+   and entropy $0$.
+
+   That second part is the point worth carrying forward. The last question
+   showed that no gate can change a state's entropy. Measurement can, and
+   it did: this one destroyed $0.811$ bits of uncertainty. There is no
+   contradiction, because measurement is not a unitary. It selects a branch
+   and renormalizes, which is exactly the operation a rigid rotation of the
+   Bloch ball cannot perform.
+
+   The wrong turn is expecting a mixed state to stay mixed, on the
+   reasoning that classical ignorance cannot be removed by a quantum
+   measurement. It can, when the measurement asks the question the
+   ignorance was about. Ask a different question and it does not: question
+   3 measures $I/2$ in the $X$ basis and also lands on a pure state, while
+   measuring $\rho=\mathrm{diag}(0.75,0.25)$ in the $X$ basis leaves you
+   with $|+\rangle$ or $|-\rangle$, again pure, but having learned nothing
+   about the original bias.
+
+   </details>
+
 3. Show that measuring $\rho=I/2$ in the $X$-basis instead of the $Z$-basis
    also gives 50/50 odds, using $P_+=|+\rangle\langle+|$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Use the Born rule with $\rho=\tfrac12 I$ and pull the scalar out:
+
+   $$
+   p_+ = \text{Tr}\left(\tfrac12 I \cdot P_+\right) = \tfrac12\text{Tr}(P_+) = \tfrac12 \cdot 1 = \tfrac12
+   $$
+
+   using the fact that a projector onto a one-dimensional subspace has
+   trace $1$. The engine returns $0.5$. The same two lines give
+   $p_- = \tfrac12$, and the two sum to $1$ as they must.
+
+   Notice how little the calculation used. It never mentioned $|+\rangle$,
+   only that $P_+$ is a rank-one projector, so the identical argument gives
+   $\tfrac12$ for a projector onto *any* single-qubit state whatsoever: the
+   $Y$ basis, some axis at $37^\circ$, anything. $I/2$ is featureless in
+   every basis at once, which is what "maximally mixed" means and why no
+   measurement can reveal which ensemble prepared it.
+
+   The collapse is the surprise. $P_+ (I/2) P_+ / p_+ = |+\rangle\langle+|$,
+   a pure state with entropy $0$, and the engine confirms it. So a
+   measurement on a completely featureless state still produces a
+   completely definite one. Nothing was learned about the past, since both
+   outcomes were equally likely whatever the preparation had been, and yet
+   the future is now fully determined. Measurement's two roles, extracting
+   information and preparing a state, come apart cleanly here: this one
+   does the second and none of the first.
+
+   The wrong turn is expecting $I/2$ to give $50/50$ in the $Z$ basis but
+   something else in $X$, by analogy with $\rho_{|+\rangle}$, which is
+   $50/50$ in $Z$ and certain in $X$. That analogy is exactly backwards.
+   The two states share a diagonal and differ in their coherences, and it
+   is the coherences that make $|+\rangle$ certain in the $X$ basis. $I/2$
+   has none, so it has no basis in which it is certain of anything.
+
+   </details>
+
 4. Prove, in general, that $U(I/2)U^\dagger=I/2$ for *any* unitary $U$
    (not just $H$), using only $UU^\dagger=I$ and linearity of scalar
-   multiplication over matrices.
+   multiplication over matrices. Then say what this implies about whether
+   any gate can lower a qubit's entropy, and name an operation that can.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Pull the scalar through and use unitarity:
+
+   $$
+   U\left(\tfrac12 I\right)U^\dagger = \tfrac12\,U I U^\dagger = \tfrac12\,U U^\dagger = \tfrac12 I
+   $$
+
+   Three steps, none of which needs to know anything about $U$ beyond
+   $UU^\dagger=I$. The engine's check with $H$ is one instance; the proof
+   covers every gate at once, including gates nobody has built.
+
+   $I/2$ is therefore a fixed point of every unitary. Geometrically it is
+   the centre of the Bloch ball, and a rotation about the centre leaves the
+   centre alone, which is the same fact without the algebra.
+
+   The implication for entropy is a hard no. Unitary conjugation preserves
+   eigenvalues, so it preserves every function of them, entropy included:
+   $S(U\rho U^\dagger)=S(\rho)$ for every $\rho$ and every $U$. No gate,
+   and no circuit of gates however long, can lower a qubit's entropy by
+   even a fraction of a bit. A maximally mixed qubit stays maximally mixed
+   forever under any closed-system evolution.
+
+   Two operations can lower it, and both step outside "unitary on this
+   qubit alone". Measurement does, as question 2 showed, taking $0.811$
+   bits to $0$ by selecting a branch. And interaction with a second system
+   does: entangle the qubit with a fresh one and then discard the partner,
+   and the qubit's entropy changes freely, which is exactly how a
+   refrigerated qubit gets reset to $|0\rangle$ in real hardware. The
+   entropy has to go somewhere, and in both cases it goes into a system you
+   stopped tracking.
+
+   The wrong turn is verifying the claim for $X$, $Y$, $Z$ and $H$ and
+   calling it proved. Those are four matrices out of a continuum, and the
+   pattern they exhibit is real but their agreement is not an argument. The
+   three-line proof above is shorter than checking even one of them by
+   direct multiplication.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -287,7 +454,7 @@ matrix, mixed or pure, which is what makes the $I/2$ example meaningful.
 - The maximally mixed state $I/2$ is invariant under every unitary gate:
   "total ignorance" cannot be rotated away.
 
-## Further Exploration
+## Back to the question Bell states raised
 
 <NextDiscovery>
 [Bell's Theorem and Local Hidden Variables](/lessons/quantum-computing/entanglement-and-measurement/bells-theorem-and-local-hidden-variables) returns to

@@ -22,7 +22,7 @@ export const expectationValueCalculation: NumericProblem = {
     type: "numeric",
     value: 0.2,
     tolerance: 0.01,
-    incorrectFeedback: "For a diagonal Hermitian operator, ⟨ψ|Z|ψ⟩ = |α|²·(top eigenvalue) + |β|²·(bottom eigenvalue) — weight each eigenvalue by the corresponding probability.",
+    incorrectFeedback: "For a diagonal Hermitian operator, ⟨ψ|Z|ψ⟩ = |α|²·(top eigenvalue) + |β|²·(bottom eigenvalue). Weight each eigenvalue by the corresponding probability.",
     nearMisses: [
       { value: Math.sqrt(0.6) - Math.sqrt(0.4), tolerance: 0.01, feedback: "That weights the eigenvalues by the amplitudes rather than the probabilities. Square each entry before weighting." },
       { value: 1, feedback: "1 would require all the weight on the +1 eigenvalue. Here 0.4 of it sits on −1, which pulls the average down." },
@@ -30,8 +30,9 @@ export const expectationValueCalculation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Since Z is diagonal, ⟨ψ|Z|ψ⟩ = |α|²(+1) + |β|²(-1) where |ψ⟩=(α,β)." },
-    { text: "Here |α|² = 0.6 and |β|² = 0.4 directly (the entries are already given as square roots of these)." },
+    { text: "A diagonal operator does not mix the basis components, so each component contributes its own diagonal entry, weighted by how much of the state sits on it." },
+    { text: "Those weights are the squared moduli of the state's entries. Read them off before doing any arithmetic with $Z$'s entries." },
+    { text: "The entries were written as square roots on purpose: squaring undoes the root, so the two weights are the numbers under them. Check that they add to 1, then attach the correct sign to each." },
   ],
   solution: {
     steps: [

@@ -63,7 +63,7 @@ export const circuitVqeMatchesExact: NumericProblem = {
   },
   explanation: {
     correctIdea: "This confirms the QuantumCircuit-based implementation reproduces Quantum Algorithms II's matrix-based ground energy exactly, not approximately.",
-    whyCorrect: "Matches the verified grid-search result, cross-checked against exactGroundStateEnergy.",
+    whyCorrect: "Ry(θ) sweeps the state around the Y axis, so ⟨Z⟩ traces cos θ and bottoms out at −1 when θ = π. The check is that a grid search over the circuit and exactGroundStateEnergy on the matrix arrive at the same −1 by unrelated routes.",
     whyWrong: ["Any value other than exactly -1 would indicate either a search-resolution issue or a genuine implementation bug; the build-time check confirms this doesn't happen."],
   },
 };

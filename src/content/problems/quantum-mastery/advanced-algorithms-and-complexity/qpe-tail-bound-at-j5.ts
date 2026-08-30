@@ -18,7 +18,7 @@ export const qpeTailBoundAtJ5: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "Using the lesson's derived tail bound P(m) ≤ 1/(4(|j|−1/2)²) for j=m−b, what upper bound does this give for the probability of measuring an outcome j=5 steps from the best estimate?",
-    inputHint: "as a decimal",
+    inputHint: "as a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -46,7 +46,7 @@ export const qpeTailBoundAtJ5: NumericProblem = {
   },
   explanation: {
     correctIdea: "The tail bound shrinks quadratically in how far an outcome is from the best estimate, a concrete, derived guarantee.",
-    whyCorrect: "This directly applies the lesson's derived inequality, which was independently verified against the real engine's exact probabilities.",
+    whyCorrect: "Applying the derived inequality at j=5 involves no further approximation, and the bound was checked independently against the engine's exact probabilities, so it is both valid and reasonably tight.",
     whyWrong: ["Using |j| instead of |j|−1/2 in the denominator gives a different (looser) bound than the one actually derived in the lesson."],
   },
 };

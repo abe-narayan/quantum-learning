@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Instrument } from "@/components/ui/Panel";
@@ -39,12 +39,17 @@ import { SolutionPanel } from "./SolutionPanel";
  * eager-graph guard in `src/lib/design/__tests__/clientBoundary.test.ts`
  * fails if any import here re-opens the chain.
  */
+/** Where a solved problem sends the reader next. Resolved by `ProblemView`
+ *  from the meta-only registry; see `nextProblemAfter` there. */
+export type NextProblem = { slug: string; title: string };
+
 export function ProblemViewClient({
   problem,
   math,
   lessonSlug,
   lessonTitle,
   prerequisiteAnchorId,
+  nextProblem,
 }: {
   problem: Problem;
   /** This problem's math, already rendered to KaTeX HTML. */
@@ -58,6 +63,9 @@ export function ProblemViewClient({
    *  different question from "give me a hint", and the readout already answers
    *  it per-prerequisite with links. */
   prerequisiteAnchorId?: string;
+  /** The problem to offer once this one is solved. Absent inside a
+   *  `CourseCheckpoint`, which sits in a lesson that has its own next step. */
+  nextProblem?: NextProblem;
 }) {
   const [rawAnswer, setRawAnswer] = useState("");
   const [result, setResult] = useState<ValidationResult | null>(null);
@@ -66,13 +74,23 @@ export function ProblemViewClient({
   // changes on every submission, so a repeat of the same wrong answer still
   // mutates the live region and is still announced. See `submissionId` there.
   const [submissionCount, setSubmissionCount] = useState(0);
+  /** Whether a non-empty answer has been submitted in this session. */
+  const [hasRealAttempt, setHasRealAttempt] = useState(false);
   const { progress, recordAttempt, revealHint, revealSolution } = useProblemProgress(problem.meta.slug);
 
   const solved = result?.status === "correct";
   const hintsRemaining = problem.hints.length - progress.hintsRevealed;
-  // Persisted, so it survives a reload and a return visit — the solution
-  // shouldn't re-lock itself just because the reader closed the tab.
-  const attempted = progress.attempts.length > 0 || result !== null;
+  // Persisted, so it survives a reload and a return visit: the solution
+  // shouldn't re-lock itself just because the reader closed the tab. The
+  // second disjunct keeps the gate live in this session even when storage is
+  // unavailable (private mode, or a full origin), where `attempts` can never
+  // grow.
+  //
+  // `hasRealAttempt`, not `result !== null`. An empty submission is still
+  // graded and still answered, so it used to set `result` and open the gate:
+  // one click on an untouched field revealed the worked solution, which is the
+  // whole thing this gate exists to prevent.
+  const attempted = progress.attempts.length > 0 || hasRealAttempt;
 
   // A correct answer unmounts the Submit button — the button the reader just
   // pressed, and the element holding keyboard focus. Nothing takes its place
@@ -106,12 +124,41 @@ export function ProblemViewClient({
     const validation = validateAnswer(problem, rawAnswer);
     setResult(validation);
     setSubmissionCount((count) => count + 1);
+
+    // An empty submission is still graded and still answered ("Enter an
+    // answer" is the useful reply), but it counts as neither an attempt nor a
+    // try for the solution gate. Pressing Submit on an untouched field used to
+    // do both, so one click revealed the worked solution, which is the whole
+    // thing the gate exists to prevent.
+    //
+    // Nothing else reads the attempt log's contents: its only two consumers,
+    // `attempted` here and the "started" filter in `ProblemsCatalog`, both ask
+    // solely whether it is non-empty.
+    if (rawAnswer.trim() === "") return;
+
+    setHasRealAttempt(true);
     recordAttempt({ timestamp: Date.now(), submitted: rawAnswer, status: validation.status });
   }
+
+  // "Clear answer" is the third self-unmounting control on this page, and it
+  // was the one still missing the fix the other two carry: it renders only
+  // while `result && !solved`, so activating it removes the button the reader
+  // is standing on and focus falls to `<body>` — their next Tab restarts from
+  // the top of the page, and the feedback box and "Next step" block vanish
+  // from under them with nothing announced. The field is both the element
+  // that survives the change and the place the reader is trying to get to, so
+  // that is where focus goes. Called straight from the handler rather than
+  // from an effect: the field does not unmount, so its node is the same one
+  // before and after the state change.
+  const answerField = useRef<HTMLElement | null>(null);
+  const setAnswerField = useCallback((node: HTMLElement | null) => {
+    answerField.current = node;
+  }, []);
 
   function handleClear() {
     setRawAnswer("");
     setResult(null);
+    answerField.current?.focus();
   }
 
   // "The reader pressed a reveal control", for the two panels whose focus
@@ -143,7 +190,7 @@ export function ProblemViewClient({
           <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
             <path d="M2 6.2 5 9l5-6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          You&rsquo;ve solved this before — try it again anytime
+          You&rsquo;ve solved this before. Try it again anytime.
         </p>
       ) : null}
 
@@ -156,6 +203,7 @@ export function ProblemViewClient({
               value={rawAnswer}
               onChange={setRawAnswer}
               disabled={solved}
+              fieldRef={setAnswerField}
             />
 
             <div className="flex flex-wrap gap-3">
@@ -172,7 +220,16 @@ export function ProblemViewClient({
             </div>
           </div>
 
-          <Feedback result={result} resultRef={feedbackRef} submissionId={submissionCount} />
+          {/* `math.feedback` is keyed by the authored string, which is all a
+              `ValidationResult` carries; an unauthored message (every one the
+              validators compose themselves) misses the map and renders as
+              plain text. See `mathRuns.ts`. */}
+          <Feedback
+            result={result}
+            math={math.feedback}
+            resultRef={feedbackRef}
+            submissionId={submissionCount}
+          />
         </form>
 
         {/*
@@ -184,12 +241,72 @@ export function ProblemViewClient({
           Rendered outside the `role="status"` region above deliberately:
           controls inside a live region get re-announced on every update.
         */}
-        {result && result.status !== "correct" ? (
+        {/*
+          The success path's own onward block, and the reason it exists: until
+          it did, the "Next step" block below rendered only on a *wrong*
+          answer. A reader who got the problem right was shown two words and
+          given nowhere to go, while a reader who got it wrong got a targeted
+          sentence and three links. Solving a problem is the single best moment
+          to offer the next one, and it was the one moment offering nothing.
+
+          Deliberately the same shape as the failure block: same rule, same
+          `tech-label`, same control sizes. The difference is what it points
+          at. There is no hint ladder to offer here (the reader did not need
+          it) and no "re-read the lesson" (they demonstrably did not need that
+          either), so the two moves that remain are the next problem and the
+          worked solution — the second because a right answer reached by a
+          shaky route is worth checking against the author's, which is a thing
+          only a reader who has already answered can usefully be offered.
+
+          Rendered outside the `role="status"` region for the same reason the
+          failure block is: controls inside a live region get re-announced on
+          every update.
+        */}
+        {solved ? (
           <div className="mt-4 border-t border-border pt-4">
             <p className="tech-label">Next step</p>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              Your answer is still in the box — edit it and submit again as many times as you like. Nothing
-              is scored and nothing is recorded against you.
+              {progress.solutionRevealed
+                ? "The worked solution above derives the same result step by step."
+                : "The worked solution derives the same result step by step, which is worth a look even when your own route got there."}
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+              {nextProblem ? (
+                <Link
+                  href={`/problems/${nextProblem.slug}`}
+                  className="inline-flex min-h-11 items-center rounded-(--radius-tight) border border-pillar-edge bg-pillar-wash px-4 text-sm font-medium text-pillar-text transition-colors duration-(--dur-fast) hover:border-pillar focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+                >
+                  Next problem: {nextProblem.title}
+                </Link>
+              ) : (
+                <Link
+                  href="/problems"
+                  className="inline-flex min-h-11 items-center rounded-(--radius-tight) border border-pillar-edge bg-pillar-wash px-4 text-sm font-medium text-pillar-text transition-colors duration-(--dur-fast) hover:border-pillar focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+                >
+                  Find another problem
+                </Link>
+              )}
+              {!progress.solutionRevealed ? (
+                <Button variant="secondary" size="sm" className="min-h-11" onClick={handleRevealSolution}>
+                  See the worked solution
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+
+        {result && result.status !== "correct" ? (
+          <div className="mt-4 border-t border-border pt-4">
+            <p className="tech-label">Next step</p>
+            {/* "Still in the box" was only true for the 426 numeric and
+                short-answer problems; on a multiple-choice one there is no box,
+                there is a selected radio, and a reader looking at a list of
+                options was being told about a field that is not on the page.
+                The sentence says the same thing without naming a control that
+                may not exist. */}
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Your answer is still here. Change it and submit again as many times as you like. Nothing is
+              scored and nothing is recorded against you.
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
               {hintsRemaining > 0 ? (
@@ -216,6 +333,29 @@ export function ProblemViewClient({
                 >
                   What this builds on
                 </a>
+              ) : null}
+              {/* A forward step on the wrong-answer path too, but only once the
+                  solution has been revealed.
+
+                  Every other control in this block points backwards, which is
+                  right while the reader is still trying: hints, the lesson,
+                  the prerequisites. Offering "next problem" beside them would
+                  be an invitation to skip, and the whole page is built around
+                  not doing that.
+
+                  Revealing the solution is the moment that changes. The reader
+                  has stopped trying and read the answer, so this problem is
+                  over for them, and until now that path ended in a wall: the
+                  success branch above carries the only forward link on the
+                  page. Giving up is a worse moment to be stranded than
+                  succeeding, not a better one. */}
+              {progress.solutionRevealed ? (
+                <Link
+                  href={nextProblem ? `/problems/${nextProblem.slug}` : "/problems"}
+                  className="inline-flex min-h-11 items-center rounded-(--radius-tight) border border-pillar-edge bg-pillar-wash px-4 text-sm font-medium text-pillar-text transition-colors duration-(--dur-fast) hover:border-pillar focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+                >
+                  {nextProblem ? `Next problem: ${nextProblem.title}` : "Find another problem"}
+                </Link>
               ) : null}
             </div>
           </div>

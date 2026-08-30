@@ -82,13 +82,13 @@ any dimension, and adds a general argument for why entanglement is
 unavoidable rather than a special feature of two-qubit systems.
 </Callout>
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Entanglement is the generic case">
   Entanglement is not a delicate, rare effect physicists engineer with
   difficulty. A dimension count shows it is the *generic* state of any
   combined system. Product states are the special case.
 </LessonHook>
 
-## Motivation
+## Two systems, described together
 
 Two separate physical systems, two electrons, two qubits, a particle and
 a measuring device, need to be describable *together*, as one combined
@@ -102,10 +102,10 @@ that structure is the **<Term id="tensor-product">tensor product</Term>**.
 Schrödinger named the phenomenon in 1935, calling it *Verschränkung*, and
 described it as "the characteristic trait of quantum mechanics" rather
 than a wrinkle in it. This lesson shows why that emphasis was warranted:
-the failure to factor is not an exotic case, it is what a dimension count
+the failure to factor is not an exotic case; it is what a dimension count
 predicts for almost every state.
 
-## Intuition
+## When nm stops being a count and becomes a dimension
 
 Classically, two systems with $n$ and $m$ possible states have $nm$
 possible joint states, full stop, nothing more to say. Quantum
@@ -115,7 +115,7 @@ dimension $nm$ contains vastly more than just $nm$ <Term id="basis">basis</Term>
 contains every superposition of them too. That extra room is where
 entanglement lives.
 
-## Mathematical Development
+## Construction, bilinearity, and the dimension count
 
 ### Construction and dimension
 
@@ -230,7 +230,7 @@ vector.
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## A postulate, confirmed by every experiment
 
 Composite quantum systems are described by the tensor product of their
 parts' state spaces. This is itself a postulate of quantum mechanics,
@@ -241,7 +241,7 @@ vector in a large composite space is entangled, with a product state as
 the rare exception, not the delicate, hard-to-prepare object it's often
 made out to be.
 
-## Worked Example
+## Is the Bell state a simple tensor?
 
 **Is $\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$ a simple tensor
 $|u\rangle\otimes|v\rangle$ for some $u,v\in\mathbb{C}^2$?**
@@ -295,7 +295,7 @@ standard measure of how entangled it is (mixed states, which this course
 has not met yet, get a longer definition that reduces to this one). It
 runs from $0$ for every product state to $1$ for the Bell state above.
 
-## Common Mistakes
+## Kronecker ordering, and the product assumption
 
 <Callout type="mistake">
 **Assuming every vector in a tensor product space is automatically a
@@ -317,13 +317,150 @@ u_1v_1,\ \ldots)$, never the other way round.
 
 1. What is $\dim(V\otimes W)$ if $V$ has dimension $5$ and $W$ has
    dimension $2$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \dim(V\otimes W) = 5 \times 2 = 10.
+   $$
+
+   Dimensions multiply, because a basis for the product space is built by
+   pairing every basis vector of $V$ with every basis vector of $W$:
+   $\{|v_i\rangle\otimes|w_j\rangle\}$ has $5\times2 = 10$ members, and they are
+   independent and spanning.
+
+   The answer to reject is 7. Adding dimensions is what happens for a **direct
+   sum** $V\oplus W$, which is the space of pairs "either a $V$ vector or a $W$
+   vector, side by side". The tensor product is the space of *joint* states, and
+   the difference between the two is the difference between a system that is in
+   one subsystem or the other and a system that has both at once.
+
+   This one multiplication is the origin of the whole difficulty of simulating
+   quantum systems. Each additional qubit multiplies the dimension by 2 rather
+   than adding 1, so $n$ qubits need $2^n$ complex amplitudes, and a classical
+   machine storing them runs out of memory somewhere around 50 qubits. Nothing
+   subtler than "dimensions multiply" is required to see it.
+
+   </details>
+
 2. Compute $u\otimes v$ for $u=(1,0,-1)\in\mathbb{C}^3$ and
    $v=(2,1)\in\mathbb{C}^2$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   u\otimes v = (2,\ 1,\ 0,\ 0,\ -2,\ -1) \in \mathbb{C}^6.
+   $$
+
+   Each component of $u$ scales a whole copy of $v$, and the copies are stacked
+   in $u$'s order:
+
+   $$
+   u\otimes v = \left(u_1 v_1,\ u_1 v_2,\ u_2 v_1,\ u_2 v_2,\ u_3 v_1,\ u_3 v_2\right) = (1\cdot2,\ 1\cdot1,\ 0\cdot2,\ 0\cdot1,\ -1\cdot2,\ -1\cdot1).
+   $$
+
+   Two checks are available without redoing the products. The dimension must be
+   $3\times2 = 6 \checkmark$. And norms multiply on simple tensors:
+   $\|u\| = \sqrt2$, $\|v\| = \sqrt5$, and
+   $\|u\otimes v\| = \sqrt{4+1+0+0+4+1} = \sqrt{10} = \sqrt2\cdot\sqrt5 \checkmark$.
+
+   The mistakes worth naming are both about ordering. Producing
+   $(2,1,0,0,-2,-1)$ requires $u$'s index to run *slowly* and $v$'s to run
+   *fast*; letting them run the other way gives $v\otimes u$, a different
+   vector. And componentwise multiplication, which would need the two vectors to
+   have the same length and is not defined here at all, is a different operation
+   entirely. The tensor product produces every pairwise product, which is why
+   the output is longer than either input rather than the same length.
+
+   </details>
+
 3. Is $\frac{1}{\sqrt2}(|00\rangle-|01\rangle)$ a simple tensor? If so,
    find $u,v$; if not, explain why.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes. Factor the first qubit out:
+
+   $$
+   \frac{1}{\sqrt2}\left(|00\rangle-|01\rangle\right) = |0\rangle\otimes\frac{1}{\sqrt2}\left(|0\rangle-|1\rangle\right) = |0\rangle\otimes|-\rangle,
+   $$
+
+   so $u = |0\rangle = (1,0)$ and $v = |-\rangle = \tfrac{1}{\sqrt2}(1,-1)$.
+
+   The factoring is available because both terms share the same first qubit.
+   Every basis term has $|0\rangle$ in the first slot, so the first qubit is in
+   a definite state, and only the second is doing anything. This is a product
+   state: measuring qubit 1 always gives 0 and tells you nothing about qubit 2,
+   and measuring qubit 2 gives $0$ or $1$ with probability $\tfrac12$ each,
+   independently.
+
+   The systematic test, for cases where the factoring is not obvious: write the
+   amplitudes as a $2\times2$ grid indexed by (first qubit, second qubit),
+
+   $$
+   \frac{1}{\sqrt2}\begin{pmatrix}1&-1\\0&0\end{pmatrix},
+   $$
+
+   and check its determinant. A simple tensor has amplitude
+   $c_{ij} = u_i v_j$, which makes the grid a rank-1 outer product, so its
+   determinant vanishes. Here $\tfrac12\left[(1)(0)-(-1)(0)\right] = 0$: simple.
+   Run the same test on the Bell state $\tfrac{1}{\sqrt2}(|00\rangle+|11\rangle)$
+   and the grid is $\tfrac{1}{\sqrt2}\begin{pmatrix}1&0\\0&1\end{pmatrix}$ with
+   determinant $\tfrac12 \ne 0$: entangled.
+
+   The trap in this question is the minus sign, which makes the state resemble
+   the Bell-like $\tfrac{1}{\sqrt2}(|00\rangle-|11\rangle)$ at a glance. That
+   one *is* entangled. What matters is not the sign but which slots vary: here
+   only the second index changes between the two terms, there both change
+   together.
+
+   </details>
+
 4. Explain in your own words why a composite system of two 10-dimensional
    subsystems has "more room" for entangled states than a composite of
    two 2-dimensional ones.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the total dimension grows like a product while the family of product
+   states grows like a sum, so the gap between them widens.
+
+   Put the two cases side by side using the counts from this lesson,
+   $\dim(V\otimes W) = nm$ against roughly $n+m-1$ parameters for a simple
+   tensor:
+
+   For two qubits, $n=m=2$: the space has dimension $4$, and product states form
+   a family with about $3$ parameters. The shortfall is $1$.
+
+   For two 10-level systems, $n=m=10$: the space has dimension $100$, and
+   product states form a family with about $19$ parameters. The shortfall is
+   $81$.
+
+   So in the two-qubit case product states are a 3-parameter slice of a
+   4-dimensional space, a thin slice but not a negligible one. In the
+   ten-level case they are a 19-parameter slice of a 100-dimensional space, and
+   almost every direction you could move in leads out of the product family into
+   an entangled state.
+
+   The asymmetry has one source. Specifying a product state means specifying
+   each subsystem separately, and separate descriptions add up. Specifying a
+   general joint state means giving an amplitude for every *combination* of
+   subsystem states, and combinations multiply. Addition never keeps pace with
+   multiplication, and the gap between them is precisely the room entanglement
+   occupies.
+
+   One caution about "more room". Both families are infinite sets, so this is
+   not a claim that one contains more states than the other in any
+   counting sense; it is a statement about *dimension*, the number of
+   independent knobs. The right mental image is a surface inside a solid, not a
+   small pile next to a large one, and as the dimensions grow the surface
+   becomes vanishingly thin relative to the solid it sits in.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -337,7 +474,7 @@ u_1v_1,\ \ldots)$, never the other way round.
 - Dimension counting shows simple tensors are a small slice of $V\otimes
   W$ in general: entanglement is the generic case, not a special one.
 
-## Further Exploration
+## One term vanishing, and what is left
 
 <ChallengePrompt prompt="Is 0.6|00⟩+0.8|11⟩ (unequal-magnitude coefficients, unlike the worked example's equal 1/√2 split) a simple tensor? And in the limit where one coefficient shrinks to 0, does the answer change?">
   Same coefficient-matching method as the worked example. For the limit,

@@ -27,15 +27,15 @@ export const verifyX2Anticommutation: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "Z₀Z₁ doesn't touch qubit 2 at all, so it trivially commutes with anything acting only on qubit 2.",
-      c: "Z₀Z₁ has no operator on qubit 2, so it can't anticommute with X₂ specifically.",
-      d: "X and Z anticommute on the same qubit — Z₁Z₂ does have a Z on qubit 2, so it must anticommute with X₂.",
+      c: "Z₀Z₁ has no operator on qubit 2, so it cannot anticommute with X₂.",
+      d: "X and Z anticommute when they act on the same qubit, and Z₁Z₂ does carry a Z on qubit 2, so it anticommutes with X₂.",
     },
-    defaultIncorrectFeedback: "Check which stabilizer actually contains a Z operator on qubit 2 specifically.",
+    defaultIncorrectFeedback: "Check which stabilizer contains a Z operator on qubit 2.",
   },
   hints: [
     { text: "X and Z anticommute only when acting on the same qubit." },
-    { text: "Z₀Z₁ has Z's on qubits 0,1 — no qubit 2 component." },
-    { text: "Z₁Z₂ has a Z on qubit 2 — this is where the anticommutation comes from." },
+    { text: "Z₀Z₁ has Z's on qubits 0 and 1, and nothing on qubit 2." },
+    { text: "Z₁Z₂ does carry a Z on qubit 2. Count how many qubits the two operators disagree on there." },
   ],
   solution: {
     steps: [{ description: "Only Z₁Z₂ contains a Z on qubit 2, so only it anticommutes with X₂." }],
@@ -43,7 +43,7 @@ export const verifyX2Anticommutation: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "This reproduces the decode table's qubit-2 entry, syndrome (0,1), from operator structure alone.",
-    whyCorrect: "Matches Lesson 2's decode table exactly, now derived rather than just quoted.",
+    whyCorrect: "Matches the decode table from Lesson 2, now derived rather than quoted.",
     whyWrong: [
       { optionId: "b", text: "Names the stabilizer that has no operator on qubit 2 at all, so it commutes with X₂ trivially." },
       { optionId: "c", text: "Would need both stabilizers to touch qubit 2, and only one of them does." },

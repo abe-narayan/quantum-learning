@@ -50,7 +50,7 @@ export const lessonMeta = {
   objectives: [
     "State the formal definition of BQP as a bounded-error, polynomial-time uniform quantum circuit class",
     "Prove precisely that Deutsch-Jozsa's and Simon's algorithms establish oracle-relative query-complexity separations, not unconditional time-complexity separations",
-    "State exactly what the BBBV Ω(√N) lower bound does and does not establish about quantum search, and connect this to the 'provably optimal / promise-dependent / heuristic' taxonomy",
+    "Delimit exactly what the BBBV Ω(√N) lower bound does and does not establish about quantum search, and connect this to the 'provably optimal / promise-dependent / heuristic' taxonomy",
   ],
   related: [
     {
@@ -67,7 +67,7 @@ export const lessonMeta = {
   remains unproven either way.
 </LessonHook>
 
-## Motivation
+## Making the Taxonomy Rigorous
 
 The Quantum Algorithms II capstone closed with a three-way taxonomy of
 quantum advantage claims: "provably optimal" (Grover's), "promise-dependent
@@ -93,7 +93,7 @@ relativization discussion at the end, and it is the single most common
 place where a correct theorem gets quoted as a stronger claim than it
 supports.
 
-## Mathematical Development
+## Deutsch-Jozsa, Simon, and the Relativization Barrier
 
 ### Defining BQP formally
 
@@ -102,21 +102,27 @@ supports.
 $\mathsf{BQP}$ is the class of
 decision problems (languages $L\subseteq\{0,1\}^*$) solvable as follows:
 there exists a polynomial-time-uniform family of quantum circuits
-$\{C_n\}$ — meaning a classical polynomial-time Turing machine outputs
-the description of $C_n$ given $n$ (the circuit family isn't allowed to
-secretly encode uncomputable advice) — built from a fixed finite
-universal gate set, such that for every input $x$ of length $n$, circuit
-$C_n$ acting on $|x\rangle|0\cdots0\rangle$ and measuring a designated
-output qubit outputs $1$ with probability $\geq2/3$ if $x\in L$, and
-$\leq1/3$ if $x\notin L$.
+$\{C_n\}$, built from a fixed finite universal gate set, such that for
+every input $x$ of length $n$, circuit $C_n$ acting on
+$|x\rangle|0\cdots0\rangle$ and measuring a designated output qubit
+outputs $1$ with probability $\geq2/3$ if $x\in L$, and $\leq1/3$ if
+$x\notin L$.
+
+*Polynomial-time-uniform* is the load-bearing adjective: it demands that
+a classical polynomial-time Turing machine, given $n$, print the
+description of $C_n$. Drop that clause and the definition stops
+describing computation. A non-uniform family may hard-code a different
+answer into each $C_n$, so it can decide the unary encoding of any
+language whatsoever, undecidable ones included, with circuits of size
+$O(n)$ that no one can write down.
 
 </DefinitionBox>
 
 The constants $2/3,1/3$ are not fundamental: running $k$ independent
 copies of $C_n$ and taking the majority vote drives the failure
 probability down to $2^{-\Omega(k)}$ (a Chernoff-Hoeffding bound on
-sums of independent bounded random variables — a standard, purely
-classical probability fact, cited here rather than re-derived). So any
+sums of independent bounded random variables, a standard and purely
+classical probability fact, cited here, not re-derived). So any
 constant bounded away from $1/2$ in the definition gives the same class
 $\mathsf{BQP}$, up to a polynomial overhead in circuit size.
 
@@ -134,20 +140,20 @@ what this lesson proves is exactly what the algorithms already built
 Deutsch-Jozsa, Simon's algorithm, and Grover's algorithm are not analyzed
 in the time-complexity model above. They're analyzed in the **query
 (oracle) model**: the algorithm is given black-box access to an unknown
-function $f$ via an oracle gate — `applyBitOracle`'s
+function $f$ via an oracle gate (`applyBitOracle`'s
 $|x\rangle|y\rangle\to|x\rangle|y\oplus f(x)\rangle$, from Quantum
-Algorithms I — and its cost is measured purely by the number of oracle
+Algorithms I), and its cost is measured purely by the number of oracle
 calls (**queries**), with unlimited free classical or quantum computation
 between queries. A **query complexity separation** is a proof that, for
 some specific promise on $f$, quantum algorithms need provably fewer
 queries than classical ones, for *every* possible oracle implementing
 that promise.
 
-This is a fundamentally different, and fundamentally *weaker*, kind of
+This is a different, and strictly *weaker*, kind of
 statement than a time-complexity separation. An oracle hides $f$'s
 internal structure completely. An algorithm can only ask "what is
 $f(x)$?" and never inspect how $f$ is computed. A concrete, real-world
-problem is never actually presented this way: it's given as an explicit
+problem is never presented this way: it's given as an explicit
 circuit or formula that any algorithm, classical or quantum, is free to
 analyze directly, not just query. A query lower bound says nothing about
 what's achievable once that extra structure is exposed.
@@ -157,7 +163,7 @@ what's achievable once that extra structure is exposed.
 **Promise:** $f:\{0,1\}^n\to\{0,1\}$ is either constant or balanced.
 **Claim:** the *exact* (zero-error, worst-case-certain) classical
 deterministic query complexity of deciding which is exactly
-$2^{n-1}+1$, while the exact quantum query complexity is exactly $1$
+$2^{n-1}+1$, while the exact quantum query complexity is $1$
 (the Deutsch-Jozsa circuit, built and verified in Quantum Algorithms I).
 
 *Proof sketch of the classical lower bound:* a deterministic algorithm
@@ -199,7 +205,7 @@ complexity, for this specific oracle problem.
 
 ### The relativization barrier: what neither result proves
 
-Both results are still, precisely, **oracle separations**: formally,
+Both results remain **oracle separations**: formally,
 they show that relative to a specific black-box oracle $O$ implementing
 $f$, $\mathsf{BPP}^O\neq\mathsf{BQP}^O$ (query-complexity analogues,
 more precisely $D^O$ vs. $EQP^O$ for Deutsch-Jozsa and $BPP^O$ vs.
@@ -218,27 +224,37 @@ resolve, or even provide direct evidence toward, either answer for
 concrete, explicitly-given problems.
 
 <InsightBlock>
-  What these results do establish, precisely: a fully rigorous,
-  unconditional fact about information-theoretic query complexity —
-  that quantum interference can extract certain global properties of a
-  black-box function using provably fewer queries than any classical
-  strategy, randomized or not. That's real mathematics and the
-  historical origin of confidence that quantum computers might be more
-  powerful in general (Simon's result directly inspired Shor's
-  algorithm's structure). What they don't establish: anything about
-  $\mathsf{BPP}$ vs. $\mathsf{BQP}$ for ordinary, structured,
-  explicitly-given computational problems — the actual, still-open
-  question.
+  What these results establish is a rigorous, unconditional fact about
+  information-theoretic query complexity. Quantum interference can
+  extract certain global properties of a black-box function using
+  provably fewer queries than any classical strategy, randomized or not.
+  That's real mathematics and the historical origin of confidence that
+  quantum computers might be more powerful in general (Simon's result
+  directly inspired Shor's algorithm's structure). What they don't
+  establish is anything about $\mathsf{BPP}$ vs. $\mathsf{BQP}$ for
+  ordinary, structured, explicitly-given computational problems, which
+  is the actual, still-open question.
 </InsightBlock>
 
 ### Grover's algorithm and the BBBV bound: optimal at what, exactly
 
 <TheoremBox title="BBBV lower bound (Bennett–Bernstein–Brassard–Vazirani, 1997)" provenance="cited">
 
-Any quantum algorithm that
-finds a single marked item among $N$ possibilities using only black-box
-queries to a marking oracle needs $\Omega(\sqrt N)$ queries to succeed
-with probability $\geq2/3$, for *every* possible oracle.
+**Hypotheses.** Fix a search space of $N$ items with exactly one marked.
+The algorithm's only access to the marking predicate is a black-box
+oracle, charged one query per use; between queries it may apply arbitrary
+unitaries on arbitrarily many ancillas, all free. No promise about the
+marked item's identity, and no structure in the predicate beyond
+"exactly one input is marked," is available to it.
+
+**Conclusion.** Any such algorithm that succeeds with probability
+$\geq2/3$ on *every* marking oracle requires $\Omega(\sqrt N)$ queries.
+The quantifier is worth reading carefully: the bound is worst-case over
+oracles, meaning that for any algorithm making $o(\sqrt N)$ queries there
+is *some* marking oracle it fails on. It does not say every individual
+oracle is hard (an algorithm told in advance which item is marked needs
+no queries at all); it says no algorithm can be uniformly fast across all
+of them.
 
 </TheoremBox>
 
@@ -271,7 +287,7 @@ technical analysis on its own):*
     $T$ queries shows the total distinguishing power after $T$ queries
     is $O(T/\sqrt N)$.
   </DerivationStep>
-  <DerivationStep annotation="Succeeding with bounded error needs that distinguishing power to be an actual constant, not something shrinking as $N$ grows.">
+  <DerivationStep annotation="Succeeding with bounded error needs that distinguishing power to be an actual constant, not something shrinking as N grows.">
     Certainty requires this to be $\Omega(1)$, forcing $T=\Omega(\sqrt
     N)$.
   </DerivationStep>
@@ -295,6 +311,8 @@ widely disbelieved without proof, as $\mathsf{P}=\mathsf{NP}$ itself).
 
 <ParametricCurve
   frames={groverCurveFrames}
+  xAxisLabel="qubits n"
+  yAxisLabel="log₁₀(oracle queries)"
   ariaLabel="log10 of classical worst-case query count N=2^n versus log10 of optimalGroverIterations(n), the real BBBV-matching query count computed by this platform's own Grover engine, plotted against n from 2 to 20 on a log y-axis. The classical curve is an exact straight line of slope log10(2); the quantum curve settles onto a straight line of exactly half that slope from n=4 onward, with a visible kink over the first segment where rounding the iteration count to a whole number (1 iteration at n=2, 3 at n=4) still matters"
 />
 
@@ -330,7 +348,7 @@ one algorithm happens to achieve.
 | Deutsch-Jozsa | Promise-dependent, and error-dependent | An exact exponential query gap for zero-error classical algorithms specifically | Any gap at all once classical algorithms are allowed bounded error |
 | Simon's | Oracle-relative, unconditional-in-query-model | An exponential query gap that survives classical randomization ($\Theta(2^{n/2})$ vs. $O(n)$) | $\mathsf{BPP}\neq\mathsf{BQP}$ for ordinary, oracle-free problems (relativization barrier) |
 
-## Physical Interpretation
+## Interference as the Spent Resource
 
 Interference is the resource every one of these algorithms spends, and
 query counting is the ledger that makes its value precise. But the
@@ -341,13 +359,13 @@ why the model is *provable* at all, not a flaw in it: black-box
 lower bounds are a different, more tractable mathematical
 object than lower bounds against every possible algorithm exploiting
 every possible structure, which is precisely what an unconditional
-$\mathsf{BPP}$-vs-$\mathsf{BQP}$ proof would require, and which nobody
+$\mathsf{BPP}$-vs-$\mathsf{BQP}$ proof requires, and which nobody
 currently knows how to do for any problem.
 
 <PredictBeforeReveal
   question="Deutsch-Jozsa needs 2ⁿ⁻¹+1 classical queries for zero-error certainty (129, at n=8). If the classical algorithm is allowed just 1% failure probability instead, how many queries does it need?"
   options={[
-    { label: "Still close to 129 — dropping certainty barely helps", value: "close" },
+    { label: "Still close to 129, because dropping certainty barely helps", value: "close" },
     { label: "Roughly half, around 65", value: "half" },
     { label: "A small constant, around 8", value: "constant" },
   ]}
@@ -355,7 +373,7 @@ currently knows how to do for any problem.
   explanation="Only 8 random queries. If f is balanced, the probability all k random queries happen to agree (falsely looking constant) is 2^-(k-1), so k=8 already pushes failure below 1%. The exponential Deutsch-Jozsa gap is entirely a demand-for-certainty artifact; it evaporates the moment classical algorithms are allowed the same kind of bounded error BQP already permits quantum ones."
 />
 
-## Worked Example
+## Query Counts for the Deutsch-Jozsa Promise
 
 **For $n=8$, state the exact classical (zero-error) and quantum query
 counts for the Deutsch-Jozsa promise, and explain what changes if the
@@ -375,10 +393,11 @@ quantum resource involved at all.
     { label: "classical (exact, worst case)", value: djClassicalWorstCase, highlight: false },
     { label: "quantum (exact, 1 query)", value: djQuantumQueries, highlight: true },
   ]}
-  ariaLabel={`Deutsch-Jozsa query counts for n=${djN}: classical exact worst case ${djClassicalWorstCase} versus quantum exact ${djQuantumQueries}`}
+  maxValue={djClassicalWorstCase}
+  ariaLabel={`Deutsch-Jozsa query counts for n=${djN}, on a linear scale pinned to the classical count: classical exact worst case ${djClassicalWorstCase} versus quantum exact ${djQuantumQueries}, so the quantum bar is a 1/129 sliver`}
 />
 
-## Common Mistakes
+## Reading an Oracle Separation as Unconditional
 
 <Callout type="warning">
 **Treating an oracle separation as proof that $\mathsf{BPP}\neq\mathsf{BQP}$.**
@@ -404,18 +423,205 @@ exploiting number-theoretic structure no black-box bound forbids.
 1. For $n=12$, compute the exact classical (zero-error) and quantum
    query counts for the Deutsch-Jozsa promise, and the number of random
    classical queries sufficient for $99\%$ confidence.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Classical exact: $2^{n-1}+1=2^{11}+1=2049$. Quantum exact: $1$.
+   Randomized at $99\%$ confidence: $8$.
+
+   The exact classical count is an adversary argument. After $2^{11}=2048$
+   queries all returning the same value, the function could still be
+   balanced, because a balanced $f$ on $2^{12}$ inputs takes each value
+   exactly $2048$ times and you may have hit one half exactly. Only the
+   $2049$th query settles it, and that is a worst case rather than a
+   typical one.
+
+   The randomized count comes from the same calculation as the $n=8$ case
+   in the text: a balanced $f$ agrees on $k$ random inputs with probability
+   $2^{-(k-1)}$, so $2^{-(k-1)}\leq0.01$ requires
+   $k\geq1+\log_2100=7.64$, hence $k=8$.
+
+   The number worth staring at is that $8$. It is the *same* $8$ the $n=8$
+   case produced, and it has to be: $n$ does not appear anywhere in
+   $2^{-(k-1)}$. Going from $n=8$ to $n=12$ multiplies the exact classical
+   cost by $16$, from $129$ to $2049$, and leaves the randomized cost
+   completely unmoved. A gap that grows exponentially in one column and is
+   constant in another is the cleanest possible demonstration that the
+   Deutsch-Jozsa separation is about the demand for certainty and not about
+   the problem's difficulty.
+
+   Read alongside the quantum count, the picture is that quantum and
+   randomized classical are both $O(1)$ here, differing by a factor of
+   eight, while exact classical is exponential. Deutsch-Jozsa's famous
+   exponential speedup is a speedup over a restriction nobody imposes on
+   quantum algorithms in the first place.
+
+   </details>
+
 2. Explain, in your own words, why the Baker-Gill-Solovay theorem implies
    that no *relativizing* proof technique (one that would work identically
    given any oracle) can resolve $\mathsf{P}$ vs. $\mathsf{NP}$ or
    $\mathsf{BPP}$ vs. $\mathsf{BQP}$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a relativizing proof proves too much. If its argument works
+   verbatim no matter what oracle both sides are given, then whatever it
+   concludes must hold for *every* oracle, and Baker, Gill and Solovay
+   exhibited two oracles that disagree.
+
+   Spell out the contradiction in both directions. Suppose someone gives a
+   relativizing proof that $\mathsf{P}\neq\mathsf{NP}$. Hand every machine
+   in that proof the oracle $A$ for which BGS showed
+   $\mathsf{P}^A=\mathsf{NP}^A$. The proof, by hypothesis, still goes
+   through and concludes $\mathsf{P}^A\neq\mathsf{NP}^A$, which is false.
+   Now suppose instead someone gives a relativizing proof that
+   $\mathsf{P}=\mathsf{NP}$. Hand it the oracle $B$ for which
+   $\mathsf{P}^B\neq\mathsf{NP}^B$, and it concludes something false again.
+   Since BGS produced both $A$ and $B$, no relativizing argument can land
+   on either answer.
+
+   The reason this bites is that the standard toolkit relativizes.
+   Simulation and diagonalization, the technique behind the time and space
+   hierarchy theorems and behind the undecidability of the halting problem,
+   treat a machine as a black box to be run step by step. Attach the same
+   oracle to the simulator and the simulated machine and every step of the
+   argument reads identically. So the most powerful general technique
+   available in the 1970s was ruled out by a 1975 theorem, which is why the
+   result was so deflating.
+
+   The same reasoning transfers to $\mathsf{BPP}$ versus $\mathsf{BQP}$
+   because both relativized answers are again realizable: Simon's oracle
+   separates them, while any $\mathsf{PSPACE}$-complete oracle collapses
+   both classes onto $\mathsf{PSPACE}$ and makes them equal. Two oracles,
+   two opposite verdicts, same conclusion.
+
+   Two things this does not say, and both matter for reading the
+   literature. It is not a proof that the questions are unresolvable; it is
+   a proof that one family of techniques cannot resolve them. And
+   non-relativizing techniques genuinely exist: arithmetization, which
+   turns Boolean formulas into low-degree polynomials, produced
+   $\mathsf{IP}=\mathsf{PSPACE}$, a theorem that is false relative to some
+   oracles and therefore could not have been obtained by any relativizing
+   argument. Later barriers, natural proofs and algebrization, were
+   formulated precisely to explain why arithmetization did not go on to
+   settle $\mathsf{P}$ versus $\mathsf{NP}$ either. Relativization is the
+   first wall, not the last one.
+
+   </details>
+
 3. `optimalGroverIterations(14)` and $N=2^{14}$ are both shown in this
    lesson's chart. Using BBBV, explain why no future quantum algorithm,
    no matter how cleverly designed, could ever solve unstructured
    search on $N=2^{14}$ marked-item instances in, say, $50$ queries
    worst-case, guaranteed for every possible oracle.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $50$ queries the best success probability *any* quantum algorithm
+   can achieve on the worst-case oracle is about $50.4\%$, short of the
+   $2/3$ that bounded-error success requires. The threshold sits at $61$
+   queries.
+
+   Start with the setting. $N=2^{14}=16384$, so $\sqrt N=128$ and
+   `optimalGroverIterations(14)` returns
+   $\lfloor\tfrac\pi4\cdot128\rfloor=100$. Asking for $50$ is asking for
+   half of Grover's count.
+
+   Being precise about which theorem does the work matters here, and it is
+   worth separating two claims that get quoted interchangeably. BBBV proves
+   $T=\Omega(\sqrt N)$, an asymptotic statement with an unstated constant.
+   At a single fixed $N$ it forbids nothing on its own, because a constant
+   is always compatible with a single data point. What settles the concrete
+   question is Zalka's sharpening (1999), which shows Grover's algorithm is
+   *exactly* optimal: for every query budget $T$, no quantum algorithm
+   achieves a higher worst-case success probability than Grover's own
+   $\sin^2\big((2T+1)\theta\big)$, where $\sin\theta=1/\sqrt N$.
+
+   Evaluate it. With $\theta=\arcsin(1/128)=0.0078126$ rad,
+
+   $$
+   T=50:\quad \sin^2(101\theta)=\sin^2(0.78907)=0.5037.
+   $$
+
+   So a $50$-query algorithm is right barely more often than a coin flip on
+   whether it found the item, and that is the *ceiling*, not a particular
+   algorithm's performance. Solving for the threshold,
+   $(2T+1)\theta\geq\arcsin\sqrt{2/3}=0.95532$ gives $2T+1\geq122.28$,
+   hence $T\geq61$. At $T=61$ the success probability is $0.6720$, just
+   clearing $2/3$; at $T=60$ it is $0.6572$, just short.
+
+   Notice the shape of the guarantee, since it is the part the question's
+   phrase "for every possible oracle" is pointing at. Nothing here says a
+   $50$-query algorithm always fails. An algorithm told in advance which
+   item is marked needs zero queries, and any algorithm gets lucky on
+   *some* oracles. The bound is worst-case over the $N$ possible marking
+   oracles: for any $50$-query algorithm there exists a marked item on
+   which it succeeds with probability below $2/3$. Query lower bounds are
+   statements about uniformity across instances, and reading them as
+   statements about individual instances is the standard misreading.
+
+   The final scope note is the one the lesson keeps returning to. All of
+   this applies to a genuinely unstructured search, where the only handle
+   on the problem is oracle calls. A $2^{14}$-element search space that
+   arises from a structured problem, a SAT formula or a database with an
+   index, is not covered at all.
+
+   </details>
+
 4. Why does Simon's algorithm's separation survive classical
    randomization while Deutsch-Jozsa's does not? Point to the specific
    step in each classical lower-bound argument that differs.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because Deutsch-Jozsa's classical lower bound is an argument about
+   *possibility* and Simon's is an argument about *probability*. Allowing
+   error destroys the first and leaves the second untouched.
+
+   **Deutsch-Jozsa, and the step that breaks.** The $2^{n-1}+1$ bound comes
+   from an adversary: after $2^{n-1}$ agreeing queries, a balanced function
+   consistent with everything seen so far still exists, so a zero-error
+   algorithm *cannot* answer. The load-bearing word is "exists". The moment
+   the algorithm is allowed to be wrong one time in a hundred, it no longer
+   needs to eliminate that possibility, only to bound its probability, and
+   the bound is $2^{-(k-1)}$ after $k$ random queries. The adversary's
+   surviving function is still there; it has simply become
+   exponentially unlikely, and unlikely is now good enough. Nothing about
+   the argument is repaired by working harder, because the argument was
+   never about how hard the problem is. Deutsch-Jozsa's promise makes the
+   problem trivially easy on average and hard only at the last, exact
+   query.
+
+   **Simon, and the step that survives.** The $\Theta(2^{n/2})$ bound is a
+   collision bound and is probabilistic from the start. Until the algorithm
+   queries two inputs $x$ and $x\oplus s$, everything it has seen is a set
+   of distinct values whose distribution is essentially independent of $s$,
+   so it has learned nothing and must guess among roughly $2^n$
+   possibilities. After $k$ queries there are $\binom k2\approx k^2/2$
+   pairs, each colliding with probability about $2^{-n}$ for a uniformly
+   random hidden $s$, so the chance of having seen any collision at all is
+   about $k^2/2^{n+1}$. Making that a constant requires $k=\Omega(2^{n/2})$.
+
+   Every quantity in that paragraph is already a probability, and the
+   conclusion is already of the form "succeeds with probability at most
+   $\epsilon$". A randomized algorithm allowed to fail a third of the time
+   faces exactly the same accounting, because the obstruction is
+   informational rather than logical: the algorithm's transcript genuinely
+   does not contain the answer, so there is nothing for extra cleverness or
+   extra tolerance for error to extract.
+
+   The one-line version: Deutsch-Jozsa is easy on average and hard only in
+   the worst case for exact algorithms, while Simon's problem is hard on
+   average. Only average-case hardness survives the move to bounded error,
+   which is why Simon's separation was the one that mattered historically
+   and the one whose period-finding structure Shor's algorithm inherited.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -435,11 +641,11 @@ exploiting number-theoretic structure no black-box bound forbids.
   black-box search specifically* (BBBV's matching lower bound), not a
   blanket statement about quantum search on structured problems like
   $\mathsf{NP}$-complete instances.
-- This proves, precisely, the "provably optimal / promise-dependent /
+- This proves the "provably optimal / promise-dependent /
   heuristic" taxonomy the Quantum Algorithms II capstone named but left
   unproven.
 
-## Further Exploration
+## From Query Counts to Real Hamiltonians
 
 <NextDiscovery>
   [Hamiltonian Simulation and Trotterization](/lessons/quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization)

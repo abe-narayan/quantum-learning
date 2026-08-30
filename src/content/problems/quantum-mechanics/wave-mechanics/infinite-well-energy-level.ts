@@ -14,14 +14,14 @@ export const infiniteWellEnergyLevel: NumericProblem = {
   },
   question: {
     type: "numeric",
-    prompt: "For an infinite square well of width L = 6 (natural units, hbar = m = 1), find E_2 = n^2*pi^2/(2*L^2) for n = 2.",
-    inputHint: "a decimal",
+    prompt: "For an infinite square well of width L = 6 (natural units, hbar = m = 1), find the energy E_2 of the n = 2 level.",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
     value: 0.548311,
     tolerance: 0.001,
-    incorrectFeedback: "E_n = n^2*pi^2/(2*L^2). Substitute n=2, L=6 carefully — L is squared in the denominator.",
+    incorrectFeedback: "E_n = n^2*pi^2/(2*L^2). Substitute n=2, L=6 carefully: L is squared in the denominator.",
     nearMisses: [
       { value: (4 * Math.PI ** 2) / 12, tolerance: 0.005, feedback: "The width is squared in the denominator: 2L² = 72, not 2L = 12." },
       { value: Math.PI ** 2 / 72, tolerance: 0.002, feedback: "That is E₁. The level index enters as n², so E₂ is four times larger." },
@@ -29,8 +29,9 @@ export const infiniteWellEnergyLevel: NumericProblem = {
     ],
   },
   hints: [
-    { text: "E_n = n^2 * pi^2 / (2*L^2), with hbar=m=1." },
-    { text: "Substitute n=2, L=6: E_2 = 4*pi^2/72." },
+    { text: "The walls force the wavefunction to vanish at both ends, so only wavenumbers fitting a whole number of half wavelengths across the well survive. Start from the wavenumber the n = 2 state must carry." },
+    { text: "Convert that wavenumber into an energy with the free-particle relation, which in these units is E = k^2/2." },
+    { text: "The quantum number enters squared and the width enters squared in the denominator. Confirm both exponents before evaluating pi^2 numerically." },
   ],
   solution: {
     steps: [

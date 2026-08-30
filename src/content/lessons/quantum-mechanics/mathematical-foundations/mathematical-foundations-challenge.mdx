@@ -39,11 +39,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="When three problems read as one">
 Something has quietly changed over the last ten lessons: a problem that mixes trace, Hermiticity, and the Born rule in a single sentence no longer looks like three separate problems stapled together.
 </LessonHook>
 
-## Motivation
+## The payoff of building it one piece at a time
 
 A mixed problem reading as one problem is the
 real payoff of building complex numbers, vector spaces, inner products,
@@ -59,10 +59,10 @@ lesson they come from, that the toolkit already fits together.
   caption="John von Neumann, whose 1932 Mathematical Foundations of Quantum Mechanics first assembled Hilbert spaces, Hermitian operators, and the Born rule into the single rigorous framework this course has spent ten lessons rebuilding piece by piece."
   credit="Los Alamos National Laboratory / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:JohnvonNeumann-LosAlamos.jpg"
-  license="Attribution, LANL"
+  license="Attribution (LANL)"
 />
 
-## The Toolkit You Now Have
+## The toolkit you now have
 
 Ten separate results, each earned in its own lesson, each still doing
 work well beyond the lesson that introduced it:
@@ -80,7 +80,7 @@ work well beyond the lesson that introduced it:
 | Tensor Products | $\dim(V\otimes W)=\dim(V)\dim(W)$; entanglement is generic | Composite-system states |
 | Probability and Quantum States | Born rule; $\langle A\rangle=\langle\psi\lvert A\rvert\psi\rangle$ derived, not assumed | All of quantum mechanics from here on |
 
-## Worked Synthesis Examples
+## Problems that cross lesson boundaries
 
 **1. A real, symmetric $2\times2$ matrix $M$ satisfies $M^2=I$. Is $M$
 necessarily unitary?**
@@ -145,7 +145,7 @@ renormalization step needed. This combines the Inner Products lesson's
 norm definition with the Tensor Products lesson's multiplicative rule for
 inner products on simple tensors.
 
-## Common Mistakes, Revisited
+## The error that spans the whole course
 
 <Callout type="warning">
 **The single most common error across this entire course: using an
@@ -172,34 +172,282 @@ notation; always check a source's convention before mixing formulas.
    rotation matrix $\begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix}$
    or a reflection (same form with an overall sign flip on one column),
    using the fact that its columns must form an orthonormal set.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Write the columns as $c_1 = (a,c)^\mathsf{T}$ and $c_2 = (b,d)^\mathsf{T}$
+   and impose orthonormality one condition at a time.
+
+   $\|c_1\| = 1$ gives $a^2+c^2 = 1$. Every real solution of that equation is a
+   point on the unit circle, so there is an angle $\theta$ with
+   $a = \cos\theta$ and $c = \sin\theta$. That is a parametrization, not an
+   assumption: no generality has been lost.
+
+   $c_2 \perp c_1$ gives $ab+cd = 0$, so $c_2$ is perpendicular to $c_1$ in
+   $\mathbb{R}^2$. The perpendicular line to a given direction is
+   one-dimensional, so $c_2$ must be a multiple of $(-\sin\theta,\cos\theta)$.
+
+   $\|c_2\| = 1$ fixes that multiple to $\pm1$, and only those two, since the
+   perpendicular direction is already a unit vector.
+
+   The two signs give the two families. With $+$:
+
+   $$
+   U = \begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix}, \qquad \det U = \cos^2\theta+\sin^2\theta = +1,
+   $$
+
+   a rotation. With $-$:
+
+   $$
+   U = \begin{pmatrix}\cos\theta&\sin\theta\\\sin\theta&-\cos\theta\end{pmatrix}, \qquad \det U = -\cos^2\theta - \sin^2\theta = -1,
+   $$
+
+   a reflection, in the line at angle $\theta/2$ through the origin.
+
+   The determinant is what separates them and it is the honest invariant here.
+   Rotations preserve orientation, reflections reverse it, and no continuous
+   family connects the two: a real $2\times2$ unitary group has two disconnected
+   components. Notice also that conjugation never entered the argument, because
+   the entries were assumed real, so "unitary" collapsed to "orthogonal" from
+   the first line.
+
+   The step most often skipped is the last one. Having found $c_2$ perpendicular
+   to $c_1$, it is tempting to write down $(-\sin\theta,\cos\theta)$ and stop,
+   which quietly throws away the reflections that the question explicitly asks
+   for. Orthogonality fixes the line; only normalization fixes the length, and
+   it leaves a sign behind.
+
+   </details>
+
 2. A Hermitian operator has eigenvalues $1, 1, 4$ (one repeated). Is a
    generic pair of eigenvectors from the repeated eigenvalue $1$
    guaranteed orthogonal to each other? Contrast with the eigenvector for
    eigenvalue $4$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No for the repeated pair, yes for the eigenvector of 4.
+
+   The orthogonality theorem is stated for eigenvectors belonging to
+   *different* eigenvalues, and its proof leans on that hypothesis at the final
+   step: it derives $(\lambda_2-\lambda_1)\langle u|v\rangle = 0$ and can only
+   conclude $\langle u|v\rangle = 0$ because $\lambda_1 \ne \lambda_2$ makes the
+   first factor nonzero. For two eigenvectors sharing $\lambda = 1$, the
+   equation reads $0 \cdot \langle u|v\rangle = 0$, which is true for every
+   value of the overlap and therefore says nothing.
+
+   Concretely, take $A = \mathrm{diag}(1,1,4)$. Both $(1,0,0)$ and
+   $(1,1,0)/\sqrt2$ are eigenvectors with eigenvalue 1, and their overlap is
+   $1/\sqrt2 \ne 0$. Nothing is broken; they simply are not orthogonal.
+
+   What *is* guaranteed is weaker and still enough. The eigenvectors for
+   $\lambda = 1$ form a two-dimensional subspace, the eigenspace, and any
+   orthonormal basis of that subspace consists of eigenvectors for the same
+   eigenvalue. So an orthogonal pair can always be *chosen*, by running
+   Gram-Schmidt inside the eigenspace, and the spectral theorem's promise of an
+   orthonormal eigenbasis survives. The choice just has to be made explicitly
+   rather than falling out of the theorem.
+
+   The eigenvector for $\lambda = 4$ is in a different position. Its eigenvalue
+   differs from 1, so the theorem applies with no caveat, and it is orthogonal
+   to *every* vector in the $\lambda=1$ eigenspace, whichever basis you picked
+   there.
+
+   The practical consequence, for a physicist rather than an algebraist: a
+   degenerate eigenvalue means the measurement outcome 1 does not determine the
+   post-measurement state. The state collapses into the eigenspace, not onto a
+   line, and pinning it down further requires a second observable that
+   distinguishes within that subspace. Degeneracy is the formal reason atoms
+   need more than one quantum number.
+
+   </details>
+
 3. Two systems have dimensions $2$ and $3$. What is the dimension of their
    combined state space, and how many free parameters does a simple tensor
    $u\otimes v$ carry (the $n+m-1$ count from the Tensor Products lesson)?
    Compare the two numbers, and say what the gap between them means for
    how common entanglement is.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \dim(V\otimes W) = 2\times3 = 6, \qquad n+m-1 = 2+3-1 = 4.
+   $$
+
+   The gap is 2.
+
+   The $-1$ in the parameter count is worth being able to justify. A simple
+   tensor is specified by a direction for $u$ and a direction for $v$, but the
+   pair $(u,v)$ and the pair $(2u,\ v/2)$ give the same product, so one scale
+   parameter is shared between the two factors and must not be counted twice.
+   That leaves $n + m - 1$.
+
+   So the product states form a 4-parameter family sitting inside a
+   6-dimensional space. They do not fill it, and the two dimensions they miss
+   are where entanglement lives. In the strict sense, the simple tensors are a
+   measure-zero subset: pick a vector in $V\otimes W$ at random and the
+   probability that it factors is zero. Entanglement is not an exotic special
+   case that has to be engineered, it is the generic situation, and product
+   states are the rarity.
+
+   The gap also grows with the dimensions, which is the real headline. At
+   $n=m=2$ it is $4-3=1$; at $n=m=3$, $9-5=4$; at $n=m=10$, $100-19=81$. A
+   product grows faster than a sum, so the more room two systems have
+   individually, the more overwhelmingly their joint states tend to be
+   entangled.
+
+   One caution about the word "parameters": the counts above are complex
+   parameters before normalization and global phase are removed, and both
+   removals shave a small constant off each side. They do not change the
+   comparison, which is what the question turns on, but a count that disagrees
+   with these by one or two is probably measuring the physical state space
+   rather than the vector space.
+
+   </details>
+
 4. A state $|\psi\rangle$ is measured with a Hermitian observable whose
    spectral decomposition is $A = 2|e_1\rangle\langle e_1| +
    5|e_2\rangle\langle e_2|$. If $\langle A\rangle = 3.5$ and there are
    only two possible outcomes, find $P(2)$ and $P(5)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   P(2) = P(5) = 0.5.
+   $$
+
+   Two equations, two unknowns. Normalization gives $P(2)+P(5) = 1$, and the
+   expectation value gives
+
+   $$
+   2P(2) + 5P(5) = 3.5.
+   $$
+
+   Substituting $P(2) = 1 - P(5)$:
+   $2 - 2P(5) + 5P(5) = 3.5$, so $3P(5) = 1.5$ and $P(5) = 0.5$, hence
+   $P(2) = 0.5$.
+
+   There is a faster reading. $3.5$ sits exactly halfway between the two
+   eigenvalues 2 and 5, and an expectation value is the probability-weighted
+   average of the outcomes, so the midpoint can only be reached by weighting
+   them equally. More generally, $\langle A\rangle$ divides the interval
+   $[\lambda_{\min}, \lambda_{\max}]$ in the ratio of the two probabilities,
+   which is a useful sanity check on any two-outcome calculation.
+
+   Note what the question did *not* give you: $|\psi\rangle$ itself. It is not
+   needed, and it is not even determined by the data. Any state with
+   $|\langle e_1|\psi\rangle|^2 = |\langle e_2|\psi\rangle|^2 = \tfrac12$ works,
+   and there is a whole circle of them differing by the relative phase between
+   the two components, all sharing this $\langle A\rangle$. An expectation value
+   is a single number extracted from a state; it cannot run backwards to recover
+   one.
+
+   The answer to reject is anything outside $[2,5]$, or a negative probability.
+   An expectation value always lies between the smallest and largest
+   eigenvalues, so if the algebra produces $P(5) = 1.2$ the arithmetic went
+   wrong before the physics did.
+
+   </details>
+
 5. Explain why the characteristic equation, completeness relation, and
    Born rule are each, in their own way, consequences of requiring
    *consistency* (probabilities summing to $1$, matrix elements
    determining an operator fully) rather than being independent
    assumptions bolted onto the theory.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The common thread is that each one is forced once you insist a
+   previously-made commitment be honoured everywhere, rather than being an extra
+   input.
+
+   **The characteristic equation** is forced by the demand that an eigenvector
+   be nonzero. $A|v\rangle = \lambda|v\rangle$ rearranges to
+   $(A-\lambda I)|v\rangle = 0$, and asking for a nonzero solution is asking for
+   $A - \lambda I$ to be non-invertible, which is exactly
+   $\det(A-\lambda I) = 0$. Nobody chose that polynomial; it is the
+   invertibility criterion applied to a demand already made.
+
+   **The completeness relation** is forced by the demand that expanding a vector
+   in a basis and reassembling it return the same vector.
+   $\sum_i |e_i\rangle\langle e_i|\psi\rangle = |\psi\rangle$ for every
+   $|\psi\rangle$ is precisely the statement that the coefficients
+   $\langle e_i|\psi\rangle$ lose nothing, which is what "basis" was supposed to
+   mean. Written as an operator identity that reads
+   $\sum_i|e_i\rangle\langle e_i| = I$, and everything downstream, matrix
+   elements determining an operator, the derivation of matrix multiplication,
+   spectral decomposition, is that one identity inserted where it is convenient.
+
+   **The Born rule** is the one place where the argument is different in kind,
+   and it is worth being honest about that. Given that probabilities must be
+   non-negative, sum to 1 across any orthonormal basis, and be unchanged by
+   global phase, $|\langle e_i|\psi\rangle|^2$ is a natural candidate and is
+   forced by normalization to have the right total, since
+   $\sum_i|\langle e_i|\psi\rangle|^2 = \langle\psi|\psi\rangle = 1$. Gleason's
+   theorem strengthens this to near-inevitability: in dimension three or higher,
+   the squared overlap is the *only* probability assignment consistent with
+   those requirements. But the link from mathematical object to observed
+   frequency is still a postulate; consistency narrows the field to one
+   candidate rather than deriving the candidate from nothing.
+
+   So the honest summary is that two of the three are theorems dressed as
+   definitions, and the third is a postulate that consistency leaves almost no
+   freedom in. The reason to see it this way is that it changes what you have to
+   remember: a formalism whose pieces are consequences of each other can be
+   reconstructed from a couple of commitments, whereas a list of independent
+   axioms can only be memorized.
+
+   </details>
+
 6. Looking back across all eleven lessons: which single result would you
    consider the most important prerequisite for everything that comes
    after it in this course? Defend your choice in two or three sentences.
+
+   <details className="answer-reveal">
+   <summary>A defensible answer</summary>
+
+   This one has no single correct answer, and it is not marked on which result
+   you name. It is marked on whether the defence actually traces dependencies,
+   so read the argument below as one worked example of the kind of case to make,
+   not as the answer.
+
+   **The spectral theorem** is the strongest candidate. It is what lets a
+   Hermitian operator be written $A = \sum_i \lambda_i|e_i\rangle\langle e_i|$,
+   and once that is available the measurement postulate has something to attach
+   to: the $\lambda_i$ are the possible outcomes, the $|e_i\rangle\langle e_i|$
+   are the projectors collapse acts by, and the Born rule has an orthonormal
+   basis to compute overlaps against. Without it there is no guarantee that a
+   general observable even *has* enough eigenvectors to span the space, and
+   expectation values, degeneracy, compatible observables and the whole
+   measurement chapter have nothing to stand on.
+
+   Two other choices are at least as defensible if the case is made properly.
+   The **inner product with its conjugation** is more foundational in the strict
+   sense, since the spectral theorem's statement uses orthogonality, which does
+   not exist until an inner product does, and no probability is real or
+   non-negative without it. And **completeness**, $\sum_i|e_i\rangle\langle e_i| = I$,
+   is the most heavily used, appearing in the derivation of matrix
+   multiplication, in every basis change, and inside the spectral theorem
+   itself.
+
+   What would *not* be a good answer is naming a result and then praising it in
+   the abstract. The question asks for a prerequisite, so the defence has to
+   name at least one specific later result that fails without it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
 <Callout type="note">
 **One honest note about what comes next.** This course kept its promise:
 everything in it was built from algebra, trigonometry and the three power
-series stated in Lesson 2, with no calculus assumed anywhere. That
+series stated in Lesson 1, Complex Numbers for Physics, with no calculus
+assumed anywhere. That
 promise covers *this* course only. From **From Classical to Quantum**
 onward, single-variable calculus is assumed rather than taught, and there
 is no calculus lesson elsewhere in this curriculum to send you to. What
@@ -213,7 +461,7 @@ The first lesson that needs any of it is **Time Evolution and the
 Schrödinger Equation**, which uses the last two. If those are unfamiliar,
 any introductory single-variable calculus text covers all of them well
 before its midpoint, and none of the material below the Quantum
-Mechanics pillar's Wave Mechanics course needs more than that.
+Mechanics track's Wave Mechanics course needs more than that.
 </Callout>
 
 ## Summary
@@ -221,20 +469,20 @@ Mechanics pillar's Wave Mechanics course needs more than that.
 - No new mathematics. This lesson exercises the ten lessons before it in
   combination.
 - The recap table above is worth returning to as a reference throughout
-  the rest of the Quantum Mechanics pillar.
+  the rest of the Quantum Mechanics track.
 - The recurring theme across every derivation in this course:
   consistency requirements (norms staying $1$, matrix elements
   determining an operator, probabilities summing to $1$) are what force
   the structure. Nothing here was arbitrary.
 
-## Further Exploration
+## Two directions this toolkit opens
 
 <NextDiscovery>
 **Mathematical Foundations for Quantum Mechanics** is complete. Two
 directions wait on this toolkit, not one: **From Classical to Quantum**
 takes this same linear algebra and builds the postulates, dynamics, and
 physical predictions of quantum theory on top of it, while the **Quantum
-Computing** pillar spends its entire first course applying it to qubits,
+Computing** track spends its entire first course applying it to qubits,
 gates, and circuits. State vectors, entanglement, measurement: all of it
 downstream of a lesson already sitting in the table above.
 </NextDiscovery>

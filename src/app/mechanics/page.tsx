@@ -16,8 +16,9 @@ import {
   pillarFacts,
   pillarReadoutItems,
 } from "@/components/pillar/PillarFraming";
+import { TierLadder } from "@/components/pillar/TierLadder";
 import { LazyWavefunctionHeroExplorer } from "@/components/simulators/wavefunction-explorer/LazyWavefunctionHeroExplorer";
-import { getCoursesByPillar } from "@/lib/content/curriculum";
+import { COURSES, getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { pillarVisual } from "@/lib/design/pillars";
 import { BASE_URL, buildBreadcrumbSchema, buildCourseListSchema, pillarUrl } from "@/lib/structuredData";
@@ -34,7 +35,7 @@ export const metadata: Metadata = buildPageMetadata({
  * Mechanics reads as editorial physics writing: a measured reading column,
  * a real numerical simulation sitting where a textbook would put a worked
  * figure, and the curriculum below laid out as a derivation chain rather
- * than a card grid. This is the pillar's own composition language —
+ * than a card grid. This is the pillar's own composition language,
  * Computing, Hardware and Software each get a structurally different one
  * (see their page files), so the four pillars stay visually distinct rather
  * than four retints of one template.
@@ -50,9 +51,9 @@ export default async function MechanicsPage() {
   ]);
   const field = pillarVisual("quantum-mechanics");
 
-  // Every figure this page quotes about itself — course/lesson/hour counts,
+  // Every figure this page quotes about itself, course/lesson/hour counts,
   // the background it assumes, its difficulty range, and the real first
-  // course and lesson — comes from one derivation over the real registries.
+  // course and lesson, comes from one derivation over the real registries.
   // See `pillarFacts`; the other three track pages call the same function so
   // none of these can drift apart. `getCourseHref` resolves to the
   // `/courses/<slug>` overview (see courseHref.ts), whose own hero has the
@@ -60,6 +61,30 @@ export default async function MechanicsPage() {
   const facts = pillarFacts(courses, lessons);
   const { firstCourse, firstLesson } = facts;
   const heroHref = firstCourse ? getCourseHref(firstCourse.slug, firstLesson?.slug) : "/learn";
+
+  // Which of this track's courses another track's course actually declares as
+  // a prerequisite. `CourseTimeline` already draws this edge station by
+  // station ("Leads to Computing"); the count is derived from the same
+  // `Course.prerequisites` field so the margin note beside the rail cannot
+  // claim a number the rail does not draw.
+  const loadBearing = courses.filter((course) =>
+    COURSES.some(
+      (other) => other.pillar !== course.pillar && other.prerequisites.includes(course.slug)
+    )
+  );
+
+  // The other direction, and the one the curriculum paragraph below used to
+  // get wrong. It said "each course built directly on the one before it",
+  // which the `CourseTimeline` immediately underneath contradicts by drawing
+  // two edges out of this track into Computing and one branch that skips a
+  // station. Counted from the same `prerequisites` field the rail draws, so
+  // the sentence and the diagram cannot disagree again.
+  const borrowsFromOtherTracks = courses.filter((course) =>
+    course.prerequisites.some((slug) => {
+      const prerequisite = COURSES.find((entry) => entry.slug === slug);
+      return Boolean(prerequisite) && prerequisite!.pillar !== course.pillar;
+    })
+  );
 
   return (
     <PillarScope pillar="quantum-mechanics">
@@ -74,14 +99,23 @@ export default async function MechanicsPage() {
           <SectionTitle level={1} size="xl" className="mt-4">
             Reality, from first principles
           </SectionTitle>
+          {/* Was "not as a computing prerequisite", which read as a claim of
+              independence from the Computing track and is contradicted eight
+              pixels down by `PillarBriefing`, which derives "Assumes: Quantum
+              Gates & Circuits (in Computing) and Entanglement & Measurement
+              (in Computing)" from the curriculum's own `prerequisites`. Two
+              courses here genuinely need that material (see the notes in
+              curriculum.ts), so the copy gave way, not the graph. What is
+              still true, and is the point the clause was reaching for, is the
+              register: this track is taught for the physics, not as a
+              service course. */}
           <Lede className="mt-5">
-            Quantum theory on its own terms, not as a computing prerequisite: the actual
-            mathematics reality obeys, built up rigorously enough that its results are derived here
-            rather than asserted.
+            Quantum theory on its own terms: the actual mathematics reality obeys, built up
+            rigorously enough that its results are derived here rather than asserted.
           </Lede>
         </Reveal>
         <Reveal delay={80}>
-          <p className="mt-4 max-w-[42rem] text-base leading-relaxed text-muted-foreground">
+          <p className="mt-4 max-w-lede text-base leading-relaxed text-muted-foreground">
             Linear algebra and complex numbers first, then state vectors, operators, and the
             Schrödinger equation, built up rigorously through the hydrogen atom and open quantum
             systems. Build intuition with the Wavefunction Explorer (real wave-packet evolution
@@ -90,11 +124,20 @@ export default async function MechanicsPage() {
           </p>
         </Reveal>
 
+        {/* The four-rung ladder, identical on all six pillar pages, above the
+            pillar-specific briefing. It is what says "this is the ground
+            floor" here and "this is the summit" on /apex, and it has to be
+            the same object in the same place on both for that contrast to be
+            readable at all. */}
+        <Reveal delay={90}>
+          <TierLadder pillar="quantum-mechanics" className="mt-8" />
+        </Reveal>
+
         <Reveal delay={100}>
           <PillarBriefing
             className="mt-8"
             facts={facts}
-            outcome="Derive the hydrogen atom's energy levels from the Schrödinger equation, and compute a tunneling probability, yourself — not recognise them, derive them."
+            outcome="Derive the hydrogen atom's energy levels from the Schrödinger equation, and compute a tunneling probability, yourself: not recognise them, derive them."
           />
         </Reveal>
 
@@ -125,7 +168,7 @@ export default async function MechanicsPage() {
         <Reveal y={20} className="mt-10 block">
           <Instrument
             label="Live simulation"
-            footnote="A real split-operator time evolution running in your browser, not a canned animation — the same engine behind Wave Mechanics' Wavefunction Explorer."
+            footnote="A real split-operator time evolution running in your browser, not a canned animation; it is the same engine behind Wave Mechanics' Wavefunction Explorer."
           >
             <LazyWavefunctionHeroExplorer />
           </Instrument>
@@ -153,14 +196,32 @@ export default async function MechanicsPage() {
             {courses.length} courses, one derivation at a time
           </SectionTitle>
           <p className="mt-3 text-muted-foreground">
-            Foundational math through open quantum systems, each course built directly on the one
-            before it.
+            Foundational math through open quantum systems, in the order the derivations need.
+            {borrowsFromOtherTracks.length > 0 ? (
+              <>
+                {" "}
+                {borrowsFromOtherTracks.length} of them also{" "}
+                {borrowsFromOtherTracks.length === 1 ? "draws" : "draw"} on a course from another
+                track, and the rail below draws that edge where it happens.
+              </>
+            ) : null}
           </p>
         </Reveal>
 
         <Marginalia className="mt-6">
-          The rail below spans the full width deliberately — a derivation chain, not a card grid,
-          reads left to right the way the courses themselves build on each other.
+          {loadBearing.length > 0 ? (
+            <>
+              {loadBearing.length} of these {courses.length} courses{" "}
+              {loadBearing.length === 1 ? "is" : "are"} a prerequisite for a course in another
+              track. The rail below marks each one with the track that waits on it, so the order it
+              draws is the order the rest of the curriculum was built against.
+            </>
+          ) : (
+            <>
+              The rail below runs in curriculum order and fills as far as you have read. Each
+              station names the courses it requires.
+            </>
+          )}
         </Marginalia>
       </Section>
 
@@ -172,9 +233,13 @@ export default async function MechanicsPage() {
         </div>
       </FullBleed>
 
+      {/* The rail above is the whole chain at once; this is the manifest,
+          module by module. The label is what tells a reader the width change
+          was a change of object rather than the same list drawn twice. */}
       <Section width="reading" tight>
         <Reveal delay={80} className="block">
-          <div className="mt-2 border-l-2 border-pillar-edge pl-6">
+          <p className="tech-label">Every lesson, course by course</p>
+          <div className="mt-4 border-l-2 border-pillar-edge pl-6">
             <CourseList courses={courses} lessons={lessons} />
           </div>
         </Reveal>

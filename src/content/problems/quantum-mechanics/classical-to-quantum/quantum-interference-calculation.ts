@@ -45,6 +45,6 @@ export const quantumInterferenceCalculation: NumericProblem = {
   explanation: {
     correctIdea: "Amplitudes add as complex numbers before the probability is computed by squaring the magnitude.",
     whyCorrect: "The cross-term formula gives the same result directly: |ψ1|²+|ψ2|²+2|ψ1||ψ2|cos(120°) = 0.18 - 0.09 = 0.09.",
-    whyWrong: ["Adding the two probabilities |ψ1|² and |ψ2|² directly (0.18) skips the interference cross term entirely — that's the classical prediction, not the quantum one."],
+    whyWrong: ["Adding the two probabilities |ψ1|² and |ψ2|² directly (0.18) skips the interference cross term entirely: that is the classical prediction, not the quantum one."],
   },
 };

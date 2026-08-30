@@ -8,14 +8,14 @@ import {
   useRef,
   useState,
   type MouseEvent as ReactMouseEvent,
-  type PointerEvent as ReactPointerEvent,
+  type PointerEvent as ReactPointerEvent
 } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   buildConceptGraph,
   getPrerequisitePath,
   type ConceptGraph,
-  type ConceptNode,
+  type ConceptNode
 } from "@/lib/content/concepts";
 import { useCompletedLessonSlugs } from "@/lib/content/progress";
 import { PILLARS } from "@/lib/content/curriculum";
@@ -24,7 +24,7 @@ import type { Difficulty } from "@/lib/content/types";
 import { cn } from "@/lib/utils";
 import { ConceptDetailPanel } from "./ConceptDetailPanel";
 import { ConceptListView } from "./ConceptListView";
-// Every zoom path in this file — pinch, wheel, the +/- buttons — goes
+// Every zoom path in this file, pinch, wheel, the +/- buttons, goes
 // through these, so the scale bounds and the anchor math are defined in
 // exactly one place (and unit-tested in ./__tests__/pinch.test.ts).
 import {
@@ -35,31 +35,62 @@ import {
   zoomAbout,
   type PinchState,
   type Point,
-  type Transform,
+  type Transform
 } from "./pinch";
 
 const NODE_WIDTH = 152;
 // Tall enough for a title line plus a compact `DifficultyMark` line below it
-// (was 52, title-only) — ROW_HEIGHT in lib/content/concepts.ts is 160, so
+// (was 52, title-only), ROW_HEIGHT in lib/content/concepts.ts is 160, so
 // there's ample headroom before this risks colliding with the next depth row.
 const NODE_HEIGHT = 68;
 /** Padding added around each pillar's node cluster to draw its background
- *  "region" band — wide enough that the band reads as a zone, not a hug. */
+ *  "region" band, wide enough that the band reads as a zone, not a hug. */
 const BAND_PADDING = 70;
 /** Pointer travel (CSS px) past which a press is treated as a pan, not a tap,
  *  so dragging the canvas from on top of a node doesn't also select it. */
 const DRAG_SLOP = 6;
-/** Remembers the graph/list choice across visits — the two views are equal
+/** Remembers the graph/list choice across visits, the two views are equal
  *  first-class ways to read the same map, so whichever one a reader picked
  *  should still be there next time. Namespaced like the other client stores. */
-const VIEW_STORAGE_KEY = "quantumlearn:map-view";
+const VIEW_STORAGE_KEY = "studyquantum:map-view";
+/** The pre-StudyQuantum-rename key, read as a fallback so a returning reader's
+ *  view choice survives the rename. Unlike lesson/problem progress this is a
+ *  single low-stakes preference, so it is a plain read-through fallback with no
+ *  copy-forward: the next time the reader switches views the new key is
+ *  written and this stops mattering. */
+const LEGACY_VIEW_STORAGE_KEY = "quantumlearn:map-view";
+
+/**
+ * Widest viewport that gets the list rather than the graph as its *default*
+ * view. Below `sm` the canvas is about 286px wide against a graph 2,600px
+ * across at 85% zoom, so a first-time reader on a phone lands on roughly a
+ * ninth of the map with no way to tell which ninth: measured at 320px, 56 of
+ * the 59 concept nodes sit outside the canvas at first paint. They are
+ * genuinely reachable (Tab recentres the view on each node, and panning
+ * works), but "reachable one node at a time" is not a map. The list view is
+ * the same graph, same grouping, same prerequisite order, and every concept
+ * is legible in it without a gesture.
+ *
+ * A default, not a restriction: the toggle is unchanged, and an explicit
+ * choice always wins over this and persists, which is why the stored value is
+ * read first. Only a reader who has never picked is affected.
+ */
+const GRAPH_DEFAULT_MIN_WIDTH = 640;
 
 function readStoredViewMode(): "graph" | "list" {
   try {
     const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
     if (stored === "graph" || stored === "list") return stored;
+    const legacy = window.localStorage.getItem(LEGACY_VIEW_STORAGE_KEY);
+    if (legacy === "graph" || legacy === "list") return legacy;
   } catch {
     // Private mode / storage disabled: fall through to the default.
+  }
+  // Safe to read layout here: this component only ever renders on the client
+  // (`LazyConceptMapExplorer` imports it with `ssr: false`), so there is no
+  // server snapshot for a width-dependent default to disagree with.
+  if (typeof window !== "undefined" && window.innerWidth < GRAPH_DEFAULT_MIN_WIDTH) {
+    return "list";
   }
   return "graph";
 }
@@ -68,12 +99,12 @@ const DIFFICULTY_RANK: Record<Difficulty, number> = {
   foundational: 0,
   intermediate: 1,
   advanced: 2,
-  master: 3,
+  master: 3
 };
 
 /**
  * A concept can cite lessons of different difficulty; the map shows the
- * hardest one a reader will need, not an average — the honest "how hard does
+ * hardest one a reader will need, not an average, the honest "how hard does
  * this concept get" signal. Returns `undefined` (rendering nothing) when
  * `lessonDifficulty` wasn't supplied or none of the concept's lessons appear
  * in it, so a caller that hasn't wired the data up yet degrades cleanly
@@ -98,7 +129,7 @@ function resolveNodeDifficulty(
  * The edges + node buttons + pillar region bands, split into their own
  * memoized component so panning/zooming (which updates `transform` on every
  * pointermove/wheel tick) only re-renders the cheap transform wrapper below,
- * not this list — without the split, every drag pixel recreated all ~60 node
+ * not this list, without the split, every drag pixel recreated all ~60 node
  * buttons and ~60 SVG paths.
  */
 const ConceptMapGraph = memo(function ConceptMapGraph({
@@ -115,14 +146,14 @@ const ConceptMapGraph = memo(function ConceptMapGraph({
   onSelect,
   onHover,
   onHoverEnd,
-  onFocusNode,
+  onFocusNode
 }: {
   graph: ConceptGraph;
   nodesById: Map<string, ConceptGraph["nodes"][number]>;
   bands: { pillar: ConceptNode["pillar"]; left: number; width: number }[];
   highlighted: Set<string> | null;
   /** The pillar whose accent color the currently-highlighted edges should
-   *  borrow (the hovered/focused node's pillar) — `undefined` when nothing
+   *  borrow (the hovered/focused node's pillar), `undefined` when nothing
    *  is highlighted, in which case edges use the neutral baseline stroke. */
   highlightPillar: ConceptNode["pillar"] | undefined;
   selectedId: string | null;
@@ -130,7 +161,7 @@ const ConceptMapGraph = memo(function ConceptMapGraph({
   /** concept id -> resolved difficulty, from `resolveNodeDifficulty`. Empty
    *  when the caller hasn't supplied lesson difficulty data yet. */
   nodeDifficulty: Map<string, Difficulty>;
-  /** Concepts with no prerequisites — the map's genuine entry point(s). Only
+  /** Concepts with no prerequisites, the map's genuine entry point(s). Only
    *  one exists in the current data ("Superposition"), but this stays
    *  general rather than hardcoding an id. */
   rootIds: Set<string>;
@@ -176,7 +207,9 @@ const ConceptMapGraph = memo(function ConceptMapGraph({
               key={`${edge.from}-${edge.to}`}
               d={`M ${from.x} ${from.y + NODE_HEIGHT / 2} C ${from.x} ${midY}, ${to.x} ${midY}, ${to.x} ${to.y - NODE_HEIGHT / 2}`}
               fill="none"
-              stroke={isHighlighted ? "var(--pillar-accent)" : dimmed ? "var(--border)" : "var(--border-strong)"}
+              stroke={
+                isHighlighted ? "var(--pillar-accent)" : dimmed ? "var(--border)" : "var(--border-strong)"
+              }
               strokeWidth={isHighlighted ? 1.75 : 1}
               strokeOpacity={isHighlighted ? 0.95 : dimmed ? 0.3 : 0.65}
             />
@@ -210,32 +243,60 @@ const ConceptMapGraph = memo(function ConceptMapGraph({
               left: node.x,
               top: node.y,
               width: NODE_WIDTH,
-              minHeight: NODE_HEIGHT,
+              minHeight: NODE_HEIGHT
             }}
             className={cn(
-              "absolute flex -translate-x-1/2 -translate-y-1/2 flex-col justify-center gap-1 rounded-(--radius-tight) border bg-surface px-3 py-2 text-left text-xs font-medium shadow-sm transition-[opacity,box-shadow,border-color] duration-(--dur-fast) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-surface-muted",
+              "absolute flex -translate-x-1/2 -translate-y-1/2 flex-col justify-center gap-1 rounded-(--radius-tight) border px-3 py-2 text-left text-xs font-medium transition-[background-color,box-shadow,border-color,color] duration-(--dur-fast) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-surface-muted",
               isSelected ? "border-pillar ring-2 ring-pillar/40" : "border-border hover:border-pillar/60",
-              dimmed ? "opacity-30" : "opacity-100"
+              // "Off the highlighted path" was a blanket `opacity-30` on a node
+              // that stays focusable, clickable, and neither `disabled` nor
+              // `pointer-events-none`. A group opacity blends the node's own
+              // background toward the ground by exactly as much as it blends
+              // the label, so it collapses the two together: measured with the
+              // repo's own compositing (src/lib/design/__tests__/color.ts, the
+              // method compositedContrast.test.ts uses), `--foreground` on
+              // `--surface` at 30% over this canvas's `bg-surface-muted/30`
+              // ground reads 2.46:1 on dark and 2.01:1 on light, against WCAG
+              // 1.4.3's 4.5:1 for an interactive control's label. Raising the
+              // alpha does not rescue it either: the node also carries
+              // `--muted-foreground` text (the DifficultyMark line), which
+              // needs opacity ~0.85 to clear 4.5:1, and at 0.85 there is no
+              // visible dimming left at all.
+              //
+              // So the recede is expressed in real tokens instead, and every
+              // channel of it is a full-strength colour:
+              //   surface -> surface-muted   (the node stops reading as raised
+              //                               and settles into the canvas)
+              //   shadow-sm -> no shadow     (same, on a second channel)
+              //   foreground -> subtle       (the label, below)
+              // `--subtle-foreground` on `--surface-muted` measures 5.35:1 on
+              // dark and 4.67:1 on light, both past AA, and it is this
+              // stylesheet's designated quiet-text voice rather than an
+              // invented one. The *state* signalling is untouched: the status
+              // line still says "Everything off that path is dimmed" in words,
+              // and on-path nodes still carry their numbered step badge, so
+              // there is a shape channel as well as a tonal one.
+              dimmed ? "bg-surface-muted" : "bg-surface shadow-sm"
             )}
           >
             <span className="flex items-center gap-2">
               {step ? (
                 <span
                   aria-hidden="true"
-                  className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-pillar-edge bg-pillar-wash font-mono text-[0.5625rem] tabular-nums text-pillar-text"
+                  className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-pillar-edge bg-pillar-wash font-mono text-micro tabular-nums text-pillar-text"
                 >
                   {step}
                 </span>
               ) : (
                 <span className="h-2 w-2 shrink-0 rounded-full bg-pillar" aria-hidden="true" />
               )}
-              <span className="text-foreground">{node.title}</span>
+              <span className={dimmed ? "text-subtle-foreground" : "text-foreground"}>{node.title}</span>
               {isCompleted ? (
                 // The tick is decorative and the word is real text, rather
                 // than the reverse. `aria-label` on this bare `<span>` did
                 // nothing: no `role` means the implicit `generic` role, which
                 // ARIA prohibits naming, so screen readers dropped it and the
-                // node button announced only "✓" — a character AT reads
+                // node button announced only "✓", a character AT reads
                 // inconsistently (some say "check mark", some skip it
                 // entirely) and which in no reading means "you have finished
                 // every lesson behind this concept". Matches the identical
@@ -249,7 +310,7 @@ const ConceptMapGraph = memo(function ConceptMapGraph({
             <span className="flex flex-wrap items-center gap-1.5 pl-3.5">
               {difficulty ? <DifficultyMark difficulty={difficulty} /> : null}
               {isRoot ? (
-                <span className="rounded-full border border-pillar-edge bg-pillar-wash px-1.5 py-0.5 text-[0.5625rem] font-semibold uppercase tracking-[0.08em] text-pillar-text">
+                <span className="rounded-full border border-pillar-edge bg-pillar-wash px-1.5 py-0.5 text-micro font-semibold uppercase tracking-meta text-pillar-text">
                   Start here
                 </span>
               ) : null}
@@ -263,12 +324,12 @@ const ConceptMapGraph = memo(function ConceptMapGraph({
 
 export function ConceptMapExplorer({
   lessonTitles,
-  lessonDifficulty,
+  lessonDifficulty
 }: {
   lessonTitles: Record<string, string>;
   /**
    * Real lesson slug -> that lesson's authored `Difficulty`, sourced from
-   * `getAllLessonsMeta()` exactly like `lessonTitles` is — optional so this
+   * `getAllLessonsMeta()` exactly like `lessonTitles` is, optional so this
    * component still renders correctly if the caller hasn't wired it up.
    * `src/app/map/page.tsx` (owned by another agent, not editable here) needs
    * one more line alongside its existing `lessonTitles` computation:
@@ -294,7 +355,7 @@ export function ConceptMapExplorer({
     return map;
   }, [graph.nodes, lessonDifficulty]);
 
-  // Concepts with no prerequisites — the map's genuine entry point(s), so a
+  // Concepts with no prerequisites, the map's genuine entry point(s), so a
   // beginner has an answer to "where do I start" instead of an alphabetical
   // or pillar-first guess. Currently exactly one ("Superposition"), but this
   // stays general rather than hardcoding that id.
@@ -310,7 +371,7 @@ export function ConceptMapExplorer({
   }, [graph.nodes, rootIds]);
 
   // Direct dependents (the reverse of prerequisiteIds), derived from edges
-  // once so hover highlighting — and the detail panel's "Leads to" list —
+  // once so hover highlighting, and the detail panel's "Leads to" list,
   // don't recompute it per node.
   const dependentsOf = useMemo(() => {
     const map = new Map<string, string[]>();
@@ -322,7 +383,7 @@ export function ConceptMapExplorer({
   }, [graph.edges]);
 
   // One background "region" per pillar, sized to that pillar's node cluster
-  // — derived from the graph's own node positions rather than re-deriving
+  // and derived from the graph's own node positions rather than re-deriving
   // concepts.ts's private column geometry, so it can't drift out of sync.
   const bands = useMemo(() => {
     const bounds = new Map<ConceptNode["pillar"], { minX: number; maxX: number }>();
@@ -341,17 +402,25 @@ export function ConceptMapExplorer({
           ? {
               pillar: PILLARS[index].slug,
               left: bound.minX - NODE_WIDTH / 2 - BAND_PADDING,
-              width: bound.maxX - bound.minX + NODE_WIDTH + BAND_PADDING * 2,
+              width: bound.maxX - bound.minX + NODE_WIDTH + BAND_PADDING * 2
             }
           : null
       )
-      .filter((band): band is { pillar: ConceptNode["pillar"]; left: number; width: number } => band !== null);
+      .filter(
+        (
+          band
+        ): band is {
+          pillar: ConceptNode["pillar"];
+          left: number;
+          width: number;
+        } => band !== null
+      );
   }, [graph.nodes]);
 
   const completedLessonSlugs = useCompletedLessonSlugs();
 
   // A deep link from the glossary (`/map?concept=<id>`) selects that concept
-  // on load instead of starting with nothing selected — see
+  // on load instead of starting with nothing selected, see
   // ConceptDetailPanel's "Full glossary entry" link and GlossaryFilter's
   // matching link the other way. Safe to read via useSearchParams without a
   // Suspense boundary: this component is only ever mounted client-side
@@ -379,13 +448,13 @@ export function ConceptMapExplorer({
   const detailRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   // 480 (half of a ~960px desktop viewport) is only a first-paint fallback,
-  // used before the viewport's real width is known — resetView() and the
+  // used before the viewport's real width is known, resetView() and the
   // mount effect below both replace it with the actual measured width, so
   // narrower (e.g. mobile) viewports don't stay centered on a desktop guess.
   const defaultTransform = (viewportWidth: number): Transform => ({
     x: -graph.width / 2 + viewportWidth / 2,
     y: 40,
-    scale: 0.85,
+    scale: 0.85
   });
   const [transform, setTransform] = useState<Transform>(() => defaultTransform(960));
   // Every gesture seeds itself from the *current* transform, and pointer
@@ -400,14 +469,20 @@ export function ConceptMapExplorer({
     setTransform(next);
   }, []);
 
-  const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number; pointerId: number } | null>(null);
+  const dragRef = useRef<{
+    startX: number;
+    startY: number;
+    originX: number;
+    originY: number;
+    pointerId: number;
+  } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   // Set once a press travels past DRAG_SLOP so the click that follows a pan
-  // is swallowed instead of selecting whatever node the drag started on —
+  // is swallowed instead of selecting whatever node the drag started on,
   // the difference between "I moved the map" and "I picked this concept",
   // which matters most on a phone where the whole canvas is under a thumb.
   const draggedRef = useRef(false);
-  // Active pointers (mouse + all simultaneous touches), keyed by pointerId —
+  // Active pointers (mouse + all simultaneous touches), keyed by pointerId,
   // the input to both single-finger panning (dragRef, above) and two-finger
   // pinch-to-zoom (pinchRef, below). A plain ref rather than state: every
   // pointermove would otherwise trigger a render just to update bookkeeping
@@ -424,11 +499,15 @@ export function ConceptMapExplorer({
     const scale = 0.85;
     commitTransform(
       requested
-        ? { x: width / 2 - requested.x * scale, y: viewport.clientHeight / 2 - requested.y * scale, scale }
+        ? {
+            x: width / 2 - requested.x * scale,
+            y: viewport.clientHeight / 2 - requested.y * scale,
+            scale
+          }
         : defaultTransform(width)
     );
     // Only correct the initial desktop-width guess (and center any deep
-    // link resolved above) once, on mount — this must not re-run on every
+    // link resolved above) once, on mount, this must not re-run on every
     // graph/render change or it would fight the user's own pan/zoom.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -437,10 +516,7 @@ export function ConceptMapExplorer({
   // to come first, in an order where nothing appears before its own
   // prerequisites. Also the highlight set for the graph, so the map answers
   // "what do I need before this" visually and in the panel from one source.
-  const path = useMemo(
-    () => (selectedId ? getPrerequisitePath(selectedId) : []),
-    [selectedId]
-  );
+  const path = useMemo(() => (selectedId ? getPrerequisitePath(selectedId) : []), [selectedId]);
   const pathRank = useMemo(() => {
     if (!showPath || path.length < 2) return null;
     return new Map(path.map((node, index) => [node.id, index + 1]));
@@ -477,7 +553,7 @@ export function ConceptMapExplorer({
       commitTransform({
         x: clientWidth / 2 - node.x * scale,
         y: clientHeight / 2 - node.y * scale,
-        scale,
+        scale
       });
     },
     [nodesById, commitTransform]
@@ -493,14 +569,14 @@ export function ConceptMapExplorer({
 
   // Below `lg` the detail panel stacks *under* the map instead of beside it,
   // so on a phone a tap would otherwise open a panel entirely off-screen.
-  // Bring it into view on selection — and only there; on desktop the panel
+  // Bring it into view on selection, and only there; on desktop the panel
   // is already visible and scrolling the page would be an unasked-for jump.
   useEffect(() => {
     if (!selectedId || typeof window === "undefined" || !window.matchMedia) return;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const behavior: ScrollBehavior = reduceMotion ? "auto" : "smooth";
 
-    // In list view, `centerOnNode` doesn't apply — but a concept chosen from
+    // In list view, `centerOnNode` doesn't apply, but a concept chosen from
     // the "Show me the path to" menu can sit anywhere in a 90-row scroller,
     // so bring the selected row into view the same way the graph re-centres.
     const row = listRef.current?.querySelector<HTMLElement>('[aria-current="true"]');
@@ -520,11 +596,11 @@ export function ConceptMapExplorer({
     try {
       window.localStorage.setItem(VIEW_STORAGE_KEY, mode);
     } catch {
-      // Storage unavailable — the choice just won't survive a reload.
+      // Storage unavailable, the choice just won't survive a reload.
     }
   }, []);
 
-  // "Where do I start" is a real question this map couldn't answer before —
+  // "Where do I start" is a real question this map couldn't answer before,
   // jumps straight to the map's genuine entry point and opens its detail
   // panel, in whichever view is active.
   const handleStartHere = useCallback(() => {
@@ -533,7 +609,7 @@ export function ConceptMapExplorer({
 
   // The other half of the beginner's question: pick any idea by name and the
   // map draws the route to it. A native <select> rather than a bespoke
-  // combobox — it is keyboard-complete for free, and on a phone it opens the
+  // combobox, it is keyboard-complete for free, and on a phone it opens the
   // OS picker instead of a cramped custom dropdown.
   const conceptsByTitle = useMemo(
     () => [...graph.nodes].sort((a, b) => a.title.localeCompare(b.title)),
@@ -548,7 +624,7 @@ export function ConceptMapExplorer({
     []
   );
   // Tabbing to a node that pan/zoom has left off-screen would otherwise
-  // focus something invisible — a real keyboard-accessibility gap on a
+  // focus something invisible, a real keyboard-accessibility gap on a
   // canvas like this. Re-centering (without changing the zoom level or the
   // selection) on every focus keeps the focused node visible at all times;
   // there's no CSS transition on the transform, so this is an instant
@@ -573,7 +649,7 @@ export function ConceptMapExplorer({
     return {
       ids: [entries[0][0], entries[1][0]] as const,
       a: entries[0][1],
-      b: entries[1][1],
+      b: entries[1][1]
     };
   }
 
@@ -584,7 +660,7 @@ export function ConceptMapExplorer({
       startY: point.y,
       originX: current.x,
       originY: current.y,
-      pointerId,
+      pointerId
     };
     setIsDragging(true);
   }
@@ -594,7 +670,10 @@ export function ConceptMapExplorer({
     // secondary *mouse* buttons, which must not start a pan.
     if (event.button !== 0) return;
     event.currentTarget.setPointerCapture(event.pointerId);
-    pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    pointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY
+    });
     draggedRef.current = false;
 
     const pair = activePinchPair();
@@ -613,7 +692,10 @@ export function ConceptMapExplorer({
 
   function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
     if (!pointersRef.current.has(event.pointerId)) return;
-    pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    pointersRef.current.set(event.pointerId, {
+      x: event.clientX,
+      y: event.clientY
+    });
 
     const pair = activePinchPair();
     if (pair) {
@@ -638,11 +720,11 @@ export function ConceptMapExplorer({
     commitTransform({
       x: drag.originX + dx,
       y: drag.originY + dy,
-      scale: transformRef.current.scale,
+      scale: transformRef.current.scale
     });
   }
 
-  /** Shared by pointerup, pointercancel and lostpointercapture — any of the
+  /** Shared by pointerup, pointercancel and lostpointercapture, any of the
    *  three can be the last thing we hear about a pointer, and missing one is
    *  exactly how a canvas ends up stuck mid-gesture. */
   function releasePointer(pointerId: number) {
@@ -678,7 +760,7 @@ export function ConceptMapExplorer({
   }
 
   // Attached as a native, non-passive listener (rather than JSX `onWheel`)
-  // because React registers wheel handlers passively by default — a
+  // because React registers wheel handlers passively by default, a
   // passive listener's `event.preventDefault()` is a silent no-op (plus a
   // console warning), so the JSX-prop version would zoom the map while
   // also letting the page scroll underneath it.
@@ -718,7 +800,7 @@ export function ConceptMapExplorer({
 
   const zoomPercent = Math.round(clampScale(transform.scale) * 100);
 
-  const selectedNode = selectedId ? nodesById.get(selectedId) ?? null : null;
+  const selectedNode = selectedId ? (nodesById.get(selectedId) ?? null) : null;
   const selectedDependents = useMemo(() => {
     if (!selectedId) return [];
     return (dependentsOf.get(selectedId) ?? [])
@@ -732,17 +814,17 @@ export function ConceptMapExplorer({
         {/* Orientation. A newcomer's first ten seconds on this page used to be
             spent working out what the picture even was; the plain sentence and
             the two concrete first actions below it are the whole fix. Nothing
-            here simplifies the map — it just says what it is and offers a
+            here simplifies the map, it just says what it is and offers a
             place to put the first click. */}
         <div className="border-b border-border px-4 py-4">
           <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
             <p className="max-w-prose text-sm leading-relaxed text-foreground">
-              Every box is one idea, and a line means you should learn the idea it comes from
-              first. The map reads top to bottom: foundations at the top, what they unlock below.
+              Every box is one idea, and a line means you should learn the idea it comes from first. The map
+              reads top to bottom: foundations at the top, what they unlock below.
             </p>
 
             {/* The graph and the list are two equal readings of the same data,
-                so the switch sits here at the top — not tucked in with the
+                so the switch sits here at the top, not tucked in with the
                 zoom controls, where it read as a fallback for when the graph
                 failed you. The choice is remembered for next visit. */}
             <div
@@ -753,7 +835,7 @@ export function ConceptMapExplorer({
               {(
                 [
                   { mode: "graph", label: "Graph" },
-                  { mode: "list", label: "List" },
+                  { mode: "list", label: "List" }
                 ] as const
               ).map(({ mode, label }) => (
                 <button
@@ -789,7 +871,7 @@ export function ConceptMapExplorer({
             {/* `max-w-full` on the label and `min-w-0` on the select are what
                 keep this control inside the panel at 320px. A `<select>`
                 takes its automatic minimum size from its widest `<option>`,
-                and these options are concept titles — so with `max-w-[13rem]`
+                and these options are concept titles, so with `max-w-[13rem]`
                 alone the label's minimum width was 24px of padding + the
                 wrapped caption + 208px of select ≈ 280px, against the 256px
                 the instrument's `px-4` leaves inside a 320px viewport. The
@@ -827,7 +909,11 @@ export function ConceptMapExplorer({
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border px-4 py-2">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             {PILLARS.map((pillar) => (
-              <span key={pillar.slug} data-pillar={pillar.slug} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span
+                key={pillar.slug}
+                data-pillar={pillar.slug}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground"
+              >
                 <span className="h-2 w-2 rounded-full bg-pillar" aria-hidden="true" />
                 {pillar.title}
               </span>
@@ -835,7 +921,17 @@ export function ConceptMapExplorer({
           </div>
 
           {viewMode === "graph" ? (
-            <div className="flex items-center gap-1.5">
+            // `flex-wrap`, and `justify-end` so a wrapped row stays aligned
+            // with the right edge it started on. Without it this group was a
+            // single nowrap row ~324px wide inside an `.instrument` that is
+            // `overflow: hidden`, so at 320px the last 37px of "Reset view"
+            // was cut off with no way to scroll to it — clipped content, not
+            // page overflow, which means `documentElement.scrollWidth` still
+            // read clean and no overflow check could see it. The zoom
+            // stepper's three controls are kept together by their own
+            // `flex` below so a wrap never splits "−" from "+" from the
+            // readout that sits between them.
+            <div className="flex flex-wrap items-center justify-end gap-1.5">
               <button
                 type="button"
                 onClick={() => setShowPath((current) => !current)}
@@ -849,25 +945,43 @@ export function ConceptMapExplorer({
               >
                 Prerequisite path
               </button>
-              <button
-                type="button"
-                onClick={() => zoomBy(-0.15)}
-                aria-label="Zoom out"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground hover:bg-surface-muted"
-              >
-                −
-              </button>
-              <span aria-hidden="true" className="w-11 text-center font-mono text-[0.6875rem] tabular-nums text-muted-foreground">
-                {zoomPercent}%
-              </span>
-              <button
-                type="button"
-                onClick={() => zoomBy(0.15)}
-                aria-label="Zoom in"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground hover:bg-surface-muted"
-              >
-                +
-              </button>
+              {/* The zoom stepper is one control in three parts. It gets its
+                  own nowrap flex so the wrap introduced above can only ever
+                  break *between* controls, never between "−", its readout and
+                  "+". */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => zoomBy(-0.15)}
+                  aria-label="Zoom out"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground hover:bg-surface-muted"
+                >
+                  −
+                </button>
+                {/* The readout for the two buttons either side of it, and it
+                  used to be `aria-hidden` in full, which left "Zoom in" and
+                  "Zoom out" with no non-visual result at all: press either
+                  and nothing anywhere reports what happened. Deliberately
+                  *not* a live region, though. Zoom also moves on every wheel
+                  tick and every pinch frame, so an announcing readout would
+                  talk continuously through a gesture nobody asked it to
+                  narrate. This is the middle option: the digits stay hidden
+                  (bare "85 %" says nothing on its own) and a named, static
+                  `sr-only` value sits beside them, so the level is there to
+                  be read on demand between presses and silent otherwise. */}
+                <span className="w-11 text-center font-mono text-meta tabular-nums text-muted-foreground">
+                  <span aria-hidden="true">{zoomPercent}%</span>
+                  <span className="sr-only">Zoom {zoomPercent} percent</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => zoomBy(0.15)}
+                  aria-label="Zoom in"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground hover:bg-surface-muted"
+                >
+                  +
+                </button>
+              </div>
               <button
                 type="button"
                 onClick={resetView}
@@ -879,7 +993,7 @@ export function ConceptMapExplorer({
           ) : null}
         </div>
 
-        {/* The answer, stated in words as well as drawn — the graph dims to the
+        {/* The answer, stated in words as well as drawn, the graph dims to the
             route, and this says how long the route is and where it starts. */}
         <p
           role="status"
@@ -893,21 +1007,20 @@ export function ConceptMapExplorer({
                 viewMode === "graph" ? " Everything off that path is dimmed." : ""
               } The full route is listed in the panel.`
             : selectedNode
-              ? `${selectedNode.title} selected — its definition, lessons and prerequisites are in the panel.`
+              ? `${selectedNode.title} selected. Its definition, lessons and prerequisites are in the panel.`
               : "Nothing selected yet. Pick a concept above, or choose any box to see what it is and what it needs first."}
         </p>
 
         {viewMode === "graph" ? (
           <>
             <p id="concept-map-instructions" className="sr-only">
-              A map of every concept on the site, drawn as boxes joined by lines, where a line
-              runs from a concept to the concepts that build on it. Drag or pinch with two
-              fingers to pan and zoom, or use the zoom buttons. Tab moves between concepts and
-              keeps the focused one centred; press Enter to see a concept&rsquo;s details, its
-              lessons, and the full list of what to learn before it. Use &ldquo;Start at the
-              beginning&rdquo; for the map&rsquo;s entry point, or the &ldquo;Show me the path
-              to&rdquo; menu to pick any concept by name. List view above presents the same map
-              as plain, grouped text.
+              A map of every concept on the site, drawn as boxes joined by lines, where a line runs from a
+              concept to the concepts that build on it. Drag or pinch with two fingers to pan and zoom, or use
+              the zoom buttons. Tab moves between concepts and keeps the focused one centred; press Enter to
+              see a concept&rsquo;s details, its lessons, and the full list of what to learn before it. Use
+              &ldquo;Start at the beginning&rdquo; for the map&rsquo;s entry point, or the &ldquo;Show me the
+              path to&rdquo; menu to pick any concept by name. List view above presents the same map as plain,
+              grouped text.
             </p>
             <div
               ref={viewportRef}
@@ -934,7 +1047,7 @@ export function ConceptMapExplorer({
                 style={{
                   width: graph.width,
                   height: graph.height,
-                  transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
+                  transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`
                 }}
               >
                 <ConceptMapGraph
@@ -986,9 +1099,9 @@ export function ConceptMapExplorer({
           <div className="flex h-full min-h-[200px] flex-col justify-center gap-2 p-6">
             <p className="text-sm font-medium text-foreground">Select a concept</p>
             <p className="text-sm leading-relaxed text-muted-foreground">
-              You&rsquo;ll get a plain-language definition, every lesson on the site that teaches
-              it, the full list of what to learn first, and what it leads to next. New here?
-              &ldquo;Start at the beginning&rdquo; opens the one concept with no prerequisites.
+              You&rsquo;ll get a plain-language definition, the lessons that teach it, and what to learn
+              before and after it. New here? &ldquo;Start at the beginning&rdquo; opens the one concept with
+              no prerequisites.
             </p>
           </div>
         )}

@@ -48,10 +48,10 @@ export const deterministicLhvChshValue: NumericProblem = {
       { description: "E(a,b)=1, E(a,b')=-1, E(a',b)=1, E(a',b')=-1 (each outcome is fixed, no averaging needed)." },
       { description: "$S = 1 + (-1) + 1 - (-1) = 2$" },
     ],
-    finalAnswer: "S = 2 — right at the classical boundary, not exceeding it.",
+    finalAnswer: "S = 2, right at the classical boundary and not past it.",
   },
   explanation: {
-    correctIdea: "Even this simple deterministic model reaches S=2 exactly, confirming the bound is tight — some LHV models really do saturate it.",
+    correctIdea: "Even this simple deterministic model reaches S=2 exactly, confirming the bound is tight: some LHV models do saturate it.",
     whyCorrect: "This is consistent with the theorem: |S|≤2 is not violated, and equality is achievable, unlike |S|>2 which no LHV model can reach.",
     whyWrong: ["Getting S=4 would come from forgetting the minus sign on the last term in the CHSH combination's definition."],
   },

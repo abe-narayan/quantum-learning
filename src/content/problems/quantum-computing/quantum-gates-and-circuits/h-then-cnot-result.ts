@@ -40,14 +40,14 @@ export const hThenCnotResult: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "That's the pattern for |Ψ+⟩, not |Φ+⟩ — check which basis states H and CNOT actually connect, starting from |00⟩.",
+      b: "That is the pattern for |Ψ+⟩, not |Φ+⟩. Check which basis states H and CNOT connect, starting from |00⟩.",
       c: "That's the state right after H, before CNOT is applied. CNOT is what entangles the two qubits.",
-      d: "This has no superposition at all — but H alone already puts qubit 0 into superposition, so the final state can't be a single basis state.",
+      d: "This has no superposition at all. H alone already puts qubit 0 into superposition, so the final state cannot be a single basis state.",
     },
     defaultIncorrectFeedback: "Work through the two steps in order: apply H to qubit 0 first, then CNOT(0,1).",
   },
   hints: [
-    { text: "First, apply H to qubit 0 of |00⟩ only — qubit 1 is untouched at this step." },
+    { text: "First apply H to qubit 0 of |00⟩. Qubit 1 is untouched at this step." },
     { text: "H|0⟩ = (|0⟩+|1⟩)/√2, so after this step you have a superposition over |00⟩ and |10⟩." },
     { text: "Now apply CNOT(0,1): the |00⟩ term is unaffected (control 0); the |10⟩ term flips its target (control 1)." },
   ],

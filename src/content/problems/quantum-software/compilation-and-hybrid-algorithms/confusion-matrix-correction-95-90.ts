@@ -1,6 +1,6 @@
 import type { NumericProblem } from "@/lib/problems/types";
 
-// M = [[0.95, 0.10], [0.05, 0.90]] — columns sum to 1, as any confusion
+// M = [[0.95, 0.10], [0.05, 0.90]]; columns sum to 1, as any confusion
 // matrix built from conditional probabilities must.
 const m00 = 0.95;
 const m01 = 0.1;
@@ -71,9 +71,9 @@ export const confusionMatrixCorrection9590: NumericProblem = {
   explanation: {
     correctIdea:
       "This applies the lesson's own confusion-matrix-inversion procedure to a different, less severe misread rate (10% of 1→0 instead of 15%) and a different raw measurement.",
-    whyCorrect: "Direct 2×2 matrix inversion and multiplication, verified by checking M applied to the recovered p_true reproduces the original p_meas exactly.",
+    whyCorrect: "Inverting the 2×2 confusion matrix and applying it to p_meas undoes the misclassification exactly. Applying M back to the recovered p_true returns the original p_meas, which is the check that the inversion was set up correctly.",
     whyWrong: [
-      "Reporting the raw measured value (0.70) instead of inverting M skips the whole point of readout correction — the raw number is exactly what's biased by the asymmetric misread rate.",
+      "Reporting the raw measured value (0.70) instead of inverting M skips the point of readout correction. The raw number is precisely what the asymmetric misread rate biases.",
       "Applying M (instead of M⁻¹) to p_meas runs the correction backward, simulating what an even noisier measurement would look like rather than recovering the true distribution.",
     ],
   },

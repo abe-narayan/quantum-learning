@@ -142,7 +142,7 @@ export function EquationReveal({
           `EquationReveal: term "${term.id}" has a symbol ("${term.symbol}") that looks like raw LaTeX ` +
             `source rather than a short plain-text/Unicode chip label. It's being typeset through KaTeX ` +
             `as a fallback so it doesn't render as literal "^{...}" text, but per docs/NARRATIVE_COMPONENTS.md ` +
-            `this prop should be a short Unicode label (e.g. "Ĥ", "E_n") — consider DerivationSteps for a ` +
+            `this prop should be a short Unicode label (e.g. "Ĥ", "E_n"). Consider DerivationSteps for a ` +
             `multi-term recursion this dense.`
         );
       }
@@ -155,7 +155,19 @@ export function EquationReveal({
           strip, and `justify-between` on a nowrap row crushed both labels. */}
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-border px-4 py-2.5 sm:px-5">
         <TechLabel>Equation</TechLabel>
-        <TechLabel className="text-subtle-foreground">Select a term for its meaning — or open the glossary below</TechLabel>
+        {/* Conditional on there being terms. With `terms={[]}` the whole chip
+            row and its `<details>` glossary below render nothing, so this
+            hint was instructing the reader to select from a strip that does
+            not exist and to open a glossary that is not there. An empty
+            `terms` is not a hypothetical: it is the shape a call site lands
+            in the moment an author reaches for this component for the frame
+            and means to fill the glossary in afterwards, and nothing in the
+            type system or the render path objects. */}
+        {terms.length > 0 ? (
+          <TechLabel className="text-subtle-foreground">
+            Select a term for its meaning, or open the glossary below
+          </TechLabel>
+        ) : null}
       </div>
 
       <div className="p-4 sm:p-5">{children}</div>
@@ -202,7 +214,15 @@ export function EquationReveal({
             })}
           </div>
 
-          <p aria-live="polite" className="mt-2.5 min-h-[2.5em] text-sm text-muted-foreground">
+          {/* `role="status"` + `aria-atomic`. A role-less element's implicit
+              `aria-atomic` is `false`, so an update is announced as only the
+              text nodes that changed. This region swaps a whole gloss at once,
+              so the practical risk was low, but nothing in the markup said so:
+              a future gloss that shares a prefix with the previous one would
+              announce only the diff. Atomic makes the guarantee explicit, and
+              `role="status"` is the standard, better-supported carrier for a
+              polite region. */}
+          <p role="status" aria-live="polite" aria-atomic="true" className="mt-2.5 min-h-[2.5em] text-sm text-muted-foreground">
             {activeTerm ? activeTerm.gloss : "Hover, tap, or Tab to a term above for its meaning."}
           </p>
 

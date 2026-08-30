@@ -14,8 +14,17 @@
 
 import type { Course, Difficulty, Pillar } from "./content/types";
 import { DIFFICULTY_LABEL } from "./content/types";
+// A value import, unlike the type-only line above. `curriculum.ts` is a plain
+// data module (930 lines of course records, one `import type` and nothing
+// else — verified, not assumed), already inside the client-data budget at
+// ~12 KB in clientBoundary.test.ts, so pulling it in here to resolve a
+// prerequisite slug to its real course costs the build none of what the
+// problem/lesson registries would. It is needed for `coursePrerequisites`,
+// which was emitting raw slugs.
+import { getCourse } from "./content/curriculum";
 import type { ProblemDifficulty } from "./problems/types";
 import { PROBLEM_TO_DIFFICULTY } from "./problems/types";
+import { PROBLEM_METAS } from "./problems/problemMeta.generated";
 
 // Single source of truth for the site origin — src/app/sitemap.ts, robots.ts,
 // and layout.tsx import this rather than redeclaring it (they used to carry
@@ -25,7 +34,11 @@ import { PROBLEM_TO_DIFFICULTY } from "./problems/types";
 //   2. VERCEL_PROJECT_PRODUCTION_URL — set automatically in every Vercel
 //      build (bare domain, no protocol), so canonicals/OG/sitemap/robots are
 //      correct on Vercel with zero configuration.
-//   3. The placeholder, for local builds where absolute URLs don't matter.
+//   3. The literal production origin, https://studyquantum.org — the real
+//      public home of the site, and the answer for a local build or any host
+//      that sets neither env var. It used to be a `.example` placeholder;
+//      it is now the actual domain, so a build that falls all the way through
+//      still emits correct absolute URLs rather than unresolvable ones.
 // Read at build time only (this is a pure-SSG site), so a changed env var
 // takes effect on the next build, which is the only place it could anyway.
 // `?.trim() || undefined` (not `??`): an env var set to "" or whitespace must
@@ -36,11 +49,50 @@ const configuredOrigin =
   (process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim()
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.trim()}`
     : undefined);
-export const BASE_URL = (configuredOrigin ?? "https://quantumlearn.example").replace(/\/+$/, "");
+export const BASE_URL = (configuredOrigin ?? "https://studyquantum.org").replace(/\/+$/, "");
 
-const SITE_NAME = "QuantumLearn";
-const SITE_DESCRIPTION =
-  "An interactive platform for learning quantum mechanics and quantum computing — lessons, simulators, and problem sets for advanced high-school and early-college students.";
+/**
+ * The site's name, as it appears in JSON-LD (`Organization.name`,
+ * `WebSite.name`) and now also as `og:site_name` on every route.
+ *
+ * Exported rather than module-private so `lib/pageMetadata.ts` can build the
+ * Open Graph `siteName` from the same constant instead of retyping the word:
+ * the same three files that used to each carry their own copy of the site
+ * description are the reason this is a shared export.
+ */
+export const SITE_NAME = "StudyQuantum";
+
+/**
+ * How many graded problems the site has, counted rather than typed.
+ *
+ * The figure appeared as a literal in four files (`app/layout.tsx`,
+ * `app/manifest.ts`, and `app/opengraph-image.tsx` twice) plus this one, with
+ * a comment in `lib/nav.ts` asking a future editor to change all of them by
+ * hand. It said 549 while the corpus held 556, having drifted twice in a
+ * single day as problems were added, which is what a hand-kept figure does.
+ *
+ * `problemMeta.generated.ts` is the right thing to count from: it imports
+ * nothing but the `ProblemMeta` type (verified, not assumed), so this reaches
+ * no problem body and none of the `lib/quantum` graph that the build-memory
+ * architecture exists to keep out of every route. Importing `problems/registry`
+ * here instead would drag all 556 problem modules into every page that renders
+ * a breadcrumb, which is the exact failure that architecture prevents.
+ *
+ * Server-only by construction: `clientBoundary.test.ts` lists both
+ * `problems/metaRegistry` and `problems/problemMeta.generated` as SERVER_ONLY,
+ * and no client component imports this module (every importer is a page, a
+ * route handler, or `lib/pageMetadata.ts`, which itself has no client
+ * readers). A future `"use client"` file reaching for `BASE_URL` would fail
+ * that test loudly rather than shipping the index.
+ */
+export const PROBLEM_COUNT = PROBLEM_METAS.length;
+
+/** Kept verbatim in step with `description` in src/app/layout.tsx and
+ *  `description` in src/app/manifest.ts, which now import this constant rather
+ *  than restating it: the same claim reaches a reader three times, as the
+ *  search-result snippet, as JSON-LD and as an installed shortcut's blurb, and
+ *  a crawler that finds them disagreeing trusts neither. */
+export const SITE_DESCRIPTION = `Learn quantum mechanics and quantum computing from the ground up. 219 lessons, 14 simulators you can experiment with, and ${PROBLEM_COUNT} problems with worked solutions, from your first qubit to research-level fault tolerance.`;
 
 /** A JSON-LD document: always includes "@context" and "@type". */
 export type JsonLd = Record<string, unknown>;
@@ -188,9 +240,42 @@ export function buildCourseSchema(course: Course, url: string): JsonLd {
     inLanguage: "en",
     educationalLevel: DIFFICULTY_LABEL[course.difficulty],
     provider: { "@id": `${BASE_URL}/#organization` },
-    ...(course.prerequisites.length > 0
-      ? { coursePrerequisites: course.prerequisites.join(", ") }
-      : {}),
+    ...buildCoursePrerequisites(course),
+  };
+}
+
+/**
+ * `coursePrerequisites` as real, resolvable courses rather than raw slugs.
+ *
+ * This used to emit `course.prerequisites.join(", ")`, which put the literal
+ * string `"classical-to-quantum"` into the graph: not a name a reader would
+ * recognise, not a URL a crawler could follow, and not something schema.org
+ * consumers can join up with the `Course` node that slug actually names.
+ * Each prerequisite now resolves through `getCourse` to the course's authored
+ * title and its own canonical `/courses/<slug>` page, both of which already
+ * exist and are already rendered elsewhere on the site.
+ *
+ * A slug that resolves to nothing is dropped rather than emitted as bare
+ * text: `/courses/<unknown>` would 404, and a prerequisite pointing at a
+ * missing page is worse than a prerequisite that goes unmentioned.
+ * `curriculum.test.ts` already asserts every prerequisite slug names a real
+ * course, so in practice nothing is dropped — this is the belt for the day
+ * that assertion is relaxed.
+ */
+function buildCoursePrerequisites(course: Course): JsonLd {
+  const resolved = course.prerequisites
+    .map((slug) => ({ slug, prerequisite: getCourse(slug) }))
+    .filter(
+      (entry): entry is { slug: string; prerequisite: Course } => entry.prerequisite !== undefined
+    );
+  if (resolved.length === 0) return {};
+  return {
+    coursePrerequisites: resolved.map(({ slug, prerequisite }) => ({
+      "@type": "Course",
+      name: prerequisite.title,
+      url: `${BASE_URL}/courses/${slug}`,
+      provider: { "@id": `${BASE_URL}/#organization` },
+    })),
   };
 }
 

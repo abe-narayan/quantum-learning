@@ -29,11 +29,11 @@ export const lessonMeta = {
 export const afterH = applySingleQubitGate(StateVector.zero(2), HADAMARD, 0);
 export const afterCnot = applyCNOT(afterH, 0, 1);
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The field's working notation">
 Every multi-qubit operation so far has been described in prose and equations. Real circuits, the ones you'll see in papers, textbooks, and every quantum SDK, are drawn as diagrams.
 </LessonHook>
 
-## Motivation
+## How papers and SDKs actually write this
 
 Circuit diagrams are the working notation of the whole field: papers,
 textbooks, and every quantum SDK draw computations as wires and boxes
@@ -58,14 +58,14 @@ the operator it stands for.
   ariaLabel="A three-qubit circuit showing every notational element: a gate box (H on qubit 0), a control dot joined to a target (CNOT from qubit 0 to qubit 1), a gate on an otherwise idle wire (T on qubit 2), a two-qubit controlled-Z between qubits 1 and 2, and a measurement meter on qubit 0. Wires with no symbol in a column are implicitly the identity."
 />
 
-## Intuition
+## A small piece of sheet music
 
 A circuit diagram is a small piece of sheet music: one horizontal line
 per qubit ("wire"), time flowing left to right, and symbols placed on the
 wires telling you what happens to that qubit at that moment. Reading a
 circuit is reading a story of the state evolving, one column at a time.
 
-## Mathematical Development
+## Conventions, then diagram to operator
 
 ### The conventions
 
@@ -77,9 +77,13 @@ circuit is reading a story of the state evolving, one column at a time.
 - **A filled dot** connected by a vertical line to a $\oplus$ symbol (or
   to another gate box) is a **<Term id="cnot-controlled-gates">controlled operation</Term>**: the dot marks the
   control qubit, the connected symbol marks the target and what happens
-  to it. The next lesson covers this in full.
-- **A meter symbol** (⏱-like gauge icon, conventionally) marks a
-  <Term id="measurement">measurement</Term> of that wire at that point in time.
+  to it. For the $\oplus$ case, $\text{CNOT}$, the one rule you need
+  before the next lesson derives its matrix is: the target flips exactly
+  when the control is $|1\rangle$, applied term by term across whatever
+  superposition the control is in.
+- **A meter symbol** (a dial with a needle sweeping up from its pivot)
+  marks a <Term id="measurement">measurement</Term> of that wire at that
+  point in time.
 - **A blank wire** at a given time step means: nothing happens to that
   qubit there, which is not "no operation," it's *implicitly the
   identity gate*, tensored in with whatever the other wires are doing.
@@ -140,7 +144,7 @@ leaves behind.
 (If this final state looks familiar, it should. You'll meet it formally,
 by name, in two lessons.)
 
-## Physical Interpretation
+## A complete recipe with one predicted output
 
 A circuit diagram is a complete recipe: given it and an input state,
 there's exactly one predicted output state, obtained by working through
@@ -150,7 +154,7 @@ product are physically identical. This is the basis for "circuit
 identities," used later in this course to simplify or rewrite circuits
 without changing what they compute.
 
-## Interactive Experiment
+## Build the two-column circuit yourself
 
 Build the exact two-column circuit derived above yourself, gate by gate,
 and step through it column by column, the same $H$-then-$\text{CNOT}$
@@ -160,7 +164,7 @@ sequence shown in the two `QuantumStateDisplay` panels above.
   <LazyCircuitBuilder />
 </InteractiveSection>
 
-## Worked Example
+## One diagram, predicted by hand
 
 **A circuit has $X$ on qubit 1 in the first column, then $\text{CNOT}$
 with qubit 1 as control and qubit 0 as target in the second column.
@@ -173,7 +177,7 @@ Final state: $|11\rangle$, with certainty (no superposition was ever
 introduced, so this circuit is doing classical bit-flip logic and nothing
 more).
 
-## Common Mistakes
+## Diagram order against operator order
 
 <Callout type="warning">
 **Reading the operator product in diagram order.** The diagram reads left
@@ -192,15 +196,158 @@ product, needed to keep the dimensions consistent.
 
 1. A circuit has $H$ on qubit 0 and $H$ on qubit 1 in the same column.
    Write the operator for that column as a tensor product.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The column is $H \otimes H$, with the left factor belonging to qubit 0
+   because wire order and tensor-factor order are the same order.
+
+   Written out, tensoring multiplies every entry of the first matrix by the
+   whole second matrix:
+
+   $$
+   H \otimes H = \frac12\begin{pmatrix}1&1&1&1\\1&-1&1&-1\\1&1&-1&-1\\1&-1&-1&1\end{pmatrix}
+   $$
+
+   Two things are worth reading off that matrix. Its first column is
+   $\tfrac12(1,1,1,1)^\mathsf{T}$, so $(H\otimes H)|00\rangle$ is the equal
+   superposition over all four basis states, which is how essentially every
+   algorithm in the next course begins. And every entry is $\pm\tfrac12$,
+   never zero, which is the signature of a gate that spreads amplitude
+   everywhere rather than shuffling it.
+
+   Two slips are common. The first is writing $H_0 H_1$ as if it were a
+   product of $4\times4$ matrices; it is a tensor product, and the
+   dimensions alone catch the error, since $2\times2$ times $2\times2$ is
+   $2\times2$, which cannot act on a four-amplitude state. The second is
+   omitting a factor when only one wire has a gate. Here both wires are
+   busy so nothing is missing, but had qubit 1 been blank the column would
+   be $H \otimes I$, not $H$.
+
+   </details>
+
 2. Write the full operator expression (as a product of tensor products)
    for a 3-column circuit: column 1 is $H$ on qubit 0 only; column 2 is
    $X$ on qubit 1 only; column 3 is $\text{CNOT}$(0,1).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   U = \text{CNOT}(0,1)\,\cdot\,(I \otimes X)\,\cdot\,(H \otimes I)
+   $$
+
+   Build it one column at a time, filling every idle wire with an explicit
+   identity. Column 1 puts $H$ on qubit 0 and nothing on qubit 1, so it is
+   $H \otimes I$. Column 2 puts nothing on qubit 0 and $X$ on qubit 1, so
+   it is $I \otimes X$. Column 3 is already a two-qubit operator and takes
+   no tensor factor of its own.
+
+   Then reverse the order to write the product. The diagram reads left to
+   right in time, but operators compose by acting on the state from the
+   right, so the first column in the picture is the rightmost factor in the
+   expression. Applying $U$ to $|00\rangle$ traces as
+   $|00\rangle \to \tfrac{1}{\sqrt2}(|00\rangle+|10\rangle) \to \tfrac{1}{\sqrt2}(|01\rangle+|11\rangle) \to \tfrac{1}{\sqrt2}(|01\rangle+|10\rangle)$,
+   which is an entangled state, and the engine agrees on all three
+   intermediate vectors.
+
+   The wrong turn is writing $(H\otimes I)(I\otimes X)\,\text{CNOT}$,
+   copying the picture's order straight into the algebra. It is seductive
+   because the ordering does not matter for the first two columns here:
+   $H\otimes I$ and $I\otimes X$ act on different wires and commute, so
+   swapping just those two is harmless. The CNOT is where it bites. Put it
+   first and you are describing a genuinely different circuit, one that
+   entangles before the $H$ has produced anything to entangle, and applied
+   to $|00\rangle$ it leaves $\tfrac{1}{\sqrt2}(|01\rangle+|11\rangle)$, a
+   product state. A near-miss that happens to agree on two of three factors
+   is the most dangerous kind of error, because it survives the first test
+   you try.
+
+   </details>
+
 3. Two circuits are proposed for the same task; one has 2 columns, the
    other has 3, but a friend claims they're equivalent. What would you
    need to check to confirm or refute this?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Multiply each circuit out into a single $2^n \times 2^n$ matrix and
+   compare those two matrices, allowing a global phase. Column count is
+   irrelevant: it measures how the circuit was written, not what it
+   computes.
+
+   In practice you do not need to compare all $4^n$ entries. Operators are
+   linear, so two circuits agree on every input if and only if they agree
+   on the $2^n$ computational basis states, and running each circuit on
+   each basis state produces the columns of its matrix directly. For two
+   qubits that is four runs per circuit.
+
+   The one allowance to make is global phase. If $U_2 = e^{i\gamma}U_3$ the
+   circuits are physically identical, since every measurement probability
+   is unchanged, so the honest test is whether $U_2^\dagger U_3$ is a
+   multiple of the identity rather than exactly the identity. Concretely,
+   $S^4$ and the empty circuit differ by nothing, while $R_z(2\pi)$ and the
+   empty circuit differ by a factor of $-1$ that no experiment on those two
+   qubits alone can detect.
+
+   Two tempting shortcuts fail. Checking one input state proves nothing: a
+   circuit that swaps $|01\rangle$ and $|10\rangle$ and a circuit that does
+   nothing agree perfectly on $|00\rangle$. And "same output probabilities"
+   is weaker than equivalence, because probabilities discard relative phase;
+   the empty circuit and $Z$ on qubit 0 give identical probabilities on
+   every computational basis input, yet they are different gates, and a
+   later controlled operation or interference step will separate them. Test
+   the operator, not one trajectory through it.
+
+   </details>
+
 4. Starting from $|10\rangle$, predict the output of: $H$ on qubit 0, then
    $\text{CNOT}$(0, 1). Work it out by hand, then compare to the "Bell
    state" derivation in the next lesson once you get there.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Column 1 applies $H$ to qubit 0, which is in $|1\rangle$, and
+   $H|1\rangle = |-\rangle = \tfrac{1}{\sqrt2}(|0\rangle - |1\rangle)$.
+   Qubit 1 is untouched at $|0\rangle$:
+
+   $$
+   (H\otimes I)|10\rangle = \frac{|00\rangle - |10\rangle}{\sqrt2}
+   $$
+
+   Column 2 applies $\text{CNOT}(0,1)$ term by term. The $|00\rangle$ term
+   has control 0, so it survives unchanged. The $|10\rangle$ term has
+   control 1, so its target flips to give $|11\rangle$, and it carries its
+   minus sign along:
+
+   $$
+   \text{CNOT}(0,1)\frac{|00\rangle - |10\rangle}{\sqrt2} = \frac{|00\rangle - |11\rangle}{\sqrt2}
+   $$
+
+   That is the Bell state $|\Phi^-\rangle$. The engine confirms both steps
+   and reports the result as entangled with entanglement entropy $1$ bit,
+   the same as $|\Phi^+\rangle$, since the sign is a relative phase between
+   the two branches and not a change in how correlated they are.
+
+   The comparison the question is steering you toward: the identical
+   circuit run on $|00\rangle$ produces $\tfrac{1}{\sqrt2}(|00\rangle+|11\rangle)$.
+   One circuit, four inputs, four different Bell states, and the input
+   alone decides which. That is why the next lesson can call this circuit
+   "the Bell state preparation circuit" without ambiguity while still
+   producing all four.
+
+   The wrong turn is applying $H$ as though it always makes $|+\rangle$.
+   $H|0\rangle = |+\rangle$ and $H|1\rangle = |-\rangle$, and a student who
+   reaches for the first out of habit gets $\tfrac{1}{\sqrt2}(|00\rangle+|11\rangle)$
+   and a sign error that a computational-basis measurement will never
+   reveal, since both states give $50/50$ on $|00\rangle$ and $|11\rangle$.
+   It shows up later, in interference or in a controlled operation, long
+   after the mistake was made.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -215,7 +362,7 @@ product, needed to keep the dimensions consistent.
 - Each column of simultaneous single-qubit gates is a tensor product of
   those gates (with identity filling in untouched wires).
 
-## Further Exploration
+## The dot-and-plus notation, worked out
 
 <NextDiscovery>
 [Controlled Gates and CNOT](/lessons/quantum-computing/quantum-gates-and-circuits/controlled-gates-and-cnot) uses the dot-and-$\oplus$ notation

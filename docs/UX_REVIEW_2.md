@@ -1,5 +1,15 @@
 # Adversarial UX & visual-QA review — round 2
 
+> **This file is a findings log, not a guide.** It records the state of the
+> tree on **2026-08-29** and re-judges [`UX_REVIEW.md`](UX_REVIEW.md)'s
+> findings against the code. **Nothing in it is a rule.** Where a finding
+> here produced a durable rule, that rule was written into
+> [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) or
+> [`NARRATIVE_COMPONENTS.md`](NARRATIVE_COMPONENTS.md), which are the two
+> files that bind. A later design-system sprint has run since this was
+> written and closed several more of the findings below; specific line
+> numbers should be assumed stale.
+
 Read against `docs/DESIGN_SYSTEM.md` (including its cascade-layers and
 client-bundle-boundary sections), `docs/NARRATIVE_COMPONENTS.md`,
 `docs/UX_REVIEW.md` (the first review), `docs/PERF_AUDIT.md` and
@@ -31,7 +41,7 @@ described, just less uneven.
 | P0-3 | Difficulty encoded 5 different, contradictory ways | **Closed** | `DIFFICULTY_LABEL` and the four-tick `DifficultyMark` now live in one place (`src/lib/content/types.ts` / `src/components/curriculum/DifficultyMark.tsx`). `ProblemDifficulty` → `Difficulty` is a real 1:1 structural map (`PROBLEM_TO_DIFFICULTY` in `src/lib/problems/types.ts`, including a new `"master"` tier). Verified `DifficultyMark` is now imported and rendered in `ProblemMetaMarks.tsx` (`DifficultyScale`), `LessonLayout.tsx:178`, `ApexCourseIndex.tsx:163`, `CurrentQuantumCard.tsx:94`, and `CurriculumExplorer.tsx` — the five previously-divergent locations all draw the same four-tick ladder now. `ProblemsCatalog.tsx`'s difficulty filter includes the new `master` option, and 99 problems were retiered `advanced`→`master` in `src/content/problems/` to make it meaningful (confirmed by `docs/SCIENCE_AUDIT.md`'s mechanical diff check). |
 | P1-1 | `DIFFICULTY_LABEL` hand-copied into nine files | **Closed** | Exported once from `src/lib/content/types.ts`; grep confirms every other site (`CurriculumExplorer.tsx`, `ProblemsCatalog.tsx`, `structuredData.ts`, `problems/types.ts`, `clientBoundary.test.ts`, `DifficultyMark.tsx`) imports it rather than redeclaring it. |
 | P1-2 | 6 routes with no `PillarScope`, `journey` crossfade leaking onto unrelated pages | **Closed** | All six named routes (`learn`, `glossary`, `map`, `problems`, `problems/[slug]` via `ProblemLayout`, `about`) now render `PillarScope`. Beyond the minimal fix: a new `atlas` regime was built specifically for cross-cutting pages (`regimes.ts` `drawAtlas` — a slow reference grid plus a six-node curriculum-order orbit, genuinely on-topic rather than generic), and `fieldStore.ts`'s `DEFAULT_STATE` was changed from `{ regime: "journey" }` to `{ regime: "atlas" }`, so a *future* page that forgets `PillarScope` entirely no longer silently inherits the homepage's narrative by construction. |
-| P1-3 | Navbar pillar indicator disagrees with `/problems/[slug]`'s real pillar | **Closed** | `src/components/layout/pillarRoutes.ts`'s `detectPillar()` now resolves `/problems/<slug>` via a new `problemPillarIndex.ts` lookup, explicitly built as a chrome-only slug→pillar table so the navbar doesn't need to import the problem registry (respecting the client-bundle-boundary rule). |
+| P1-3 | Navbar pillar indicator disagrees with `/problems/[slug]`'s real pillar | **Closed** | `src/components/layout/pillarRoutes.ts`'s `detectPillar()` now resolves `/problems/<slug>` via a new `problemPillarIndex.ts` lookup, explicitly built as a chrome-only slug→pillar table so the navbar doesn't need to import the problem registry (respecting the client-bundle-boundary rule). **Note, 2026-08-30:** `problemPillarIndex.ts` no longer exists. A 556-row table cost 7.2KB gzip on every route, and `detectPillar()` now returns nothing for `/problems/<slug>`; `isProblemPage()` marks that one route shape as the case that reads the field store's scoped pillar instead. The finding stays closed; the named file does not. |
 | P1-4 | Software pillar page has no interactive/computed content — "the hole in the curve" | **Closed** | `src/app/software/page.tsx` now has a real `Instrument` (line ~168) containing `CircuitStateStepper`, stepping a Hadamard-then-CNOT circuit transpiled via real `swapOverheadForLinearChain`/`cnotOnLinearChain` code, with amplitude bars computed live from `runInstructions` on every step — not an animation standing in for data. The page also computes and displays the real state-vector memory wall (`stateVectorMemoryBytes(30/40/50)`). This is now one of the stronger pillar pages, not the weakest. |
 | P1-5 | 4 pillar pages converge on byte-identical `CourseTimeline` + `CourseList` | **Closed** | `CourseTimeline` now appears only on `mechanics/page.tsx`. Computing, Hardware and Software each end on `CourseList` alone — no longer a duplicated block across four pages. |
 | P1-6 | Content-completeness bar and reader's-own-progress badge sit unlabeled | **Closed** | `CourseList.tsx` now renders `"Content available — {progressPercent}%"` directly under the bar, disambiguating it from `CourseProgressBadge` above it. |
@@ -133,6 +143,14 @@ using the prose that already names the features as the pin labels — the
 content work is largely already written, it just needs pins instead of one
 caption paragraph.
 
+> **Resolved 2026-08-29.** All six of the files named above now use
+> `AnnotatedFigure`: `superconducting-qubits.mdx`, `trapped-ions.mdx`,
+> `neutral-atoms.mdx`, `photonic-qubits.mdx`, `spin-qubits.mdx` and
+> `cryogenic-systems.mdx`. Two further lessons outside Hardware adopted it
+> as well (`quantum-computing/.../global-and-relative-phase.mdx`,
+> `quantum-mastery/.../rigorous-teleportation-and-superdense-coding.mdx`),
+> for eight call sites in total.
+
 ### P2-new-3 · Catalog pages agree on structure but not on how they declare the neutral field regime
 
 `src/app/current-quantum/page.tsx:65` and `src/app/simulators/page.tsx:324`
@@ -149,6 +167,12 @@ wrong, but worth closing while the convention is still being set.
 **Fix:** pick one convention (explicit `regime="atlas"` is more robust to a
 future default change) and apply it to all five cross-cutting pages.
 
+> **Resolved 2026-08-29.** All five pass `regime="atlas"` explicitly, which
+> is the convention the fix recommended. `current-quantum/page.tsx` carries
+> the reasoning in its own comment. `fieldScope.test.ts` asserts that every
+> route declares a regime and that `journey` stays exclusive to the
+> homepage, so the implicit form cannot come back unnoticed.
+
 ### P2-new-4 (unchanged from P2-2, restated for completeness) · `Callout` severity is still two-valued in practice
 
 No file changed here since the first review: 450 `type="mistake"`, 24
@@ -158,6 +182,16 @@ this round, quoted verbatim from the first review's numbers) correctly
 describes the problem but the corpus hasn't moved. Genuinely an
 authoring-balance issue with no code-level fix; flagged again only because
 the brief asks to verify state, not because it's new.
+
+> **Resolved 2026-08-29.** An authoring pass fixed it. The distribution is
+> now `warning` 268, `note` 182, `mistake` 49 across 499 uses in all 219
+> lessons. `mistake` is the *rarest* of the three, at under 10%, and every
+> call site passes an explicit `type`. Note how far this overshot the doc:
+> `NARRATIVE_COMPONENTS.md`'s guidance still quoted the old "~95% mistake"
+> figure afterwards, so the reference was warning about an imbalance in the
+> opposite direction to the real one. Both that section and `Callout.tsx`'s
+> own docstring now carry the recount plus an instruction to re-derive
+> rather than trust the number.
 
 ---
 

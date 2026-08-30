@@ -38,7 +38,7 @@ const PILLAR_LABEL: Record<Pillar, string> = {
  * the connecting segment between two stations fills solid once the earlier
  * station is complete (so "how far have I actually gotten" reads at a
  * glance, not just "is this one done"), and any course another pillar's
- * course depends on gets a small "→ Pillar" marker, surfacing a real
+ * course depends on gets a small "Leads to <Pillar>" marker, surfacing a real
  * cross-pillar dependency edge instead of only the within-pillar order.
  *
  * Each station's text block is a real link to its course (via the shared
@@ -72,8 +72,18 @@ export function CourseTimeline({
   return (
     // Three classes, three separate failures they each prevent:
     //
-    // `overflow-x-auto` — the rail is `sm:min-w-max` by design and is routinely
-    //   wider than the page.
+    // `sm:overflow-x-auto` — the rail is `sm:min-w-max` by design and is
+    //   routinely wider than the page. Gated at `sm` because that is the only
+    //   breakpoint at which it can overflow: below it the `<ol>` is
+    //   `flex-col` with no `min-w-max`, every child either wraps
+    //   (`DifficultyMark`, the "Leads to" chips) or is text that reflows, so
+    //   there is nothing to scroll. Ungated it was not merely inert on a
+    //   phone, it was harmful: `overflow-x: auto` with `overflow-y: visible`
+    //   computes the y axis to `auto` as well, and ink overflow does not
+    //   create scrollable area, so the bottom of the last station's focus
+    //   outline (the site's one focus treatment is a 2px outline at a 2px
+    //   offset, so it sits 4px outside the box) was clipped away on exactly
+    //   the viewport where nothing was gained by clipping it.
     // `min-w-0` — whenever this lands inside a flex or grid item, that item's
     //   default `min-width: auto` resolves to the rail's max-content width, so
     //   the *parent* track grows to 2871px and this box never has anything
@@ -82,7 +92,7 @@ export function CourseTimeline({
     // `relative` — the subtle one, and the one that actually caused a
     //   1357px-wide horizontal scroll on `/learn` and every track page.
     //   Tailwind's `sr-only` is `position: absolute`, and each course in this
-    //   rail carries one ("— Not started"). An absolutely-positioned element
+    //   rail carries one (": Not started"). An absolutely-positioned element
     //   is clipped by an ancestor scroll container only when its *containing
     //   block* is inside that container. With this div `position: static`,
     //   the containing block resolved past it to the nearest positioned
@@ -91,7 +101,7 @@ export function CourseTimeline({
     //   width out with them. Nothing was visible out there; the page just
     //   scrolled sideways into empty space. Making this the containing block
     //   brings them back inside the clip.
-    <div className="relative min-w-0 overflow-x-auto">
+    <div className="relative min-w-0 sm:overflow-x-auto">
       {/* Built from `DIFFICULTY_HINT`, not hand-copied. `DifficultyMark`'s own
           comment says that map exists "for CourseTimeline's legend line — kept
           here too so the two never drift apart", but this legend was a literal
@@ -138,7 +148,7 @@ export function CourseTimeline({
             .filter((title): title is string => Boolean(title));
 
           // Cross-pillar courses (in other pillars) that list this course as
-          // a prerequisite — surfaced as a small "-> Hardware" style marker.
+          // a prerequisite, surfaced as a small "Leads to Hardware" marker.
           const dependentPillars = Array.from(
             new Set(
               COURSES.filter(
@@ -195,7 +205,7 @@ export function CourseTimeline({
 
               <Link
                 href={courseHref}
-                aria-label={`${course.title} — ${statusLabel}`}
+                aria-label={`${course.title}: ${statusLabel}`}
                 className="flex min-h-11 flex-col gap-2 rounded-(--radius-tight) py-2 pl-3 transition-colors duration-(--dur-fast) ease-instrument hover:bg-surface-muted sm:items-start sm:gap-2 sm:pb-8 sm:pl-0 sm:pt-3"
               >
                 <p className="text-sm font-semibold leading-snug text-foreground transition-colors duration-(--dur-fast) ease-mech group-hover:text-pillar-text">
@@ -207,15 +217,19 @@ export function CourseTimeline({
                       the element is aria-hidden, so it's not a real fallback).
                       It is repeated in the anchor's `aria-label` so the status
                       survives the label override too. */}
-                  <span className="sr-only">
-                    {" — "}
-                    {statusLabel}
-                  </span>
+                  <span className="sr-only">{`: ${statusLabel}`}</span>
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
                   <DifficultyMark difficulty={course.difficulty} />
-                  <span className="font-tech text-[0.65rem] uppercase tracking-wide text-subtle-foreground">
-                    {authoredModules}/{totalModules} lessons{contentComplete ? " · complete" : ""}
+                  {/* "written", not a bare "lessons": the station circle beside
+                      it already encodes the *reader's* own progress, so an
+                      unqualified fraction here read as a second, contradictory
+                      version of the same thing. Same wording as CourseList's
+                      caption, so the two views state one fact one way. */}
+                  <span className="tech-label text-subtle-foreground">
+                    {contentComplete
+                      ? `All ${totalModules} lessons written`
+                      : `${authoredModules}/${totalModules} lessons written`}
                   </span>
                 </div>
                 {dependentPillars.length > 0 ? (
@@ -223,9 +237,15 @@ export function CourseTimeline({
                     {dependentPillars.map((pillar) => (
                       <span
                         key={pillar}
-                        className="rounded-full border border-border px-2 py-0.5 font-tech text-[0.6rem] uppercase tracking-wide text-subtle-foreground"
+                        className="rounded-full border border-border px-2 py-0.5 font-tech text-micro uppercase tracking-meta text-subtle-foreground"
                       >
-                        → {PILLAR_LABEL[pillar]}
+                        {/* Was a bare "→ Hardware", which reads as a
+                            destination you could click rather than as "another
+                            track depends on this course". Spelling out the
+                            relation costs seven characters on a chip that
+                            wraps anyway, and drops a glyph screen readers
+                            announce as "right arrow". */}
+                        Leads to {PILLAR_LABEL[pillar]}
                       </span>
                     ))}
                   </div>

@@ -46,14 +46,14 @@ export const onePlusVsPlusOneTensorOrder: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "That's $|+\\rangle\\otimes|1\\rangle$ instead — the factor order is reversed. Qubit 0 must be whichever ket comes first.",
+      b: "That's $|+\\rangle\\otimes|1\\rangle$ with the factor order reversed. Qubit 0 is whichever ket comes first.",
       c: "This has no superposition at all, but |+⟩ is a superposition state, so qubit 1 can't collapse to a single definite value.",
-      d: "That's $|0\\rangle\\otimes|+\\rangle$ — the first factor should be $|1\\rangle$, not $|0\\rangle$.",
+      d: "That's $|0\\rangle\\otimes|+\\rangle$, but the first factor should be $|1\\rangle$, not $|0\\rangle$.",
     },
     defaultIncorrectFeedback: "Tensor $|1\\rangle$ (as qubit 0) with $|+\\rangle$ (as qubit 1): expand $|+\\rangle$'s two terms and prepend the qubit-0 label to each.",
   },
   hints: [
-    { text: "|1⟩ becomes qubit 0; |+⟩ becomes qubit 1 — the order they're written in is the order they combine in." },
+    { text: "|1⟩ becomes qubit 0 and |+⟩ becomes qubit 1: the written order is the combining order." },
     { text: "Expand |+⟩ = (|0⟩+|1⟩)/√2 and prepend '1' to each of its basis labels." },
     { text: "Every basis label in the result starts with the same digit, since qubit 0 is definite here. Only qubit 1 varies." },
   ],

@@ -65,6 +65,8 @@ export const capstoneBars = capstoneNValues.map((n, i) => ({
   caption: capstoneVariances[i].toExponential(2),
 }));
 
+export const capstoneVarianceMax = Math.max(...capstoneVariances);
+
 export const capstoneN16 = optimalGroverIterations(4);
 export const capstoneN1024 = optimalGroverIterations(10);
 export const capstoneClassicalN16 = 2 ** 4;
@@ -90,16 +92,17 @@ export const lessonMeta = {
     "Synthesize BQP's oracle-relative separations, Trotterization's error bound, and barren plateaus' variance scaling into one account of what scale requires",
     "Explain why every exactly-verified toy result on this platform sits on the near side of all three walls",
     "State, honestly and without exaggeration in either direction, what real research is doing about each wall",
+    "Recognize the shape all three walls share: each is a quantitative resource or trainability statement, not an impossibility proof, which is exactly why each is a target rather than a verdict",
   ],
 };
 
 <LessonHook eyebrow="Three walls, one honest map">
   Checking that an algorithm is correct, exactly, on a toy instance,
   proves nothing about whether it still wins once the problem is scaled
-  up to where an advantage would actually have to show itself.
+  up to where an advantage would have to show itself.
 </LessonHook>
 
-## Motivation
+## Every Toy Result on the Near Side
 
 Every algorithm this platform has built, Grover's on $16$ items, Shor's
 factoring $15$, VQE finding a $1$-qubit ground state to $10^{-12}$, was
@@ -107,7 +110,7 @@ verified *exactly*, gate by gate, number by number, against closed-form
 mathematics. None of that verification was faked, rounded, or
 hand-waved. And none of it, by itself, proves anything about whether the
 same algorithms deliver a real advantage at the scale where it would
-actually matter: millions of gates, hundreds of qubits, cryptographically
+matter: millions of gates, hundreds of qubits, cryptographically
 or scientifically relevant problem sizes. This capstone brings together
 three separate, real, derived results from this course to say why, and
 what would have to be true for that gap to close. Three walls, one
@@ -121,7 +124,7 @@ a *structured, useful* advantage costs. Both facts are true at once, and
 holding them together is most of what separates a careful reading of the
 field from an enthusiastic one.
 
-## Mathematical Development
+## Three Walls, Derived
 
 ### Wall 1: oracle separations aren't unconditional advantage
 
@@ -137,7 +140,7 @@ quantum algorithm, which is why Shor's algorithm (exploiting
 real number-theoretic structure) can and does beat what BBBV's bound
 would suggest is possible for generic search.
 
-### Wall 2: simulation cost is real, derived, and grows with the problem
+### Wall 2: simulation cost is real and grows with the problem
 
 Module 2 derived a total-error bound for first-order
 Trotterization, $\frac{t^2}{2n}\|[A,B]\|$, and Module 4 derived the
@@ -165,14 +168,15 @@ concentration of measure to bite.
 
 <BarChart
   bars={capstoneBars}
-  ariaLabel="Recap: measured gradient variance for a real multi-qubit variational ansatz at n=2 through 6 qubits, from this course's barren plateaus lesson, the sharpest single number in the course for what scale costs"
+  maxValue={capstoneVarianceMax}
+  ariaLabel="Recap: measured gradient variance for a real multi-qubit variational ansatz at n=2 through 6 qubits, on a linear scale pinned to the n=2 variance, from this course's barren plateaus lesson"
 />
 
 This is the same computation from the <Term id="barren-plateaus">barren plateaus</Term> lesson,
 reproduced here because it's arguably the sharpest single number in the
 whole course: a factor of roughly $17\times$ shrinkage in just four
-additional qubits, entirely real, entirely derived from this platform's
-actual gate and expectation-value engine.
+additional qubits, computed from this platform's own gate and
+expectation-value engine.
 
 ### Why every toy result sits on the near side of all three walls
 
@@ -181,36 +185,40 @@ iterations; on $N=1024$, $25$ iterations, both tiny, both nowhere near
 where BBBV's bound becomes an obstacle to anything, since nobody
 is proposing to break real cryptography with $16$-item search. VQE's
 $1$-qubit toy example sits so far from barren-plateau territory that its
-cost landscape has essentially no flat regions at all. Shor's factoring
+cost landscape has no flat regions at all. Shor's factoring
 $15$ needs a period-finding register barely large enough to demonstrate
 the mechanism. **None of this is a trick or a hidden shortcut**: every
 one of these results is exactly what it claims to be. The point is that
 "exactly correct at small scale" and "advantageous at large scale" are
-different claims, and this course has now derived, rather than merely
-asserted, exactly where the gap between them comes from.
+different claims, and this course has now derived where the gap between
+them comes from.
 
 <BarChart
   bars={[
     { label: "classical, N=16", value: capstoneClassicalN16, highlight: false },
     { label: "Grover, N=16", value: capstoneN16, highlight: true },
-  ]}
-  ariaLabel={`Wall 1: unstructured search query counts at N=16. Classical worst case is ${capstoneClassicalN16}, while Grover's optimal iteration count is only ${capstoneN16}`}
-/>
-
-<BarChart
-  bars={[
     { label: "classical, N=1024", value: capstoneClassicalN1024, highlight: false },
     { label: "Grover, N=1024", value: capstoneN1024, highlight: true },
   ]}
-  ariaLabel={`Wall 1: unstructured search query counts at N=1024. Classical worst case is ${capstoneClassicalN1024}, while Grover's optimal iteration count is only ${capstoneN1024}`}
+  maxValue={capstoneClassicalN1024}
+  formatCaption={(v) => v.toFixed(0)}
+  ariaLabel={`Wall 1: unstructured search query counts at two problem sizes on one shared scale pinned to ${capstoneClassicalN1024}. At N=16 the classical worst case is ${capstoneClassicalN16} and Grover needs ${capstoneN16} iterations; at N=1024 the classical worst case is ${capstoneClassicalN1024} and Grover needs ${capstoneN1024}. Multiplying N by 64 multiplies the classical bar by 64 and Grover's by about 8, the square root of 64.`}
 />
 
-Both bar pairs are real numbers from this course's own Grover engine
-(`optimalGroverIterations`), not illustrative round figures: classical
-brute force grows linearly with $N$ while Grover's $\Theta(\sqrt N)$
-optimum barely grows at all across the same range, the gap Wall
-1 says is real, provable, and still nowhere near unconditional advantage
-on a structured problem.
+All four bars are real numbers from this course's own Grover engine
+(`optimalGroverIterations`), not illustrative round figures, and they
+share one vertical scale so the two problem sizes can be read against
+each other; neither is restretched to fill its own frame.
+Multiplying $N$ by $64$ multiplies the classical worst case by $64$, from
+$16$ to $1024$, and multiplies Grover's optimal iteration count by only
+about $8$, from $3$ to $25$. The underlying scaling factor is exactly
+$\sqrt{64}=8$; the measured ratio $25/3\approx8.3$ differs only because
+each count is $\lfloor\tfrac\pi4\sqrt N\rfloor$ rounded to a whole
+number, and $3$ is small enough for that rounding to show. Either way
+the square root in $\Theta(\sqrt N)$ is legible as a ratio of bar
+heights. It is
+also the gap Wall 1 says is provable
+and still nowhere near unconditional advantage on a structured problem.
 
 | Wall | What this course derived | What it implies about scale |
 |---|---|---|
@@ -218,12 +226,12 @@ on a structured problem.
 | Simulation cost (Modules 2, 4) | $\frac{t^2}{2n}\|[A,B]\|$ Trotter error; $O(t^2)$ exact / $O(t\log(t/\epsilon))$ approximate QFT gate counts | Resource costs are quantifiable and scale with system size and target precision, not free |
 | Trainability (Module 5) | Gradient variance $O(2^{-n})$ for deep, expressive ansätze against global cost functions | Naive scaling of a working small ansatz can make it untrainable well before it becomes classically hard to simulate |
 
-## Physical Interpretation
+## The Common Shape of All Three
 
 All three walls share a common shape: each is a *quantitative*,
 *derived* limit, not a qualitative mystery and not a proof of
 impossibility. A proof of impossibility would say "this can never work."
-What this course actually derived says something more precise and more
+What this course derived says something more precise and more
 useful: "this costs exactly this much, scales exactly this way, and
 degrades for exactly this reason", which is the kind of
 statement that real research can and does push against, by finding
@@ -233,15 +241,15 @@ rather than by hoping the walls aren't there.
 <PredictBeforeReveal
   question="VQE's 1-qubit toy example converged perfectly. Scale the same ansatz pattern up naively. Which of this course's three walls would you hit first: running out of qubits to simulate the circuit, running out of gate budget for time evolution, or losing a trainable gradient?"
   options={[
-    { label: "Running out of qubits — classical simulation is the first thing to break", value: "qubits" },
-    { label: "Running out of gate budget — Trotter/QFT costs grow fastest", value: "gates" },
-    { label: "Losing a trainable gradient — barren plateaus bite at modest qubit counts", value: "gradient" },
+    { label: "Running out of qubits, since classical simulation is the first thing to break", value: "qubits" },
+    { label: "Running out of gate budget, since Trotter/QFT costs grow fastest", value: "gates" },
+    { label: "Losing a trainable gradient, since barren plateaus bite at modest qubit counts", value: "gradient" },
   ]}
   correctValue="gradient"
-  explanation="Module 5's own numbers make this concrete: gradient variance already drops by roughly 17× just going from n=2 to n=6 qubits — sizes small enough that classical simulation and Trotter gate counts are both trivial. Wall 3 is the one that shows up earliest as qubit count grows, well before Wall 1's structural limits or Wall 2's raw resource costs become the binding constraint, which is why 'just add more qubits to a working small ansatz' is not, by itself, a viable scaling strategy."
+  explanation="Module 5's own numbers make this concrete: gradient variance already drops by roughly 17× just going from n=2 to n=6 qubits, sizes small enough that classical simulation and Trotter gate counts are both trivial. Wall 3 is the one that shows up earliest as qubit count grows, well before Wall 1's structural limits or Wall 2's raw resource costs become the binding constraint, which is why 'just add more qubits to a working small ansatz' is not, by itself, a viable scaling strategy."
 />
 
-## Worked Example
+## One Ambition, Costed Against Each Wall
 
 **For each wall, name one concrete research direction that specifically
 targets it, using only what this course has derived to explain why it
@@ -249,7 +257,7 @@ helps.**
 
 *Wall 1 (structure over black boxes):* Shor's algorithm itself is the
 answer already in this platform: it doesn't try to beat BBBV's generic
-bound, it sidesteps the black-box model entirely by exploiting modular
+bound; it sidesteps the black-box model entirely by exploiting modular
 arithmetic's real structure (period-finding via the QFT, Module 1's
 "structured problems are fair game" point made concrete). Every serious
 quantum algorithm search for new speedups looks for this kind of
@@ -257,8 +265,8 @@ exploitable structure, not a way around unstructured-search's proven
 limit.
 
 *Wall 2 (simulation cost):* higher-order product formulas (this
-course's first-order bound was derived; second-order "Strang" splitting,
-mentioned in Module 2's practice questions, provably does better,
+course's first-order bound was derived; the second-order "Strang"
+splitting, derived alongside it in Module 2, provably does better,
 $O(\delta^3)$ per step instead of $O(\delta^2)$) and fundamentally
 different simulation algorithms (qubitization, quantum signal
 processing) push the *same* derived-error-bound logic to better scaling,
@@ -272,12 +280,12 @@ ansätze shallow or structured enough to avoid ever reaching the
 "sufficiently random" regime the concentration-of-measure argument
 requires.
 
-## Common Mistakes
+## Resource Limits Read as Impossibility
 
 <Callout type="note">
 **Reading this capstone as "quantum computing doesn't really work."**
 Every wall derived in this course is a *resource* or *trainability*
-scaling law, not a no-go theorem. Shor's algorithm is a real,
+scaling law, not a no-go theorem. Shor's algorithm is an
 unconditional (conditional only on standard cryptographic hardness
 assumptions about factoring's classical difficulty) quantum speedup for
 a structured problem, proof that at least one of these walls
@@ -299,24 +307,206 @@ not a lesser one.
    the "oracle separation" critique in a way Deutsch-Jozsa's speedup is
    not: what specifically makes factoring a *structured*, not
    black-box, problem?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because there is no black box. Shor's algorithm's input is the integer
+   $N$, written out in binary, and the algorithm *builds* the circuit it
+   then queries.
+
+   Trace what the two algorithms are given. Deutsch-Jozsa is handed an
+   oracle for a function $f$ about which it is told exactly one thing, that
+   $f$ is constant or balanced, and it may learn about $f$ only by
+   querying. Every lower bound in Module 1 is a statement about how much
+   can be learned that way, and it holds for *every* $f$ satisfying the
+   promise. Nothing about $f$'s internal structure is available, because
+   nothing was supplied.
+
+   Shor's algorithm is handed the digits of $N$. From them it constructs,
+   with ordinary reversible arithmetic, a circuit computing
+   $x\mapsto a^x\bmod N$. That circuit's periodicity is not a promise
+   somebody made; it is a theorem about the multiplicative group modulo
+   $N$, whose order is finite, so $a^x$ must repeat. The quantum Fourier
+   transform then reads that period off, and the period is what factors
+   $N$. Every step depends on the specific arithmetic structure, and the
+   algorithm fails outright on a generic periodic function presented as a
+   black box with no relation to modular arithmetic.
+
+   That dependence is exactly why relativization has no purchase. A
+   relativizing argument has to survive replacing the oracle with an
+   arbitrary one; Shor's algorithm does not survive that replacement, so it
+   was never making a relativizing claim, and Baker-Gill-Solovay says
+   nothing about it.
+
+   The honest completion of the picture is that the two results have
+   opposite logical shapes and neither is an unconditional separation.
+   Simon's is unconditional but relative to an oracle: rigorously proved,
+   about a model. Shor's is un-relativized but conditional: it beats every
+   classical factoring algorithm anyone has found, and there is no proof
+   that no fast classical one exists. Trading a proved statement about an
+   artificial model for an unproved statement about a real problem is
+   progress, but it is a trade, not an escape.
+
+   </details>
+
 2. Using Module 2's derived error bound, explain in your own words why
    "more Hamiltonian terms" and "tighter target accuracy" both directly,
    quantifiably increase simulation cost, rather than one being a
    hard limit and the other being free.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because both appear explicitly in the step count. Inverting
+   $\tfrac{t^2}{2n}\|[A,B]\|\leq\epsilon$ gives
+
+   $$
+   n\geq\frac{t^2\,\|[A,B]\|}{2\epsilon},
+   $$
+
+   and the two quantities the question names are sitting in the numerator
+   and denominator respectively.
+
+   **Tighter accuracy.** $n\propto1/\epsilon$ at first order. Ask for ten
+   times the accuracy and pay ten times the steps. The exponent is what
+   research moves: the symmetric Strang splitting derived in the same
+   module gives $n\propto1/\sqrt\epsilon$, so the same tenfold improvement
+   costs only about three times the steps, and post-Trotter methods such as
+   qubitization reach $\log(1/\epsilon)$, where a tenfold improvement is
+   nearly free. Three different exponents for the same quantity, which is
+   what it looks like when a cost is a research target rather than a limit.
+
+   **More Hamiltonian terms.** For $H=\sum_{j=1}^{L}H_j$ the bound
+   generalizes with $\|[A,B]\|$ replaced by
+   $\sum_{j<k}\|[H_j,H_k]\|$, so the numerator grows with the number of
+   non-commuting pairs, at worst like $L^2$. And the cost per step grows
+   too, since each Trotter step now applies $L$ exponentials instead of
+   $2$. The total gate count therefore carries the term count twice over,
+   once through $n$ and once through the per-step width.
+
+   The distinction the question is pushing at is that neither of these is a
+   threshold. Nothing happens at some critical $L$ or some critical
+   $\epsilon$ where simulation stops working; the formula returns a larger
+   number and you decide whether you can afford it. That is what makes the
+   result usable: an experimentalist reads off a gate count, compares it
+   against a coherence time, and gets a yes or a no for a specific machine,
+   rather than a verdict about the enterprise.
+
+   One place the arithmetic is much better than the naive reading suggests,
+   and it is worth carrying: the sum is over *commutators*, not over norms.
+   For a local Hamiltonian most pairs of terms act on disjoint qubits and
+   commute exactly, contributing zero. That is why the commutator-scaling
+   analysis cited in Module 2 revived Trotterization for chemistry after
+   norm-counting estimates had made it look hopeless. A cost estimate can
+   be loose, and improving the estimate is itself progress.
+
+   </details>
+
 3. Using Module 5's derivation, explain why a *local* cost function
    (built from few-qubit observables) might avoid the same
    concentration-of-measure argument that afflicts a *global* one like
    $Z^{\otimes n}$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because concentration is exponential in the dimension actually being
+   averaged over, and a local observable only ever sees the part of the
+   circuit that can reach it.
+
+   Recall precisely what the argument needs. Lévy's lemma bounds
+   fluctuations of $\langle\psi|H|\psi\rangle$ over Haar-random
+   $|\psi\rangle$ in a $D$-dimensional space by something of order $1/D$.
+   For a global observable on all $n$ qubits, $D=2^n$ and the variance is
+   $O(2^{-n})$: exponentially flat.
+
+   For a local observable such as $Z_1$, differentiating with respect to a
+   parameter $\theta_i$ produces an expression involving only the circuit
+   lying between that gate and the observable. In an architecture with
+   local entangling gates that reverse light cone touches $O(d)$ qubits at
+   depth $d$, so the effective dimension is $2^{O(d)}$ rather than $2^n$.
+   At depth $d=O(\log n)$ that is $\mathrm{poly}(n)$, and the variance
+   decays only polynomially, which an optimizer can work with. This is the
+   cost-function-dependent barren plateau result (Cerezo and coauthors,
+   2021): global cost, exponentially flat at *constant* depth; local cost,
+   polynomially flat up to logarithmic depth.
+
+   Two things not to conclude, both easy to slide into.
+
+   Locality alone is not the fix; locality *plus shallowness* is. Push a
+   local-cost circuit past logarithmic depth and the light cone grows to
+   cover every qubit, the circuit approaches a unitary $2$-design, and the
+   plateau returns exactly as before. If the state really is Haar-random
+   over the full space, $Z_1$ concentrates just as hard as
+   $Z^{\otimes n}$, since its $\pm1$ eigenspaces are the same size.
+
+   And a local cost has to still be the *right* cost. Replacing an
+   observable by an easier one is only legitimate if its minimum is the
+   answer you wanted, which has to be established problem by problem and is
+   not always possible. Mitigating a plateau by optimizing the wrong
+   function is not mitigation.
+
+   </details>
+
 4. In your own words: what's the difference between "this course proved
    X is provably a wall" and "this course proved X is provably a
    quantifiable cost, currently large"? Give one example of each from
    this course.
 
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   A wall is a theorem with no dial in it: inside its stated model, no
+   amount of ingenuity changes the answer. A cost is a formula with a dial:
+   it tells you the price, and the price responds to better algorithms,
+   better hardware, and better analysis.
+
+   **A wall: BBBV.** No quantum algorithm searching an unstructured
+   $N$-item space with a marking oracle can succeed with bounded error on
+   every instance in $o(\sqrt N)$ queries. Sharpened by Zalka, Grover's
+   algorithm is not merely asymptotically optimal but *exactly* optimal at
+   every query budget. There is nothing left to improve. The only available
+   move is to leave the model, which is precisely what Shor's algorithm
+   does by refusing to treat its input as a black box.
+
+   **A cost: the Trotter step count.** $n=O(t^2\|[A,B]\|/\epsilon)$ is a
+   number, and every part of it has moved. Symmetrizing the product formula
+   sent $1/\epsilon$ to $1/\sqrt\epsilon$; higher-order Suzuki formulas
+   push it further; commutator-scaling analysis shrank the constant by
+   orders of magnitude for local Hamiltonians without changing the
+   algorithm at all. Same task, same theorem-quality rigour, a much smaller
+   number.
+
+   The barren plateau sits in the second category too, which is worth
+   saying because it is the one most often misread as the first. The
+   $O(2^{-n})$ variance is proved for deep, expressive circuits against
+   global cost functions, and each of those three qualifiers is a hypothesis
+   somebody can attack. Local costs, shallow problem-tailored ansätze, and
+   informed initialization all target one of them.
+
+   The reason to keep the distinction sharp is that misclassifying in
+   either direction wastes effort. Read a cost as a wall and you abandon
+   something workable: Trotterization was widely written off on
+   norm-counting estimates that later turned out to be loose by orders of
+   magnitude. Read a wall as a cost and you spend years looking for a
+   faster unstructured-search algorithm that a 1997 theorem already proved
+   cannot exist.
+
+   There is also a third category this course keeps running into, which
+   belongs to neither: the conditional statement. Shor's advantage rests on
+   the unproved assumption that factoring is classically hard, and
+   $\mathsf{BPP}$ versus $\mathsf{BQP}$ is open. Those are not walls and
+   not costs; they are questions, and honest reading of the field means
+   keeping all three labels distinct.
+
+   </details>
+
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
-- Three real, derived walls separate this course's exactly-verified toy
+- Three derived walls separate this course's exactly-verified toy
   results from at-scale quantum advantage: oracle-relative (not
   unconditional) separations (Module 1), quantifiable simulation-cost
   scaling (Modules 2, 4), and exponentially vanishing trainability for
@@ -325,20 +515,20 @@ not a lesser one.
   of all three walls, not because of a hidden shortcut, but because the
   problem sizes involved are small.
 - None of the three walls is a proof of impossibility; each is a
-  quantitative scaling law with a real, active, technical research
+  quantitative scaling law with a technical research
   program pushing against it, the kind of honest, specific
   optimism this course's own derivations, not slogans, can back up.
 
-## Further Exploration
+## Where the Course Leaves the Frontier
 
 <NextDiscovery>
   This completes **Quantum Algorithms, Complexity & Simulation at
   Scale**, and with it the algorithms thread of the **Quantum Mastery**
-  pillar. [Rigorous Quantum Information
+  track. [Rigorous Quantum Information
   Theory](/lessons/quantum-mastery/quantum-information-theory/schmidt-decomposition-and-purification)
   and [Hilbert Space & Spectral
   Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/hilbert-spaces-and-self-adjointness)
-  hold the same standard (derivations rather than assertions, computed
-  rather than quoted numbers, explicit scope) and turn it on the
+  hold the same standard (derivations, not assertions; computed numbers,
+  not quoted ones; explicit scope) and turn it on the
   mathematical foundations this course assumed throughout.
 </NextDiscovery>

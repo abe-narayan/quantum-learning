@@ -15,7 +15,7 @@ export const synthesisBeatFrequencyCalculation: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "An infinite well of width L = 10 (natural units, hbar = m = 1) holds an equal superposition of its n=1 and n=2 eigenstates. Find the beat angular frequency omega_beat = (E2 - E1)/hbar.",
-    inputHint: "a decimal",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -29,8 +29,9 @@ export const synthesisBeatFrequencyCalculation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Compute E_1 = pi^2/(2*100) and E_2 = 4*pi^2/(2*100) separately." },
-    { text: "The beat frequency is exactly E_2 - E_1 (hbar=1)." },
+    { text: "A superposition of two energy eigenstates keeps a relative phase that winds at a rate set by the gap between the energies, not by either energy alone." },
+    { text: "Write down the infinite-well levels for n = 1 and n = 2 at this width, then take their difference." },
+    { text: "Both levels carry the same overall factor, so the difference is that factor times the difference of the two squared quantum numbers. That is fewer operations than evaluating both levels." },
   ],
   solution: {
     steps: [
@@ -41,7 +42,7 @@ export const synthesisBeatFrequencyCalculation: NumericProblem = {
   },
   explanation: {
     correctIdea: "A superposition's probability density oscillates at a frequency set exactly by the energy gap between the two superposed levels.",
-    whyCorrect: "This is exactly the beat pattern visible in the Wavefunction Explorer's superposition preset, computed directly from the analytical energy formula.",
+    whyCorrect: "This is the beat pattern visible in the Wavefunction Explorer's superposition preset, computed directly from the analytical energy formula.",
     whyWrong: ["Using the sum E_1+E_2 instead of the difference E_2-E_1 confuses the average energy with the beat frequency, which depends on the energy gap, not the total."],
   },
 };

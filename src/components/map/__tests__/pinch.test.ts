@@ -161,7 +161,7 @@ describe("pinchMatchesPointers", () => {
     expect(pinchMatchesPointers(pinch, [3, 1])).toBe(false);
     // One of the original two lifted; a different finger took its slot.
     expect(pinchMatchesPointers(pinch, [1, 3])).toBe(false);
-    // Same ids, swapped order — still a re-seed, since startDist/anchor were
+    // Same ids, swapped order, still a re-seed, since startDist/anchor were
     // derived from a specific (a, b) assignment.
     expect(pinchMatchesPointers(pinch, [2, 1])).toBe(false);
     expect(pinchMatchesPointers(null, [1, 2])).toBe(false);

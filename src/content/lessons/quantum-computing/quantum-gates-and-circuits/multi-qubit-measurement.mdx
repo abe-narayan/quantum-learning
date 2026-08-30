@@ -38,11 +38,11 @@ export const plusZero = new StateVector([new Complex(Math.SQRT1_2), new Complex(
 );
 export const plusZeroAfterMeasuringQubit1 = measureQubit(plusZero, 1, 0.5).collapsed;
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="From a probability claim to a derivation">
 The last lesson showed that measuring either qubit of a Bell state always matches its partner. That claim was stated in terms of probabilities; this lesson derives it from the measurement postulate directly.
 </LessonHook>
 
-## Motivation
+## A tool built along the way
 
 Deriving the Bell-state correlation from the measurement postulate builds a
 tool along the way: measuring *part* of a multi-qubit state. That operation
@@ -50,7 +50,7 @@ is not a convenience of the mathematics. Real hardware reads out one qubit
 at a time, through that qubit's own readout line, and quantum teleportation
 two lessons from now is built out of nothing else.
 
-## Intuition
+## Collapse, but only partly
 
 Measuring a single-qubit state <Term id="wavefunction-collapse">collapses</Term> it to a definite basis state,
 full stop. Measuring one qubit *within* a multi-qubit state has to do
@@ -59,7 +59,7 @@ in superposition, and the measurement cannot erase them. What it
 does is throw away every possibility inconsistent with the outcome you
 got, and rescale what's left so it's still a valid, normalized state.
 
-## Mathematical Development
+## Sum, then renormalize what survives
 
 ### The rule
 
@@ -91,9 +91,9 @@ $|\Phi^+\rangle=\frac{1}{\sqrt2}|00\rangle+\frac{1}{\sqrt2}|11\rangle$
 has exactly one term with qubit 0 equal to 0 (the $|00\rangle$ term) and
 one with qubit 0 equal to 1 (the $|11\rangle$ term), each with
 $|c_i|^2=\frac12$. So $P(\text{qubit }0{=}0)=P(\text{qubit }0{=}1)=\frac12$,
-confirming the 50/50 claim. Now the post-measurement state: if the
-outcome is 0, only the $|00\rangle$ term survives, and dividing by
-$\sqrt{1/2}$ gives amplitude exactly 1 on $|00\rangle$:
+confirming the 50/50 claim. The post-measurement state is the half worth
+pausing on. Apply the rule above to the outcome-0 case, and note while you
+do it that nobody has touched qubit 1:
 
 <PredictBeforeReveal
   question="You measure qubit 0 of |Φ+⟩ = (|00⟩+|11⟩)/√2 and get outcome 0. What state is qubit 1 in immediately afterward?"
@@ -106,6 +106,9 @@ $\sqrt{1/2}$ gives amplitude exactly 1 on $|00\rangle$:
   correctValue="zero"
   explanation="Only the |00⟩ term survives outcome 0. The |11⟩ term is zeroed out and what remains is renormalized, so there is nothing left in the state with qubit 1 equal to 1. Qubit 1 is |0⟩ with certainty, not merely likely to be |0⟩, and no further measurement can change that. Notice nobody touched qubit 1."
 />
+
+Only the $|00\rangle$ term survives outcome 0, and dividing by
+$\sqrt{1/2}$ gives amplitude exactly $1$ on $|00\rangle$:
 
 <QuantumStateDisplay state={bellAfterZero} label="Bell state, after measuring qubit 0 → outcome 0" />
 <QuantumStateDisplay state={bellAfterOne} label="Bell state, after measuring qubit 0 → outcome 1" />
@@ -144,7 +147,7 @@ qubit of a product state never disturbs the other, while measuring one
 qubit of an entangled state generally does. <Term id="entanglement">Entanglement</Term> is what makes the
 difference possible.
 
-## Physical Interpretation
+## Local, and yet not separable
 
 Partial measurement is local in a strict sense: only the measured qubit's
 degree of freedom is projected. But when the qubits are entangled, "only the
@@ -157,7 +160,7 @@ though nothing was done to it directly.
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
-## Worked Example
+## One partial measurement, start to finish
 
 **A 2-qubit state is $\frac{1}{2}|00\rangle+\frac{\sqrt3}{2}|01\rangle$.
 Find $P(\text{qubit }0{=}0)$ and the post-measurement state if that
@@ -170,7 +173,7 @@ this state to begin with. The post-measurement state is unchanged:
 $\frac{1}{2}|00\rangle+\frac{\sqrt3}{2}|01\rangle$. Qubit 1 keeps
 whatever superposition it already had.
 
-## Common Mistakes
+## Not every partial measurement disturbs the rest
 
 <Callout type="note">
 **Assuming partial measurement always collapses the other qubits too.**
@@ -190,17 +193,179 @@ normalized quantum state.
 1. For $|\Psi^+\rangle=\frac{1}{\sqrt2}(|01\rangle+|10\rangle)$, find
    $P(\text{qubit }0{=}0)$ and the resulting state if that outcome
    occurs. What does qubit 1 become?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Exactly one term has qubit 0 equal to 0, namely $|01\rangle$, so
+
+   $$
+   P(\text{qubit }0{=}0) = \left|\tfrac{1}{\sqrt2}\right|^2 = \tfrac12 .
+   $$
+
+   Zero out the inconsistent term and renormalize. Only $\tfrac{1}{\sqrt2}|01\rangle$
+   survives, and dividing by $\sqrt{1/2}$ gives amplitude exactly 1:
+
+   $$
+   |\psi'\rangle = |01\rangle .
+   $$
+
+   Qubit 1 becomes $|1\rangle$, with certainty. The engine agrees on both
+   the probability and the collapsed state.
+
+   The instructive difference from $|\Phi^+\rangle$ is the direction of the
+   correlation, not its strength. In $|\Phi^+\rangle$ the partner matches;
+   here the partner is the opposite. Both are perfect, in the sense that
+   one outcome fixes the other with certainty, and both come from the same
+   mechanical rule: keep the terms consistent with the outcome, discard the
+   rest, renormalize. There is no separate physics for anticorrelation.
+
+   Two slips are worth naming. The first is skipping the renormalization
+   and reporting $\tfrac{1}{\sqrt2}|01\rangle$, which is not a state; the
+   division by $\sqrt{P}$ is what makes the total probability 1 again once
+   you have thrown half of it away. The second is saying qubit 1 is "likely
+   to be 1". It is 1, full stop. After the collapse there is no amplitude
+   anywhere in the state with qubit 1 equal to 0, so no future measurement
+   can return 0.
+
+   </details>
+
 2. For the same $|\Psi^+\rangle$, what happens if you measure qubit 1
    first instead of qubit 0? Should the final joint state depend on which
    qubit you measure first?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Measuring qubit 1 first gives $P(\text{qubit }1{=}0) = \tfrac12$,
+   collapsing to $|10\rangle$, and $P(\text{qubit }1{=}1) = \tfrac12$,
+   collapsing to $|01\rangle$. Compare with question 1's route: measuring
+   qubit 0 first gives $|01\rangle$ or $|10\rangle$, each with probability
+   $\tfrac12$. Same two outcomes, same two probabilities, same two final
+   states.
+
+   No, the final joint state does not depend on the order, and this is not
+   a coincidence of this example. Two computational-basis measurements on
+   different qubits are described by projectors that commute, so applying
+   them in either order projects onto the same subspace and produces the
+   same normalized survivor. The probability factorizes the same way too:
+   $P(\text{q0}{=}0)\,P(\text{q1}{=}1 \mid \text{q0}{=}0) = \tfrac12 \cdot 1$
+   going one way, and $P(\text{q1}{=}1)\,P(\text{q0}{=}0 \mid \text{q1}{=}1) = \tfrac12 \cdot 1$
+   going the other. Both give $\tfrac12$ for the joint result $01$.
+
+   The order-independence matters far beyond bookkeeping. Alice and Bob may
+   be light-years apart holding the two halves, and there is in general no
+   observer-independent fact about whose measurement happened first.
+   Relativity would be in trouble if the joint statistics depended on an
+   order that different observers disagree about. They do not, and this
+   commuting-projectors fact is the mechanism, the same one behind
+   entanglement's inability to signal.
+
+   The wrong turn is reading collapse as a physical influence that
+   propagates from the measured qubit to its partner, which invites the
+   question "which one went first?" and then predicts an order dependence
+   that does not exist. The rule the lesson states involves no propagation
+   at all: it discards the branches inconsistent with what was learned.
+   That said, order does matter the moment the two measurements stop
+   commuting, for instance measuring qubit 0 in the Z basis and then again
+   in the X basis. Different qubits, same basis, is the commuting case.
+
+   </details>
+
 3. A 3-qubit entangled state is
    $\frac{1}{\sqrt2}(|000\rangle+|111\rangle)$. Find the post-measurement
    state after measuring qubit 0 and getting outcome 1. What are qubits 1
-   and 2 now?
+   and 2 now? Then repeat for the lopsided version
+   $\frac{1}{\sqrt3}|000\rangle+\sqrt{\frac{2}{3}}|111\rangle$: which parts
+   of your answer change, and which do not?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   For the GHZ state, only $|111\rangle$ has qubit 0 equal to 1, so
+   $P(\text{qubit }0{=}1) = \tfrac12$, and renormalizing the single
+   survivor gives
+
+   $$
+   |\psi'\rangle = |111\rangle .
+   $$
+
+   Qubits 1 and 2 are both $|1\rangle$, each with certainty. One
+   measurement on one qubit has determined all three values at once, which
+   is what makes GHZ states the standard example of correlation that is not
+   merely pairwise.
+
+   For the lopsided version the probability changes and nothing else does.
+   $P(\text{qubit }0{=}1) = \left|\sqrt{2/3}\right|^2 = \tfrac23$, and
+   $P(\text{qubit }0{=}0) = \tfrac13$, which the engine confirms. But the
+   collapsed states are still exactly $|111\rangle$ and $|000\rangle$,
+   because renormalizing a single surviving term always drives its
+   amplitude to 1 regardless of how large it was to begin with. The
+   original amplitudes decide *how often* each branch happens; they have no
+   say in *what* the branch looks like once it happens.
+
+   That separation is the useful takeaway, and the slip it guards against
+   is carrying the old amplitude through, reporting the collapsed state as
+   $\sqrt{2/3}\,|111\rangle$. That vector has norm $\sqrt{2/3}$, not 1, so
+   its probabilities would sum to $\tfrac23$: two thirds of the time
+   something happens, and the rest of the time, apparently, nothing exists.
+   Dividing by $\sqrt{P}$ is not cosmetic tidying; it is what keeps the
+   post-measurement description a description of a system that is certainly
+   still there.
+
+   </details>
+
 4. Explain why "measuring an entangled qubit always destroys
    superposition everywhere" is an overstatement. Construct or recall a
    3-qubit example where measuring one qubit leaves some superposition
    intact among the rest.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The overstatement is in the word "everywhere". Measuring one qubit
+   removes every branch inconsistent with the outcome, and how much
+   superposition that destroys depends entirely on how many branches
+   survive. For GHZ, one branch survives and everything becomes definite.
+   Whenever two or more survive, what is left is still a superposition, and
+   can even still be entangled.
+
+   The cleanest example is the W state:
+
+   $$
+   |W\rangle = \frac{1}{\sqrt3}\left(|001\rangle+|010\rangle+|100\rangle\right).
+   $$
+
+   Measure qubit 0. Two of the three terms, $|001\rangle$ and $|010\rangle$,
+   have qubit 0 equal to 0, so $P(\text{qubit }0{=}0) = \tfrac23$, and
+   renormalizing the two survivors by $\sqrt{2/3}$ gives
+
+   $$
+   \frac{|001\rangle+|010\rangle}{\sqrt2},
+   $$
+
+   in which qubits 1 and 2 are left in $\tfrac{1}{\sqrt2}(|01\rangle+|10\rangle) = |\Psi^+\rangle$,
+   a maximally entangled pair. The engine confirms the probability, the
+   collapsed state, and that the residual two-qubit state has entanglement
+   entropy $1$ bit. So measuring one qubit of a three-qubit entangled state
+   here leaves the other two not merely superposed but as entangled as two
+   qubits can be.
+
+   The other outcome makes the contrast inside a single example. With
+   probability $\tfrac13$ the measurement returns 1, only $|100\rangle$
+   survives, and qubits 1 and 2 collapse to $|00\rangle$ with no
+   superposition left at all. Same state, same measurement, and whether
+   superposition survives depends on which branch you land in. That is the
+   sharpest possible refutation of "always".
+
+   The reasoning that leads people astray is generalizing from the Bell and
+   GHZ examples, where every basis term carries a distinct value of the
+   measured qubit, so each outcome is consistent with exactly one term.
+   Those are the special cases in which the correlation is total. The
+   general rule is the mechanical one this lesson gives, and it does not
+   promise anything about how much survives.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -213,7 +378,7 @@ normalized quantum state.
 - Applied to a product state, the untouched qubit's superposition survives
   intact.
 
-## Further Exploration
+## A sharply counterintuitive consequence
 
 <NextDiscovery>
 [The No-Cloning Theorem](/lessons/quantum-computing/quantum-gates-and-circuits/the-no-cloning-theorem) is a sharply counterintuitive consequence of

@@ -23,21 +23,21 @@ export const lessonMeta = {
   objectives: [
     "Explain how a qubit can be encoded in a photon's polarization or spatial path",
     "State why photonic qubits have essentially no decoherence in the usual sense, and what limits them instead (loss)",
-    "Explain, at a conceptual level, why two-photon gates are fundamentally harder than gates on matter-based qubits",
+    "Account, at a conceptual level, for why two-photon gates are harder than gates on matter-based qubits",
   ],
   related: [
     {
       slug: "quantum-computing/quantum-gates-and-circuits/bb84-quantum-key-distribution",
-      note: "Polarization encoding is exactly how real quantum key distribution hardware sends BB84's Z/X-basis qubits; this platform's abstract H-and-measure protocol is, physically, an experiment built from this lesson's photon optics.",
+      note: "Polarization encoding is how real quantum key distribution hardware sends BB84's Z/X-basis qubits; this platform's abstract H-and-measure protocol is, physically, an experiment built from this lesson's photon optics.",
     },
   ],
 };
 
 <LessonHook eyebrow="A qubit that doesn't sit still">
-Every other platform confines a qubit at a fixed location. A photonic qubit is different in kind: the qubit is a particle of light, traveling at the speed of light, and it doesn't sit anywhere.
+Every other platform confines a qubit at a fixed location. A photonic qubit is different in kind: the qubit is a particle of light, traveling at the speed of light, and it never sits anywhere you could point at.
 </LessonHook>
 
-## Motivation
+## The Qubit That Travels
 
 Every platform so far, superconducting circuits, trapped ions, <Term id="neutral-atoms">neutral
 atoms</Term>, encodes a qubit in something that sits still. A <Term id="photonic-qubits">photonic qubit</Term>
@@ -47,9 +47,10 @@ travels instead, typically through optical fiber or free space.
   src="https://upload.wikimedia.org/wikipedia/commons/f/f6/FMN_Lab_electro-optical_integrated_modulator.jpg"
   alt="A photonic integrated circuit chip, an electro-optical modulator, during wire bonding of its electrical contacts, showing the on-chip waveguides light travels through"
   caption="A real photonic integrated circuit: an electro-optical modulator chip, the kind of on-chip waveguide hardware that routes and manipulates a photon's path or phase, the same path-encoding this lesson describes as an alternative to polarization."
+  aspect="aspect-[3812/2722]"
   pins={[
-    { id: "pins", x: 3, y: 45, label: "Wire-bond pin array — the edge connector routing electrical signals onto the chip." },
-    { id: "waveguides", x: 35, y: 42, label: "The photonic chip itself, with on-chip waveguides etched as the visible traces — the light path this lesson calls path encoding." },
+    { id: "pins", x: 3, y: 45, label: "Wire-bond pin array: the edge connector routing electrical signals onto the chip." },
+    { id: "waveguides", x: 35, y: 42, label: "The photonic chip itself, with on-chip waveguides etched as the visible traces, the light path this lesson calls path encoding." },
     { id: "bondwires", x: 64, y: 48, label: "Bond wires linking the chip's contact pads to the electrical launcher." },
     { id: "launcher", x: 80, y: 35, label: "Electrical launcher, delivering the modulator's driving signal to the chip." },
   ]}
@@ -58,7 +59,7 @@ travels instead, typically through optical fiber or free space.
   license="CC BY 4.0"
 />
 
-## Engineering Development
+## Encoding in Light, and Paying in Loss
 
 ### Encoding a qubit in light
 
@@ -76,7 +77,7 @@ qubit in superposition, directly realizing the same math this platform's
 `the-bloch-sphere` and interferometer-based lessons already built,
 now with an actual physical interferometer.
 
-<InteractiveSection title="The same qubit math, a different physical carrier" description="This is the same Bloch sphere from the-bloch-sphere lesson — nothing about the underlying math changes when the qubit is a photon's polarization or path instead of a trapped ion's spin or a superconducting circuit's charge. Apply a gate and measure; whatever state you land on is as valid a photonic-qubit state as it was for every other platform.">
+<InteractiveSection title="The same qubit math, a different physical carrier" description="This is the same Bloch sphere from the-bloch-sphere lesson. Nothing about the underlying math changes when the qubit is a photon's polarization or path instead of a trapped ion's spin or a superconducting circuit's charge. Apply a gate and measure; whatever state you land on is as valid a photonic-qubit state as it was for every other platform.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
@@ -114,14 +115,15 @@ engineering solutions (the Noise, Decoherence & Scaling course develops
 loss as its own error channel).
 
 <PredictBeforeReveal
-  question="A gradual T1/T2 decay curve fades continuously toward zero. A lost photon either arrives or it doesn't. If you had to guess when a given photon's fate is decided, which is true?"
+  question="Good telecom fiber attenuates about 0.2 dB per kilometer at its best wavelength, which sounds like almost nothing. Send one photon down 50 km of it. What is the chance it arrives at all?"
   options={[
-    { label: "It fades in gradually, like decoherence, no single moment to point to", value: "gradual" },
-    { label: "It's decided at one moment (absorbed, scattered, or not), and survives fully intact until then", value: "binary" },
-    { label: "Photon loss and T1/T2 decay are actually the same underlying process", value: "same" },
+    { label: "About 90%", value: "ninety" },
+    { label: "About 63%", value: "sixtythree" },
+    { label: "About 10%", value: "ten" },
+    { label: "About 1%", value: "one" },
   ]}
-  correctValue="binary"
-  explanation="Loss is a survival/no-survival event, not a fade. The photon is fully present with unit amplitude right up until the instant it's absorbed or scattered, then it's simply gone. Resample the plot below and watch only the timing of the drop move; the fact that it's a discontinuous drop, not a decay curve, never changes."
+  correctValue="ten"
+  explanation="Attenuation in dB adds along the fiber, and 50 km at 0.2 dB/km is 10 dB, a factor of ten in power. So nine photons out of ten never arrive. The worked example below runs the arithmetic, and the point to carry forward is that the loss budget depends on distance flown rather than on time elapsed, which is the opposite of a matter qubit's T1 clock."
 />
 
 <LossVsDecoherence ariaLabel="Gradual decoherence versus binary photon loss, plotted over normalized time in transit" />
@@ -147,7 +149,7 @@ implement an effective, probabilistic, two-qubit gate). This is *the*
 central engineering challenge specific to photonic quantum computing,
 without a clean analogue on any other platform covered so far.
 
-## Physical Interpretation
+## Loss Instead of Decoherence
 
 Photonic qubits sit on a different axis from every other platform's
 speed-vs-coherence tradeoff entirely: essentially perfect coherence in
@@ -172,10 +174,11 @@ as the central cost of doing business; they differ on how much error
 correction versus how much probabilistic-gate loss they're willing to
 absorb.
 
-## Worked Example
+## Surviving a Long Fiber
 
 **Why doesn't a photon's polarization "decohere" the way a
-superconducting qubit's state does, even over a long fiber trip?**
+superconducting qubit's state does, even over a fiber trip long enough
+that you would expect it to?**
 
 Decoherence (Advanced Topics in Quantum Mechanics' dephasing channel)
 requires the qubit to interact, even weakly, with an uncontrolled
@@ -184,8 +187,8 @@ through well-isolated fiber largely doesn't interact with anything along
 its path; there's no "bath" continuously nudging it the way a solid-state
 qubit sits embedded in a noisy physical device. The dominant failure mode
 instead is binary: the photon survives to be detected, or it's lost
-(absorbed, scattered) along the way — a different statistical structure
-from gradual dephasing.
+(absorbed, scattered) along the way. That is a different statistical
+structure from gradual dephasing.
 
 **How much of a single-photon signal survives 50 km of telecom fiber?**
 
@@ -206,13 +209,14 @@ dominant error grows with how far it has to fly. That inversion is why
 photons excel at links (where distance is the job) and matter qubits
 excel at storage (where time is).
 
-## Common Mistakes
+## Mistaking Low Decoherence for Low Error
 
 <Callout type="mistake">
-**Assuming "no decoherence" means "no errors."** Photon loss is a real,
-often dominant error source for photonic platforms. It just has a
+**Assuming "no decoherence" means "no errors."** Photon loss is often
+the dominant error source for photonic platforms. It just has a
 different mathematical character (binary survive/lost) than gradual
-$T_1$/$T_2$ decay.
+$T_1$/$T_2$ decay, so it will not show up anywhere you look for a
+coherence time.
 </Callout>
 
 <Callout type="warning">
@@ -225,14 +229,210 @@ anything the other platforms in this course face.
 ## Practice Questions
 
 1. Name two physical properties of a photon that can each encode a
-   qubit.
-2. Why is "loss" a fundamentally different kind of error from $T_1$/$T_2$
-   decoherence, in terms of what actually happens to the qubit?
+   qubit, and state the general requirement a property has to meet before
+   it can be used this way.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Polarization** and **path**, the two this lesson works with.
+   Polarization uses the orientation of the photon's oscillating electric
+   field, mapping $|H\rangle\to|0\rangle$ and $|V\rangle\to|1\rangle$ (or
+   equivalently left- and right-circular). Path encoding uses which of
+   two waveguides or fibres the photon travels down, so a photon in a
+   superposition of two arms of an interferometer is a qubit in
+   superposition.
+
+   A third is worth knowing, because real long-distance links use it:
+   **time-bin**, where the qubit is which of two arrival time slots the
+   photon lands in. Time-bin survives a fibre trip better than
+   polarization does, since ordinary fibre slowly rotates polarization as
+   the cable warms, bends, and ages.
+
+   **The general requirement.** The property must have two settings that
+   are reliably preparable, reliably distinguishable at measurement, and
+   preserved in flight, and it has to actually vary from photon to
+   photon. That last clause is what rules candidates out. A photon's rest
+   mass is not an encoding, and not because it is hard to measure: it is
+   zero for every photon there has ever been, so there is no second
+   setting to pair against the first. A property that takes one universal
+   value carries no information at all.
+
+   The mistake to watch for is confusing "two values I can talk about"
+   with "two values this photon could have." Energy, for instance, is a
+   real and variable property, and frequency-bin encoding is a genuine
+   scheme built on it. Mass is not in that category.
+
+   </details>
+
+2. Why is "loss" a different kind of error from $T_1$/$T_2$
+   decoherence, in terms of what happens to the qubit?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Under decoherence the qubit is still there and its state has degraded.
+   Under loss the qubit is not there.
+
+   $T_1$ and $T_2$ describe continuous processes. The state drifts toward
+   the ground state or toward a mixture, a little more with every passing
+   microsecond, and at every instant there is still a two-dimensional
+   system holding some density matrix. There is no single moment you can
+   point at and call "the error." That is what a time constant describes:
+   a rate of gradual degradation.
+
+   Loss is binary and instantaneous. The photon is fully present, in
+   whatever state it was prepared in, right up until one random moment
+   when it is absorbed or scattered, and after that there is no photon to
+   measure. The register has lost a dimension rather than having one
+   corrupted. This is why the lesson's two curves have different shapes:
+   one fades, the other is flat and then drops.
+
+   Three consequences follow from that structural difference, and they
+   are the reason the distinction is worth insisting on.
+
+   **It is not a bit flip or a phase flip.** A code built to detect $X$
+   and $Z$ errors is looking for a qubit that came back wrong. A lost
+   photon does not come back at all, so it is invisible to that code
+   until the loss itself is detected. In the standard vocabulary this is
+   a leakage error: the state has left the computational subspace
+   entirely.
+
+   **But its location is known, and that helps enormously.** A detector
+   that fires nowhere tells you *which* qubit went missing, which makes
+   loss an erasure error rather than an error at an unknown position.
+   Erasures are much cheaper to correct than unlocated errors, with
+   substantially higher fault-tolerance thresholds, and photonic
+   architectures are designed around exactly this. The property that
+   looks like the platform's weakness is partly recovered by being
+   self-announcing.
+
+   **The clock is different.** A matter qubit's $T_1$ runs on time
+   elapsed, whether or not the qubit goes anywhere. A photon's loss
+   budget runs on distance flown: about 0.2 dB per kilometre in good
+   telecom fibre, so 50 km costs 10 dB and $10^{-10/10}=10\%$ of photons
+   arrive, while 100 km costs 20 dB and 1% arrive.
+
+   The wrong turn is the one the lesson calls out directly: reading "no
+   decoherence" as "no errors," and then looking for the platform's error
+   budget where a coherence time would be. It is not there and never will
+   be. The number that governs a photonic link is a transmission
+   probability, and a system characterized only by its coherence time has
+   not been characterized at all.
+
+   </details>
+
 3. Why don't two ordinary light beams naturally interact the way two
    trapped ions' motion or two neutral atoms' Rydberg states do?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because Maxwell's equations in vacuum are linear, and a photon carries
+   no charge for another photon to act on.
+
+   Linearity is the whole story at the classical level: if two field
+   configurations are each solutions, their sum is a solution, so two
+   beams superpose and then continue on their original paths as though
+   nothing had happened. Nothing in that structure lets one beam change
+   what the other does. Every other platform in this course has a
+   handle that light lacks. An ion carries charge, so it pushes on its
+   neighbour by Coulomb repulsion, and the shared motion that produces is
+   the bus a two-qubit gate rides. A Rydberg atom has an enormous induced
+   dipole, giving a strong dipole-dipole interaction on demand. Two
+   transmons can be capacitively coupled by wiring them together on the
+   chip. Photons have no charge, no dipole moment and no wire.
+
+   Being precise: photon-photon scattering is not exactly zero. Quantum
+   electrodynamics allows it through a virtual electron-positron loop.
+   The cross-section at optical energies is so small that it has never
+   been a resource anyone could build a gate from, and treating it as
+   "zero for engineering purposes" is the right call. Nonlinear optical
+   media can also mediate an effective interaction through a $\chi^{(3)}$
+   response, and at high beam intensities that is routine technology. At
+   the level of two *single* photons the induced phase shift in ordinary
+   materials falls orders of magnitude short of the $\pi$ a controlled-Z
+   would need.
+
+   The seductive wrong answer is "but two beams do interact, that is what
+   interference is." Interference is precisely the thing linearity
+   permits: amplitudes add, and a beamsplitter redistributes them.
+   Passing two photons through a beamsplitter and seeing them bunch, the
+   Hong-Ou-Mandel effect, is a genuine quantum phenomenon and still pure
+   linear optics. Nothing there is a nonlinearity, and linear optics
+   alone cannot implement a deterministic entangling gate on two
+   independent photonic qubits.
+
+   What linear optics *can* do is give an entangling gate that works
+   sometimes. Add photon detection and post-selection, keep the runs
+   where the detectors fired in the right pattern and discard the rest,
+   and measurement supplies the effective nonlinearity the medium would
+   not. This is why the platform's entry in the capstone's comparison
+   table is "probabilistic fusion gates: succeed or fail heralded" rather
+   than a fidelity percentage. "What fraction succeed" and "how good are
+   the survivors" are two separate questions here, and a single number
+   would hide one of them.
+
+   </details>
+
 4. Why might a hybrid architecture use photons specifically for
    communication between separate quantum processors, even if those
    processors themselves use superconducting or ion qubits?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a link's job is transmission, and transmission is the one task
+   where every property that makes photons awkward computers is either
+   irrelevant or an advantage.
+
+   **The carrier is already in motion.** Every other platform's qubit is
+   bolted into a trap, a fridge or a chip. Moving one to the next
+   building is not an operation the hardware supports. A photon travels
+   at $c$ by its nature and needs no environment to live in.
+
+   **The error clock matches the task.** A matter qubit's $T_1$ runs on
+   elapsed time whether or not it goes anywhere, so carrying quantum
+   information across a campus in a transmon would spend coherence for
+   the whole journey. A photon's dominant error grows with distance
+   flown. That is exactly the axis a link is measured on, and it is the
+   inversion the lesson draws out: photons excel where distance is the
+   job, matter qubits excel where time is.
+
+   **The infrastructure exists.** The 0.2 dB/km figure is for the telecom
+   wavelength that the world's installed fibre was built around.
+
+   **Failures announce themselves.** Because loss is heralded, a link
+   attempt that failed is known to have failed. Entanglement distribution
+   can therefore be run as repeat-until-success: try, check, keep the
+   successes. That protocol is unavailable for an error you cannot see.
+
+   **The platform's hardest problem is off the critical path.** Photonic
+   quantum *computing* is hard because two-photon gates are hard. A link
+   does not need a two-photon gate. It needs a photon to arrive, so the
+   weakness never comes up.
+
+   The hybrid then reads as each layer doing what it is best at:
+   superconducting or ion qubits for computation, where strong couplings
+   and fast or high-fidelity gates live, and photons for the links
+   between them.
+
+   One honest complication, since a hybrid is not free. Joining the two
+   layers requires converting a stationary qubit's excitation into a
+   flying photon and back, and for a superconducting processor that means
+   moving between microwave and optical frequencies. Microwave-to-optical
+   transduction is an active research problem precisely because current
+   converters are lossy and noisy, and the whole architecture's link rate
+   is set by that step.
+
+   The wrong turn is running the argument one step further into "so
+   photons should be the computer too, since their coherence is
+   effectively perfect." The absence of interaction that makes a photon
+   an excellent courier is the same absence that makes it a poor gate
+   partner. It is one physical fact, and it reads as a strength or a
+   weakness depending only on which job you hand it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -251,7 +451,7 @@ anything the other platforms in this course face.
   two-qubit gates the platform's defining engineering challenge, without
   a direct analogue among the matter-based platforms.
 
-## Further Exploration
+## Back to Solid State
 
 <NextDiscovery>
 [Spin Qubits](/lessons/quantum-hardware/physical-qubit-platforms/spin-qubits) is a solid-state platform that, unlike

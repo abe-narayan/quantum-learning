@@ -9,22 +9,22 @@ import type { FieldRegime } from "@/lib/design/pillars";
  * ("atlas") for pages that survey the whole curriculum rather than standing
  * inside one pillar's physics.
  *
- * The rule every one of these follows — and the reason there is not a single
- * generic particle system in this file — is that **the background depicts the
+ * The rule every one of these follows, and the reason there is not a single
+ * generic particle system in this file, is that **the background depicts the
  * physics of the pillar you are standing in**:
  *
  *   wave      A real Gaussian wave packet, psi(x,t), with its |psi|^2 envelope.
- *             It propagates *and disperses* — the envelope genuinely widens
+ *             It propagates *and disperses*, the envelope genuinely widens
  *             with time, because a free packet's width grows as
  *             sqrt(1 + (t/tau)^2). Scrolling advances t.
  *   state     A Bloch sphere in orthographic projection with a state vector
  *             precessing about z (Larmor precession) and its equatorial
- *             shadow — the projection that measurement in the z basis sees.
+ *             shadow, the projection that measurement in the z basis sees.
  *   lattice   A coupled-qubit lattice with control lines running in from the
  *             edge; pulses travel along them at finite speed and light the
  *             qubit they reach. That is what "control and readout" looks like.
  *   graph     Circuit rails carrying gates right to left, including two-qubit
- *             connectors — a circuit executing, not decoration.
+ *             connectors, a circuit executing, not decoration.
  *   operator  The magnitude structure |U_jk| of a Fourier-like unitary drawn
  *             as a matrix heat grid, slowly rotating in phase. Mastery is
  *             where operators stop being notation and start being objects.
@@ -33,8 +33,8 @@ import type { FieldRegime } from "@/lib/design/pillars";
  *             (open problems). The horizon rises as you scroll.
  *   atlas     The neutral default for pages with no single pillar (Learn,
  *             Glossary, the concept Map, the Problems catalog, About): a
- *             faint reference grid — an atlas's own meridians and parallels
- *             — behind the six curriculum pillars themselves, drawn as a
+ *             faint reference grid (an atlas's own meridians and parallels)
+ *             behind the six curriculum pillars themselves, drawn as a
  *             slowly-orbiting hexagon of nodes in curriculum order and
  *             joined edge to edge. It depicts the real thing these pages
  *             are actually showing (the shape of the whole six-pillar
@@ -43,7 +43,7 @@ import type { FieldRegime } from "@/lib/design/pillars";
  *
  * Everything is drawn in CSS pixels (the caller has already applied the
  * device-pixel-ratio transform), at low alpha, behind content. No regime may
- * draw at an alpha high enough to compete with body text — that ceiling is
+ * draw at an alpha high enough to compete with body text, that ceiling is
  * enforced by the caller's `intensity` multiplier, not by trust.
  */
 
@@ -89,21 +89,86 @@ function rand(seed: number): number {
  * `intensity`.
  *
  * This is a *measured* number, not a round one. The field is composited over
- * `--background`, and `--pillar-accent` — the brightest colour any renderer
- * reaches for — reaches body-text weight (4.5:1 against that ground) at
+ * `--background`, and `--pillar-accent`, the brightest colour any renderer
+ * reaches for, reaches body-text weight (4.5:1 against that ground) at
  * roughly alpha 0.63. Every regime draws somewhere behind the reading column
  * at some viewport, so a mark at or above that weight is a background
  * competing with the prose in front of it, which is the single rule this
  * whole feature is built around. 0.55 lands at ~3.4:1: unambiguously
  * perceivable as a graphic, unambiguously quieter than text.
  *
- * The ceiling used to live only in `__tests__/regimes.test.ts`, set to 0.75 —
+ * The ceiling used to live only in `__tests__/regimes.test.ts`, set to 0.75,
  * loose enough that `drawState`'s state vector sat at 0.7 (5.09:1, brighter
  * than anything else in the file) and passed. It is exported from the module
  * it governs now so the number and the renderers it constrains are read
  * together.
  */
 export const REGIME_ALPHA_CEILING = 0.55;
+
+/**
+ * A second ceiling, on the *composite* rather than on a single mark, applied
+ * by `QuantumField` to `frame.intensity` before it dispatches.
+ *
+ * ### Why one ceiling was not enough
+ *
+ * `REGIME_ALPHA_CEILING` above constrains what any one `withAlpha` call may
+ * paint. A frame is not one call. Marks overlap — a glow under a stroke, two
+ * particles crossing, a rail drawn over a grid — and alpha composites as
+ * `1 - (1-a)(1-b)`, so two marks at 0.5 leave a pixel at 0.75. Measured with
+ * `scripts/audit/field.mjs`, which reads this canvas's own backing store over
+ * 70 frames at three scroll positions, the loudest pixel in a real frame runs
+ * **1.3 to 1.5x the per-mark ceiling**: 0.55 becomes 0.72 in `lattice`, 0.80
+ * in `graph`, 0.82 in `state`. The constant that claims to bound this layer
+ * did not bound it.
+ *
+ * ### And why the number it was tuned against was the wrong one
+ *
+ * The docstring above reasons the 0.55 out against `--foreground` on
+ * `--depth-0`, and for `--foreground` it very nearly holds. But
+ * `--foreground` is not the only text this site sets directly on the page
+ * ground with nothing but the field behind it. A `Lede` is
+ * `--muted-foreground` at 20px. A caption, a unit, a footnote, a code span is
+ * `--subtle-foreground` at 12px. Those two voices are dimmer, so they fail at
+ * a far lower ground luminance: `--foreground` survives a ground up to
+ * L = 0.145, `--muted-foreground` only to 0.041, `--subtle-foreground` only
+ * to 0.022. Against the real composite, seven of the eight regimes took at
+ * least one voice under AA, and three took `--foreground` itself under it —
+ * `graph` to 2.40:1.
+ *
+ * This is the same shape of error `docs/DESIGN_SYSTEM.md` §2 records for
+ * `--axis`: a token tuned against the bar that was in mind rather than the
+ * strictest bar it actually has to clear.
+ *
+ * ### The numbers
+ *
+ * Each value is the factor that brings that regime's measured worst pixel
+ * under the strictest voice's limit, with about 10% of margin because the
+ * measurement is a sample of a moving image rather than a proof. They are
+ * reproducible: `node scripts/audit/field.mjs` prints the required factor per
+ * regime, and after this it prints 1.000 for all eight.
+ *
+ * They differ per regime on purpose. A single site-wide number would have to
+ * be the strictest one, which would dim `operator` — already the quietest
+ * thing here, and already passing — by a further two thirds for nothing. What
+ * these do instead is *equalise*: after this every regime peaks at roughly the
+ * same loudness, which is also the more coherent design. A background that is
+ * four times brighter on Software than on Mastery was not a decision anybody
+ * made.
+ *
+ * `journey` takes the strictest of the six it crossfades, because it renders
+ * them through `drawJourney` with its own intensity and cannot be given six
+ * different ceilings.
+ */
+export const REGIME_COMPOSITE_CEILING: Record<FieldRegime, number> = {
+  wave: 0.27,
+  state: 0.18,
+  lattice: 0.21,
+  graph: 0.15,
+  operator: 1,
+  frontier: 0.45,
+  atlas: 0.45,
+  journey: 0.15,
+};
 
 function withAlpha(ctx: CanvasRenderingContext2D, alpha: number, draw: () => void) {
   const previous = ctx.globalAlpha;
@@ -113,14 +178,14 @@ function withAlpha(ctx: CanvasRenderingContext2D, alpha: number, draw: () => voi
 }
 
 /* -------------------------------------------------------------------------
-   wave — Quantum Mechanics
+   wave: Quantum Mechanics
    ------------------------------------------------------------------------- */
 function drawWave(frame: FieldFrame) {
   const { ctx, width, height, time, scroll, accent, dim, intensity, detail } = frame;
 
   // Free-particle Gaussian packet. sigma(t) = sigma0 * sqrt(1 + (t/tau)^2) is
   // the actual spreading law; using it (rather than a fixed-width envelope
-  // that just slides) is the whole point — a reader who later meets wave
+  // that just slides) is the whole point, a reader who later meets wave
   // packet dispersion in Wave Mechanics has already watched it happen here.
   const tau = 26;
   const t = time * 0.55 + scroll * 22;
@@ -163,7 +228,7 @@ function drawWave(frame: FieldFrame) {
     ctx.stroke();
   });
 
-  // A second, slower packet lower down, out of phase — enough to suggest the
+  // A second, slower packet lower down, out of phase, enough to suggest the
   // interference these two would produce without drawing a busy pattern.
   const centre2 = width - ((t * width * 0.008 + width * 0.2) % (width * 1.4));
   const baseline2 = height * 0.86;
@@ -180,7 +245,7 @@ function drawWave(frame: FieldFrame) {
     ctx.stroke();
   });
 
-  // Position axis with ticks — this is a plot, not an ornament.
+  // Position axis with ticks, this is a plot, not an ornament.
   withAlpha(ctx, 0.18 * intensity, () => {
     ctx.strokeStyle = dim;
     ctx.lineWidth = 1;
@@ -200,7 +265,7 @@ function drawWave(frame: FieldFrame) {
 }
 
 /* -------------------------------------------------------------------------
-   state — Quantum Computing
+   state: Quantum Computing
    ------------------------------------------------------------------------- */
 function drawState(frame: FieldFrame) {
   const { ctx, width, height, time, scroll, accent, dim, intensity, detail } = frame;
@@ -241,7 +306,7 @@ function drawState(frame: FieldFrame) {
 
   // The state vector: polar angle set by scroll (the reader "rotates" the
   // qubit as they descend the page), azimuth precessing about z at a fixed
-  // rate — Larmor precession, the thing a detuned drive actually does.
+  // rate, Larmor precession, the thing a detuned drive actually does.
   const theta = 0.55 + scroll * 1.9;
   const phi = time * 0.6;
   const sx = Math.sin(theta) * Math.cos(phi);
@@ -268,7 +333,7 @@ function drawState(frame: FieldFrame) {
   });
 
   // 0.5, not the 0.7 this shipped with. `accent` at 0.7 over `--background`
-  // composites to 5.09:1 — above the 4.5:1 AA threshold, i.e. this line was
+  // composites to 5.09:1, above the 4.5:1 AA threshold, i.e. this line was
   // drawn at literal body-text weight, and the sphere is centred at
   // `0.72 * width` with a radius of `0.3 * min(width, height)`, so it sweeps
   // straight through the reading column at every viewport (worse on a phone,
@@ -322,7 +387,7 @@ function drawState(frame: FieldFrame) {
 }
 
 /* -------------------------------------------------------------------------
-   lattice — Quantum Hardware
+   lattice: Quantum Hardware
    ------------------------------------------------------------------------- */
 function drawLattice(frame: FieldFrame) {
   const { ctx, width, height, time, scroll, accent, dim, intensity, detail } = frame;
@@ -395,7 +460,7 @@ function drawLattice(frame: FieldFrame) {
 }
 
 /* -------------------------------------------------------------------------
-   graph — Quantum Software
+   graph: Quantum Software
    ------------------------------------------------------------------------- */
 function drawGraph(frame: FieldFrame) {
   const { ctx, width, height, time, scroll, accent, dim, intensity, detail } = frame;
@@ -466,7 +531,7 @@ function drawGraph(frame: FieldFrame) {
 }
 
 /* -------------------------------------------------------------------------
-   operator — Quantum Mastery
+   operator: Quantum Mastery
    ------------------------------------------------------------------------- */
 function drawOperator(frame: FieldFrame) {
   const { ctx, width, height, time, scroll, accent, dim, intensity, detail } = frame;
@@ -524,7 +589,7 @@ function drawOperator(frame: FieldFrame) {
 }
 
 /* -------------------------------------------------------------------------
-   frontier — Apex
+   frontier: Apex
    ------------------------------------------------------------------------- */
 function drawFrontier(frame: FieldFrame) {
   const { ctx, width, height, time, scroll, accent, dim, intensity, detail } = frame;
@@ -548,7 +613,7 @@ function drawFrontier(frame: FieldFrame) {
     ctx.stroke();
   });
 
-  // Below: settled results. A dense, regular, dim lattice — order, closed.
+  // Below: settled results. A dense, regular, dim lattice, order, closed.
   const spacing = Math.max(34, 60 - detail * 24);
   withAlpha(ctx, 0.13 * intensity, () => {
     ctx.fillStyle = dim;
@@ -561,7 +626,7 @@ function drawFrontier(frame: FieldFrame) {
     }
   });
 
-  // Above: open problems. Sparse, brighter, irregular — and the links between
+  // Above: open problems. Sparse, brighter, irregular, and the links between
   // them form and fade, because which results connect to which is exactly
   // what is not yet known.
   const openCount = Math.round(14 + detail * 18);
@@ -595,12 +660,12 @@ function drawFrontier(frame: FieldFrame) {
   });
 
   // Open-problem points draw in `accent`, like every other regime's brightest
-  // marks — not `--foreground` (docs/UX_REVIEW.md P1-13). Apex is the pillar
+  // marks, not `--foreground` (docs/UX_REVIEW.md P1-13). Apex is the pillar
   // with the densest text and the strongest `--atmosphere-strength`; drawing
   // these in the body-text color would have made them the single brightest
   // marks anywhere in the background system, on the page least able to
   // afford it. The rising horizon and the sparse link structure above
-  // already carry the "known below, open above" metaphor — point brightness
+  // already carry the "known below, open above" metaphor, point brightness
   // was never doing the teaching, so capping it here costs nothing.
   for (const point of points) {
     withAlpha(ctx, 0.3 * intensity * point.b, () => {
@@ -613,12 +678,12 @@ function drawFrontier(frame: FieldFrame) {
 }
 
 /* -------------------------------------------------------------------------
-   atlas — neutral default for cross-cutting, whole-curriculum pages
+   atlas: neutral default for cross-cutting, whole-curriculum pages
    ------------------------------------------------------------------------- */
 function drawAtlas(frame: FieldFrame) {
   const { ctx, width, height, time, scroll, accent, dim, intensity, detail } = frame;
 
-  // A quiet reference grid — the literal furniture of an atlas — rather than
+  // A quiet reference grid, the literal furniture of an atlas, rather than
   // any single pillar's phenomenon. Drift is slow and vertical only; nothing
   // here pretends to be "descending" anything the way `journey` genuinely
   // is, because these pages have no one curriculum position to descend
@@ -645,7 +710,7 @@ function drawAtlas(frame: FieldFrame) {
 
   // Six nodes, one per curriculum pillar (Mechanics through Apex, the same
   // order as `journey`'s sequence), held in a slow orbit around the page
-  // centre and joined in that order — the curriculum's own path, not an
+  // centre and joined in that order, the curriculum's own path, not an
   // arbitrary hexagon. This is what these pages are actually about: the
   // whole six-pillar structure, seen from outside any one of them, rather
   // than a phenomenon borrowed from a pillar they aren't standing in.
@@ -688,7 +753,7 @@ function drawAtlas(frame: FieldFrame) {
 }
 
 /* -------------------------------------------------------------------------
-   journey — the homepage
+   journey: the homepage
    ------------------------------------------------------------------------- */
 const JOURNEY_SEQUENCE: Exclude<FieldRegime, "journey">[] = [
   "wave",
@@ -700,11 +765,20 @@ const JOURNEY_SEQUENCE: Exclude<FieldRegime, "journey">[] = [
 ];
 
 /**
- * Crossfades the six pillar environments in curriculum order across the
- * document's scroll range, so scrolling the homepage is literally a descent
- * through the curriculum: waves, then qubits, then hardware, then software,
- * then operators, then the frontier. Two regimes are live at any moment
- * (never more), so the cost is bounded at twice a single regime.
+ * Crossfades the six pillar environments in curriculum order across
+ * `frame.scroll`, so scrolling the homepage is literally a descent through the
+ * curriculum: waves, then qubits, then hardware, then software, then
+ * operators, then the frontier. Two regimes are live at any moment (never
+ * more), so the cost is bounded at twice a single regime.
+ *
+ * `frame.scroll` is normally the raw fraction of the document scrolled, which
+ * only lines the six environments up with the six sections when those sections
+ * are evenly spaced. They are not: the homepage opens with three sections that
+ * belong to no track. So `QuantumField` re-scores `frame.scroll` against the
+ * `data-journey-stop` elements the page declares, and hands this function a
+ * *curriculum* position rather than a document position. Nothing here has to
+ * know that, which is the point: this stays a pure function of the frame, and
+ * a page that declares no stops still gets the old even spacing.
  */
 function drawJourney(frame: FieldFrame) {
   const segments = JOURNEY_SEQUENCE.length - 1;
@@ -720,7 +794,7 @@ function drawJourney(frame: FieldFrame) {
 
   // The crossfade is the one place a regime is rendered at something other
   // than the caller's own intensity. It used to spread a fresh frame per
-  // side, which meant the homepage — the only page that uses `journey` —
+  // side, which meant the homepage, the only page that uses `journey`,
   // allocated two frame objects on top of the caller's on every single frame.
   // Setting the one field that differs and putting it back is exactly
   // equivalent: every renderer destructures `intensity` on entry and none
@@ -743,7 +817,7 @@ function drawJourney(frame: FieldFrame) {
 /**
  * Every renderer divides by, or takes a modulus of, some fraction of the
  * viewport size. A zero-size viewport therefore produces NaN coordinates,
- * which canvas silently accepts and then drops the rest of the path for — a
+ * which canvas silently accepts and then drops the rest of the path for, a
  * blank background with nothing in the console. Zero-size is not
  * hypothetical: a phone reports it mid-orientation-change, and so does a
  * canvas measured before layout has settled.
@@ -784,7 +858,7 @@ export const REGIME_DESCRIPTIONS: Record<FieldRegime, string> = {
   frontier:
     "Background animation: a horizon separating a dense lattice of settled results below from sparse, tentatively-connected open problems above.",
   journey:
-    "Background animation: the six curriculum environments in sequence — wave packets, Bloch-sphere states, qubit hardware, circuits, operators, and the research frontier — crossfading as the page scrolls.",
+    "Background animation: the six curriculum environments (wave packets, Bloch-sphere states, qubit hardware, circuits, operators, and the research frontier) crossfading into one another as each section of the page reaches the middle of the screen.",
   atlas:
-    "Background animation: a faint reference grid behind six slowly orbiting nodes representing the curriculum's six pillars, joined in learning order.",
+    "Background animation: a faint reference grid behind six slowly orbiting nodes representing the curriculum's six tracks, joined in learning order.",
 };

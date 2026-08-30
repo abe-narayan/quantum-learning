@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { SITE_DESCRIPTION } from "@/lib/structuredData";
 
 // Only favicon.ico exists in src/app/ today — no larger PNG/SVG icon assets
 // have been generated for this repo, so `icons` only lists what actually
@@ -12,12 +13,18 @@ import type { MetadataRoute } from "next";
 // (#818cf8) respectively. Previously these were the *light*-theme values,
 // which briefly flashed a white/indigo splash screen on a site that now
 // opens dark by default.
+//
+// `description` is now imported from `SITE_DESCRIPTION` rather than copied and
+// kept in step by hand — the copy here had already fallen 7 problems behind the
+// real corpus. An installed shortcut and a search result are the same promise
+// made in two places; when they disagree, the reader has no way to tell which
+// one the site meant. `name` still matches `title.default` in
+// src/app/layout.tsx by hand, which is safe because it carries no figure.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "QuantumLearn — Learn Quantum Mechanics & Quantum Computing",
-    short_name: "QuantumLearn",
-    description:
-      "An interactive platform for learning quantum mechanics and quantum computing — lessons, simulators, and problem sets for advanced high-school and early-college students.",
+    name: "StudyQuantum: Quantum Mechanics and Quantum Computing from Scratch",
+    short_name: "StudyQuantum",
+    description: SITE_DESCRIPTION,
     start_url: "/",
     display: "standalone",
     background_color: "#05070c",

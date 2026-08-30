@@ -76,15 +76,35 @@ export function approxQFTCircuit(state, cutoff) {
   return s;
 }
 
-export function frobeniusDistance(M1, M2) {
+export function matrixDifference(M1, M2) {
+  return M1.add(M2.scale(-1));
+}
+
+export function frobeniusNorm(D) {
   let sum = 0;
-  for (let r = 0; r < M1.rows; r++) {
-    for (let c = 0; c < M1.cols; c++) {
-      const d = M1.get(r, c).sub(M2.get(r, c));
-      sum += d.magnitudeSquared();
-    }
+  for (let r = 0; r < D.rows; r++) {
+    for (let c = 0; c < D.cols; c++) sum += D.get(r, c).magnitudeSquared();
   }
   return Math.sqrt(sum);
+}
+
+export function operatorNorm(D) {
+  const G = D.dagger().mul(D);
+  const n = G.rows;
+  let v = Array.from({ length: n }, (_, i) => new Complex(Math.cos(1.7 * i) + 1.3, Math.sin(0.9 * i)));
+  let lambda = 0;
+  for (let iter = 0; iter < 200; iter++) {
+    const w = Array.from({ length: n }, (_, r) => {
+      let acc = Complex.ZERO;
+      for (let c = 0; c < n; c++) acc = acc.add(G.get(r, c).mul(v[c]));
+      return acc;
+    });
+    const norm = Math.sqrt(w.reduce((a, z) => a + z.magnitudeSquared(), 0));
+    if (norm < 1e-280) return 0;
+    lambda = norm;
+    v = w.map((z) => z.scale(1 / norm));
+  }
+  return Math.sqrt(lambda);
 }
 
 export const aqftN = 6;
@@ -92,20 +112,26 @@ export const aqftExactMatrix = matrixFromCircuit(aqftN, (s) => quantumFourierTra
 export const aqftCutoffs = [1, 2, 3, 4, 5, 6];
 export const aqftResults = aqftCutoffs.map((cutoff) => {
   const approx = matrixFromCircuit(aqftN, (s) => approxQFTCircuit(s, cutoff));
-  const error = frobeniusDistance(aqftExactMatrix, approx);
+  const diff = matrixDifference(aqftExactMatrix, approx);
   let gateCount = 0;
   for (let q = 0; q < aqftN; q++) {
     for (let k = 2; k <= aqftN - q; k++) if (k <= cutoff) gateCount++;
   }
-  return { cutoff, error, gateCount, bound: (2 * Math.PI * aqftN) / 2 ** cutoff };
+  return {
+    cutoff,
+    opError: operatorNorm(diff),
+    frobError: frobeniusNorm(diff),
+    gateCount,
+    bound: (2 * Math.PI * aqftN) / 2 ** cutoff,
+  };
 });
 
 export const aqftCurveFrames = [
   {
     paramLabel: "",
     series: [
-      { label: "log₁₀(actual AQFT error)", color: "brand", points: aqftResults.filter((r) => r.error > 0).map((r) => ({ x: r.cutoff, y: Math.log10(r.error) })) },
-      { label: "log₁₀(derived bound 2πn/2^m)", color: "muted", points: aqftResults.map((r) => ({ x: r.cutoff, y: Math.log10(r.bound) })) },
+      { label: "log₁₀(operator-norm AQFT error)", color: "brand", mode: "points", points: aqftResults.filter((r) => r.opError > 0).map((r) => ({ x: r.cutoff, y: Math.log10(r.opError) })) },
+      { label: "log₁₀(derived bound 2πt/2^m)", color: "muted", points: aqftResults.map((r) => ({ x: r.cutoff, y: Math.log10(r.bound) })) },
     ],
   },
 ];
@@ -115,7 +141,7 @@ export const gateCountExact = (gateCountN * (gateCountN - 1)) / 2;
 export const gateCountAQFTm = 5;
 export const gateCountAQFT = (() => {
   let kept = 0;
-  for (let q = 0; q < gateCountN; q++) kept += Math.min(Math.max(gateCountN - q - 1, 0), gateCountAQFTm);
+  for (let q = 0; q < gateCountN; q++) kept += Math.max(Math.min(gateCountAQFTm, gateCountN - q) - 1, 0);
   return kept;
 })();
 
@@ -135,27 +161,28 @@ export const lessonMeta = {
   objectives: [
     "Derive the exact closed-form measurement probability of QPE for an arbitrary (not necessarily exactly representable) phase, via geometric series",
     "Prove the 4/π² worst-case success probability guarantee and a per-outcome tail-probability bound from that closed form",
-    "Derive exact QFT gate counts and a provable error bound for an approximate QFT that drops small-angle controlled-phase gates",
+    "Count the exact QFT gate cost and a provable error bound for an approximate QFT that drops small-angle controlled-phase gates",
   ],
 };
 
-<LessonHook eyebrow="What a real factoring circuit actually pays for">
+<LessonHook eyebrow="What a real factoring circuit pays for">
   Phase estimation is the subroutine that turns "find the period of a
-  modular exponential function" into "read off a phase" — the entire
-  mechanism behind Shor's algorithm. Every gate this lesson counts, and
-  every bit of precision its bounds guarantee, is a real resource cost.
+  modular exponential function" into "read off a phase," which is the
+  entire mechanism behind Shor's algorithm. Every gate this lesson
+  counts, and every bit of precision its bounds guarantee, is a real
+  resource cost.
 </LessonHook>
 
-## Motivation
+## The Case the Earlier Derivation Skipped
 
 Quantum Phase Estimation was derived, in Quantum Algorithms I, only for
 phases $\varphi$ exactly representable in $t$ bits, a clean but
 special case where the precision register lands on a single basis state
 with certainty. Every real phase encountered in practice (an
-eigenphase of a physically realistic Hamiltonian, say) is essentially
+eigenphase of a physically realistic Hamiltonian, say) is almost
 never exactly representable in any finite register. This lesson derives
-what actually happens then, exactly, and separately asks the QFT's own
-circuit-engineering question: how much does the QFT actually cost to
+what happens then, exactly, and separately asks the QFT's own
+circuit-engineering question: how much does the QFT cost to
 build, and what does an engineer get to trade away to build a cheaper
 approximation?
 
@@ -168,7 +195,7 @@ survive truncation) is a consequence of <Term id="quantum-phase-estimation-preci
 derived here</Term>. The bounds are not preliminaries to the interesting part.
 They are the resource cost of the interesting part.
 
-## Mathematical Development
+## A Worst-Case Guarantee and an Exact Gate Count
 
 ### The exact closed-form measurement probability
 
@@ -219,7 +246,7 @@ $\sin x\leq x$ for the denominator (so $\sin^2(\pi\delta/N)\leq
     P(b) = \frac1{N^2}\frac{\sin^2(\pi\delta)}{\sin^2(\pi\delta/N)} \geq \frac{\sin^2(\pi\delta)}{\pi^2\delta^2} = \left(\frac{\sin(\pi\delta)}{\pi\delta}\right)^2
     $$
   </DerivationStep>
-  <DerivationStep annotation="sinc(δ) = sin(πδ)/(πδ) is even and decreases monotonically on δ ∈ [0, 1/2] (a standard elementary-calculus fact, cited rather than re-derived), so its minimum on δ ∈ [−1/2, 1/2] occurs at |δ| = 1/2, where sinc(1/2) = sin(π/2)/(π/2) = 2/π.">
+  <DerivationStep annotation="sinc(δ) = sin(πδ)/(πδ) is even and decreases monotonically on δ ∈ [0, 1/2] (a standard elementary-calculus fact, cited here), so its minimum on δ ∈ [−1/2, 1/2] occurs at |δ| = 1/2, where sinc(1/2) = sin(π/2)/(π/2) = 2/π.">
     $$
     P(b) \geq \left(\frac2\pi\right)^2 = \frac4{\pi^2} \approx 0.4053
     $$
@@ -318,7 +345,9 @@ actual physical operation with its own error rate on real hardware.
 Each controlled-phase gate at "distance" $k$ applies angle $\theta_k=
 2\pi/2^k$, exponentially small for $k$ much larger than a cutoff $m$.
 The **approximate QFT (AQFT)** omits every controlled-phase gate
-with $k>m$, keeping only the $m$ largest-angle neighbors at each row.
+with $k>m$, keeping only the largest-angle neighbors at each row (the
+gates run from $k=2$ up to $k=t-q$ on row $q$, so a cutoff $m$ leaves at
+most $m-1$ of them per row).
 Bound the resulting error by reusing the previous lesson's
 submultiplicativity lemma directly: replacing a single controlled-phase
 gate $\text{phaseGate}(\theta_k)$ with the identity changes that one
@@ -330,7 +359,7 @@ ranging over $m+1,\dots,t$) via the lemma:
 <EquationReveal
   terms={[
     { id: "norm", symbol: "‖QFT−AQFT_m‖", gloss: "The operator-norm distance between the exact QFT circuit and the approximate one that drops gates below the cutoff m." },
-    { id: "theta", symbol: "θ_k", gloss: "The rotation angle of the controlled-phase gate at distance k, 2π/2^k — exponentially small for large k." },
+    { id: "theta", symbol: "θ_k", gloss: "The rotation angle of the controlled-phase gate at distance k, equal to 2π/2^k and so exponentially small for large k." },
     { id: "t", symbol: "t", gloss: "The number of precision qubits (rows) in the QFT circuit." },
     { id: "m", symbol: "m", gloss: "The cutoff: every controlled-phase gate with k > m is dropped." },
   ]}
@@ -345,31 +374,54 @@ $$
 This is a derived bound, exponentially small in the cutoff $m$, so
 $m=O(\log(t/\epsilon))$ suffices for total error $\leq\epsilon$, while
 the *gate count* drops from $O(t^2)$ to $O(tm)=O(t\log(t/\epsilon))$, a
-real, quantified engineering trade.
+quantified engineering trade.
 
 <ParametricCurve
   frames={aqftCurveFrames}
-  ariaLabel="log10 of the actual AQFT error and log10 of the derived bound 2*pi*n/2^m, both plotted against the cutoff m, for a real 6-qubit QFT built and compared gate-by-gate against the exact circuit"
+  xAxisLabel="AQFT cutoff m"
+  yAxisLabel="log₁₀(operator-norm error)"
+  ariaLabel="log10 of the measured operator-norm AQFT error, drawn as one marker per integer cutoff m, against log10 of the derived bound 2*pi*t/2^m drawn as a continuous line, for a real 6-qubit QFT built and compared gate-by-gate against the exact circuit. Every measured point lies below the bound, and they fall away from it steeply once m reaches 3. There is no marker at m=6, where the approximation is the exact QFT and the error is exactly zero, off the bottom of a log axis"
 />
 
-Built directly from this platform's real `applySingleQubitGate`,
-`applyControlledGate`, and `applySwap` (not a hypothetical), for a real
-$6$-qubit QFT circuit compared column-by-column against the exact one:
+Built from this platform's real `applySingleQubitGate`,
+`applyControlledGate`, and `applySwap`, for a
+$6$-qubit QFT circuit compared column-by-column against the exact one.
+Which norm the error is measured in matters here, so both are reported:
+the bound was proved in the **operator norm** $\|\cdot\|$, computed below
+by power iteration on $D^\dagger D$, while the Frobenius norm
+$\|\cdot\|_F$ is the cheaper quantity a numerics check reaches for first.
 
-| cutoff $m$ | gates kept (of $15$) | actual error | derived bound $2\pi n/2^m$ |
-|---|---|---|---|
-| $1$ | $0$ | $11.51$ | $18.85$ |
-| $2$ | $5$ | $9.482$ | $9.425$ |
-| $3$ | $9$ | $4.395$ | $4.712$ |
-| $4$ | $12$ | $1.512$ | $2.356$ |
-| $5$ | $14$ | $0.3925$ | $1.178$ |
-| $6$ | $15$ (exact) | $0$ | $0.589$ |
+| cutoff $m$ | gates kept (of $15$) | $\|\text{QFT}-\text{AQFT}_m\|$ | $\|\text{QFT}-\text{AQFT}_m\|_F$ | derived bound $2\pi t/2^m$ |
+|---|---|---|---|---|
+| $1$ | $0$ | $1.999$ | $11.51$ | $18.85$ |
+| $2$ | $5$ | $1.999$ | $9.482$ | $9.425$ |
+| $3$ | $9$ | $1.482$ | $4.395$ | $4.712$ |
+| $4$ | $12$ | $0.4860$ | $1.512$ | $2.356$ |
+| $5$ | $14$ | $0.09814$ | $0.3925$ | $1.178$ |
+| $6$ | $15$ (exact) | $0$ | $0$ | $0.589$ |
 
-The actual error stays below the derived bound at every cutoff tested,
-and both shrink roughly geometrically in $m$, confirming the bound's
-exponential-in-$m$ scaling directly, and at $m=t=6$ (nothing dropped)
-the error is exactly $0$, a direct correctness check on this lesson's
-own AQFT implementation.
+The operator-norm error respects the derived bound at every cutoff, and
+at $m=t=6$ (nothing dropped) it is exactly $0$, which is a correctness
+check on this lesson's own AQFT implementation as much as on the bound.
+Read the Frobenius column and you would reach the opposite conclusion at
+$m=2$, where $9.482$ sits just above the bound's $9.425$. That is not a
+counterexample. For a $d\times d$ matrix the two norms satisfy
+$\|M\|\leq\|M\|_F\leq\sqrt d\,\|M\|$, and $d=2^6=64$ here, so a Frobenius
+figure may run up to $8\times$ the operator norm before anything is
+wrong. It does: $9.482/1.999\approx4.7$. A bound proved in one norm is
+only tested by measuring in that norm, and the sibling Trotter lesson
+gets away with the substitution in the other direction, where Frobenius
+overestimates and therefore only ever makes the bound harder to satisfy.
+
+The two operator-norm rows at $m=1$ and $m=2$ are also worth a look: the
+error is pinned near $2$, which is the largest two unitaries can ever be
+apart, since $\|U-V\|\leq\|U\|+\|V\|=2$. At those cutoffs the AQFT has
+thrown away enough of the transform that some input vector is mapped to
+something close to the *negative* of where the exact QFT sends it, and no
+bound can say anything useful. Only from $m=3$ does the measured error
+leave that ceiling and start falling geometrically, roughly a factor of
+$4$ per unit of $m$ over the last three rows, against the bound's factor
+of $2$.
 
 **Concrete savings.** For $t=20$ precision qubits with cutoff $m=5$:
 
@@ -378,26 +430,37 @@ own AQFT implementation.
     { label: "exact QFT (m=t)", value: gateCountExact, highlight: false },
     { label: "AQFT, m=5", value: gateCountAQFT, highlight: true },
   ]}
-  ariaLabel={`Controlled-phase gate count for a 20-qubit QFT: exact ${gateCountExact} versus approximate-QFT-with-cutoff-5 ${gateCountAQFT}`}
+  maxValue={gateCountExact}
+  formatCaption={(v) => v.toFixed(0)}
+  ariaLabel={`Controlled-phase gate count for a 20-qubit QFT on a linear scale pinned to the exact count: exact ${gateCountExact} versus approximate-QFT-with-cutoff-5 ${gateCountAQFT}`}
 />
 
-$190\to85$ controlled-phase gates, more than a $2\times$ reduction,
-while the derived error bound at $m=5,t=20$ is $2\pi(20)/2^5\approx
-3.93$, tiny on the scale relevant to any realistic target precision
-below the leading digit of the phase itself.
+$190\to70$ controlled-phase gates, nearly a $3\times$ reduction. What
+the gate saving costs in certified accuracy is worth reading off the same
+formula rather than assumed away: at $m=5,t=20$ the derived bound is
+$2\pi(20)/2^5\approx3.93$, which is *above* the trivial ceiling
+$\|U-V\|\leq2$ noted two paragraphs ago, so at that cutoff the bound
+certifies nothing at all. It only starts saying anything once
+$2\pi t/2^m<2$, i.e. $m\geq6$ at $t=20$ (bound $1.96$, $85$ gates kept),
+and reaching a target of $0.1$ takes $m=11$ (bound $0.061$), which keeps
+$145$ of the $190$ gates rather than $70$. The
+exponential in $m$ is real, but so is the factor of $t$ in front of it:
+the AQFT's saving is a genuine $O(t\log(t/\epsilon))$-versus-$O(t^2)$
+asymptotic win, not a licence to cut to $m=5$ at $t=20$ and still claim a
+proved error.
 
 <PredictBeforeReveal
   question="The 4/π² worst-case success guarantee was derived above for t=5 (N=32). If the precision register were widened to t=20 (N over a million) instead, what happens to that worst-case floor?"
   options={[
-    { label: "It gets much worse — more bits means more ways to misread", value: "worse" },
-    { label: "It improves — more bits should mean a better guarantee", value: "better" },
+    { label: "It gets much worse, since more bits means more ways to misread", value: "worse" },
+    { label: "It improves, since more bits should mean a better guarantee", value: "better" },
     { label: "It stays exactly 4/π² ≈ 0.405, unchanged", value: "same" },
   ]}
   correctValue="same"
-  explanation="The derivation never used N or t: the bound 4/π² came from minimizing sinc(δ) over δ∈[-1/2,1/2], a statement purely about the worst-case rounding offset δ, not about register size. Widening t moves the whole distribution's outcomes closer together on the unit circle, but the worst-case shape at the midpoint between two adjacent outcomes is scale-invariant. What t does control is how finely 'the best estimate' resolves φ — not how confident you are in landing on it."
+  explanation="The derivation never used N or t: the bound 4/π² came from minimizing sinc(δ) over δ∈[-1/2,1/2], a statement purely about the worst-case rounding offset δ, not about register size. Widening t moves the whole distribution's outcomes closer together on the unit circle, but the worst-case shape at the midpoint between two adjacent outcomes is scale-invariant. What t does control is how finely 'the best estimate' resolves φ, not how confident you are in landing on it."
 />
 
-## Physical Interpretation
+## A Finite Register Does Not Succeed or Fail
 
 <InsightBlock>
   An algorithm with a finite register does not "work" or "fail." It
@@ -420,11 +483,11 @@ live entirely inside these two bounds: the precision register has to be
 wide enough that the $4/\pi^2$-style guarantee resolves the right
 period with workable odds, and the QFT circuit driving that register
 has to fit within whatever coherence time and gate-error budget the
-device actually has. Neither bound is theoretical decoration; they are
-the two numbers an experimentalist actually checks before running the
+device has. Neither bound is theoretical decoration; they are
+the two numbers an experimentalist checks before running the
 circuit.
 
-## Worked Example
+## Checking the Bound Against a Stubborn Phase
 
 **For $t=8$ precision qubits, $\varphi=1/3$: find $b$, $\delta$, and
 verify $P(b)$ against the $4/\pi^2$ guarantee and the closed form.**
@@ -440,7 +503,7 @@ matching `phaseEstimation`'s actual engine output to within $10^{-15}$,
 and comfortably above the $4/\pi^2\approx0.4053$ floor, exactly as
 guaranteed.
 
-## Common Mistakes
+## Treating a Worst-Case Floor as Typical
 
 <Callout type="warning">
 **Treating $P(b)\geq4/\pi^2$ as the *typical* success probability rather
@@ -466,16 +529,191 @@ a doubling) to maintain the same error bound.
 1. For $\varphi=1/5$ and $t=4$ ($N=16$), compute $b=\text{round}(16/5)$
    and $\delta$, then use the closed form to compute $P(b)$ by hand and
    check it exceeds $4/\pi^2$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $b=3$, $\delta=0.2$, and $P(3)=0.8756$, comfortably above the
+   $4/\pi^2\approx0.4053$ floor.
+
+   $\varphi N=16/5=3.2$, so $b=\mathrm{round}(3.2)=3$ and
+   $\delta=3.2-3=0.2$. Feeding those into the closed form with
+   $\varepsilon=\delta/N$:
+
+   $$
+   P(b)=\frac{1}{N^2}\,\frac{\sin^2(\pi\delta)}{\sin^2(\pi\delta/N)}
+   =\frac{1}{256}\cdot\frac{\sin^2(0.2\pi)}{\sin^2(0.2\pi/16)}
+   =\frac{1}{256}\cdot\frac{(0.5877853)^2}{(0.0392598)^2},
+   $$
+
+   $$
+   P(b)=\frac{1}{256}\cdot\frac{0.3454915}{0.00154133}=\frac{224.148}{256}=0.87559.
+   $$
+
+   Comparing with the guarantee, $0.8756>0.4053$, so the bound holds with
+   a wide margin. That margin is exactly what the derivation predicts:
+   $4/\pi^2$ is the value at the *worst* offset $|\delta|=1/2$, and
+   $\delta=0.2$ is nowhere near it.
+
+   The tighter intermediate bound is worth evaluating too, because it
+   shows how little the register size costs here. The derivation's first
+   step gave $P(b)\geq\mathrm{sinc}^2(\delta)=\big(\sin(\pi\delta)/(\pi\delta)\big)^2$,
+   which at $\delta=0.2$ is $(0.935489)^2=0.87514$. The true value
+   $0.87559$ exceeds it by $0.0005$, the entire gap contributed by the
+   $\sin x\leq x$ substitution at $x=\pi\delta/N$ with $N=16$. Even at
+   four qubits that approximation is already nearly exact, which is why
+   the $4/\pi^2$ floor is a good bound and not a lazy one.
+
+   One thing not to conclude from a success probability of $0.88$: that
+   the estimate is accurate to $0.88$ of something. $P(b)$ is the
+   probability of landing on the single best four-bit outcome
+   $b=3$, meaning $\hat\varphi=3/16=0.1875$ against the true $0.2$. The
+   estimate's *accuracy* is set by $N$, and here it is only $1/16$; the
+   probability is about how reliably that resolution is achieved. Widening
+   the register improves the first and leaves the second alone, which is
+   the trade the whole lesson is about.
+
+   </details>
+
 2. Using the derived tail bound $P(m)\leq\frac1{4(|j|-1/2)^2}$, compute
    an upper bound on the total probability of landing *more than* $3$
    outcomes away from the best estimate ($\sum_{|j|\geq4}$), by bounding
    the sum with an integral or a few explicit terms.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The bound gives $0.2$ by the integral estimate, and $0.1652$ if the sum
+   is evaluated exactly.
+
+   Fold the two tails together first, since the bound depends only on
+   $|j|$:
+
+   $$
+   \sum_{|j|\geq4}P(m)\;\leq\;2\sum_{j=4}^{\infty}\frac{1}{4\left(j-\tfrac12\right)^2}
+   =\frac12\sum_{j=4}^{\infty}\frac{1}{\left(j-\tfrac12\right)^2}.
+   $$
+
+   Now bound the sum by an integral. Each term $1/(j-\tfrac12)^2$ is at
+   most $\int_{j-1}^{j}dx/(x-\tfrac12)^2$, because the integrand is
+   decreasing and exceeds the term's value throughout that unit interval.
+   Summing from $j=4$,
+
+   $$
+   \sum_{j=4}^{\infty}\frac{1}{\left(j-\tfrac12\right)^2}\leq\int_3^\infty\frac{dx}{\left(x-\tfrac12\right)^2}=\left[\frac{-1}{x-\tfrac12}\right]_3^\infty=\frac{1}{2.5}=0.4,
+   $$
+
+   so the total is at most $\tfrac12(0.4)=0.2$. Summing the series exactly
+   instead gives $\psi'(3.5)=0.33036$ (the trigamma function, reachable by
+   hand from $\psi'(\tfrac12)=\pi^2/2$ and $\psi'(x{+}1)=\psi'(x)-1/x^2$),
+   hence $0.16518$, so the integral step costs about $21\%$ of looseness.
+
+   Two things worth extracting.
+
+   The bound is conservative by a clean factor. The true tail, in the
+   worst case $\delta=\tfrac12$ and large $N$, behaves like
+   $P\approx1/\big(\pi^2(j-\tfrac12)^2\big)$, so the actual probability of
+   landing beyond three outcomes is about
+   $(4/\pi^2)(0.16518)=0.0669$. The bound overshoots by exactly
+   $\pi^2/4\approx2.47$, which is the price of having replaced $\sin$ by
+   its chord.
+
+   The bound is useless close in, and knowing where it turns on matters.
+   At $|j|=1$ it reads $1/(4\cdot\tfrac14)=1$, a statement that a
+   probability is at most one. At $|j|=2$ it gives $0.111$ and starts
+   being informative. This is why the textbook corollary quoted above does
+   not simply sum over all $j\neq0$, which would give something larger
+   than $1$; it sums from $|j|\geq2^{t-n-1}$, choosing the extra ancillas
+   precisely so that the sum starts far enough out for the bound to be
+   worth having.
+
+   </details>
+
 3. For $t=10$ precision qubits, using the derived AQFT bound
    $2\pi t/2^m$, find the smallest cutoff $m$ that guarantees error
    below $0.1$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $m=10$, which at $t=10$ means keeping the entire exact QFT. The bound
+   certifies no saving at all here.
+
+   $$
+   \frac{2\pi t}{2^m}\leq0.1
+   \;\Longleftrightarrow\;
+   2^m\geq\frac{2\pi(10)}{0.1}=628.32
+   \;\Longleftrightarrow\;
+   m\geq\log_2 628.32=9.30,
+   $$
+
+   so $m=10$. Checking the neighbours: $m=9$ gives $62.83/512=0.1227$,
+   over target, and $m=10$ gives $0.0614$, under.
+
+   Now read what $m=10$ means for the circuit. On row $q$ the
+   controlled-phase gates run over $k=2,\dots,t-q$, so the largest $k$
+   anywhere in a ten-qubit QFT is $10$. A cutoff of $m=10$ therefore drops
+   nothing: all $\binom{10}{2}=45$ gates are kept and the "approximation"
+   is the exact transform.
+
+   That is the honest answer, and it is more useful than a number that
+   pretends otherwise. The bound is $2\pi t/2^m$, with a factor of $t$
+   sitting in front of the exponential, so at small $t$ the exponential has
+   not had room to work. Compare $t=20$, where $m=11$ suffices and keeps
+   $145$ of $190$ gates, and the asymptotic $O(t\log(t/\epsilon))$ against
+   $O(t^2)$ only becomes a real saving at register sizes well beyond
+   anything simulated in this lesson.
+
+   The distinction to hold on to is between what is true and what is
+   certified. The lesson's own measured table at $t=6$ shows an operator
+   norm error of $0.098$ at cutoff $m=5$, while the bound at that cutoff
+   reads $1.178$, more than ten times larger. So a cutoff far below what
+   the bound demands very often does work. It just is not *proved* to
+   work, and a resource estimate that has to hold for every input has to
+   quote the bound. If you want a smaller $m$ with confidence, the route is
+   a tighter bound, not a measurement at one register size.
+
+   </details>
+
 4. Explain why the exact QFT's controlled-phase gate count is
    $\binom t2$, not $t^2$, directly from `quantumFourierTransform`'s row
    structure (row $q$ contributes $t-q-1$ controlled-phase gates).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the rows contribute a decreasing sequence rather than a
+   constant one, and summing an arithmetic run gives a triangle:
+
+   $$
+   \sum_{q=0}^{t-1}(t-q-1)=(t-1)+(t-2)+\cdots+1+0=\sum_{j=0}^{t-1}j=\frac{t(t-1)}{2}=\binom t2.
+   $$
+
+   The structural reason the sequence decreases is the useful part. After
+   the Hadamard on qubit $q$, that qubit needs a phase correction
+   conditioned on each qubit *later* in the register, and on none of the
+   earlier ones, because those corrections were already applied when their
+   own rows were processed. Row $0$ therefore has $t-1$ partners, row $1$
+   has $t-2$, and the last row has none.
+
+   Equivalently, and this is the version worth remembering: each
+   *unordered pair* of qubits $\{q,q'\}$ receives exactly one
+   controlled-phase gate, so the count is the number of pairs,
+   $\binom t2$. A count of $t^2$ would be counting ordered pairs and
+   self-pairs, which corresponds to applying every correction twice and
+   each qubit to itself. The handshake argument gives the same answer from
+   the other side: every qubit participates in $t-1$ gates, and
+   $t(t-1)$ counts each gate from both ends, so divide by two.
+
+   The factor of two is not asymptotically interesting, since
+   $\binom t2\sim t^2/2$ is still $\Theta(t^2)$, but it is entirely real on
+   hardware. At $t=20$ the difference is $190$ two-qubit gates against
+   $400$, and each of those is a physical operation with its own error
+   rate and its own contribution to circuit depth. The scaling determines
+   whether the algorithm is viable in principle; the constant determines
+   whether it fits inside a coherence time.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -489,15 +727,16 @@ a doubling) to maintain the same error bound.
 - From that closed form, $P(\text{best estimate})\geq4/\pi^2\approx
   0.405$ (a worst-case guarantee) and
   $P(m)\leq\frac1{4(|j|-1/2)^2}$ for any outcome $j$ steps from the best
-  estimate, both fully derived, not asserted.
+  estimate, both derived here from the closed form.
 - The exact QFT costs $\binom t2=O(t^2)$ controlled-phase gates; an
   approximate QFT dropping gates below cutoff $m$ has a provable error
   bound $2\pi t/2^m$ (derived by reusing the previous lesson's
   submultiplicativity lemma), cutting gate count to $O(tm)$ while
-  keeping error exponentially small in $m$, verified directly on a
+  keeping error exponentially small in $m$, verified in the operator
+  norm the bound was proved in (by power iteration on $D^\dagger D$) on a
   real $6$-qubit circuit built gate-by-gate against the exact one.
 
-## Further Exploration
+## When the Ansatz Replaces the Register
 
 <NextDiscovery>
   [Barren Plateaus and Variational Trainability](/lessons/quantum-mastery/advanced-algorithms-and-complexity/barren-plateaus-and-variational-trainability)

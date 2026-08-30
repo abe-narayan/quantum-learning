@@ -85,13 +85,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="A Bell state, arriving from spin">
   Combine two spin-1/2 particles and one particular combination turns out
   to be a state this platform already built for an entirely different
   reason: a Bell state.
 </LessonHook>
 
-## Motivation
+## Two spins with no single total
 
 Two spin-$\tfrac12$ particles do not combine into one well-defined total
 spin. Depending on which combined state they occupy, the pair behaves as
@@ -102,23 +102,7 @@ This lesson works out that decomposition, then finds that one of the four
 resulting states was already built on this platform, in a different
 course, for reasons that had nothing to do with atoms.
 
-Before deriving anything, guess: does combining two spin-$\tfrac12$
-particles always give total spin $1$ (the "obvious" $\tfrac12+\tfrac12$
-answer), or can it come out differently depending on how the two spins
-are combined?
-
-<PredictBeforeReveal
-  question="Two spin-1/2 particles are combined. Is the total spin always exactly 1?"
-  options={[
-    { label: "Yes, spins just add: 1/2 + 1/2 = 1, always", value: "always-1" },
-    { label: "No, it depends on the specific combined state: total spin can be 0 or 1", value: "depends" },
-    { label: "No, the total spin is always 0", value: "always-0" },
-  ]}
-  correctValue="depends"
-  explanation="Spin does not add like ordinary numbers. The combined space is four-dimensional, and it splits into three states of total spin 1 (the triplet) plus one of total spin 0 (the singlet). Which you have depends on which of the four states the pair occupies, and the count 3+1=4 is the first hint that the answer had to be more than a single number."
-/>
-
-## Mathematical Development
+## Four states, and which j each one carries
 
 ### The total angular momentum operator
 
@@ -130,11 +114,26 @@ other particle, then summed. This is the standard way a single-particle
 operator extends to a multi-particle system, already used throughout
 Quantum Gates & Circuits.
 
-Here is why a change of basis is unavoidable. Below is $\vec J^{\,2}$
-written in the computational basis $|{\uparrow}{\uparrow}\rangle,
-|{\uparrow}{\downarrow}\rangle,|{\downarrow}{\uparrow}\rangle,
-|{\downarrow}{\downarrow}\rangle$, built from the operators just defined
-with $\hbar=1$:
+The natural first move is to ask what $\vec J^{\,2}$ looks like in the
+basis already in hand, the computational one:
+$|{\uparrow}{\uparrow}\rangle, |{\uparrow}{\downarrow}\rangle,
+|{\downarrow}{\uparrow}\rangle, |{\downarrow}{\downarrow}\rangle$. Before
+looking at the matrix, work out how much of the job that basis already
+does.
+
+<PredictBeforeReveal
+  question="Which of the four computational basis states are NOT already eigenstates of J²?"
+  options={[
+    { label: "|↑↓⟩ and |↓↑⟩, which J² mixes into each other", value: "middle" },
+    { label: "None of them: all four are eigenstates, so J² is diagonal", value: "none" },
+    { label: "Only |↑↑⟩ and |↓↓⟩, where the two spins are parallel", value: "outer" },
+  ]}
+  correctValue="middle"
+  explanation="The middle two. J² contains the term S₁₊S₂₋ + S₁₋S₂₊, which flips one spin up and the other down, so it turns |↑↓⟩ into |↓↑⟩ and back. It cannot do that to |↑↑⟩ or |↓↓⟩: there is no spin left to raise, and both are annihilated, leaving them clean eigenvalue-2 eigenstates. So the computational basis gets two of the four right for free and leaves a 2×2 block to diagonalize, which is where the singlet and the m=0 triplet come from."
+/>
+
+The matrix below is built from the operators just defined, with
+$\hbar=1$:
 
 <MatrixGrid
   matrix={totalJSquared}
@@ -245,7 +244,7 @@ the same $|\Psi^-\rangle$ up to an unobservable <Term id="global-relative-phase"
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
-## Physical Interpretation
+## Zero total spin means no preferred direction
 
 The agreement is not a coincidence of notation, and there is a physical
 reason for it. A system with total angular momentum zero has no preferred
@@ -258,13 +257,21 @@ out at $50/50$. But the total must stay zero, so whatever one particle
 gives, the other must cancel. Perfectly random individually, perfectly
 anti-correlated jointly, in every basis.
 
-That is precisely the property Bell States and Entanglement established
-for $|\Phi^+\rangle$ by pushing Hadamards through a circuit. Here it
-follows from a symmetry statement instead: zero angular momentum means no
-directional information, and no directional information means no basis
-can be the special one.
+Bell States and Entanglement reached correlations of this kind for
+$|\Phi^+\rangle$ by pushing Hadamards through a circuit, one basis at a
+time. The singlet's version is both stronger and cheaper. It follows from
+a symmetry statement rather than a calculation, and it covers *every* axis
+at once: zero angular momentum means no directional information, and no
+directional information means no basis can be the special one.
 
-## Worked Example
+$|\Phi^+\rangle$ carries no such guarantee, and in fact does not have the
+property. It is perfectly *correlated* along $z$ and along $x$, and
+perfectly *anti*-correlated along $y$, because
+$|\Phi^+\rangle=\tfrac{1}{\sqrt2}(|{+}i,{-}i\rangle+|{-}i,{+}i\rangle)$.
+The singlet is the one Bell state whose correlation reads the same on
+every axis, and its rotational invariance is exactly why.
+
+## Checking a Jz eigenvalue on a superposition
 
 **Verify $|1,0\rangle$'s $J_z$ eigenvalue is exactly $0$, directly from
 the individual-particle operators.**
@@ -282,7 +289,7 @@ minus combination verbatim. Separating them requires $\vec J^{\,2}$,
 which is precisely the operator whose off-diagonal block forced the two
 states to mix in the first place.
 
-## Common Mistakes
+## A product state need not have a total spin
 
 <Callout type="warning">
 **Assuming any two-spin-$\tfrac12$ state has a well-defined total spin.**
@@ -310,19 +317,173 @@ names, and the $\vec J^{\,2}=0$ check above is performed on that vector.
 1. Verify $|1,1\rangle=|{\uparrow}{\uparrow}\rangle$'s $J_z$ eigenvalue
    is exactly $\hbar$, directly from the individual operators (no
    superposition to track, unlike the worked example).
-2. Confirm $|1,-1\rangle$ and $|0,0\rangle$ from this lesson correspond
-   exactly to which two of the four Bell states from Quantum Gates &
-   Circuits (Hint: $|1,-1\rangle=|{\downarrow}{\downarrow}\rangle$ is a
-   product state, not entangled at all).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Each term of $J_z$ acts on its own particle and both return
+   $+\tfrac\hbar2$, so the eigenvalue is their sum:
+
+   $$
+   J_z|{\uparrow}{\uparrow}\rangle = \left(S_z^{(1)}\otimes I + I\otimes S_z^{(2)}\right)|{\uparrow}{\uparrow}\rangle = \frac\hbar2|{\uparrow}{\uparrow}\rangle + \frac\hbar2|{\uparrow}{\uparrow}\rangle = \hbar\,|{\uparrow}{\uparrow}\rangle
+   $$
+
+   Both terms returned the *same* vector, which is what makes this an
+   eigenvalue equation rather than a two-term expansion. In the worked
+   example the two terms of $J_z$ acting on
+   $|{\uparrow}{\downarrow}\rangle$ gave $+\tfrac\hbar2$ and
+   $-\tfrac\hbar2$ on the same vector and cancelled, and the
+   $|{\downarrow}{\uparrow}\rangle$ half had to be tracked separately.
+   Here there is one basis vector and nothing to track.
+
+   Cross-check it against the labels. $m=1$ with $j=1$ is the top rung of
+   the triplet ladder, and the top rung must satisfy $J_+|j,j\rangle=0$.
+   That is visibly true: $J_+=S_+^{(1)}\otimes I+I\otimes S_+^{(2)}$, and
+   both spins are already up, so each term annihilates the state. Nothing
+   above it exists to raise into, which is the same statement in words.
+
+   </details>
+
+2. Work out which of the four Bell states from Quantum Gates & Circuits
+   $|1,-1\rangle$ and $|0,0\rangle$ correspond to, if either does, and say
+   which Bell state the decomposition supplies in place of any that turns
+   out to be missing (Hint:
+   $|1,-1\rangle=|{\downarrow}{\downarrow}\rangle$ is a product state, not
+   entangled at all).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Only one of the two named states is a Bell state. $|0,0\rangle$ is
+   $|\Psi^-\rangle$; $|1,-1\rangle=|{\downarrow}{\downarrow}\rangle=|11\rangle$
+   is a plain product state and matches none of the four. The second Bell
+   state appearing in this decomposition is the *other* $m=0$ state,
+   $|1,0\rangle=|\Psi^+\rangle$.
+
+   Line them up against the definitions:
+
+   $$
+   |\Psi^-\rangle = \frac{|01\rangle-|10\rangle}{\sqrt2} = |0,0\rangle, \qquad |\Psi^+\rangle = \frac{|01\rangle+|10\rangle}{\sqrt2} = |1,0\rangle
+   $$
+
+   while $|1,1\rangle=|00\rangle$ and $|1,-1\rangle=|11\rangle$ are
+   single basis vectors, separable, with zero entanglement by any measure.
+   A Bell state is by definition maximally entangled, so a product state
+   cannot be one however the labels are matched up.
+
+   The part worth extracting is why $|\Phi^\pm\rangle=\tfrac1{\sqrt2}
+   (|00\rangle\pm|11\rangle)$ never appear here at all, in any of the four
+   slots. $|00\rangle$ has $J_z$ eigenvalue $+\hbar$ and $|11\rangle$ has
+   $-\hbar$, so any superposition of the two is a mix of different $J_z$
+   eigenvalues and cannot itself be a $J_z$ eigenstate. Every state in the
+   $|j,m\rangle$ basis is a $J_z$ eigenstate by construction, so
+   $|\Phi^\pm\rangle$ is structurally excluded. That is not an accident of
+   which Bell states someone chose to name: the total-spin basis and the
+   Bell basis overlap in exactly two vectors, and the other two Bell
+   states are legitimate two-qubit states with no definite total spin
+   projection.
+
+   </details>
+
 3. Using the antisymmetry of $|0,0\rangle=\frac1{\sqrt2}(|{\uparrow}{\downarrow}\rangle-|{\downarrow}{\uparrow}\rangle)$
    under swapping the two particles, explain in one sentence why swapping
    which particle is "1" and which is "2" leaves the *physical* state
    unchanged (up to an overall sign, which doesn't affect any
    measurement).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the swap returns the same vector multiplied by $-1$, and an
+   overall factor of $-1$ cancels out of every Born probability
+   $|\langle\phi|\psi\rangle|^2$ and every expectation value
+   $\langle\psi|A|\psi\rangle$, so no measurement can detect it.
+
+   Explicitly, with $P$ the operator exchanging the two particles:
+
+   $$
+   P|0,0\rangle = \frac{|{\downarrow}{\uparrow}\rangle - |{\uparrow}{\downarrow}\rangle}{\sqrt2} = -\,|0,0\rangle
+   $$
+
+   The distinction that matters, and the one this question is really
+   testing: a *global* sign is unobservable, a *relative* sign is not. The
+   minus sign sitting between the two terms inside $|0,0\rangle$ is
+   entirely observable, and it is the whole difference between the singlet
+   and the triplet's $|1,0\rangle$, which have different total spin and
+   different measurement statistics. Multiplying the finished state by
+   $-1$ is a different operation from flipping the sign of one term.
+
+   One hypothesis is doing quiet work here. The conclusion holds because
+   $|0,0\rangle$ happens to be an *eigenstate* of $P$. That is not
+   automatic. Swap the labels on $|{\uparrow}{\downarrow}\rangle$ and you
+   get $|{\downarrow}{\uparrow}\rangle$, a genuinely different state that
+   predicts different outcomes, and no phase relates them. All four states
+   in this lesson's decomposition are $P$ eigenstates, the three triplet
+   states with $+1$ and the singlet with $-1$, which is why the labels
+   drop out for all of them and not for a generic two-spin state.
+
+   That $\pm1$ split is the entire subject of the Identical Particles
+   course later in this track, where the swap eigenvalue stops being a
+   convenience and becomes a law: two electrons are *required* to take the
+   $-1$ option.
+
+   </details>
+
 4. Why does a spin-zero (singlet) two-particle system necessarily give
    perfectly random single-particle measurement outcomes along *any*
    axis, not just $z$? Connect this to $\vec J^{\,2}=0$ meaning zero
    total angular momentum in every direction simultaneously.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $\vec J^{\,2}=0$ forces all three components to annihilate the
+   state, which leaves the singlet with no preferred direction at all, and
+   a state with no preferred direction cannot favour either outcome on any
+   axis you choose.
+
+   Start with the step that makes "zero in every direction" precise.
+   $\vec J^{\,2}=J_x^2+J_y^2+J_z^2$ with each $J_i$ Hermitian, so
+
+   $$
+   0 = \langle\psi|\vec J^{\,2}|\psi\rangle = \big\|J_x|\psi\rangle\big\|^2 + \big\|J_y|\psi\rangle\big\|^2 + \big\|J_z|\psi\rangle\big\|^2
+   $$
+
+   A sum of non-negative numbers vanishes only if each vanishes, so
+   $J_x|\psi\rangle=J_y|\psi\rangle=J_z|\psi\rangle=0$ separately, and
+   hence $(\vec J\cdot\hat n)|\psi\rangle=0$ for every unit vector
+   $\hat n$. Hermiticity is essential to that step; without it the norms
+   are not what $\langle\vec J^{\,2}\rangle$ decomposes into.
+
+   Randomness follows. Since $\vec J=\vec S_1+\vec S_2$ annihilates the
+   state, and the same is true after any rotation, $\langle\vec S_1\rangle$
+   is a vector that every rotation must leave unchanged, and the only such
+   vector is zero. So for any axis,
+   $\langle \vec S_1\cdot\hat n\rangle=0$. That observable has eigenvalues
+   $\pm\hbar/2$ with probabilities $p_+$ and $p_-$, so
+
+   $$
+   \frac\hbar2\left(p_+ - p_-\right) = 0, \qquad p_+ + p_- = 1 \implies p_+ = p_- = \frac12
+   $$
+
+   Anti-correlation comes from the same equation read differently:
+   $(\vec S_1\cdot\hat n)|\psi\rangle = -(\vec S_2\cdot\hat n)|\psi\rangle$,
+   so whatever particle 1 gives, particle 2 gives the opposite with
+   certainty, on every axis alike.
+
+   The tempting wrong turn is to argue from how the state is *written*.
+   $\tfrac1{\sqrt2}(|{\uparrow}{\downarrow}\rangle-|{\downarrow}{\uparrow}\rangle)$
+   looks balanced between up and down, so $50/50$ along $z$ seems obvious,
+   and it is easy to assume the balance carries over to other axes.
+   Written form proves nothing here. $|\Phi^+\rangle=\tfrac1{\sqrt2}
+   (|00\rangle+|11\rangle)$ looks every bit as balanced and does give
+   $50/50$ on each single qubit, yet its *correlations* are basis
+   dependent: correlated along $z$ and $x$, anti-correlated along $y$, as
+   the section above showed. The singlet's isotropy is not readable off
+   the notation. It comes from $\vec J^{\,2}=0$, which is a statement
+   about the state and not about the basis it is displayed in.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -335,13 +496,13 @@ names, and the $\vec J^{\,2}=0$ check above is performed on that vector.
   triplet's $m=0$ state is $|\Psi^+\rangle$: the same vectors, reached
   from atomic physics and from circuit construction independently.
 - Total spin zero forces perfectly random single-particle outcomes along
-  any measurement axis, with perfect correlation between the two
-  particles, the physical content behind Bell-state entanglement,
-  arrived at from a completely different starting point.
+  any measurement axis, with perfect *anti*-correlation between the two
+  particles on every axis alike, the physical content behind Bell-state
+  entanglement, arrived at from a completely different starting point.
 
-## Further Exploration
+## The correspondence this lesson only asserts
 
-<ChallengePrompt prompt="Physical Interpretation states, in passing, that the triplet's m=0 state |1,0⟩ is identical to the Bell state |Ψ+⟩ from Quantum Gates & Circuits. Verify this directly: write out |Ψ+⟩'s definition and compare coefficients against |1,0⟩ term by term.">
+<ChallengePrompt prompt="The singlet section states, in a closing parenthesis, that the triplet's m=0 state |1,0⟩ is identical to the Bell state |Ψ+⟩ from Quantum Gates & Circuits. Verify this directly: write out |Ψ+⟩'s definition and compare coefficients against |1,0⟩ term by term.">
   Same coefficient-matching move as the singlet/|Ψ⁻⟩ identification
   above, applied to the one correspondence this lesson only asserts.
 </ChallengePrompt>

@@ -1,13 +1,13 @@
 /**
- * Full "Current Quantum" entries — meta joined to prose.
+ * Full "Current Quantum" entries: meta joined to prose.
  *
  * SERVER-ONLY, because it imports `data.ts`. Every consumer of this module
  * renders whole cards (`/current-quantum`, `RelatedCurrentQuantum` at the
  * foot of each lesson), and all of them are server components that hand the
  * finished entries down as props.
  *
- * If all you need is a slug/date/title/category/lesson — as the concept
- * map's client panel does — import `metaRegistry.ts` instead. Importing this
+ * If all you need is a slug/date/title/category/lesson, as the concept
+ * map's client panel does, import `metaRegistry.ts` instead. Importing this
  * file from a `"use client"` component pulls the whole collection's prose,
  * citations and image metadata into the browser bundle; see the header of
  * `metaRegistry.ts`, and `src/lib/design/__tests__/clientBoundary.test.ts`,

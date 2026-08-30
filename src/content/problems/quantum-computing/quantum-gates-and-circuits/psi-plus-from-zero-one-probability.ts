@@ -21,7 +21,7 @@ export const psiPlusFromZeroOneProbability: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "Starting from $|01\\rangle$, apply $H$ to qubit 0, then $\\text{CNOT}(0,1)$ — the recipe that produces $|\\Psi^+\\rangle$. What is the probability of measuring $|01\\rangle$ in the resulting state?",
+      "Starting from $|01\\rangle$, apply $H$ to qubit 0, then $\\text{CNOT}(0,1)$, the recipe that produces $|\\Psi^+\\rangle$. What is the probability of measuring $|01\\rangle$ in the resulting state?",
     inputHint: "as a decimal between 0 and 1",
   },
   answer: {
@@ -35,9 +35,9 @@ export const psiPlusFromZeroOneProbability: NumericProblem = {
     ],
   },
   hints: [
-    { text: "H on qubit 0 of |01⟩ gives (|01⟩+|11⟩)/√2 — qubit 1 stays at 1 throughout this step." },
+    { text: "H on qubit 0 of |01⟩ gives (|01⟩+|11⟩)/√2. Qubit 1 stays at 1 throughout this step." },
     { text: "CNOT(0,1): the |01⟩ term (control 0) is unaffected; the |11⟩ term (control 1) has its target, qubit 1, flipped." },
-    { text: "The |11⟩ term becomes |10⟩ — so the final state is (|01⟩+|10⟩)/√2, which is exactly |Ψ+⟩." },
+    { text: "The |11⟩ term becomes |10⟩, so the final state is (|01⟩+|10⟩)/√2, which is |Ψ+⟩." },
   ],
   solution: {
     steps: [

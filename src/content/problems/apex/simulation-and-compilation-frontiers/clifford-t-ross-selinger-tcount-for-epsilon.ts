@@ -64,7 +64,7 @@ export const cliffordTRossSelingerTCountForEpsilon: NumericProblem = {
       { description: "log₂(1/ε) = log₂(10⁶) = 6 × log₂(10) ≈ 6 × 3.3219 ≈ 19.93 bits." },
       { description: "T-count ≈ 3.5 × 19.93 ≈ 69.76, so about 70 T gates." },
     ],
-    finalAnswer: `≈ ${value.toFixed(1)} T gates`,
+    finalAnswer: `≈ ${value.toFixed(1)}, so about ${Math.round(value)} T gates`,
   },
   explanation: {
     correctIdea:

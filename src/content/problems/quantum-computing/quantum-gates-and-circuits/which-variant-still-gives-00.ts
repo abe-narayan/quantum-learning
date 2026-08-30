@@ -44,11 +44,11 @@ export const whichVariantStillGives00: MultipleChoiceProblem = {
   question: {
     type: "multiple-choice",
     prompt:
-      "The lesson's main derivation ($H\\otimes H$, $Z$ on qubit 1, $H\\otimes H$) concentrates onto $|01\\rangle$. Which of these alternatives instead concentrates back onto $|00\\rangle$, the same outcome as doing nothing between the two $H\\otimes H$ steps?",
+      "The lesson's main derivation ($H\\otimes H$, $Z$ on qubit 1, $H\\otimes H$) concentrates onto $|01\\rangle$. Which of these alternatives instead concentrates back onto $|00\\rangle$?",
     options: [
       { id: "a", text: "Apply $Z$ to qubit 0 instead of qubit 1." },
       { id: "b", text: "Apply $Z$ to both qubits instead of just one." },
-      { id: "c", text: "Skip the middle $Z$ step entirely." },
+      { id: "c", text: "Skip the middle $Z$ step." },
       { id: "d", text: "Measure qubit 1 right after the middle step, then apply $H\\otimes H$ to the collapsed state." },
     ],
   },
@@ -58,7 +58,7 @@ export const whichVariantStillGives00: MultipleChoiceProblem = {
     optionFeedback: {
       a: "This concentrates onto $|10\\rangle$ instead (the previous problem in this set works this out directly).",
       b: "This concentrates onto $|11\\rangle$: $Z\\otimes Z$ turns $|+\\rangle\\otimes|+\\rangle$ into $|-\\rangle\\otimes|-\\rangle$, and $H|-\\rangle=|1\\rangle$ for both factors.",
-      d: "Measuring partway through destroys the superposition needed for interference — you'd get a random definite outcome, not a guaranteed one, exactly the mistake the lesson's Common Mistakes section warns about.",
+      d: "Measuring partway through destroys the superposition the interference depends on. The result is a random definite outcome rather than a guaranteed one, the mistake the lesson's Common Mistakes section warns about.",
     },
     defaultIncorrectFeedback: "Work out what each alternative does to the intermediate $|+\\rangle\\otimes|+\\rangle$ state before the second $H\\otimes H$.",
   },

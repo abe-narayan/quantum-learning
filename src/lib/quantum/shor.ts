@@ -22,7 +22,7 @@ export function classicalOrder(a: number, N: number): number {
   while (value !== 1) {
     value = (value * a) % N;
     r++;
-    if (r > N) throw new Error(`classicalOrder: no order found for a=${a} mod N=${N} within N steps — check gcd(a,N)=1.`);
+    if (r > N) throw new Error(`classicalOrder: no order found for a=${a} mod N=${N} within N steps. Check that gcd(a,N)=1.`);
   }
   return r;
 }

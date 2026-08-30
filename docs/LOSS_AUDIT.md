@@ -1,5 +1,22 @@
 # Content-Loss Audit — post-redesign verification
 
+> **This file is a findings log, not a guide.** Audit date: **2026-08-26**.
+> It answers one question about one pair of passes (did the de-duplication
+> and component-adoption passes silently drop a unique claim?), and the
+> answer was no. **Nothing in it is a rule**, and it covers nothing done
+> after that date.
+>
+> Two things in it remain useful beyond the verdict, and both are in the
+> **Coverage and confidence** section at the end rather than in the findings:
+> the shape of the detector (a per-lesson multiset comparison of math spans
+> and prose numerals against `git HEAD`), and its honest statement of what a
+> lexical screen structurally cannot see: a claim reworded into something
+> subtly weaker while keeping the same symbols and numbers. That blind spot
+> is still open. No test covers it.
+>
+> The three cosmetic side-effects it reports were reported, not fixed; they
+> have not been re-verified since.
+
 **Scope.** `docs/SCIENCE_AUDIT.md` verified, by exhaustive LaTeX multiset comparison, that the
 visual redesign corrupted no equation. That audit ran *before* two later passes:
 

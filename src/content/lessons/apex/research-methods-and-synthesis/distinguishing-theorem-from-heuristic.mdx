@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
+import { ScrollableFigure } from "@/components/mdx/ScrollableFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "apex/research-methods-and-synthesis/distinguishing-theorem-from-heuristic"
@@ -10,7 +11,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Distinguishing Theorem from Heuristic",
   description:
-    "An explicit four-question checklist, built directly on the Quantum Complexity Theory capstone's proven/conjectured/open framework, for classifying any quantum-computing claim as a theorem, a well-supported heuristic, a conjecture, or genuinely open — practiced on real results this platform already built.",
+    "An explicit four-question checklist, built directly on the Quantum Complexity Theory capstone's proven/conjectured/open framework, for classifying any quantum-computing claim as a theorem, a well-supported heuristic, a conjecture, or genuinely open, practiced on real results this platform already built.",
   course: "research-methods-and-synthesis",
   module: "distinguishing-theorem-from-heuristic",
   order: 2,
@@ -37,7 +38,7 @@ export const lessonMeta = {
   Exactly one is a proven theorem.
 </LessonHook>
 
-## Motivation
+## Four Claims That Sound Alike
 
 Four claims, all real, all built in earlier courses. Grover's algorithm
 cannot be beaten by any black-box quantum algorithm. QAOA finds
@@ -62,7 +63,7 @@ Commit to an answer before reading the checklist. The value of the
 exercise is in noticing which way your instinct pulls, not in scoring.
 
 <PredictBeforeReveal
-  question="Of the four claims above — Grover's algorithm cannot be beaten; QAOA finds near-optimal cuts on practical instances; factoring has no efficient classical algorithm; barren plateaus make variational circuits untrainable — which one is a proven mathematical theorem as stated?"
+  question="Of the four claims above (Grover's algorithm cannot be beaten; QAOA finds near-optimal cuts on practical instances; factoring has no efficient classical algorithm; barren plateaus make variational circuits untrainable), which one is a proven mathematical theorem as stated?"
   options={[
     { label: "Grover's algorithm cannot be beaten", value: "grover" },
     { label: "QAOA finds near-optimal cuts on practical instances", value: "qaoa" },
@@ -70,7 +71,7 @@ exercise is in noticing which way your instinct pulls, not in scoring.
     { label: "Barren plateaus make variational circuits untrainable", value: "plateaus" },
   ]}
   correctValue="grover"
-  explanation="Grover — and even that one carries a scope clause worth stating: the Θ(√N) bound is proven in the black-box query model, not against classical algorithms that get to inspect the problem's structure. QAOA's practical performance is evaluated empirically. Factoring's classical hardness is a conjecture with decades of failed attacks behind it and no proof. Barren plateaus split in two: the zero-mean gradient is an unconditional theorem, the variance decay is a theorem for a stated ansatz class, and the unscoped sentence above is neither. Sections (a) through (d) below run the checklist on each."
+  explanation="Grover, and even that one carries a scope clause worth stating: the Θ(√N) bound is proven in the black-box query model, not against classical algorithms that get to inspect the problem's structure. QAOA's practical performance is evaluated empirically. Factoring's classical hardness is a conjecture with decades of failed attacks behind it and no proof. Barren plateaus split in two: the zero-mean gradient is an unconditional theorem, the variance decay is a theorem for a stated ansatz class, and the unscoped sentence above is neither. Sections (a) through (d) below run the checklist on each."
 />
 
 ## The Checklist: Operationalizing Proven / Evidenced / Open
@@ -97,7 +98,7 @@ questions **in order**, stopping at the first "yes":
    a bigger dataset could ever overturn it.
 2. **Is there strong numerical or simulation evidence across many
    independent test cases, without a matching general proof?** If yes:
-   **Heuristic / empirical finding.** The claim is a real, checkable
+   **Heuristic / empirical finding.** The claim is a checkable
    regularity that nobody has yet derived from first principles for the
    general case.
 3. **Is there a plausible, motivated argument (a restricted-case proof,
@@ -186,10 +187,10 @@ matching general proof.
 
 Question 3 is worth a beat, though, because this claim is mixed rather
 than purely heuristic. The *original* QAOA construction (Farhi,
-Goldstone & Gutmann 2014) does carry a real, narrow, proven guarantee:
+Goldstone & Gutmann 2014) does carry a proven guarantee:
 a specific worst-case approximation ratio for $p=1$ QAOA on a specific
-restricted graph class (3-regular, triangle-free graphs). That is a
-Tier 1 result for one $p$ and one instance family, not for "large,
+restricted graph class (3-regular graphs). That is a Tier 1 result for
+one $p$ and one instance family, not for "large,
 practically relevant instances" in general, which is the claim under
 evaluation here. This restricted-case-versus-general-case gap is the
 one How to Read a Quantum Computing Paper's worked example was built
@@ -202,9 +203,9 @@ to catch.
 >
   The construction that introduced QAOA proves a specific worst-case
   approximation ratio for $p=1$ QAOA, but only on a restricted graph
-  class: 3-regular, triangle-free graphs. It's a real Tier 1 theorem for
-  that scope, not a general performance guarantee for the large,
-  practical instances a headline claim usually means.
+  class: 3-regular graphs. It is a real Tier 1 theorem for that scope,
+  not a general performance guarantee for the large, practical instances
+  a headline claim usually means.
 </ResearchConnection>
 
 **Classification:** Tier 2, heuristic/empirical, for the claim as stated
@@ -215,7 +216,7 @@ special case.
 **What would move it up a tier:** A proof of a matching worst-case
 approximation-ratio bound for QAOA at general depth $p$, on the actual
 instance classes practitioners care about: not a restricted graph
-family, and not limited to $p=1$. This is real, active research, and
+family, and not limited to $p=1$. This is active research, and
 its difficulty is why the claim currently sits at Tier 2, not Tier 1.
 
 ### (c) Factoring's classical hardness: Conjecture
@@ -230,7 +231,7 @@ no. This isn't a broad-numerical-sweep kind of claim; there is no
 "benchmark" that would even make sense here. Question 3: yes. The
 evidence is decades of attempted classical attacks, none successful,
 reinforced by factoring's structural relationship to other believed-hard
-number-theoretic problems. That is real, namable, motivated evidence.
+number-theoretic problems. That is motivated evidence.
 It is not a proof.
 
 **Classification:** Tier 3, conjecture. This matches the capstone's own
@@ -264,7 +265,7 @@ separate results with two separate epistemic statuses:
   of the statement: it holds for sufficiently deep, sufficiently random
   ansätze and global cost functions, proved via concentration of
   measure (Lévy's lemma, cited to McClean, Boixo, Smelyanskiy, Babbush
-  & Neven 2018). A real, rigorous proof for that ansatz class, not for
+  & Neven 2018). A rigorous proof for that ansatz class, not for
   every possible variational circuit design. Checklist Question 1: yes,
   *for a restricted class of circuits*. A proven theorem with a stated
   scope, not a universal one.
@@ -284,7 +285,7 @@ deep/random ansätze and global costs), reinforced by Tier-2-style direct
 numerical confirmation. The claim that goes wrong is the *unscoped*
 version, "variational circuits are always untrainable at scale". That
 same lesson's second Common Mistakes callout flags it directly:
-shallower, problem-tailored ansätze and *local* cost functions are real,
+shallower, problem-tailored ansätze and *local* cost functions are
 partially effective mitigations. The unscoped claim overclaims a
 narrower proven result, the same way an unqualified "exponential
 speedup" can overclaim an oracle-model theorem.
@@ -322,7 +323,7 @@ content.
   deserves to be separated out. The *scaling law's shape*,
   $p_L\sim A(p/p_{th})^{(d+1)/2}$, is tied to a phase-transition
   argument (the Nishimori point of a random-bond Ising model, Dennis,
-  Kitaev, Landahl & Preskill 2002). That is real, citable theory, but
+  Kitaev, Landahl & Preskill 2002). That is citable theory, but
   it proves the *functional form* of the suppression, not the specific
   $\sim1\%$ numerical value for any given decoder and noise model.
 
@@ -349,7 +350,7 @@ content.
 
 **Practice claim 2: "Random circuit sampling is classically hard."**
 Already classified in full by the Quantum Complexity Theory capstone:
-Tier 3, conjecture. A real, citable theoretical basis (the
+Tier 3, conjecture. A citable theoretical basis (the
 polynomial-hierarchy-collapse argument) provides Question-3-style
 motivated evidence, but that basis itself rests on an unproven, if
 widely believed, assumption, so the claim never reaches Question 1.
@@ -382,8 +383,8 @@ setting," not "open because nobody has looked."
 
 ## The Classification Flowchart
 
-<div className="not-prose my-8 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-<svg viewBox="0 0 760 580" width="760" className="w-full min-w-[560px]" role="img" aria-label="A flowchart classifying a quantum-computing claim. Start: a specific, precisely-stated claim. Question 1: is there a complete, checkable mathematical proof? If yes, branch right to THEOREM, containing Grover's optimality, the threshold theorem's existence, and the barren-plateau zero-mean gradient. If no, continue down to Question 2: is there strong numerical or simulation evidence across many cases without a general proof? If yes, branch right to HEURISTIC, containing QAOA's real-world performance, the surface code's numerical threshold, and barren-plateau variance decay. If no, continue down to Question 3: is there a plausible, motivated argument with some real evidence but unverified in the general setting? If yes, branch right to CONJECTURE, containing factoring's classical hardness and random circuit sampling's classical hardness. If no, fall through to GENUINELY OPEN, containing whether BQP is a subset of NP. A dashed footer box below notes that at every tier, the same follow-up question applies: what specific additional result would move this claim up a tier?">
+<ScrollableFigure label="Flowchart classifying a claim as theorem, heuristic, conjecture, or genuinely open" className="my-8">
+<svg viewBox="0 0 760 580" width="760" height="580" role="img" aria-label="A flowchart classifying a quantum-computing claim. Start: a specific, precisely-stated claim. Question 1: is there a complete, checkable mathematical proof? If yes, branch right to THEOREM, containing Grover's optimality, the threshold theorem's existence, the barren-plateau zero-mean gradient, and the barren-plateau variance decay for its stated ansatz class. If no, continue down to Question 2: is there strong numerical or simulation evidence across many cases without a general proof? If yes, branch right to HEURISTIC, containing QAOA's real-world performance and the surface code's numerically estimated threshold. If no, continue down to Question 3: is there a plausible, motivated argument with some real evidence but unverified in the general setting? If yes, branch right to CONJECTURE, containing factoring's classical hardness and random circuit sampling's classical hardness. If no, fall through to GENUINELY OPEN, containing whether NP is a subset of BQP. A dashed footer box below notes that at every tier, the same follow-up question applies: what specific additional result would move this claim up a tier?">
   <rect x="180" y="10" width="220" height="40" rx="20" className="fill-surface stroke-foreground/40" strokeWidth="1.5" />
   <text x="290" y="35" textAnchor="middle" className="fill-foreground text-[11px] font-semibold">A specific, precisely-stated claim</text>
 
@@ -434,15 +435,16 @@ setting," not "open because nobody has looked."
   <text x="380" y="521" textAnchor="middle" className="fill-muted-foreground text-[11px] font-medium">Whichever tier you land in, always ask Q4: what specific new result (a general proof,</text>
   <text x="380" y="540" textAnchor="middle" className="fill-muted-foreground text-[11px] font-medium">a broader benchmark, a restricted-case theorem extended further) would move it up a tier?</text>
 </svg>
-</div>
+</ScrollableFigure>
 
-<div className="not-prose my-8 grid gap-4 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4 sm:grid-cols-2 lg:grid-cols-4">
+<div className="not-prose my-8 grid gap-4 rounded-panel border border-border bg-surface-muted/40 p-4 sm:grid-cols-2 lg:grid-cols-4">
   <div className="rounded-(--radius-tight) border border-brand/40 bg-brand/5 p-4">
     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand">Theorem</p>
     <ul className="mt-3 space-y-2 text-sm leading-snug text-foreground">
       <li>Grover's Θ(√N) optimality, proved twice (a)</li>
       <li>Threshold theorem: p_th &gt; 0 exists, drives error → 0 below it</li>
-      <li>Zero-mean parameter-shift gradient, any depth/qubit count (half of d)</li>
+      <li>Zero-mean parameter-shift gradient, any depth/qubit count (d)</li>
+      <li>Barren-plateau variance decay, for sufficiently deep random ansätze and global costs (d)</li>
     </ul>
   </div>
   <div className="rounded-(--radius-tight) border border-accent/40 bg-accent/5 p-4">
@@ -450,7 +452,6 @@ setting," not "open because nobody has looked."
     <ul className="mt-3 space-y-2 text-sm leading-snug text-foreground">
       <li>QAOA's real-world approximation ratio on large instances (b)</li>
       <li>Surface code's numerically-estimated ~1% threshold</li>
-      <li>Barren-plateau variance decay, measured at n=2..6 (other half of d)</li>
     </ul>
   </div>
   <div className="rounded-(--radius-tight) border border-warning/40 bg-warning/5 p-4">
@@ -463,13 +464,13 @@ setting," not "open because nobody has looked."
   <div className="rounded-(--radius-tight) border border-border bg-surface-muted/60 p-4">
     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Genuinely open</p>
     <ul className="mt-3 space-y-2 text-sm leading-snug text-foreground">
-      <li>Is BQP ⊆ NP?</li>
+      <li>Is NP ⊆ BQP?</li>
       <li>Ceiling on quantum advantage for practically useful problems</li>
     </ul>
   </div>
 </div>
 
-## Why This Matters
+## Unproven Is Not Untrustworthy
 
 <InsightBlock>
   "Not yet proven" and "not worth trusting" are entirely different
@@ -507,7 +508,7 @@ prediction, all classify the same way. Quantum computing is simply
 where you practiced, on results precise and well-documented enough to
 classify with confidence.
 
-## Common Mistakes
+## Collapsing the Tiers Into One Word
 
 <Callout type="note">
 **Reporting a well-supported heuristic as a proven theorem.** "QAOA
@@ -535,6 +536,71 @@ mirror image of the first mistake above.
    for factoring exists." Run this lesson's four-question checklist on
    each separately, and explain why they land in different tiers even
    though both describe the exact same problem.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Tier 1 and Tier 3, and the gap between them is the whole reason this
+   checklist exists.
+
+   **Claim 1: Shor's gate count. Theorem.** Question 1 is answered yes
+   immediately. The algorithm is a construction: modular exponentiation
+   built from reversible arithmetic, a quantum Fourier transform, and a
+   classical continued-fraction post-processing step, each with a derived
+   gate count and an analyzed success probability. Nothing about the
+   claim is measured or extrapolated; the count comes from adding up the
+   circuit. The checklist stops at Question 1.
+
+   One precision worth attaching, since it is the kind of clause this
+   lesson exists to notice. The exponent is implementation-dependent:
+   $O(n^3)$ assumes schoolbook modular multiplication, and faster
+   multiplication algorithms improve it, while nearest-neighbour
+   connectivity makes it worse. The robust theorem is "polynomial-size
+   uniform circuit family," and the cubic is one instantiation of it. So
+   the claim as worded is Tier 1 for a stated arithmetic subroutine and
+   the *polynomiality* is Tier 1 unconditionally.
+
+   **Claim 2: no efficient classical factoring algorithm. Conjecture.**
+   Question 1: no. There is no unconditional lower bound, and nobody is
+   close to one. Question 2: no, and the reason is worth stating rather
+   than skipping, because "decades of failed attempts" *sounds* like
+   empirical evidence. It is not a numerical sweep across test cases. A
+   heuristic finding is a regularity that has been *observed*; this is
+   the absence of a discovery, which is a different kind of thing and is
+   settled by a different kind of result. Question 3: yes. There is a
+   real motivating basis, namely centuries of number theory that has
+   produced nothing better than the subexponential general number field
+   sieve, plus the largest adversarial test ever conducted, which is that
+   public-key infrastructure has stood on the assumption in the open for
+   decades. **Tier 3, conjecture.**
+
+   What would move it up: an unconditional superpolynomial lower bound.
+   That has a price tag attached, since factoring's decision version is
+   in $\mathsf{NP}$, so proving it is not in $\mathsf{P}$ proves
+   $\mathsf{P}\neq\mathsf{NP}$ on the way past. Anyone promoting this
+   claim to Tier 1 has also settled the field's most famous open problem.
+
+   **Why the same problem yields two different tiers.** The two claims
+   have opposite logical shapes.
+
+   The first is an existence claim about one specific object: here is a
+   circuit, here is its size. Existence claims are settled by exhibiting
+   the object, and exhibiting is something a person can do.
+
+   The second is a universal non-existence claim quantified over every
+   classical algorithm that could ever be written. Nobody can enumerate
+   that space, so the only route is a lower-bound technique, and
+   complexity theory has essentially none that bite against general
+   classical computation at this level.
+
+   That asymmetry is not special to factoring. **Almost every quantum
+   advantage claim is half theorem and half conjecture in exactly this
+   way**: the quantum side is a construction and is provable, the
+   classical side is a non-existence claim and is not. Reading a speedup
+   claim well starts with splitting it along that seam and tiering the
+   two halves separately.
+
+   </details>
 2. Classify the claim "the HHL algorithm provides an exponential speedup
    for solving linear systems of equations." Be precise about which
    restrictions are structurally *part of* the claim before it can be
@@ -545,6 +611,73 @@ mirror image of the first mistake above.
    random ansätze" before its variance-decay theorem applied. State
    whether the unrestricted, unqualified version of the claim survives
    Question 1.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Fully qualified, it is **Tier 1**. Unqualified, it does not reach
+   Question 1 at all, because it is not unproven, it is false.
+
+   **The restrictions, and each one is load-bearing rather than
+   decorative.**
+
+   *Sparsity, or an efficient block encoding.* The algorithm begins at
+   "there is a cheap circuit implementing $A$." For an arbitrary dense
+   matrix handed over as $N^2$ numbers, there is not, and merely reading
+   the input already costs $\Omega(N^2)$, which ends the discussion.
+
+   *Well-conditioning.* The cost carries a factor of the condition number
+   $\kappa$, so an exponential advantage requires $\kappa$ to stay
+   polylogarithmic in $N$. This is the restriction most often waved past
+   and it has the sharpest teeth. The Applications lesson computes
+   $\kappa = 4.46\times10^{11}$ for a discretized one-dimensional
+   Laplacian at $N=2^{20}$, a completely ordinary matrix, which turns an
+   estimate of 14 queries into $3\times10^{12}$.
+
+   *Efficient preparation of $|b\rangle$.* If loading the right-hand side
+   costs $\Omega(N)$, the speedup is spent before the algorithm starts.
+
+   *The output is a state, not a vector.* This one changes what problem
+   is being solved. The algorithm produces $|x\rangle\propto
+   A^{-1}|b\rangle$, and extracting all $N$ components costs
+   $\Omega(N)$ measurements. Only a limited class of global properties,
+   expectation values $\langle x|M|x\rangle$ for efficiently measurable
+   $M$, come out cheaply.
+
+   **With all four in place, Question 1 is answered yes,** and better
+   than for most speedup claims. There is a proof of the runtime, and,
+   unusually, a matching hardness result: the problem in this restricted
+   form is BQP-complete, so a classical algorithm running in
+   $\mathrm{poly}(\log N)$ would imply $\mathsf{BQP}=\mathsf{BPP}$. That
+   puts the classical half of the claim on a named complexity assumption
+   rather than on "nobody has found one," which is a genuinely stronger
+   footing than factoring's.
+
+   **Unqualified, the claim fails, and not for lack of evidence.** Drop
+   well-conditioning and there is no speedup, demonstrably, on matrices
+   people actually solve. Drop the state-output caveat and the speedup is
+   provably gone, since the readout alone is linear in $N$. "Solving
+   linear systems of equations," as an unrestricted English sentence, is
+   a problem HHL does not solve. So the unqualified version is not a Tier
+   2 or Tier 3 claim awaiting evidence. It is a false statement, and the
+   checklist's first job here is to notice that the restrictions are part
+   of the *claim* rather than caveats attached to it.
+
+   **One further narrowing worth knowing, because it moved after the
+   original paper.** Dequantization results starting with Tang's work
+   showed that for *low-rank* matrices with sample-and-query access,
+   classical algorithms also achieve polylogarithmic scaling, removing
+   the exponential advantage in that regime. So the surviving territory
+   is narrower than "sparse and well-conditioned" suggested in 2009: it
+   is sparse-but-not-low-rank, well-conditioned, cheaply loadable, and
+   read out only through global properties. That is a real set of
+   problems and it is a much smaller room than the abstract implies. It
+   is also a clean example of the field narrowing its own claim, which is
+   what the Evaluating Quantum Advantage lesson argues is healthy rather
+   than embarrassing.
+
+   </details>
+
 3. Classify the claim "BB84 quantum key distribution is unconditionally
    secure against any eavesdropping strategy, including future ones."
    Then state the specific additional assumption (about the physical
@@ -554,14 +687,76 @@ mirror image of the first mistake above.
    separating a proven theorem from the unscoped claim it gets mistaken
    for.
 
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Tier 1, for the idealized protocol.** Complete security proofs
+   exist, from Mayers and from Shor and Preskill, later recast in
+   composable frameworks. The guarantee is information-theoretic: it
+   holds against an adversary limited only by quantum mechanics, with no
+   assumption about the eavesdropper's computational power. That is what
+   "including future ones" earns, and it is a real and remarkable
+   property that no computational cryptosystem has.
+
+   **What "unconditional" actually means, since the word oversells
+   itself.** It means "not conditional on a *computational* hardness
+   assumption." It does not mean "conditional on nothing." The proofs
+   assume the devices behave as modeled, that no information leaks from
+   the two labs by any channel outside the model, that the random number
+   generators are genuinely random, and that the classical channel used
+   for basis reconciliation is authenticated, which itself requires a
+   short pre-shared secret. Every one of those is an assumption, and each
+   is about the world rather than about mathematics.
+
+   **The implementation assumption to name: single-photon sources.** The
+   proof assumes each pulse carries one photon in the chosen state. Real
+   deployments use attenuated laser pulses, whose photon number is
+   Poisson-distributed, so a fraction of pulses contain two or more
+   identical photons. That opens the **photon-number-splitting attack**:
+   Eve keeps one photon from every multi-photon pulse, forwards the rest
+   untouched, waits for the basis announcement, and measures. She learns
+   those bits completely while introducing **no error at all**, so the
+   protocol's own eavesdropper test, an elevated error rate, never fires.
+   Over a lossy channel Eve can block the single-photon pulses and pass
+   only the multi-photon ones, and the security proof's conclusion simply
+   does not apply to the system being run.
+
+   That is the exact structure of the barren-plateau case. A proven
+   theorem about a stated model gets repeated as an unscoped claim about
+   a deployed system, and the sentence stays true right up until someone
+   builds the thing.
+
+   **The repair, and it is a good one.** Decoy-state BB84, due to Hwang
+   and to Lo, Ma, and Chen, sends pulses at several randomly chosen
+   intensities and compares their transmission yields. A
+   photon-number-splitting attacker cannot make the different intensities
+   behave consistently, so the attack becomes detectable, and a provable
+   key rate is restored for weak coherent sources. The claim returns to
+   Tier 1 with the model corrected rather than the caveat waived, which
+   is the right way for this to be fixed.
+
+   **Why the caveat should be taken seriously rather than noted
+   politely.** Commercial QKD systems running provably secure protocols
+   have been broken in the laboratory, by detector-blinding attacks that
+   drive avalanche photodiodes into a linear regime the security model
+   never described, and by timing side channels. Nothing in those attacks
+   contradicts any theorem. They go around the model. The research
+   response is device-independent QKD, whose proofs assume only an
+   observed Bell-inequality violation and nothing about how the boxes
+   work, at a heavy cost in rate and distance. The existence of that
+   research programme is the clearest evidence available that the
+   implementation assumption in ordinary BB84 is load-bearing.
+
+   </details>
+
 <PracticeLinks problems={practiceProblems} />
 
-<ChallengePrompt prompt="Take a claim from your own field of work — not quantum computing — that you have repeated to someone else in the last month, and run the four questions on it.">
+<ChallengePrompt prompt="Take a claim from your own field of work, not quantum computing, that you have repeated to someone else in the last month, and run the four questions on it.">
   Most claims people repeat professionally turn out to be Tier 2: a
   regularity that holds across the cases anyone has checked, with no
   general derivation behind it. That is not a criticism of the claim.
   The failure mode is repeating a Tier 2 claim in Tier 1 language, and
-  the only reliable defence is having named the tier out loud once.
+  the only reliable defense is having named the tier out loud once.
   Finish by answering Question 4: name the specific result that would
   move it up.
 </ChallengePrompt>
@@ -592,7 +787,7 @@ mirror image of the first mistake above.
   quantum computing: it is a reusable tool for evaluating any technical
   claim, in any field, that you did not personally derive yourself.
 
-## Further Exploration
+## The Same Checklist, Aimed at Advantage
 
 <NextDiscovery>
   Next, [Evaluating Quantum Advantage

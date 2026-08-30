@@ -38,7 +38,7 @@ export const minusIPlusTensorProbability: NumericProblem = {
   hints: [
     { text: "The amplitude on |11⟩ in a tensor product is the product of each factor's amplitude on |1⟩." },
     { text: "|−i⟩'s amplitude on |1⟩ is $-i/\\sqrt2$; |+⟩'s amplitude on |1⟩ is $1/\\sqrt2$." },
-    { text: "Multiply those two amplitudes, then square the magnitude of the result — the phase from $-i$ disappears once you square." },
+    { text: "Multiply those two amplitudes, then square the magnitude of the result. The phase from $-i$ drops out in the squaring." },
   ],
   solution: {
     steps: [
@@ -58,7 +58,7 @@ export const minusIPlusTensorProbability: NumericProblem = {
     correctIdea: "A tensor product's amplitude on a basis state is the product of each factor's amplitude on its own bit.",
     whyCorrect: "The complex phase $-i$ contributes to the amplitude but vanishes once the Born rule squares the magnitude.",
     whyWrong: [
-      "Multiplying probabilities (1/2 × 1/2 = 1/4) happens to give the same number here, but only by coincidence — this state has a complex amplitude, and multiplying amplitudes first is the rule that generalizes correctly (it wouldn't coincidentally match once relative phases between terms actually matter, e.g. after interference).",
+      "Multiplying probabilities (1/2 × 1/2 = 1/4) happens to give the same number here, but only by coincidence. Multiplying amplitudes first is the rule that generalizes, and the two stop agreeing once relative phases between terms matter, as they do after interference.",
       "Forgetting to square the magnitude and reporting 1/2 (the magnitude of the amplitude, not the probability) skips the Born rule entirely.",
     ],
   },

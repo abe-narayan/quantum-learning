@@ -43,8 +43,8 @@ export const combinedT2FromTwoProcesses: NumericProblem = {
     finalAnswer: "T2 ≈ 4.44 microseconds, correctly below the 2*T1=10 microsecond bound.",
   },
   explanation: {
-    correctIdea: "Independent Lindblad jump operators contribute additively to a coherence's total decay rate, not to T2 itself directly -- rates add, not time constants.",
-    whyCorrect: "This is exactly the additivity the lesson derived from the generator's linearity, and the result correctly respects T2 <= 2*T1 = 10 microseconds.",
+    correctIdea: "Independent Lindblad jump operators contribute additively to a coherence's total decay rate, not to T2 directly. Rates add, not time constants.",
+    whyCorrect: "Rates add because the generator is linear, so two independent processes contribute their 1/T2 terms separately rather than interfering. The combined figure stays inside the T2 <= 2*T1 = 10 microsecond ceiling, as any physical answer must.",
     whyWrong: ["Averaging T1 and T2,pure directly (rather than their rates) would give a different, incorrect number."],
   },
 };

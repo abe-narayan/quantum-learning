@@ -1,23 +1,22 @@
 import Link from "next/link";
 import { Section, SplitFigure } from "@/components/ui/Section";
-import { Eyebrow, SectionTitle, Lede, Readouts, TechLabel } from "@/components/ui/Typography";
+import { Eyebrow, SectionTitle, Lede } from "@/components/ui/Typography";
 import { Reveal } from "@/components/motion/Reveal";
 import { PillarBand } from "@/components/home/PillarBand";
+import { PillarFooter } from "@/components/home/PillarFooter";
 import { DailyPuzzle } from "@/components/home/DailyPuzzle";
-import { getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
-import { PILLAR_VISUALS } from "@/lib/design/pillars";
 
 const PILLAR = "quantum-software" as const;
 
 const PIPELINE = [
   {
     title: "Write the circuit",
-    description: "Circuits as data before you ever run them — the same build-then-run model real SDKs use.",
+    description: "Circuits as data before you ever run them, the same build-then-run model real SDKs use.",
   },
   {
     title: "Compile & optimize",
-    description: "An abstract circuit turned into something real hardware — or a state-vector simulator — can actually run.",
+    description: "An abstract circuit turned into something real hardware, or a state-vector simulator, can actually run.",
   },
   {
     title: "Run, then verify",
@@ -26,24 +25,21 @@ const PIPELINE = [
 ];
 
 /**
- * Pillar 4 of 6 — where the field's `journey` crossfade is dominated by
- * `graph` (circuit rails executing). Composition: a timeline across the top
- * (the compile/run pipeline this pillar actually teaches), then a split
- * pairing the case for practice with a live instance of it — today's
- * problem — rather than a static "view all problems" card grid.
+ * Track 4 of 6, the fourth stop in the field's `journey` crossfade, where the
+ * environment becomes `graph` (circuit rails executing). Composition: a
+ * timeline across the top for the compile/run pipeline this track actually
+ * teaches, then a split pairing the case for practice with a live instance of
+ * it, today's problem, rather than a static "view all problems" card grid.
  */
 export function SoftwareSection() {
-  const courses = getCoursesByPillar(PILLAR);
-  const hours = courses.reduce((sum, course) => sum + course.estimatedHours, 0);
   const totalProblems = getAllProblemMeta().length;
-  const visual = PILLAR_VISUALS[PILLAR];
 
   return (
     <PillarBand pillar={PILLAR}>
       <Section width="wide" aria-labelledby="software-heading">
         <Reveal>
           <Eyebrow>04 · Quantum Software</Eyebrow>
-          <SectionTitle id="software-heading" className="mt-3" size="lg">
+          <SectionTitle id="software-heading" level={3} className="mt-3" size="lg">
             The layer between your code and a real qubit
           </SectionTitle>
           {/* "State-vector engine" and "hybrid quantum-classical loop" are
@@ -73,7 +69,7 @@ export function SoftwareSection() {
                   {index + 1}
                 </span>
                 <div className="md:mt-4">
-                  <h3 className="font-semibold text-foreground">{step.title}</h3>
+                  <h4 className="font-semibold text-foreground">{step.title}</h4>
                   <p className="mt-1 text-sm text-muted-foreground">{step.description}</p>
                 </div>
               </Reveal>
@@ -87,49 +83,37 @@ export function SoftwareSection() {
             text={
               <div>
                 <Reveal>
-                  <h3 className="font-display text-xl font-semibold text-foreground">
-                    Test what you actually understand
-                  </h3>
+                  <h4 className="font-display text-xl font-semibold text-foreground">
+                    Find out what you understood
+                  </h4>
+                  {/* Deliberately *not* a second description of the problem
+                      corpus. `ExploreSection`, one section below this, already
+                      catalogues it (how many, filterable by what) and used to
+                      say almost word for word what this paragraph said about
+                      exact grading and multiple choice. This one is about the
+                      act, what happens to you when you get one wrong; that one
+                      is about the shelf. Same destination, two different
+                      reasons to go. */}
                   <p className="mt-3 text-muted-foreground">
-                    {totalProblems} practice problems across every course, each graded exactly
-                    and tied to a specific lesson, with progressive hints and a worked
-                    solution — not multiple choice standing in for understanding.
+                    {totalProblems} problems, every one of them attached to the single lesson it
+                    tests. Hints arrive one at a time, so a problem you are stuck on hands you the
+                    next step and not the answer. The worked solution sits behind them. Submit as
+                    often as you like: nothing is scored, and nothing is recorded against you.
                   </p>
                   <Link
                     href="/problems"
                     className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-pillar hover:underline"
                   >
-                    View all problems →
+                    Browse the problem set →
                   </Link>
                 </Reveal>
 
-                <Reveal
-                  delay={120}
-                  className="mt-10 flex flex-wrap items-end justify-between gap-6 border-t border-border pt-6"
-                >
-                  <Readouts
-                    items={[
-                      { label: "Courses", value: courses.length },
-                      { label: "Est. time", value: hours, unit: "hrs" },
-                    ]}
-                  />
-                  <Link
-                    href={visual.route}
-                    className="inline-flex min-h-11 items-center text-sm font-semibold text-pillar hover:underline"
-                  >
-                    Enter {visual.short} →
-                  </Link>
-                </Reveal>
-
-                <p className="mt-6 flex items-baseline gap-2">
-                  <TechLabel>Field</TechLabel>
-                  <span className="text-xs text-subtle-foreground">{visual.fieldCaption}</span>
-                </p>
+                <PillarFooter pillar={PILLAR} />
               </div>
             }
             figure={
               <Reveal y={18} delay={80}>
-                <DailyPuzzle />
+                <DailyPuzzle headingLevel="h4" />
               </Reveal>
             }
           />

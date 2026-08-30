@@ -20,17 +20,33 @@ export const whyHCommutesWithLz: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["kinetic", "p^2", "p²", "rotationally symmetric", "rotationally invariant"],
-      ["potential", "V(r)", "depends only on r", "distance"],
-      ["generates rotation", "rotation about z", "preserves"],
+      {
+        phrases: ["kinetic", "p squared", "momentum", "rotationally symmetric", "rotationally invariant"],
+        missingFeedback:
+          "The Hamiltonian has two pieces and the argument has to cover both separately. Start with the first one and say why turning the coordinate frame leaves it alone.",
+      },
+      {
+        phrases: ["potential", "V(r)", "depends only on r", "distance"],
+        missingFeedback:
+          "You have one piece. Now do the other: say what it depends on, and why that dependence is blind to a rotation.",
+      },
+      {
+        phrases: ["generates rotation", "rotation about z", "preserves"],
+        missingFeedback:
+          "You have said both pieces are unmoved by turning the frame. Now connect that to the operator in question: say what Lz has to do with turning things, which is what converts invariance into a vanishing commutator.",
+      },
     ],
-    incorrectFeedback: "Address the kinetic term p²/2m and the potential term V(r) as two separate arguments, not one combined claim.",
-    partialFeedback: "Good — make sure both pieces are addressed explicitly, since commutation with a sum requires commutation with each term.",
+    incorrectFeedback: "You argued that H as a whole is unchanged by rotations and stopped, which is the sum-level claim the question asks you to unpack. Use [A, B+C] = [A,B] + [A,C], then handle the two summands one at a time, giving each its own reason.",
+    partialFeedback: "Address both pieces explicitly, since commutation with a sum requires commutation with each term.",
+    modelAnswers: [
+      "The kinetic term is built from p squared, which is rotationally invariant: turning the frame does not change it. The potential V(r) depends only on r, the distance from the origin, so a rotation about z leaves it alone too. Lz generates rotation about z, so each piece separately commutes with it, and hence so does the sum.",
+      "Both pieces are rotationally symmetric on their own. The momentum-squared operator is unchanged under any rotation, and the potential depends only on distance, so neither notices a rotation about z, which is exactly what Lz generates.",
+    ],
   },
   hints: [
-    { text: "[A, B+C] = [A,B] + [A,C] — commuting with a sum requires commuting with each term separately." },
-    { text: "V(r) depends only on distance, which rotation preserves." },
-    { text: "p² = px²+py²+pz² is built symmetrically from momentum components, the same way r² is built from position — rotation preserves total momentum magnitude too." },
+    { text: "A commutator with a sum splits into a sum of commutators. Write that identity down and apply it to H." },
+    { text: "Take the second piece first. It is a function of one scalar quantity; ask whether turning the system around the z axis changes that quantity." },
+    { text: "Now the first piece. It is built from the three components of p in the same symmetric way that r² is built from the three coordinates, so ask what a turn does to it." },
   ],
   solution: {
     steps: [
@@ -42,8 +58,8 @@ export const whyHCommutesWithLz: ConceptualProblem = {
     finalAnswer: "Both p²/2m and V(r) are individually rotationally invariant, so each commutes with Lz (which generates rotation), and hence so does their sum H.",
   },
   explanation: {
-    correctIdea: "The full argument requires two separate rotational-invariance claims, not one — this is the actual content of the Central Potentials lesson's derivation, not a shortcut.",
-    whyCorrect: "This matches the lesson's Mathematical Development section exactly, addressing both terms of H individually.",
-    whyWrong: ["Asserting '[H,Lz]=0 because H is the energy and energy is conserved' skips the actual mechanism and doesn't generalize to explaining why L² also commutes."],
+    correctIdea: "The full argument requires two separate rotational-invariance claims, not one. That is the content of the Central Potentials lesson's derivation, not a shortcut.",
+    whyCorrect: "L_z generates rotations about the z axis, and both terms of H are unchanged by such a rotation: the radial kinetic and potential pieces do not refer to the azimuthal angle at all, and the angular piece is built from L², which commutes with each of its own components.",
+    whyWrong: ["Asserting '[H,Lz]=0 because H is the energy and energy is conserved' skips the mechanism and does not generalize to explaining why L² also commutes."],
   },
 };

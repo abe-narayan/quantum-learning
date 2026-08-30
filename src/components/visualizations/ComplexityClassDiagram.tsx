@@ -88,8 +88,34 @@ export function ComplexityClassDiagram({
   const overlapCy = hasLensA ? (LENS_A.cy + LENS_B.cy) / 2 : LENS_B.cy;
 
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
-      <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel} className="mx-auto w-full max-w-lg">
+    // `w-full max-w-lg` removed from the `<svg>`. The note further down is
+    // right that inside an SVG a Tailwind `text-[13px]` is 13 *user units*, and
+    // right that a 480-unit viewBox painting `w-full` scales them down; it is
+    // the box it divides by that was optimistic. The real content box on a
+    // 320px viewport is 320 - 32 (Container `px-4`) = 288, less
+    // 2 x (16px `p-4` + 1px `panel-inset` border) = 254px, so a unit is
+    // 254/480 = 0.529px, not ~0.53 of a 256px box, and the sizes land at
+    //   18 units -> 9.5px    (outer class name)
+    //   16 -> 8.5px, 14 -> 7.4px, 13 -> 6.9px, 12 -> 6.4px
+    // The note's own target ("the smallest is ~7px and the class names
+    // themselves reach ~9.5-10.5px") is below the ~9px floor for every label
+    // except the outermost one, and this figure is nothing but labels: each
+    // one is a complexity-class name, and a class name a reader cannot resolve
+    // makes the containment picture unreadable rather than merely coarse.
+    //
+    // Without `w-full` the intrinsic `width={480}` applies, one unit is one CSS
+    // pixel, and the same numbers become a literal 18/16/14/13/12px. The
+    // wrapper's `overflow-x-auto` (already present, previously dead because
+    // `w-full` guaranteed a fit) carries the overflow, matching
+    // `EnergyLevelDiagram` and `LevelSplittingDiagram`.
+    //
+    // `tabIndex={0}` because that scroller now actually scrolls, and
+    // `overflow-x-auto` is focusable by default in no browser but Firefox: the
+    // marked point and its label sit at the right-hand edge, so a keyboard-only
+    // reader would otherwise be unable to reach them. No `role`/`aria-label`
+    // on the wrapper; the `<svg>` carries both already.
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
+      <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
         {/* Outer boundary — solid, proven container for everything drawn. */}
         <rect
           x={OUTER.x}

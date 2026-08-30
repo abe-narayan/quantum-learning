@@ -95,7 +95,7 @@ export function CHSHBellTestControls({
               symbol: "S",
               name: "the CHSH number",
               means:
-                "one number combining all four angle pairings. Any universe where each particle already carried its answer is stuck at |S| ≤ 2. Real entangled particles reach 2.83 — and real experiments have measured it.",
+                "one number combining all four angle pairings. Any universe where each particle already carried its answer is stuck at |S| ≤ 2. Real entangled particles reach 2.83, and real experiments have measured it.",
               glossaryId: "bells-theorem",
             },
           ]}
@@ -113,7 +113,7 @@ function AngleSlider({
 }: {
   /** The symbol printed on screen, e.g. "a′". */
   label: string;
-  /** Who this angle belongs to, in words — appended invisibly to the label. */
+  /** Who this angle belongs to, in words, appended invisibly to the label. */
   spokenAs: string;
   value: number;
   onChange: (value: number) => void;
@@ -130,7 +130,7 @@ function AngleSlider({
       label={
         <>
           <span className="font-mono">{label}</span>
-          <span className="sr-only"> — {spokenAs}</span>
+          <span className="sr-only">, {spokenAs}</span>
         </>
       }
       value={value}

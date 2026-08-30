@@ -20,16 +20,32 @@ export const qftReducesToHadamard: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["e^0", "e^{0}", "exponent is 0", "exponent is zero", "zero exponent", "phase factor", "every phase", "each phase", "phases are", "phases all", "phase is 1", "phase equals 1", "no phase", "both terms 1", "all terms equal"],
-      ["1/√2", "1/sqrt(2)", "1/sqrt2", "1/root 2", "equal superposition", "plus state", "|+>", "|+⟩", "h|0", "hadamard on |0", "same state as", "identical to h", "matches h"],
+      {
+        phrases: ["e^0", "e^{0}", "exponent is 0", "exponent is zero", "zero exponent", "phase factor", "every phase", "each phase", "phases are", "phases all", "phase is 1", "phase equals 1", "no phase", "both terms 1", "all terms equal"],
+        missingFeedback:
+          "Substitute the values in and look at the exponent. Say what number each term of the sum gets multiplied by when j=0.",
+      },
+      {
+        phrases: ["1/√2", "1/sqrt(2)", "1/sqrt2", "1/root 2", "equal superposition", "plus state", "|+>", "|+⟩", "h|0", "hadamard on |0", "same state as", "identical to h", "matches h"],
+        missingFeedback:
+          "You have simplified the sum. Now write out the state it leaves and name the familiar single-qubit state it equals.",
+        anchors: {
+          "|+>": "Ket notation strips to nothing, so it is matched raw. This is the ASCII form a student types without a special keyboard.",
+          "|+⟩": "The same ket in the notation the lesson prints.",
+        },
+      },
     ],
-    incorrectFeedback: "Plug j=0 and N=2 directly into QFT|j⟩=(1/√N)Σₖ e^{2πijk/N}|k⟩ and simplify each term.",
-    partialFeedback: "Good start. Now connect the resulting state to what the Hadamard produces from |0⟩, written out explicitly.",
+    incorrectFeedback: "Put j = 0 and N = 2 into the defining sum yourself rather than citing the lesson's statement about the one-qubit case. Evaluate the two exponentials that result, and compare the vector you get with what a Hadamard does to the zero state.",
+    partialFeedback: "You have one half. Now write the other side out in full: what vector does the Hadamard send the zero state to? Then set the two vectors beside each other.",
+    modelAnswers: [
+      "Put j=0 and N=2 into the QFT sum. Every exponent is 0, so every phase factor is 1, and you are left with (1/sqrt(2))(|0>+|1>). That is exactly H|0>, the plus state.",
+      "With j=0 the exponent is zero for both terms, so all terms equal 1 and the sum is (1/sqrt(2))(|0>+|1>). That is an equal superposition, identical to H acting on |0>.",
+    ],
   },
   hints: [
-    { text: "Write out the defining sum for QFT|j⟩ with N=2, then set j=0. What happens inside each exponential?" },
-    { text: "Evaluate the two exponentials. What number does each one become?" },
-    { text: "Compare the two-term state you get with what the Hadamard sends |0⟩ to. Are they the same vector?" },
+    { text: "Write the defining sum for QFT|j⟩ with N = 2, leaving j general. Count its terms." },
+    { text: "Now set j = 0 and look at what each exponential's argument becomes." },
+    { text: "Evaluate the two exponentials and write the resulting two-component vector. Then write the vector the Hadamard produces from the zero state and compare." },
   ],
   solution: {
     steps: [

@@ -67,7 +67,7 @@ export function TypeGlyph({ type, className }: { type: ProblemType; className?: 
  *  this take" chip reused by the card and the problem page header. */
 export function TypeMark({ type, className }: { type: ProblemType; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 tech-label !text-[0.6875rem] text-muted-foreground", className)}>
+    <span className={cn("inline-flex items-center gap-1.5 tech-label text-muted-foreground", className)}>
       <TypeGlyph type={type} />
       {TYPE_LABEL[type]}
     </span>

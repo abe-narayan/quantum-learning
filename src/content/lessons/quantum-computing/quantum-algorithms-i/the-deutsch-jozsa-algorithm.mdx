@@ -74,7 +74,7 @@ export const lessonMeta = {
 Classically, distinguishing a constant function from a balanced one with certainty can take exponentially many queries in the worst case. Deutsch-Jozsa does it with a single query.
 </LessonHook>
 
-## Motivation
+## Constant or balanced, and nothing in between
 
 $f:\{0,1\}^n\to\{0,1\}$ is *promised* to be either constant (same output on
 every input) or balanced (exactly half 0, half 1), never anything in
@@ -83,38 +83,44 @@ $2^{n-1}+1$ queries in the worst case: check that many inputs, and if
 they're all equal, it could still be balanced with the very next query
 breaking the pattern.
 
-<PredictBeforeReveal
-  question="Deutsch-Jozsa gets to query U_f in superposition instead of one input at a time. How many queries does it need to determine constant-vs-balanced with certainty?"
-  options={[
-    { label: "Still needs many queries, just fewer than 2^(n-1)+1", value: "many-fewer" },
-    { label: "About half of 2^(n-1)+1", value: "half" },
-    { label: "Scales with n, but grows more slowly", value: "grows-with-n" },
-    { label: "Exactly one, always correct", value: "one" },
-  ]}
-  correctValue="one"
-  explanation="One query, and the answer is certain rather than probable. Phase kickback marks every |x⟩ with (-1)^f(x) in a single call to U_f, and the second Hadamard layer converts that phase pattern into an amplitude landing on ±1 (constant) or 0 (balanced), derived below. No repeated sampling, no error probability to drive down: the promise guarantees a clean either/or from one query. This is the largest separation between classical and quantum query counts you will meet in this course, and it is worth knowing up front that it depends entirely on the promise."
-/>
-
 That is what <Term id="deutsch-jozsa">Deutsch-Jozsa</Term> achieves: **one** query
 to $U_f$, using the phase-kickback trick from last lesson plus a second
 layer of Hadamards to turn phases back into a directly measurable answer.
 
+Before the derivation, it is worth pinning down what that one query is and
+is not going to hand you. The previous lesson queried $U_f$ on a
+superposition of all $2^n$ inputs and came away with one useless random
+sample. This lesson runs the same single query and comes away with a
+certain answer, so something has to have been given up in exchange.
+
+<PredictBeforeReveal
+  question="Deutsch-Jozsa queries U_f once, on a superposition of all 2ⁿ inputs. How many individual values f(x) can you read off from the run?"
+  options={[
+    { label: "All 2ⁿ of them: that is what querying in superposition means", value: "all" },
+    { label: "Half of them, the half the balanced promise fixes", value: "half" },
+    { label: "One, the same as a single classical query", value: "one" },
+    { label: "None at all", value: "none" },
+  ]}
+  correctValue="none"
+  explanation="None. The run ends in a single measurement of the input register, which returns one n-bit string, and the only thing that string is read for is whether it is all zeros. No f(x) is ever recovered, not even the one classical query's worth you could have had for free. That is the trade: the algorithm answers a global question about f and destroys every local fact about it on the way. It is also why the previous lesson's 'evaluate f on every input at once' was a dead end on its own, and why Deutsch-Jozsa is a demonstration of a mechanism rather than a useful tool."
+/>
+
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/04/David_Deutsch.jpg"
   alt="David Deutsch, the physicist who first formulated the Deutsch-Jozsa problem and is often called a father of quantum computing"
-  caption="David Deutsch, whose 1985 paper first framed quantum computation in terms of problems like the one this lesson solves; Richard Jozsa generalized his single-qubit version to the full multi-qubit algorithm derived below."
+  caption="David Deutsch, who posed the single-qubit constant-versus-balanced question that the algorithm derived below generalizes."
   credit="Simon Benjamin, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:David_Deutsch.jpg"
   license="CC BY 3.0"
 />
 
 <HistoricalMoment date="1985">
-David Deutsch's paper first frames quantum computation in terms of problems like the one this lesson solves; Richard Jozsa later generalizes his single-qubit version to the full multi-qubit algorithm derived below.
+David Deutsch's paper frames quantum computation around problems like this one and poses the single-qubit constant-versus-balanced question. Deutsch and Richard Jozsa extend it to n qubits in 1992, and that extension is the algorithm derived below.
 </HistoricalMoment>
 
-## Mathematical Development
+## Tracking one amplitude through the whole circuit
 
-### The circuit
+### The one-query circuit
 
 Prepare $n$ input qubits at $|0\rangle^{\otimes n}$ and one ancilla at
 $|1\rangle$. Apply $H$ to every qubit (input becomes the uniform
@@ -142,7 +148,7 @@ $$
 H^{\otimes 2}|x_1x_2\rangle = \big(H|x_1\rangle\big)\otimes\big(H|x_2\rangle\big) = \frac{1}{2}\sum_{z_1,z_2}(-1)^{x_1z_1+x_2z_2}|z_1z_2\rangle
 $$
   </DerivationStep>
-  <DerivationStep annotation="The same tensoring, n times: one factor of 1/√2 per qubit (multiplying to 2^{−n/2}) and one sign per bit position, accumulating to the bitwise dot product x·z = x₁z₁ + ⋯ + xₙzₙ mod 2. This general pattern is the Hadamard transform of a basis state.">
+  <DerivationStep annotation="The same tensoring, n times: one factor of 1/√2 per qubit (multiplying to an overall 1/√(2ⁿ)) and one sign per bit position, accumulating to the bitwise dot product x·z = x₁z₁ + ⋯ + xₙzₙ mod 2. This general pattern is the Hadamard transform of a basis state.">
 $$
 H^{\otimes n}|x\rangle = \frac{1}{\sqrt{2^n}}\sum_z(-1)^{x\cdot z}|z\rangle
 $$
@@ -226,7 +232,7 @@ forces this: each of these seven balanced masks defines a different
 function, yet all seven land on the identical amplitude-cancellation result
 the derivation predicted.
 
-## Physical Interpretation
+## Never querying an individual input
 
 The classical lower bound is about *worst-case adversarial inputs*, and the
 quantum algorithm sidesteps it by never querying an individual input. It
@@ -234,12 +240,15 @@ queries the oracle once, in superposition, and lets <Term id="phase-interference
 $2^n$ branches decide: constructive for constant $f$, perfectly
 destructive for balanced $f$.
 
-Notice what is not learned. No individual value $f(x)$ is ever recovered.
-The algorithm answers the global question and nothing else, which is
-exactly what the promise problem asked for and is also, honestly, why
-Deutsch-Jozsa is a demonstration rather than a useful tool.
+The derivation also settles the question posed before it. Nowhere in the
+sum does any single $f(x)$ survive on its own: the algorithm reads the
+one number $\sum_x(-1)^{f(x)}$ and every individual value is spent
+producing it. That is the whole trade, and it is why the promise matters
+so much. A global question with a two-valued answer is the only kind this
+machinery can answer, which makes Deutsch-Jozsa a clean demonstration of a
+mechanism rather than a useful tool.
 
-## Worked Example
+## Running it on the parity function
 
 **Run Deutsch-Jozsa on the balanced function $f(x)=x_1\oplus x_2$ (parity
 of the two input bits) for $n=2$. Confirm $P(00)=0$.**
@@ -252,7 +261,7 @@ $|00\rangle$ correctly reports "balanced." This is exactly
 bits) as this course's engine builds it, and the $0$ result matches the
 engine's output.
 
-## Common Mistakes
+## The promise is not optional
 
 <Callout type="warning">
 **Thinking Deutsch-Jozsa works for an arbitrary (non-promised) function.**
@@ -273,15 +282,170 @@ measurable probability difference.
 
 1. Compute the constant-vs-balanced amplitude sum for the constant-1
    function on $n=1$, and confirm $P(0)=1$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The boxed result is that the amplitude on $|0\rangle^{\otimes n}$ is
+   $\tfrac{1}{2^n}\sum_x(-1)^{f(x)}$. For $n=1$ the sum runs over
+   $x\in\{0,1\}$, and $f$ is constant-$1$, so both terms are $(-1)^1=-1$:
+
+   $$
+   \text{amplitude on }|0\rangle = \frac{1}{2}\big((-1)+(-1)\big) = \frac{-2}{2} = -1
+   $$
+
+   $P(0) = |-1|^2 = 1$. Certainty, and the engine's full circuit returns
+   $1.0000000000000004$ for the probability that the input register reads
+   all zeros.
+
+   The minus sign is the detail worth pausing on. The amplitude is $-1$,
+   not $+1$, so the final state is $-|0\rangle$ rather than $|0\rangle$.
+   Constant-$0$ gives $+1$ instead, and the two differ by a global phase
+   that no measurement can see. Both report $P(0)=1$, and the algorithm
+   answers "constant" without saying which constant, exactly as its promise
+   allows.
+
+   The mechanism is that all $2^n$ terms in the sum are the same sign, so
+   they reinforce completely, and the normalization $1/2^n$ divides by
+   exactly the number of them. Constructive interference on
+   $|0\rangle^{\otimes n}$ means, by conservation of probability,
+   destructive interference everywhere else: all $2^n-1$ other amplitudes
+   must be zero, and they are.
+
+   The wrong turn is squaring the sum before dividing, or dividing by
+   $2^{n/2}$ out of habit from Hadamard normalizations. The factor is
+   $1/2^n$ because two layers of $H^{\otimes n}$ each contributed
+   $2^{-n/2}$. Getting it wrong gives an amplitude of magnitude $2^{n/2}$
+   and a probability above $1$, which is the fastest way to notice.
+
+   </details>
+
 2. For $n=1$, is $f(0)=0,f(1)=1$ (the identity function) constant or
    balanced? Compute the resulting amplitude on $|0\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Balanced: it returns $0$ on one of its two inputs and $1$ on the other,
+   which is exactly half and half. The amplitude on $|0\rangle$ is
+
+   $$
+   \frac{1}{2}\big((-1)^0 + (-1)^1\big) = \frac{1+(-1)}{2} = 0
+   $$
+
+   so $P(0)=0$, and the engine confirms $0$ exactly. The measurement is
+   certain to return $|1\rangle$ rather than $|0\rangle$, and the algorithm
+   reports "balanced" with no possibility of error.
+
+   The two cancelling terms are the whole story. Balanced means the number
+   of $+1$s equals the number of $-1$s in $\sum_x(-1)^{f(x)}$, so the sum
+   is exactly zero, so the amplitude on the all-zeros string is exactly
+   zero. Not small, not usually zero: zero, by an exact count. That is why
+   the algorithm is certain rather than probabilistic, and why the promise
+   of *exactly* half is doing real work rather than being a convenience.
+
+   Note also that "balanced" is a global property no single query could
+   detect classically, whereas the quantum circuit reads it off the total
+   of $2^n$ signs in one shot. What it does not do is tell you *which*
+   balanced function $f$ is: the identity, the negation, and every other
+   balanced $f$ on one bit all give amplitude zero on $|0\rangle$.
+
+   The wrong turn is calling the identity function constant because it
+   "does nothing to its input". Constant refers to the *output*: $f$ is
+   constant when $f(x)$ is the same value for every $x$. The identity's
+   output changes with $x$, so it is as balanced as a function on one bit
+   can be.
+
+   </details>
+
 3. Explain why $2^{n-1}+1$ classical queries are needed in the worst case
    to be *certain* of constant-vs-balanced, using a specific adversarial
    sequence of "all queries so far returned 0."
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Suppose you have made $2^{n-1}$ queries and every one returned $0$. Both
+   hypotheses are still alive. $f$ could be constant-$0$, which agrees with
+   everything you have seen. Or $f$ could be balanced, with its $2^{n-1}$
+   zeros sitting on exactly the inputs you happened to choose and its
+   $2^{n-1}$ ones on all the inputs you have not touched. Nothing you have
+   observed separates the two, so you cannot yet answer with certainty.
+
+   One more query settles it, and it must. Query $2^{n-1}+1$ lands on an
+   input outside the all-zeros block you have already seen. If it returns
+   $1$, the function is not constant, so it is balanced. If it returns $0$,
+   then $f$ has at least $2^{n-1}+1$ zeros, which is more than half of
+   $2^n$, so it cannot be balanced, so it is constant. Either answer is
+   decisive, so $2^{n-1}+1$ suffices and $2^{n-1}$ does not.
+
+   Thinking of it as an adversary is what makes the bound feel inevitable
+   rather than pessimistic. Imagine an opponent who does not fix $f$ in
+   advance but answers each query as it comes, always saying $0$ while a
+   consistent balanced function and a consistent constant function both
+   remain available. That opponent can keep it up for exactly $2^{n-1}$
+   queries and no longer. At $n=20$ this is $524{,}289$ queries against the
+   quantum algorithm's one.
+
+   Two wrong turns are worth separating. The first is arguing that you need
+   to query *every* input, $2^n$ queries. You do not: seeing a majority of
+   zeros already rules balanced out. The second, and the more important
+   one, is treating this bound as the honest classical cost of the problem.
+   It is the cost of *certainty*. A classical algorithm that queries a
+   dozen random inputs and answers "constant" if they all agree is wrong
+   with probability under one in a thousand, and takes constant time
+   regardless of $n$. Deutsch-Jozsa's exponential separation is against
+   deterministic classical algorithms only, which is precisely the gap
+   Simon's algorithm later closes.
+
+   </details>
+
 4. Deutsch-Jozsa's promise is somewhat artificial: real-world problems
    rarely come pre-labeled "constant or balanced." What does this suggest
    about its value as a *demonstration* of <Term id="quantum-advantage-supremacy">quantum advantage</Term> versus a
    *practically useful* algorithm?
+
+   <details className="answer-reveal">
+   <summary>A defensible answer</summary>
+
+   Marked on the case made, not on the verdict. Here is one position
+   argued in full, then the alternatives, then what does not count.
+
+   A worked version: Deutsch-Jozsa is a first-rate demonstration and a
+   worthless tool, and both halves are worth saying. As a demonstration it
+   is unimprovable, because the mechanism is visible in four lines of
+   algebra: kick $f$ into a phase, interfere, and read a global property
+   off a single measurement. Nothing is asymptotic, nothing is
+   approximate, and the exact zero amplitude in the balanced case makes the
+   answer certain. As a tool it is useless twice over. The promise almost
+   never holds for a function anyone cares about, and even when it does, a
+   randomized classical algorithm answers correctly with probability
+   $1-2^{-k}$ after $k$ queries, so the exponential separation evaporates
+   the moment you accept a one-in-a-billion error rate.
+
+   Equally defensible. You can argue that the promise's artificiality is
+   the *point* rather than a flaw, since a first proof of principle should
+   engineer the cleanest possible instance, the way Carnot's engine is
+   useless and indispensable. You can argue that its real value is
+   pedagogical and historical: it is the template, Hadamards then oracle
+   then Hadamards, that Simon's and Shor's algorithms scale up, and its
+   worth is measured by what it led to rather than by what it computes. You
+   can also take the harder line that "quantum advantage" should be
+   reserved for separations against randomized classical algorithms, in
+   which case Deutsch-Jozsa demonstrates nothing and Simon's algorithm is
+   the first real result.
+
+   What a bad answer looks like: "it proves quantum computers are
+   exponentially faster than classical ones", full stop. That is the claim
+   the question is testing, and it is wrong in two directions at once,
+   since the separation is only against deterministic classical algorithms
+   and only for this promise. Also insufficient is dismissing it as a toy
+   without saying what it demonstrates: the interference mechanism it
+   exhibits is real and is the same one every later algorithm uses.
+   Any answer needs to separate "the speedup is real for this problem"
+   from "this problem is worth solving", and hold both.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -297,7 +461,7 @@ measurable probability difference.
 - Both cases are checked directly against the engine, not just derived on
   paper.
 
-## Further Exploration
+## From one bit to a whole pattern
 
 <NextDiscovery>
 [The Quantum Fourier Transform](/lessons/quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform) is the generalization of the

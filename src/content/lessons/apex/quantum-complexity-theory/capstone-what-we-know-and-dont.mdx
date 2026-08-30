@@ -31,49 +31,49 @@ export const lessonMeta = {
     "Synthesize the whole course into a single, calibrated map of what is PROVEN, what is CONJECTURED (with strong evidence), and what is genuinely OPEN in quantum complexity theory",
     "Explain precisely what 'quantum supremacy/advantage' experiments (e.g. random circuit sampling) do and do not establish, complexity-theoretically",
     "Articulate, as this course's practical takeaway, how to correctly classify a new claim about quantum computational power into the proven/conjectured/open framework",
+    "Locate two results from the past decade, the quantum PCP conjecture's first necessary step and practical classical verification of quantum computation, on that map, and say which tier each moved",
   ],
   related: [
     {
       slug: "apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp",
-      note: "That lesson first drew the proven/conjectured/open line for P, NP, and BQP specifically; this capstone widens the exact same three-way distinction to everything the rest of the course added (QMA, Local Hamiltonian, query lower bounds) and to experimental claims like random circuit sampling.",
+      note: "That lesson first drew the proven/conjectured/open line for P, NP, and BQP specifically; this capstone widens that same three-way distinction to everything the rest of the course added (QMA, Local Hamiltonian, query lower bounds) and to experimental claims like random circuit sampling.",
     },
   ],
 };
 
 <LessonHook eyebrow="The question this capstone answers">
-  Every result in this course was proven, conjectured, or left open — and
-  the single most publicly famous claim in the field, a "quantum
-  supremacy" experiment, is a case study in exactly why conflating those
-  three is the most common way popular writing about quantum computing
-  goes wrong.
+  Every result in this course was proven, conjectured, or left open. The
+  field's most publicly famous claim, a "quantum supremacy" experiment,
+  is a case study in why conflating those three is the most common way
+  popular writing about quantum computing goes wrong.
 </LessonHook>
 
-## Motivation
+## Four Lessons, Four Kinds of Result
 
 Four lessons, four different kinds of result. Complexity Classes: P, NP,
 and BQP placed $\mathsf{BQP}$ inside the classical landscape and proved
 exactly three containments while leaving three questions open. QMA and
 Quantum Verification built the quantum analogue of $\mathsf{NP}$-verification
 and proved $\mathsf{NP}\subseteq\mathsf{QMA}\subseteq\mathsf{PSPACE}$. The
-Local Hamiltonian Problem showed that the natural QMA-complete problem is a
-real physics question — a Hamiltonian's ground-state energy — via Kitaev's
-theorem. Query Complexity and Lower Bounds proved, by two independent
+Local Hamiltonian Problem showed, via Kitaev's theorem, that the natural
+QMA-complete problem is a real physics question: a Hamiltonian's
+ground-state energy. Query Complexity and Lower Bounds proved, by two independent
 methods, that Grover's algorithm's $\Theta(\sqrt N)$ query complexity cannot
 be beaten in the black-box model.
 
 Every one of those lessons was careful, at the moment it stated a result,
 to say whether that result was a theorem, a conjecture, or an open
-question — and never to blur the three. This capstone's only new content is
+question, and never to blur the three. This capstone's only new content is
 to pull all four lessons' calibration into a single map, applied by name to
 every specific result this course built, and then to use that map for the
 thing it's actually for: correctly classifying a new claim, including the
 most publicly famous kind of quantum-computing claim there is, a
 "quantum supremacy" experiment. That classification skill is also the
-direct bridge to this pillar's next and final course, **Research Methods
-and Synthesis**, which turns exactly this habit into a repeatable practice
+direct bridge to this track's next and final course, **Research Methods
+and Synthesis**, which turns this habit into a repeatable practice
 for reading real papers.
 
-## Mathematical Development
+## Three Tiers of Epistemic Status
 
 ### The three-tier framework
 
@@ -86,21 +86,21 @@ goes wrong:
   experiment could ever falsify one (short of finding an error in the
   proof itself).
 - **Strongly-evidenced conjectures.** Believed by essentially the entire
-  field, on the strength of specific, namable evidence — but not proven.
+  field, on the strength of specific, namable evidence, but not proven.
   A conjecture can be believed with very high confidence and still be
   false; that is exactly what makes it a conjecture and not a theorem.
 - **Genuinely open questions.** Not even a strong consensus belief exists
-  either way, or the question is simply unresolved with no decisive
-  evidence pointing one direction.
+  either way, or the question is unresolved with no decisive evidence
+  pointing one direction.
 
-#### Tier 1 — Proven theorems
+#### Tier 1: Proven theorems
 
 <TheoremBox title="This course's proven containments and completeness results" provenance="cited">
 
 $\mathsf{P}\subseteq\mathsf{BQP}\subseteq\mathsf{PSPACE}$ and
 $\mathsf{NP}\subseteq\mathsf{QMA}\subseteq\mathsf{PSPACE}$ are proven
 containments (Lessons 1–2). The Local Hamiltonian problem is
-$\mathsf{QMA}$-complete — Kitaev's theorem (Lesson 3). Grover's algorithm's
+$\mathsf{QMA}$-complete, by Kitaev's theorem (Lesson 3). Grover's algorithm's
 $\Theta(\sqrt N)$ query complexity is provably optimal in the black-box
 model, established independently by both the adversary method and the
 polynomial method (Lesson 4).
@@ -127,7 +127,7 @@ theorem is true.
   core={{ id: "P", label: "P" }}
   openLabel="NP⊆BQP? / BQP⊆NP?"
   markedPoint={{ label: "Local Hamiltonian", note: "QMA-complete" }}
-  footnote="Solid boundaries (PSPACE, QMA, P) and the marked point are this course's Tier 1 theorems. The dashed BQP/NP lenses and the open-question label are Tier 3 — genuinely unresolved."
+  footnote="Solid boundaries (PSPACE, QMA, P) and the marked point are this course's Tier 1 theorems. The dashed BQP/NP lenses and the open-question label are Tier 3, genuinely unresolved."
   ariaLabel="The whole course's containment map in one diagram: PSPACE contains QMA (solid, proven), which contains NP; PSPACE also contains BQP, drawn as a dashed lens since how BQP and NP relate is open; P sits proven inside both BQP and NP; Local Hamiltonian is marked on QMA's boundary as QMA-complete."
 />
 
@@ -135,44 +135,54 @@ This is the single picture every result in Lessons 1–3 assembles into: two
 solid, proven chains up to $\mathsf{PSPACE}$ ($\mathsf{P}\subseteq
 \mathsf{BQP}$ and $\mathsf{P}\subseteq\mathsf{NP}\subseteq\mathsf{QMA}$),
 Local Hamiltonian pinned to $\mathsf{QMA}$'s own boundary as its complete
-problem, and the one relationship — how $\mathsf{BQP}$ and $\mathsf{NP}$
-themselves compare — still drawn dashed because it is still genuinely open.
+problem, and one relationship still drawn dashed, how $\mathsf{BQP}$ and
+$\mathsf{NP}$ compare, because that one remains open.
 
-#### Tier 2 — Strongly-evidenced conjectures
+#### Tier 2: Strongly-evidenced conjectures
 
 <DefinitionBox title="What makes a conjecture 'strongly evidenced' rather than merely 'popular'">
 
 A conjecture belongs in this tier when the field can point to specific,
-namable evidence for it — a proven result in a restricted model, decades of
-failed attempts at a counterexample, or a real, currently-unbroken
-cryptographic assumption — while being explicit that none of that evidence
+namable evidence for it (a proven result in a restricted model, decades of
+failed attempts at a counterexample, or a cryptographic assumption that
+has stood unbroken) while being explicit that none of that evidence
 amounts to a proof in the unrestricted setting the conjecture is actually
 about.
+
+Two different lines are being drawn here, and it is worth keeping them
+apart. The line between Tier 1 and everything below it is drawn by proof
+and nothing else; no quantity of evidence or belief carries a statement
+across it. The line between Tier 2 and Tier 3 is drawn *inside* the
+unproven territory, and there evidence and the field's expectations are
+exactly what is being assessed. So "nobody has a consensus belief either
+way" is a reason to file an open question under Tier 3 rather than Tier
+2, and never a reason to move anything into or out of Tier 1.
 
 </DefinitionBox>
 
 | Conjecture | Why it's believed (the real evidence) | What the evidence does *not* do |
 |---|---|---|
-| $\mathsf{P}\neq\mathsf{NP}$ | The oldest, most famous open problem in all of computer science; decades of the entire field failing to find a polynomial algorithm for any $\mathsf{NP}$-complete problem | Quantum computing does not resolve this at all — it is a purely classical question, unaffected by anything this course proved |
-| $\mathsf{P}\neq\mathsf{BQP}$ | Shor's algorithm: factoring $\in\mathsf{BQP}$ with no known classical polynomial algorithm (Lesson 1) | Factoring is not known to be $\mathsf{NP}$-complete, and "factoring has no classical polynomial algorithm" is itself unproven — so this is conditional evidence, not a separation theorem |
-| $\mathsf{NP}\not\subseteq\mathsf{BQP}$ | BBBV's proven optimality of Grover's search, reinforced by Lesson 4's adversary- and polynomial-method lower bounds | All of this evidence lives in the *black-box* model; an explicitly-given $\mathsf{NP}$-complete instance (e.g. a real 3-SAT formula) is not a black box, so the evidence is suggestive, not a proof for the general, structured setting |
+| $\mathsf{P}\neq\mathsf{NP}$ | The oldest, most famous open problem in all of computer science; decades of the entire field failing to find a polynomial algorithm for any $\mathsf{NP}$-complete problem | Quantum computing does not resolve this at all; it is a purely classical question, unaffected by anything this course proved |
+| $\mathsf{P}\neq\mathsf{BQP}$ | Shor's algorithm: factoring $\in\mathsf{BQP}$ with no known classical polynomial algorithm (Lesson 1) | Factoring is not known to be $\mathsf{NP}$-complete, and "factoring has no classical polynomial algorithm" is itself unproven, so this is conditional evidence, not a separation theorem |
+| $\mathsf{NP}\not\subseteq\mathsf{BQP}$ | BBBV's proven optimality of Grover's search, reinforced by Lesson 4's adversary- and polynomial-method lower bounds | All of this evidence lives in the *black-box* model; an explicitly given $\mathsf{NP}$-complete instance (e.g. a real 3-SAT formula) is not a black box, so the evidence is suggestive, not a proof for the general, structured setting |
 | Factoring has no efficient classical algorithm | The actual cryptographic assumption underlying RSA's security: decades of attempted classical attacks, none successful | No unconditional lower bound rules out a fast classical factoring algorithm; "nobody has found one" and "no such algorithm exists" remain different claims |
 
 Notice the structural pattern: $\mathsf{P}\neq\mathsf{BQP}$'s evidence
 *is* Shor's algorithm, and Shor's own significance rests on factoring's
-conjectured classical hardness — the fourth row is the load-bearing
+conjectured classical hardness. The fourth row is the load-bearing
 assumption underneath the second. Tier 2 conjectures can depend on each
 other this way; that is normal, and does not make either one weaker or
 stronger than its own evidence independently supports.
 
 <InsightBlock>
-  A result's tier is not about how confident the field is — Tier 2
-  conjectures like $\mathsf{P}\neq\mathsf{NP}$ are believed almost
-  universally. It's about whether a complete proof exists. No amount of
-  confidence promotes a conjecture to a theorem.
+  Whether a result reaches Tier 1 is not about how confident the field
+  is; Tier 2 conjectures like $\mathsf{P}\neq\mathsf{NP}$ are believed
+  almost universally and are still not theorems. Confidence does decide
+  Tier 2 against Tier 3, since both are unproven and evidence is the only
+  thing left to sort them by. It never promotes anything to Tier 1.
 </InsightBlock>
 
-#### Tier 3 — Genuinely open questions
+#### Tier 3: Genuinely open questions
 
 - **Is $\mathsf{BQP}\subseteq\mathsf{NP}$?** Unlike $\mathsf{NP}\subseteq
   \mathsf{BQP}$, there isn't even a strong heuristic argument pointing
@@ -185,28 +195,28 @@ stronger than its own evidence independently supports.
   $\mathsf{NP}$, and a genuine YES answer here would be tightly bound up
   with $\mathsf{P}$ vs. $\mathsf{NP}$ itself: an efficient quantum
   algorithm for even one $\mathsf{NP}$-complete problem would be one of
-  the most important results in the field's history, precisely because
+  the most important results in the field's history, because
   it bears so directly on Tier 2's most disbelieved conjecture.
 - **Can query-complexity lower-bound techniques be extended to
   unconditional circuit-complexity separations?** Lesson 4's adversary and
   polynomial methods are exact, rigorous, and entirely about the
   *black-box* (query) model. Nobody currently knows how to adapt either
-  technique to prove an unconditional separation for explicitly-given
-  circuits — the Baker-Gill-Solovay relativization barrier is exactly the
-  obstacle that stands in the way, and no proof strategy is known to get
+  technique to prove an unconditional separation for explicitly given
+  circuits. The Baker-Gill-Solovay relativization barrier is the obstacle
+  in the way, and no proof strategy is known to get
   around it for the questions that matter most (like $\mathsf{P}$ vs.
   $\mathsf{NP}$ or $\mathsf{P}$ vs. $\mathsf{BQP}$).
 - **Exactly how large a quantum advantage is achievable for practically
   useful problems?** As opposed to problems specifically engineered to be
   classically hard and quantumly easy (random circuit sampling, discussed
   next), nobody knows the ceiling on quantum speedup for problems people
-  actually want solved — chemistry, optimization, materials science.
+  actually want solved: chemistry, optimization, materials science.
   Some (like factoring) have an exponential conjectured speedup; many
   others have, at best, a proven quadratic Grover-style speedup or no
   known speedup at all, and which category a given useful problem falls
   into is frequently itself unresolved.
 
-## Physical Interpretation: Random Circuit Sampling and What It Actually Shows
+## Sycamore, Read Through the Tiers
 
 <ResearchConnection
   title="The Sycamore 'quantum supremacy' experiment"
@@ -218,8 +228,8 @@ stronger than its own evidence independently supports.
   a then-best classical supercomputer thousands of years, versus about
   200 seconds on the quantum hardware. Pednault et al.
   ([arXiv:1910.09534](https://arxiv.org/abs/1910.09534)) argued within
-  weeks that a cleverer classical technique — trading secondary storage
-  for the raw memory a brute-force state-vector simulation requires —
+  weeks that a cleverer classical technique, trading secondary storage
+  for the raw memory a brute-force state-vector simulation requires,
   could reproduce the same task in days, and Pan, Chen and Zhang
   (Phys. Rev. Lett. 129, 090502 (2022)) later did so with tensor-network
   contraction. Similar narrowing of specific instances has continued
@@ -228,31 +238,31 @@ stronger than its own evidence independently supports.
 
 Google's 2019 Sycamore experiment, already pictured elsewhere on this
 platform running the exact transmon hardware Quantum Hardware describes and
-sitting exactly at the classical-simulation wall Simulating Quantum
+sitting at the classical-simulation wall Simulating Quantum
 Systems computes, is the most publicly visible "quantum supremacy" claim in
-the field's history. This course's framework exists precisely to state, with
+the field's history. This course's framework exists to state, with
 no more and no less confidence than is warranted, what an experiment like
 that establishes.
 
 **What random circuit sampling is.** A specific, carefully chosen
 computational task: sample from the output distribution of a particular
-random quantum circuit. The task is not chosen because it's useful — it
+random quantum circuit. The task is not chosen because it's useful. It
 is chosen because it is believed to be *classically hard* while being
 *quantumly easy*, which makes it a clean, if narrow, place to look for a
 gap between the two models of computation.
 
 **The real theoretical basis for believing it's classically hard.** This
-is not hand-waving: there is a citable, real complexity-theoretic argument,
+is not hand-waving: there is a citable complexity-theoretic argument,
 built on the conjecture that the polynomial hierarchy does not collapse.
 Roughly, if a classical computer *could* efficiently sample from the same
 distribution a random quantum circuit produces, a chain of implications
-(cited here, not re-derived — it is its own substantial result in the
+(cited here, not re-derived; it is its own substantial result in the
 sampling-complexity literature) would force the polynomial hierarchy down
 to a finite level, something almost as widely disbelieved as
-$\mathsf{P}\neq\mathsf{NP}$ itself. That is a genuine, named theoretical
-basis for random circuit sampling's classical hardness — and it is
-*itself* resting on an unproven, if strongly believed, assumption, exactly
-the same Tier 2 shape as everything else in this lesson's middle column.
+$\mathsf{P}\neq\mathsf{NP}$ itself. That is a named theoretical
+basis for random circuit sampling's classical hardness, and it *itself*
+rests on an unproven, if strongly believed, assumption: the same Tier 2
+shape as everything else in this lesson's middle column.
 
 <ResearchConnection
   title="The hardness argument, with its assumptions on the surface"
@@ -274,13 +284,13 @@ the same Tier 2 shape as everything else in this lesson's middle column.
 **What the experiment does establish.** Strong empirical evidence
 consistent with $\mathsf{BQP}$ (or more precisely, the class of problems a
 quantum computer solves efficiently) being separated from what a classical
-computer can efficiently simulate — for this one, specific, carefully
+computer can efficiently simulate, for this one specific, carefully
 engineered sampling task, run on real hardware, under the
 plausible-but-unproven polynomial-hierarchy assumption above.
 
 **What it does not establish.** It does not prove any Tier 3 question
 resolved. It does not prove $\mathsf{BQP}\neq$(efficiently classically
-simulable) unconditionally — that would require proving the
+simulable) unconditionally; that would require proving the
 polynomial-hierarchy assumption itself, which nobody has done. And it does
 not, by itself, demonstrate a quantum advantage on any *practically useful*
 computational problem: random circuit sampling was chosen for its
@@ -291,8 +301,8 @@ open by this experiment as it was before.
 **The honest, ongoing scientific back-and-forth.** This is not a case
 where the story stopped in 2019. Simulating Quantum Systems' own account
 of this exact experiment already notes that IBM subsequently argued a
-cleverer classical technique — trading disk space for the raw memory
-brute-force state-vector simulation requires — could approximate the same
+cleverer classical technique, trading disk space for the raw memory
+brute-force state-vector simulation requires, could approximate the same
 sampling task, narrowing the claimed classical-hardness margin. That
 pattern has continued industry-wide since: specific classical algorithms
 have, at various points, been shown to simulate specific random-circuit-
@@ -300,14 +310,14 @@ sampling instances faster than initially estimated, and some early
 supremacy claims have had their margins reduced or contested as classical
 methods improved. **This is not a sign that the enterprise is flawed.**
 A claim resting on "no known classical algorithm is fast enough yet" is,
-by its own honest nature, a claim the field should keep trying to break —
-and successfully narrowing or contesting a specific instance is exactly
-how a healthy field checks its own extraordinary claims, not evidence that
-the entire research program was hollow. Evaluating exactly this kind of
-claim — precisely, evenhandedly, neither dismissing it as meaningless PR
-nor overclaiming it as proof of unconditional quantum superiority — is
-what this pillar's next course, **Research Methods and Synthesis**,
-formalizes into a repeatable practice, in a lesson literally titled
+by its own honest nature, a claim the field should keep trying to break.
+Successfully narrowing or contesting a specific instance is how a healthy
+field checks its own extraordinary claims, not evidence that
+the entire research program was hollow. Evaluating this kind of
+claim evenhandedly, neither dismissing it as meaningless PR
+nor overclaiming it as proof of unconditional quantum superiority, is
+what this track's next course, **Research Methods and Synthesis**,
+formalizes into a repeatable practice, in a lesson titled
 "Evaluating Quantum Advantage Claims." This capstone's random-circuit-
 sampling discussion is the direct motivating case study for why that
 lesson exists.
@@ -315,15 +325,15 @@ lesson exists.
 <PredictBeforeReveal
   question="Using this course's three-tier framework, before reading the step-by-step classification below, predict which tier the theoretical claim underlying Google's Sycamore 'quantum supremacy' experiment belongs in."
   options={[
-    { label: "Tier 1 — a proven theorem", value: "tier1" },
-    { label: "Tier 2 — a strongly-evidenced conjecture", value: "tier2" },
-    { label: "Tier 3 — a genuinely open question", value: "tier3" },
+    { label: "Tier 1: a proven theorem", value: "tier1" },
+    { label: "Tier 2: a strongly-evidenced conjecture", value: "tier2" },
+    { label: "Tier 3: a genuinely open question", value: "tier3" },
   ]}
   correctValue="tier2"
-  explanation="Tier 2. There is a real, citable theoretical argument for random circuit sampling's classical hardness — built on the conjecture that the polynomial hierarchy doesn't collapse — but that argument itself rests on an unproven assumption, and the experiment is an empirical result on one specific circuit family, not a mathematical proof. It resolves no Tier 3 question and says nothing about advantage on practically useful problems."
+  explanation="Tier 2. There is a citable theoretical argument for random circuit sampling's classical hardness, built on the conjecture that the polynomial hierarchy doesn't collapse, but that argument itself rests on an unproven assumption, and the experiment is an empirical result on one specific circuit family, not a mathematical proof. It resolves no Tier 3 question and says nothing about advantage on practically useful problems."
 />
 
-## Worked Example
+## Auditing a Supremacy Claim
 
 **Classify this claim using the three-tier framework: "Google's Sycamore
 experiment proves quantum computers are more powerful than classical
@@ -336,7 +346,7 @@ computers."**
     at the time, to take a then-best classical supercomputer thousands of
     years, versus about 200 seconds on the quantum hardware.
   </DerivationStep>
-  <DerivationStep annotation="A mathematical proof of a complexity-class separation is the only thing that qualifies for Tier 1 — an experiment on specific hardware cannot be one.">
+  <DerivationStep annotation="A mathematical proof of a complexity-class separation is the only thing that qualifies for Tier 1; an experiment on specific hardware cannot be one.">
     **Is this a Tier 1 proven theorem?** No. Nothing about it is a
     mathematical proof of a complexity-class separation. It is an empirical,
     experimental result about one specific circuit family run on one specific
@@ -351,17 +361,17 @@ computers."**
     collapse. That places the underlying theoretical claim in Tier 2:
     strongly evidenced, not proven.
   </DerivationStep>
-  <DerivationStep annotation="Check the claim against every genuinely open question this course identified — none of them are touched by a result engineered for classical hardness rather than usefulness.">
+  <DerivationStep annotation="Check the claim against every genuinely open question this course identified. None of them are touched by a result engineered for classical hardness rather than usefulness.">
     **Does it resolve any Tier 3 question?** No. It says nothing
     about $\mathsf{BQP}$ vs. $\mathsf{NP}$, nothing about whether any
     $\mathsf{NP}$-complete problem has an efficient quantum algorithm, and
     nothing about the achievable quantum advantage on a practically useful
-    problem — random circuit sampling was engineered to be classically hard,
+    problem. Random circuit sampling was engineered to be classically hard,
     not to be useful.
   </DerivationStep>
   <DerivationStep annotation="An honest classification has to account for how the evidence has moved since the original claim, not just the state at announcement.">
     **Has the specific classical-hardness claim itself been static
-    and unchallenged?** No — and this matters for an honest classification.
+    and unchallenged?** No, and this matters for an honest classification.
     IBM's subsequent disk-based classical simulation argument, and later
     improved classical algorithms industry-wide, have contested or narrowed
     the classical-hardness margin for specific instances. That is normal,
@@ -374,7 +384,7 @@ computers."**
     empirical evidence, consistent with (but not a proof of) a quantum
     advantage over classical computation, for one specific, carefully chosen,
     practically-useless sampling task, resting on a plausible but unproven
-    theoretical assumption — and some of the specific classical-hardness
+    theoretical assumption. Some of the specific classical-hardness
     margins claimed have since been legitimately narrowed or contested by
     improved classical methods, which is exactly how this kind of claim is
     supposed to be checked." Longer, and correct.
@@ -383,9 +393,9 @@ computers."**
 
 ## The Three-Tier Map
 
-<div className="not-prose my-8 grid gap-4 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4 sm:grid-cols-3">
+<div className="not-prose my-8 grid gap-4 rounded-panel border border-border bg-surface-muted/40 p-4 sm:grid-cols-3">
   <div className="rounded-(--radius-tight) border border-brand/40 bg-brand/5 p-4">
-    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand">Tier 1 — Proven</p>
+    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand">Tier 1: Proven</p>
     <ul className="mt-3 space-y-2 text-sm leading-snug text-foreground">
       <li>P ⊆ BQP ⊆ PSPACE</li>
       <li>NP ⊆ QMA ⊆ PSPACE</li>
@@ -394,7 +404,7 @@ computers."**
     </ul>
   </div>
   <div className="rounded-(--radius-tight) border border-warning/40 bg-warning/5 p-4">
-    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-warning">Tier 2 — Strongly-evidenced conjectures</p>
+    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-warning">Tier 2: Strongly-evidenced conjectures</p>
     <ul className="mt-3 space-y-2 text-sm leading-snug text-foreground">
       <li>P ≠ NP</li>
       <li>P ≠ BQP (Shor's algorithm, conditionally)</li>
@@ -404,7 +414,7 @@ computers."**
     </ul>
   </div>
   <div className="rounded-(--radius-tight) border border-accent/40 bg-accent/5 p-4">
-    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Tier 3 — Genuinely open</p>
+    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Tier 3: Genuinely open</p>
     <ul className="mt-3 space-y-2 text-sm leading-snug text-foreground">
       <li>Is BQP ⊆ NP?</li>
       <li>Any NP-complete problem with an efficient quantum algorithm?</li>
@@ -418,9 +428,9 @@ This is the artifact this whole capstone was built to hand you: every
 specific result from all four prior lessons, plus random circuit
 sampling's real theoretical status, sorted into exactly one of three
 columns and nowhere else. Any new claim you encounter should be sortable
-into this same layout — and if it can't be sorted cleanly, that itself is
-usually a sign the claim was stated imprecisely rather than that the
-framework has a gap.
+into this same layout. If it can't be sorted cleanly, that is usually a
+sign the claim was stated imprecisely rather than that the framework has
+a gap.
 
 ## The Frontier: Where the Map Is Moving
 
@@ -502,7 +512,7 @@ a classical skeptic can verify a quantum computation. That conditional
 structure is not a weakness to hide. It is the same honest form every
 Tier 2 row in this lesson already takes.
 
-## Common Mistakes
+## Overclaiming and Its Mirror Image
 
 <Callout type="mistake">
 **Treating a "quantum supremacy" experiment as proof of a general
@@ -511,22 +521,22 @@ evidence consistent with a Tier 2 conjecture (that efficient classical
 simulation and efficient quantum computation are separated), for one
 specific, engineered task, under an unproven assumption. It is not a Tier
 1 theorem, it does not resolve any Tier 3 question, and it says nothing
-about advantage on practically useful problems. The opposite error —
-dismissing the whole result as "meaningless PR" because it hasn't proven
-an unconditional separation, or because a later classical algorithm
-narrowed its margin — is equally imprecise: a genuine, carefully-designed
-empirical result consistent with a real theoretical conjecture is neither
-proof nor noise.
+about advantage on practically useful problems. The opposite error is
+equally imprecise: dismissing the whole result as "meaningless PR"
+because it hasn't proven an unconditional separation, or because a later
+classical algorithm narrowed its margin. A carefully designed empirical
+result consistent with a real theoretical conjecture is neither proof nor
+noise.
 </Callout>
 
 <Callout type="warning">
 **Confusing "evidenced in a restricted model" with "proven in general."**
 $\mathsf{NP}\not\subseteq\mathsf{BQP}$'s evidence (BBBV, the adversary and
-polynomial methods) is real and rigorous — entirely within the black-box
-query model. An explicitly-given $\mathsf{NP}$-complete instance is not a
+polynomial methods) is real and rigorous, entirely within the black-box
+query model. An explicitly given $\mathsf{NP}$-complete instance is not a
 black box, so this evidence is suggestive of, not a proof of, the
 unrestricted claim. The same shape of error appears with random circuit
-sampling's polynomial-hierarchy argument: a real, citable theoretical
+sampling's polynomial-hierarchy argument: a citable theoretical
 basis for believing classical hardness, resting itself on an unproven
 assumption, is Tier 2 evidence, not a Tier 1 theorem.
 </Callout>
@@ -538,15 +548,190 @@ assumption, is Tier 2 evidence, not a Tier 1 theorem.
    framework, identify exactly which tier the underlying theoretical claim
    belongs in, and state precisely what would need to be true for the
    experiment's evidence to become a proof instead.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The underlying claim, $\mathsf{BQP}\not\subseteq\mathsf{P}$, is
+   **Tier 2**. The talk is asserting Tier 1 status for it, and no
+   experiment can supply that.
+
+   Three separate things have gone wrong, and they are worth keeping
+   apart because only the third is about tiers at all.
+
+   **An experiment is the wrong kind of object.** A complexity class is a
+   statement about a *family* of circuits, quantified over all input
+   sizes. A device with a fixed qubit count is a single point. Even a
+   flawless run at $n=53$ places no constraint on asymptotic behaviour,
+   because asymptotics say nothing about any finite $n$ and any finite
+   $n$ says nothing back. This is not a matter of the experiment being
+   too small; there is no size at which it would start to count as a
+   proof.
+
+   **Random circuit sampling is not in $\mathsf{BQP}$.** $\mathsf{BQP}$
+   is a class of *decision* problems. Sampling from a distribution is a
+   different kind of task, living in the sampling classes
+   $\mathsf{SampBQP}$ and $\mathsf{SampBPP}$. A separation there would be
+   a real and interesting result and it would not be the separation the
+   talk named. The claim is category-mismatched before its evidence is
+   even examined.
+
+   **The theory it rests on is conditional twice over.** The argument
+   that random circuit sampling is classically hard assumes the
+   polynomial hierarchy does not collapse. And because real hardware
+   samples approximately rather than exactly, the argument needs a second
+   assumption about average-case hardness of computing output
+   probabilities. Both are Tier 2, and a conclusion drawn through two
+   Tier 2 assumptions is Tier 2 at best.
+
+   **What would make it a proof.** Nothing about the experiment, at any
+   scale, with any fidelity. $\mathsf{P}\neq\mathsf{BQP}$ is a
+   mathematical statement and needs a mathematical proof: an
+   unconditional lower bound showing some problem in $\mathsf{BQP}$ has
+   no polynomial-time classical algorithm. Two things are known about
+   what such a proof would have to look like. It cannot relativize, by
+   the Baker-Gill-Solovay barrier. And it would settle a famous open
+   problem in purely classical complexity on the way past, because
+   $\mathsf{P}\subseteq\mathsf{BQP}\subseteq\mathsf{PSPACE}$ means that
+   $\mathsf{P}=\mathsf{PSPACE}$ would force $\mathsf{P}=\mathsf{BQP}$,
+   so proving $\mathsf{P}\neq\mathsf{BQP}$ proves
+   $\mathsf{P}\neq\mathsf{PSPACE}$ as a corollary. Anyone announcing the
+   former has also announced the latter, which is a useful sanity check
+   to apply to any such announcement.
+
+   **What the talk could have said and been right.** That the experiment
+   is strong empirical evidence, on real hardware, that this particular
+   engineered sampling task is beyond current classical methods at this
+   scale, consistent with the conjectured separation and conditional on
+   the two named assumptions. That is a genuinely significant claim. It
+   is a smaller one, and the difference between the two sentences is the
+   whole subject of the next course.
+
+   </details>
+
 2. Explain why $\mathsf{P}\neq\mathsf{BQP}$ and "factoring has no
    efficient classical algorithm" are both Tier 2 conjectures that depend
    on each other, and why that dependency doesn't make either one weaker
    than its own evidence supports.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The dependency runs in one direction, and that is what keeps it
+   healthy.
+
+   Shor's theorem puts factoring in $\mathsf{BQP}$, unconditionally. So
+   if factoring is not in $\mathsf{P}$, then $\mathsf{P}\neq\mathsf{BQP}$
+   follows immediately: one problem in $\mathsf{BQP}$ and outside
+   $\mathsf{P}$ is all a separation needs. That single implication is the
+   main reason anybody believes $\mathsf{P}\neq\mathsf{BQP}$, which is why
+   the table's second row's evidence is really the fourth row's claim.
+
+   **The reason this is a chain and not a loop** is that the fourth row
+   has its own evidence, and none of it is quantum. Factoring's
+   conjectured classical hardness rests on centuries of number theory and
+   decades of concentrated algorithmic attack: trial division to Pollard
+   rho to the quadratic sieve to the general number field sieve, which
+   after all that effort is still subexponential rather than polynomial.
+   It also rests on the largest adversarial test anyone has ever run,
+   which is that the world's public-key infrastructure has been sitting
+   on the assumption in the open for decades. Not one line of that
+   evidence mentions quantum computation, so
+   $\mathsf{P}\neq\mathsf{BQP}$ is inheriting a belief that was formed
+   independently of it.
+
+   Circularity would require the evidence for factoring's hardness to be
+   "$\mathsf{P}\neq\mathsf{BQP}$." It is not, and it never was.
+
+   **The real caution the dependency implies,** stated so that "it does
+   not weaken either" is not mistaken for "it costs nothing." It means
+   $\mathsf{P}\neq\mathsf{BQP}$ has one flagship witness rather than
+   several independent ones. Find a classical polynomial-time factoring
+   algorithm tomorrow and the conjecture does not become false, but it
+   loses its best argument and falls back on thinner support: discrete
+   logarithm, other hidden-subgroup problems, and oracle separations that
+   the relativization barrier says cannot transfer. So the honest reading
+   is that these two beliefs will largely stand or fall together, and
+   pretending otherwise would overstate how many independent legs the
+   conjecture is standing on.
+
+   **Why the framework handles this correctly.** A Tier 2 claim resting
+   on another Tier 2 claim stays Tier 2. Nothing in the tier structure
+   lets a stack of conjectures bootstrap itself upward, because the only
+   thing that reaches Tier 1 is a proof. That rule looks pedantic right
+   up until you meet a chain of four plausible conditionals whose
+   conclusion is being reported as a fact, at which point it is the only
+   thing standing between the reader and a mistake.
+
+   </details>
+
 3. A later classical algorithm narrows the classical-hardness margin
    originally claimed for a specific random-circuit-sampling experiment.
    Explain why this is a normal, healthy part of how the field checks its
    own claims rather than evidence the original result was wrong or the
    whole research program is unsound.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the claim being narrowed was always a claim about the best
+   *known* classical method, and the only way to test a claim of that
+   shape is to try to beat it. A margin that nobody attacked would be a
+   margin nobody had checked.
+
+   The clean way to see it is to separate the three claims such an
+   experiment actually makes, since a later classical algorithm touches
+   exactly one of them.
+
+   **The measurement.** The device ran a circuit of a stated size and
+   depth and produced samples with a stated fidelity. That is an
+   experimental result. A classical algorithm published three years later
+   has no bearing on whether the hardware did what the paper says it did.
+
+   **The comparison.** "This would take a classical supercomputer $X$
+   years" is a statement about the best classical algorithm anyone had
+   written down at the time of publication. It has an expiry date built
+   into its own definition. Revising it downward is not falsifying the
+   paper; it is updating a quantity the paper could only ever have quoted
+   as of a date.
+
+   **The theoretical hardness argument.** That random circuit sampling is
+   classically hard rests on the polynomial hierarchy not collapsing, and
+   it is an asymptotic statement. A faster simulation at $53$ qubits does
+   not touch it, because a constant-factor or memory-hierarchy
+   improvement at fixed $n$ is not an asymptotic result. The crossover
+   point moves; the conjectured slope does not.
+
+   **What would be genuinely bad news,** because "this is healthy" should
+   not become a formula that absorbs every criticism. A classical
+   algorithm running in time polynomial in the circuit's size and depth,
+   for the general instance family rather than for a specific circuit,
+   would attack the hardness conjecture itself and would be a serious
+   problem for the entire programme. The narrowings that have actually
+   happened are not of that kind: they trade secondary storage against
+   memory, or contract the circuit as a tensor network more cleverly, on
+   particular instances. Knowing which kind of result you are reading is
+   the skill; declaring all of them harmless is not.
+
+   **Where criticism is warranted, and it is not of the later work.** If
+   an original claim was phrased as though "$10{,}000$ years" were a
+   property of the task rather than of a particular classical program on
+   particular hardware in a particular year, then the overclaim is the
+   error, and it was an error on the day it was published rather than on
+   the day someone improved the simulation. Tiering a claim honestly at
+   the moment it is made is what makes later improvements read as
+   progress instead of as embarrassment.
+
+   The structural comparison worth carrying: this is exactly how
+   cryptography works. RSA is trusted because people have been paid to
+   break it for decades and have not. Nobody treats an improved factoring
+   record as evidence that public-key cryptography was a hollow research
+   programme. Adversarial testing is the mechanism by which a claim of
+   the form "nobody can do this efficiently" acquires any credibility at
+   all, and a field where such claims went unchallenged would be worth
+   far less trust, not more.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -564,37 +749,37 @@ assumption, is Tier 2 evidence, not a Tier 1 theorem.
   quantum-solvable $\mathsf{NP}$-complete problem? unconditional
   circuit-complexity separations from query techniques? the ceiling on
   useful-problem quantum advantage?).
-- Random circuit sampling experiments like Sycamore provide genuine, strong
+- Random circuit sampling experiments like Sycamore provide strong
   empirical evidence consistent with a real Tier 2 conjecture, for one
   specific, classically-hard-by-design task, resting on the
-  polynomial-hierarchy assumption — not a Tier 1 proof of anything, and
-  not, by itself, a demonstration of advantage on any useful problem.
+  polynomial-hierarchy assumption. That is not a Tier 1 proof of anything,
+  and not, by itself, a demonstration of advantage on any useful problem.
   Subsequent narrowing or contesting of specific hardness margins by
   improved classical algorithms is healthy scientific self-correction, not
   a flaw in the enterprise.
 - The actual payoff of this entire course is a repeatable question: for any
   new claim, is it a proven theorem, a conjecture with stated evidence, or
-  a genuinely open question — and if it's experimental, exactly what task
-  was it demonstrated on and under what classical-hardness assumption?
+  a genuinely open question? And if it's experimental, exactly what task
+  was it demonstrated on, and under what classical-hardness assumption?
 
-## Further Exploration
+## Where This Map Gets Used Next
 
 This completes **Quantum Complexity Theory**. From here, [How to Read a
 Quantum Computing
 Paper](/lessons/apex/research-methods-and-synthesis/how-to-read-a-quantum-computing-paper)
-opens **Research Methods and Synthesis**, the APEX pillar's final course,
-which turns this capstone's classification habit — proven, conjectured, or
-open, and under what assumption — into a formal, repeatable practice for
+opens **Research Methods and Synthesis**, the APEX track's final course,
+which turns this capstone's classification habit (proven, conjectured, or
+open, and under what assumption) into a formal, repeatable practice for
 reading real research.
 
-<ChallengePrompt prompt="Take the next quantum-computing headline you encounter — 'quantum advantage,' 'exponential speedup,' or similar — and run it through all six worked-example steps above.">
+<ChallengePrompt prompt="Take the next quantum-computing headline you encounter, whether it says 'quantum advantage', 'exponential speedup', or something similar, and run it through all six worked-example steps above.">
   Identify what was actually demonstrated, whether it's Tier 1/2/3, what
   assumption it rests on if any, and whether the claim as stated matches
   what the six-step classification would actually support.
 </ChallengePrompt>
 
 <NextDiscovery>
-  **Research Methods and Synthesis** turns this exact classification
+  **Research Methods and Synthesis** turns this classification
   habit into a repeatable practice, starting with how to read a real
   quantum computing paper's claims section without either over- or
   under-crediting it.

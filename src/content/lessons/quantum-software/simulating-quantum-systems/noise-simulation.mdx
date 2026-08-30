@@ -64,27 +64,27 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Before it ever touches real hardware">
-Every simulation this course has discussed so far assumed an ideal, noiseless circuit. Real quantum programming needs to predict what a NOISY device will actually produce — a noise simulator's job — before ever touching real hardware.
+Every simulation this course has discussed so far assumed an ideal, noiseless circuit. Real quantum programming needs to predict what a NOISY device will produce (a noise simulator's job) before ever touching real hardware.
 </LessonHook>
 
-## Motivation
+## Predicting What a Real Device Will Say
 
-A noise simulator predicts what a real, imperfect device will output
+A noise simulator predicts what an imperfect physical device will output
 before any scarce hardware time gets spent. This lesson builds and
 runs one directly, reusing Advanced Topics in Quantum Mechanics'
-Kraus-channel machinery exactly as-is: ideal gate evolution and a
+Kraus-channel machinery unchanged: ideal gate evolution and a
 noise channel, alternating after every gate.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/1/12/Quantum_refrigerator_at_UCL_%2817626619658%29.jpg"
   alt="A dilution refrigerator at UCL, used to cool samples to within a fraction of a degree of absolute zero"
-  caption="A dilution refrigerator at UCL. Everything this lesson models as a Kraus channel — dephasing, relaxation, readout error — is what happens to a qubit inside a machine like this, and the whole point of simulating it first is to spend the answer, not the fridge time, on finding out."
+  caption="A dilution refrigerator at UCL. Everything this lesson models as a Kraus channel (dephasing, relaxation, readout error) is what happens to a qubit inside a machine like this, and the whole point of simulating it first is to spend the answer, not the fridge time, on finding out."
   credit="UCL Mathematical & Physical Sciences, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_refrigerator_at_UCL_(17626619658).jpg"
   license="CC BY 2.0"
 />
 
-## Engineering Development
+## Interleaving Gates With Channels
 
 ### Interleaving ideal evolution with a noise channel
 
@@ -94,7 +94,7 @@ the gate's IDEAL <Term id="unitary-evolution">unitary evolution</Term> to a dens
 <Term id="noise-decoherence">noise channel</Term> (Advanced Topics in Quantum Mechanics' `applyKrausChannel`)
 modeling whatever physical error process (Noise, Decoherence & Scaling's
 T1/T2, or others) affects the real device between operations. This
-platform's `runNoisyCircuit` implements exactly this two-step loop,
+platform's `runNoisyCircuit` implements this two-step loop,
 literally two function calls per gate, both already built and tested
 elsewhere.
 
@@ -105,20 +105,35 @@ $|0\rangle$, it should return cleanly to $|0\rangle$. This platform's
 engine confirms it with a trivial (identity) noise channel: `purity=1`,
 `P(0)=1`, no deviation at all.
 
-With a real dephasing channel ($\lambda=0.2$) interleaved after each of
-the two $H$ gates instead, the SAME circuit no longer returns cleanly:
-$P(0)\approx0.9$ (not $1.0$), and purity drops to $\approx0.82$, a
-directly computed illustration of what "noise degrades circuit
-fidelity" means numerically, not just qualitatively.
+Now interleave a real dephasing channel ($\lambda=0.2$) after each of
+those two $H$ gates. Both gates are identical, and both are followed by
+the identical noise channel, so the natural expectation is that each one
+costs the same amount of purity.
+
+<PredictBeforeReveal
+  question="H, then dephasing, then H, then the same dephasing again. Does the second noisy H gate cost the same purity the first one did?"
+  options={[
+    { label: "No; the second gate costs nothing at all", value: "flat" },
+    { label: "Yes; identical gate, identical channel, identical cost", value: "same" },
+    { label: "No; the second gate costs strictly more than the first", value: "more" },
+  ]}
+  correctValue="flat"
+  explanation="The first H sends the Bloch vector from the north pole out to the equator, along x, where dephasing shortens it to 0.8 and purity falls to ≈0.82. The second H rotates that shortened vector onto the z axis, and dephasing shrinks only x and y, so it finds nothing to act on: purity holds at ≈0.82. A third noisy H swings the vector back onto x, dephasing bites again, and purity drops to ≈0.70. Noise accumulation trends downward overall, but not gate by gate without exception. Check all three values on the live bars below."
+/>
+
+With that dephasing channel interleaved, the SAME circuit no longer
+returns cleanly: $P(0)\approx0.9$ (not $1.0$), and purity drops to
+$\approx0.82$, a directly computed illustration of what "noise degrades
+circuit fidelity" means numerically, not just qualitatively.
 
 Those numbers come from this page's own live runs, not from a quoted
 result. The bars below re-run `runNoisyCircuit` right here, so the
 demonstration can be watched rather than taken on trust:
 
-<InteractiveSection title="The demonstration, computed live" description="Each frame re-runs this platform's own runNoisyCircuit from |0⟩ with 1, 2, or 3 noisy H gates (dephasing λ=0.2 interleaved after every gate, exactly as runNoisyCircuit's loop does). Slide to 2 gates: that is this section's H-then-H circuit, coming back to only P(0)≈0.9 with purity ≈0.82 instead of returning cleanly to |0⟩. Keep an eye on what purity does between 1 and 2 gates; the worked example below picks that oddity up." mode="observe">
+<InteractiveSection title="The demonstration, computed live" description="Each frame re-runs this platform's own runNoisyCircuit from |0⟩ with 1, 2, or 3 noisy H gates (dephasing λ=0.2 interleaved after every gate, exactly as runNoisyCircuit's loop does). Slide to 2 gates: that is this section's H-then-H circuit, coming back to only P(0)≈0.9 instead of returning cleanly to |0⟩. Watch the purity bar as you step from 1 gate to 2, and then to 3." mode="observe">
   <BarChartExplorer
     sliderLabel="Noisy H gates applied"
-    ariaLabel="P(0), P(1), and purity after 1, 2, or 3 noisy H gates, showing purity flat between 1 and 2 gates then dropping at 3 gates"
+    ariaLabel="P(0), P(1), and purity after 1, 2, or 3 noisy H gates"
     maxValue={1}
     frames={noiseSimFrames}
   />
@@ -130,56 +145,47 @@ This platform's `runNoisyCircuit` is deliberately scoped to
 single-qubit circuits. Extending it correctly to multiple qubits
 requires expanding each gate into a full $2^n\times2^n$ unitary (via
 <Term id="tensor-product">tensor products</Term> with identity on every untouched qubit) before applying
-it to a multi-qubit density matrix. This is real, well-understood
-machinery, just not needed by anything this course's lessons actually
+it to a multi-qubit density matrix. This is well-understood
+machinery, just not needed by anything this course's lessons
 demonstrate, an explicit, stated scope choice, not a hidden limitation.
 
-## Physical Interpretation
+## How Production Noise Models Work
 
-This is precisely how real noisy-simulator software (Qiskit Aer's
-noise models, for instance) works in principle, at a conceptual level:
+This is how real noisy-simulator software (Qiskit Aer's noise models,
+for instance) works at a conceptual level:
 combine an ideal circuit description with a noise model, and predict
 what the actual (imperfect) output distribution will look like, letting
 researchers estimate real-hardware performance without consuming real,
 scarce hardware time (Programming Quantum Computers' queue-time
 discussion).
 
-## Worked Example
+## Watching Fidelity Fall, Unevenly
 
 **Does purity decrease monotonically with every additional noisy gate,
 or can it stay flat for some steps?**
 
 This platform's own test suite shows purity after 1 noisy $H$ gate
 ($\approx0.82$) equals purity after 2 noisy $H$ gates (also
-$\approx0.82$) — not strictly decreasing at every single step — but
-purity after 3 gates ($\approx0.70$) is strictly less than after 1. This
-reflects $H$'s specific interaction with dephasing noise: the second $H$
-partially "undoes" the first's basis rotation relative to the noise's
-preferred axis, a checkable detail showing that noise accumulation
-isn't always monotonic step-by-step, even though it trends downward
-overall.
-
-<PredictBeforeReveal
-  question="Purity after 1 noisy H gate is ≈0.82. Adding a second noisy H gate — does purity drop further, stay about the same, or bounce back up?"
-  options={[
-    { label: "Drops further, since noise accumulates with every gate", value: "drops" },
-    { label: "Stays at about the same value, ≈0.82", value: "flat" },
-    { label: "Bounces back up toward 1", value: "recovers" },
-  ]}
-  correctValue="flat"
-  explanation="It stays flat at ≈0.82. The second H rotates the state back in a way that partially undoes the first H's alignment with the dephasing channel's preferred axis, so this particular step doesn't cost any additional purity — even though a third noisy H gate then drops purity again, to ≈0.70. Noise accumulation trends downward overall, but not gate-by-gate without exception."
-/>
+$\approx0.82$), so purity does not strictly decrease at every step. But
+purity after 3 gates ($\approx0.70$) is strictly less than after 1. The
+mechanism is $H$'s specific relationship to the dephasing channel's
+axis. Dephasing shrinks the Bloch vector's $x$ and $y$ components and
+leaves $z$ alone, and $H$ swaps $x$ with $z$. So the vector alternates:
+after gate 1 it lies along $x$, where the channel shortens it; after
+gate 2 it lies along $z$, where the channel has nothing to grip; after
+gate 3 it is back on $x$ and loses length again. Noise accumulation
+isn't monotonic step by step, even though it trends downward overall.
 
 One question the worked example leaves open: is this behavior specific
 to dephasing, or would an energy-loss channel act the same way? The
-Noise & Decoherence Explorer below exists for exactly this kind of
+Noise & Decoherence Explorer below exists for this kind of
 qualitative question. It applies a channel repeatedly to a fixed state,
 with no gates interleaved, so its numbers won't reproduce this lesson's
 $\approx0.82$ and $\approx0.70$; treat it as a map of what each channel
 type does, and to which states it does it. Start from $|0\rangle$ with
 phase scrambling (T2) selected and nothing decays at all: a
 computational-basis state has no coherence for dephasing to destroy,
-which is exactly why this lesson's demonstration needed its $H$ gates
+which is why this lesson's demonstration needed its $H$ gates
 first, to rotate into a state the noise could act on. Then switch to
 energy loss (T1) starting from $|1\rangle$ and watch the same state
 decay immediately.
@@ -188,7 +194,7 @@ decay immediately.
   <LazyNoiseExplorer />
 </InteractiveSection>
 
-## Common Mistakes
+## Assuming Every Gate Degrades the State
 
 <Callout type="warning">
 **Assuming purity must strictly decrease after every single noisy gate.**
@@ -209,14 +215,224 @@ the tensor-product gate expansion this lesson names but doesn't build.
 
 1. Describe the two-step loop `runNoisyCircuit` performs for each gate
    in a circuit.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   For every gate in the list, in order:
+
+   **Step 1, ideal unitary evolution.** `evolveDensityMatrix(rho, gate)`
+   applies $\rho\to U\rho U^\dagger$. This is the gate exactly as a
+   noiseless simulator would apply it, with nothing degraded.
+
+   **Step 2, the noise channel.** `applyKrausChannel(rho, noiseChannel)`
+   applies $\rho\to\sum_i K_i\rho K_i^\dagger$, modelling whatever
+   physical error the real device accumulates around that operation.
+
+   Then move to the next gate and do both again. That is the entire
+   function: two calls per gate, both to machinery built and tested in
+   earlier courses, with no new physics anywhere in it.
+
+   The structural point worth extracting is *why the state is a density
+   matrix at all*. Every other simulator in this course carries a
+   `StateVector`. This one carries a `Matrix`, and it has to, because a
+   noise channel maps a pure state to a mixed one and a state vector
+   cannot represent a mixed state. There is no amplitude array
+   corresponding to "the qubit is $|0\rangle$ half the time and
+   $|1\rangle$ half the time, incoherently." So the switch from
+   $|\psi\rangle$ to $\rho$ is forced by the presence of noise rather
+   than chosen for convenience, and it is what the whole density-matrix
+   formalism exists for.
+
+   Two details in the ordering are worth noticing.
+
+   The noise comes *after* the gate, modelling error accrued during and
+   around that operation. Nothing forbids a different placement, and real
+   noise models often attach different channels to different gate types
+   or add idle-time noise to qubits doing nothing. The interleaving
+   pattern is the general shape; where exactly each channel sits is part
+   of the model.
+
+   And the ideal step remains exactly ideal. The gate is not "applied
+   noisily"; a perfect gate is applied and then a separate channel
+   degrades the result. That factorization is what makes the noise model
+   a swappable component, which is exactly how production tools such as
+   Qiskit Aer are built.
+
+   The wrong turn is expecting a noisy simulator to need a different
+   physics engine, some approximate gate application that bakes error in.
+   It needs a different *state representation* and one extra function
+   call per gate.
+
+   </details>
+
 2. Using the worked example's numbers, is "more gates always means lower
    purity" a safe assumption? Justify using the specific 1-vs-2-gate
    result.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **No.** Purity after one noisy $H$ is $0.820000$, and purity after two
+   is $0.820000$: identical, to every digit the engine prints. The second
+   noisy gate cost nothing.
+
+   **The mechanism is geometric.** Track the Bloch vector, and recall
+   that for one qubit purity is $\tfrac12(1+r^2)$ where $r$ is the
+   vector's length.
+
+   Start at the north pole, $z=1$, $r=1$, purity 1. The first $H$ swings
+   the vector onto the $x$ axis. Dephasing shrinks $x$ and $y$ and leaves
+   $z$ untouched, so it finds the vector lying entirely in its own
+   contraction plane and shortens it to $x=0.800$, giving
+   $\tfrac12(1+0.64)=0.82$.
+
+   The second $H$ swaps $x$ with $z$, putting the vector along the $z$
+   axis at $z=0.800$. Dephasing now has nothing to grip: $x$ and $y$ are
+   already zero, and $z$ is exactly what it does not touch. Length
+   unchanged, purity unchanged at 0.82.
+
+   The third $H$ swings it back onto $x$, dephasing bites again,
+   $x=0.640$, and purity falls to $\tfrac12(1+0.4096)=0.7048$.
+
+   The engine's staircase, computed live: purity runs
+   $1,\ 0.8200,\ 0.8200,\ 0.7048,\ 0.7048,\ 0.6311,\ 0.6311$ across zero
+   through six gates. Down on odd gates, flat on even ones. The trend is
+   downward and the step-by-step claim is false.
+
+   **And the failure is worse than "sometimes flat."** Swap dephasing for
+   amplitude damping at the same strength and purity after one, two and
+   three noisy $H$ gates comes out $0.920000$, $0.935108$, $0.894148$. It
+   *rose* at the second gate. Nothing is wrong: amplitude damping's fixed
+   point is the pure state $|0\rangle$, so it contracts the Bloch ball
+   toward a point on its surface, and a state being dragged toward a pure
+   state can become purer. A channel that loses information can still
+   increase purity, because purity measures how close the state is to
+   *some* pure state, not how much information survives.
+
+   The wrong turn is treating purity as a running total of damage, a
+   quantity that only goes one way, like entropy in a closed system. It
+   is a property of the current state and nothing else. What actually
+   accumulates is the channel's effect on the *information*, and purity
+   is an imperfect proxy for that: informative when the geometry
+   cooperates, misleading when it does not.
+
+   Practically, the lesson is to be careful with per-step fidelity or
+   purity checks as a debugging signal. A step that costs nothing may
+   only mean the state was pointing somewhere the channel could not
+   reach, on that particular step.
+
+   </details>
+
 3. Why is `runNoisyCircuit` scoped to single-qubit circuits specifically,
    and what would extending it to multiple qubits require?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because nothing in this course needs the multi-qubit version, and
+   building it would mean adding machinery no lesson exercises. It is a
+   stated scope decision, not a limitation of the formalism.
+
+   **What extending it requires:** each single-qubit gate has to be
+   expanded into a full $2^n\times2^n$ unitary, by taking tensor products
+   with the identity on every untouched qubit, before it can act on a
+   multi-qubit density matrix. The single-qubit Kraus operators need the
+   same lifting, so that a channel modelling noise on one qubit acts as
+   the identity on the others. Both are standard, well-understood
+   constructions.
+
+   Three tempting explanations for the scope are wrong, and each is worth
+   dismissing individually because each contains a true statement pointed
+   at the wrong target.
+
+   **"Kraus channels are defined for a single system."** They are not.
+   The formalism is dimension-agnostic: a channel on any finite
+   dimensional system is $\rho\to\sum_i K_i\rho K_i^\dagger$ with
+   $\sum_i K_i^\dagger K_i=I$, and nothing in it mentions qubit count.
+
+   **"A multi-qubit density matrix has $4^n$ entries, so even two qubits
+   is impractical."** Two qubits is $4^2=16$ complex numbers, 256 bytes.
+   Nothing about that is impractical. The cost argument is real but bites
+   far later: $4^{20}\approx1.1\times10^{12}$ entries, about 17.6 TB, and
+   notice that this is the same figure as a *40-qubit* state vector.
+   That equivalence is the useful way to hold it: a density matrix on $n$
+   qubits costs what a state vector on $2n$ qubits costs, so noisy
+   simulation halves your reachable qubit count.
+
+   **"Correlated noise across qubits has no agreed model."** Correlated
+   noise models are standard, and crosstalk in particular is very well
+   characterized on real devices. This turns an unbuilt feature into an
+   unsettled research question, which it is not.
+
+   The distinction the lesson is drawing, and the reason it says so
+   explicitly, is between something that *cannot* be done and something
+   that *has not been done here*. A lesson that names exactly what the
+   extension would require is describing the second.
+
+   </details>
+
 4. Explain why a noisy simulator is valuable even before running
    anything on real hardware, connecting to Programming Quantum
    Computers' queue-time discussion.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because hardware time is the scarce resource, and a noisy simulator
+   answers most of the questions you would otherwise spend it on.
+
+   **Queue time is the direct link.** A device is one machine in one
+   building, shared, and a submitted job waits. A design loop that
+   iterates against a queue proceeds in days. The same loop against a
+   simulator proceeds in seconds, and the whole point of predicting the
+   noisy output first is to spend the answer rather than the fridge time
+   on finding out.
+
+   Four things a noisy simulator does that neither an ideal simulator nor
+   hardware can.
+
+   **It separates the two error sources.** An ideal simulator tells you
+   whether the circuit is logically right. Hardware mixes logic errors
+   with physical ones and labels nothing. A noisy simulator lets you turn
+   the noise model on and off around the same circuit, so a difference is
+   attributable by construction.
+
+   **It answers "is this worth submitting?"** Given a device's published
+   error rates, the simulator estimates the output distribution before
+   any shots are bought. If the predicted signal is already buried,
+   nothing is learned by queueing for it.
+
+   **It distinguishes circuits an ideal simulator cannot.** Two
+   transpilations of the same logical circuit are identical under
+   noiseless simulation, by construction. Under a noise model the shorter
+   or better-routed one wins measurably, which is what makes the
+   Compilation course's optimizations checkable at all.
+
+   **It answers counterfactuals no device can.** What if $T_1$ were twice
+   as long? What if the dominant channel were dephasing rather than
+   damping? You cannot dial a real device's noise, and these are exactly
+   the questions that decide where engineering effort should go. The same
+   ability is what makes zero-noise extrapolation designable, since that
+   protocol needs to know how an observable behaves as noise strength is
+   varied.
+
+   Two honest limits, so this does not read as a claim that hardware is
+   optional.
+
+   A noise model is a model. Real devices have noise that drifts between
+   calibrations, that is correlated across qubits, and that is not
+   Markovian, and an interleaved single-qubit channel captures none of
+   that. Agreement between a simulator and a device is evidence the model
+   is adequate for that circuit, not proof it is right.
+
+   And the simulation is more expensive than the ideal one. A density
+   matrix costs $4^n$ rather than $2^n$, so switching noise on halves the
+   qubit count you can reach. Noisy simulation is a tool for small
+   circuits, which is precisely the regime where you are still deciding
+   whether the large one is worth running.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -228,11 +444,11 @@ the tensor-product gate expansion this lesson names but doesn't build.
   `applyKrausChannel` unchanged.
 - Demonstrated concretely: $H,H$ (ideally identity) returns exactly to
   $|0\rangle$ with no noise, but only to $P(0)\approx0.9$ with dephasing
-  interleaved, a real, computed fidelity loss.
+  interleaved, a computed fidelity loss.
 - Purity doesn't always decrease monotonically gate-by-gate (confirmed
   by direct computation), an honest, checked nuance, not assumed.
 
-## Further Exploration
+## What This Closes, and What It Opens
 
 <NextDiscovery>
 This closes **Simulating Quantum Systems**. The next course,

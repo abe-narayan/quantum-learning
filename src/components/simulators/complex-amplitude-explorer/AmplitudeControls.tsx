@@ -1,7 +1,7 @@
 import { SimulatorSlider, SymbolGloss } from "../shared/controls";
 
 /**
- * Two synced control pairs — real/imaginary and magnitude/phase — driving
+ * Two synced control pairs (real/imaginary and magnitude/phase) driving
  * the same underlying complex number. Moving either pair updates the
  * other, so a student can manipulate whichever representation they're
  * currently thinking in.
@@ -47,7 +47,7 @@ export function AmplitudeControls({
       </div>
       <div className="space-y-4 border-t border-border pt-4">
         <SimulatorSlider
-          label="|z| (magnitude — how long it is)"
+          label="|z| (magnitude: how long it is)"
           min={0}
           max={1.5}
           step={0.01}
@@ -57,7 +57,7 @@ export function AmplitudeControls({
           disabled={disabled}
         />
         <SimulatorSlider
-          label="θ (phase — which way it points)"
+          label="θ (phase: which way it points)"
           min={-180}
           max={180}
           step={1}
@@ -77,14 +77,14 @@ export function AmplitudeControls({
             symbol: "a, b",
             name: "real and imaginary parts",
             means:
-              "the arrow's horizontal and vertical reach — a is how far right, b is how far up. Together they place the tip of the arrow.",
+              "the arrow's horizontal and vertical reach: a is how far right, b is how far up. Together they place the tip of the arrow.",
             glossaryId: "complex-number",
           },
           {
             symbol: "|z|",
             name: "magnitude",
             means:
-              "the arrow's length. Square it and you have the probability of this outcome — nothing else about the amplitude survives that step.",
+              "the arrow's length. Square it and you have the probability of this outcome; nothing else about the amplitude survives that step.",
             glossaryId: "modulus",
           },
           {

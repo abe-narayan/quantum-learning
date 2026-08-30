@@ -45,11 +45,11 @@ export const distillationRateFromEntanglementEntropy: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "Entanglement concentration converts n copies of a pure partially-entangled state into approximately n*H(p) near-perfect Bell pairs by projecting onto the typical subspace and relabeling -- the same H(p) that is the state's own entanglement entropy.",
+      "Entanglement concentration converts n copies of a pure partially-entangled state into approximately n*H(p) near-perfect Bell pairs by projecting onto the typical subspace and relabeling, where H(p) is the state's own entanglement entropy.",
     whyCorrect:
-      "The typical subspace has dimension approximately 2^(nH(p)), and since it is nearly maximally entangled within itself, relabeling its basis into qubits yields approximately nH(p) qubits' worth of near-perfect Bell pairs per side -- the lesson's worked p=0.9, n=6 example demonstrates the same formula on numbers small enough to check by hand.",
+      "The typical subspace has dimension approximately 2^(nH(p)), and since it is nearly maximally entangled within itself, relabeling its basis into qubits yields approximately nH(p) qubits' worth of near-perfect Bell pairs per side. The lesson's worked p=0.9, n=6 example demonstrates the same formula on numbers small enough to check by hand.",
     whyWrong: [
-      "Using n directly as the answer (500 Bell pairs) ignores that the state is only partially entangled -- only n=500 perfect Bell pairs would be extractable if p were already 0.5 (H(0.5)=1), not for p=0.7.",
+      "Using n directly as the answer (500 Bell pairs) ignores that the state is only partially entangled. All 500 pairs would be extractable only if p were 0.5, where H(0.5)=1, not at p=0.7.",
       "Using p itself (0.7) or 1-p (0.3) as a per-copy rate instead of the Shannon entropy H(p) confuses the Schmidt coefficient with the entropy those coefficients determine.",
     ],
   },

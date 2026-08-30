@@ -15,7 +15,7 @@ export const characteristicTimescaleCalculation: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "An observable A has Delta A = 2 and |d<A>/dt| = 3. Find its characteristic evolution timescale Delta t_A.",
-    inputHint: "a decimal",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -27,7 +27,11 @@ export const characteristicTimescaleCalculation: NumericProblem = {
       { value: 6, feedback: "6 multiplies the two. A time comes from dividing a spread by a rate of change." },
     ],
   },
-  hints: [{ text: "Divide Delta A by the rate of change directly." }],
+  hints: [
+    { text: "The timescale answers how long the observable needs before it has moved by about its own spread, so the spread and the rate play different roles in it." },
+    { text: "Track units. $\\Delta A$ carries $A$'s units; $|d\\langle A\\rangle/dt|$ carries $A$ per unit time. Arrange the two so only a time survives." },
+    { text: "Only one of the two orderings leaves a time. Decide which before you evaluate anything." },
+  ],
   solution: {
     steps: [{ description: "$\\Delta t_A = \\dfrac{\\Delta A}{|d\\langle A\\rangle/dt|} = \\dfrac{2}{3} \\approx 0.6667$." }],
     finalAnswer: "$\\Delta t_A \\approx 0.6667$",

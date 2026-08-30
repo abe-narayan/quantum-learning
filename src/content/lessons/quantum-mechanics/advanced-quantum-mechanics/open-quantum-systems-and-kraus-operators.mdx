@@ -100,11 +100,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Nobody has ever built an isolated system">
 A perfectly isolated system evolving unitarily forever is an idealization nobody has ever built in a lab. Every real system eventually interacts with something outside itself: stray photons, a measuring apparatus, thermal vibrations in the mounting hardware.
 </LessonHook>
 
-## Motivation
+## The property that makes unitary evolution fatal here
 
 Entanglement, Mixed States & Bell Tests built density matrices and gave
 them a <Term id="unitary-operator">unitary evolution</Term> rule, $\rho\to U\rho U^\dagger$. That rule has a
@@ -134,7 +134,7 @@ $1$. Nothing
 in this lesson's machinery forbids that, and the reason it happens is
 worth working out before reading on.
 
-## Mathematical Development
+## Past unitary evolution, and the one constraint left
 
 ### Why unitary evolution alone isn't enough
 
@@ -151,15 +151,20 @@ its environment does evolve unitarily. It is that discarding the
 environment, by tracing it out, leaves behind a map on the system that
 need not be unitary at all.
 
+Amplitude damping models a qubit losing energy to a cold environment, so
+its destination is not much of a mystery: it ends up in $|0\rangle$,
+which is pure, and that is the $1$ the curve climbs back to. The dip on
+the way there is the part worth stopping for.
+
 <PredictBeforeReveal
-  question="The amplitude damping curve above falls and then climbs back toward 1. Amplitude damping models a qubit losing energy to a cold environment. Where does that leave the qubit after many steps?"
+  question="If amplitude damping starts at the pure state |+⟩ and ends at the pure state |0⟩, why does purity sag to 0.875 around step 7 instead of holding at 1 the whole way?"
   options={[
-    { label: "In the maximally mixed state, purity 1/2, like dephasing", value: "mixed" },
-    { label: "In the pure ground state |0⟩, purity 1", value: "ground" },
-    { label: "Nowhere in particular; the curve is a numerical artifact", value: "artifact" }
+    { label: "Partway through it is a real mixture: decayed, and not yet", value: "mixture" },
+    { label: "Its phase has to be destroyed before any energy can be lost", value: "phase" },
+    { label: "The channel briefly stops being trace-preserving there", value: "broken" },
   ]}
-  correctValue="ground"
-  explanation="Amplitude damping drives every state toward |0⟩, which is pure. The purity dip in between is real: partway through, the qubit is a genuine mixture of 'has decayed' and 'has not decayed yet'. Once decay is essentially certain, that ambiguity is gone and purity returns. So decoherence is not the same thing as purity loss, and a channel can restore purity while still being irreversible: the |+⟩ information is destroyed either way."
+  correctValue="mixture"
+  explanation="Both endpoints are pure states. What sits between them is not: after a few steps the qubit is part decayed and part not, nobody is tracking which, and that is what a mixed state is. Once decay is close to certain the ambiguity is gone and purity climbs back. Notice what this does not mean. Purity returning to 1 undoes nothing; the |+⟩ phase information is destroyed either way, so purity loss is a symptom of decoherence rather than a definition of it."
 />
 
 ### The Kraus operator sum representation
@@ -193,29 +198,32 @@ single Kraus operator scaled by $2$, whose sum comes out $4I$. That
 second test matters more than the first, because a check that only ever
 returns `true` proves nothing.
 
-The condition has a geometric consequence you can watch. Every
-intermediate state below is a legitimate density matrix, so its Bloch
-vector stays within the sphere at every step, even while purity falls.
+The condition has a geometric consequence you can watch. A qubit's Bloch
+vector has length $\sqrt{x^2+y^2+z^2}$, and a length above $1$ would not
+be a density matrix at all. Amplitude damping starting from $|+\rangle$
+drags the vector from the equator up to the north pole, and along the way
+the length dips below $1$ and comes back: $0.866$ at its shallowest,
+around step $7$, the same place purity bottomed out.
 
 <PredictBeforeReveal
-  question="Start at |+⟩ on the equator and apply amplitude damping repeatedly. As the Bloch vector shrinks toward |0⟩, does it ever poke outside the sphere?"
+  question="On that trip from the equator to the north pole, does the Bloch vector ever poke outside the sphere?"
   options={[
-    { label: "No, it stays inside or on the sphere the whole time", value: "inside" },
-    { label: "It briefly leaves the sphere near the middle of the decay", value: "leaves" },
     { label: "It can't be determined without picking a specific γ", value: "depends" },
+    { label: "It briefly leaves near the middle of the decay, then returns", value: "leaves" },
+    { label: "No, it stays inside or on the sphere the whole time", value: "inside" },
   ]}
   correctValue="inside"
-  explanation="It never leaves. The trace-preservation condition ∑K†K=I is what guarantees this: every intermediate ρ is a legitimate density matrix, so its Bloch vector has length ≤ 1 at every step, even as purity falls. A set of matrices failing that condition would produce vectors outside the sphere, which is to say states with total probability above or below 1."
+  explanation="It never leaves, for any γ. The trace-preservation condition ∑K†K=I is what guarantees it: every intermediate ρ is a legitimate density matrix, so its Bloch vector has length at most 1 at every step, even as purity falls. A set of matrices failing that condition would produce vectors outside the sphere, which is to say states whose total probability is not 1."
 />
 
 <InteractiveSection
   title="Shrink the Bloch vector without leaving the sphere"
-  description="Pick amplitude damping, start from |+⟩, and step forward. Watch the Bloch vector shrink toward |0⟩ while never leaving the sphere. That's the trace-preservation condition holding exactly even as purity drops."
+  description="Pick amplitude damping, start from |+⟩, and step forward. Watch where the Bloch vector heads, and whether it ever leaves the sphere on the way. Trace preservation makes a commitment about one of those two things, and only one, even as purity drops."
 >
   <LazyNoiseExplorer />
 </InteractiveSection>
 
-## Physical Interpretation
+## Each operator is one thing the environment might have done
 
 Each $K_k$ stands for one thing the environment could have done. For
 amplitude damping, $K_1$ is "a photon was emitted" and $K_0$ is "no
@@ -234,7 +242,7 @@ which branch occurred and the experimenter cannot read it, which is why
 the $T_1$ and $T_2$ decay curves measured routinely on every processor
 are these channels in another notation.
 
-## Worked Example
+## Checking amplitude damping is trace-preserving
 
 **Confirm the amplitude damping channel, $K_0=\begin{pmatrix}1&0\\0&\sqrt{1-\gamma}\end{pmatrix}$,
 $K_1=\begin{pmatrix}0&\sqrt\gamma\\0&0\end{pmatrix}$, is trace-preserving.**
@@ -262,7 +270,7 @@ identical their sums come out.
   ariaLabel="Kraus operators K0, K1, and their completeness sum K0-dagger K0 plus K1-dagger K1, for amplitude damping and dephasing at strength 0.3"
 />
 
-## Common Mistakes
+## Not every set of matrices is a channel
 
 <Callout type="warning">
 **Assuming any set of matrices can serve as Kraus operators.** The
@@ -285,15 +293,151 @@ is being bent.
 
 1. Show that a single unitary $K_0=U$ automatically satisfies the
    trace-preservation condition.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With one term in the sum, the condition reads
+
+   $$
+   \sum_k K_k^\dagger K_k = K_0^\dagger K_0 = U^\dagger U = I
+   $$
+
+   which is the definition of unitarity. Nothing further to check.
+
+   The reason this is worth doing rather than assuming is that it settles
+   the relationship between the two frameworks. The Kraus form is not a
+   rival to unitary evolution or a correction applied on top of it. It is
+   a generalization that contains it as the one-operator case, so nothing
+   proved earlier about closed systems is at risk here.
+
+   It also isolates where non-unitary behaviour can come from. With a
+   single term the map is $\rho\to K\rho K^\dagger$, a similarity
+   transformation that cannot change purity. Everything interesting about
+   channels lives in the sum having two or more terms.
+
+   </details>
+
 2. Why does $\rho\to U\rho U^\dagger$ always preserve purity exactly,
    while a general Kraus channel need not?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because with one unitary the $U^\dagger U$ pairs cancel in the middle
+   and the trace's cyclic property carries the rest:
+
+   $$
+   \mathrm{Tr}\big((U\rho U^\dagger)^2\big) = \mathrm{Tr}(U\rho \underbrace{U^\dagger U}_{I}\rho U^\dagger) = \mathrm{Tr}(U\rho^2U^\dagger) = \mathrm{Tr}(\rho^2)
+   $$
+
+   With several Kraus operators there is nothing to cancel. Squaring
+   $\sum_kK_k\rho K_k^\dagger$ produces cross terms
+   $K_j\rho K_j^\dagger K_k\rho K_k^\dagger$ with $j\ne k$, and no
+   identity collapses them.
+
+   The physical account is the one worth carrying. Unitarity is not being
+   abandoned: the system together with its environment evolves under a
+   single unitary and the *joint* purity is preserved exactly. What the
+   channel does is trace out the environment, discarding the correlations
+   the interaction built between the two. Purity of the whole is
+   conserved; purity of a part is not, and the missing purity has gone
+   into entanglement with something you are no longer describing.
+
+   One correction to a common overstatement. A channel does not always
+   *reduce* purity. Amplitude damping is the counterexample plotted at the
+   top of this lesson: it drags every state toward $|0\rangle$, which is
+   pure, so purity ends up back near $1$. Channels that can never decrease
+   entropy are the unital ones, those satisfying
+   $\sum_kK_kK_k^\dagger=I$ as well, which is true of dephasing and false
+   of amplitude damping. Purity is preserved under unitaries and merely
+   unconstrained under channels.
+
+   </details>
+
 3. Verify by direct matrix multiplication that the dephasing channel's
    $K_0,K_1$ (given in this course's engine) satisfy
    $K_0^\dagger K_0+K_1^\dagger K_1=I$ for $\lambda=0.4$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The engine's dephasing operators are
+   $K_0=\sqrt{1-\lambda/2}\,I$ and $K_1=\sqrt{\lambda/2}\,Z$. At
+   $\lambda=0.4$ that is $\sqrt{0.8}$ and $\sqrt{0.2}$:
+
+   $$
+   K_0 = \begin{pmatrix}\sqrt{0.8}&0\\0&\sqrt{0.8}\end{pmatrix}, \qquad K_1 = \begin{pmatrix}\sqrt{0.2}&0\\0&-\sqrt{0.2}\end{pmatrix}
+   $$
+
+   Both are real and diagonal, so the dagger is the transpose and each
+   product just squares the diagonal entries. The minus sign in $K_1$
+   squares away:
+
+   $$
+   K_0^\dagger K_0 = \begin{pmatrix}0.8&0\\0&0.8\end{pmatrix}, \qquad K_1^\dagger K_1 = \begin{pmatrix}0.2&0\\0&0.2\end{pmatrix}, \qquad \text{sum} = \begin{pmatrix}1&0\\0&1\end{pmatrix} = I
+   $$
+
+   The general statement is cleaner than the numbers. Since $I^2=Z^2=I$,
+   the sum is $(1-\lambda/2)I+(\lambda/2)I=I$ for every
+   $\lambda\in[0,1]$, so $0.4$ is not a special case and the check is
+   really about the identity $Z^2=I$.
+
+   Notice that the sign the calculation discards is the entire physical
+   content of the channel. $K_1$ applies $Z$, flipping the phase of
+   $|1\rangle$ relative to $|0\rangle$, and it is that random phase flip
+   applied with probability $\lambda/2$ that destroys the off-diagonal
+   elements of $\rho$. Trace preservation is blind to it, which is exactly
+   why passing the trace-preservation test tells you a channel is legal
+   and nothing about what it does.
+
+   </details>
+
 4. Physically, what does each individual $K_k$ represent, and why does
    summing over all of them (rather than picking just one) correctly
    describe the system when no measurement of the environment actually
    occurs?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Each $K_k$ is one thing the environment could have done, and the sum is
+   the state you are entitled to write down when nobody looked to see
+   which.
+
+   For amplitude damping the two are concrete: $K_1$ is "a photon was
+   emitted" and $K_0$ is "no photon was emitted." If you *did* watch the
+   environment and saw outcome $k$, the right description would be a
+   single branch, renormalized:
+
+   $$
+   \rho \to \frac{K_k\rho K_k^\dagger}{\mathrm{Tr}\!\left(K_k\rho K_k^\dagger\right)} \quad\text{with probability } \mathrm{Tr}\!\left(K_k\rho K_k^\dagger\right)
+   $$
+
+   and that map preserves purity, being a single-operator map. The
+   unconditional state is those branches weighted by their probabilities,
+   which is what $\sum_kK_k\rho K_k^\dagger$ is: the probability factors
+   cancel against the renormalizations and leave the plain sum. Purity
+   falls because averaging over unread branches is precisely what makes a
+   state mixed.
+
+   Picking just one term would be asserting a fact you do not have. It
+   would predict a pure state where the laboratory measures a mixed one,
+   and it would get the $T_1$ and $T_2$ curves wrong on every real device.
+
+   There is a caveat that keeps this from being taken too literally, and
+   it is the most interesting thing in this lesson. The Kraus
+   decomposition of a channel is not unique. Any set
+   $K'_j=\sum_k u_{jk}K_k$ with $u$ unitary gives the identical map on
+   every $\rho$, so the same physical channel can be told as "emitted or
+   not emitted" or as a completely different pair of alternatives. The
+   channel is a fact; the story about which branch the environment took is
+   not. It depends on what basis you would have measured the environment
+   in, and if you never measured it, no such basis was picked. Read $K_k$
+   as one useful way to decompose the map, not as a hidden record of what
+   really happened.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -312,7 +456,7 @@ is being bent.
   confirmed for amplitude damping and dephasing and rejected for a
   deliberately invalid counter-example.
 
-## Further Exploration
+## Watching coherence decay
 
 <NextDiscovery>
 [Decoherence & the Quantum-to-Classical Transition](/lessons/quantum-mechanics/advanced-quantum-mechanics/decoherence-and-the-quantum-to-classical-transition) uses

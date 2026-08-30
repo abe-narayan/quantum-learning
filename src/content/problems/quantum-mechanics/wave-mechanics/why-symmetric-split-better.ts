@@ -21,13 +21,29 @@ export const whySymmetricSplitBetter: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["cancel", "cancels the leading error", "higher order accuracy"],
-      ["symmetric", "half-step", "Strang splitting"],
+      {
+        phrases: ["cancel", "cancels the leading error", "higher order accuracy"],
+        missingFeedback:
+          "Say what the symmetric arrangement actually buys you numerically. Compare the size of the error left behind with what the plainer ordering leaves.",
+      },
+      {
+        phrases: ["symmetric", "half-step", "Strang splitting"],
+        missingFeedback:
+          "You have the benefit. Now name the arrangement that produces it, and describe the shape of the step sequence.",
+      },
     ],
-    incorrectFeedback: "Name both pieces: that the arrangement is called a symmetric (Strang) splitting, and that this symmetry specifically cancels the leading-order Trotter error.",
-    partialFeedback: "You're partway there — be explicit that the improvement is in the order of accuracy, not just 'more careful' evolution.",
+    incorrectFeedback: "You said it is 'more accurate' or 'more stable' without saying in what sense. The comparison is between two error terms: work out the per-step error of each arrangement in powers of Delta t and compare the leading powers.",
+    partialFeedback: "Say explicitly that the improvement is in the order of accuracy, not merely 'more careful' evolution.",
+    modelAnswers: [
+      "The symmetric ordering, half a potential step on each side of a full kinetic step, makes the leading Trotter error terms cancel between the two halves. That is Strang splitting, and it buys higher order accuracy for the same number of transforms.",
+      "Splitting the potential into two half-steps around the kinetic step is symmetric in time, so the leading error cancels and you get higher order accuracy at the same cost.",
+    ],
   },
-  hints: [{ text: "How does the per-step error's order in Delta t change between a naive split and a symmetric one?" }],
+  hints: [
+    { text: "Two operators that do not commute cannot be exponentiated one at a time for free. Write down the size of that cost for the naive arrangement, in powers of Delta t." },
+    { text: "Now do the same for the arrangement that applies the potential in two pieces around the kinetic step. Expand both one order beyond where they first differ." },
+    { text: "The two expansions agree at leading order and part company after that. Ask which term dropped out of the second one, and what it is about the arrangement's mirror structure that removed it." },
+  ],
   solution: {
     steps: [
       { description: "The naive (single-ordering) split has $O(\\Delta t^2)$ error, from the commutator $[\\hat T,\\hat V]$." },
@@ -37,7 +53,7 @@ export const whySymmetricSplitBetter: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "A small change in ordering (splitting the potential step in half) is a genuine, well-known accuracy improvement in numerical time evolution.",
-    whyCorrect: "This matches exactly why SplitOperatorEvolver.step() is implemented as potential-half, kinetic, potential-half.",
-    whyWrong: ["Saying the symmetric version 'preserves norm better' is incorrect — both orderings preserve norm exactly (each factor is a pure phase); the difference is purely in accuracy, not norm conservation."],
+    whyCorrect: "This is why SplitOperatorEvolver.step() is implemented as potential-half, kinetic, potential-half.",
+    whyWrong: ["Saying the symmetric version 'preserves norm better' is incorrect: both orderings preserve norm exactly, since each factor is a pure phase. The difference is in accuracy, not norm conservation."],
   },
 };

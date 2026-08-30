@@ -8,9 +8,9 @@ import { Container } from "@/components/ui/Container";
 //
 // It lives in the `[...slug]` segment, not in `/lessons`, which is where it
 // used to sit. A `loading.tsx` wraps its own segment's page as well as
-// everything nested under it, so from `/lessons` this lesson-shaped skeleton
-// — breadcrumb, instrument readouts, title, objectives, prose-and-ToC
-// columns — was also what a reader saw on the way to the *index* page, whose
+// everything nested under it, so from `/lessons` this lesson-shaped
+// skeleton (breadcrumb, instrument readouts, title, objectives, and a
+// prose-and-ToC split) was also what a reader saw on the way to the *index* page, whose
 // real shape is an intro column above a filter panel and a grouped list.
 // Flashing the wrong page's silhouette is worse than flashing none, so the
 // index has its own skeleton now and this one covers only lessons.
@@ -18,8 +18,8 @@ import { Container } from "@/components/ui/Container";
 // Shape mirrors the current LessonLayout: breadcrumb,
 // instrument readouts + progress rung, title, lede, objectives block, the
 // lineage instrument, then a two-column prose + table-of-contents rail.
-// Deliberately no pillar tint here — which pillar this lesson belongs to is
-// exactly the thing not yet loaded — so every block uses the neutral
+// Deliberately no pillar tint here, which pillar this lesson belongs to is
+// exactly the thing not yet loaded, so every block uses the neutral
 // `surface-muted` fill rather than guessing a `data-pillar`.
 export default function LessonLoading() {
   return (
@@ -35,7 +35,7 @@ export default function LessonLoading() {
       </p>
       <div className="h-3 w-48 rounded bg-surface-muted" />
 
-      <div className="mt-6 max-w-[46rem]">
+      <div className="mt-6 max-w-reading">
         <div className="flex flex-wrap gap-x-10 gap-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex flex-col gap-2">
@@ -58,7 +58,7 @@ export default function LessonLoading() {
         </div>
       </div>
 
-      <div className="mt-8 max-w-[46rem] rounded-panel border border-border p-5">
+      <div className="mt-8 max-w-reading rounded-panel border border-border p-5">
         <div className="h-2.5 w-16 rounded bg-surface-muted" />
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="h-4 w-3/4 rounded bg-surface-muted" />
@@ -67,7 +67,7 @@ export default function LessonLoading() {
       </div>
 
       <div className="mt-12 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-10">
-        <div className="max-w-[46rem] space-y-4">
+        <div className="max-w-reading space-y-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}

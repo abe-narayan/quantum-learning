@@ -7,12 +7,13 @@ import type { Pillar } from "@/lib/content/types";
 import { PILLAR_VISUALS } from "@/lib/design/pillars";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { IconButton } from "@/components/ui/IconButton";
+import { IconButton, TOUCH_TARGET_CLASSES } from "@/components/ui/IconButton";
 import { SearchTrigger } from "@/components/search/SearchTrigger";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Wordmark } from "@/components/layout/Wordmark";
-import { ROUTE_TO_PILLAR, detectPillar } from "@/components/layout/pillarRoutes";
-import { NAV_ITEMS, START_LEARNING_HREF, TRACK_NAV_ITEMS } from "@/lib/nav";
+import { ROUTE_TO_PILLAR, detectPillar, isProblemPage } from "@/components/layout/pillarRoutes";
+import { useFieldState } from "@/components/field/fieldStore";
+import { NAV_ITEMS, START_LEARNING_HREF, TRACK_NAV_ITEMS, navDescription } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 function isActive(pathname: string, href: string) {
@@ -104,7 +105,12 @@ function SectionIndicator({
     <span
       data-pillar={pillar}
       className={cn(
-        "items-center gap-2 border-l border-border pl-3 font-tech text-[0.6875rem] font-medium uppercase tracking-[0.14em]",
+        // `.tech-label`, not the same declarations spelled out: the class sets
+        // exactly `font-tech`, `--text-meta` (0.6875rem), `--tracking-meta`
+        // (0.14em), uppercase and weight 500. `text-pillar-text` /
+        // `text-muted-foreground` below still win the colour, because
+        // utilities sit in a later cascade layer than `@layer components`.
+        "tech-label items-center gap-2 border-l border-border pl-3",
         pillar ? "text-pillar-text" : "text-muted-foreground",
         className
       )}
@@ -183,9 +189,17 @@ function TracksDropdown({ pathname }: { pathname: string }) {
         // same situation. `aria-expanded` alone is what carries the state
         // while the panel does not exist.
         aria-controls={isOpen ? "tracks-dropdown-panel" : undefined}
+        // The other half of "where am I", which this trigger was missing. When
+        // the reader is on one of the six track pages this button carries the
+        // lit-tab underline every other current nav item gets, but the panel
+        // holding the `aria-current="page"` link is unmounted, so a screen
+        // reader user tabbing the bar had no equivalent of that underline at
+        // all. `aria-current` is a global attribute and `"true"` is the right
+        // value here: this is the current *item in the set*, not the page.
+        aria-current={isTrackActive ? "true" : undefined}
         onClick={() => setIsOpen((open) => !open)}
         className={cn(
-          "flex items-center gap-1 rounded-[var(--radius-tight)] px-2.5 py-2 text-sm font-medium",
+          "flex items-center gap-1 rounded-(--radius-tight) px-2.5 py-2 text-sm font-medium",
           INTERACTIVE_CLASSES,
           isTrackActive || isOpen
             ? "bg-surface-muted text-foreground"
@@ -225,7 +239,7 @@ function TracksDropdown({ pathname }: { pathname: string }) {
         // matches how the grid reads visually.
         <div
           id="tracks-dropdown-panel"
-          className="absolute left-0 top-full z-50 mt-2 grid w-[19rem] grid-cols-1 gap-1 rounded-[var(--radius-panel)] border border-border bg-surface p-2 shadow-lg sm:w-[27rem] sm:grid-cols-2"
+          className="absolute left-0 top-full z-50 mt-2 grid w-[19rem] grid-cols-1 gap-1 rounded-panel border border-border bg-surface p-2 shadow-lg sm:w-[27rem] sm:grid-cols-2"
         >
           {TRACK_NAV_ITEMS.map((item) => (
             <Link
@@ -238,7 +252,7 @@ function TracksDropdown({ pathname }: { pathname: string }) {
               // pillar the page behind the dropdown happens to be scoped to.
               data-pillar={ROUTE_TO_PILLAR[item.href]}
               className={cn(
-                "flex flex-col gap-1 rounded-[var(--radius-tight)] border border-transparent px-3 py-2.5 text-sm",
+                "flex flex-col gap-1 rounded-(--radius-tight) border border-transparent px-3 py-2.5 text-sm",
                 INTERACTIVE_CLASSES,
                 isActive(pathname, item.href)
                   ? "border-pillar-edge bg-surface-muted text-foreground"
@@ -258,15 +272,25 @@ function TracksDropdown({ pathname }: { pathname: string }) {
   );
 }
 
-function DesktopNavLink({ item, pathname }: { item: (typeof NAV_ITEMS)[number]; pathname: string }) {
+function DesktopNavLink({
+  item,
+  pathname,
+  problemCount,
+}: {
+  item: (typeof NAV_ITEMS)[number];
+  pathname: string;
+  problemCount: number;
+}) {
   const current = navCurrent(pathname, item.href);
   return (
     <Link
       href={item.href}
       aria-current={current}
-      title={item.description}
+      // `navDescription`, not `item.description`: the "Problems" copy carries
+      // a `{problems}` token that only the server-supplied count can fill.
+      title={navDescription(item, problemCount)}
       className={cn(
-        "rounded-[var(--radius-tight)] px-2.5 py-2 text-sm font-medium",
+        "rounded-(--radius-tight) px-2.5 py-2 text-sm font-medium",
         INTERACTIVE_CLASSES,
         current ? `bg-surface-muted text-foreground ${ACTIVE_MARK_CLASSES}` : "text-muted-foreground hover:text-foreground"
       )}
@@ -288,7 +312,15 @@ function MobileNavLink({ item, pathname, onNavigate }: { item: (typeof NAV_ITEMS
         // from, so the current item is marked with a left rule instead —
         // the same "lit edge" idea rotated 90°, and legible in a vertical
         // list in a way a background tint alone was not.
-        "rounded-[var(--radius-tight)] px-3 py-2 text-sm font-medium",
+        //
+        // `min-h-11`: `px-3 py-2` around a 14px line box is 36px, and these
+        // eight rows *are* the site's navigation on a phone — the only route
+        // to it at every width below `lg`. 36px clears WCAG 2.5.8's 24px floor
+        // and misses the 44px this codebase holds every other control to
+        // (`IconButton`, `FilterChips`, `PillarLessonStrip`'s rows), which is
+        // the wrong place to be a rounding error. `gap-1` (4px) between rows
+        // means the expanded boxes still do not touch.
+        "flex min-h-11 items-center rounded-(--radius-tight) px-3 py-2 text-sm font-medium",
         INTERACTIVE_CLASSES,
         current
           ? "border-l-2 border-brand bg-surface-muted pl-2.5 text-foreground"
@@ -302,6 +334,7 @@ function MobileNavLink({ item, pathname, onNavigate }: { item: (typeof NAV_ITEMS
 
 export function Navbar({
   startLessonMinutes,
+  problemCount,
 }: {
   /**
    * Authored length, in minutes, of the lesson `START_LEARNING_HREF` opens —
@@ -311,17 +344,42 @@ export function Navbar({
    * "First lesson · N min" line used to state a hardcoded 20 against a lesson
    * authored at 30; `estimatedMinutes` is recalibrated corpus-wide, so the
    * number has to come from the data or it drifts again. Optional so the
-   * line degrades to "First lesson · no math background needed" rather than
+   * line degrades to "First lesson · no prerequisites" rather than
    * to a wrong figure if the slug ever stops resolving.
    */
   startLessonMinutes?: number;
+  /**
+   * Size of the problem corpus, for the "Problems" item's description (the
+   * desktop tooltip and the drawer's copy). Same contract as
+   * `startLessonMinutes` and for the same reason: the only derivation of this
+   * figure is `PROBLEM_COUNT` in `lib/structuredData.ts`, which counts the
+   * generated problem-meta array — a module no client bundle may reach. See
+   * `navDescription` in `lib/nav.ts`.
+   */
+  problemCount: number;
 }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuPanelRef = useRef<HTMLDivElement>(null);
-  const pillar = detectPillar(pathname);
-  const section = sectionLabel(pathname, pillar);
+  const routePillar = detectPillar(pathname);
+  /**
+   * The pillar the *page* declared, for the one route shape whose pathname
+   * cannot name it: `/problems/<slug>`. `ProblemLayout` resolves it on the
+   * server and `<PillarScope>` publishes it to the field store, so this is a
+   * subscription to a value the page already produced, not a second lookup —
+   * and it replaces the 556-row slug->pillar table that used to be shipped to
+   * every route to answer the same question. See ./pillarRoutes.ts.
+   *
+   * `FieldRegimeSetter` publishes from an effect, so this is `null` in the
+   * server-rendered HTML and arrives on hydration. That is why it tints the
+   * readout but does not *name* it: `section` below stays route-derived, so
+   * the label ("Problems") is correct in the first painted frame and never
+   * changes. What arrives late is the colour and the 6px dot beside it.
+   */
+  const scopePillar = useFieldState().pillar ?? undefined;
+  const pillar = routePillar ?? (isProblemPage(pathname) ? scopePillar : undefined);
+  const section = sectionLabel(pathname, routePillar);
 
   // Same disclosure contract `TracksDropdown` implements above (§9 of
   // docs/DESIGN_SYSTEM.md names it as the standard to match): Escape closes
@@ -389,13 +447,23 @@ export function Navbar({
         <div className="flex min-w-0 items-center gap-3">
           <Link
             href="/"
-            className={cn("flex items-center rounded-[var(--radius-tight)]", INTERACTIVE_CLASSES)}
+            // `TOUCH_TARGET_CLASSES`: below 400px the word is `sr-only` and
+            // this link is the 32x32 mark alone, which is the smallest tap
+            // target in the chrome and sits at the very edge of the screen,
+            // where a thumb is least accurate. Measured at 32x32 by
+            // `scripts/audit/responsive.mjs` at both 320 and 375px. The
+            // shared idiom gives it the same `max(44px, own size)` hit area
+            // the three icon buttons on the other end of the row already
+            // carry, without growing the painted mark — which must stay 32px,
+            // because the row's whole width budget is accounted for down to
+            // the pixel in the comment below.
+            className={cn("flex items-center rounded-(--radius-tight)", TOUCH_TARGET_CLASSES, INTERACTIVE_CLASSES)}
             onClick={() => setIsMenuOpen(false)}
           >
             {/* The word is dropped below 400px, and the arithmetic is why.
                 Nothing in this row can shrink: the three icon controls carry
                 `shrink-0`, the Start button's padding and five-character label
-                are fixed, and "QuantumLearn" is one unbreakable word, so the
+                are fixed, and "StudyQuantum" is one unbreakable word, so the
                 row's minimum width is the sum of its parts and the flex
                 container can only overflow.
 
@@ -443,11 +511,11 @@ export function Navbar({
 
         <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
           {NAV_ITEMS.slice(0, 1).map((item) => (
-            <DesktopNavLink key={item.href} item={item} pathname={pathname} />
+            <DesktopNavLink key={item.href} item={item} pathname={pathname} problemCount={problemCount} />
           ))}
           <TracksDropdown pathname={pathname} />
           {NAV_ITEMS.slice(1).map((item) => (
-            <DesktopNavLink key={item.href} item={item} pathname={pathname} />
+            <DesktopNavLink key={item.href} item={item} pathname={pathname} problemCount={problemCount} />
           ))}
         </nav>
 
@@ -518,14 +586,14 @@ export function Navbar({
                 <div
                   data-pillar={pillar}
                   className={cn(
-                    "flex items-center gap-2 rounded-[var(--radius-tight)] border px-3 py-2",
+                    "flex items-center gap-2 rounded-(--radius-tight) border px-3 py-2",
                     pillar ? "border-pillar-edge bg-pillar-wash" : "border-border bg-surface-muted"
                   )}
                 >
                   <PillarDot pillar={pillar} />
                   <p
                     className={cn(
-                      "font-tech text-[0.6875rem] font-medium uppercase tracking-[0.14em]",
+                      "tech-label",
                       pillar ? "text-pillar-text" : "text-muted-foreground"
                     )}
                   >
@@ -550,9 +618,12 @@ export function Navbar({
                 >
                   Start learning
                 </Button>
-                <p className="text-center font-tech text-[0.6875rem] uppercase tracking-[0.12em] text-subtle-foreground">
-                  First lesson{startLessonMinutes ? ` · ${startLessonMinutes} min` : ""} · no math
-                  background needed
+                {/* `tracking-[0.12em]` here was a 0.3px difference from the
+                    0.14em everywhere else at this size, which is exactly the
+                    unusable distinction the tracking tokens collapsed. */}
+                <p className="tech-label text-center text-subtle-foreground">
+                  First lesson{startLessonMinutes ? ` · ${startLessonMinutes} min` : ""} · no
+                  prerequisites
                 </p>
               </div>
 
@@ -572,7 +643,7 @@ export function Navbar({
                   the desktop dropdown does: "Mechanics" and "Mastery" are not
                   self-explanatory to someone on their first visit. */}
               <div>
-                <p className="mb-2 px-3 font-tech text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
+                <p className="tech-label mb-2 px-3 text-subtle-foreground">
                   Tracks
                 </p>
                 <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -584,7 +655,7 @@ export function Navbar({
                         aria-current={navCurrent(pathname, item.href)}
                         data-pillar={ROUTE_TO_PILLAR[item.href]}
                         className={cn(
-                          "flex h-full flex-col gap-1 rounded-[var(--radius-tight)] border px-3 py-2.5 text-sm font-medium",
+                          "flex h-full flex-col gap-1 rounded-(--radius-tight) border px-3 py-2.5 text-sm font-medium",
                           INTERACTIVE_CLASSES,
                           isActive(pathname, item.href)
                             ? "border-pillar-edge bg-surface-muted text-foreground"
@@ -605,7 +676,7 @@ export function Navbar({
               </div>
 
               <div>
-                <p className="mb-2 px-3 font-tech text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
+                <p className="tech-label mb-2 px-3 text-subtle-foreground">
                   Explore
                 </p>
                 <div className="flex flex-col gap-1">

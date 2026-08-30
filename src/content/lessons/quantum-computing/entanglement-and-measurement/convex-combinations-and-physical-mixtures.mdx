@@ -24,11 +24,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Two recipes, one indistinguishable result">
 The last lesson's worked example already produced a strange result: a 50/50 mixture of |0⟩,|1⟩ and a 50/50 mixture of |+⟩,|−⟩ gave the exact same density matrix, I/2. That wasn't a coincidence.
 </LessonHook>
 
-## Motivation
+## Not a coincidence about those four states
 
 The last lesson's worked example, where 50/50 mixtures of two different
 bases both produced $I/2$, was not a coincidence about those four states.
@@ -51,7 +51,7 @@ state is, and this lesson proves it.
   license="Public domain"
 />
 
-## Mathematical Development
+## The general mixture, and when two ensembles collide
 
 ### The general mixture
 
@@ -82,15 +82,21 @@ $$
 \tfrac12|a\rangle\langle a| + \tfrac12|b\rangle\langle b| = \tfrac12(|a\rangle\langle a|+|b\rangle\langle b|) = \tfrac12 I
 $$
 
-The last equality is the **completeness relation**: for any orthonormal
-basis, $|a\rangle\langle a|+|b\rangle\langle b|=I$, an identity derived
-back in The Bra-Ket Formalism (Mathematical Foundations) and in use ever
-since, whenever an expectation value is computed from a spectral
-decomposition. So
+The last equality is the **completeness relation**,
+$|a\rangle\langle a|+|b\rangle\langle b|=I$ for any orthonormal basis.
+This course has not needed it before, so here it is in one line. Any
+qubit state expands in the basis as
+$|v\rangle=\langle a|v\rangle|a\rangle+\langle b|v\rangle|b\rangle$, and
+applying the left-hand side to that same $|v\rangle$ gives
+$|a\rangle\langle a|v\rangle+|b\rangle\langle b|v\rangle$, which is the
+identical expansion. An operator that returns every vector unchanged is
+the identity, so the two sides are equal as operators. (The Bra-Ket
+Formalism, in Mathematical Foundations, derives the same relation for a
+space of any dimension, if you want the general version.) So
 *every* orthonormal basis, mixed 50/50, gives $I/2$: infinitely many
 different physical recipes ("flip a fair coin, prepare $|0\rangle$ or
 $|1\rangle$"; "flip a fair coin, prepare $|+\rangle$ or $|-\rangle$"; "flip
-a fair coin, prepare $|i\rangle$ or $|{-i}\rangle$"; ...), all producing
+a fair coin, prepare $|{+i}\rangle$ or $|{-i}\rangle$"; ...), all producing
 the identical <Term id="density-matrices">density matrix</Term>.
 
 ### Why this matters: ρ is the complete physical description
@@ -111,7 +117,7 @@ these do. The quantum mixture forgets its preparation recipe across a
 whole continuum of bases, and there is no classical analogue to compare
 that to.
 
-## Physical Interpretation
+## A question about physics, or about bookkeeping
 
 Given a density matrix $\rho$, asking "but which ensemble was it *really*
 prepared from?" is not a question quantum mechanics declines to answer. It
@@ -122,7 +128,7 @@ That reframes what a density matrix is. Not a record of an experimenter's
 uncertainty about some hidden true ket, but the complete physical
 description, on the same footing $|\psi\rangle$ holds for pure states.
 
-## Worked Example
+## One three-component ensemble, checked and computed
 
 **Show that the ensemble $\{(0.5,|0\rangle),(0.25,|1\rangle),(0.25,|+\rangle)\}$
 is a valid mixture (i.e., that its probabilities are legitimate), and
@@ -146,22 +152,22 @@ against `convexCombination`'s output).
 </InteractiveSection>
 
 <PredictBeforeReveal
-  question="For the 50/50 mixture of |0⟩ and |1⟩ from above (ρ = I/2), what are its purity Tr(ρ²) and von Neumann entropy S(ρ)?"
+  question="Mix |0⟩ and |+⟩ with weight 1/2 each. These are two distinct pure states, exactly as |0⟩ and |1⟩ were, but they are not orthogonal. Where does this mixture's Bloch point land?"
   options={[
-    { label: "Purity = 1, entropy = 0 (it behaves like a pure state)", value: "pure" },
-    { label: "Purity = 0.5, entropy = 1 bit (the extremes for a qubit)", value: "max-mixed" },
-    { label: "Purity = 0.75, entropy = 0.5 bits", value: "partial" },
-    { label: "Purity = 0, entropy is infinite", value: "zero" },
+    { label: "Halfway between the two components' points, inside the ball", value: "halfway" },
+    { label: "Dead center at I/2, like the |0⟩,|1⟩ mixture", value: "center" },
+    { label: "On the ball's surface, since both components are pure states", value: "surface" },
+    { label: "Nearer |+⟩, because a non-orthogonal component pulls harder than an orthogonal one", value: "nearer-plus" },
   ]}
-  correctValue="max-mixed"
-  explanation="I/2's eigenvalues are both exactly 0.5, so Tr(ρ²) = 0.5²+0.5² = 0.5 (the lowest purity any single-qubit density matrix can have) and S(ρ) = -0.5log₂0.5 - 0.5log₂0.5 = 1 bit, the largest entropy a qubit can carry. That's confirmed directly from `purity` and `vonNeumannEntropy` in densityMatrix.ts applied to I/2. Contrast that with the non-orthogonal |0⟩/|+⟩ mixture you'll build in the explorer below: because the two components overlap instead of sitting orthogonal, that mixture's purity comes out well above 0.5: mixed, but nowhere near as mixed as the maximally mixed case."
+  correctValue="halfway"
+  explanation="ρ is linear in its components and the Bloch vector is linear in ρ, so an equal-weight mixture always lands at the midpoint of its components' Bloch vectors: (0,0,1) and (1,0,0) average to (0.5, 0, 0.5), of length 1/√2 ≈ 0.71. That is off the surface but nowhere near the center, and the matrix is ρ = [[0.75, 0.25],[0.25, 0.25]] with Tr(ρ²) = 0.75. I/2 only appears when the two components sit at opposite ends of a diameter, which is what orthogonality means on the Bloch sphere: |0⟩ and |+⟩ are 90 degrees apart there, not 180."
 />
 
-<InteractiveSection title="Orthogonal vs. non-orthogonal mixtures, side by side" description="This explorer mixes just two components, enough to isolate the orthogonality question on its own. First load the 'mix-0-1' preset (50/50, orthogonal) and note the point sits exactly at the center, I/2. Then set component 1 to |0⟩ and component 2 to |+⟩ with weight 0.67 on |0⟩: this is non-orthogonal, off-center, and behaves nothing like the orthogonal case. That's the same reason the three-component worked example above lands away from I/2 too.">
+<InteractiveSection title="Orthogonal vs. non-orthogonal mixtures, side by side" description="This explorer mixes just two components, enough to isolate the orthogonality question on its own. First load the 50/50 mix of |0⟩, |1⟩ preset and note the point sits at the center, I/2. Then set component 1 to |0⟩ and component 2 to |+⟩ with weight 0.67 on |0⟩: this pair is non-orthogonal, the point lands off-center at Bloch vector (0.33, 0, 0.67), and no reweighting of these two components ever reaches the center. That's the same reason the three-component worked example above lands away from I/2 too.">
   <LazyDensityMatrixExplorer />
 </InteractiveSection>
 
-## Common Mistakes
+## Components need not be orthogonal
 
 <Callout type="note">
 **Assuming a mixture's components must be orthogonal.** They don't have
@@ -180,23 +186,181 @@ hard to tell apart.
 
 ## Practice Questions
 
-1. Verify the completeness relation $|i\rangle\langle i|+|{-i}\rangle\langle-i|=I$
-   for the $Y$-eigenbasis $|i\rangle=\frac{1}{\sqrt2}(|0\rangle+i|1\rangle)$,
+1. Verify the completeness relation $|{+i}\rangle\langle{+i}|+|{-i}\rangle\langle{-i}|=I$
+   for the $Y$-eigenbasis $|{+i}\rangle=\frac{1}{\sqrt2}(|0\rangle+i|1\rangle)$,
    $|{-i}\rangle=\frac{1}{\sqrt2}(|0\rangle-i|1\rangle)$, and conclude that
-   a 50/50 mixture of $|i\rangle,|{-i}\rangle$ also gives $I/2$.
+   a 50/50 mixture of $|{+i}\rangle,|{-i}\rangle$ also gives $I/2$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Build each projector. Remember the bra conjugates, so $|{+i}\rangle$'s
+   second component $i$ becomes $-i$ in $\langle{+i}|$:
+
+   $$
+   |{+i}\rangle\langle{+i}| = \frac12\begin{pmatrix}1\\i\end{pmatrix}\begin{pmatrix}1&-i\end{pmatrix} = \frac12\begin{pmatrix}1&-i\\i&1\end{pmatrix}, \qquad |{-i}\rangle\langle{-i}| = \frac12\begin{pmatrix}1&i\\-i&1\end{pmatrix}
+   $$
+
+   Adding them, the diagonals give $\tfrac12+\tfrac12=1$ twice and the
+   off-diagonals cancel in conjugate pairs, $-\tfrac{i}{2}+\tfrac{i}{2}=0$:
+
+   $$
+   |{+i}\rangle\langle{+i}|+|{-i}\rangle\langle{-i}| = \begin{pmatrix}1&0\\0&1\end{pmatrix} = I
+   $$
+
+   The engine returns exactly the identity for this sum, and the 50/50
+   mixture, which is half of it, comes back as $\mathrm{diag}(0.5,0.5)$.
+   That conclusion is one line: a mixture with equal weights is
+   $\tfrac12(|{+i}\rangle\langle{+i}|+|{-i}\rangle\langle{-i}|)=\tfrac12 I$.
+
+   Notice what actually did the work. The two off-diagonal entries are
+   complex conjugates of each other with opposite signs, so they cancel,
+   and the diagonals are equal, so they add to one. Nothing about the
+   specific value $i$ mattered; any orthonormal pair does the same thing,
+   which is the general statement the lesson proves. This is the third
+   distinct recipe for $I/2$ after the $Z$ and $X$ bases, and there are
+   infinitely many more, one for every axis through the Bloch sphere.
+
+   The slip to watch for is dropping the conjugate and writing
+   $\langle{+i}| = \tfrac{1}{\sqrt2}(1, i)$. That produces a matrix with
+   $+i$ in both off-diagonal slots, which is not Hermitian and therefore
+   not a projector at all, and the two "projectors" would then fail to sum
+   to $I$. The conjugate is what makes $|v\rangle\langle v|$ Hermitian for
+   complex $|v\rangle$.
+
+   </details>
+
 2. Compute the density matrix for the ensemble
    $\{(0.6,|0\rangle),(0.4,|1\rangle)\}$, and compare it to
-   $\{(0.5,|0\rangle),(0.1,|1\rangle),(0.4,|1\rangle)\}$ (splitting the
+   $\{(0.6,|0\rangle),(0.1,|1\rangle),(0.3,|1\rangle)\}$ (splitting the
    $|1\rangle$ weight into two identical-state terms). Explain why these
    two ensembles must give the same $\rho$ even though they list a
    different number of components.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Both give
+
+   $$
+   \rho = \begin{pmatrix}0.6&0\\0&0.4\end{pmatrix},
+   $$
+
+   confirmed by running `convexCombination` on each list.
+
+   The reason is that the defining sum $\rho=\sum_i p_i|\psi_i\rangle\langle\psi_i|$
+   is linear in the weights, so two terms carrying the same state simply
+   add their coefficients:
+   $0.1\,|1\rangle\langle1| + 0.3\,|1\rangle\langle1| = 0.4\,|1\rangle\langle1|$.
+   The three-term list is the two-term list with one entry written as a sum,
+   and matrix addition does not care how a coefficient was assembled. Both
+   ensembles are valid, since $0.6+0.1+0.3=1$ with all weights nonnegative.
+
+   This is a small instance of the lesson's central result, and a useful one
+   because the two ensembles really are different procedures. Imagine the
+   second one implemented as "roll a die: on 1 through 6 of a ten-sided
+   roll prepare $|0\rangle$, on 7 prepare $|1\rangle$, on 8 through 10
+   prepare $|1\rangle$ from a different machine". The lab notebooks differ,
+   the equipment differs, and the physics does not. Where the lesson's
+   $Z$-versus-$X$ example makes the point with genuinely different states,
+   this one makes it with genuinely different bookkeeping, and the
+   formalism is equally indifferent to both.
+
+   The wrong turn is expecting a three-component ensemble to be somehow
+   "more mixed" than a two-component one, on the intuition that more
+   possibilities means more uncertainty. Both have purity
+   $0.36+0.16=0.52$ and both have von Neumann entropy $0.971$ bits. The
+   number of terms in the list is a property of the description, and the
+   entropy is a property of $\rho$, which has forgotten the list entirely.
+
+   </details>
+
 3. Why does `convexCombination` reject an ensemble with probabilities
    $\{0.7,0.5\}$ (summing to 1.2) even though both are individually valid
    probabilities?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because no physical preparation procedure produces those weights. The
+   $p_i$ are the probabilities of mutually exclusive, exhaustive
+   possibilities for what the source prepared, so they must sum to exactly
+   $1$. A total of $1.2$ says the machine prepares something $120\%$ of the
+   time, which is not a statement about a system. The engine refuses with
+   `convexCombination requires probabilities summing to 1, got 1.2`.
+
+   The consequence in the matrix is concrete rather than philosophical. The
+   trace of the result would be $\sum_i p_i = 1.2$, not $1$, so
+   $\text{Tr}(\rho P)$ over a complete set of projectors would sum to
+   $1.2$: measurement probabilities adding to more than one. Every formula
+   downstream, expectation values, purity thresholds, entropy, is built on
+   $\text{Tr}(\rho)=1$, so a matrix that violates it silently poisons all
+   of them. Rejecting at construction is cheaper than debugging an entropy
+   of $1.15$ bits three lessons later.
+
+   The check has two halves and both are needed. Negative weights are
+   rejected as well, and they are the more insidious failure: an ensemble
+   like $\{1.5, -0.5\}$ sums to $1$ and would pass a trace test, yet it can
+   produce a matrix with a negative eigenvalue, meaning a negative
+   probability for some measurement outcome. Nonnegative and summing to one
+   are exactly the two conditions that make the combination *convex*, which
+   is what guarantees the result lands inside the Bloch ball rather than
+   outside it.
+
+   The wrong turn is thinking the constraint is a normalization convention
+   that could be fixed by dividing through by $1.2$. Rescaling does produce
+   a valid density matrix, $\{0.583, 0.417\}$, but it is a different
+   ensemble from the one that was asked for, and silently substituting it
+   would hide a genuine error in the caller's reasoning about their own
+   experiment.
+
+   </details>
+
 4. Two experimenters prepare qubits by different physical processes but
    both end up with $\rho=I/2$. Can any measurement, however precise,
    determine which process was used on a given qubit? Justify your answer
-   using this lesson's central result.
+   using this lesson's central result. Then say what *would* distinguish
+   the two procedures, and why that thing is not a property of the qubit.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No measurement on the qubit can. Every prediction quantum mechanics
+   makes about it is computed from $\rho$ through
+   $\langle A\rangle=\text{Tr}(\rho A)$ or $\text{Tr}(\rho P)$, and both
+   experimenters hand you the same $\rho$. Identical input, identical
+   output, for every observable in every basis, on any number of copies.
+   The ensemble, the coins, the equipment: none of it appears anywhere in
+   the formalism after $\rho$ is formed.
+
+   What does distinguish the procedures is a record, and the record is not
+   part of the qubit. Suppose the first experimenter wrote down which of
+   $|0\rangle,|1\rangle$ she prepared and the second wrote down which of
+   $|+\rangle,|-\rangle$ he prepared. Those notes are correlated with their
+   respective qubits in different ways, and an experiment on the *pair*,
+   note plus qubit, separates the two situations easily: reading note one
+   and then measuring in the $Z$ basis gives perfect agreement, while
+   reading note two and measuring in $Z$ gives a coin flip. The
+   distinguishing information exists; it lives in a second system.
+
+   That is the honest resolution, and it says something about what a
+   reduced description is. $I/2$ is what you have when you hold the qubit
+   and not the record. Hand over the record too and the joint object is no
+   longer $I/2$ on its own; it is a correlated two-system state, and $I/2$
+   is what you get by tracing the record away, which is the operation the
+   next lesson builds. Destroy the record and there is nothing left to
+   find, in principle and not merely in practice.
+
+   The reasoning to avoid is "one of them is really $|0\rangle$ or
+   $|1\rangle$, so the fact of the matter exists and we simply cannot get
+   at it". Once the record is gone, the two preparations are the same state
+   in the strongest sense the theory allows, and treating the ensemble as a
+   hidden fact about the qubit predicts a distinguishing experiment that
+   provably does not exist. Also worth avoiding is the opposite
+   overcorrection, that nothing anywhere could ever tell them apart: the
+   record does, which is exactly why the qubit alone does not.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -213,7 +377,7 @@ hard to tell apart.
 - $\rho$ is the complete physical description of a quantum state; the
   preparation ensemble is not independently physically meaningful.
 
-## Further Exploration
+## Answering the question this course opened with
 
 <NextDiscovery>
 [Partial Trace and Reduced States](/lessons/quantum-computing/entanglement-and-measurement/partial-trace-and-reduced-states) is the tool that finally

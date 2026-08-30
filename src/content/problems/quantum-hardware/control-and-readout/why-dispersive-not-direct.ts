@@ -20,16 +20,28 @@ export const whyDispersiveNotDirect: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["disturb", "uncontrolled", "collapse"],
-      ["resonator", "indirect", "dispersive", "coupled"],
+      {
+        phrases: ["disturb", "uncontrolled", "collapse"],
+        missingFeedback:
+          "Name the risk. Say what going straight at the qubit's energy levels does to the qubit you are trying to read.",
+      },
+      {
+        phrases: ["resonator", "indirect", "dispersive", "coupled"],
+        missingFeedback:
+          "You have named the risk. Now say what the technique measures instead of the qubit, and how that keeps the probe off the qubit itself.",
+      },
     ],
-    incorrectFeedback: "Address both the specific risk of direct probing, and how coupling to a separate resonator sidesteps it.",
-    partialFeedback: "Good — now be explicit that the resonator's frequency, not the qubit's energy levels, is what's actually measured.",
+    incorrectFeedback: "Two things need saying. First, what goes wrong if you interrogate the qubit's own transition head-on, in terms of what a strong interaction does to the state you were trying to read. Second, the specific trick that avoids it: what object is actually probed instead, and why probing that object still tells you the qubit's state.",
+    partialFeedback: "Good. Now be explicit that the quantity actually measured belongs to the cavity, not to the qubit: the cavity's resonance sits at a different frequency depending on which state the qubit is in.",
+    modelAnswers: [
+      "Probing the qubit's levels directly risks disturbing the qubit in an uncontrolled way. Dispersive readout avoids that by measuring a coupled resonator instead, reading its state-dependent frequency shift rather than the qubit itself.",
+      "Direct probing means poking the qubit itself, which can collapse or disturb it unpredictably. The dispersive scheme is indirect: you interrogate the resonator the qubit is coupled to, so the probe never touches the qubit.",
+    ],
   },
   hints: [
-    { text: "Directly probing the qubit's energy levels means interacting strongly with the qubit itself." },
-    { text: "This risks disturbing or fully collapsing the state in an uncontrolled way." },
-    { text: "Dispersive readout couples the qubit weakly (off-resonantly) to a separate resonator, and measures the RESONATOR's frequency shift instead." },
+    { text: "Interrogating the qubit's own transition head-on means driving it strongly." },
+    { text: "Ask what a strong drive does to a state you were trying to leave alone." },
+    { text: "Now consider putting a cavity beside the qubit, weakly and off-resonantly, and reading the cavity instead. What about the cavity would depend on the qubit's state?" },
   ],
   solution: {
     steps: [
@@ -41,7 +53,7 @@ export const whyDispersiveNotDirect: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "This is the lesson's central engineering motivation, stated as a precise risk-avoidance mechanism rather than a vague 'it's gentler' claim.",
-    whyCorrect: "Matches the lesson's Engineering Development section directly.",
-    whyWrong: ["Saying dispersive readout is 'more accurate' misses the actual point — it's about avoiding disturbance, not primarily about accuracy."],
+    whyCorrect: "The cavity's resonance shifts by ±χ depending on the qubit state, so probing the cavity reads the qubit without driving it.",
+    whyWrong: ["Saying dispersive readout is 'more accurate' misses the point. It is about avoiding disturbance, not primarily about accuracy."],
   },
 };

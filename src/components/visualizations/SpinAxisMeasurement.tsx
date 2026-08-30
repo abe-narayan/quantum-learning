@@ -100,9 +100,17 @@ export function SpinAxisMeasurement({
       : `Measured ${outcome === 1 ? "+n̂" : "−n̂"}: the state has collapsed onto that axis's own eigenstate.`;
 
   return (
-    <div className="not-prose space-y-4 panel-inset p-4 sm:p-5" aria-label={ariaLabel}>
+    // The caller's `ariaLabel` used to sit on this wrapper as a bare
+    // `aria-label` with no `role`. A plain `<div>` maps to the generic role,
+    // and `aria-label` on a generic element is dropped from the accessibility
+    // tree by every current engine, so the one sentence describing what this
+    // figure *is* was announced nowhere: the `<svg role="img">` below built its
+    // own label from scratch and never included it. It now leads that label,
+    // which is the element that actually gets named. The wrapper carries no
+    // role, so adding one here would only announce the figure twice.
+    <div className="not-prose space-y-4 panel-inset p-4 sm:p-5">
       <div className="flex justify-center">
-        <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={`Bloch circle. Input state at angle ${inputTheta.toFixed(2)} radians from |0⟩. Measurement axis at angle ${axisTheta.toFixed(2)} radians. ${narration}`} className="w-full max-w-[260px]">
+        <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={`${ariaLabel} Bloch circle. Input state at angle ${inputTheta.toFixed(2)} radians from |0⟩. Measurement axis at angle ${axisTheta.toFixed(2)} radians. ${narration}`} className="w-full max-w-[260px]">
           {/* The Bloch circle is the plotted region: every vector here is
               meaningful only as a direction on it, and the collapsed state
               landing *on* it is the postulate being demonstrated.
@@ -161,7 +169,25 @@ export function SpinAxisMeasurement({
             setOutcome(null);
             setAxisTheta(Number(e.target.value));
           }}
-          aria-label="Measurement axis angle theta, in radians from the Z axis"
+          // Two fixes on one control.
+          //
+          // `aria-valuetext`: this slider's `value` is radians (0 to π in
+          // steps of 0.01) while the readout beside its label is degrees, so a
+          // screen reader announced "1.05" for the "60°" on screen and nothing
+          // in the figure reconciled the two. The `aria-live` narration at the
+          // bottom carries P(+n̂) and P(−n̂) but never the angle. `valuetext`
+          // now speaks exactly the number the eye sees, with the radian value
+          // after it since the axis label and the SVG description both use
+          // radians.
+          //
+          // The visible label reads "Measurement axis angle θ", and an
+          // `aria-label` overrides it wholesale, so spelling the glyph out as
+          // "theta" left the accessible name without the visible string in it
+          // (WCAG 2.1 SC 2.5.3, Label in Name): a voice-control user saying
+          // what they can read did not match. The glyph now leads and the
+          // spelled-out form follows it.
+          aria-label="Measurement axis angle θ (theta), measured from the Z axis"
+          aria-valuetext={`${((axisTheta * 180) / Math.PI).toFixed(0)} degrees, ${axisTheta.toFixed(2)} radians from the Z axis`}
           className="mt-2 h-11 w-full accent-brand"
         />
       </label>
@@ -208,7 +234,7 @@ export function SpinAxisMeasurement({
         </button>
       </div>
 
-      <div aria-live="polite" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      <div aria-live="polite" aria-atomic="true" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {narration}
       </div>
     </div>

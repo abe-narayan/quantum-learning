@@ -31,7 +31,7 @@ export const nearPureEntropyCalculation: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "First find the eigenvalues via the quadratic formula, using a=0.6, d=0.4, z=0.48 — they should be close to 1 and 0, but not exactly.",
+    incorrectFeedback: "First find the eigenvalues via the quadratic formula, using a=0.6, d=0.4, z=0.48. They come out close to 1 and 0 without reaching them.",
     nearMisses: [
       {
         value: 0,
@@ -49,18 +49,18 @@ export const nearPureEntropyCalculation: NumericProblem = {
   hints: [
     { text: "Use λ± = (a+d)/2 ± √(((a-d)/2)² + z²) with a=0.6, d=0.4, z=0.48." },
     { text: "(a+d)/2 = 0.5, and ((a-d)/2)²+z² = 0.01+0.2304 = 0.2404." },
-    { text: "√0.2404 ≈ 0.4903, giving eigenvalues ≈ 0.9903 and ≈ 0.0097 — close to a pure state, but not exactly." },
+    { text: "Take the square root and form both eigenvalues. They land very close to 1 and 0, so the smaller one dominates the entropy sum: the term −λ log₂λ is tiny for λ near 1 but not for λ near 0." },
   ],
   solution: {
     steps: [
       { description: "Eigenvalues: $\\lambda_\\pm = 0.5\\pm\\sqrt{0.01+0.2304}=0.5\\pm0.4903$, giving $\\lambda_+\\approx0.9903,\\lambda_-\\approx0.0097$." },
       { description: "$S = -0.9903\\log_2(0.9903)-0.0097\\log_2(0.0097) \\approx 0.014+0.065$", latex: "S \\approx 0.079 \\text{ bits}" },
     ],
-    finalAnswer: "S ≈ 0.079 bits — small, since this ρ is close to (but not exactly) a pure state.",
+    finalAnswer: "S ≈ 0.079 bits, small because this ρ is close to a pure state without being one.",
   },
   explanation: {
     correctIdea: "This matrix's off-diagonal entry (0.48) is close to, but slightly below, the value (√0.24≈0.4899) that would make it exactly pure.",
-    whyCorrect: "The eigenvalues (≈0.99, ≈0.01) are close to (1,0), giving small but nonzero entropy — not exactly 0.",
+    whyCorrect: "The eigenvalues (≈0.99, ≈0.01) are close to (1,0), giving small but nonzero entropy rather than 0.",
     whyWrong: ["Answering exactly 0 would incorrectly assume this matrix is exactly pure, but its off-diagonal entry (0.48) doesn't quite reach the value needed for that."],
   },
 };

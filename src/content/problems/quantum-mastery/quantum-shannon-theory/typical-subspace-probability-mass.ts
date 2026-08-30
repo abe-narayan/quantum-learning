@@ -32,8 +32,8 @@ export const typicalSubspaceProbabilityMass: NumericProblem = {
   },
   hints: [
     { text: "Mean type: np = 4 * 0.9 = 3.6." },
-    { text: "Standard deviation: sqrt(np(1-p)) = sqrt(4 * 0.9 * 0.1) = sqrt(0.36) = 0.6, so the typical range is [3.0, 4.2] -- exactly k=3 and k=4." },
-    { text: "P(3) = C(4,3) * 0.9^3 * 0.1^1 = 4 * 0.729 * 0.1 = 0.2916. P(4) = C(4,4) * 0.9^4 = 0.6561. Sum them." },
+    { text: "The binomial standard deviation is sqrt(np(1-p)). Work it out, step one deviation either side of the mean, and list the integer k values that land inside that window." },
+    { text: "Feed each surviving k back into the binomial formula the prompt gives, and add the results. Only a couple of terms are involved, and the rest of the distribution is discarded, which is the whole content of a typical set." },
   ],
   solution: {
     steps: [
@@ -46,9 +46,9 @@ export const typicalSubspaceProbabilityMass: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "Even at the very small n=4, defining the typical set as types within one standard deviation of the mean already captures the overwhelming majority of the joint Schmidt weight -- the same concentration phenomenon the lesson's own n=6 worked example demonstrates numerically.",
+      "Even at n=4, defining the typical set as types within one standard deviation of the mean already captures the overwhelming majority of the joint Schmidt weight. That is the same concentration phenomenon the lesson's n=6 worked example demonstrates numerically.",
     whyCorrect:
-      "The joint Schmidt coefficients of |psi>^{\\otimes n} are exactly binomially distributed by type k (number of copies in the |00> branch), so this is a direct application of the binomial distribution's own concentration around its mean np, the same law of large numbers argument behind the general 2^(nH(p)) asymptotic formula.",
+      "The joint Schmidt coefficients of n independent copies of |psi> are exactly binomially distributed by type k (number of copies in the |00> branch), so this is a direct application of the binomial distribution's own concentration around its mean np, the same law of large numbers argument behind the general 2^(nH(p)) asymptotic formula.",
     whyWrong: [
       "Including all five types k=0..4 in the sum gives 1 (the whole distribution), which misses the point of restricting to the typical set specifically.",
       "Using the wrong standard deviation formula (e.g. sqrt(n) alone, ignoring p(1-p)) gives a typical range that doesn't match the one the lesson's own n=6 example uses.",

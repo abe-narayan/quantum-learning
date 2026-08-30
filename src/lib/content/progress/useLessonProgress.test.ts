@@ -51,7 +51,7 @@ describe("useLessonProgress module-scope storage listener", () => {
     subscribe(listener);
 
     fakeWindow.fireStorage({
-      key: "quantumlearn:lesson-progress:some-lesson",
+      key: "studyquantum:lesson-progress:some-lesson",
       newValue: JSON.stringify({ completed: true, completedAt: 1 }),
     });
 
@@ -66,7 +66,7 @@ describe("useLessonProgress module-scope storage listener", () => {
     const listener = vi.fn();
     subscribe(listener);
 
-    fakeWindow.fireStorage({ key: "quantumlearn:problem-progress:some-problem", newValue: "{}" });
+    fakeWindow.fireStorage({ key: "studyquantum:problem-progress:some-problem", newValue: "{}" });
 
     expect(listener).not.toHaveBeenCalled();
   });

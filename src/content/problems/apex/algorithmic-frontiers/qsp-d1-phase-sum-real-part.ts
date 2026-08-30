@@ -50,7 +50,7 @@ export const qspD1PhaseSumRealPart: NumericProblem = {
     finalAnswer: "Re(P(0.4)) = 0.200",
   },
   explanation: {
-    correctIdea: "For d=1, tuning the phases only ever multiplies the underlying shape x by an overall unit-modulus complex phase e^{i(phi0+phi1)} -- it never changes x into a different real shape.",
+    correctIdea: "For d=1, tuning the phases only ever multiplies the underlying shape x by an overall unit-modulus complex phase e^{i(phi0+phi1)}. It never turns x into a different real shape.",
     whyCorrect: "This is the direct payoff of the lesson's fully symbolic derivation: the (0,0) entry factors exactly as a phase times x, so its real part is just x times the cosine of the phase sum.",
     whyWrong: ["Forgetting to take only the real part (reporting the full complex magnitude, |P(0.4)|=0.4, instead) misses that phi0+phi1=pi/3 is not a multiple of pi, so P(0.4) is genuinely complex, not real."],
   },

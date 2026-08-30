@@ -56,7 +56,7 @@ export const lessonMeta = {
   objectives: [
     "Summarize how Kraus operators, decoherence, and the path integral each extend or reframe the operator formalism from earlier courses",
     "State clearly what decoherence explains and what it leaves open about measurement",
-    "Identify where each of this course's tools will reappear in the Quantum Computing pillar (error correction, noise, hardware)",
+    "Identify where each of this course's tools will reappear in the Quantum Computing track (error correction, noise, hardware)",
   ],
 };
 
@@ -64,7 +64,7 @@ export const lessonMeta = {
 Decoherence explains why coherent superpositions do not survive contact with an environment, and this course computed that decay rather than asserting it. It does not explain why a measurement yields one definite outcome rather than a mixture of possibilities. That question is still open, and saying so is part of the subject.
 </LessonHook>
 
-## Motivation
+## What this course added, and what it deliberately skipped
 
 This course deliberately avoided re-deriving density matrices,
 entanglement, or Bell inequalities. Entanglement, Mixed States & Bell
@@ -84,7 +84,7 @@ open questions leaves us.
   license="Public domain"
 />
 
-## Synthesis
+## Closed to open, operators to paths
 
 ### From closed to open systems
 
@@ -107,8 +107,8 @@ conclusion off it.
 <PredictBeforeReveal
   question="Amplitude damping eventually returns the qubit to a pure state, |0⟩. Does that mean the channel is reversible, so that some operation could recover the original |+⟩?"
   options={[
-    { label: "Yes: it ends on a pure state, so no information was lost", value: "reversible" },
-    { label: "No: every input state ends at |0⟩, so nothing distinguishes them afterwards", value: "irreversible" },
+    { label: "Yes: it ends on a pure state, so no information can have been lost", value: "reversible" },
+    { label: "No: every input state ends at |0⟩, so the map is many-to-one", value: "irreversible" },
     { label: "Only for small γ, where the state has not moved far", value: "small-gamma" }
   ]}
   correctValue="irreversible"
@@ -124,7 +124,7 @@ Watch both channels at once as the coupling strength $\eta$ varies:
   <ParametricCurve
     frames={capstoneFrames}
     sliderLabel="Coupling strength η"
-    ariaLabel="Purity of a qubit starting in |+> under repeated amplitude damping versus repeated dephasing, as the number of channel applications grows, for several coupling strengths"
+    ariaLabel="Two purity curves against the number of channel applications, 0 to 30, both starting from |+> at purity 1, with a slider for the coupling strength eta. The dephasing curve falls without ever turning back and flattens onto 0.5: at eta 0.1 it is still 0.56 after ten applications, at eta 0.7 it has arrived by the third. The amplitude damping curve instead sags to about 0.875 and climbs back to 1. Raising eta slides that dip earlier, from step 7 at eta 0.1 to step 1 at eta 0.5, without making it appreciably deeper."
   />
 </InteractiveSection>
 
@@ -133,7 +133,7 @@ mixture at <Term id="von-neumann-entropy-purity">purity</Term> $0.5$, the maxima
 destroys phase *and* drains population toward one specific pure state, so
 its purity recovers to $1$.
 
-The two are structurally different, not two labels for the same process,
+The two are structurally different processes that happen to share a name,
 and the pair makes a useful point about vocabulary. "Decoherence" is
 sometimes used as a synonym for purity loss, and these two channels show
 why that identification fails: both destroy the superposition
@@ -141,11 +141,10 @@ irreversibly, and only one of them leaves a mixed state behind.
 
 ### From operators to paths
 
-The path integral is a different formulation altogether, not an
-extension in the same sense as Kraus operators are. It computes the
-same physical predictions (transition amplitudes) via a completely
-different mathematical object: a sum over histories, rather than an
-operator acting on a state. This course verified their consistency in
+Where Kraus operators extend the formalism, the path integral replaces
+it. It computes the same physical predictions (transition amplitudes)
+through a completely different mathematical object: a sum over histories,
+where the operator picture has an operator acting on a state. This course verified their consistency in
 one specific, tractable case (the free particle, Euclidean time) via
 the Chapman-Kolmogorov composition law, rather than asserting the
 equivalence in general.
@@ -160,9 +159,9 @@ with an environment. That is a computed, checkable result, and this
 course produced the numbers.
 
 It does not explain why a measurement yields one definite outcome. After
-full decoherence the state is a probabilistic mixture, and a mixture is a
-description of not knowing which outcome occurred, not an account of one
-occurring. Getting from "one of these, unknown" to "this one" requires
+full decoherence the state is a probabilistic mixture, and a mixture only
+ever describes not knowing which outcome occurred. Where in it does one
+outcome actually occur? Getting from "one of these, unknown" to "this one" requires
 something the formalism above does not supply.
 
 What fills the gap is a choice of interpretation, and the candidates
@@ -174,7 +173,7 @@ testable in principle. This course takes no position, and the honest
 summary is that a century of work has made the question sharper without
 settling it.
 
-## Where This Goes Next
+## Where this goes next
 
 - **Kraus operators and decoherence** reappear in Quantum Computing's
   **Error Correction & Fault Tolerance**, which is the answer to why
@@ -187,7 +186,7 @@ settling it.
   simulation and certain quantum algorithm analyses, previewed but not
   developed further in this platform's current scope.
 
-## Common Mistakes
+## Decoherence does not reach that far
 
 <Callout type="mistake">
 **Treating decoherence as "solving" the measurement problem.** Decoherence
@@ -208,15 +207,134 @@ fundamental" than the other.
 1. In one sentence each, state what a Kraus channel generalizes, and
    what the path integral reframes, using this course's specific
    terminology.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   A Kraus channel $\rho\to\sum_kK_k\rho K_k^\dagger$ generalizes unitary
+   evolution $\rho\to U\rho U^\dagger$ from closed systems to open ones,
+   with the unitary case recovered as the single-operator instance
+   $K_0=U$.
+
+   The path integral reframes the whole formulation: it computes the same
+   transition amplitudes as a sum over every history weighted by
+   $e^{iS/\hbar}$, in place of an operator acting on an evolving state.
+
+   The pairing is worth keeping distinct, because the two additions are
+   different in kind. The Kraus form is a strict *extension*: it produces
+   maps no unitary can, so it makes predictions the earlier framework
+   could not make, and the purity curves are the evidence. The path
+   integral is a *reformulation*: it predicts nothing new, agrees on
+   everything, and earns its place by making different facts obvious.
+   Confusing the two leads to asking which formulation is correct, which
+   is not a question either one answers.
+
+   </details>
+
 2. Why is "decoherence solves the measurement problem" an overclaim, per
    this course's explicit discussion?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because decoherence delivers a mixture, and a mixture is a statement
+   about not knowing which outcome obtains rather than an account of one
+   obtaining.
+
+   The two claims separate cleanly, and it is worth having both in front
+   of you.
+
+   What decoherence does establish, with numbers this course computed: a
+   superposition in contact with an environment loses its off-diagonal
+   density-matrix elements geometrically fast, the resulting state is
+   experimentally indistinguishable from a classical probability
+   distribution, and the basis that survives is fixed by the coupling
+   rather than by anyone's choice. That is a real result and it disposes
+   of the cat.
+
+   What it does not establish: that one outcome occurs. The dynamics
+   producing the mixture were linear and unitary on system plus
+   environment, and no branch was discarded at any step. Nothing in the
+   calculation converts "one of these, unknown" into "this one," and there
+   is no line of it where that conversion could be inserted.
+
+   The gap is filled only by choosing an interpretation, and the
+   candidates disagree rather than refine each other: Copenhagen takes
+   collapse as primitive, many-worlds denies there is a unique outcome
+   needing explanation, and objective-collapse models change the dynamics
+   and are testable in principle for exactly that reason.
+
+   The overclaim is common enough to be worth naming as a habit rather
+   than a slip. A tidy final density matrix is persuasive, and it is easy
+   to let the arrival of a familiar-looking classical object stand in for
+   a derivation of classical definiteness.
+
+   </details>
+
 3. Name the two specific engine functions from this course that will be
    reused directly (not re-derived) in the future Noise, Decoherence &
    Scaling course.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   `amplitudeDampingChannel` and `dephasingChannel`.
+
+   They are reused rather than rebuilt because they are already the
+   quantities that course measures. Amplitude damping is energy relaxation
+   toward $|0\rangle$, whose time constant is $T_1$; dephasing is phase
+   randomization at fixed populations, whose time constant is $T_2$. The
+   $\gamma$ and $\lambda$ parameters this course slid around are those
+   decay rates in dimensionless form, so the abstract channel and the
+   number quoted on a device datasheet are the same object.
+
+   That is also why the ordering $T_2\le 2T_1$ holds on real hardware:
+   losing energy destroys phase as a side effect, so the dephasing
+   timescale can never much exceed twice the relaxation one, while pure
+   dephasing can and does make it shorter.
+
+   </details>
+
 4. Looking back across this entire course, which single numerical result
    most convincingly demonstrates that "sum over paths" and "solve the
    Schrödinger equation" give the same physics, in the one case actually
    tested here?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The Chapman-Kolmogorov check: the discretized two-slice path sum for
+   $x_f=3$, $x_i=-1$, $\tau=2$ matched the closed-form Euclidean
+   propagator to a relative difference of about $1.3\times10^{-15}$.
+
+   What makes it evidence rather than a tautology is where the two sides
+   come from. The right-hand side was built by the path-integral recipe:
+   integrate over every intermediate position, summing amplitudes for
+   two-segment histories. The left-hand side is the free-particle
+   propagator in closed form, which is a solution of the imaginary-time
+   Schrödinger equation. Two constructions with no step in common,
+   agreeing to machine precision.
+
+   Being honest about the strength of the test matters more here than
+   claiming the win, and the lesson is careful about this. It is one case,
+   and a friendly one. The particle is free, so there is no potential; the
+   time is Euclidean, so there are no oscillatory phases to cancel; and
+   the identity being checked is at bottom a Gaussian convolution, which
+   is exact for any number of slices rather than converging as slices are
+   added. So it confirms that the construction is correctly implemented
+   and reproduces the known answer. It does not test the equivalence where
+   the equivalence is hard, which is with an interacting potential in real
+   time, and this course states the general equivalence rather than
+   proving it.
+
+   That is worth appreciating as a pattern rather than a limitation. A
+   check you can actually run on a system you already know the answer to
+   is how you calibrate a method before pointing it at something unknown,
+   the same move the time-dependent perturbation theory lesson made when
+   it put Runge-Kutta beside a first-order formula on a two-level system
+   nobody needed either for.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -231,15 +349,15 @@ fundamental" than the other.
   resolve which single outcome is observed upon measurement, an honest,
   explicitly-stated open question.
 - This course's Kraus-channel machinery is built to be reused directly in
-  the Quantum Computing pillar's hardware-noise and error-correction
-  courses, not just as a one-off demonstration.
+  the Quantum Computing track's hardware-noise and error-correction
+  courses, where it does real work well beyond this one demonstration.
 
-## Further Exploration
+## The end of the track, and the tracks beside it
 
 <NextDiscovery>
 This closes **Advanced Topics in Quantum Mechanics**, and the entire
-Quantum Mechanics pillar. The Quantum Hardware and Quantum Software
-pillars (Physical Qubit Platforms, Control & Readout, Noise, Decoherence
+Quantum Mechanics track. The Quantum Hardware and Quantum Software
+tracks (Physical Qubit Platforms, Control & Readout, Noise, Decoherence
 & Scaling, Programming Quantum Computers, Simulating Quantum Systems,
 Compilation & Hybrid Algorithms) pick up directly from here, applying
 this course's decoherence machinery to real hardware constraints.

@@ -58,7 +58,7 @@ export const jordanWignerPresets = [
       { label: "a₁ = σ⁻⊗I (unchanged)", cells: matrixToCells(jwA1) },
       { label: "a₂ = I⊗σ⁻ (no Z)", cells: matrixToCells(naiveA2) },
       { label: "a₂† = I⊗σ⁺ (no Z)", cells: matrixToCells(naiveA2Dagger) },
-      { label: "{a₁,a₂†}, naive — NOT zero", cells: matrixToCells(naiveAnticommutatorA1A2Dagger), highlightDiagonal: true }
+      { label: "{a₁,a₂†}, naive: NOT zero", cells: matrixToCells(naiveAnticommutatorA1A2Dagger), highlightDiagonal: true }
     ]
   }
 ];
@@ -66,7 +66,7 @@ export const jordanWignerPresets = [
 export const lessonMeta = {
   title: "Quantum Simulation of Molecules",
   description:
-    "The electronic structure problem's combinatorial Hilbert space made concrete, then a fully explicit 2-mode Jordan-Wigner mapping built from this platform's own Matrix/Complex primitives and verified numerically (not just asserted) to satisfy {a₁,a₂†}=0, framing VQE and phase estimation as this field's two honestly-scoped paths toward a real, near-term-plausible quantum advantage.",
+    "The electronic structure problem's combinatorial Hilbert space made concrete, then a fully explicit 2-mode Jordan-Wigner mapping built from this platform's own Matrix/Complex primitives and verified numerically (not just asserted) to satisfy {a₁,a₂†}=0, framing VQE and phase estimation as this field's two honestly-scoped paths toward a near-term-plausible quantum advantage.",
   course: "simulation-and-compilation-frontiers",
   module: "quantum-simulation-of-molecules",
   order: 5,
@@ -76,12 +76,12 @@ export const lessonMeta = {
   objectives: [
     "State the electronic structure problem precisely: finding the ground-state energy of a molecular Hamiltonian (electrons in the Coulomb field of fixed nuclei, the Born-Oppenheimer approximation), and explain why this is believed classically hard for all but small/special molecules",
     "Explain the second-quantized molecular Hamiltonian and the Jordan-Wigner transformation for mapping fermionic creation/annihilation operators to qubit Pauli operators, verifying the mapping preserves the fermionic anticommutation relations on a small explicit example",
-    "Explain the two main quantum algorithmic approaches, VQE (variational, NISQ-friendly) and quantum phase estimation (fault-tolerant, asymptotically superior), and state honestly, with real numbers where possible, the qubit/gate-count scale needed for classically-hard, chemically-significant molecules",
+    "Weigh the two main quantum algorithmic approaches, VQE (variational, NISQ-friendly) and quantum phase estimation (fault-tolerant, asymptotically superior), and state honestly, with real numbers where possible, the qubit/gate-count scale needed for classically-hard, chemically-significant molecules",
   ],
   related: [
     {
       slug: "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization",
-      note: "That lesson's first-order Trotter product formula and its derived error bound are exactly the circuit-cost machinery this lesson's phase-estimation approach depends on: 'simulate e^{-iHt}' here literally means running that lesson's Trotter steps on the Jordan-Wigner-mapped molecular Hamiltonian.",
+      note: "That lesson's first-order Trotter product formula and its derived error bound are exactly the circuit-cost machinery this lesson's phase-estimation approach depends on: 'simulate e^(-iHt)' here literally means running that lesson's Trotter steps on the Jordan-Wigner-mapped molecular Hamiltonian.",
     },
     {
       slug: "quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation",
@@ -92,37 +92,41 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="The problem classical computers are believed to lose">
   Real, industrially important molecules are believed to defeat every
-  known classical method — and the physical answer, a ground-state
-  energy in real chemical units, is something a pharmaceutical or
-  fertilizer company would pay for today.
+  known classical method. The physical answer, a ground-state energy in
+  real chemical units, is something a pharmaceutical or fertilizer
+  company would pay for today.
 </LessonHook>
 
-## Motivation
+## An Algorithm Judged by Chemistry
 
 Every quantum algorithm this platform has built so far has been judged
-against a classical baseline that, for most problems, is already
-extremely good. Molecular electronic structure is different: the
-quantum approach doesn't require solving any new open theoretical
-problem. This is why
-quantum simulation of molecules is the example most frequently cited,
-across the whole field, as the first plausible large-scale
-practical use of a fault-tolerant quantum computer.
+against a classical baseline that, for most problems, is already very
+good, and the honest verdict has usually been "no proven advantage on a
+problem anyone needs solved." Molecular electronic structure is the one
+place where both halves of the argument are unusually solid at once: a
+narrow but economically real class of molecules where classical methods
+are believed to fail, and a quantum route whose asymptotic cost is
+already understood without resolving any further open question in
+complexity theory. That is why quantum simulation of molecules is the
+example most frequently cited, across the whole field, as the first
+plausible large-scale practical use of a fault-tolerant quantum
+computer.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/6/60/FeMoco_cluster.svg"
   alt="Structural diagram of the FeMo-cofactor, the iron-molybdenum-sulfur active-site cluster of the nitrogenase enzyme"
-  caption="The FeMo-cofactor (MoFe7S9C, plus a homocitrate ligand): nitrogenase's active site, and the single most frequently cited example in the quantum-simulation resource-estimation literature of a real, industrially significant molecule believed to need a fault-tolerant quantum computer, not classical methods, to simulate accurately. Understanding it better bears directly on industrial nitrogen fixation, one of the most energy-intensive processes in modern agriculture."
+  caption="The FeMo-cofactor (MoFe7S9C, plus a homocitrate ligand): nitrogenase's active site, and the single most frequently cited example in the quantum-simulation resource-estimation literature of an industrially significant molecule believed to need a fault-tolerant quantum computer, not classical methods, to simulate accurately. Understanding it better bears directly on industrial nitrogen fixation, one of the most energy-intensive processes in modern agriculture."
   credit="Smokefoot / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:FeMoco_cluster.svg"
   license="Public domain"
 />
 
-## Mathematical Development
+## From Electrons to Qubits via Jordan-Wigner
 
 ### The electronic structure problem
 
-Fix the nuclei of a molecule at classical point-charge positions — the
-**Born-Oppenheimer approximation**, justified because nuclei are
+Fix the nuclei of a molecule at classical point-charge positions. This is
+the **Born-Oppenheimer approximation**, justified because nuclei are
 thousands of times heavier than electrons (a proton outweighs an
 electron by a factor of about 1836) and therefore move far more slowly,
 so on the electrons' own timescale the nuclear positions look static.
@@ -141,7 +145,7 @@ Hamiltonian's ground-state energy is the electronic structure problem.
 Why is this believed hard classically? For $n$ electrons distributed
 among $m$ available spin-orbitals, the antisymmetric many-electron
 Hilbert space (the space of Slater determinants) has dimension
-$\binom{m}{n}$ — a combinatorial, not linear, growth in system size.
+$\binom{m}{n}$, a combinatorial rather than linear growth in system size.
 Classical quantum chemistry has excellent tools here: Hartree-Fock
 (mean-field, ignores most electron correlation), coupled-cluster methods
 like CCSD(T) (systematically better, and often called the classical
@@ -149,15 +153,15 @@ like CCSD(T) (systematically better, and often called the classical
 uncertain accuracy when it fails) all give good **approximations** for
 a huge range of molecules using only polynomial classical resources.
 The believed-hard regime is narrower but real and industrially
-important: **strongly correlated** systems — certain transition-metal
-catalysts, or a bond stretched partway through breaking — where reaching
+important: **strongly correlated** systems (certain transition-metal
+catalysts, or a bond stretched partway through breaking), where reaching
 **chemical accuracy** (about 1 kcal/mol, i.e. roughly 1.6 milli-Hartree,
 the standard target for a result to be chemically meaningful) is
 believed to require classical resources scaling exponentially with
-system size. A fault-tolerant quantum computer is conjectured — this is
-the real, specific hope motivating this entire research direction — to
-handle exactly this strongly correlated regime in polynomial time, via
-Hamiltonian simulation.
+system size. A fault-tolerant quantum computer is conjectured to handle
+exactly this strongly correlated regime in polynomial time, via
+Hamiltonian simulation. That conjecture is the specific hope motivating
+this entire research direction.
 
 ### Second quantization and the Jordan-Wigner transformation
 
@@ -176,6 +180,27 @@ the Pauli exclusion principle ($a_j^\dagger a_j^\dagger=0$, you cannot
 create the same electron twice) and antisymmetry under particle
 exchange.
 
+Nothing earlier in this curriculum has used that operator language, so
+it is worth a paragraph on what it buys. Second quantization stops
+tracking *which* electron sits in which orbital, an accounting the
+antisymmetry requirement makes painful, and tracks only *how many*
+electrons occupy each spin-orbital. A basis state becomes an
+**occupation-number string** $|n_1 n_2\cdots n_m\rangle$ with
+$n_j\in\{0,1\}$, one bit per spin-orbital, which is already a qubit
+register. That is why a mapping onto qubits is available at all. In
+that language the first-quantized Hamiltonian above becomes
+
+$$
+H = \sum_{pq} h_{pq}\,a_p^\dagger a_q + \tfrac12\sum_{pqrs} h_{pqrs}\,a_p^\dagger a_q^\dagger a_r a_s
+$$
+
+where $h_{pq}$ and $h_{pqrs}$ are one- and two-electron integrals over
+the chosen orbitals, computed classically once and then held fixed.
+Every trace of the wavefunction's antisymmetry has moved out of the
+state and into the operators' anticommutation relations, which leaves
+exactly one quantum problem: represent those operators on qubits. That
+is the single job the Jordan-Wigner transformation does.
+
 To run a molecular Hamiltonian on a qubit-based quantum computer, these
 fermionic operators must be mapped onto qubit operators. The
 **Jordan-Wigner transformation** does this, in the convention used
@@ -192,21 +217,20 @@ $\{|0\rangle,|1\rangle\}$ (unoccupied/occupied) basis. The
 **Z-string** $Z_1\otimes\cdots\otimes Z_{j-1}$ prepended to it is the
 entire nontrivial content of the transformation: qubit operators
 supported on different tensor factors always *commute* with each other
-(that's just what a tensor product means), which is exactly the
-*bosonic*, not fermionic, algebra. Without the Z-string, mapping each
+(that is what a tensor product means), which is the *bosonic*, not
+fermionic, algebra. Without the Z-string, mapping each
 mode to its own qubit's raising/lowering operator would silently build
 the wrong particle statistics into the encoding. The Z-string's job is
 to convert that natural commutation into the required anticommutation,
 by attaching a $-1$ phase every time an operator is moved past an
-occupied lower-indexed mode — precisely mimicking the sign a real
-fermion swap picks up. The Worked Example below verifies this
-mechanism directly, not just states it.
+occupied lower-indexed mode, mimicking the sign a real fermion swap
+picks up. The worked example below verifies this mechanism directly.
 
 <TheoremBox title="Jordan-Wigner preserves the fermionic algebra" provenance="cited">
 
 For $i\neq j$, $\{a_i,a_j^\dagger\}=0$ and $\{a_i,a_j\}=0$; for $i=j$,
 $\{a_i,a_i^\dagger\}=1$. This is a standard, textbook result (see any
-second-quantization treatment of the Jordan-Wigner mapping) — cited here
+second-quantization treatment of the Jordan-Wigner mapping), cited here
 rather than proved in full generality, since the general-$n$-mode proof
 is a short induction on the same Z-string mechanism this lesson verifies
 explicitly for the smallest nontrivial case, $n=2$, below.
@@ -216,16 +240,16 @@ explicitly for the smallest nontrivial case, $n=2$, below.
 ### VQE and quantum phase estimation: the two paths forward
 
 Once the molecular Hamiltonian is Jordan-Wigner-mapped to a sum of
-qubit Pauli strings, two genuinely different quantum algorithmic
+qubit Pauli strings, two quite different quantum algorithmic
 strategies exist for finding its ground energy.
 
-**Variational Quantum Eigensolver (VQE)** — already built end to end,
+**Variational Quantum Eigensolver (VQE)**, already built end to end,
 ansatz and optimization loop both, in Compilation & Hybrid Algorithms'
-[Variational Algorithm Implementation](/lessons/quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation)
-— is the dominant **near-term (NISQ-era)** approach: a parameterized
+[Variational Algorithm Implementation](/lessons/quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation),
+is the dominant **near-term (NISQ-era)** approach: a parameterized
 circuit prepares a trial state, a classical optimizer adjusts the
 parameters to minimize the measured energy, and the whole loop is
-noise-resilient precisely because the classical feedback can partially
+noise-resilient because the classical feedback can partially
 compensate for a noisy quantum evaluation. That lesson's mechanics
 carry over here unchanged; nothing about applying VQE to a
 Jordan-Wigner-mapped molecular Hamiltonian instead of a toy spin
@@ -233,32 +257,32 @@ Hamiltonian changes how the ansatz or optimizer work. What must be
 stated honestly is VQE's actual theoretical status: it is a
 **heuristic**. No proof guarantees it finds the true ground state, or
 that it does so with fewer resources than the best classical method, for
-a general molecule — its practical dominance today is about NISQ-era
+a general molecule. Its practical dominance today is about NISQ-era
 noise tolerance, not a proven complexity-theoretic advantage.
 
 **Quantum phase estimation (QPE)**, applied to a Hamiltonian-simulation
-circuit for $e^{-iHt}$ — built either from Trotterization (Quantum
-Mastery's
+circuit for $e^{-iHt}$, gives in principle a **provably efficient
+(polynomial-time)** ground-energy estimate. The simulation circuit can
+be built from Trotterization (Quantum Mastery's
 [Hamiltonian Simulation and Trotterization](/lessons/quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization))
 or, for better asymptotic scaling, from the QSVT-based block-encoding
 approach this course's sibling Algorithmic Frontiers course develops in
 [Quantum Signal Processing](/lessons/apex/algorithmic-frontiers/quantum-signal-processing)
 and
-[The Quantum Singular Value Transformation](/lessons/apex/algorithmic-frontiers/the-quantum-singular-value-transformation)
-— gives, in principle, a **provably efficient (polynomial-time)**
-ground-energy estimate. That word "given" is load-bearing: the proof
-requires the initial state fed into phase estimation to have
-non-negligible overlap with the true ground state, a real and
-frequently underappreciated caveat spelled out in full below. QPE also
-requires **fault-tolerant hardware** — error correction and magic-state
-distillation at the scale this pillar's Fault Tolerance Frontiers course
-covered — which does not yet exist at useful scale.
+[The Quantum Singular Value Transformation](/lessons/apex/algorithmic-frontiers/the-quantum-singular-value-transformation).
+That "in principle" is load-bearing: the proof requires the initial state
+fed into phase estimation to have non-negligible overlap with the true
+ground state, a real and frequently underappreciated caveat spelled out
+in full below. QPE also requires **fault-tolerant hardware**, error
+correction and magic-state distillation at the scale this track's Fault
+Tolerance Frontiers course covered, which does not yet exist at useful
+scale.
 
 ### Scale: what it actually takes
 
-Published resource-estimation studies for classically-hard,
-industrially significant molecules — the FeMo-cofactor pictured above is
-the standard example, motivated by industrial nitrogen fixation — have
+Published resource-estimation studies for classically hard,
+industrially significant molecules (the FeMo-cofactor pictured above is
+the standard example, motivated by industrial nitrogen fixation) have
 estimated, for a fault-tolerant quantum phase-estimation simulation,
 somewhere on the order of hundreds to low thousands of **logical**
 qubits, and a very large circuit cost: many millions to billions of
@@ -268,10 +292,10 @@ vary noticeably between published studies because the estimate depends
 on choices (active space size, Trotter step count or QSVT polynomial
 degree, error budget) that are themselves engineering trade-offs, not
 fixed physical constants. Translating "here is an algorithm" into "here
-is a real qubit and gate count" is exactly the skill this course's own
+is a real qubit and gate count" is the skill this course's own
 capstone,
 [From Algorithm to Qubit Count](/lessons/apex/simulation-and-compilation-frontiers/capstone-from-algorithm-to-qubit-count),
-builds next, on a toy-scale version of precisely this kind of estimate.
+builds next, on a toy-scale version of this kind of estimate.
 
 <ResearchConnection
   title="The FeMoco estimates, and how far they moved"
@@ -286,37 +310,37 @@ builds next, on a toy-scale version of precisely this kind of estimate.
   (a factorized, low-rank form) and the simulation subroutine
   (qubitization rather than Trotterization), which together moved the
   gate count by several orders of magnitude. That is why this section
-  quotes a range rather than a number, and why a resource estimate should
-  be read as a statement about a *pipeline* rather than about a molecule.
+  quotes a range instead of a single number, and why a resource estimate
+  describes a *pipeline* more than it describes a molecule.
 </ResearchConnection>
 
-## Why This Matters
+## The Field's Most-Cited Application
 
 Quantum simulation of molecules and materials is widely regarded, across
 the research field, as one of the most likely **first** practically
 useful applications of a large-scale fault-tolerant quantum
-computer — not because it is easy, but because of a specific conjunction
+computer, not because it is easy, but because of a specific conjunction
 of two honest facts. First, classical methods are believed to scale
-badly for a real, economically important subclass of molecules
+badly for an economically important subclass of molecules
 (strongly correlated catalysts, bond-breaking, certain transition-metal
-chemistry). Second, the quantum algorithmic approach — Hamiltonian
-simulation via Trotterization or QSVT, feeding phase estimation — is
+chemistry). Second, the quantum algorithmic approach (Hamiltonian
+simulation via Trotterization or QSVT, feeding phase estimation) is
 comparatively well understood: it doesn't require resolving any further
 open theoretical question the way, say, a proof of $\mathsf P\neq
-\mathsf{BQP}$ would. That combination — a real classical weakness plus
-an already-understood quantum strategy — is rare, and it's why
+\mathsf{BQP}$ would. That combination of a real classical weakness with
+an already-understood quantum strategy is rare, and it's why
 pharmaceutical companies (drug-binding energetics), agricultural
-companies (nitrogen fixation catalysis, motivated by exactly the
+companies (nitrogen fixation catalysis, motivated by the
 FeMo-cofactor pictured above), and battery/materials researchers
 (electrolyte and cathode chemistry) all fund quantum simulation research
-today as a real, near-to-medium-term economic bet, not speculative
+today as a near-to-medium-term economic bet, not speculative
 marketing.
 
-## Worked Example
+## Anticommutation, Verified Numerically
 
 **Verify explicitly, for the smallest nontrivial case ($n=2$ modes,
 $j=1,2$), that the Jordan-Wigner mapping's Z-string produces the correct
-fermionic anticommutation $\{a_1,a_2^\dagger\}=0$ — and that omitting
+fermionic anticommutation $\{a_1,a_2^\dagger\}=0$, and that omitting
 the Z-string breaks it.**
 
 With $\sigma^-=\begin{pmatrix}0&1\\0&0\end{pmatrix}$ and
@@ -348,25 +372,32 @@ the correct fermionic anticommutation, and the Z-string is the entire
 reason it holds: without it, $a_2^{\dagger,\text{naive}}=I\otimes
 \sigma^+$ acts on a different tensor factor than $a_1$ entirely, so the
 two trivially *commute* rather than anticommute, giving
-$\{a_1,a_2^{\dagger,\text{naive}}\}=2(\sigma^-\otimes\sigma^+)\neq0$ — a
-concrete, checkable demonstration of exactly the failure the Z-string
-exists to prevent.
+$\{a_1,a_2^{\dagger,\text{naive}}\}=2(\sigma^-\otimes\sigma^+)\neq0$, a
+concrete, checkable demonstration of the failure the Z-string exists to
+prevent.
+
+Neither claim is left resting on the algebra above. Both anticommutators
+are built at module scope from this platform's own `Matrix` and `Complex`
+primitives and compared entrywise against `zeroFourByFour`:
+`jwMappingVerified` (the with-Z-string case matches the zero matrix) is
+{String(jwMappingVerified)}, and `naiveMappingIsWrong` (the Z-string-free
+case does not) is {String(naiveMappingIsWrong)}.
 
 ### Confirming it live, entry by entry
 
 <PredictBeforeReveal
   question="Drop the Z-string and map mode 2's operators to I⊗σ⁻ and I⊗σ⁺ directly. Does {a₁, a₂†} still come out to zero?"
   options={[
-    { label: "Yes — a₁ and a₂ act on different qubits, so they still anticommute", value: "yes-still-zero" },
-    { label: "No — without the Z-string the operators commute instead of anticommuting", value: "no-nonzero" },
+    { label: "Yes: a₁ and a₂ act on different qubits, so they still anticommute", value: "yes-still-zero" },
+    { label: "No: without the Z-string the operators commute instead of anticommuting", value: "no-nonzero" },
   ]}
   correctValue="no-nonzero"
-  explanation="Operators on different tensor factors always commute, by definition of a tensor product — that's the natural, bosonic behavior, not the fermionic one the encoding needs. Without the Z-string, {a₁,a₂†} works out to 2(σ⁻⊗σ⁺), which is nonzero. The Z-string's whole job is to overwrite that natural commutation with the sign flip a real fermion swap requires, and the toggle below shows the two anticommutators side by side."
+  explanation="Operators on different tensor factors always commute, by definition of a tensor product. That is the natural, bosonic behavior, not the fermionic one the encoding needs. Without the Z-string, {a₁,a₂†} works out to 2(σ⁻⊗σ⁺), which is nonzero. The Z-string's whole job is to overwrite that natural commutation with the sign flip a real fermion swap requires, and the toggle below shows the two anticommutators side by side."
 />
 
 <InteractiveSection
   title="Compare the Jordan-Wigner mapping with and without its Z-string"
-  description="Toggle between the correct mapping (with the Z-string) and the naive one (without it). a₁ is unchanged either way; only a₂, a₂†, and therefore the anticommutator {a₁,a₂†} change. With the Z-string it is exactly the zero matrix, matching the hand computation above entry by entry; without it, it is not."
+  description="Toggle between the correct mapping (with the Z-string) and the naive one (without it). a₁ is unchanged either way; only a₂, a₂†, and therefore the anticommutator {a₁,a₂†} change. Read that anticommutator in both modes and check each against the hand computation above, entry by entry."
 >
   <MatrixGridExplorer
     presets={jordanWignerPresets}
@@ -374,18 +405,18 @@ exists to prevent.
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Treating the Speedup as Unconditional
 
 <Callout type="note">
 **Treating quantum phase estimation's "provably efficient" claim as
 unconditional.** The polynomial-time guarantee assumes the prepared
 initial state has non-negligible overlap with the true, unknown ground
-state. If that overlap is exponentially small — a real risk for a
-strongly correlated molecule where a cheap classical guess (e.g. a
-single Hartree-Fock determinant) is a poor approximation to the true
-ground state — the number of repetitions needed to see the ground energy
-even once also grows exponentially, silently reintroducing exponential
-cost through the state-preparation step. Finding a provably good initial
+state. Suppose that overlap is exponentially small, a real risk for a
+strongly correlated molecule where a cheap classical guess (a single
+Hartree-Fock determinant, say) is a poor approximation to the true
+ground state. Then the number of repetitions needed to see the ground
+energy even once also grows exponentially, silently reintroducing
+exponential cost through the state-preparation step. Finding a provably good initial
 state is itself an open, instance-dependent problem, not something
 phase estimation supplies for free.
 </Callout>
@@ -397,8 +428,8 @@ practically motivated, but with no proof that it reaches the ground
 state, or that it does so with asymptotically fewer resources than the
 best classical method, for a general molecule. Its dominance today is
 about near-term hardware compatibility, not a settled complexity-theory
-result — exactly the same "asymptotic vs. practical" distinction drawn
-elsewhere in this pillar for QSVT versus Trotterization.
+result, the same "asymptotic vs. practical" distinction drawn
+elsewhere in this track for QSVT versus Trotterization.
 </Callout>
 
 ## Practice Questions
@@ -406,13 +437,183 @@ elsewhere in this pillar for QSVT versus Trotterization.
 1. Why does the Born-Oppenheimer approximation's validity depend on the
    proton-to-electron mass ratio specifically, and not just on "nuclei
    being heavier"?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because "heavier" is not a number you can put in an error bound, and a
+   ratio is. The approximation is an expansion, and $m_e/M$ is what it is
+   expanded in.
+
+   The physical content is about *speeds*, not masses. At comparable
+   momentum, a particle's speed is $p/m$, so nuclei move slower than
+   electrons by roughly $m_e/M$. Only the ratio appears; absolute masses
+   cancel out of the comparison entirely, which is why "nuclei are heavy"
+   states nothing quantitative. The electrons adjust to a change in
+   nuclear position on a timescale shorter by that same factor, so
+   treating the nuclear coordinates as static while solving for the
+   electrons is accurate to an amount controlled by the ratio.
+
+   Powers of it are visible in ordinary spectroscopy, which is the best
+   evidence that this is the right parameter. With $M/m_e\approx1836$ per
+   nucleon, the standard scaling of the three energy scales runs
+
+   $$
+   \frac{E_{\text{vib}}}{E_{\text{el}}} \sim \left(\frac{m_e}{M}\right)^{1/2} \approx \frac{1}{43}, \qquad
+   \frac{E_{\text{rot}}}{E_{\text{el}}} \sim \frac{m_e}{M} \approx \frac{1}{1836},
+   $$
+
+   which is why electronic transitions land in the electronvolt range,
+   vibrational ones a few hundredths of that (tenths of an eV), and
+   rotational ones three
+   orders of magnitude below. That hierarchy is the mass ratio made
+   observable, and it is what lets a chemist assign a spectrum by
+   inspection.
+
+   **Where the approximation fails, and why the mass ratio does not save
+   it there.** The real expansion parameter is not $m_e/M$ alone; it is
+   $m_e/M$ divided by the energy gap between electronic surfaces. Near a
+   conical intersection or an avoided crossing, that gap goes to zero and
+   the ratio's smallness is overwhelmed. Photochemistry, internal
+   conversion, and non-radiative decay all happen precisely there, and
+   they are exactly the processes Born-Oppenheimer cannot describe at any
+   nuclear mass. Separately, the ratio is worst for hydrogen, which is
+   why proton tunneling and hydrogen-versus-deuterium kinetic isotope
+   effects are where the approximation is most visibly strained.
+
+   **Two wrong turns.** The first is reading Born-Oppenheimer as "nuclei
+   are classical" or "nuclei are at rest." Neither is assumed. The nuclei
+   still move; the approximation's output is the potential energy surface
+   they move *on*, obtained by solving the electronic problem at each
+   fixed geometry. The second matters for this lesson's subject: the
+   electronic structure problem a quantum computer is being asked to
+   solve is *defined* by this approximation. If Born-Oppenheimer fails
+   for the chemistry you care about, a phase-estimation circuit will
+   return the ground-state energy of the wrong Hamiltonian, to
+   arbitrarily many digits, and no number of qubits detects that.
+
+   </details>
+
 2. In the 2-mode worked example, which single $2\times2$ identity
    ($\{\sigma^-,Z\}=0$) does the entire $\{a_1,a_2^\dagger\}=0$ result
    reduce to, and why does that identity fail once the $Z$ is removed?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The identity is $\{\sigma^-,Z\}=0$, and the whole $4\times4$ result is
+   that one fact tensored with a spectator.
+
+   With $a_1=\sigma^-\otimes I$ and $a_2^\dagger=Z\otimes\sigma^+$, both
+   products act on the second factor identically, as $I\sigma^+=\sigma^+
+   I=\sigma^+$, so the second factor never participates:
+
+   $$
+   \{a_1,a_2^\dagger\} = \big(\sigma^-Z + Z\sigma^-\big)\otimes\sigma^+ = \{\sigma^-,Z\}\otimes\sigma^+ .
+   $$
+
+   Everything therefore rests on a single $2\times2$ anticommutator, and
+   it vanishes because $\sigma^-=|0\rangle\langle1|$ moves the qubit from
+   the $Z=-1$ eigenvector to the $Z=+1$ one. Any operator that flips a
+   $Z$ eigenvalue anticommutes with $Z$, and here explicitly
+   $\sigma^-Z=-\sigma^-$ while $Z\sigma^-=+\sigma^-$.
+
+   **Why removing the $Z$ breaks it.** The naive mapping
+   $a_2^{\dagger,\text{naive}}=I\otimes\sigma^+$ replaces $Z$ with $I$ in
+   the first slot, so the same factorization now gives
+   $\{\sigma^-,I\}\otimes\sigma^+ = 2\,\sigma^-\otimes\sigma^+$, which is
+   not zero. The failed identity is $\{\sigma^-,I\}=2\sigma^-$, and it
+   fails for the most basic reason available: the identity commutes with
+   everything, so there is no sign to cancel against.
+
+   The general statement worth extracting is that **operators supported
+   on disjoint tensor factors always commute.** That is a fact about
+   tensor products, not about physics, and it is the natural behaviour of
+   distinguishable subsystems. Fermions are required to *anti*commute, so
+   any qubit encoding of them has to install the missing sign by hand,
+   somewhere on the factors in between. $Z$ is the natural choice: it
+   anticommutes with both $X$ and $Y$, and hence with $\sigma^\pm$, and
+   it is Hermitian and its own inverse, so a string of them is cheap to
+   apply and undoes itself.
+
+   **What that costs, since the Z-string is not free.** A Jordan-Wigner
+   mapped operator on modes $j$ and $k$ carries $Z$ on every mode between
+   them, so its Pauli weight grows with the distance and reaches $O(n)$
+   for a molecular Hamiltonian's long-range terms. Every one of those
+   $Z$'s becomes gates in a Trotter step. That is precisely the cost the
+   Bravyi-Kitaev and related encodings were designed to reduce, trading
+   Jordan-Wigner's simple locality for $O(\log n)$ operator weight. The
+   $Z$-string is not a technicality; it is one of the main line items in
+   a chemistry resource estimate.
+
+   </details>
+
 3. A friend argues that since VQE runs today on real NISQ hardware while
    phase estimation cannot yet, VQE must be the "better" algorithm.
    What is wrong with treating hardware availability as a substitute for
    an asymptotic complexity comparison?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The two claims answer different questions, and only one of them is
+   about the algorithms.
+
+   "Runs on today's hardware" is a fact about this year's devices. It is
+   contingent, it is already changing, and it says nothing about what
+   either algorithm computes or what it costs at scale. "Better
+   algorithm," in the sense the word normally carries, is a claim about
+   how cost grows with problem size and required accuracy, which is a
+   property of the algorithm and does not move when the hardware does.
+
+   Here the two point in opposite directions, which is why the
+   substitution is not harmless.
+
+   **Phase estimation has a guarantee.** Given a state with
+   non-negligible overlap with the ground state, it returns an eigenvalue
+   to additive precision $\epsilon$ at cost $O(1/\epsilon)$, and it
+   returns a *certified* answer: you know which eigenvalue you have and
+   how precisely.
+
+   **VQE has none.** It is a heuristic, and three separate things are
+   unproven about it. Nothing guarantees the chosen ansatz can represent
+   the true ground state, so the variational energy is an upper bound
+   that may sit arbitrarily far above the answer with no way to tell from
+   the output. Barren plateaus can make the optimization landscape
+   exponentially flat in the qubit count, so the classical optimizer may
+   have nothing to descend. And energy estimation is sampling-limited at
+   $O(1/\epsilon^2)$ measurements, with a prefactor set by the number of
+   Hamiltonian terms, which grows like $O(N^4)$ in the number of
+   spin-orbitals. That last one is the quiet killer: published estimates
+   of the measurement time for molecules of real chemical interest run to
+   days and beyond, on hardware that is otherwise assumed to work
+   perfectly, and no improvement in qubit count or coherence touches it.
+
+   So the honest comparison is that phase estimation is unavailable and
+   provably delivers; VQE is available and provably delivers nothing in
+   particular. "Better" has to be told which of those it cares about.
+
+   **The strongest version of the friend's case, which deserves a real
+   hearing.** An algorithm you cannot run is worth nothing today, and if
+   fault-tolerant hardware is decades away while VQE might produce a
+   useful result in five years, the practical calculus genuinely favours
+   VQE. NISQ experiments have also generated real knowledge about noise,
+   ansatz design, and error mitigation that no amount of theory would
+   have produced. That case is respectable.
+
+   But notice what it rests on: a forecast about hardware timelines, not
+   a property of either algorithm. Grant every word of it and VQE is
+   still not the better *algorithm*; it is the better *thing to be doing
+   this decade* under a particular prediction. Those are different
+   sentences, and only the second is defensible. Saying which one you
+   mean costs nothing and is the difference between an argument and a
+   slogan.
+
+   The compressed form: nobody claims bubble sort beats quicksort because
+   it is easier to implement on a machine without recursion. Availability
+   is a constraint on the person, not a property of the method.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -425,7 +626,7 @@ elsewhere in this pillar for QSVT versus Trotterization.
   molecules is believed classically exponential.
 - The Jordan-Wigner transformation maps fermionic operators to qubit
   Pauli operators via $a_j=(\bigotimes_{k<j}Z_k)\otimes\sigma^-_j$; the
-  Z-string is precisely what converts qubits' natural commutation into
+  Z-string is what converts qubits' natural commutation into
   the required fermionic anticommutation, verified explicitly here for
   $n=2$: $\{a_1,a_2^\dagger\}=0$ with the Z-string, nonzero without it.
 - VQE (heuristic, NISQ-friendly, no proven advantage) and phase
@@ -435,19 +636,17 @@ elsewhere in this pillar for QSVT versus Trotterization.
   field's best near-term bet for a practically useful payoff of a
   fault-tolerant quantum computer.
 
-## Further Exploration
+## Where These Resource Numbers Came From
 
-Continue to
-[Capstone: From Algorithm to Qubit Count](/lessons/apex/simulation-and-compilation-frontiers/capstone-from-algorithm-to-qubit-count),
-which turns this course's algorithms — Trotterization, QSVT, Clifford+T
-synthesis, noise-aware compilation, and this lesson's own molecular
-Hamiltonians — into the same kind of concrete logical-qubit and T-gate
-estimate this lesson only quoted from the published literature, worked
-out by hand on a toy-scale example.
+This lesson quoted its resource numbers from the published literature and
+pointed at the wide spread between studies. The obvious next question is
+where such a number comes from in the first place, and that is a
+calculation rather than a citation.
 
 <NextDiscovery>
-  Next: the capstone turns this course's algorithms — Trotterization,
-  QSVT, Clifford+T synthesis, noise-aware compilation, and this lesson's
-  own molecular Hamiltonians — into a concrete logical-qubit and T-gate
-  estimate, worked out by hand on a toy-scale example.
+  [Capstone: From Algorithm to Qubit Count](/lessons/apex/simulation-and-compilation-frontiers/capstone-from-algorithm-to-qubit-count)
+  turns this course's algorithms (Trotterization, QSVT, Clifford+T
+  synthesis, noise-aware compilation, and this lesson's own molecular
+  Hamiltonians) into a concrete logical-qubit and T-gate estimate, worked
+  out by hand on a toy-scale example.
 </NextDiscovery>

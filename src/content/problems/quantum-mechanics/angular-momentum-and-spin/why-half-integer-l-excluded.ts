@@ -20,16 +20,35 @@ export const whyHalfIntegerLExcluded: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["e^{i pi}", "e^{ipi}", "e^{iπ}", "e^(i pi)", "e^(iπ)", "e^ipi", "e^iπ", "-1", "−1", "minus one", "minus 1", "not equal to 1", "≠1", "≠ 1", "not 1"],
-      ["multi-valued", "multivalued", "multi valued", "double-valued", "double valued", "two values", "two different values", "different value", "not single-valued", "not single valued", "fails single", "disagree", "inconsistent", "ill-defined", "not well-defined", "not well defined"],
+      // "e^{iπ} = −1" strips to the three tokens "e i 1", which the validator
+      // matches as an in-order subsequence against almost any sentence ("the
+      // electron in 1 dimension..."). "π}" survives only as a literal
+      // substring, so it catches the same typed answer without the looseness.
+      {
+        phrases: ["e^{i pi} = -1", "e^{ipi}", "e^ipi", "eipi", "π}", "minus one", "negative one", "minus 1 not 1", "not equal to 1", "does not equal 1", "doesn't equal 1", "is not 1", "isn't 1", "not 1 but"],
+        missingFeedback:
+          "Do the substitution and evaluate. Say what number the phase comes out to after a full turn when m is a half, and how that compares with what it has to be.",
+        anchors: {
+          "π}": "The closing brace after pi is the tail of a typed e^{iπ}. It survives normalization as nothing, which is the point: the raw glyphs are what identify the substitution having been carried out.",
+        },
+      },
+      {
+        phrases: ["multi-valued", "multivalued", "multi valued", "double-valued", "double valued", "two values", "two different values", "different value", "not single-valued", "not single valued", "fails single", "disagree", "inconsistent", "ill-defined", "not well-defined", "not well defined"],
+        missingFeedback:
+          "You have the number. Now say what having that value after a full turn in phi does to the wavefunction at one and the same physical point.",
+      },
     ],
-    incorrectFeedback: "Substitute m=1/2 into the condition the wavefunction must satisfy after a full 2π turn, evaluate the resulting number, and say what its value means for the function.",
-    partialFeedback: "Good. Now state explicitly what this means for the wavefunction's validity at a single physical point.",
+    incorrectFeedback: "You appealed to 'orbital angular momentum comes in whole numbers' as a rule, which is the thing being derived. Do the substitution instead: put m = 1/2 into the condition a full turn imposes, evaluate the number that comes out, and say what having that number instead of the required one does to the wavefunction at one point in space.",
+    partialFeedback: "Now state what this means for the wavefunction's validity at a single physical point.",
+    modelAnswers: [
+      "Put m=1/2 into the phase you pick up after a full turn and you get e^{ipi}, which is -1, not 1. So going once round in phi returns the wavefunction with the opposite sign: it would be double valued and disagree with itself at the same physical point.",
+      "The half integer case gives minus one rather than one after a 2pi turn. Since that does not equal 1, the wavefunction is not single-valued; it takes two different values at the same place, which is inconsistent.",
+    ],
   },
   hints: [
-    { text: "Single-valuedness requires e^{im2π}=1." },
-    { text: "Substitute m=1/2. What does the exponent become?" },
-    { text: "Evaluate that exponential with Euler's formula. Does it satisfy the requirement from the first hint?" },
+    { text: "Single-valuedness requires that the azimuthal factor come back to itself after a full turn. Write that requirement as an equation in m." },
+    { text: "Substitute m = 1/2. What does the exponent reduce to?" },
+    { text: "Evaluate that exponential with Euler's formula and compare the result with what the first rung's equation demands." },
   ],
   solution: {
     steps: [

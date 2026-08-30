@@ -21,11 +21,23 @@ export const diagnosingTheI4Counterexample: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["pure state", "purity", "was pure", "is pure", "be pure", "not pure", "isn't pure", "pure global", "mixed global", "globally mixed", "global state", "no state vector", "not a state vector", "genuinely mixed", "mixed, not pure"],
-      ["assum", "requir", "presuppos", "relied on", "relies on", "rely on", "depends on", "depended on", "starts from", "started from", "amplitudes a,b,c,d", "four amplitudes", "no amplitudes"],
+      {
+        phrases: ["pure state", "purity", "was pure", "is pure", "be pure", "not pure", "isn't pure", "pure global", "mixed global", "globally mixed", "global state", "no state vector", "not a state vector", "genuinely mixed", "mixed, not pure"],
+        missingFeedback:
+          "You have said the proof leans on something. Name the property of the joint state it leans on, and say whether this counterexample has it.",
+      },
+      {
+        phrases: ["assum", "requir", "presuppos", "relied on", "relies on", "rely on", "depends on", "depended on", "starts from", "started from", "amplitudes a,b,c,d", "four amplitudes", "no amplitudes"],
+        missingFeedback:
+          "You have said what kind of object this counterexample is. Now connect it to the derivation: what did that argument take for granted at its very first line?",
+      },
     ],
     incorrectFeedback: "Ask what kind of object the earlier proof wrote down in its first line, and whether ρ_AB=I/4 can be written as one.",
-    partialFeedback: "You're close. Name the kind of state the proof's first line writes down, and say why I/4 cannot be put in that form.",
+    partialFeedback: "Name the kind of state the proof's first line writes down, then say why I/4 cannot be put in that form.",
+    modelAnswers: [
+      "The proof starts from a pure global state written with four amplitudes a, b, c, d. I/4 is not pure, it is genuinely mixed, so there are no amplitudes to plug in and the derivation never gets going.",
+      "It assumed the joint state was pure. This one has no state vector at all, so the very first line of that proof, the one that relies on writing down amplitudes, does not apply here.",
+    ],
   },
   hints: [
     { text: "What form did the earlier proof write the two-qubit state in, on its very first line?" },

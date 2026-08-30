@@ -32,7 +32,7 @@ export const syndromeForQubit0Error: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "(0,0) means no error detected — but an error genuinely occurred here.",
+      b: "(0,0) means no error was detected, but an X error was applied to qubit 0 here.",
       c: "(1,1) is the qubit-1 error signature, not qubit 0's.",
       d: "(0,1) is the qubit-2 error signature, not qubit 0's.",
     },
@@ -44,12 +44,12 @@ export const syndromeForQubit0Error: MultipleChoiceProblem = {
     { text: "s₂ checks qubits 1,2 agreement: they still agree in both terms." },
   ],
   solution: {
-    steps: [{ description: "Qubits 0,1 now disagree (s₁=1); qubits 1,2 still agree (s₂=0) — syndrome (1,0)." }],
+    steps: [{ description: "Qubits 0,1 now disagree (s₁=1); qubits 1,2 still agree (s₂=0), giving syndrome (1,0)." }],
     finalAnswer: `(${result.syndrome[0]},${result.syndrome[1]})`,
   },
   explanation: {
     correctIdea: "The syndrome directly encodes which parities the error disturbed.",
-    whyCorrect: "Matches the engine's actual syndrome extraction exactly.",
+    whyCorrect: "Matches the syndrome the engine's extraction routine returns for this error.",
     whyWrong: [
       { optionId: "b", text: "Reports no error at all, but qubits 0 and 1 no longer agree." },
       { optionId: "c", text: "The signature of an error on qubit 1, which sits in both parity checks and so trips both." },

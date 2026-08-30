@@ -1,6 +1,7 @@
-import type { Problem } from "@/lib/problems/types";
+import type { Problem, ProblemMeta } from "@/lib/problems/types";
+import { getProblemMetaForCourse, getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { prerenderProblemMath } from "./renderProblemMath";
-import { ProblemViewClient } from "./ProblemViewClient";
+import { ProblemViewClient, type NextProblem } from "./ProblemViewClient";
 
 /**
  * ============================================================
@@ -36,6 +37,49 @@ import { ProblemViewClient } from "./ProblemViewClient";
  * chunk, exactly where it already was and off every lesson page's eager
  * graph.
  */
+/**
+ * The problem to offer after this one is solved, and where it comes from.
+ *
+ * Finishing a problem correctly is the best moment on the site to offer the
+ * next one, and until now the success screen offered nothing at all: the
+ * "Next step" block rendered only on a *wrong* answer, so a reader who got it
+ * right was left on a dead end while a reader who got it wrong was handed
+ * three onward links.
+ *
+ * The lesson's own practice list first, because that is a real sequence rather
+ * than a heap: `getProblemMetaForLesson` returns it ordered easiest to
+ * hardest, so "the next one" is a genuine step up on the same idea, and it is
+ * the identical ordering the lesson page's `PracticeLinks` renders — a reader
+ * who follows this link twice walks the list they would have seen there.
+ * Falling back to the course keeps the last problem of a lesson from being a
+ * dead end too, preferring a problem from a *different* lesson, since having
+ * just exhausted this one the useful next move is the next topic.
+ *
+ * Derived here rather than passed in from the route, because this is the
+ * boundary that can afford it: `ProblemView` is a Server Component (the whole
+ * point of this file, see above) and `metaRegistry` is the deliberately
+ * meta-only view of the corpus that imports none of the problem or quantum
+ * graph. What crosses into the client is two strings. `CourseCheckpoint`
+ * renders `ProblemViewClient` directly and simply passes none, which is
+ * right: a checkpoint sits inside a lesson that already has its own next step.
+ */
+function nextProblemAfter(problem: Problem): NextProblem | undefined {
+  const asLink = (meta: ProblemMeta): NextProblem => ({ slug: meta.slug, title: meta.title });
+
+  const withinLesson = problem.meta.lesson ? getProblemMetaForLesson(problem.meta.lesson) : [];
+  const lessonPosition = withinLesson.findIndex((meta) => meta.slug === problem.meta.slug);
+  const nextInLesson = lessonPosition === -1 ? undefined : withinLesson[lessonPosition + 1];
+  if (nextInLesson) return asLink(nextInLesson);
+
+  const withinCourse = problem.meta.course ? getProblemMetaForCourse(problem.meta.course) : [];
+  const coursePosition = withinCourse.findIndex((meta) => meta.slug === problem.meta.slug);
+  if (coursePosition === -1) return undefined;
+  const rest = withinCourse.slice(coursePosition + 1);
+  const nextTopic = rest.find((meta) => meta.lesson !== problem.meta.lesson);
+  const next = nextTopic ?? rest[0];
+  return next ? asLink(next) : undefined;
+}
+
 export function ProblemView({
   problem,
   lessonSlug,
@@ -56,6 +100,7 @@ export function ProblemView({
       lessonSlug={lessonSlug}
       lessonTitle={lessonTitle}
       prerequisiteAnchorId={prerequisiteAnchorId}
+      nextProblem={nextProblemAfter(problem)}
     />
   );
 }

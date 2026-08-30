@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useId, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export type StabilizerGeneratorEntry = {
@@ -65,6 +65,14 @@ export function StabilizerTable({
    */
   qubitLabelOffset?: number;
 }) {
+  // `useId()` rather than a literal id string. Two instances of this figure
+  // on one page emitted duplicate ids, which is invalid HTML and leaves
+  // every reference ambiguous: an `id` lookup resolves to the first match in
+  // document order, so the second instance's references silently pointed at
+  // the first instance's element. Harmless while both are identical, wrong
+  // the moment they are not. Matches `ProjectionShadow`, which already does
+  // this.
+  const idBase = useId();
   const numQubits = generators[0]?.pattern.length ?? 0;
   const qubits = useMemo(() => Array.from({ length: numQubits }, (_, i) => i + 1), [numQubits]);
 
@@ -99,8 +107,8 @@ export function StabilizerTable({
       className="not-prose space-y-4 overflow-x-auto panel-inset p-4"
     >
       <div className="flex flex-wrap items-start gap-6">
-        <section aria-labelledby="stabilizer-qubit-heading">
-          <h3 id="stabilizer-qubit-heading" className="tech-label">
+        <section aria-labelledby={`${idBase}-qubit-heading`}>
+          <h3 id={`${idBase}-qubit-heading`} className="tech-label">
             Qubit
           </h3>
           <div role="group" aria-label="Qubit to error" className="mt-2 flex flex-wrap gap-1.5">
@@ -132,8 +140,8 @@ export function StabilizerTable({
           </div>
         </section>
 
-        <section aria-labelledby="stabilizer-error-heading">
-          <h3 id="stabilizer-error-heading" className="tech-label">
+        <section aria-labelledby={`${idBase}-error-heading`}>
+          <h3 id={`${idBase}-error-heading`} className="tech-label">
             Error type
           </h3>
           <div role="group" aria-label="Error type" className="mt-2 flex gap-1.5">
@@ -217,11 +225,16 @@ export function StabilizerTable({
         })}
       </div>
 
-      <p aria-live="polite" className="text-sm text-foreground">
+      {/* `aria-atomic="true"`. The sentence is a fixed frame around two
+          changing fragments, and picking a different qubit changes only the
+          digit after the Pauli letter. A role-less element's implicit
+          `aria-atomic` is `false`, so that press announced a bare number with
+          no verb and no generator list. Atomic re-reads the whole claim. */}
+      <p aria-live="polite" aria-atomic="true" className="text-sm text-foreground">
         {errorType}
         {selectedQubit - qubitLabelOffset} anticommutes with{" "}
         {anticommutingLabels.length === 0
-          ? "none of the generators — this error is undetectable by this code's stabilizers."
+          ? "none of the generators: this error is undetectable by this code's stabilizers."
           : `exactly ${anticommutingLabels.length === 1 ? anticommutingLabels[0] : anticommutingLabels.join(", ")}, flipping ${
               anticommutingLabels.length === 1 ? "that syndrome bit" : "those syndrome bits"
             }.`}

@@ -8,14 +8,25 @@ import type { NumericAnswer, Problem } from "@/lib/problems/types";
 /**
  * The format spec — rendered *above* the field, before anyone types.
  *
- * The information already existed (`question.inputHint` on all 252 numeric
- * problems, `question.placeholder` on all 174 conceptual ones), but it sat
+ * The information already existed (`question.inputHint` on all 256 numeric
+ * problems, `question.placeholder` on all 175 conceptual ones), but it sat
  * below the input as an afterthought, and the placeholder disappears the
  * moment a character is typed. Both grading paths are strict in ways that
- * are invisible from the field itself: `validateNumeric` parses with
- * `Number(...)`, so "1/2" and "sqrt(2)" are rejected as unparseable rather
- * than evaluated, and `validateConceptual` matches author-supplied key
- * phrases, so a correct answer that never names them reads as incomplete.
+ * are invisible from the field itself: `validateNumeric` parses through
+ * `parseNumericSubmission`, which forgives a typographic minus sign, spaces
+ * inside the number and thousands separators, but still rejects "1/2" and
+ * "sqrt(2)" as unparseable rather than evaluating them; and
+ * `validateConceptual` matches author-supplied key phrases, so a correct
+ * answer that never names them reads as incomplete.
+ *
+ * The hint is load-bearing for more than syntax: it is also where a problem
+ * states the precision its tolerance actually demands. An audit of all 256
+ * numeric problems found 29 whose window was tighter than anything the hint
+ * asked for, including one that rejected 2.83 as an answer for the square
+ * root of 8. `numeric.test.ts` now grades each answer at the precision its
+ * own hint instructs and fails if that would not pass, so a hint that says
+ * less than the tolerance requires is a test failure rather than a student
+ * being marked wrong.
  * A student who only finds that out from a rejection has been marked wrong
  * for a syntax rule nobody stated. Stating it up front costs one line.
  *
@@ -32,6 +43,20 @@ function FormatSpec({ id, children }: { id: string; children: ReactNode }) {
 }
 
 /** Strip float noise (0.30000000000000004 renders as 0.3) without switching to exponent notation for typical tolerances. */
+/**
+ * Capitalises the first letter of an authored `inputHint` so it can open a
+ * sentence.
+ *
+ * Only the first character, and only when it is a lowercase letter. A hint
+ * beginning with a digit, a symbol or an already-capitalised word is left
+ * exactly as written, because the one thing worse than a lowercase sentence
+ * start is a mangled unit or identifier.
+ */
+function sentenceCase(hint: string): string {
+  const first = hint.charAt(0);
+  return first >= "a" && first <= "z" ? first.toUpperCase() + hint.slice(1) : hint;
+}
+
 function formatNumberForHint(value: number): string {
   return String(Number(value.toPrecision(12)));
 }
@@ -80,6 +105,7 @@ export function AnswerInput({
   value,
   onChange,
   disabled,
+  fieldRef,
 }: {
   problem: Problem;
   /** Option text rendered to KaTeX HTML, keyed by option **id** — never by
@@ -89,6 +115,20 @@ export function AnswerInput({
   value: string;
   onChange: (value: string) => void;
   disabled: boolean;
+  /**
+   * The one element a caller can send focus back to: the text field, or the
+   * first displayed radio. `ProblemView` uses it after "Clear answer", which
+   * unmounts itself and would otherwise drop focus to `<body>`.
+   *
+   * A *callback* ref rather than a `RefObject`, and the reason is a type one
+   * worth stating: the three branches below hand it an `<input>` in two
+   * shapes and a `<textarea>`, and `RefObject`'s `current` is mutable and so
+   * invariant — a `RefObject<HTMLElement | null>` is not assignable to the
+   * `Ref<HTMLInputElement>` the element expects without a cast. Function
+   * parameters are contravariant, so a callback taking the wider
+   * `HTMLElement | null` is assignable to all three with no cast at all.
+   */
+  fieldRef?: (node: HTMLElement | null) => void;
 }) {
   const formatId = `${problem.meta.slug}-format`;
 
@@ -111,7 +151,7 @@ export function AnswerInput({
       <div>
         <FormatSpec id={formatId}>Select one option, then submit.</FormatSpec>
         <div role="radiogroup" aria-label="Answer options" aria-describedby={formatId} className="space-y-2">
-          {displayOptions.map((option) => {
+          {displayOptions.map((option, index) => {
             const checked = value === option.id;
             // A lettered instrument cell rather than a generic radio dot — reads
             // as selecting a channel, not filling out a form. The letter itself
@@ -133,7 +173,7 @@ export function AnswerInput({
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "tech-value flex h-6 w-6 shrink-0 items-center justify-center rounded-(--radius-tight) border text-[0.7rem] font-medium",
+                    "tech-value flex h-6 w-6 shrink-0 items-center justify-center rounded-(--radius-tight) border text-meta font-medium",
                     checked ? "border-pillar bg-pillar-wash text-pillar-text" : "border-border-strong text-subtle-foreground"
                   )}
                 >
@@ -153,6 +193,10 @@ export function AnswerInput({
                 <span className="sr-only">Option {letter}: </span>
                 <input
                   type="radio"
+                  /* The first *displayed* option, which after a clear is where
+                     a keyboard reader should land: with nothing selected a
+                     radio group's tab stop is its first radio anyway. */
+                  ref={index === 0 ? fieldRef : undefined}
                   name={`problem-${problem.meta.slug}`}
                   value={option.id}
                   checked={checked}
@@ -179,9 +223,18 @@ export function AnswerInput({
   if (problem.question.type === "numeric") {
     return (
       <div>
+        {/* `inputHint` is authored as a lowercase noun phrase ("a decimal
+            between 0 and 1", "a whole number of qubits"): all 256 of them in
+            the corpus are, and none carries a trailing period. Interpolating
+            one straight in produced "a decimal between 0 and 1. type a plain
+            number.", which starts lowercase and then puts a lowercase word
+            after a full stop, on every one of the 256 numeric problems.
+            Capitalising at the render site rather than in the content keeps
+            the authored fragments composable, and is the only place that has
+            to know it is starting a sentence here. */}
         <FormatSpec id={formatId}>
-          {problem.question.inputHint ? `${problem.question.inputHint} — ` : null}
-          type a plain number. Expressions are not evaluated, so enter 0.707 rather than 1/sqrt(2).
+          {problem.question.inputHint ? `${sentenceCase(problem.question.inputHint)}. ` : null}
+          Type a plain number. Expressions are not evaluated, so enter 0.707 rather than 1/sqrt(2).
           {/* `problem.answer` isn't narrowed by the `question.type` check
               (TS narrows only the property switched on), so re-check its own
               discriminant; registry.test.ts pins the two in lockstep. */}
@@ -223,6 +276,7 @@ export function AnswerInput({
               Number(...)), and the numeric-entry affordances that don't cost
               a key are kept via the attrs below. */}
           <input
+            ref={fieldRef}
             type="text"
             inputMode="text"
             autoComplete="off"
@@ -259,6 +313,7 @@ export function AnswerInput({
           `.instrument`'s `overflow-hidden`, so the 4px of ring plus offset has
           room and needs no `ring-inset`. */}
       <textarea
+        ref={fieldRef}
         value={value}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}

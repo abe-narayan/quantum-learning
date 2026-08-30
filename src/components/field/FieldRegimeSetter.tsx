@@ -10,7 +10,7 @@ import { resetFieldState, setFieldState } from "./fieldStore";
  *
  * Renders nothing. Exists as its own leaf client component so that a page
  * needing a background regime does not have to become a client component
- * itself — `PillarScope` (a server component) renders one of these alongside
+ * itself, `PillarScope` (a server component) renders one of these alongside
  * its server-rendered children.
  */
 export function FieldRegimeSetter({

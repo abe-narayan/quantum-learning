@@ -146,7 +146,15 @@ export function BB84RoundTable({
             here, unlike the auto-playing figures on this bench: nothing on a
             timer ever rewrites it, so it speaks exactly once per press —
             paced by the reader. */}
-        <p aria-live="polite" className="text-sm text-foreground">
+        {/* `role="status"` + `aria-atomic="true"`. Not tidy-up: this region is
+            a fixed frame ("Kept (sifted): … / 8 · Error rate on kept: …")
+            around two `<span>`s that carry the only text that changes. A
+            role-less element's implicit `aria-atomic` is `false`, so pressing
+            "New round" announced the two bare numbers with none of the labels
+            that say what they count, and the whole point of this readout is
+            the *contrast* between the two figures. Atomic re-reads the frame
+            with them. */}
+        <p role="status" aria-live="polite" aria-atomic="true" className="text-sm text-foreground">
           Kept (sifted): <span className="font-mono font-medium">{keptCount}</span> / {numQubits} &middot; Error rate on
           kept: <span className="font-mono font-medium">{(errorRate * 100).toFixed(0)}%</span>
         </p>

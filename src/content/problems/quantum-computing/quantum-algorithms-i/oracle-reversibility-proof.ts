@@ -20,16 +20,31 @@ export const oracleReversibilityProof: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["xor", "⊕", "twice", "cancel", "self-inverse", "self inverse", "own inverse", "undoes itself", "involution"],
-      ["same value", "f(x) twice", "returns", "original", "back to", "back where", "recover", "restores", "identity"],
+      {
+        phrases: ["xor", "⊕", "twice", "cancel", "self-inverse", "self inverse", "own inverse", "undoes itself", "involution"],
+        missingFeedback:
+          "Reversibility has a concrete test. Try running the operation a second time and say what the target register's bit does under that repeat.",
+        anchors: {
+          "⊕": "The XOR symbol strips to nothing, so it is matched raw. It is here for the student who writes the operation in symbols instead of naming it.",
+        },
+      },
+      {
+        phrases: ["same value", "returns", "original", "back to", "back where", "recover", "restores", "identity"],
+        missingFeedback:
+          "You have described the operation being repeated. Now say what state you are left with at the end, compared with the one you started from.",
+      },
     ],
-    incorrectFeedback: "Try applying U_f to its own output and watch what happens in the second register.",
-    partialFeedback: "Good start. Be explicit about what the second application does to the target register and why nothing of f survives there.",
+    incorrectFeedback: "You argued that AND cannot be undone, which is true of AND alone and not of this map. Apply U_f to its own output and look at what the second register holds after the second application.",
+    partialFeedback: "Say what the second application does to the target register, and why nothing of f survives there.",
+    modelAnswers: [
+      "Apply U_f twice and you get |x>|y XOR f(x) XOR f(x)> = |x>|y>, because XOR-ing the same value twice cancels. So U_f is its own inverse and you always get back to the original state, whatever f is.",
+      "U_f is self-inverse: running it a second time undoes it, since y XOR f(x) XOR f(x) returns y. That works for any f at all, even AND, because the extra register keeps the input around.",
+    ],
   },
   hints: [
-    { text: "Apply U_f once: y becomes y⊕f(x)." },
-    { text: "Apply U_f again to that result: (y⊕f(x))⊕f(x)." },
-    { text: "XOR-ing the same bit twice always cancels: a⊕a=0." },
+    { text: "Apply U_f once and write down what the second register holds." },
+    { text: "Now apply the very same operator to that output. Write down what the second register holds this time, without simplifying." },
+    { text: "Simplify that expression using the one algebraic fact about combining a bit with itself. What is left?" },
   ],
   solution: {
     steps: [

@@ -37,7 +37,7 @@ export const forcedCloneStateProbability: NumericProblem = {
     value: probabilityOf11,
     tolerance: 0.01,
     incorrectFeedback:
-      "Expand $U(|i\\rangle\\otimes|0\\rangle)$ using linearity first — it's a fixed combination of the two already-known outputs $U(|00\\rangle)$ and $U(|10\\rangle)$, not something new $U$ gets to choose.",
+      "Expand $U(|i\\rangle\\otimes|0\\rangle)$ using linearity first. It is a fixed combination of the two already-known outputs $U(|00\\rangle)$ and $U(|10\\rangle)$, not something $U$ gets to choose.",
     nearMisses: [
       {
         value: 0.25,
@@ -71,11 +71,11 @@ export const forcedCloneStateProbability: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "Linearity doesn't just forbid perfect cloning in the abstract — it pins down exactly what state a would-be cloner is forced into for every superposition input, once its behavior on the basis states is fixed.",
+      "Linearity does more than forbid perfect cloning in the abstract: it pins down which state a would-be cloner is forced into for every superposition input, once its behaviour on the basis states is fixed.",
     whyCorrect:
-      "$U(|00\\rangle)=|00\\rangle$ and $U(|10\\rangle)=|11\\rangle$ together with linearity leave no freedom in what $U(|i\\rangle\\otimes|0\\rangle)$ can be — it's a fixed superposition of $|00\\rangle$ and $|11\\rangle$, an entangled state, not two independent copies of $|i\\rangle$.",
+      "$U(|00\\rangle)=|00\\rangle$ and $U(|10\\rangle)=|11\\rangle$ together with linearity leave no freedom in what $U(|i\\rangle\\otimes|0\\rangle)$ can be. It is a fixed superposition of $|00\\rangle$ and $|11\\rangle$, an entangled state rather than two independent copies of $|i\\rangle$.",
     whyWrong: [
-      "Correct cloning of $|i\\rangle$ would require the product state $|i\\rangle\\otimes|i\\rangle$, which has nonzero amplitude on all four basis states, not just $|00\\rangle$ and $|11\\rangle$ — the forced state and the required state are not the same.",
+      "Correct cloning of $|i\\rangle$ would require the product state $|i\\rangle\\otimes|i\\rangle$, which has nonzero amplitude on all four basis states, not just $|00\\rangle$ and $|11\\rangle$. The forced state and the required state are not the same.",
     ],
   },
 };

@@ -23,7 +23,7 @@ export const greenCurveFrames = [
     paramLabel: "",
     series: [
       {
-        label: `G_well(0.3,−0.2;E), clamped to ±30 — poles at E1=${wellE1.toFixed(4)}, E2=${wellE2.toFixed(4)}`,
+        label: `G_well(0.3,−0.2;E), clamped to ±30, with poles at E1=${wellE1.toFixed(4)} and E2=${wellE2.toFixed(4)}`,
         color: "brand",
         points: greenEValues.map((E) => ({ x: E, y: greenClamp(wellGreenFunction(E, -0.2, 0.3, wellHalfWidth)) })),
       },
@@ -85,8 +85,8 @@ export const lessonMeta = {
   ],
   objectives: [
     "Derive the resolvent R(E)=(E−H)⁻¹=Σₙ Pₙ/(E−Eₙ) directly from the spectral theorem and identify its poles as bound-state energies",
-    "Derive the free-particle and infinite-square-well Green's functions in closed form from a jump condition, and verify the well's poles reproduce the exact known energy levels",
-    "Derive the Sokhotski–Plemelj imaginary-part identity and connect it to why the continuous spectrum shows up as a branch cut rather than isolated poles",
+    "Construct the free-particle and infinite-square-well Green's functions in closed form from a jump condition, and verify the well's poles reproduce the exact known energy levels",
+    "Apply the Sokhotski–Plemelj imaginary-part identity and connect it to why the continuous spectrum shows up as a branch cut rather than isolated poles",
   ],
   related: [
     {
@@ -103,7 +103,7 @@ export const lessonMeta = {
   marks where the scattering continuum begins.
 </LessonHook>
 
-## Motivation
+## Bisection, and Why It Was Necessary
 
 Solving the Finite Well Numerically needed bisection because
 $k\tan(ka)=\kappa$ has no closed-form solution. That's true for a
@@ -124,7 +124,7 @@ equation" with "find where this specific function blows up."
   license="CC BY-SA 2.0"
 />
 
-## Intuition
+## Resonance as a Pole
 
 A driven classical oscillator's response amplitude goes like
 $1/(\omega^2-\omega_0^2)$: it diverges exactly at resonance,
@@ -136,7 +136,7 @@ at resonance. The analogy has a limit worth flagging early: for a
 discrete eigenvalue the blow-up is a pole, and for a continuous spectral
 value it is not, which is what the branch-cut section below is about.
 
-## Mathematical Development
+## Poles, Branch Cuts, and Sokhotski-Plemelj
 
 ### The resolvent, derived from the spectral theorem
 
@@ -150,7 +150,7 @@ $$
 $$
 
 (using $HP_n=E_nP_n$ and completeness $\sum_nP_n=I$), which verifies that
-the formula is the inverse rather than a plausible guess. One hypothesis
+the formula really is the inverse. One hypothesis
 rides along silently: $E$ must lie in the resolvent set. For $E$ on the
 spectrum a denominator vanishes and $R(E)$ fails to be a bounded
 operator, which is why the resolvent set is defined by boundedness of the
@@ -165,6 +165,14 @@ are the bound-state energies": not an analogy, but a direct algebraic
 consequence of the spectral decomposition, readable off the formula
 above by inspection.
 
+For a matrix this is the end of the story. In finite dimensions
+$R(E)=\mathrm{adj}(E-H)/\det(E-H)$ is a rational function of $E$ whose
+only singularities are the finitely many roots of the characteristic
+polynomial, all of them poles. A matrix resolvent can never have a branch
+cut, because a rational function has none. Everything in the next section
+is a phenomenon that exists only once the spectrum stops being a finite
+list.
+
 ### Branch cuts $\leftrightarrow$ continuous spectrum, via Sokhotski–Plemelj
 
 For a continuous spectrum, the sum becomes the spectral-theorem integral
@@ -173,26 +181,17 @@ lessons ago), and the integrand's singularity is no longer isolated: it
 sweeps continuously along the whole continuous spectrum. Approaching a
 point $E'$ *on* that continuum from just above versus just below the
 real axis gives *different* limits, which is exactly what a branch cut
-means. The identity behind that statement is worth deriving in full
-rather than just naming:
+means. The identity behind that statement is worth deriving in full:
 
 $$
 \mathrm{Im}\left[\frac{1}{x-i\varepsilon}\right]=\mathrm{Im}\left[\frac{x+i\varepsilon}{x^2+\varepsilon^2}\right]=\frac{\varepsilon}{x^2+\varepsilon^2}
 $$
 
-Integrate this over all $x$, using the antiderivative $\frac{d}{dx}
-\arctan(x/\varepsilon)=\varepsilon/(x^2+\varepsilon^2)$ (a direct check
-by differentiating):
-
-$$
-\int_{-\infty}^{\infty}\frac{\varepsilon}{x^2+\varepsilon^2}\,dx=\Big[\arctan(x/\varepsilon)\Big]_{-\infty}^{\infty}=\frac\pi2-\left(-\frac\pi2\right)=\pi
-$$
-
-**exactly $\pi$, for every $\varepsilon>0$**, while the function itself
-concentrates ever more sharply at $x=0$ as $\varepsilon\to0$ (its peak
-height $1/\varepsilon\to\infty$, its width $\sim\varepsilon\to0$),
-the same delta-sequence structure as the last lesson's Dirichlet
-kernel, now for a Lorentzian instead of a sinc:
+As $\varepsilon\to0$ this Lorentzian concentrates ever more sharply at
+$x=0$: its peak height $1/\varepsilon\to\infty$ and its width
+$\sim\varepsilon\to0$. Whether that concentration is the same
+delta-sequence structure as the last lesson's Dirichlet kernel turns
+entirely on what happens to the area underneath:
 
 <PredictBeforeReveal
   question="As ε shrinks toward 0 in ε/(x²+ε²), the peak at x=0 climbs toward 1/ε. What happens to the total area under the curve over that same limit?"
@@ -202,11 +201,25 @@ kernel, now for a Lorentzian instead of a sinc:
     { label: "It stays exactly π for every ε>0", value: "fixed" },
   ]}
   correctValue="fixed"
-  explanation="The antiderivative computation above gives exactly π for every ε>0 — not a limiting value, an exact one at each finite ε. Only the curve's shape sharpens as ε→0; the fixed area is what turns ε/(x²+ε²) into πδ(x), the same delta-sequence mechanism as the Dirichlet kernel one lesson ago, now driving the Sokhotski–Plemelj relation."
+  explanation="The antiderivative computation just below gives exactly π for every ε>0. That is not a limiting value but an exact one at each finite ε. Only the curve's shape sharpens as ε→0; the fixed area is what turns ε/(x²+ε²) into πδ(x), the same delta-sequence mechanism as the Dirichlet kernel one lesson ago, now driving the Sokhotski–Plemelj relation."
 />
+
+Integrating over all $x$, using the antiderivative $\frac{d}{dx}
+\arctan(x/\varepsilon)=\varepsilon/(x^2+\varepsilon^2)$ (a direct check
+by differentiating), settles it:
+
+$$
+\int_{-\infty}^{\infty}\frac{\varepsilon}{x^2+\varepsilon^2}\,dx=\Big[\arctan(x/\varepsilon)\Big]_{-\infty}^{\infty}=\frac\pi2-\left(-\frac\pi2\right)=\pi
+$$
+
+**exactly $\pi$, for every $\varepsilon>0$**: fixed area, rising peak,
+narrowing width, the same delta-sequence structure as the Dirichlet
+kernel, now for a Lorentzian instead of a sinc.
 
 <ParametricCurve
   frames={lorentzFrames}
+  xAxisLabel="x"
+  yAxisLabel="ε/(x²+ε²)"
   sliderLabel="Regularization ε"
   ariaLabel="The Lorentzian epsilon over x squared plus epsilon squared, sharpening into a delta spike at x=0 as epsilon shrinks from 1 to 0.03"
 />
@@ -239,8 +252,8 @@ treatment of tempered distributions).
 
 The consequence for the resolvent: its imaginary part, evaluated right on
 the continuous spectrum, is $\pi$ times a density of states, since the
-$\delta$ contributes weight at every point of the continuum rather than
-at isolated points. That is why the continuous spectrum reads as a branch
+$\delta$ contributes weight at every point of the continuum, never at
+isolated points. That is why the continuous spectrum reads as a branch
 cut on the real axis rather than a set of poles. The limiting value
 differs depending on which side of the axis you approach from, and a
 function with two different boundary values across a line has a cut
@@ -250,9 +263,14 @@ there, by definition.
 
 $G_0(x,x';E)\equiv\langle x|R(E)|x'\rangle$ satisfies $(E-H)G_0=\delta(x-x')$
 in position space. For $H=-\tfrac12\,d^2/dx^2$ (natural units, $V=0$),
-this reads $G_0''+k^2G_0=2\delta(x-x')$, $k\equiv\sqrt{2E}$. Away from
-$x=x'$, $G_0'' +k^2G_0=0$: the outgoing-wave solution respecting
-$x\to\pm\infty$ boundary conditions is $G_0(x,x';E)=Ae^{ik|x-x'|}$.
+this reads $G_0''+k^2G_0=2\delta(x-x')$, $k\equiv\sqrt{2E}$. A real
+$E>0$ sits *on* the free particle's continuous spectrum, where the
+previous section says the resolvent has no single value, so a branch has
+to be chosen: take $k=\sqrt{2(E+i0^+)}$, the limit from above, which
+fixes $\mathrm{Im}\,k>0$ and picks out the *outgoing* solution. That
+choice is what the phrase "the retarded Green's function" names. Away
+from $x=x'$, $G_0'' +k^2G_0=0$, and the outgoing solution respecting
+$x\to\pm\infty$ is $G_0(x,x';E)=Ae^{ik|x-x'|}$.
 Integrating the ODE across the kink at $x=x'$ (the second derivative of
 $|x-x'|$ contributes exactly the delta function's coefficient) gives the
 jump condition $G_0'(x'^+)-G_0'(x'^-)=2$. Direct differentiation of
@@ -263,7 +281,7 @@ $$
 \boxed{\;G_0(x,x';E)=-\frac{i}{k}\,e^{ik|x-x'|}, \qquad k=\sqrt{2E}\;}
 $$
 
-a fully derived closed form, not looked up.
+The jump condition, not a table of integrals, is what fixed $A$.
 
 ### The infinite-well Green's function, derived and verified against the known spectrum
 
@@ -285,24 +303,32 @@ $E=n^2\pi^2/(8a^2)$**: compare directly to the infinite well's already-known
 closed-form spectrum, `infiniteSquareWellEnergyLevel(n, 2a)` $=n^2\pi^2/(2(2a)^2)=n^2\pi^2/(8a^2)$
 **exactly the same formula**, an independent derivation reproducing a
 result this platform already had, not a new assumption. For $a=1$,
-computed by `infiniteSquareWellEnergyLevel`: $E_1={wellE1.toFixed(4)}$,
-$E_2={wellE2.toFixed(4)}$.
+computed by `infiniteSquareWellEnergyLevel`: $E_1=$ {wellE1.toFixed(4)},
+$E_2=$ {wellE2.toFixed(4)}.
 
 <ParametricCurve
   frames={greenCurveFrames}
+  xAxisLabel="energy E"
+  yAxisLabel="G(0.3, −0.2; E), clamped"
   ariaLabel="The infinite well Green's function at fixed x=0.3, x'=-0.2, plotted against energy E, clamped near its poles, showing sharp divergences exactly at the known bound-state energies E1 and E2"
 />
 
-The plotted $G_{\text{well}}(0.3,-0.2;E)$, clamped to $\pm30$ so the
-plot stays legible, spikes sharply right at $E\approx1.234$
-and $E\approx4.935$, the two poles, landing exactly on
-the two already-known bound-state energies, with nothing in between or
-beyond them in this range, visible directly rather than asserted.
+The plotted $G_{\text{well}}(0.3,-0.2;E)$ is clamped to $\pm30$ so the
+plot stays legible, and the clamp is what makes the figure worth reading.
+Away from the poles this function is small: over the sampled range its
+magnitude never exceeds $1.3$ anywhere in $(2,4)$, and never exceeds
+$0.23$ above $E=6$. Only $5$ of the $500$ sampled energies exceed $30$ in
+magnitude, and they sit in two tight clusters around $E\approx1.234$ and
+$E\approx4.935$. So the picture is a flat baseline with two isolated
+walls, and those walls stand exactly on $E_1$ and $E_2$ as computed by
+`infiniteSquareWellEnergyLevel`. Nothing appears between them or beyond
+them, which is the right answer: the next pole is at
+$E_3=9\pi^2/8\approx11.10$, outside the plotted range.
 
-## Physical Interpretation
+## Turning a Search Into an Analytic Structure
 
 The resolvent turns "find the bound states" (a hard problem in general;
-Solving the Finite Well Numerically needed bisection precisely because
+Solving the Finite Well Numerically needed bisection because
 no closed form exists) into "find the poles of one specific function of
 a complex variable", the *same* kind of question regardless of how
 complicated the potential is, even when the eigenvalues themselves have
@@ -313,22 +339,22 @@ problems, trading "solve a transcendental equation" for "locate a
 singularity," a different and often more tractable kind of
 question.
 
-## Worked Example
+## The Infinite Well's Green Function, Two Ways
 
 **Check the closed form against the eigenfunction expansion
 $G(x,x';E)=\sum_n\psi_n(x)\psi_n(x')/(E-E_n)$, which is derived from the
 spectral theorem rather than from the jump condition, and so is an
 independent route to the same object.**
 
-Take $a=1$, $E={greenTestEnergy}$ (strictly between
-$E_1\approx{wellE1.toFixed(4)}$ and $E_2\approx{wellE2.toFixed(4)}$, so
-no pole is nearby), $x={greenTestX}$, $x'={greenTestXPrime}$. The boxed
-closed form gives $G_{\text{well}}={greenClosedForm.toFixed(5)}$. The
+Take $a=1$, $E=$ {greenTestEnergy} (strictly between
+$E_1\approx$ {wellE1.toFixed(4)} and $E_2\approx$ {wellE2.toFixed(4)}, so
+no pole is nearby), $x=$ {greenTestX}, $x'=$ {greenTestXPrime}. The boxed
+closed form gives $G_{\text{well}}=$ {greenClosedForm.toFixed(5)}. The
 spectral sum, run at module scope over the first
 {greenSpectralTermCount} terms with energies from this platform's
 `infiniteSquareWellEnergyLevel` and the well's normalized
-eigenfunctions, gives {greenSpectralSum.toFixed(5)}: a relative gap of
-{(greenRelativeGap * 100).toFixed(3)}%.
+eigenfunctions, gives {greenSpectralSum.toFixed(5)}: the same to every
+decimal shown, with a relative gap of {greenRelativeGap.toExponential(1)}.
 
 The residual is the truncation, not an error in either derivation. The
 terms fall off like $1/n^2$, so a $200$-term partial sum still carries a
@@ -337,7 +363,7 @@ What matters is that a boundary-value ODE solve and a spectral sum over
 independently-known eigenfunctions, sharing no step of their derivations,
 land on the same value.
 
-## Common Mistakes
+## Expecting Poles Where There Is a Cut
 
 <Callout type="warning">
 **Expecting the resolvent to have poles anywhere in the continuum, the
@@ -361,13 +387,179 @@ points) but never *where* the poles are.
 
 1. Verify directly, by substitution, that $G_0(x,x';E)=-\frac{i}{k}
    e^{ik|x-x'|}$ satisfies $G_0''+k^2G_0=0$ for $x\ne x'$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Away from $x=x'$ the sign of $x-x'$ is fixed, so write
+   $s\equiv\mathrm{sgn}(x-x')$, a constant on each side, and
+   $|x-x'|=s(x-x')$. Then $G_0=-\frac{i}{k}e^{iks(x-x')}$ is an ordinary
+   exponential in $x$ with rate $iks$, and differentiating twice just
+   brings that rate down twice:
+
+   $$
+   \frac{\partial^2G_0}{\partial x^2}=(iks)^2G_0=-k^2s^2G_0=-k^2G_0,
+   $$
+
+   because $s^2=1$ on either side. So $G_0''+k^2G_0=0$, with no case
+   analysis needed. Doing the two cases separately gives the same thing:
+   for $x>x'$, $G_0'=e^{ik(x-x')}$ and $G_0''=ik\,e^{ik(x-x')}$, and
+   $ik\,e^{ik(x-x')}+k^2\left(-\tfrac{i}{k}\right)e^{ik(x-x')}=0$; for
+   $x<x'$ every $k$ flips sign and the same cancellation happens.
+
+   The step $s^2=1$ is the whole point of the absolute value, and it is
+   worth naming rather than passing over. The homogeneous equation is
+   blind to the sign: $e^{+ik(x-x')}$ and $e^{-ik(x-x')}$ both solve it,
+   and gluing one to each side produces something the equation still
+   cannot distinguish from either. What the equation *can* see is the
+   derivative at the seam. Since $G_0'=s\,e^{ik|x-x'|}$, the one-sided
+   limits are $+1$ and $-1$, so
+
+   $$
+   G_0'(x'^+)-G_0'(x'^-)=1-(-1)=2,
+   $$
+
+   exactly the jump condition that fixed $A=-i/k$ in the first place. The
+   same kink that is invisible to the equation for $x\ne x'$ is precisely
+   what manufactures the delta at $x=x'$. Verification and construction
+   are two halves of one fact.
+
+   Notice also that $-i/k$ never entered the check. It could not: the
+   equation is linear and homogeneous, so it accepts any constant
+   multiple, and the constant was pinned by the jump condition and by
+   nothing else. A student who reports having "verified the
+   normalization" has verified something the homogeneous equation is
+   incapable of testing.
+
+   The wrong turn is differentiating $|x-x'|$ all the way through and
+   producing a delta term, since $\frac{d}{dx}|x-x'|=s$ and
+   $\frac{ds}{dx}=2\delta(x-x')$, then reporting that the identity fails
+   by $2\delta$. Nothing failed. That delta is exactly the term the
+   question excluded by saying $x\ne x'$, and it is the source term of
+   the full equation $G_0''+k^2G_0=2\delta(x-x')$. A second wrong turn is
+   deciding that the absolute value makes $G_0$ non-differentiable and
+   therefore unverifiable. It is analytic on each open side; the single
+   bad point is the one point removed from consideration.
+
+   </details>
+
 2. For the infinite well with $a=2$ (not $a=1$), at what energy does the
    *first* pole of $G_{\text{well}}$ occur? Compare to
    `infiniteSquareWellEnergyLevel(1, 4)`.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Poles sit where $\sin(2ka)=0$, so $2ka=n\pi$ and $k=n\pi/(2a)$. With
+   $a=2$ and $n=1$ that is $k=\pi/4$, and since $k=\sqrt{2E}$,
+
+   $$
+   E_1=\frac{k^2}{2}=\frac{1}{2}\left(\frac{\pi}{4}\right)^2=\frac{\pi^2}{32}=0.3084251375 .
+   $$
+
+   The general form $E=n^2\pi^2/(8a^2)$ gives the same thing at $n=1,a=2$.
+   The engine call agrees to every digit: `infiniteSquareWellEnergyLevel(1, 4)`
+   evaluates $\pi^2/(2\cdot1\cdot4^2)=\pi^2/32=0.30842513753404244$, and
+   the closed form returns $0.30842513753404244$ as well.
+
+   The comparison to $a=1$ is the useful sanity check. There
+   $E_1=\pi^2/8=1.2337005501$, exactly four times larger. Doubling the
+   half-width quarters the energy, which is the $1/a^2$ in the formula
+   showing up as a clean factor of $4$ rather than as something to take on
+   trust.
+
+   The wrong turn is calling `infiniteSquareWellEnergyLevel(2, ...)` or,
+   far more commonly, `infiniteSquareWellEnergyLevel(1, 2)`: passing the
+   half-width where the function wants the full width. It returns
+   $1.2337005501361697$, four times too big, and it is seductive because
+   the lesson's own formula is written in terms of $a$ while the engine's
+   signature is written in terms of `width`. The lesson spells the
+   translation out as `infiniteSquareWellEnergyLevel(n, 2a)`, and the
+   factor-of-four discrepancy is the symptom to recognize: an energy off
+   by exactly $4$ in a well problem is almost always a half-width fed in
+   as a width.
+
+   A second thing worth checking, because it looks like a pole and is
+   not: $\sin(2ka)$ also vanishes at $k=0$, that is at $E=0$. Expand the
+   Green's function there. The numerator
+   $\sin(k(x_<+a))\sin(k(a-x_>))$ vanishes like $k^2$ while the
+   denominator $k\sin(2ka)$ vanishes like $2ak^2$, so the ratio is finite
+   and $G_{\text{well}}\to-(x_<+a)(a-x_>)/a$. Numerically at $a=2$,
+   $x=0.3$, $x'=-0.2$, the closed form returns $-1.53025$ at $k=10^{-2}$
+   and $-1.53000$ at $k=10^{-5}$, converging on the predicted $-1.53$.
+   $E=0$ is a removable singularity, not a pole, and it has to be: $n=0$
+   would mean $\psi\propto\sin(0)=0$, which is not a state. The formula
+   knows on its own that the ground state is $n=1$.
+
+   </details>
 3. Explain in one or two sentences why $\mathrm{Im}[1/(x-i\varepsilon)]=
    \varepsilon/(x^2+\varepsilon^2)$ integrating to exactly $\pi$ for
    *every* $\varepsilon>0$ (not just in some limit) is what makes it a
    delta-sequence, not merely "approximately" one.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a delta-sequence has to get two independent things right, and
+   an exact mass settles one of them before the limit is ever taken. The
+   family must concentrate, which the shrinking width does, *and* it must
+   carry a fixed total weight, so that the limit has a definite
+   normalization rather than one that depends on how the limit was
+   approached. Here $\int\varepsilon/(x^2+\varepsilon^2)dx=\pi$ holds
+   identically in $\varepsilon$, so the weight is decided in advance and
+   only the shape is left to change.
+
+   One precision, since the lesson is careful about it and the question's
+   wording is loose: $\varepsilon/(x^2+\varepsilon^2)$ is a delta-sequence
+   only after dividing by $\pi$. As written it converges to $\pi\delta(x)$,
+   and that is exactly where the $\pi$ in
+   $\mathcal P(1/x)+i\pi\delta(x)$ comes from. The factor is not
+   cosmetic; it propagates into every density of states read off
+   $\mathrm{Im}\,R(E)$.
+
+   Where the exactness does concrete work is in the interchange of limit
+   and integral. Split a test function around the origin:
+
+   $$
+   \int\frac{\varepsilon\,\varphi(x)}{x^2+\varepsilon^2}dx=\pi\varphi(0)+\int\frac{\varepsilon\big[\varphi(x)-\varphi(0)\big]}{x^2+\varepsilon^2}dx .
+   $$
+
+   The first term is pulled out using the exact mass, with no error
+   attached to it whatsoever. The second vanishes because
+   $\varphi(x)-\varphi(0)=O(|x|)$ near the origin cancels one power of
+   $x$, leaving something of size $\varepsilon\ln(1/\varepsilon)$: on
+   $|x|\le1$ the bound $\varepsilon\ln\!\big((1+\varepsilon^2)/\varepsilon^2\big)$
+   is $0.46$, $0.092$, $0.014$ at $\varepsilon=0.1,0.01,0.001$. Had the
+   mass only been *approximately* $\pi$, the first term would carry an
+   unknown error multiplying $\varphi(0)$, and the estimate would be
+   circular: you would be trying to prove the limit while assuming a
+   bound on the very quantity in question.
+
+   Substituting $x=\varepsilon\tan\theta$ turns the mass integral into
+   $\int_{-\pi/2}^{\pi/2}d\theta$ with $\varepsilon$ cancelling
+   identically, and dense quadrature in $\theta$ returns $3.141592654$ at
+   $\varepsilon=1$, $0.1$, $0.03$ and $10^{-6}$ alike: nine digits,
+   unchanged across six orders of magnitude.
+
+   The wrong turn is the height-times-width argument: the peak is
+   $1/\varepsilon$ and the width is about $\varepsilon$, the product is
+   order one, so it must be a delta. That reasoning gets the shape right
+   and the constant wrong, and the constant is the entire content here.
+   Peak times full width at half maximum is $(1/\varepsilon)(2\varepsilon)=2$
+   exactly, and peak times half-width is $1$; neither is $\pi$. Trusting
+   the heuristic drops the $\pi$ from Sokhotski-Plemelj and from every
+   density of states derived through it.
+
+   A second wrong turn is integrating the pointwise limit. At any fixed
+   $x\ne0$, $\varepsilon/(x^2+\varepsilon^2)\to0$ as $\varepsilon\to0$, so
+   the pointwise limit is the zero function almost everywhere and its
+   integral is $0$, not $\pi$. The two orders of operation genuinely
+   disagree, and the exact mass is what tells you which order is the
+   definition: the limit is taken in the pairing against a test function,
+   never inside it. That is the same lesson the Dirichlet kernel taught
+   one lesson ago, with a Lorentzian in place of a sinc.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -388,13 +580,13 @@ points) but never *where* the poles are.
   closed form agrees with an independent eigenfunction-expansion sum to
   $5$-$6$ significant figures using 200 terms: two different derivations, same number.
 
-## Further Exploration
+## The Same Machinery on a Weighted Interval
 
 <NextDiscovery>
   [Sturm-Liouville Theory](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/sturm-liouville-theory)
   names the structure the infinite well's $-y''=\lambda y$ and the
   hydrogen radial equation share, and proves why every
   "boundary-matching" eigenvalue problem of that shape arrives with real
-  eigenvalues and a complete orthogonal eigenbasis, rather than having to
-  be checked case by case.
+  eigenvalues and a complete orthogonal eigenbasis, with no case-by-case
+  checking required.
 </NextDiscovery>

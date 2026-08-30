@@ -27,7 +27,7 @@ export const costLandscapeGrid = Array.from({ length: 15 }, (_, i) => {
 export const lessonMeta = {
   title: "Variational Algorithm Implementation",
   description:
-    "Closing the loop this pillar has been building toward: a VQE ansatz built from this platform's own QuantumCircuit (not Quantum Algorithms II's separate matrix-based ansatzState) finds ⟨Z⟩'s minimum at θ=π, value -1, matching exactGroundStateEnergy(Z) to full precision, then extends to a two-parameter Hamiltonian and converges to within 0.04% of the true ground energy by grid search alone.",
+    "Closing the loop this track has been building toward: a VQE ansatz built from this platform's own QuantumCircuit (not Quantum Algorithms II's separate matrix-based ansatzState) lands its grid search exactly on ⟨Z⟩'s true minimum, matching exactGroundStateEnergy to full precision, then extends to a two-parameter Hamiltonian and converges to within 0.04% of the true ground energy by grid search alone.",
   course: "compilation-and-hybrid-algorithms",
   module: "variational-algorithm-implementation",
   order: 1,
@@ -42,22 +42,22 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Assembling the pieces">
-Every piece needed for this final implementation already exists, scattered across this entire platform — Quantum Algorithms II's VQE physics, Programming Quantum Computers' QuantumCircuit, this course's compilation concepts. This closing lesson assembles them into one working, end-to-end variational algorithm.
+Every piece needed for this final implementation already exists, scattered across this entire platform: Quantum Algorithms II's VQE physics, Programming Quantum Computers' QuantumCircuit, this course's compilation concepts. This closing lesson assembles them into one working, end-to-end variational algorithm.
 </LessonHook>
 
-## Motivation
+## The Same VQE, Written as a Program
 
 Quantum Algorithms II already built <Term id="vqe">VQE</Term> once, computing its ansatz
 state by direct matrix arithmetic. This closing lesson implements the
 same variational loop the "software" way instead: the circuit-as-data
-pattern this pillar has developed, built from this platform's own
+pattern this track has developed, built from this platform's own
 `QuantumCircuit`. Because both code paths compute the same physics,
 every result here can be cross-checked against
 `exactGroundStateEnergy`, the same verified answers Quantum
 Algorithms II already established.
 
-The Hamiltonians in this lesson are deliberately small — one and two
-parameters, ground energies known in closed form — because that is what
+The Hamiltonians in this lesson are deliberately small (one and two
+parameters, ground energies known in closed form) because that is what
 makes the implementation checkable. The reason anyone builds this
 machinery is the case where no closed form exists: a molecular
 Hamiltonian whose ground-state energy is the thing you wanted and cannot
@@ -66,13 +66,13 @@ get any other way.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/6/60/FeMoco_cluster.svg"
   alt="Structural diagram of the FeMo-cofactor, the iron-molybdenum-sulfur active-site cluster of the nitrogenase enzyme"
-  caption="The FeMo-cofactor of nitrogenase, the most-cited target in the quantum-chemistry resource-estimation literature. A variational algorithm aimed at a molecule like this runs the same loop this lesson builds — prepare an ansatz, measure an expectation value, hand it to a classical optimizer — with a Hamiltonian of thousands of terms in place of 0.6Z + 0.8X, and no exact answer to check against."
+  caption="The FeMo-cofactor of nitrogenase, the most-cited target in the quantum-chemistry resource-estimation literature. A variational algorithm aimed at a molecule like this runs the same loop this lesson builds (prepare an ansatz, measure an expectation value, hand it to a classical optimizer) with a Hamiltonian of thousands of terms in place of 0.6Z + 0.8X, and no exact answer to check against."
   credit="Smokefoot / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:FeMoco_cluster.svg"
   license="Public domain"
 />
 
-## Engineering Development
+## Ansatz, Cost Function, Optimizer
 
 ### Building the ansatz with QuantumCircuit
 
@@ -86,7 +86,7 @@ circuit.ry(0, theta);
 const state = runCircuit(circuit);
 ```
 
-This is the "software" version of the same physics — the
+This is the "software" version of the same physics: the
 circuit-as-data pattern (Circuit Representation in Code) applied to a
 variational algorithm.
 
@@ -109,20 +109,22 @@ $\langle Z\rangle$ directly from the circuit's own output.
     { label: "θ = 3π/2", value: "three-half-pi" },
   ]}
   correctValue="pi"
-  explanation="Ry(π)|0⟩ = |1⟩ up to global phase, and ⟨Z⟩ on |1⟩ is exactly -1, the smallest value Z's expectation can take on any state. The grid search below confirms this directly, landing exactly on θ=π with ⟨Z⟩=-1, matching exactGroundStateEnergy(PAULI_Z) exactly."
+  explanation="Ry(π)|0⟩ = |1⟩ up to global phase, and ⟨Z⟩ on |1⟩ is exactly -1, the smallest value Z's expectation can take on any state. The grid search below confirms this directly, landing exactly on θ=π with ⟨Z⟩=-1, matching exactGroundStateEnergy(PAULI_Z)."
 />
 
 A simple grid search over $\theta\in[0,2\pi]$ (the same
 "smallest correct optimizer" choice Quantum Algorithms II's `runVqe`
 already used) finds the minimum at $\theta=\pi$, with
 $\langle Z\rangle=-1$, matching `exactGroundStateEnergy(PAULI_Z)=-1` to
-full precision — the `QuantumCircuit` implementation reproduces Quantum
+full precision. The `QuantumCircuit` implementation reproduces Quantum
 Algorithms II's matrix-based result through an entirely separate
 (software-first) code path. This page's own grid search, run live over
 all 41 points, traces out the cost landscape the optimizer is searching:
 
 <ParametricCurve
   ariaLabel="Cost landscape: expectation value of Z vs theta, grid search over one full period"
+  xAxisLabel="θ (rad)"
+  yAxisLabel="⟨Z⟩"
   frames={[
     {
       paramLabel: "grid search over θ ∈ [0, 2π]",
@@ -154,7 +156,7 @@ $\sqrt{0.6^2+0.8^2}=1$), a two-parameter ansatz
 direct matrix application to the circuit's output amplitudes,
 grid-searched over both $\theta$ and $\phi$, converges to
 $\langle H\rangle\approx-0.9996$, within $0.04\%$ of the true $-1$
-ground energy, limited only by grid resolution — a finer grid closes the
+ground energy, limited only by grid resolution. A finer grid closes the
 gap further, as the Variational Method course established for a
 different, continuous-wavefunction trial family.
 
@@ -174,19 +176,19 @@ The darkest-green cell is the grid search's winner: the lowest
 $\langle H\rangle$ this particular $15\times15$ grid found, sitting
 close to (but, unlike the $H=Z$ case, not exactly on) the true
 continuous minimum. That offset is the residual gap described above,
-seen as a picture of the whole landscape rather than a single reported
-number.
+seen here as a picture of the whole landscape, where before it was a
+single reported number.
 
-## Physical Interpretation
+## One Physics, Two Implementations
 
-This is the Quantum Software pillar's thesis made concrete: one physical
+This is the Quantum Software track's thesis made concrete: one physical
 algorithm (VQE, already built in Quantum Algorithms II) admits several
-software realizations — direct matrix computation, circuit-as-data — and
+software realizations (direct matrix computation, circuit-as-data), and
 when both are correct they agree to the last digit. Software structure
 is a real engineering choice, and it changes nothing about the physics
 underneath.
 
-## Worked Example
+## Matching the Exact Ground-State Energy
 
 **Confirm the QuantumCircuit-based single-parameter result matches
 Quantum Algorithms II's exactGroundStateEnergy exactly, and explain why
@@ -201,7 +203,7 @@ $R_y(\theta)$ ansatz family reaches it at $\theta=\pi$, unlike
 the two-parameter $0.6Z+0.8X$ case, where the grid search's finite
 resolution leaves a small (but shrinkable) residual gap.
 
-## Common Mistakes
+## Expecting Two Implementations to Disagree
 
 <Callout type="note">
 **Assuming a QuantumCircuit-based and a matrix-based VQE implementation
@@ -222,14 +224,212 @@ special, checkable coincidence of that specific problem's structure.
 
 1. Write out (conceptually) the QuantumCircuit-based steps to compute
    $\langle Z\rangle$ for a given $\theta$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Five steps, of which only one is arithmetic:
+
+   1. Create a one-qubit circuit, `new QuantumCircuit(1)`.
+   2. Append the ansatz rotation, `circuit.ry(0, theta)`. This adds one
+      `RY` instruction with its angle as a parameter. Nothing has run
+      yet, and no state exists.
+   3. Execute it, `runCircuit(circuit)`. This allocates $|0\rangle$,
+      dispatches the instruction to `applySingleQubitGate`, and returns
+      the final `StateVector`.
+   4. Read the measurement probabilities off the amplitudes,
+      `state.probabilities()`, giving $[P(0),\,P(1)]$.
+   5. Subtract: $\langle Z\rangle = P(0)-P(1)$.
+
+   **Why step 5 needs no matrix machinery at all.** $Z$ is diagonal in
+   the measurement basis, with eigenvalue $+1$ on $|0\rangle$ and $-1$ on
+   $|1\rangle$. Its expectation value is therefore the eigenvalue-weighted
+   average of the measurement outcomes, which is exactly
+   $(+1)P(0)+(-1)P(1)$. No operator is applied; the expectation is read
+   straight out of the probabilities the measurement already produces.
+
+   That is not a trick specific to $Z$, and it is worth generalizing
+   correctly. *Any* observable diagonal in the computational basis is a
+   weighted sum of measurement probabilities, so any such term is free
+   once you have the counts.
+
+   **And it is worth being clear about where it stops.** $X$ is not
+   diagonal in that basis, so $\langle X\rangle$ cannot be read off a
+   $Z$-basis measurement at all. The two-parameter case in this lesson
+   therefore applies the Hamiltonian matrix to the amplitudes directly,
+   which a simulator can do and a device cannot. On real hardware the
+   equivalent move is to rotate the basis before measuring, one extra
+   gate and a *separate measurement setting* per non-commuting term. That
+   is precisely why the Hybrid Workflows lesson's cost arithmetic
+   multiplies by the number of Pauli terms: each one is its own set of
+   circuit executions.
+
+   The wrong turn is thinking step 2 computed something. It appended a
+   data object, and the whole build-then-run separation this course
+   develops sits in the gap between steps 2 and 3.
+
+   </details>
+
 2. Why does $H=Z$'s ground state land EXACTLY on a grid point
    ($\theta=\pi$) while $H=0.6Z+0.8X$'s optimal parameters don't land
    as precisely on this lesson's grid?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because one optimum is at a rational fraction of the search interval
+   and the other is not. Nothing about the second Hamiltonian is harder;
+   the difference is arithmetic about where the target sits.
+
+   **The $H=Z$ case.** With the ansatz $R_y(\theta)|0\rangle$, the cost
+   is $\langle Z\rangle=\cos\theta$, minimized at exactly $\theta=\pi$.
+   A grid of $n$ points spanning $[0,2\pi]$ with both endpoints included
+   has spacing $2\pi/(n-1)$, so $\pi$ is a grid point whenever $n-1$ is
+   even, that is, whenever $n$ is odd. The lesson's 41-point grid
+   qualifies, and so does a 21-point one: both return exactly $-1$,
+   matching `exactGroundStateEnergy(PAULI_Z)`.
+
+   **The $H=0.6Z+0.8X$ case.** Write $H=\hat n\cdot\vec\sigma$ with
+   $\hat n=(0.8,\,0,\,0.6)$, a unit vector. The ground state is the $-1$
+   eigenvector, whose Bloch vector is $-\hat n=(-0.8,\,0,\,-0.6)$. Its
+   polar angle is $\theta^\*=\arccos(-0.6)=\pi-\arctan(4/3)\approx
+   2.214297$, with azimuth $\varphi^\*=\pi$. Evaluating the ansatz there
+   returns $\langle H\rangle=-1$ exactly.
+
+   Now ask whether $\theta^\*$ can ever be a grid point.
+   $\theta^\*/\pi\approx0.70483$, and $\tan\theta^\*=-4/3$. A rational
+   multiple of $\pi$ has tangent in $\{0,\pm1\}$ or undefined, so
+   $\theta^\*/\pi$ is irrational. **A uniform grid over $[0,2\pi]$ will
+   never contain it, at any resolution whatsoever.** The best any grid
+   can do is land near it, and the 15-point grid's nearest useful point,
+   $\theta=2.24399$, misses by 0.0297 and returns $-0.99955907$: the
+   0.04% the lesson quotes.
+
+   The wrong turn is reading the residual as physics, as though the
+   variational method were failing or the ansatz were too weak to
+   represent the ground state. It is not: the same two-parameter ansatz
+   reaches $\langle H\rangle=-1$ to machine precision at
+   $(\theta^\*,\varphi^\*)$. The 0.04% belongs entirely to the optimizer,
+   and specifically to the decision to search a discrete grid rather than
+   a continuous parameter space. Question 4 is about what happens when
+   you try to buy your way out of that.
+
+   </details>
+
 3. Explain why building the SAME VQE physics through two different code
-   paths (direct matrix vs. circuit-as-data) serves as a genuine
+   paths (direct matrix vs. circuit-as-data) serves as a
    correctness check on both implementations.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a bug in one shows up as a disagreement only if the other does
+   not share it, and these two share nothing.
+
+   The circuit path builds an instruction list, dispatches it through
+   `applySingleQubitGate` to produce amplitudes, and reads the
+   expectation off those amplitudes. `exactGroundStateEnergy` takes the
+   Hamiltonian matrix and finds its lowest eigenvalue. No gate-application
+   code is common to the two, and no intermediate representation is
+   shared. When they agree to the last digit, the agreement is evidence,
+   because the space of bugs that would produce the *same* wrong number
+   through both routes is very small.
+
+   The question to test any cross-check against is: what would this prove
+   if both paths went through the buggy code? That is the criterion, and
+   it disposes of three plausible-sounding alternatives.
+
+   **"Both call the same gate helpers, so agreement confirms the
+   helpers."** This would make the check vacuous. A shared layer is
+   exactly where a common bug hides, and running the same wrong function
+   twice produces the same wrong answer twice. The value here comes from
+   the paths *not* sharing that layer.
+
+   **"The matrix computation is the reference, so a matching circuit
+   result inherits its correctness."** The evidence is symmetric. Neither
+   implementation has earned authority over the other, and if they
+   disagreed you would not know which to believe without further work.
+   What agreement supports is the conjunction, not one side of it.
+
+   **"VQE converges to the ground energy for any correct ansatz, so
+   agreement confirms the ansatz was good."** This assumes the
+   conclusion. Whether the optimization converged correctly is the thing
+   under test.
+
+   **One honest limit**, because "correctness check" can be read too
+   strongly. Agreement rules out *independent* bugs. It does not rule out
+   a shared conceptual error: if both paths adopted the same wrong sign
+   convention for $R_y$, or both misidentified which eigenvalue is the
+   ground state, they would agree and both be wrong. Two independent
+   implementations agreeing is strong evidence and not a proof, which is
+   why this platform pairs it with checks against closed-form answers
+   wherever a closed form exists.
+
+   </details>
+
 4. What would you expect to happen to the two-parameter case's residual
    gap (currently $\approx0.04\%$) if the grid resolution were doubled?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **The expected answer is that it falls by about a factor of four. What
+   actually happens on this grid is that it does not move at all.** Both
+   halves are worth having.
+
+   **The reasoning behind the factor of four.** Near a smooth minimum the
+   cost is quadratic: $f(\theta^\*+\delta)-f(\theta^\*)\approx
+   \tfrac12 f''\delta^2$. A grid of spacing $h$ guarantees some point
+   within $h/2$ of the optimum, so the worst-case gap scales as $h^2$.
+   Halve $h$ and the gap should quarter. As an asymptotic law, averaged
+   over where the optimum happens to fall, that is correct.
+
+   **What the engine actually returns.** Refining the lesson's
+   $15\times15$ grid the natural way, keeping both endpoints so the point
+   count goes $15\to29\to57$:
+
+   $15\times15$, 225 evaluations, gap $4.4093\times10^{-4}$, 0.04409%;
+
+   $29\times29$, 841 evaluations, gap $4.4093\times10^{-4}$, 0.04409%;
+
+   $57\times57$, 3,249 evaluations, gap $4.4093\times10^{-4}$, 0.04409%.
+
+   Identical to eight decimal places, for fourteen times the work.
+
+   **Why.** Doubling a grid this way is *nested*: every old point is
+   still a point of the new grid, so the previous winner remains a
+   candidate and refinement helps only if a newly added point beats it.
+   The $15$-grid's winner at $\theta=2.24399$ sits only 0.0297 from
+   $\theta^\*\approx2.214297$, which is unusually close for a grid that
+   coarse, and the new points at each refinement all land further away.
+   Only at $113\times113$ does a new point at $\theta=2.18789$ finally
+   edge it out, improving the gap to 0.03485%, and it takes
+   $225\times225$ and 50,625 evaluations to reach 0.00014%.
+
+   **And doubling the other way makes it worse.** Go $15\to30$ instead,
+   so the endpoints shift and the grids are not nested, and the gap rises
+   to 0.11366%: refining the search by 4× the evaluations returned an
+   answer nearly three times further from the truth. The gap is a step
+   function of resolution, not a smooth curve, because it depends on
+   where the nearest available point happens to fall.
+
+   Two things to take from this.
+
+   **Grid search scales terribly.** In $d$ parameters, doubling the
+   resolution multiplies the evaluations by $2^d$. Here $d=2$, so 4×. A
+   realistic VQE with a dozen parameters would pay $2^{12}=4096\times$
+   the circuit executions per refinement, on top of the shots-per-term
+   arithmetic from Hybrid Workflows. This is why grid search is a
+   teaching optimizer and gradient methods are what anyone actually runs.
+
+   **The gap is not a floor.** It belongs to the optimizer, not to the
+   ansatz. $R_y(\theta)R_z(\varphi)$ reaches $\langle H\rangle=-1$ to
+   machine precision at $(\theta^\*,\pi)$, so a continuous optimizer
+   closes the gap entirely rather than shrinking it. Buying resolution
+   is the expensive way to approach an answer a better search finds
+   directly.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -246,14 +446,14 @@ special, checkable coincidence of that specific problem's structure.
   the same variational-method pattern established all the way back in
   Approximation Methods, now implemented end to end in software.
 
-## Further Exploration
+## When the Answer Is Still Too Noisy
 
 <NextDiscovery>
 This closes the algorithmic core of **Compilation & Hybrid Algorithms**:
 only **Quantum Error Mitigation** remains, closing out this course and,
-with it, the entire Quantum Software pillar. Every course from
+with it, the entire Quantum Software track. Every course from
 Mathematical Foundations through this lesson now has lessons, problems,
 and, wherever useful, verified engine code connecting them, with the
 four graduate-level Quantum Mastery courses still ahead across this
-platform's full, 26-course, five-pillar curriculum.
+platform's full, 26-course, five-track curriculum.
 </NextDiscovery>

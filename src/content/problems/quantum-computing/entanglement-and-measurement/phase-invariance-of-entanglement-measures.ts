@@ -37,7 +37,7 @@ export const phaseInvarianceOfEntanglementMeasures: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "Concurrence uses |ad-bc|, and a phase on d only changes its phase, not its magnitude — compare to an ordinary Bell state.",
+    incorrectFeedback: "Concurrence uses |ad-bc|, and a phase on d changes only its phase, not its magnitude. Compare against an ordinary Bell state.",
     nearMisses: [
       { value: 0.5, feedback: "0.5 is |ad−bc|. Concurrence doubles it: C = 2|ad−bc|." },
       {
@@ -54,10 +54,10 @@ export const phaseInvarianceOfEntanglementMeasures: NumericProblem = {
   ],
   solution: {
     steps: [
-      { description: "$|ad-bc|=|a||d|=\\sqrt{0.5}\\times\\sqrt{0.5}=0.5$ — the phase $e^{i\\pi/6}$ doesn't affect the magnitude." },
+      { description: "$|ad-bc|=|a||d|=\\sqrt{0.5}\\times\\sqrt{0.5}=0.5$. The phase $e^{i\\pi/6}$ leaves the magnitude untouched." },
       { description: "$C=2\\times0.5=1$." },
     ],
-    finalAnswer: "C = 1, exactly the same as an ordinary |Φ+⟩ Bell state (phase 0) — confirming the phase doesn't affect concurrence.",
+    finalAnswer: "C = 1, exactly the same as an ordinary |Φ+⟩ Bell state (phase 0), confirming that the phase does not affect concurrence.",
   },
   explanation: {
     correctIdea: "Concurrence depends only on the magnitude |ad-bc|, and multiplying by a unit-magnitude phase factor doesn't change any magnitude.",

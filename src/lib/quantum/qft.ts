@@ -76,7 +76,7 @@ function matrixPower(u: Matrix, power: number): Matrix {
  */
 export function phaseEstimation(u: Matrix, eigenstate: [Complex, Complex], precisionQubits: number): StateVector {
   if (u.rows !== 2 || u.cols !== 2) {
-    throw new Error(`phaseEstimation requires a 2x2 unitary (got ${u.rows}x${u.cols}) — see this function's scope note.`);
+    throw new Error(`phaseEstimation requires a 2x2 unitary (got ${u.rows}x${u.cols}). See this function's scope note.`);
   }
   const eigenQubit = precisionQubits; // the last qubit holds the eigenstate
   const zeros = Array.from({ length: 2 ** precisionQubits }, (_, i) => (i === 0 ? Complex.ONE : Complex.ZERO));

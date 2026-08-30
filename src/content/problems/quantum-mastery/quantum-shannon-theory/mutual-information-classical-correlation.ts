@@ -15,7 +15,7 @@ export const mutualInformationClassicalCorrelation: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "Consider rho_AB = 0.8|00><00| + 0.2|11><11| -- a classical (no coherence) mixture, so A and B always agree but are not entangled. Compute the quantum mutual information I(A:B) = S(rho_A) + S(rho_B) - S(rho_AB), in bits.",
+      "Consider rho_AB = 0.8|00><00| + 0.2|11><11|, a classical (no coherence) mixture, so A and B always agree but are not entangled. Compute the quantum mutual information I(A:B) = S(rho_A) + S(rho_B) - S(rho_AB), in bits.",
     inputHint: "bits, to 3 decimal places",
   },
   answer: {
@@ -23,7 +23,7 @@ export const mutualInformationClassicalCorrelation: NumericProblem = {
     value: 0.721928,
     tolerance: 0.001,
     incorrectFeedback:
-      "rho_AB is already diagonal with eigenvalues (0.8, 0, 0, 0.2), so S(rho_AB) = -0.8log2(0.8) - 0.2log2(0.2). Tracing out either qubit leaves the same distribution (0.8, 0.2) on the other, so S(rho_A) = S(rho_B) = S(rho_AB) exactly -- making I(A:B) equal to that same single Shannon entropy.",
+      "rho_AB is already diagonal with eigenvalues (0.8, 0, 0, 0.2), so S(rho_AB) = -0.8log2(0.8) - 0.2log2(0.2). Tracing out either qubit leaves the same distribution (0.8, 0.2) on the other, so S(rho_A) = S(rho_B) = S(rho_AB) exactly, which makes I(A:B) equal to that same single Shannon entropy.",
     nearMisses: [
       { value: 1.443856, tolerance: 0.003, feedback: "That is S(rho_A) + S(rho_B), with S(rho_AB) never subtracted. All three entropies coincide here, so one of them cancels." },
       { value: 2, feedback: "2 bits is a Bell state's mutual information. This state is classically correlated, not entangled, and carries strictly less." },
@@ -31,8 +31,8 @@ export const mutualInformationClassicalCorrelation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "rho_AB is diagonal in the computational basis, with eigenvalues 0.8, 0, 0, 0.2 -- read off S(rho_AB) directly as a Shannon entropy." },
-    { text: "Tracing out qubit B from |00><00| leaves |0><0|, and from |11><11| leaves |1><1|, so rho_A = 0.8|0><0| + 0.2|1><1| -- and symmetrically for rho_B." },
+    { text: "rho_AB is diagonal in the computational basis, with eigenvalues 0.8, 0, 0, 0.2, so S(rho_AB) can be read off directly as a Shannon entropy." },
+    { text: "Tracing out qubit B from |00><00| leaves |0><0|, and from |11><11| leaves |1><1|, so rho_A = 0.8|0><0| + 0.2|1><1|, and symmetrically for rho_B." },
     { text: "S(rho_A) = S(rho_B) = S(rho_AB) = H(0.8, 0.2), so I(A:B) = S(rho_A) + S(rho_B) - S(rho_AB) collapses to just H(0.8,0.2) itself." },
   ],
   solution: {
@@ -46,6 +46,6 @@ export const mutualInformationClassicalCorrelation: NumericProblem = {
   explanation: {
     correctIdea: "For a state where A and B are perfectly, classically correlated (always equal, never entangled), all three entropies S(rho_A), S(rho_B), and S(rho_AB) coincide, so I(A:B) reduces to exactly that single shared value.",
     whyCorrect: "This is the quantum mutual information reducing to its classical Shannon-theory counterpart for two perfectly correlated classical bits: knowing B tells you A completely, and the 'total correlation' I(A:B) is exactly the entropy of either variable, since there is no independent uncertainty left over once you condition on the other.",
-    whyWrong: ["Assuming this state is entangled because I(A:B) > 0: mutual information alone cannot distinguish classical correlation from entanglement -- both give a positive number. This exact state is separable (it is a probabilistic mixture of two unentangled product states), unlike the Bell state's I(A:B)=2 bits."],
+    whyWrong: ["Assuming this state is entangled because I(A:B) > 0. Mutual information alone cannot distinguish classical correlation from entanglement; both give a positive number. This state is separable, a probabilistic mixture of two unentangled product states, unlike the Bell state with its I(A:B)=2 bits."],
   },
 };

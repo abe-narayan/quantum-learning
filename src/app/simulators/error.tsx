@@ -5,7 +5,7 @@ import { Section } from "@/components/ui/Section";
 import { Eyebrow, SectionTitle, Lede } from "@/components/ui/Typography";
 import { Button } from "@/components/ui/Button";
 
-// Scoped to /simulators — every route here renders a heavy numeric explorer
+// Scoped to /simulators, every route here renders a heavy numeric explorer
 // (Bloch sphere, wavefunction, circuit builder, ...), so this is the most
 // likely place for a computation bug to surface as a render-time throw.
 // Catching it here keeps the Navbar/Footer chrome and points back to the
@@ -30,7 +30,7 @@ export default function SimulatorsError({
         This simulator crashed
       </SectionTitle>
       <Lede className="mt-4">
-        An unexpected error interrupted this simulator — likely a bug in its numerical engine, not
+        An unexpected error interrupted this simulator, likely a bug in its numerical engine, not
         something you did. You can try again, or head back to the simulator index.
       </Lede>
 

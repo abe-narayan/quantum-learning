@@ -28,8 +28,9 @@ export const traceOfProjectorEqualsDegeneracy: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Write out P explicitly as a 3x3 diagonal matrix first." },
-    { text: "The trace of any projector equals the dimension of the subspace it projects onto." },
+    { text: "In a basis that diagonalizes N, the projector is diagonal too, and its entries are only ever 1 or 0." },
+    { text: "Write P out as a 3x3 diagonal matrix, putting a 1 wherever N's diagonal carries the eigenvalue in question and a 0 elsewhere." },
+    { text: "The trace adds those entries up, so the total is counting something. Say what it counts before you check the arithmetic." },
   ],
   solution: {
     steps: [

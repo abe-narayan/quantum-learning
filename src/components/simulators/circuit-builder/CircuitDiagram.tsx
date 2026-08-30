@@ -7,9 +7,9 @@ const COLUMN_WIDTH = 64;
 const LABEL_WIDTH = 40;
 /**
  * Half-width of the invisible tap target drawn behind every clickable gate
- * group. The painted symbols are small on purpose — a 36px gate box and a
+ * group. The painted symbols are small on purpose: a 36px gate box and a
  * 10px CNOT control dot are the standard circuit notation, and inflating them
- * would stop the diagram looking like a circuit diagram — but they were also
+ * would stop the diagram looking like a circuit diagram, but they were also
  * the whole of the hit area, which put a finger-sized tap well under the 44px
  * floor. A transparent rect behind each group takes the taps instead: the
  * notation keeps its size, the target does not. 22 (44px wide) fits inside
@@ -102,7 +102,7 @@ export function CircuitDiagram({
     // circuit walks gate to gate, and each focus move scrolls its gate into
     // view for free, so a keyboard-only reader reaches the far end of the
     // circuit by using the circuit. Adding a stop on the container would put a
-    // redundant landing point in front of that walk on every simulator step —
+    // redundant landing point in front of that walk on every simulator step,
     // exactly the tab-order noise the affordance is supposed to be worth.
     // (The empty-circuit case has no gates and also no overflow: `width` is
     // then `LABEL_WIDTH + COLUMN_WIDTH`, well inside the stage.)
@@ -110,14 +110,14 @@ export function CircuitDiagram({
       <svg
         width={width}
         height={height}
-        // `role="group"`, not `role="img"` — the same correction
+        // `role="group"`, not `role="img"`: the same correction
         // `BlochSphereCanvas` documents, and for a sharper reason here. Every
         // gate below is a `<g role="button" tabIndex={0} aria-label="Jump to
         // right after …">`. `img` is a children-presentational role: Chrome
         // and Safari prune the entire subtree of an `img` from the
         // accessibility tree, so those gate buttons lost their roles and their
         // labels while keeping their DOM tab stops. The result was the worst
-        // of both worlds — a screen-reader user tabbed onto N *silent* focus
+        // of both worlds: a screen-reader user tabbed onto N *silent* focus
         // stops (one per gate, growing as they build the circuit), heard
         // nothing about what any of them did, and the only announcement in the
         // whole widget was this container's static summary. `img` also claims
@@ -128,8 +128,8 @@ export function CircuitDiagram({
         // themselves operable: it exposes children normally, so each gate's
         // `role="button"` and its "Jump to right after H on qubit 0" label
         // reach the reader. `aria-roledescription` keeps the useful half of
-        // what `img` conveyed — the reader hears "quantum circuit" instead of
-        // a bare "group" — without asserting the subtree is inert.
+        // what `img` conveyed (the reader hears "quantum circuit" instead of
+        // a bare "group") without asserting the subtree is inert.
         //
         // NOTE for `src/lib/design/__tests__/scrollRegions.test.ts`: the
         // wrapper's excuse for having no tab stop depends on this. It is only
@@ -147,7 +147,15 @@ export function CircuitDiagram({
               y1={q * ROW_HEIGHT + ROW_HEIGHT / 2}
               x2={width}
               y2={q * ROW_HEIGHT + ROW_HEIGHT / 2}
-              className="stroke-border"
+              // `--axis`, not `--border`. A qubit wire is this figure's
+              // coordinate line: a gate's row is what says which qubit it acts
+              // on, and a two-qubit gate is read by following the wire between
+              // its control and its target. That is a mark the reader must
+              // perceive, which is what `--axis` (4.5:1) is authored for, not
+              // panel chrome at 1.41:1. The chip substrates and enclosures
+              // elsewhere in this directory are chrome and correctly stay on
+              // `--border`.
+              className="stroke-axis"
               strokeWidth={2}
             />
             <text

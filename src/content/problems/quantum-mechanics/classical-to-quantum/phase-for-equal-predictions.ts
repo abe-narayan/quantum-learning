@@ -22,7 +22,7 @@ export const phaseForEqualPredictions: NumericProblem = {
     type: "numeric",
     value: 0.5,
     tolerance: 0.02,
-    incorrectFeedback: "The cross term is proportional to cos(θ) — find where cos(θ)=0 in that range.",
+    incorrectFeedback: "The cross term is proportional to cos(θ). Find where cos(θ)=0 in that range.",
     nearMisses: [
       { value: 1, feedback: "θ = π is where the cross term is most negative, giving fully destructive interference. The predictions agree where the cross term vanishes, not where it is extreme." },
       { value: 0, feedback: "θ = 0 is fully constructive, the largest possible disagreement with the classical prediction. Look for where the cosine crosses zero instead." },
@@ -31,7 +31,7 @@ export const phaseForEqualPredictions: NumericProblem = {
   hints: [
     { text: "The quantum and classical predictions differ only by the cross term, proportional to cos(θ)." },
     { text: "They coincide exactly when the cross term is zero." },
-    { text: "cos(θ)=0 at θ=π/2 within (0,π)." },
+    { text: "Solve cos(θ)=0 on the open interval (0,π): exactly one angle there qualifies. Then write it as a multiple of π, which is the form the input box wants." },
   ],
   solution: {
     steps: [

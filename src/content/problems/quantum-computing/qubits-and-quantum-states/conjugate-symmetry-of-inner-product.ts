@@ -30,15 +30,16 @@ export const conjugateSymmetryOfInnerProduct: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "That would mean the two inner products are equal, but they're generally only equal when the value is real — 2+3i is not real.",
-      c: "This negates the real part too — the reversal rule only conjugates the value, it doesn't negate it entirely.",
-      d: "This negates the real part but keeps the imaginary part's sign — the reversal rule does the opposite: it keeps the real part and flips only the imaginary part's sign.",
+      b: "That would mean the two inner products are equal, and the two agree only when the value is real. 2+3i is not.",
+      c: "This negates the real part as well. Reversing the order conjugates the value; it does not negate it.",
+      d: "This negates the real part and keeps the imaginary part's sign. Conjugation does the opposite: the real part stays and only the imaginary sign flips.",
     },
     defaultIncorrectFeedback: "Recall $\\langle\\psi|\\phi\\rangle=\\langle\\phi|\\psi\\rangle^*$: reversing the order conjugates the value.",
   },
   hints: [
-    { text: "Dirac notation's key asymmetry: ⟨ψ|φ⟩ = ⟨φ|ψ⟩*, the complex conjugate, not the same value." },
-    { text: "Conjugating a complex number flips only the sign of its imaginary part." },
+    { text: "The complex inner product is not symmetric in its two arguments. Reversing them does something specific to the value, rather than leaving it alone." },
+    { text: "That something is complex conjugation. Apply it to the number given." },
+    { text: "Conjugation touches the imaginary part only. If both parts of your answer changed sign, you negated the number instead of conjugating it." },
   ],
   solution: {
     steps: [
@@ -48,7 +49,7 @@ export const conjugateSymmetryOfInnerProduct: MultipleChoiceProblem = {
     finalAnswer: `$${reversedOverlap.re}-${Math.abs(reversedOverlap.im)}i$`,
   },
   explanation: {
-    correctIdea: "⟨φ|ψ⟩ and ⟨ψ|φ⟩ are complex conjugates of each other, not equal in general — order in Dirac notation matters.",
+    correctIdea: "⟨φ|ψ⟩ and ⟨ψ|φ⟩ are complex conjugates of each other rather than equal, so order in Dirac notation matters.",
     whyCorrect: "This directly follows from the bra being a conjugate-transpose: swapping which ket is the bra and which is the ket introduces exactly one extra conjugation.",
     whyWrong: [
       { optionId: "b", text: "Treats the inner product as symmetric in its two arguments. The two orderings agree only when the value is real, and 2+3i is not." },

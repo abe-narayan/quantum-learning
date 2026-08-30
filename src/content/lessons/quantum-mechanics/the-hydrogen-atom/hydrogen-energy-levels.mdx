@@ -44,11 +44,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Balmer's numerology, explained at last">
 Heat hydrogen gas and it doesn't glow across a smooth rainbow. It emits at a handful of exact, discrete wavelengths, cataloged by Balmer in 1885 as pure empirical numerology, a formula that fit the data perfectly with no physical justification behind it for decades.
 </LessonHook>
 
-## Motivation
+## Three decades waiting for a reason
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/2/21/Visible_spectrum_of_hydrogen.jpg"
@@ -71,7 +71,7 @@ means physically; the next lesson uses the actual radial wavefunctions
 (already built and verified in this course's engine) to see the states
 themselves.
 
-## Intuition
+## No walls, and the requirement is just as rigid
 
 The infinite square well forced only certain wavelengths to fit between
 two walls; here, the walls are gone, but the requirement is just as
@@ -84,7 +84,7 @@ a continuum, for the same reason a guitar string can only vibrate
 at certain frequencies: a boundary condition that must be satisfied
 exactly, not approximately, leaves only a countable set of solutions.
 
-## Mathematical Development
+## Where quantization comes from, and why l drops out
 
 ### The quantization condition
 
@@ -184,12 +184,12 @@ algebra exercise, not a new physical input).
   <BarChartExplorer
     frames={hydrogenDegeneracyFrames}
     sliderLabel="Principal quantum number n"
-    ariaLabel="Bar chart of the degeneracy 2l+1 for each l value at fixed n, summing to the total n-squared degeneracy of hydrogen energy level n"
+    ariaLabel="A bar per allowed l value at the chosen n, each bar's height the degeneracy 2l+1. At n=1 there is a single bar of height 1. Each step of the slider adds one more bar, two taller than the last: n=2 shows 1 and 3, n=3 shows 1, 3, 5, and n=6 shows 1, 3, 5, 7, 9, 11. The bars in each frame sum to n squared, so 4, 9, 16, 25 and 36 in turn."
     maxValue={11}
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## 13.6 eV as an ionization energy
 
 $E_1=-13.6\text{ eV}$ fixes the ionization energy of hydrogen, which is
 its magnitude $+13.6\text{ eV}$: the energy that must be *supplied* to
@@ -211,7 +211,7 @@ formula and was verified against $E_1=-13.6$, $E_2=-3.4$, $E_4=-0.85$ eV.
   explanation="Smaller. The worked example below gives E(3→2) ≈ 1.89 eV, while E(2→1) = E_2 − E_1 = −3.40 − (−13.6) = 10.2 eV, over five times larger. Levels crowd together at high n because each successive gap shrinks, which is why the visible Balmer lines (all landing on n=2) get closer together toward shorter wavelengths, while the Lyman series (landing on n=1) is spread out much further in energy."
 />
 
-## Worked Example
+## The first line of the Balmer series
 
 **What photon energy is released when an electron falls from $n=3$ to
 $n=2$? (This is the first line of the hydrogen Balmer series.)**
@@ -234,10 +234,10 @@ is easiest to see plotted rather than just stated:
   levels={hydrogenLevels}
   unit="eV"
   transition={{ fromLabel: "n = 3", toLabel: "n = 2", caption: "Balmer-α, 1.89 eV" }}
-  ariaLabel="Hydrogen energy levels n=1 through n=6, crowding toward the ionization threshold"
+  ariaLabel="Six horizontal levels on an energy axis, all negative, at -13.60, -3.40, -1.51, -0.85, -0.54 and -0.38 eV for n=1 through 6. The n=1 level sits far below everything else; the gap from n=1 to n=2 is 10.2 eV while the gap from n=5 to n=6 is 0.16 eV, so the upper five bunch tightly under the zero line. An arrow marks the n=3 to n=2 transition, labelled Balmer-alpha, 1.89 eV."
 />
 
-## Common Mistakes
+## Higher means less negative
 
 <Callout type="warning">
 **Forgetting the sign.** $E_n$ is negative for every bound state: the
@@ -258,12 +258,117 @@ implies.
 
 1. Compute $E_5$ using the formula, and check it against
    `hydrogenEnergyLevel(5)`.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   E_5 = -\frac{13.6\text{ eV}}{5^2} = -\frac{13.6}{25}\text{ eV} \approx -0.544\text{ eV}
+   $$
+
+   matching `hydrogenEnergyLevel(5)`.
+
+   For scale: that is $25$ times shallower than the ground state, and the
+   gap from $n=5$ to $n=4$ is only $0.31\text{ eV}$, well into the
+   infrared. Room-temperature thermal energy is about $0.025\text{ eV}$, so
+   a hydrogen atom in $n=5$ is bound by roughly twenty times $k_BT$ and a
+   modest collision can finish the job. High Rydberg states are fragile,
+   which is exactly why they are studied in cold, dilute traps.
+
+   </details>
+
 2. What is the total degeneracy (counting all $l$ and $m$) of the $n=2$
    level? List the specific $(l,m)$ pairs.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Four states: $(0,0)$, $(1,-1)$, $(1,0)$, $(1,+1)$.
+
+   The allowed $l$ at $n=2$ are $l=0$ and $l=1$, since $l$ runs from $0$
+   to $n-1$, and each contributes $2l+1$ values of $m$:
+
+   $$
+   \sum_{l=0}^{1}(2l+1) = 1 + 3 = 4 = n^2
+   $$
+
+   These are the $2s$ orbital and the three $2p$ orbitals, all at
+   $-3.40\text{ eV}$ in pure hydrogen. They are degenerate in energy and
+   nothing like each other in shape: $2s$ is spherical with a radial node,
+   $2p$ has two lobes and vanishes at the nucleus.
+
+   Two qualifications on the number $4$. The $m$ degeneracy is guaranteed
+   by rotational symmetry and holds for any central potential; the $l$
+   degeneracy is the accident of the $1/r$ form and is the first thing to
+   break, in any atom with more than one electron or in any field. And
+   $4$ counts orbital states only. Including the electron's spin doubles
+   it to $8$, which is where the second row of the periodic table gets its
+   length.
+
+   </details>
+
 3. A photon carries away $10.2\text{ eV}$ when an electron transitions
    from $n=2$ to $n=1$. Verify this using $E_1$ and $E_2$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \Delta E = E_2 - E_1 = -\frac{13.6}{4} - \left(-\frac{13.6}{1}\right) = -3.40 + 13.60 = 10.2\text{ eV}
+   $$
+
+   The sign convention is where this goes wrong if it goes wrong. Both
+   energies are negative, and the photon's energy is the *drop*, so it is
+   the less negative number minus the more negative one, a positive
+   result. Writing $E_1-E_2$ gives $-10.2\text{ eV}$, which is the energy
+   change of the electron rather than the energy carried off.
+
+   Converting with $hc\approx1240\text{ eV}\cdot\text{nm}$ gives
+   $\lambda\approx1240/10.2\approx122\text{ nm}$: Lyman-alpha, deep in the
+   ultraviolet and invisible to the eye. That is a piece of history worth
+   noticing. Hydrogen's strongest and most energetic transition cannot be
+   seen without a vacuum spectrograph, which is why Balmer, working in
+   1885 with visible light, catalogued the much weaker series landing on
+   $n=2$ instead. The Lyman series was not observed until 1906.
+
+   </details>
+
 4. Why does $E_n\to0$ as $n\to\infty$ correspond physically to the
    electron becoming unbound, rather than to some other special state?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $E=0$ is not an arbitrary point on the scale. It is the energy
+   of an electron at rest infinitely far from the proton, which is the
+   definition of "not bound," and the convention $V(r)\to0$ as
+   $r\to\infty$ is what puts it there.
+
+   So $|E_n|$ is the binding energy: the work needed to remove the
+   electron from level $n$. As $n$ grows that work shrinks toward zero,
+   and an electron held by nothing is free. The $13.6\text{ eV}$ ionization
+   energy is this same statement at $n=1$.
+
+   The structural reason $E=0$ is a genuine threshold and not just a
+   round number shows up in the derivation above. The decay constant is
+   $\kappa=\sqrt{-2mE}/\hbar$, real for $E<0$, giving the $e^{-\kappa r}$
+   tail that makes a state normalizable and confines the electron to a
+   region of size $\langle r\rangle\propto n^2a_0$. As $E\to0^-$,
+   $\kappa\to0$: the tail stops decaying and the orbit swells without
+   bound. For $E>0$ there is no real $\kappa$ at all, the solutions
+   oscillate out to infinity instead of decaying, no termination condition
+   applies, and the spectrum turns continuous. Discrete below, continuous
+   above, and $E=0$ is the seam.
+
+   The misconception this question is aimed at: reading $E=0$ as "no
+   energy," or as the electron sitting still at the nucleus. Neither. The
+   zero is a reference point we chose. Shift every energy by a constant
+   and no measurable transition changes, since spectra depend on
+   differences alone. What is physical about $E=0$ here is not the number
+   but its role: the boundary between a spectrum that is discrete and one
+   that is not.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -276,7 +381,7 @@ implies.
 - $E_n$ depends only on $n$ (not $l$ or $m$), a special feature of the
   exact $1/r$ potential, giving each level an $n^2$-fold degeneracy.
 
-## Further Exploration
+## Assembling the orbitals themselves
 
 <NextDiscovery>
 [Orbitals & Quantum Numbers](/lessons/quantum-mechanics/the-hydrogen-atom/orbitals-and-quantum-numbers) picks up from here, combining the

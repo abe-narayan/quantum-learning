@@ -27,7 +27,7 @@ export const threeQubitUniformSuperposition: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.005,
-    incorrectFeedback: "H^⊗3|000⟩ is a uniform superposition over all 8 three-bit strings — each equally likely.",
+    incorrectFeedback: "H^⊗3|000⟩ is a uniform superposition over all 8 three-bit strings, each equally likely.",
     nearMisses: [
       { value: 1 / 3, tolerance: 0.005, feedback: "1/3 counts qubits rather than outcomes. Three qubits give 2³ = 8 distinct bit strings, and the superposition is uniform over all of them." },
       { value: Math.SQRT1_2 / 2, tolerance: 0.005, feedback: "That is 1/√8, the amplitude. The probability is its square." },
@@ -35,7 +35,7 @@ export const threeQubitUniformSuperposition: NumericProblem = {
     ],
   },
   hints: [
-    { text: "H^⊗3|000⟩ = (1/√8)Σₓ|x⟩ — 8 equally-weighted basis states." },
+    { text: "H^⊗3|000⟩ = (1/√8)Σₓ|x⟩, a sum of 8 equally weighted basis states." },
     { text: "Each amplitude has magnitude 1/√8." },
     { text: "Probability is the squared magnitude: (1/√8)² = 1/8." },
   ],
@@ -46,6 +46,6 @@ export const threeQubitUniformSuperposition: NumericProblem = {
   explanation: {
     correctIdea: "H^⊗n|0...0⟩ is exactly uniform over all 2ⁿ basis states.",
     whyCorrect: "1/8 matches 1/2³, consistent with 3 independent 50/50 Hadamards.",
-    whyWrong: ["Answering 1/3 confuses 'number of qubits' with 'number of outcomes' — there are 2³=8 outcomes, not 3."],
+    whyWrong: ["Answering 1/3 confuses the number of qubits with the number of outcomes: there are 2³=8 outcomes, not 3."],
   },
 };

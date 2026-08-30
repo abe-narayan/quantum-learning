@@ -142,13 +142,13 @@ export const panelVectors = (v1, v1Label, v2, v2Label) => {
 
 <LessonHook eyebrow="What this lesson finally proves">
   A pure bipartite state's two reduced density matrices always share the
-  same nonzero eigenvalues — a fact the earlier course asserted without
+  same nonzero eigenvalues, a fact the earlier course asserted without
   proof.
   Here it falls out, in three lines, of nothing more than the singular
   value decomposition.
 </LessonHook>
 
-## Motivation
+## One Theorem Under the Whole Entanglement Story
 
 Entanglement Entropy for Pure Bipartite States built its entire theory
 on one claimed fact, stated but never proved: for a pure bipartite state
@@ -179,7 +179,7 @@ pure state on a bigger system) following as an almost-free corollary.
   license="CC BY-SA 2.0 DE"
 />
 
-## Mathematical Development
+## The Theorem, via Singular Value Decomposition
 
 ### Setup: the amplitude matrix
 
@@ -198,7 +198,7 @@ $|\psi\rangle=a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$) to test
 separability via $\det M$. Normalization of $|\psi\rangle$ is exactly the
 statement $\sum_{ij}|M_{ij}|^2=1$, i.e. $\text{Tr}(M^\dagger M)=1$.
 
-### The theorem, via singular value decomposition
+### Substituting the SVD into the state
 
 **Claim.** Every matrix $M$ has a singular value decomposition
 $M=U\Sigma V^\dagger$, where $U$ ($d_A\times d_A$) and $V$ ($d_B\times d_B$)
@@ -232,6 +232,12 @@ This gives the **Schmidt decomposition**:
 
 <TheoremBox title="Schmidt decomposition" provenance="derived">
 
+**Hypotheses.** $|\psi\rangle_{AB}$ is a normalized **pure** state on a
+tensor product $\mathcal H_A\otimes\mathcal H_B$ of finite dimensions
+$d_A,d_B$. Nothing else: no assumption of symmetry, of equal dimensions,
+or of real amplitudes. Purity is the one hypothesis that cannot be
+relaxed, since a mixed $\rho_{AB}$ has no such two-term-per-index form.
+
 $$
 \boxed{|\psi\rangle_{AB} = \sum_{k=0}^{r-1} \sqrt{\lambda_k}\,|u_k\rangle_A\,|w_k\rangle_B}, \qquad \lambda_k \equiv \sigma_k^2 \geq 0,\quad \sum_k\lambda_k=1
 $$
@@ -240,6 +246,22 @@ where $r=\text{rank}(M)\leq\min(d_A,d_B)$ is the **Schmidt rank** and
 $\lambda_k$ are the **Schmidt coefficients**.
 
 </TheoremBox>
+
+The finiteness assumption is the kind that usually goes unstated, and
+here it can be lifted, though not for free. If $\mathcal H_A$ and
+$\mathcal H_B$ are separable but infinite-dimensional (two modes of a
+field, say), normalization still forces
+$\sum_{ij}|M_{ij}|^2=\|M\|_{\text{HS}}^2=1$, so $M$ is a Hilbert–Schmidt
+operator, and Hilbert–Schmidt operators are compact. The spectral theorem
+for compact self-adjoint operators applies to $M^\dagger M$ and delivers
+the SVD with a *countable* set of singular values $\sigma_0\geq\sigma_1
+\geq\cdots\to0$. So the boxed formula survives verbatim, with $r=\infty$
+allowed and the sum converging in norm. What does not survive is
+$r\leq\min(d_A,d_B)$ as a useful bound, and neither does the guarantee
+that the entanglement entropy $-\sum_k\lambda_k\log\lambda_k$ is finite:
+a $\lambda_k$ sequence can be summable while its entropy diverges.
+Infinite Schmidt rank with infinite entropy is a real possibility here,
+and it is invisible from the finite-dimensional case.
 
 This is a markedly
 different, far more restrictive statement than a generic bipartite
@@ -257,9 +279,9 @@ kills the rest), leaving
 
 <EquationReveal
   terms={[
-    { id: "rhoA", symbol: "ρ_A", gloss: "The reduced state of subsystem A — what's left of |ψ⟩ after tracing out B." },
-    { id: "rhoB", symbol: "ρ_B", gloss: "The reduced state of subsystem B — what's left of |ψ⟩ after tracing out A." },
-    { id: "lambda", symbol: "λ_k", gloss: "The Schmidt coefficients — the same set for both ρ_A and ρ_B." },
+    { id: "rhoA", symbol: "ρ_A", gloss: "The reduced state of subsystem A, what's left of |ψ⟩ after tracing out B." },
+    { id: "rhoB", symbol: "ρ_B", gloss: "The reduced state of subsystem B, what's left of |ψ⟩ after tracing out A." },
+    { id: "lambda", symbol: "λ_k", gloss: "The Schmidt coefficients, which are the same set for both ρ_A and ρ_B." },
     { id: "uk", symbol: "|u_k⟩⟨u_k|", gloss: "A's Schmidt basis, in which ρ_A is automatically diagonal." },
     { id: "wk", symbol: "|w_k⟩⟨w_k|", gloss: "B's Schmidt basis, in which ρ_B is automatically diagonal." },
   ]}
@@ -294,9 +316,19 @@ coefficients."
 
 <MatrixGrid matrix={M} label="M (amplitude matrix)" ariaLabel="The 2x2 amplitude matrix M for the worked-example state" />
 
-<MatrixGrid matrix={rhoA} label="rho_A = M M-dagger" compareTo={rhoB} compareLabel="rho_B = M-transpose M-conjugate" ariaLabel="Reduced density matrices rho_A and rho_B for the worked-example state, computed via partial trace" />
+<MatrixGrid matrix={rhoA} label="rho_A = M M-dagger" compareTo={rhoB} compareLabel="rho_B = M-transpose M-conjugate" ariaLabel="Reduced density matrices rho_A and rho_B for the worked-example state, computed via partial trace. Read entry by entry the two matrices are different: rho_A has diagonal 0.45 and 0.55 with off-diagonal 0.334243, while rho_B has diagonal 0.4 and 0.6 with off-diagonal 0.322829. They nonetheless share a trace of 1 and a determinant of 0.135782, hence the identical eigenvalue pair the theorem predicts" />
 
-## Worked Example
+The pair above is the theorem's claim in visible form, and the point is
+that the two matrices are *not* equal. Entry by entry they differ:
+$\rho_A$ carries diagonal $(0.45,0.55)$ and off-diagonal $0.334243$,
+$\rho_B$ carries $(0.4,0.6)$ and $0.322829$. Both have trace $1$, and
+both have determinant $0.135782$, so both have the same characteristic
+polynomial and therefore the same eigenvalues. Sameness of spectrum
+without sameness of matrix is exactly what "share the same nonzero
+eigenvalues" asserts, and it is why $S(\rho_A)=S(\rho_B)$ can hold
+between two states that are not the same state.
+
+## A Two-Qubit State, Decomposed and Purified
 
 **Take $|\psi\rangle=0.6|00\rangle+0.3|01\rangle+0.2|10\rangle+d|11\rangle$
 with $d=\sqrt{1-0.6^2-0.3^2-0.2^2}\approx0.714143$ (chosen to normalize).
@@ -323,8 +355,8 @@ sign/transpose slip, flagged below), giving
 $|w_1\rangle_B\approx(0.593342,\ 0.804951)$ and
 $|w_2\rangle_B\approx(0.804951,\ -0.593342)$. Direct substitution back
 into $\sqrt{\lambda_1}|u_1\rangle|w_1\rangle+\sqrt{\lambda_2}|u_2\rangle|w_2\rangle$
-reproduces $(a,b,c,d)=(0.6,0.3,0.2,0.714143)$ to numerical precision,
-computed directly rather than taken on faith. The entanglement entropy is
+reproduces $(a,b,c,d)=(0.6,0.3,0.2,0.714143)$ to all six digits shown.
+The entanglement entropy is
 $S(\rho_A)=-\lambda_1\log_2\lambda_1-\lambda_2\log_2\lambda_2\approx0.639163$
 bits, matching `vonNeumannEntropy(rhoA)` exactly, and consistent with the
 earlier lesson's formula for the special case $b=c=0$ (there, $M$ is
@@ -335,8 +367,14 @@ vectors and $\lambda_k=\cos^2\theta,\sin^2\theta$).
 
 <TheoremBox title="Purification" provenance="derived">
 
-Every mixed state $\rho_A$ on system $A$ is the reduced state
-of some pure state $|\psi\rangle_{AB}$ on a larger system $AB$, a
+**Hypotheses.** $\rho_A$ is a density operator on $\mathcal H_A$:
+positive semidefinite with $\text{Tr}\,\rho_A=1$. The auxiliary system
+must satisfy $\dim\mathcal H_B\geq\text{rank}\,\rho_A$, and that bound is
+tight, since the construction below needs one orthonormal $|w_k\rangle_B$
+per nonzero eigenvalue. A qubit cannot purify a full-rank qutrit state.
+
+Every such $\rho_A$ is the reduced state
+of some pure state $|\psi\rangle_{AB}$ on the larger system $AB$, a
 <Term id="quantum-state-purification">**purification** of $\rho_A$</Term>.
 
 </TheoremBox>
@@ -369,7 +407,7 @@ is a strictly mixed single-qubit state (purity $<1$, since neither
 eigenvalue is $0$ or $1$), and $|\psi\rangle_{AB}$ is a concrete,
 explicitly-verified pure state on two qubits whose partial trace over
 $B$ reproduces it exactly. Nothing further needs to be built:
-purification is not new machinery, it is the Schmidt decomposition
+purification is not new machinery; it is the Schmidt decomposition
 theorem run in the direction "start from the eigenvalues, build the
 state" instead of "start from the state, find the eigenvalues."
 
@@ -383,7 +421,7 @@ any other only by a unitary on the purifying system, is exactly the
 degree of freedom the next lesson's proof of Uhlmann's fidelity theorem
 optimizes over.
 
-## Physical Interpretation
+## Schmidt Rank as the Honest Complexity Measure
 
 <InsightBlock>
   The Schmidt rank is the honest measure of how complicated a bipartite
@@ -407,7 +445,7 @@ Mechanics.
 
 The claim above is a statement about a *rotated* basis, not the
 computational one, so it is easy to nod along without seeing what the
-rotation actually looks like. The explorer below draws both reduced
+rotation looks like. The explorer below draws both reduced
 subsystems side by side: the fixed computational axes $\{|0\rangle,|1\rangle\}$
 in light gray, and the Schmidt vectors $|u_k\rangle_A$, $|w_k\rangle_B$
 as colored arrows, $u_1$/$w_1$ in one color and $u_2$/$w_2$ in the other,
@@ -417,8 +455,8 @@ to the matching $w_k$) is something to look at, not just read.
 <PredictBeforeReveal
   question="The Bell state's two Schmidt coefficients come out exactly equal (lambda1 = lambda2 = 0.5). Given that, are its Schmidt vectors u1, u2 pinned to one specific basis, the same way the worked example's unequal coefficients pin down a specific rotation?"
   options={[
-    { label: "Yes — every pure state has one and only one Schmidt basis", value: "unique" },
-    { label: "No — with equal coefficients, any orthonormal basis works equally well", value: "not-unique" },
+    { label: "Yes, every pure state has one and only one Schmidt basis", value: "unique" },
+    { label: "No, since with equal coefficients any orthonormal basis works equally well", value: "not-unique" },
   ]}
   correctValue="not-unique"
   explanation="Equal Schmidt coefficients mean rho_A is proportional to the identity, and every orthonormal basis diagonalizes the identity equally well. There is no preferred direction to find. This is the ordinary non-uniqueness of degenerate eigenvectors, and it is why the Bell-state panel below looks unrotated: the computational basis is just as valid a Schmidt basis as any other for this particular state, not because the state is somehow less entangled."
@@ -427,12 +465,12 @@ to the matching $w_k$) is something to look at, not just read.
 <div className="not-prose space-y-6 rounded-panel border border-border bg-surface-muted/40 p-4">
 
 <div>
-<p className="mb-3 text-sm text-muted-foreground">
-Product state |0⟩|0⟩ — Schmidt rank 1: $\lambda_1$ = {productPreset.lambda1.toFixed(3)}, $\lambda_2$ = {productPreset.lambda2.toFixed(3)}.
+<div className="mb-3 text-sm text-muted-foreground">
+Product state |0⟩|0⟩, Schmidt rank 1: $\lambda_1$ = {productPreset.lambda1.toFixed(3)}, $\lambda_2$ = {productPreset.lambda2.toFixed(3)}.
 A product state carries no entanglement to rotate the bases away from
 the computational one, so $u_1,u_2$ and $w_1,w_2$ land exactly on
 $|0\rangle,|1\rangle$: no rotation at all.
-</p>
+</div>
 <div className="flex flex-wrap gap-4">
 <div>
 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Subsystem A</p>
@@ -454,15 +492,15 @@ $|0\rangle,|1\rangle$: no rotation at all.
 </div>
 
 <div>
-<p className="mb-3 text-sm text-muted-foreground">
+<div className="mb-3 text-sm text-muted-foreground">
 Maximally entangled: $\lambda_1$ = {bellPreset.lambda1.toFixed(3)},
 $\lambda_2$ = {bellPreset.lambda2.toFixed(3)}, exactly equal. Because the two
 Schmidt coefficients are degenerate, $\rho_A$ is proportional to the
 identity and *any* orthonormal basis is a valid Schmidt basis (see
-Common Mistakes below). The computational basis shown here works as
+the cautions below). The computational basis shown here works as
 well as any other, so this panel looks axis-aligned even though the
 state is more entangled than the worked example.
-</p>
+</div>
 <div className="flex flex-wrap gap-4">
 <div>
 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Subsystem A</p>
@@ -484,14 +522,14 @@ state is more entangled than the worked example.
 </div>
 
 <div>
-<p className="mb-3 text-sm text-muted-foreground">
+<div className="mb-3 text-sm text-muted-foreground">
 The lesson's own worked example: $\lambda_1$ = {workedPreset.lambda1.toFixed(3)},
 $\lambda_2$ = {workedPreset.lambda2.toFixed(3)}, clearly unequal. Here
 $u_1,u_2$ (A) and $w_1,w_2$ (B) are rotated well away from
 $|0\rangle,|1\rangle$. This is what "measure $A$ along $u_k$"
 means geometrically, and why it is not the same instruction as
 "measure $A$ in the computational basis."
-</p>
+</div>
 <div className="flex flex-wrap gap-4">
 <div>
 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Subsystem A</p>
@@ -514,7 +552,7 @@ means geometrically, and why it is not the same instruction as
 
 </div>
 
-## Common Mistakes
+## Getting the SVD Correspondence Backwards
 
 <Callout type="warning">
 **Using $Mu_k$ instead of $M^\top u_k$ to find the $B$-side Schmidt
@@ -545,18 +583,221 @@ whenever a degeneracy occurs.
 1. Show that the Bell state $|\Phi^+\rangle=\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$
    is already in Schmidt form, and identify $\lambda_1,\lambda_2,|u_k\rangle,|w_k\rangle$
    directly by inspection.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It is in Schmidt form with $\lambda_1=\lambda_2=\tfrac12$,
+   $|u_1\rangle=|w_1\rangle=|0\rangle$ and $|u_2\rangle=|w_2\rangle=|1\rangle$.
+
+   "Showing" it means checking the three things the boxed form demands, one
+   at a time, rather than pattern matching on the shape.
+
+   The same index appears on both sides of every term. Write the state as
+   $\sum_{k=0}^{1}c_k|k\rangle_A|k\rangle_B$: there are no cross terms
+   $|0\rangle_A|1\rangle_B$ or $|1\rangle_A|0\rangle_B$. That is the whole
+   structural content of the decomposition, and it is the condition a
+   generic state fails.
+
+   Each side's vectors are orthonormal. $\{|0\rangle,|1\rangle\}$ is the
+   computational basis, so this is free here, but it is a real requirement:
+   $\frac1{\sqrt2}(|00\rangle+|0{+}\rangle)$ has matching indices in the
+   same loose sense and is not in Schmidt form.
+
+   The coefficients are non-negative reals summing in square to one.
+   $c_0=c_1=1/\sqrt2$, and $\lambda_k=|c_k|^2=\tfrac12$ with
+   $\lambda_1+\lambda_2=1$.
+
+   So $r=2$, the maximum available for two qubits, and
+   $\rho_A=\tfrac12|0\rangle\langle0|+\tfrac12|1\rangle\langle1|=\tfrac12\mathbb 1$,
+   giving $S(\rho_A)=1$ bit, the maximum a qubit can carry. Maximal Schmidt
+   rank with equal coefficients is what "maximally entangled" means, and
+   both facts are visible without computing an eigenvalue.
+
+   The equal coefficients cost something, though, and it is the point the
+   prediction above was making. Because $\rho_A\propto\mathbb 1$, every
+   orthonormal basis diagonalizes it, so the Schmidt vectors are not
+   determined at all. Concretely, for *any* single-qubit unitary $U$,
+
+   $$
+   |\Phi^+\rangle=\frac{1}{\sqrt2}\sum_k U|k\rangle_A\otimes \overline U|k\rangle_B,
+   $$
+
+   which is the unitarity identity
+   $\sum_k U_{ik}\overline{U_{jk}}=(UU^\dagger)_{ij}=\delta_{ij}$ in
+   disguise. Taking $U=H$ (real, so $\overline U=U$) gives the check any
+   reader can do by hand:
+
+   $$
+   |\Phi^+\rangle=\tfrac{1}{\sqrt2}\left(|{+}{+}\rangle+|{-}{-}\rangle\right),
+   $$
+
+   since $|{+}{+}\rangle+|{-}{-}\rangle=\tfrac12(|00\rangle+|01\rangle+|10\rangle+|11\rangle)+\tfrac12(|00\rangle-|01\rangle-|10\rangle+|11\rangle)=|00\rangle+|11\rangle$.
+   Both readings are correct Schmidt decompositions of the same state. The
+   coefficients $\{\tfrac12,\tfrac12\}$ are the invariant content; the
+   vectors are not.
+
+   </details>
+
 2. A product state $|\psi\rangle=|x\rangle_A\otimes|y\rangle_B$ has
    amplitude matrix $M=xy^\top$ (an outer product, rank 1). What is its
    Schmidt rank, and what does that say about its entanglement entropy
    without computing anything further?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Schmidt rank $r=1$, and therefore entanglement entropy exactly zero.
+
+   The chain is short enough to be airtight. The theorem defines
+   $r=\mathrm{rank}(M)$, and $M=xy^\top$ has rank $1$ (its column space is
+   spanned by the single vector $x$, and $x\neq0$ because $|\psi\rangle$ is
+   normalized). So the Schmidt sum has exactly one term. But the
+   coefficients satisfy $\sum_k\lambda_k=1$, so a single term forces
+   $\lambda_1=1$, and
+
+   $$
+   S(\rho_A)=-\sum_k\lambda_k\log_2\lambda_k=-1\cdot\log_2 1=0.
+   $$
+
+   No eigenvalue was computed, no partial trace was taken. Counting the
+   rank of a matrix settled it.
+
+   This runs in both directions, which is what makes Schmidt rank a
+   genuinely useful invariant rather than a curiosity. $r=1$ means
+   $|\psi\rangle=\sqrt{\lambda_1}|u_1\rangle_A|w_1\rangle_B$, manifestly a
+   product state. So
+
+   $$
+   r=1 \iff \text{product state} \iff S(\rho_A)=0,
+   $$
+
+   and each equivalence is a one-liner given the theorem. This is why the
+   `testSeparability` routine mentioned earlier can decide separability for
+   two qubits from $\det M$ alone: for a $2\times2$ matrix, $\det M=0$ is
+   exactly the statement $\mathrm{rank}(M)\leq1$.
+
+   Worth naming what the Schmidt vectors are, since the outer product hands
+   them over directly: $|u_1\rangle=|x\rangle$ and $|w_1\rangle=|y\rangle$,
+   with $\lambda_1=1$. The "canonical form" the theorem promises is, for a
+   product state, the state you already wrote down.
+
+   One caution. Rank $1$ is a statement about $M$, not about how many
+   nonzero amplitudes $|\psi\rangle$ has. The state
+   $\tfrac12(|00\rangle+|01\rangle+|10\rangle+|11\rangle)$ has four nonzero
+   amplitudes and Schmidt rank $1$; it is $|{+}\rangle|{+}\rangle$ wearing
+   a disguise. Counting nonzero amplitudes tells you nothing about
+   entanglement, which is the practical reason the rank is the right thing
+   to look at.
+
+   </details>
+
 3. Using the purification construction, write down an explicit 2-qubit
    purification of $\rho_A=\text{diag}(0.9,0.1)$, and verify by partial
    trace that it reproduces $\rho_A$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   |\psi\rangle_{AB}=\sqrt{0.9}\,|0\rangle_A|0\rangle_B+\sqrt{0.1}\,|1\rangle_A|1\rangle_B
+   \approx 0.9486833\,|00\rangle+0.3162278\,|11\rangle.
+   $$
+
+   The construction asked for is mechanical once $\rho_A$ is diagonalized,
+   and here it arrives diagonal: eigenvalues $\lambda_0=0.9$, $\lambda_1=0.1$
+   with eigenvectors $|0\rangle,|1\rangle$. Take $\mathcal H_B$ to be one
+   qubit, which is permitted because $\dim\mathcal H_B=2\geq\mathrm{rank}\,\rho_A=2$,
+   pick the orthonormal set $\{|0\rangle_B,|1\rangle_B\}$, and assemble
+   $\sum_k\sqrt{\lambda_k}|u_k\rangle_A|w_k\rangle_B$.
+
+   Verifying by partial trace, write out the projector first:
+
+   $$
+   |\psi\rangle\langle\psi|=0.9\,|00\rangle\langle00|+0.3\,|00\rangle\langle11|+0.3\,|11\rangle\langle00|+0.1\,|11\rangle\langle11|,
+   $$
+
+   using $\sqrt{0.9}\sqrt{0.1}=\sqrt{0.09}=0.3$ for the cross terms. Now
+   trace over $B$ term by term. The diagonal terms give
+   $0.9\,|0\rangle\langle0|_A\,\mathrm{Tr}(|0\rangle\langle0|_B)=0.9|0\rangle\langle0|_A$
+   and likewise $0.1|1\rangle\langle1|_A$. The cross terms give
+   $0.3\,|0\rangle\langle1|_A\,\mathrm{Tr}(|0\rangle\langle1|_B)=0.3\,|0\rangle\langle1|_A\,\langle1|0\rangle=0$,
+   and its conjugate the same. So
+
+   $$
+   \mathrm{Tr}_B|\psi\rangle\langle\psi|=0.9|0\rangle\langle0|+0.1|1\rangle\langle1|=\mathrm{diag}(0.9,0.1)=\rho_A.
+   $$
+
+   The cross terms dying is where the orthonormality of $\{|w_k\rangle_B\}$
+   earns its place in the hypotheses. Had we lazily used
+   $|w_0\rangle=|w_1\rangle=|0\rangle_B$, the state would collapse to the
+   product $(\sqrt{0.9}|0\rangle+\sqrt{0.1}|1\rangle)_A|0\rangle_B$, whose
+   reduced state is a pure state, not $\rho_A$ at all. The purifying
+   system's job is precisely to keep records that are perfectly
+   distinguishable, and non-orthogonal $|w_k\rangle$ fail at it.
+
+   Sanity checks worth doing on any purification: the coefficients squared
+   sum to $0.9+0.1=1$, so $|\psi\rangle$ is normalized; and $\rho_A$ has
+   purity $0.9^2+0.1^2=0.82<1$, correctly mixed, while
+   $|\psi\rangle\langle\psi|$ has purity $1$. Mixedness on $A$ has become
+   entanglement across $AB$, which is the whole content of the theorem.
+
+   </details>
+
 4. Two purifications $|\psi\rangle_{AB}$ and $|\phi\rangle_{AB}$ of the
    same $\rho_A$ must be related by a unitary on $B$ alone. If
    $|\psi\rangle_{AB}=\sqrt{0.9}|00\rangle+\sqrt{0.1}|11\rangle$, write
    down a second, distinct purification $|\phi\rangle_{AB}$ of
    the same $\rho_A$, and identify the unitary $W_B$ relating them.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Take $W_B=X$, the bit flip. Then
+
+   $$
+   |\phi\rangle_{AB}=(\mathbb 1_A\otimes X)|\psi\rangle_{AB}=\sqrt{0.9}\,|0\rangle_A|1\rangle_B+\sqrt{0.1}\,|1\rangle_A|0\rangle_B,
+   $$
+
+   that is $\sqrt{0.9}|01\rangle+\sqrt{0.1}|10\rangle$.
+
+   It purifies the same $\rho_A$, by the same partial trace as before: the
+   diagonal terms give $0.9|0\rangle\langle0|+0.1|1\rangle\langle1|$, and
+   the cross terms carry $\mathrm{Tr}(|1\rangle\langle0|_B)=\langle0|1\rangle=0$.
+   The $B$-side labels moved; the $A$-side bookkeeping did not notice,
+   because a unitary on $B$ permutes an orthonormal set into another
+   orthonormal set and the trace only ever saw orthonormality.
+
+   It is genuinely distinct, not a rephrasing. $\langle\psi|\phi\rangle=0$:
+   the two purifications are orthogonal states of $AB$, about as different
+   as two states can be, and yet no measurement on $A$ alone can tell them
+   apart.
+
+   Other valid choices, to show the freedom is a whole group and not one
+   trick: $W_B=Z$ gives $\sqrt{0.9}|00\rangle-\sqrt{0.1}|11\rangle$, and
+   $W_B=H$ gives $\sqrt{0.9}|0\rangle|{+}\rangle+\sqrt{0.1}|1\rangle|{-}\rangle$.
+   Every $2\times2$ unitary produces one, so the purifications of this
+   $\rho_A$ on a single purifying qubit form a $U(2)$ orbit.
+
+   Two points of precision that the question's phrasing invites you to
+   skate past.
+
+   $W_B$ is unique here, but not in general. Uniqueness holds because
+   $\rho_A$ has full rank $2$ and $\dim\mathcal H_B=2$, so the relation
+   $W_B|w_k\rangle=|w'_k\rangle$ pins $W_B$ down on a full basis. If
+   $\rho_A$ were rank $1$, only one $|w_k\rangle$ would appear in the sum,
+   $W_B$ would be fixed on a one-dimensional subspace and free elsewhere.
+   And when the two purifying systems have different dimensions the correct
+   statement uses an isometry rather than a unitary.
+
+   The unitary has to act on $B$. Applying $U_A\otimes\mathbb 1$ instead
+   sends $\rho_A\mapsto U_A\rho_AU_A^\dagger$, which is a purification of a
+   *different* state unless $U_A$ happens to commute with $\rho_A$. That
+   asymmetry is the entire reason the freedom is useful: it lets you
+   optimize over purifications while holding the physical state of $A$
+   fixed, which is exactly what Uhlmann's theorem does in the next lesson.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -577,7 +818,7 @@ whenever a degeneracy occurs.
   never unique: any unitary acting only on the purifying system leaves
   the reduced state unchanged.
 
-## Further Exploration
+## Purification's Non-Uniqueness, Put to Work
 
 <NextDiscovery>
   [Trace Distance and Fidelity](/lessons/quantum-mastery/quantum-information-theory/trace-distance-and-fidelity) uses the non-uniqueness of purification

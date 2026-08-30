@@ -41,6 +41,7 @@ export const lessonMeta = {
   objectives: [
     "State the canonical commutation relation [a, a†] = 1 and derive the number operator's key algebraic identities",
     "Prove the harmonic oscillator's energy spectrum is a non-negative integer ladder, using only algebra",
+    "Say what zero-point energy is and name one laboratory consequence of it",
     "Compute ladder-operator actions using the platform's truncated matrix representation",
   ],
   related: [
@@ -51,13 +52,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Every level, and no calculus">
   Two operators, one commutator, and no calculus at all are enough to pin
   down every energy a quantum <Term id="quantum-harmonic-oscillator">harmonic oscillator</Term> is allowed to have,
   including the one it cannot get below.
 </LessonHook>
 
-## Motivation
+## The most reused solvable system there is
 
 No solvable system in quantum mechanics gets used more than the harmonic
 oscillator: a particle sitting in a potential well shaped like
@@ -68,7 +69,7 @@ The traditional route to its solution is a differential equation
 fully rigorous route that needs nothing beyond the linear algebra already
 built: **ladder operators**.
 
-## Intuition
+## Climb the ladder instead of solving for rungs
 
 Instead of solving for energy eigenstates directly, define two operators,
 one that steps a state *down* one energy level, one that steps it *up*,
@@ -80,7 +81,7 @@ at integer heights.
 The payoff is not just economy. The argument uses one commutator and
 nothing about the potential's shape, so it transfers intact to every
 other system with the same commutator: field modes, phonons, and the
-angular-momentum ladders later in this pillar.
+angular-momentum ladders later in this track.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/b/b2/TuningFork659Hz.jpg"
@@ -91,7 +92,7 @@ angular-momentum ladders later in this pillar.
   license="Public domain"
 />
 
-## Mathematical Development
+## One commutator determines the whole spectrum
 
 ### The ladder operators
 
@@ -204,7 +205,7 @@ because $n=0$ is where the ladder ends, not where the energy does.
 />
 
 Every rung sits $\hbar\omega$ above the one below it, all the way up.
-Compare the hydrogen spectrum later in this pillar, where the gaps shrink
+Compare the hydrogen spectrum later in this track, where the gaps shrink
 as $n$ grows and crowd together toward a limit. Even spacing is a
 property of this potential, not a general rule, and it has a practical
 consequence: because every gap is identical, you cannot address one
@@ -227,7 +228,7 @@ That truncation is what this platform's `annihilationOperator`,
 lets the ordinary finite-dimensional `Matrix` engine handle the harmonic
 oscillator alongside every other operator on this site.
 
-## Physical Interpretation
+## Why liquid helium refuses to freeze
 
 Zero-point energy is measurable rather than an artifact of the
 derivation. Liquid helium refuses to freeze at atmospheric pressure no
@@ -241,7 +242,7 @@ Molecular bonds and electromagnetic field modes absorb and emit in sharp,
 evenly spaced lines, each line one $n\to n\pm1$ step of a ladder like the
 one derived above.
 
-## Worked Example
+## Raising the second level in a truncated basis
 
 **In a 5-level truncated representation ($\hbar\omega=1$), compute
 $a^\dagger|2\rangle$ and the energy $E_2$.**
@@ -265,7 +266,7 @@ $E_2=\hbar\omega(2+\tfrac12)=1\cdot2.5=2.5$.
   explanation="The matrix has no |5⟩ row to put that amplitude in, so a†|4⟩ comes back as the zero vector and every bar reads 0. That is the truncation error flagged above and in Practice Question 2. It appears only at the last retained rung, and enlarging the truncation moves the artifact up one rung rather than removing it: the infinite ladder cannot be represented by any finite matrix."
 />
 
-<InteractiveSection title="Slide n, watch the raising operator act" description="Each bar is a coefficient of a†|n⟩ in the |0⟩...|4⟩ Fock basis, produced by applying the platform's creationOperator matrix in the same 5-level truncation the worked example uses. At n = 2 the single nonzero bar sits on |3⟩ at height √3 ≈ 1.732, matching the worked example. Slide to n = 4, the top of the truncation, to meet the truncation error from Practice Question 2: every bar drops to 0, because this basis holds no |5⟩ for a† to raise into.">
+<InteractiveSection title="Slide n, watch the raising operator act" description="Each bar is a coefficient of a†|n⟩ in the |0⟩...|4⟩ Fock basis, produced by applying the platform's creationOperator matrix in the same 5-level truncation the worked example uses. At n = 2, find which single bar is nonzero and read its height against the worked example. Then slide to n = 4, the top of the truncation, and ask what this basis leaves for a† to raise into: that is the truncation error Practice Question 2 is about.">
   <BarChartExplorer
     frames={ladderFrames}
     sliderLabel="n"
@@ -274,7 +275,7 @@ $E_2=\hbar\omega(2+\tfrac12)=1\cdot2.5=2.5$.
   />
 </InteractiveSection>
 
-## Common Mistakes
+## The half that is easy to drop
 
 <Callout type="warning">
 **Forgetting the zero-point energy.** $E_n=\hbar\omega n$ (without the
@@ -291,15 +292,166 @@ is a specific linear function of $N$, not the same operator.
 ## Practice Questions
 
 1. Compute $a|3\rangle$ using the lowering rule.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $a|3\rangle = \sqrt3\,|2\rangle \approx 1.732\,|2\rangle$.
+
+   The rule derived above is $a|n\rangle=\sqrt n\,|n-1\rangle$, so $n=3$
+   gives $\sqrt3$ on level $2$. Applying the platform's
+   `annihilationOperator` in a five-level truncation returns the vector
+   $(0,\,0,\,1.7320508,\,0,\,0)$, which is the same statement written as
+   coefficients on $|0\rangle$ through $|4\rangle$.
+
+   Two coefficient errors are worth naming because they come from the same
+   confusion.
+
+   Writing $\sqrt4$ mixes up the two rules: $\sqrt{n+1}$ belongs to
+   $a^\dagger$, which raises, and $\sqrt n$ belongs to $a$, which lowers.
+   The way to keep them apart is not memory but the boundary case. At
+   $n=0$ the lowering coefficient must vanish, or the ladder would
+   continue below the ground state; $\sqrt n$ does that on its own and
+   $\sqrt{n+1}$ does not. Whichever rule hands back zero at $n=0$ is the
+   lowering one.
+
+   Writing $3|2\rangle$ drops the square root. The square root is not
+   decoration: it came from taking a norm. The derivation computed
+   $\|a|n\rangle\|^2 = \langle n|a^\dagger a|n\rangle = n$, and the
+   coefficient is a length, so it is the square root of that.
+
+   Finally, note that $a|3\rangle$ is not normalized, and should not be.
+   Its norm is $\sqrt3\approx1.73$, not $1$. The ladder operators are not
+   unitary and do not preserve length; that is exactly why they are not
+   valid time evolutions, and why the $\sqrt n$ factors have to be tracked
+   by hand whenever a physical state is wanted at the end.
+
+   </details>
+
 2. In a 4-level truncated representation, what does $a^\dagger|3\rangle$
    equal? (This is the honest truncation-error case: think carefully
    about what the truncated matrix actually does here versus what the
    true, untruncated oscillator would give.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The truncated matrix returns the **zero vector**. The true oscillator
+   returns $2\,|4\rangle$.
+
+   A four-level truncation keeps $|0\rangle,|1\rangle,|2\rangle,|3\rangle$
+   and nothing above. The raising rule says $a^\dagger|3\rangle =
+   \sqrt{3+1}\,|4\rangle = 2\,|4\rangle$, but $|4\rangle$ is not one of
+   the four basis vectors, so there is no row of the matrix for that
+   amplitude to land in. Applying the platform's `creationOperator` at
+   dimension $4$ to $|3\rangle$ returns $(0,0,0,0)$, confirming it.
+
+   The two things to keep separate are what the *matrix* says and what the
+   *physics* says. They disagree here, and the disagreement is not a bug
+   in the matrix; it is the price of representing an infinite ladder with
+   finitely many rows. The lesson flags it above: truncation reproduces
+   every identity exactly *except* at the top retained rung.
+
+   Now contrast this zero with the other one. $a|0\rangle = 0$ is a true
+   physical statement: there is no level below the ground state, and the
+   $\sqrt n$ coefficient vanishes there on its own, in the infinite ladder
+   as much as in any truncation. $a^\dagger|3\rangle = 0$ at dimension $4$
+   is an artifact, and enlarging the truncation to five levels turns it
+   into $2|4\rangle$ while creating the identical artifact one rung
+   higher, at $a^\dagger|4\rangle$. No finite matrix ever removes it,
+   which is what it means for the ladder to be genuinely infinite.
+
+   The practical rule that follows is the one the lesson states: a
+   truncation is safe as long as the states you care about carry
+   negligible amplitude near the cutoff. The moment a calculation puts
+   real weight on the top rung, the numbers stop being approximations of
+   the oscillator and start being properties of the matrix you chose.
+
+   </details>
+
 3. For $\hbar\omega=2$, find $E_0, E_1, E_2$, and confirm consecutive
    levels differ by exactly $\hbar\omega$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $E_0=1$, $E_1=3$, $E_2=5$, and each gap is exactly $2=\hbar\omega$.
+
+   From $E_n=\hbar\omega\left(n+\tfrac12\right)$ with $\hbar\omega=2$:
+
+   $$
+   E_0 = 2\left(0+\tfrac12\right) = 1, \quad E_1 = 2\left(1+\tfrac12\right) = 3, \quad E_2 = 2\left(2+\tfrac12\right) = 5
+   $$
+
+   The platform's `harmonicOscillatorEnergyLevels(4, 2)` returns
+   $[1,3,5,7]$, matching. The gaps are $3-1=2$ and $5-3=2$, both equal to
+   $\hbar\omega$.
+
+   The even spacing is not an accident of these numbers, and it is easy to
+   see why in general: the $+\tfrac12$ is the same in every level, so it
+   cancels out of every difference,
+
+   $$
+   E_{n+1}-E_n = \hbar\omega\left[(n+1)+\tfrac12\right] - \hbar\omega\left[n+\tfrac12\right] = \hbar\omega
+   $$
+
+   independent of $n$. That cancellation is worth noticing for a second
+   reason: it shows the zero-point term can never be found by measuring
+   *transitions*, since every spectral line reports a difference and the
+   $\tfrac12$ has dropped out of all of them. Its evidence has to come
+   from somewhere else, which is why the lesson reaches for liquid helium
+   and the Casimir effect rather than for a spectrum.
+
+   The predictable slip is answering $E_0=0$, $E_1=2$, $E_2=4$, which is
+   $E_n=\hbar\omega n$ with the zero-point energy dropped. Notice that
+   this wrong answer has the *right* spacing, so checking the gaps does
+   not catch it. Only $E_0$ distinguishes the two, and it is the number
+   the algebra was most careful about: the ladder terminates at $n=0$, but
+   the energy at that rung is $\hbar\omega/2$, not zero.
+
+   </details>
+
 4. Using $n=\langle n|N|n\rangle=\|a|n\rangle\|^2\ge0$, explain in one or
    two sentences why the ladder *must* terminate rather than continuing
    to arbitrarily negative $n$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $a$ steps the eigenvalue down by exactly $1$ each time, so a
+   non-terminating ladder would eventually reach a negative eigenvalue,
+   and $n=\|a|n\rangle\|^2$ is a squared length and cannot be negative.
+   The only way out is for the descent to stop, and the one place it can
+   stop without producing a new eigenstate is where $a|n\rangle$ is the
+   zero vector, which forces $n=0$ and hence integer spacing all the way
+   up.
+
+   Expanded slightly, since the argument has two halves that must both be
+   present. The algebraic half is $[N,a]=-a$, which gives
+   $N(a|n\rangle)=(n-1)(a|n\rangle)$: applying $a$ produces a genuine
+   eigenvector one rung down, unless it produces nothing at all. The
+   analytic half is positivity: $n = \langle n|a^\dagger a|n\rangle$ is
+   the squared norm of a vector, so $n\ge0$. Iterate the first against the
+   second and the contradiction is forced after finitely many steps for
+   any starting $n$.
+
+   Note what "terminate" is allowed to mean. The chain cannot end by an
+   eigenvector simply going missing, since the algebra manufactures one at
+   every step. It ends only where the step returns the zero vector, which
+   is not an eigenvector at all, and the $\sqrt n$ coefficient is exactly
+   zero at $n=0$ and nowhere else. So termination pins the bottom rung at
+   $n=0$ rather than at some arbitrary floor.
+
+   The subtle wrong turn is to conclude only that $n$ is bounded below,
+   and stop. Boundedness alone would permit a lowest rung at, say,
+   $n=0.3$, with the rest of the ladder at $1.3, 2.3, \ldots$ and nothing
+   negative anywhere. What rules that out is that the descent from $0.3$
+   would continue to $-0.7$: a bottom rung is only stable if the next step
+   down annihilates the state, and the coefficient $\sqrt n$ vanishes only
+   at $n=0$. That is why the spectrum is the non-negative integers exactly
+   rather than any shifted copy of them.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -317,7 +469,7 @@ is a specific linear function of $N$, not the same operator.
   functions are a finite, truncated, exact-except-at-the-boundary matrix
   representation of this same algebra.
 
-## Further Exploration
+## Two zeros, only one of them real
 
 <ChallengePrompt prompt="In a 6-level truncated representation, compute a|0⟩ and a†|5⟩, the two opposite boundaries of the truncation. Both come back as the zero vector. Is either one of them telling you the truth?">
   One of these zeros is what the true, untruncated oscillator gives as

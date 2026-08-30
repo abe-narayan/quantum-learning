@@ -1,7 +1,7 @@
 import type { ParamSpec } from "./presets";
 import { SimulatorSlider } from "../shared/controls";
 
-/** Renders one slider per parameter the current preset exposes — schema-driven, so adding a preset never means writing a new controls component. */
+/** Renders one slider per parameter the current preset exposes: schema-driven, so adding a preset never means writing a new controls component. */
 export function PresetControls({
   params,
   values,

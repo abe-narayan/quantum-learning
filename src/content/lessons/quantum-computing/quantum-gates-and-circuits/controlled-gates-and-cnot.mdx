@@ -72,19 +72,18 @@ export const swapCircuitFrames = [
   },
 ];
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="One qubit's value, another qubit's fate">
 Every gate so far acts on one qubit independently of the others. Nothing yet lets one qubit's value affect what happens to another, which means nothing so far can build a state the last lesson called entangled.
 </LessonHook>
 
-## Motivation
+## Every operation so far leaves a product state alone
 
 Tensor products build multi-qubit states, and the last lesson's circuit
 notation showed how to draw operations on them. Both are still missing
 something. Every operation you can currently write is a tensor product of
 single-qubit gates, and a tensor product of single-qubit gates applied to a
-product state gives back a product state. The entangled two-thirds of the
-state space, which the counting argument said was there, remains
-unreachable.
+product state gives back a product state. The entangled part of the state
+space the counting argument said was there remains unreachable.
 
 **<Term id="cnot-controlled-gates">CNOT</Term>** (controlled-NOT) is the gate that reaches it, and it is the
 two-qubit gate this course leans on hardest.
@@ -95,10 +94,10 @@ two-qubit gate this course leans on hardest.
   caption="A real physical proposal (Cirac & Zoller, 1995) for implementing CNOT: a sequence of laser pulses acting on two trapped ions, one of the earliest concrete blueprints for building this exact gate out of physical hardware."
   credit="QuarksAndElectrons, after Cirac & Zoller (1995)"
   creditUrl="https://commons.wikimedia.org/wiki/File:Diagram_of_the_Cirac-Zoller_CNOT_gate.svg"
-  license="CC0 1.0 (Public Domain)"
+  license="CC0 1.0 (public domain)"
 />
 
-## Intuition
+## A conditional whose condition is in superposition
 
 A controlled-$U$ gate is a conditional: "if the control qubit is
 $|1\rangle$, apply $U$ to the target; if the control is $|0\rangle$, do
@@ -108,7 +107,7 @@ does something no classical conditional can: it applies $U$ and
 not-$U$ simultaneously, in proportion to the control's amplitudes,
 producing correlation between the two qubits that wasn't there before.
 
-## Mathematical Development
+## The general construction, and CNOT out of it
 
 ### The general controlled-U construction
 
@@ -187,7 +186,7 @@ undoes it, since flipping the target bit twice returns it to where it
 started, regardless of the control. That makes CNOT reversible, like $X$,
 $Z$, and $H$ before it, as every quantum gate must be.
 
-## Physical Interpretation
+## Correlation, created on purpose
 
 CNOT is the standard building block for creating correlation between
 qubits *deliberately*. Applied to a control that's already in
@@ -196,7 +195,7 @@ produces a target whose value is tied to the control's, in whatever
 proportion the control's amplitudes dictate. That is <Term id="entanglement">entanglement</Term> built on
 demand, and it is the next lesson's subject.
 
-## Interactive Experiment
+## Watch the indicator when the control is superposed
 
 <InteractiveSection title="Confirm the truth table and the SWAP construction" description="Initialize each of |00⟩, |01⟩, |10⟩, |11⟩ in turn and press CNOT (control=qubit 0, target=qubit 1). Confirm all four truth-table rows this lesson derived: 00 to 00, 01 to 01, 10 to 11, 11 to 10. Then initialize |10⟩ again, press SWAP (the platform's real applySwap), and confirm the end state matches |01⟩, the same result the three-CNOT trace below reaches step by step.">
   <LazyTwoQubitExplorer />
@@ -220,15 +219,15 @@ the two-qubit basis state before revealing it.
 </InteractiveSection>
 
 <PredictBeforeReveal
-  question="Starting from |10⟩, after all three CNOTs (control 0, then control 1, then control 0), what is the final state?"
+  question="Track |10⟩ through the three CNOTs one column at a time. Which of the three columns actually changes the state?"
   options={[
-    { label: "|10⟩ (unchanged)", value: "10" },
-    { label: "|01⟩ (swapped)", value: "01" },
-    { label: "|11⟩", value: "11" },
-    { label: "|00⟩", value: "00" },
+    { label: "All three, one flip each", value: "all" },
+    { label: "Only the middle one, the only column with qubit 1 as control", value: "middle" },
+    { label: "The first and third, with the middle one idle", value: "outer" },
+    { label: "The first two; the third finds nothing to flip", value: "first-two" },
   ]}
-  correctValue="01"
-  explanation="Track it column by column: |10⟩ →(CNOT(0,1))→ |11⟩ →(CNOT(1,0))→ |01⟩ →(CNOT(0,1))→ |01⟩. The last CNOT does nothing here because its control qubit (0) is now 0. The two qubits' values end up exchanged, which is the SWAP identity being verified."
+  correctValue="first-two"
+  explanation="Column by column: |10⟩ →(CNOT(0,1))→ |11⟩ →(CNOT(1,0))→ |01⟩ →(CNOT(0,1))→ |01⟩. The third column's control is qubit 0, which the second column just cleared to 0, so it has nothing to flip. The values do end up exchanged, which is the SWAP identity being verified, but only two of the three columns did any work on this particular input. Start from |11⟩ instead and the idle column moves: there the first and third act and the middle one sits out."
 />
 
 Track $|10\rangle$ through all three steps:
@@ -246,7 +245,7 @@ derived, three times in a row. This matters practically. On hardware where
 only neighbouring qubits can interact, moving a qubit across the chip means
 a chain of SWAPs, and every one of them costs three CNOTs.
 
-## Common Mistakes
+## CNOT does not always entangle
 
 <Callout type="note">
 **Assuming CNOT always entangles its inputs.** Applied to $|10\rangle$
@@ -267,12 +266,169 @@ the SWAP derivation above relies on directly.
 1. Derive the matrix for controlled-$Z$ (control=qubit 0, target=qubit 1)
    using the same $|0\rangle\langle0|\otimes I + |1\rangle\langle1|\otimes Z$
    construction.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Expand each tensor product separately, then add.
+
+   $$
+   |0\rangle\langle0|\otimes I = \begin{pmatrix}1&0&0&0\\0&1&0&0\\0&0&0&0\\0&0&0&0\end{pmatrix}, \qquad |1\rangle\langle1|\otimes Z = \begin{pmatrix}0&0&0&0\\0&0&0&0\\0&0&1&0\\0&0&0&-1\end{pmatrix}
+   $$
+
+   $$
+   \text{CZ} = \begin{pmatrix}1&0&0&0\\0&1&0&0\\0&0&1&0\\0&0&0&-1\end{pmatrix} = \mathrm{diag}(1,1,1,-1)
+   $$
+
+   The engine's own `applyCZ` returns exactly this on all four basis
+   states, including the sign on $|11\rangle$.
+
+   Read what the matrix says: CZ leaves every basis state alone except
+   $|11\rangle$, which it multiplies by $-1$. So on a basis state it does
+   nothing observable at all, and it is only on a superposition that the
+   sign becomes a relative phase and starts to matter. That is CZ's whole
+   job in later circuits, and it is why it appears in Grover's diffusion
+   step and in surface-code stabilizer measurement rather than in anything
+   that looks like classical logic.
+
+   There is a structural surprise hiding in the diagonal that is worth
+   noticing now. CZ is symmetric under exchanging the two qubits: the
+   construction with control $=$ qubit 1 and target $=$ qubit 0 gives
+   $I \otimes |0\rangle\langle0| + Z \otimes |1\rangle\langle1|$, which is
+   the same $\mathrm{diag}(1,1,1,-1)$. Calling one qubit the "control" is
+   pure bookkeeping for CZ, and circuit diagrams reflect this by drawing it
+   with a dot on *both* wires. CNOT enjoys no such symmetry, as the very
+   next question's truth table shows.
+
+   The likely slip is expanding $|1\rangle\langle1|\otimes Z$ into the
+   upper-left block instead of the lower-right. The projector's only
+   nonzero entry is at position $(2,2)$, so its tensor product occupies the
+   *last* $2\times2$ block, where the basis labels start with 1.
+
+   </details>
+
 2. What does $\text{CNOT}(0,1)$ do to $|11\rangle$? To $|01\rangle$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\text{CNOT}(0,1)|11\rangle = |10\rangle$ and
+   $\text{CNOT}(0,1)|01\rangle = |01\rangle$.
+
+   Both follow from one rule, read off the matrix derived above: qubit 0 is
+   never touched, and qubit 1 flips exactly when qubit 0 is 1. For
+   $|11\rangle$ the control is 1, so the target goes $1 \to 0$. For
+   $|01\rangle$ the control is 0, so nothing happens, and the state is a
+   fixed point.
+
+   The pair is chosen to make the asymmetry visible. $|01\rangle$ and
+   $|10\rangle$ are the same two bit values in the two wires, yet CNOT
+   leaves one alone and moves the other. Control and target are not
+   interchangeable, and $\text{CNOT}(1,0)$ would give the mirror-image
+   answers: it fixes $|10\rangle$ and sends $|01\rangle$ to $|11\rangle$.
+
+   Neither of these outputs is entangled, and that is the point of the
+   lesson's warning callout. To see what CNOT can actually do, take the
+   superposition built from these two very inputs and apply linearity:
+
+   $$
+   \text{CNOT}(0,1)\frac{|01\rangle+|11\rangle}{\sqrt2} = \frac{|01\rangle+|10\rangle}{\sqrt2}
+   $$
+
+   The engine reports that output as entangled, entropy $1$ bit. The two
+   basis-state answers above are exactly the two ingredients, each
+   perfectly ordinary on its own, and the entanglement lives in the
+   *combination*. Same gate, same two answers, superposed instead of run
+   one at a time.
+
+   The wrong turn is to read "CNOT flips the target" and flip qubit 1 in
+   both cases, giving $|10\rangle$ and $|00\rangle$. That mistake is
+   effectively dropping the conditional and applying $I \otimes X$, and it
+   is seductive because CNOT's name emphasizes the NOT and buries the
+   controlled.
+
+   </details>
+
 3. Confirm $\text{CNOT}^2=I$ by multiplying the CNOT matrix derived above
    by itself.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \begin{pmatrix}1&0&0&0\\0&1&0&0\\0&0&0&1\\0&0&1&0\end{pmatrix}\begin{pmatrix}1&0&0&0\\0&1&0&0\\0&0&0&1\\0&0&1&0\end{pmatrix} = \begin{pmatrix}1&0&0&0\\0&1&0&0\\0&0&1&0\\0&0&0&1\end{pmatrix} = I
+   $$
+
+   The multiplication is easier than it looks because CNOT is a permutation
+   matrix: every row and every column holds a single 1. Squaring it just
+   composes the permutation with itself, and the permutation in question is
+   the transposition that swaps the third and fourth basis labels while
+   fixing the first two. A transposition applied twice is the identity, so
+   only the bottom-right $2\times2$ block has anything to check, and that
+   block is $X$, whose square is the familiar $X^2 = I$.
+
+   Two consequences follow immediately and both get used later.
+   $\text{CNOT}^{-1} = \text{CNOT}$, so undoing an entangling step needs no
+   new gate, which is what makes the "uncompute" pattern cheap in
+   algorithms and what lets teleportation and superdense coding run the
+   Bell circuit backwards to decode. And CNOT is real and symmetric, so
+   $\text{CNOT}^\dagger = \text{CNOT}$, which together with
+   $\text{CNOT}^2 = I$ makes it both unitary and Hermitian. It is
+   simultaneously a legal gate and a legal observable, a coincidence the
+   Paulis share and most gates, like $S$ and $T$, do not.
+
+   The slip worth naming is concluding "CNOT undoes itself, so any circuit
+   made of CNOTs undoes itself". It does not. The SWAP construction in this
+   lesson is three CNOTs, and running that whole sequence twice is the
+   identity only because SWAP happens to be its own inverse too. Question 4
+   shows how quickly the reasoning breaks when the controls stop
+   alternating.
+
+   </details>
+
 4. Why does the SWAP construction need to *alternate* which qubit is the
    control (0,1 then 1,0 then 0,1), rather than using the same control
    three times?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because three copies of the same gate collapse. Using
+   $\text{CNOT}(0,1)$ three times gives
+   $\text{CNOT}^3 = \text{CNOT}^2 \cdot \text{CNOT} = I \cdot \text{CNOT} = \text{CNOT}$,
+   so the circuit is just one CNOT wearing a costume. Run it on
+   $|10\rangle$ and you get $|11\rangle$, not the $|01\rangle$ that SWAP
+   demands, and the engine confirms both the matrix identity and that
+   output.
+
+   The deeper reason is about what each gate can reach. A CNOT with control
+   0 never modifies qubit 0, so any product of such gates leaves qubit 0
+   exactly as it found it. SWAP has to change qubit 0 whenever the two
+   values differ. No sequence of $\text{CNOT}(0,1)$ gates, of any length,
+   can do that, and no argument about counting or parity is needed to see
+   it. Information has to travel in both directions, so both directions
+   have to appear among the gates.
+
+   Follow the alternating version and you can watch the round trip happen.
+   Starting from $|ab\rangle$, the first $\text{CNOT}(0,1)$ writes
+   $|a, a\oplus b\rangle$, which parks the XOR of both values on qubit 1.
+   The second, $\text{CNOT}(1,0)$, uses it: qubit 0 becomes
+   $a \oplus (a \oplus b) = b$, giving $|b, a\oplus b\rangle$. The third,
+   $\text{CNOT}(0,1)$ again, cleans up: qubit 1 becomes
+   $(a\oplus b)\oplus b = a$, giving $|ba\rangle$. Each step is the
+   classical three-XOR variable swap, the one that exchanges two integers
+   without a temporary, and every line of it is reversible, which is why it
+   transfers to quantum gates unchanged.
+
+   The wrong turn worth naming is checking the claim on a single input.
+   Trace $|10\rangle$ through the correct alternating circuit and the middle
+   column is the only one whose control is qubit 1, while the third column
+   sits idle; trace $|11\rangle$ instead and it is the middle column that
+   sits idle. A student who verifies one input can walk away believing a
+   column is redundant. The identity has to hold on all four basis states,
+   and by linearity that is exactly what makes it hold on every state.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -286,7 +442,7 @@ the SWAP derivation above relies on directly.
 - CNOT on a basis state never entangles anything by itself. Superposition
   on the control is required, which is where the next lesson begins.
 
-## Further Exploration
+## Superposing the control first
 
 <NextDiscovery>
 Up next, [Bell States and Entanglement](/lessons/quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement) puts a control qubit into

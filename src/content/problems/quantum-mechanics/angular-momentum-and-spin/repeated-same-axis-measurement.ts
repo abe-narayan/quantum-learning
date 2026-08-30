@@ -26,7 +26,7 @@ export const repeatedSameAxisMeasurement: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "0.5 would apply if an incompatible-axis measurement occurred in between — here there's no intervening measurement at all.",
+      b: "0.5 would apply if an incompatible-axis measurement occurred in between. Here there is no intervening measurement at all.",
       c: "This would mean measuring twice always flips the outcome, which contradicts the state being an eigenstate after the first measurement.",
       d: "This imagines the state drifting back toward random while it flies. An Sz eigenstate is stationary under the free evolution between the magnets; nothing in the idealized setup rotates it, so the separation does not enter.",
     },

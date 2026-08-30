@@ -1,6 +1,6 @@
-# QuantumLearn — Platform Architecture
+# StudyQuantum — Platform Architecture
 
-This document is the product/engineering blueprint for QuantumLearn: a free,
+This document is the product/engineering blueprint for StudyQuantum: a free,
 in-depth educational platform covering Quantum Mechanics, Quantum Computing,
 Quantum Hardware, Quantum Software, Quantum Mastery, and Apex, taking a
 student from strong high-school math through graduate-level, research-adjacent
@@ -21,9 +21,17 @@ changes — it should stay the source of truth, not a snapshot.
 order) · Simulators · Map · Glossary · Problems · Current Quantum · About.
 The logo itself links home, so a separate "Home" text link was dropped as
 pure duplication. `/map` (`src/components/map/`, an interactive
-concept-dependency map) and `/glossary` (an alphabetical term reference
-linked back into lessons) are both real, shipped pages not covered anywhere
-else in this document.
+concept-dependency map) and `/glossary` (an alphabetical reference of 273
+terms as of 2026-08-30, linked back into lessons from `<Term>` call sites in
+191 of the 219 lessons) are both real, shipped pages. **`GLOSSARY_TERMS` is a
+merge of two sources**, which is worth knowing before you grep: 214 entries
+are authored in `src/lib/content/glossary.ts`, and 59 more are derived from
+`CONCEPT_NODES` in `src/lib/content/concepts.ts`. Grepping `glossary.ts` for
+`id:` therefore "finds" ids missing that resolve perfectly well, which has
+been a recurring false alarm; `glossary.test.ts` asserts resolution instead,
+which is the property that matters. `/map` is not covered anywhere else
+in this document; for how glossary terms reach site search without reaching
+a browser bundle, see §7d.
 
 **`/lessons` and `/learn` are two different jobs, and briefly were one.**
 `/lessons` was collapsed into a `permanentRedirect("/learn")` stub at one
@@ -285,7 +293,7 @@ course once had (§2 & 3).
 Apex is the sixth and, per §7c, the curriculum's **terminal pillar**: 5
 courses, 28 modules, 48 estimated hours, every course again at the
 `"master"` difficulty tier. Its `PILLARS` description calls it "the summit
-of QuantumLearn: research-depth algorithms, fault tolerance, complexity
+of StudyQuantum: research-depth algorithms, fault tolerance, complexity
 theory, large-scale simulation and compilation, and a final course in
 reading and evaluating real quantum-computing research — the point where a
 motivated student can approach the literature without being lost."
@@ -333,7 +341,7 @@ The final course, `Research Methods and Synthesis`, is deliberately not new
 physics — its own lesson content says so directly.
 `how-to-read-a-quantum-computing-paper.mdx` opens "Not a new law of
 physics, not a new algorithm — a reading strategy," and states plainly that
-"the final course of QuantumLearn opens not with new physics but with a
+"the final course of StudyQuantum opens not with new physics but with a
 practical skill." It teaches how to read a real paper's precise claim
 against its abstract's framing, how to distinguish a proven theorem from a
 numerical experiment from a heuristic, and how to spot a "quantum
@@ -425,12 +433,17 @@ re-opens the 4× gap the derivation just closed. Note also what is *not*
 enforced — no test checks a lesson's own minutes against the rule (only the
 course roll-up is pinned), so the coefficients live here and nowhere else.
 
-Effect on the site total: from ~277h of hand-authored figures to **116h**
-(6,963 minutes across 219 lessons, measured 2026-08-29; the 32 courses'
-derived `estimatedHours` sum to 117h, the difference being half-hour
-rounding). This number is still moving as individual pillars are
-recalibrated — treat it as a reading of the day it was taken, not a
-constant.
+Effect on the site total: from ~277h of hand-authored figures to **117.2h**
+(7,034 minutes across 219 lessons, read 2026-08-30). The 32 courses' derived
+`estimatedHours` sum to **118h**, and that is the figure the site quotes,
+because each course's hours are the same total rounded to the nearest half
+hour *per course* first, and thirty-two such roundings accumulate about three
+quarters of an hour. Two derivations of one quantity is the defect, so the
+site prints only the course-hours sum, through `CURRICULUM_HOURS` in
+`curriculum.ts` (read its own note there before touching it, and
+`curriculumCoverage.test.ts` re-derives every `estimatedHours` from
+`LESSON_METAS`). Both numbers move as pillars are recalibrated: re-derive
+rather than quote either.
 
 **Loading (`src/lib/content/lessons.ts`)** — server-only:
 
@@ -1135,9 +1148,8 @@ listed here as future work, was designed and built this session — see §7b.
 > **Note on cross-references.** Comments throughout `src/lib/problems/`
 > point at "docs/ARCHITECTURE.md §10" for the problems system — that is
 > **this** section. The document was renumbered and the code comments were
-> not; treat `§10` in `registry.ts`, `types.ts` and
-> `validators/conceptual.ts` as meaning §7b until those comments are
-> updated.
+> not; treat `§10` in `registry.ts` (twice) and `types.ts` (twice) as meaning
+> §7b until those comments are updated. There is no §10 in this document.
 
 The problems system is the platform's first real content type that isn't
 prose-plus-math (a lesson) or a hand-built interactive widget (a
@@ -1295,8 +1307,9 @@ authored strings through `ScrollableMathText` → `MathText` → `katex`, and
 not one of those five files declares `"use client"` itself — they were
 dragged over the boundary by their importer. Everything statically
 reachable below a client boundary is downloaded eagerly, so 268KB raw /
-74.1KB gzip of `katex.min.js` sat in the *eager* bundle of all 547 problem
-pages, and the two existing katex guards never saw it because both pin
+74.1KB gzip of `katex.min.js` sat in the *eager* bundle of every problem
+page (547 of them when this was measured; the corpus has grown since), and
+the two existing katex guards never saw it because both pin
 `mdx-components.tsx` and `LessonLayout.tsx` by name.
 
 The fix is the one the lesson corpus already uses (`rehypeKatexHtml.mjs`
@@ -1329,7 +1342,7 @@ passes through MDX:
   chunk, where it already was and off every lesson page's eager graph.
 
 Measured: the route's eager client graph went **86.6 KB → 13.8 KB gzip**,
-removing 74 KB of KaTeX from every one of the 547 problem pages, at a cost
+removing 74 KB of KaTeX from every problem page, at a cost
 of ~568 bytes gzip of prerendered HTML per page in the flight payload
 (median 163B, max 2.8KB). Rendering the gated hints and solution up front
 leaks nothing new: `ProblemView` was always handed the whole `Problem` —
@@ -1500,8 +1513,8 @@ still only one definition of "what counts as complete" anywhere on the
 site; only the surrounding chrome (a numbered table of contents with dotted
 leaders, hairline rules, no cards) is Apex-specific.
 
-**Narrative MDX components** (`src/components/narrative/`, registered
-globally in `src/mdx-components.tsx` alongside the pre-existing
+**Narrative MDX components** (`src/components/narrative/`, most of them
+registered globally in `src/mdx-components.tsx` alongside the pre-existing
 `Callout`/`DefinitionBox`/`TheoremBox`/`ExternalFigure`/
 `InteractiveSection`/`PredictBeforeReveal`) give lesson authors a vocabulary
 for structuring a lesson as an experience — hook → question →
@@ -1511,12 +1524,91 @@ prose. `LessonHook`, `Question`, `InsightBlock`, `DerivationSteps`/
 `DerivationStep`, `EquationReveal`, `AnnotatedFigure`, `ResearchConnection`,
 `HistoricalMoment`, `ChallengePrompt`, and `NextDiscovery` are all plain,
 mostly presentational components with no shared state between them — an
-author opts into whichever beats a given lesson actually calls for. Full
+author opts into whichever beats a given lesson actually calls for. Two of
+them (`Question`, `AnnotatedFigure`) sit below the global mapping's usage bar
+and are imported explicitly by the three and eight lessons respectively that
+use them; see §5 for why that bar exists. Full
 prop-level documentation and usage examples for every one of these (and the
-six pre-existing MDX shortcodes) live in
+pre-existing MDX shortcodes) live in
 [`docs/NARRATIVE_COMPONENTS.md`](NARRATIVE_COMPONENTS.md), which is the
 author-facing reference; this section only covers where they sit
 architecturally.
+
+---
+
+## 7d. Site search and the prebuilt index
+
+Site search is a **prebuilt JSON file plus a client ranker**, not a service
+and not a per-request query. `public/search-index.json` holds 1,100 entries
+as of 2026-08-30: 556 problems, 273 glossary terms, 219 lessons, 32 courses,
+14 simulators, 6 track pages. The index is regenerated before every
+dev/build/test, so that breakdown is a reading, not a specification: it is
+the corpus, counted. `SearchOverlay` fetches it lazily on first open, so
+nothing about search sits in any route's initial payload.
+
+**How it is built.** `scripts/generate-search-index.mjs` runs under plain
+Node before dev/build/test. It cannot resolve `@/…` aliases and is not inside
+Next's bundler, so it **cannot import an MDX lesson module at all**. It reads
+lesson and problem sources as text, brace-scans out their metadata object
+literals (the same technique `generate-lesson-registry.mjs` uses, shared via
+`scripts/lib/extract.mjs`), `import()`s `curriculum.ts` directly because that
+module is dependency-free at runtime, and hands all of it to
+`buildSearchIndex()` in `src/lib/search/index.ts` to assemble. That
+constraint is the reason for several shapes in `lib/search/` that would
+otherwise look like over-parameterisation. See below.
+
+**Glossary rows are baked in, and that is a boundary, not an optimisation.**
+`src/lib/content/glossary.ts` is a large prose corpus, and the search overlay
+used to dynamic-import a `lib/search/glossaryEntries.ts` shim to match
+against it. That file is gone. `clientBoundary.test.ts` now lists
+`lib/content/glossary.ts` as **server-only outright**: its only permitted
+importers are server components (`app/glossary/page.tsx`), the build script,
+and type-only importers (`lib/search/index.ts`, `components/glossary/**`).
+"Must not reach a browser at all" is a stronger promise than a byte budget
+that has to be renegotiated every time a term is added. Do not add a
+client-side glossary import under `src/components/search/**`.
+
+**`linkCount`, and why it is a parameter rather than an import.** Glossary
+entries carry one extra field the other five kinds do not: `linkCount`, how
+many times the lesson corpus links to that term with `<Term id="…">`. It is a
+**ranking weight only** and is never rendered. It exists to settle ties: a
+query for "Dirac" names both Dirac Notation and the Dirac delta, "Grover"
+names both the algorithm and its diffusion operator, and when two terms score
+identically the one the lessons actually lean on should lead. The alternative
+tie-break was alphabetical order. (`lib/search/types.ts` records that
+difficulty and glossary-graph degree were both tried as weights and both
+rejected.)
+
+The generator counts it, because it is already reading every lesson file:
+one extra regex sweep of a string it has in hand, rather than a second walk
+of the corpus. It then **passes** the counts into `buildSearchIndex` as a
+defaulted `termLinkCounts: Record<string, number>` parameter. This is
+deliberate and slightly awkward on purpose:
+
+- `buildSearchIndex` reads no files, by design. Computing this there would
+  make the assembly function a filesystem consumer.
+- It cannot import the glossary to compute it either. `clientBoundary.test.ts`
+  pins `lib/search/index.ts` as a **type-only** importer of
+  `lib/content/glossary.ts`; adding a value import would fail that test and
+  re-open the boundary the previous paragraph just closed.
+- The parameter is defaulted to `{}` so every existing caller still compiles
+  and simply gets no weighting. `pillars: PillarInfo[] = []` is defaulted for
+  the same reason, and both are the same pattern: this function's inputs are
+  pushed in from the one place that is allowed to read them.
+
+**Two duplications in `lib/search/index.ts` are deliberate.** `PILLAR_HREF`
+and the `/courses/<slug>` href construction both duplicate logic that exists
+elsewhere (`lib/design/pillars.ts`, `components/curriculum/courseHref.ts`)
+rather than importing it, again because plain Node resolves no `@/…` alias.
+`src/lib/design/__tests__/routes.test.ts` and `pillars.test.ts` assert the
+copies agree with the originals, so they cannot drift silently. If you change
+one, the test names the other.
+
+`SIMULATOR_ENTRIES` in that same file is hand-maintained: there is no
+programmatic registry of simulators to source it from, so its titles,
+descriptions and `#anchor` ids are copied from
+`src/app/simulators/page.tsx` and must be updated by hand when that page's
+set of simulators changes.
 
 ---
 
@@ -2345,6 +2437,23 @@ polish was applied only to the Circuit Builder component this session
 wrote, not swept across the platform's pre-existing simulators and pages.
 
 ## 9. Implementation Roadmap
+
+> **This section is history, not a plan, and its numbers are from the
+> sessions that wrote them.** Read it for how the build sequenced, not for
+> what to do next. Three of its statements are no longer true of the site:
+>
+> - "all 22 courses across all 4 pillars" was true after Session 11. There
+>   are now **32 courses across 6 pillars** (Quantum Mastery and Apex came
+>   later), holding **219 authored lessons**.
+> - "9 real interactive simulators" was true after Session 12. There are now
+>   **14** on `/simulators`.
+> - "the quiz-taking UI … remains exactly as deferred" is no longer true: the
+>   problems system was designed and built, and is §7b of this document.
+>   **547 problems** ship as static pages.
+>
+> The one item below that is still genuinely open is the from-scratch
+> cross-check of the full prerequisite graph, and it is now a larger job than
+> it was when written, since the graph has grown from 22 courses to 32.
 
 **Update after Session 11:** all 22 courses across all 4 pillars are now
 fully authored (see Session 11's changelog entry above for the complete

@@ -44,11 +44,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Every standard 1D potential, in one picture">
 Between Wave Mechanics and this course, every standard 1D potential from the opening chapters of a quantum mechanics textbook has now been solved, bound states and scattering states alike. This capstone puts them in one picture.
 </LessonHook>
 
-## Motivation
+## A complete inventory, after two courses
 
 Two courses of one-dimensional quantum mechanics leave a complete
 inventory: the infinite well (exactly, closed form), the
@@ -77,15 +77,15 @@ general, not a coincidence of these five examples: it comes from whether
 the boundary conditions at infinity are restrictive enough to pick out
 isolated energies.
 
-## Worked Synthesis Examples
+## Problems that span both courses
 
 <PredictBeforeReveal
   question="A finite well is made deeper and deeper (V0 grows, half-width a fixed). What happens to its total number of bound states?"
   options={[
     { label: "It stays fixed at whatever it started at", value: "fixed" },
-    { label: "It grows without bound, adding one state at a time", value: "grows" },
     { label: "It grows at first, then saturates at some maximum", value: "saturates" },
     { label: "It can only ever be exactly one, no matter how deep", value: "one" },
+    { label: "It grows without bound, adding one state at a time", value: "grows" },
   ]}
   correctValue="grows"
   explanation="It grows without limit, one state at a time. Counting them is a matter of counting curve crossings, which Worked Example 1 below does. The endpoint is worth noting now: as V0→∞ the count diverges, which is how the finite well recovers the infinite well's endless ladder rather than contradicting it."
@@ -136,14 +136,14 @@ correction is real but small at this energy, while the resonance
 enhancement is not present at all away from its peak.
 
 <InteractiveSection
-  title="Slide V0, watch resonance peaks emerge"
-  description="Slide the barrier height V0 and watch the transmission curve T(E) develop resonance peaks touching T = 1, the mechanism behind Worked Example 2's comparison between resonant and off-resonant energies."
+  title="Slide V0, watch the resonance hold its height"
+  description="Slide the barrier height V0 and watch T(E). One resonance falls inside each frame's energy window, always at E = V0 + 3, and it touches T = 1 exactly however tall the barrier is: the peak's height never degrades, only the transmission on either side of it does. That contrast is the mechanism behind Worked Example 2's comparison between resonant and off-resonant energies."
 >
   <ParametricCurve
     frames={challengeTransmissionFrames}
     sliderLabel="Barrier height V0"
     referenceLines={[{ y: 1, label: "T = 1 (resonance)" }]}
-    ariaLabel="Transmission probability T versus energy E for a barrier of width 1.2825, as barrier height V0 varies from 1 to 4, showing resonance peaks reaching T=1 amid an off-resonance baseline"
+    ariaLabel="Transmission probability T against energy E for a barrier of fixed width 1.2825, with a slider stepping the height V0 through 1, 2, 3 and 4. Each frame starts at the threshold E just above V0 and runs 8 units higher, and each contains exactly one resonance, a single touch of the dashed T=1 line at E = V0 + 3. The second resonance would sit at E = V0 + 12, off the right edge. Raising V0 makes the barrier bite harder at threshold without moving the peak's height: at V0=1 the curve starts at 0.57, reaches 1 at E=4, and never falls below 0.99 afterwards, while at V0=4 it starts at only 0.25, reaches 1 at E=7, and sags to 0.95 before ending at 0.97."
   />
 </InteractiveSection>
 
@@ -159,7 +159,7 @@ equation's roots). The barrier's scattering state is oscillatory on
 Any energy is compatible with *some* valid oscillatory solution outside,
 so nothing forces discreteness.
 
-## Common Mistakes, Revisited
+## Why one formula could never cover both
 
 <Callout type="note">
 **Expecting a single unified formula to cover both regimes.** Bound
@@ -183,14 +183,162 @@ which one is more trustworthy.
    one whose solution method combined *both* a closed-form derivation and
    an approximate/numerical cross-check within the same course. (Hint:
    revisit the Tunneling lesson's approach.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The barrier below its height, $E<V_0$: the tunneling row.
+
+   It is the only row whose entry names two methods of different kinds.
+   The derivation is closed form as far as it goes: solving
+   $\psi''=\kappa^2\psi$ inside the barrier and matching at both edges
+   gives the transmission scale $e^{-2\kappa a}$ analytically, with
+   $\kappa=\sqrt{2m(V_0-E)}/\hbar$ written down exactly. What it does not
+   give is the exact transmission, because the algebraic prefactor was not
+   carried through, so the lesson cross-checks against the Wavefunction
+   Explorer, which evolves a real packet and reports
+   $P(\text{transmitted})$ and $P(\text{reflected})$ numerically. Analytic
+   scaling plus numerical value, in the same lesson.
+
+   Compare each of the other four to see why none qualifies.
+
+   The infinite well is closed form and nothing else; the numbers are
+   exact and there is nothing left to cross-check against. The harmonic
+   oscillator has two derivations, ladder operators and a Gaussian
+   substitution, but both are closed form, so it is a cross-check between
+   two exact methods rather than between an exact one and an approximate
+   one. The step and the over-the-barrier case are closed form outright,
+   with $R+T=1$ verified as an algebraic identity rather than numerically.
+
+   The finite well is the interesting near-miss and worth ruling out
+   explicitly. It is solved numerically, by bisection, and it *is*
+   cross-checked against a closed form: the $V_0\to\infty$ limit reduces
+   the transcendental equation to the infinite well's exact
+   $k\to\pi/(2a)$. But the direction is reversed. There the primary answer
+   is numerical and the closed form is a limiting check on it, whereas the
+   question asks for a primary derivation that is closed form with the
+   numerics playing the checking role. The hint settles which one is
+   meant.
+
+   The general point behind the question is that the two kinds of method
+   are complements, not a hierarchy. The Common Mistakes note at the top
+   of this lesson says it directly: a bisection root is correct to machine
+   precision, and which tool a problem demands is a fact about the
+   equation, not about how much the answer can be trusted.
+
+   </details>
+
 2. If a well were deep enough to support exactly 3 even-parity bound
    states, roughly how many times would the growing quarter-circle from
    Worked Example 1 need to cross a tangent branch?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Three times: one crossing per even-parity state, since each root of
+   $k\tan(ka)=\kappa$ *is* one bound state.
+
+   The counting is worth making precise, because "roughly" hides an exact
+   condition. The even branches of $k\tan(ka)$ start at $ka=0,\pi,2\pi,
+   \ldots$ and each diverges upward a quarter period later, at
+   $ka=\pi/2,3\pi/2,5\pi/2$. The quarter circle
+   $\kappa=\sqrt{2V_0-k^2}$ runs from $(0,\sqrt{2V_0})$ down to
+   $(\sqrt{2V_0},0)$, so its reach along the $k$ axis is $\sqrt{2V_0}$.
+   It crosses the $n$-th even branch exactly when its reach passes that
+   branch's starting point:
+
+   $$
+   \sqrt{2V_0} > \frac{(n-1)\pi}{a}
+   $$
+
+   Three even states therefore need $\sqrt{2V_0}\,a>2\pi$, that is
+
+   $$
+   V_0 > \frac{2\pi^2}{a^2}
+   $$
+
+   which at $a=1$ is $V_0>19.74$. The earlier worked well, $a=1$ with
+   $V_0=5$, is the cautionary case for this criterion. Its reach
+   $\sqrt{2V_0}=3.1623$ clears the second even branch's start at
+   $\pi=3.1416$ by two hundredths, so it carries *two* even states rather
+   than one, the second of them barely bound at $E\approx-0.002$. A margin
+   that thin is exactly what a drawn graph cannot resolve, which is why the
+   inequality above is worth having in symbols.
+
+   Two refinements keep the count honest.
+
+   Each branch is crossed *once*, not more. The tangent branch rises
+   monotonically from zero to infinity across its quarter period while the
+   quarter circle falls monotonically, so they meet at most once per
+   branch. That monotonicity is what turns "count the crossings" into a
+   reliable method rather than a picture.
+
+   And the question asks only about *even* states. The odd states satisfy
+   $-k\cot(ka)=\kappa$, whose branches interleave with the even ones,
+   starting at $ka=\pi/2,3\pi/2,5\pi/2,\ldots$. A well with *exactly* three
+   even states has $\sqrt{2V_0}\,a$ just past $2\pi\approx6.28$, which
+   clears the odd branches at $\pi/2$ and $3\pi/2$ but falls well short of
+   the third at $5\pi/2\approx7.85$. So it holds two odd states, five in
+   total, alternating even, odd, even, odd, even up the ladder. The general
+   count agrees: a well of half-width $a$ and depth $V_0$ holds
+   $\lceil2a\sqrt{2V_0}/\pi\rceil$ bound states, and here that argument is
+   $4^{+}$, giving $5$. Counting one parity and reporting it as the total
+   is the error to avoid, and so is assuming the two parities contribute
+   equally.
+
+   </details>
+
 3. A future course extends these tools to 3 spatial dimensions (e.g.
    the Hydrogen Atom). Which single idea from *this* course, bound vs.
    continuous spectra, do you expect to reappear essentially unchanged,
    and which technique (transcendental-equation bisection, plane-wave
    matching) do you expect will need the most rework?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The bound-versus-continuous split survives untouched. Plane-wave
+   matching needs the most rework; bisection on a transcendental
+   condition transfers almost as it stands.
+
+   **What survives.** The split is not a property of one dimension. It
+   comes from the boundary condition at infinity: a state required to
+   decay in every direction is over-constrained, and only isolated
+   energies satisfy it, while a state allowed to oscillate out to infinity
+   is not, and every energy above the threshold works. That argument never
+   mentioned how many dimensions there are. Hydrogen bears it out exactly:
+   $E<0$ gives the discrete Rydberg ladder, $E>0$ gives a continuum of
+   ionized scattering states, and the two meet at $E=0$ where the electron
+   is just barely free.
+
+   **What transfers.** Separating a central potential into radial and
+   angular parts leaves a one-dimensional equation in $r$, with an
+   effective potential that includes a centrifugal term. That is this
+   course's problem in a new variable: match the solution's behaviour at
+   the origin and at infinity, get a transcendental condition on the
+   energy, and bisect. The root-finder does not care that $r$ came from
+   three dimensions, which is why the same bisection strategy is reused
+   again in the WKB lesson later in this track.
+
+   **What needs rework.** Plane-wave matching. In one dimension a
+   scattering problem has two channels, left-moving and right-moving, so
+   two boundary conditions settle everything and $r$ and $t$ come out in
+   two lines. In three dimensions an incoming plane wave scatters into a
+   *continuum of directions*, and there is no single reflected wave to
+   match. The technique is replaced by a partial-wave expansion: decompose
+   the incident wave into angular-momentum components, solve each one
+   radially, and describe the whole result by a *phase shift* per partial
+   wave rather than by one reflection amplitude. Quantum Mastery's
+   three-dimensional scattering lesson is where that reconstruction
+   happens, and it is a genuine rebuild rather than a relabelling.
+
+   The pattern is the same one the Wave Mechanics capstone found for its
+   own numerical machinery: what generalizes is the physical
+   classification and the one-dimensional radial reduction, and what
+   breaks is anything that assumed there were only two directions to go
+   in.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -207,12 +355,12 @@ which one is more trustworthy.
 - Resonant transmission is a new phenomenon this course introduced, with
   a direct, non-coincidental analogy to classical wave optics.
 
-## Further Exploration
+## One dimension short of an atom
 
 <NextDiscovery>
 This completes **One-Dimensional Systems**. Everything solved here lived
 on a line, which is one dimension short of an atom. The next steps deeper
-into the Quantum Mechanics pillar, **Angular Momentum & Spin** and
+into the Quantum Mechanics track, **Angular Momentum & Spin** and
 **The Hydrogen Atom**, add the two missing dimensions. What comes with
 them is angular momentum, an idea with no one-dimensional counterpart at
 all, working alongside a radial equation you will recognize: it is the

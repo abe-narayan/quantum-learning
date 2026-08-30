@@ -27,7 +27,11 @@ export const distinctJointEigenvaluePairs: NumericProblem = {
       { value: 6, feedback: "6 counts every combination of N's and M's values. Only the three combinations actually realized by a basis state occur." },
     ],
   },
-  hints: [{ text: "List the pairs: (1,5), (1,-5), (2,7). Are all three different from each other?" }],
+  hints: [
+    { text: "Each basis state carries one eigenvalue from $N$ and one from $M$. What is being counted is those two-part labels, not either operator's spectrum on its own." },
+    { text: "Read the two diagonals in step: for each of the three basis states, write down its ordered pair (its $N$ value, its $M$ value)." },
+    { text: "Two basis states share an $N$ value. Check whether their $M$ values also agree before deciding whether their labels count as one or as two." },
+  ],
   solution: {
     steps: [
       { description: "$|0\\rangle\\to(1,5)$, $|1\\rangle\\to(1,-5)$, $|2\\rangle\\to(2,7)$: three pairs, all mutually distinct." },
@@ -35,7 +39,7 @@ export const distinctJointEigenvaluePairs: NumericProblem = {
     finalAnswer: "$3$ distinct pairs, confirming $\\{N,M\\}$ is a CSCO for this space.",
   },
   explanation: {
-    correctIdea: "A CSCO's defining property is exactly that its joint eigenvalues distinguish every basis state.",
+    correctIdea: "A CSCO's defining property is that its joint eigenvalues distinguish every basis state.",
     whyCorrect: "Direct enumeration of the three pairs from the lesson's own table.",
     whyWrong: ["Counting only N's distinct eigenvalues (2, since N has values 1 and 2) misses the point: the question asks about the joint pair, which resolves N's own degeneracy."],
   },

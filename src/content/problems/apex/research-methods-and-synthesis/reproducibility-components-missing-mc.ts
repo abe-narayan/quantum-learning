@@ -19,19 +19,19 @@ export const reproducibilityComponentsMissingMc: MultipleChoiceProblem = {
     options: [
       {
         id: "a",
-        text: "Four independent pieces are missing, and no single addition closes the others: the exact gate sequence, a calibration snapshot for the device on the day it ran, the classical post-processing pipeline, and the shot count with a confidence interval on the 90% figure.",
+        text: "Four independent pieces are missing and none closes the rest: the gate sequence, calibration data, post-processing, and the shot count",
       },
       {
         id: "b",
-        text: "Naming the specific device model closes the gap: a device's gate fidelities and coherence times are fixed once it is fabricated, so the model name pins the performance down.",
+        text: "Naming the device model closes the gap: gate fidelities and coherence times are fixed at fabrication, so the model name pins performance down",
       },
       {
         id: "c",
-        text: "Only the shot count matters; the exact circuit and post-processing pipeline are implementation details that don't affect whether the result is trustworthy.",
+        text: "Two pieces are missing, the circuit and the shot count; calibration and post-processing are conventions a reader can safely assume",
       },
       {
         id: "d",
-        text: "Since the paper reports a specific number (90%) rather than a vague description, the claim is already fully reproducible as stated.",
+        text: "Three pieces are missing, but the statistics are not among them: an overlap quoted to two significant figures implies its shot count",
       },
     ],
   },
@@ -39,9 +39,9 @@ export const reproducibilityComponentsMissingMc: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Calibration established that a real device's performance (gate fidelities, decoherence times, readout asymmetry) drifts day to day; the SAME physical device, named correctly, can still perform differently a week later without a calibration snapshot attached. A device model name alone doesn't fix this.",
-      c: "Statistical uncertainty is one of four independent gaps, not the only one. The exact circuit and post-processing pipeline each independently change what the reported number even means, regardless of how many shots were used to compute it -- Quantum Error Mitigation's own worked example turned an 80% raw measurement into a 94% corrected one, a swing entirely from post-processing, not statistics.",
-      d: "A specific-looking number is not the same as a reproducible claim. '90% overlap' with no circuit, hardware/calibration, post-processing, or shot-count/confidence-interval detail is exactly the kind of impressive-sounding but unverifiable claim this lesson's common-mistakes callout warns against.",
+      b: "Calibration established that a real device's performance (gate fidelities, decoherence times, readout asymmetry) drifts day to day. The same physical device, named correctly, can still perform differently a week later without a calibration snapshot attached. A device model name alone does not fix this.",
+      c: "Treats the two hardest gaps as house style. Calibration drifts day to day on the same physical device, and Quantum Error Mitigation's own worked example turned an 80% raw measurement into a 94% corrected one, a swing that came entirely from an unstated post-processing choice.",
+      d: "A number's precision on the page says nothing about how many shots produced it. Without the shot count and an interval, 90% could rest on one run or on a million, and a reader has no way to tell which.",
     },
     defaultIncorrectFeedback:
       "Recall this lesson's four independent components of a reproducible claim: exact circuit, exact hardware/simulator with calibration data, exact classical post-processing/error-mitigation pipeline, and honest statistical uncertainty reporting. A claim missing several of these needs all of them supplied, not just one substituted for the others.",
@@ -54,20 +54,20 @@ export const reproducibilityComponentsMissingMc: MultipleChoiceProblem = {
   solution: {
     steps: [
       { description: "The four components (exact circuit, exact hardware+calibration, exact post-processing pipeline, honest statistical reporting) are independent: each answers a different question about how the result was obtained." },
-      { description: "The claim as stated supplies none of them in checkable detail -- 'a 20-qubit superconducting device' names a class of hardware, not a calibrated instance; '90% overlap' has no shot count or confidence interval attached." },
+      { description: "The claim as stated supplies none of them in checkable detail. 'A 20-qubit superconducting device' names a class of hardware, not a calibrated instance, and '90% overlap' has no shot count or confidence interval attached." },
       { description: "Supplying only one (e.g. just the shot count) would still leave the circuit, calibration, and post-processing pipeline completely unspecified, so no single addition suffices." },
     ],
     finalAnswer: "All four components are missing and independent: exact circuit, calibrated hardware snapshot, post-processing pipeline, and shot count with a confidence interval.",
   },
   explanation: {
     correctIdea:
-      "Reproducibility is a conjunction of four independent requirements, not a single score to raise -- a claim is only as reproducible as its weakest missing component.",
+      "Reproducibility is a conjunction of four independent requirements, not a single score to raise. A claim is only as reproducible as its weakest missing component.",
     whyCorrect:
       "Listing all four components this lesson identifies, and treating them as independent gaps requiring independent fixes, is what the 'Four Components' section asks a reader to do.",
     whyWrong: [
       { optionId: "b", text: "Conflates naming a device class with specifying a calibrated instance of it, ignoring that performance drifts over time." },
-      { optionId: "c", text: "Elevates statistics to the only relevant factor. The circuit and the post-processing pipeline each change what the number means, independently of shot count." },
-      { optionId: "d", text: "Mistakes a specific-sounding number for a reproducible claim when none of the four components are specified." },
+      { optionId: "c", text: "Assumes calibration and post-processing are standardised enough to go unstated. Both vary run to run and both move the reported number." },
+      { optionId: "d", text: "Reads precision as evidence. Quoting a figure to two significant places is a typographical choice, not a statement about the sample behind it." },
     ],
   },
 };

@@ -65,7 +65,7 @@ export const lessonMeta = {
 Einstein believed quantum mechanics had to be incomplete: that a measurement outcome was fixed in advance by some deeper layer of reality, rather than left open until someone looked. In 1964 John Bell found a way to settle the question with a number instead of an argument.
 </LessonHook>
 
-## Motivation
+## Thirty years with no way to decide
 
 Einstein's belief, that measurement outcomes are fixed in advance by some
 deeper layer of reality, was a reasonable position held by one of the
@@ -85,9 +85,13 @@ lesson, reaches $2\sqrt2$.
 
 Bell States and Entanglement, back in Quantum Gates & Circuits, already
 showed something suggestive: measuring both qubits of $|\Phi^+\rangle$ in
-the $X$ basis still gives perfect correlation, and promised that no
-*predetermined* classical description could reproduce that in general.
-This lesson supplies the proof. It is classical probability and
+the $X$ basis still gives perfect correlation. It was careful to say that
+this on its own convicts nobody, since a pair of slips of paper carrying a
+predetermined answer for $Z$ and for $X$ reproduces both results exactly.
+What it promised instead was a bound on correlations measured across
+several angles at once, which every predetermined description has to obey
+and an entangled pair does not. This lesson supplies that bound, and its
+proof. It is classical probability and
 combinatorics, with no quantum mechanics in it anywhere, and that is the
 point. The bound has to be established without reference to the theory it
 will be used to test.
@@ -126,7 +130,7 @@ John Bell, on leave from CERN, turns the EPR concern into mathematics: any local
 The original paper, whose central argument this lesson walks through in full. Bell's own version uses a different (and slightly weaker) inequality; the CHSH form proved here, due to Clauser, Horne, Shimony and Holt in 1969, is the one experiments actually test.
 </ResearchConnection>
 
-## Intuition
+## A cheat sheet handed out before they separate
 
 Picture Alice and Bob's shared strategy as a cheat sheet, $\lambda$,
 handed to both of them by the source before they separate. Each of them
@@ -135,11 +139,12 @@ cheat sheet, never at what the other person chose or got. You might
 guess that a rich enough cheat sheet could correlate their answers as
 strongly as you like. It cannot. The combination of correlations defined
 below, called $S$, is boxed in at magnitude 2 however the cheat sheet is
-designed or distributed. You can check that exhaustively further down, by
-stepping through all 16 deterministic cheat sheets and watching $S$ land
-on $+2$ or $-2$ every time.
+designed or distributed. The bound turns out to be even more rigid than
+that, in a way worth predicting before you see it, and you can check the
+rigid version exhaustively further down by stepping through all 16
+deterministic cheat sheets one at a time.
 
-## Mathematical Development
+## The model, the combination, and the bound
 
 ### The local hidden-variable model, precisely
 
@@ -179,8 +184,8 @@ range is $-4$ to $+4$.
   options={[
     { label: "Anything between -4 and +4", value: "range" },
     { label: "Always exactly 0", value: "zero" },
-    { label: "Always exactly ±2", value: "pm2" },
     { label: "Depends on the measurement settings chosen", value: "depends" },
+    { label: "Always exactly ±2", value: "pm2" },
   ]}
   correctValue="pm2"
   explanation="For any single fixed λ, S(λ) is +2 or −2. Never anything between them, and never anything outside. That is far tighter than 'bounded by 4', and it is a discrete fact about every deterministic hidden variable. The factoring below shows why: since every outcome is ±1, one of the two grouped terms vanishes identically. Hold onto how rigid this is. A real entangled pair, checked next lesson, produces S=2√2≈2.828, which no fixed λ reaches and no averaging over a distribution of them can reach either."
@@ -262,7 +267,7 @@ That is what gives the bound its reach. It holds for every LHV model at
 once, including ones nobody has invented, which is why measuring a
 violation settles a question rather than refuting one model.
 
-## Physical Interpretation
+## What structure, exactly, is being ruled out
 
 Bell's theorem does not merely show that "classical physics predicts
 different numbers than quantum mechanics for this experiment." It
@@ -280,7 +285,7 @@ because it does not satisfy the locality assumption the proof above
 depends on. Bell's theorem is a precise statement about *local*
 determinism specifically, not determinism in general.
 
-## Worked Example
+## One trivial deterministic model, scored
 
 **Suppose a source always sends $\lambda$ such that
 $A(A,\lambda)=A(A',\lambda)=+1$ and $B(B,\lambda)=B(B',\lambda)=+1$ for
@@ -294,7 +299,7 @@ $S=1+1+1-1=2$: right at the boundary, not exceeding it, just as the
 inequality requires ($|S|\leq2$, and this trivial model saturates it
 without violating it).
 
-## Common Mistakes
+## Local is the word doing the work
 
 <Callout type="mistake">
 **Thinking Bell's theorem proves "there are no hidden variables."** It
@@ -316,19 +321,185 @@ outside the range of the values being averaged), never more.
 
 1. Suppose $A(a,\lambda)=A(a',\lambda)=+1$ always, but
    $B(b,\lambda)=+1,B(b',\lambda)=-1$ always. Compute $S$ for this
-   deterministic model and confirm it satisfies $|S|\leq2$.
+   deterministic model and confirm it satisfies $|S|\leq2$. Then work out
+   the complete set of values $S$ can take across all 16 deterministic
+   strategies, and say what that set reveals about the bound.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Every correlation is a product of two fixed numbers here, so
+   $E(a,b)=+1$, $E(a,b')=-1$, $E(a',b)=+1$, $E(a',b')=-1$, and
+
+   $$
+   S = 1 + (-1) + 1 - (-1) = 2 .
+   $$
+
+   $|S|=2$, satisfying the bound and in fact saturating it. The factored
+   form makes it clearer:
+   $S = A(B+B') + A'(B-B') = (1)(1-1) + (1)(1+1) = 0 + 2$.
+
+   Enumerating all $16$ assignments of $\pm1$ to $A, A', B, B'$ gives a
+   surprisingly thin set of outcomes: $S$ is $+2$ for eight of them and
+   $-2$ for the other eight, and never anything else. There is no
+   deterministic strategy scoring $0$, or $1.7$, or $1.999$.
+
+   The reason is the factoring itself. $B+B'$ and $B-B'$ can never both be
+   nonzero, since $B$ and $B'$ are each $\pm1$: if they agree, the
+   difference vanishes and the sum is $\pm2$; if they disagree, the sum
+   vanishes and the difference is $\pm2$. So exactly one of the two terms
+   survives, multiplied by $A$ or $A'$, both of which are $\pm1$. The
+   result is $\pm2$ with no other possibility.
+
+   What this says about the bound is worth stating plainly. $|S|\leq2$ is
+   not a loose estimate that a cleverer deterministic cheat sheet might
+   creep up on. Every deterministic strategy is already at the ceiling.
+   Values strictly inside $(-2,2)$ arise only by averaging over a
+   distribution $p(\lambda)$ of strategies, and averaging over numbers all
+   equal to $\pm2$ cannot escape $[-2,2]$: that convexity is the entire
+   content of the theorem. Quantum mechanics reaching $2\sqrt2$ is
+   therefore not "doing slightly better than the best cheat sheet". It is
+   outside the range any average of cheat sheets can produce.
+
+   The wrong turn is treating a specific model like this one as evidence
+   for the bound. It is a single point in a set of $16$, and even
+   enumerating all $16$ covers only the deterministic case; the proof has to
+   handle every probability distribution over them at once, which is what
+   the factoring argument does.
+
+   </details>
+
 2. In the factoring step, explain why exactly one of
    "$B(b,\lambda)=B(b',\lambda)$" or "$B(b,\lambda)\neq B(b',\lambda)$"
    must hold for any fixed $\lambda$, given that both outcomes are in
    $\{+1,-1\}$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because for a fixed $\lambda$ both $B(b,\lambda)$ and $B(b',\lambda)$
+   are single, definite numbers drawn from a two-element set, and two
+   definite numbers are either equal or unequal. The dichotomy is
+   exhaustive, so at least one case holds, and exclusive, so not both. That
+   is all the step needs.
+
+   The load-bearing word is *definite*. An LHV model asserts that
+   $B(b,\lambda)$ has a value for every setting $b$, whether or not Bob
+   chose that setting, and whether or not anyone will ever measure it. Once
+   both values exist as numbers, the case split is available, and it is
+   what lets the proof write $B+B'=0$ or $B-B'=0$ and factor $S$ into a
+   single surviving term.
+
+   This is exactly where quantum mechanics declines to play. In the quantum
+   description there is no joint value for two non-commuting observables:
+   the outcome of measuring $B$ is not a function that also has an entry
+   for what $B'$ would have given on the same run. So the dichotomy has
+   nothing to apply to, the factoring step never happens, and $2\sqrt2$ is
+   not blocked. Counterfactual definiteness, the assumption that unmeasured
+   settings still have answers, is smuggled in right here, and it is one of
+   the two assumptions a violation refutes.
+
+   The wrong turn is answering "because $B$ has to be $+1$ or $-1$", which
+   is true and is not the point. The two-element range matters for the
+   later step where $B+B'$ or $B-B'$ equals $\pm2$; the dichotomy itself
+   would work for any set of values at all. What the step actually needs is
+   that both quantities exist simultaneously for the same $\lambda$.
+
+   </details>
+
 3. Why does the proof of $|S|\leq2$ never need to know the actual
    probability distribution $p(\lambda)$, beyond it being a valid
    probability distribution (nonnegative, integrates to 1)?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the bound is established for each $\lambda$ separately, before
+   any averaging happens. The factoring argument shows that the quantity
+
+   $$
+   A(a,\lambda)B(b,\lambda) + A(a,\lambda)B(b',\lambda) + A(a',\lambda)B(b,\lambda) - A(a',\lambda)B(b',\lambda)
+   $$
+
+   equals $\pm2$ for every single $\lambda$, whatever the four outcome
+   functions are. $S$ is the $p$-weighted average of that quantity, and an
+   average of numbers all lying in $[-2,2]$ lies in $[-2,2]$, for any
+   nonnegative weights summing to one.
+
+   That is the whole role of $p(\lambda)$: it has to be a genuine average
+   rather than an arbitrary linear combination. Nonnegativity forbids
+   cancelling a $+2$ against another $+2$ with a negative weight, and the
+   normalization forbids scaling the answer up by using total weight
+   greater than one. Given those two, nothing else about $p$ can matter.
+
+   The generality this buys is the reason the theorem is a theorem and not a
+   model comparison. $\lambda$ may be a single bit, a real number, a
+   continuum of fields, or an entire library of pre-agreed instructions; it
+   may be distributed in any way at all, including in ways nobody could
+   ever measure. None of that changes an average of $\pm2$s. This is why a
+   violation cannot be explained away by proposing a more elaborate hidden
+   variable, and why experimentalists test the number rather than arguing
+   about mechanisms.
+
+   The wrong turn is imagining the proof needs $\lambda$ to be
+   uniformly distributed, or finite, or independent of the settings. It
+   needs none of those. Independence of $p(\lambda)$ from the settings *is*
+   a real assumption of the setup, but it enters earlier, in writing the
+   same $p$ for all four correlation terms, and it is the freedom-of-choice
+   assumption a real experiment has to close by other means.
+
+   </details>
+
 4. A friend proposes a hidden-variable model where Bob's outcome
    function is allowed to depend on Alice's setting $a$ as well as
    Bob's own setting $b$. Explain, citing the specific step in the proof
    above that would break, why this model is not covered by the CHSH
-   inequality proven here.
+   inequality proven here. Then say how large $S$ could get in such a
+   model, and what actually rules it out.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The step that breaks is the factoring. The proof writes
+   $S(\lambda) = A(B+B') + A'(B-B')$, which requires the *same* two numbers
+   $B$ and $B'$ to appear in all four correlation terms. If Bob's outcomes
+   are $B(b,a,\lambda)$, then the $B$ appearing in $E(a,b)$ and the $B$
+   appearing in $E(a',b)$ are different quantities, there is nothing common
+   to factor out, and the argument stops on its first line. Locality is
+   not an extra assumption bolted onto the proof; it is the thing that
+   makes $B$ writable without an $a$ in it.
+
+   With that freedom, $S$ can reach $4$, the algebraic maximum. Let Bob's
+   device return the value that makes each term favourable: outcomes
+   agreeing with Alice's for the three terms that enter with a plus sign
+   and disagreeing for the one that enters with a minus. Then
+   $E(a,b)=E(a,b')=E(a',b)=+1$ and $E(a',b')=-1$, so $S=1+1+1+1=4$. Since
+   each correlation is bounded by $1$ in magnitude, no model of any kind
+   can do better, and quantum mechanics reaching only $2\sqrt2\approx2.83$
+   is itself a fact in need of explanation, known as Tsirelson's bound.
+
+   What rules the model out is not a Bell test. It is relativity, plus the
+   experimental fact that no signal has ever been observed on this channel.
+   A device whose output depends on a distant setting can be used to send a
+   message instantly, simply by having Alice choose $a$ or $a'$ and letting
+   Bob read the shift in his own marginal statistics. Quantum mechanics
+   never permits that: whatever Alice does, Bob's local distribution is
+   fixed, which is the no-signaling property this pillar has appealed to
+   since teleportation.
+
+   So the honest summary is that a CHSH violation refutes the conjunction
+   of locality and definite pre-existing values, and does not by itself say
+   which one to give up. Non-local hidden variables remain logically
+   available, and Bohmian mechanics is a worked example of one, and they
+   pay for it by needing an explanation of why the non-locality is
+   permanently hidden from view.
+
+   The wrong turn is calling the friend's model "already excluded by the
+   experiments". The experiments exclude local models. This one is
+   excluded by a different argument, and knowing which argument does which
+   job is most of what the theorem is for.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -350,27 +521,30 @@ outside the range of the values being averaged), never more.
 ## Try It Yourself
 
 The proof above is airtight and entirely classical: $|S|\leq2$ for every
-local hidden-variable model, no exceptions. The next lesson derives, by
-hand, what an actual <Term id="entanglement">entangled</Term> qubit pair does instead. Before it does,
-make a prediction.
+local hidden-variable model, no exceptions. An <Term id="entanglement">entangled</Term> pair reaches
+$2\sqrt2\approx2.83$, which the next lesson derives by hand. That leaves
+one question the proof above says nothing about, because it is a question
+about quantum mechanics rather than about hidden variables: four
+correlations each lying in $[-1,+1]$ would allow $S$ as large as $4$
+on arithmetic alone.
 
 <PredictBeforeReveal
-  question="A real pair of entangled qubits, measured at the right four angles: can the CHSH value S exceed 2?"
+  question="Over every quantum state and every choice of the four observables, what is the largest S quantum mechanics can produce?"
   options={[
-    { label: "No: 2 is a fact about correlation itself, not only about local models", value: "no" },
-    { label: "Yes, but only by a little", value: "yes-little" },
-    { label: "Yes, all the way up to 2√2 ≈ 2.83", value: "yes-2sqrt2" },
+    { label: "4, the arithmetic maximum, given enough entanglement", value: "four" },
+    { label: "2√2 ≈ 2.828, and nothing beats it", value: "tsirelson" },
+    { label: "3, halfway between the classical bound and the arithmetic one", value: "three" },
+    { label: "There is no finite maximum; S keeps growing with system size", value: "unbounded" },
   ]}
-  correctValue="yes-2sqrt2"
-  explanation="A real Bell pair reaches S=2√2≈2.828, the Tsirelson bound, well past the classical ceiling of 2. The next lesson derives that number by hand from the density-matrix engine. Nothing in this lesson's proof is wrong: it shows |S|≤2 for every local hidden-variable model. The conclusion is that nature is not a local hidden-variable model."
+  correctValue="tsirelson"
+  explanation="2√2 is a ceiling for quantum mechanics itself, known as Tsirelson's bound, and this platform carries it as the constant CHSH_QUANTUM_BOUND in chsh.ts. So the situation has three levels, not two: local hidden variables stop at 2, quantum mechanics stops at 2√2, and only a theory more permissive than quantum mechanics could reach 4. Quantum correlations are stronger than any classical story allows and still nowhere near as strong as the arithmetic permits, and no one has a satisfying account of why the ceiling sits exactly there."
 />
 
-You don't have to wait for the derivation to see the number. The
-interactive below runs the exact same `chshValue` engine on a real
+The interactive below runs the same `chshValue` engine on a real
 $|\Phi^+\rangle$ Bell pair, live: drag any of the four measurement
 angles and watch $S$ update.
 
-<InteractiveSection title="A real CHSH experiment, right now" description="All four angles start at 0°, where S stays inside the classical bound. Load the quantum-optimal preset (or find it yourself) and watch S climb past 2 toward 2√2 ≈ 2.83, the violation the next lesson derives algebraically.">
+<InteractiveSection title="A real CHSH experiment, right now" description="This opens at the quantum-optimal angles, where S is already 2√2 ≈ 2.83, past anything a local hidden-variable model can produce. Load the all-angles-0° classical preset and read S there against the classical bound of 2, noting whether it lands on the bound or somewhere inside it. Then drag the angles yourself and try to beat 2.83.">
   <LazyCHSHBellTestExplorer />
 </InteractiveSection>
 
@@ -378,7 +552,7 @@ The full version of this simulator, with lab notes and a side-by-side
 comparison against both bounds, lives at
 [/simulators#chsh-bell-test](/simulators#chsh-bell-test).
 
-## Further Exploration
+## What quantum mechanics puts on the other side
 
 <NextDiscovery>
 [The CHSH Inequality and Quantum Violation](/lessons/quantum-computing/entanglement-and-measurement/the-chsh-inequality) computes $S$

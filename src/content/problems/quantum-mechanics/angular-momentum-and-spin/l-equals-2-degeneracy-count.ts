@@ -1,48 +1,92 @@
 import type { NumericProblem } from "@/lib/problems/types";
 
-const l = 2;
-const value = 2 * l + 1;
+/** The shell runs l = 0, 1, ..., n-1, and each l carries 2l+1 values of m. */
+const n = 3;
+const value = Array.from({ length: n }, (_, l) => 2 * l + 1).reduce((a, b) => a + b, 0);
 
 export const lEquals2DegeneracyCount: NumericProblem = {
   meta: {
     slug: "l-equals-2-degeneracy-count",
-    title: "How Many m-States Share an l=2 Energy Level?",
+    title: "From the Commutation Relations to Hydrogen's Shell Degeneracy",
     course: "angular-momentum-and-spin",
     lesson: "quantum-mechanics/angular-momentum-and-spin/capstone-from-abstract-algebra-to-the-hydrogen-atom",
-    difficulty: "beginner",
-    estimatedMinutes: 3,
+    difficulty: "advanced",
+    estimatedMinutes: 7,
     problemType: "numeric",
-    tags: ["capstone", "degeneracy"],
+    tags: ["capstone", "degeneracy", "synthesis"],
     prerequisites: ["quantum-mechanics/angular-momentum-and-spin/capstone-from-abstract-algebra-to-the-hydrogen-atom"],
   },
   question: {
     type: "numeric",
-    prompt: "For a central potential's l=2 angular momentum states, how many different m values (and hence how many degenerate states, from angular momentum alone) are there?",
+    prompt:
+      "Trace this course's chain to its end. The commutation relations $[J_i,J_j]=i\\hbar\\varepsilon_{ijk}J_k$ alone force each $l$ to carry a fixed number of $m$ values. Hydrogen adds one further fact from outside the algebra: its Coulomb energy does not depend on $l$, so a shell of principal quantum number $n$ collects every $l$ from 0 up to $n-1$ at the same energy. For $n=3$, whose top rung is $l=2$, how many degenerate orbital states does the shell hold? Ignore spin.",
     inputHint: "as an integer",
   },
   answer: {
     type: "numeric",
     value,
     tolerance: 0.5,
-    incorrectFeedback: "Use the 2l+1 count from this course's ladder-operator derivation.",
+    incorrectFeedback:
+      "One of the two steps went missing. The algebra fixes how many states sit at a single l; the Coulomb potential's l-independence is what licenses adding those counts across every l the shell contains. Do both, in that order.",
     nearMisses: [
-      { value: 4, feedback: "4 is 2l, which forgets the m=0 rung sitting between the negative and positive values." },
-      { value: 2, feedback: "2 is l itself, the angular momentum label. The question asks how many m values it permits." },
-      { value: 3, feedback: "3 would be the count for l=1. At l=2 the ladder runs from m=−2 to m=+2." },
+      {
+        value: 5,
+        feedback:
+          "5 is the l=2 rung on its own, the largest single contribution. It is the answer to 'how many states at this l', not 'how many in the shell', and the shell collects the smaller l values too.",
+      },
+      {
+        value: 3,
+        feedback:
+          "3 counts the allowed values of l rather than the states. Each l carries a whole multiplet of its own, and only l=0 carries just one.",
+      },
+      {
+        value: 18,
+        feedback:
+          "18 doubles the count for the two spin orientations. That is the right move for the full shell capacity, but the prompt asks for orbital states alone.",
+      },
+      {
+        value: 27,
+        feedback:
+          "27 is n³. Summing the first n odd numbers gives n², and it is worth checking that on the small cases: 1, then 1+3, then 1+3+5.",
+      },
     ],
   },
   hints: [
-    { text: "The general count of allowed m values for a given l is 2l+1." },
-    { text: "With l=2: 2(2)+1." },
-    { text: "Evaluate 2(2)+1, or simply list the allowed m values from -l up to +l and count them." },
+    {
+      text: "Two separate facts are doing work here, and only one of them comes from the commutation relations. Say which part of the count the algebra fixes on its own, and which part needs something the Coulomb potential contributes.",
+    },
+    {
+      text: "The algebra fixes how many states sit at one fixed value of $l$. The l-independence of the energy is what lets you add those counts together across the shell instead of treating each $l$ as its own level.",
+    },
+    {
+      text: "Write out the allowed values of $l$ for $n=3$, put each one's multiplet size beside it, and add the column. The numbers in that column come out as the odd integers in order, which is worth noticing.",
+    },
   ],
   solution: {
-    steps: [{ description: "2l+1 = 2(2)+1 = 5 states: m=−2,−1,0,1,2." }],
-    finalAnswer: "5",
+    steps: [
+      {
+        description:
+          "The commutation relations, via the ladder-operator argument, force the spectrum of $J_z$ at fixed $l$ to run from $-l$ to $+l$ in integer steps, giving $2l+1$ states. This part is pure algebra and holds for any system at all.",
+      },
+      {
+        description:
+          "Hydrogen's Coulomb energy $E_n=-13.6\\,\\mathrm{eV}/n^2$ carries no $l$, so all of $l=0,1,2$ sit at the same energy for $n=3$. That degeneracy is a property of the $1/r$ potential, not of the algebra.",
+      },
+      {
+        description: "Summing the multiplet sizes over the shell gives the total.",
+        latex: "\\sum_{l=0}^{n-1}(2l+1) = 1+3+5 = 9 = n^2",
+      },
+    ],
+    finalAnswer: "9 orbital states, which is $n^2$ for $n=3$.",
   },
   explanation: {
-    correctIdea: "This 2l+1 degeneracy is a direct, general consequence of the ladder-operator spectrum derivation, not specific to hydrogen.",
-    whyCorrect: "Matches the general m-counting rule from this course's ladder-operator lesson exactly.",
-    whyWrong: ["Answering just 'l=2' or '2' confuses the angular momentum quantum number itself with the count of distinct m-states it allows."],
+    correctIdea:
+      "The n² degeneracy of a hydrogen shell is two results stacked: an algebraic one that fixes 2l+1 at each l, and a potential-specific one that puts every l at the same energy so those counts can be added.",
+    whyCorrect:
+      "Summing the first n odd numbers gives n² exactly, which is why hydrogen's shells hold 1, 4 and 9 orbital states. Pull out the l-independence and the sum stops being meaningful: each l would be its own energy level with its own 2l+1 degeneracy, and no shell total would exist to ask about.",
+    whyWrong: [
+      "Reporting 5 stops at the top rung and treats the largest multiplet as the whole shell, which is what happens when the l-independence step is skipped.",
+      "Doubling to 18 counts spin. Spin multiplies the orbital count by 2 and is what makes the periodic table's shells hold 2n² electrons, but the prompt asks for the orbital count itself.",
+    ],
   },
 };

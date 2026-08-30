@@ -41,11 +41,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Two loose ends, one explanation">
 Two lessons ago, Y|0⟩=i|1⟩ landed on the same Bloch point as X|0⟩=|1⟩. Last lesson, Rz(2π)=−I did nothing physical despite the matrix carrying an unmistakable overall minus sign. Two loose ends, one explanation.
 </LessonHook>
 
-## Motivation
+## Twice asked to take something on faith
 
 You have twice been asked to accept a result on faith. $Y|0\rangle$ and
 $X|0\rangle$ differ by a factor of $i$, yet sit at the same point on the
@@ -59,7 +59,7 @@ the same thing? The answer is that a phase can enter a state in two
 structurally different ways, and only one of them is a change of state at
 all. This lesson draws that line and proves where it falls.
 
-## Intuition
+## Rotating the photograph, or one figure inside it
 
 **Global phase** multiplies an entire state by the same factor:
 $|\psi\rangle \to e^{i\gamma}|\psi\rangle$. Every amplitude gets rotated by
@@ -88,19 +88,7 @@ Bloch sphere (a different $\varphi$), and that rotation is measurable.
   license="Public domain"
 />
 
-## Mathematical Development
-
-<PredictBeforeReveal
-  question="Multiply an entire qubit state by e^{iγ} for some nonzero γ (a global phase). How many measurement probabilities, in any basis you could pick, change?"
-  options={[
-    { label: "None. Every probability stays the same", value: "none" },
-    { label: "Only in the computational basis", value: "comp-only" },
-    { label: "Only in bases other than computational", value: "other-only" },
-    { label: "All of them shift, by an amount depending on γ", value: "all" },
-  ]}
-  correctValue="none"
-  explanation="Zero, in any basis, for any γ. That is not a coincidence about one particular measurement; it is a theorem. The proof below shows P(e_i) = |⟨e_i|ψ⟩|² is untouched because |e^{iγ}| = 1 divides straight out of the modulus-squared. A relative phase, by contrast, does move probabilities, as the next section shows."
-/>
+## One phase proven invisible, the other proven not
 
 ### Global phase is unobservable
 
@@ -139,9 +127,21 @@ That is the difference between rotating the whole picture and rotating one
 part of it against the other, made visible amplitude by amplitude rather
 than point by point on the sphere.
 
-<InteractiveSection title="Two arrows, two kinds of rotation" description="Switch the explorer below to two-amplitude mode. Drag γ (global phase) and watch α's and β's arrows sweep around the complex plane together, while P(0), P(1), and α*β underneath never change. Then drag δ (relative phase) and watch only β's arrow move, with α*β rotating along with it. That difference is the whole proof above, seen at the amplitude level instead of on the Bloch sphere.">
+<InteractiveSection title="Two arrows, two kinds of rotation" description="Switch the explorer below to two-amplitude mode. Drag γ (global phase) and watch which arrows move, keeping P(0), P(1), and α*β underneath in view. Then drag δ (relative phase) and run exactly the same check. The difference between what the two drags disturb is the whole proof above, seen at the amplitude level instead of on the Bloch sphere.">
   <LazyComplexAmplitudeExplorer twoAmplitudeVariant="global-vs-relative" />
 </InteractiveSection>
+
+<PredictBeforeReveal
+  question="Now put the phase on one amplitude only: |ψ⟩ = (|0⟩ + e^iδ|1⟩)/√2, with δ free to be anything. Measure in the computational basis and sweep δ through a full turn. How far does P(0) move?"
+  options={[
+    { label: "Not at all: it sits at 0.5 for every δ", value: "flat" },
+    { label: "From 1 down to 0 as δ runs from 0 to π", value: "full" },
+    { label: "Between 0.25 and 0.75, a half-sized swing", value: "half" },
+    { label: "Up to 1 at δ = π/2, then back down", value: "peak" },
+  ]}
+  correctValue="flat"
+  explanation="P(0) = |⟨0|ψ⟩|² = |1/√2|² = 1/2 for every δ. The modulus-squared throws the phase away just as surely here as it did for a global phase, because δ sits on the |1⟩ amplitude and P(0) never touches that amplitude at all. So a *computational-basis* measurement cannot tell δ apart from any other value. That is not the same as δ being unphysical, and the section below shows what changes the moment you measure in a different basis."
+/>
 
 ### Relative phase is observable
 
@@ -193,7 +193,7 @@ evaluated on the state $\tfrac{1}{\sqrt2}\left(|0\rangle + e^{i\delta}|1\rangle\
   ]}
   xAxisLabel="relative phase δ (radians)"
   yAxisLabel="measurement probability"
-  ariaLabel="Two curves plotted against relative phase δ from 0 to 2π for the state (|0⟩ + e^{iδ}|1⟩)/√2. The X-basis probability P(+) starts at 1, falls to 0 at δ = π, and returns to 1 at δ = 2π. The Z-basis probability P(0) is a flat horizontal line at 0.5 across the entire range."
+  ariaLabel="Two curves plotted against relative phase δ from 0 to 2π for the state (|0⟩ + e^iδ|1⟩)/√2. The X-basis probability P(+) starts at 1, falls to 0 at δ = π, and returns to 1 at δ = 2π. The Z-basis probability P(0) is a flat horizontal line at 0.5 across the entire range."
 />
 
 The flat line is why relative phase can hide: measure in the computational
@@ -214,7 +214,7 @@ point.
 a global phase ($\gamma=\pi$) applied to the whole state, not a relative
 one. Unobservable, as the simulator showed.
 
-## Physical Interpretation
+## A redundancy on one side, real physics on the other
 
 Global phase is a redundancy in the mathematical description: the same
 physical state can be written infinitely many ways, differing by
@@ -228,13 +228,13 @@ dismissed. The point of this lesson is that you never have to guess which
 kind you are looking at. Check whether the factor multiplies every
 amplitude or only some of them.
 
-## Interactive Experiment
+## Turn the relative phase and watch a probability move
 
 <InteractiveSection title="Same gate, two different roles" description={`Prepare |1⟩, then apply S. The amplitudes shown numerically change (as computed in the Quantum Gates lesson, β → iβ), but the Bloch vector and both probabilities stay frozen: global phase, caught in the act of doing nothing physical. Now prepare |+⟩ and apply S. This time the vector visibly sweeps to |+i⟩, the same gate, but now acting as a relative-phase change, because this time there are two nonzero amplitudes for the phase to be relative between.`}>
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
-## Worked Example
+## Telling the two kinds apart on a concrete pair
 
 **Do $|\psi_1\rangle=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)$ and
 $|\psi_2\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$ differ by a global
@@ -250,7 +250,7 @@ $e^{i\pi}=-1$), not a global one, consistent with $|\psi_1\rangle=|+\rangle$
 and $|\psi_2\rangle=|-\rangle$ sitting at opposite, physically distinct
 points on the equator.
 
-## Common Mistakes
+## Decide which kind before dismissing it
 
 <Callout type="mistake">
 **"It's just a phase, so it doesn't matter."** Half-true, dangerously so.
@@ -270,16 +270,156 @@ equally (global) or only *some* of them (relative) determines that.
 1. $|\psi_1\rangle=\frac{3}{5}|0\rangle+\frac{4}{5}|1\rangle$ and
    $|\psi_2\rangle=-\frac{3}{5}|0\rangle-\frac{4}{5}|1\rangle$. Global
    phase, relative phase, or neither? Justify with a calculation.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Global phase. The two states are physically identical.
+
+   The test is whether one common factor takes every coefficient of
+   $|\psi_1\rangle$ to the matching coefficient of $|\psi_2\rangle$. Divide
+   them one at a time:
+
+   $$
+   \frac{-3/5}{3/5} = -1, \qquad \frac{-4/5}{4/5} = -1.
+   $$
+
+   The same factor both times, so $|\psi_2\rangle = -|\psi_1\rangle = e^{i\pi}|\psi_1\rangle$.
+   That is a global phase with $\gamma = \pi$, and a global phase is
+   unobservable, so no experiment of any kind separates these two.
+
+   Confirm it on the sphere: both states have Bloch vector
+   $(0.96,\ 0,\ -0.28)$, the same point, because every Bloch coordinate is an
+   expectation value $\langle\psi|P|\psi\rangle$ and the two factors of $e^{i\pi}$
+   meet as $e^{-i\pi}e^{i\pi} = 1$.
+
+   The mistake worth naming is treating "there are minus signs here" as
+   evidence of a relative phase. Two minus signs on two amplitudes is one
+   common factor; one minus sign on one amplitude, question 2, is not. What
+   matters is not whether a phase is present but whether it multiplies
+   everything.
+
+   </details>
+
 2. $|\psi_1\rangle=\frac{3}{5}|0\rangle+\frac{4}{5}|1\rangle$ and
    $|\psi_3\rangle=\frac{3}{5}|0\rangle-\frac{4}{5}|1\rangle$. Same
    question.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Relative phase. These are genuinely different states.
+
+   The same ratio test now gives two different answers:
+
+   $$
+   \frac{3/5}{3/5} = +1, \qquad \frac{-4/5}{4/5} = -1.
+   $$
+
+   No single factor works, so this cannot be a global phase. It is a relative
+   phase of $\pi$ sitting on the $|1\rangle$ amplitude alone.
+
+   The Bloch vectors show the consequence: $|\psi_1\rangle$ is at
+   $(0.96,\ 0,\ -0.28)$ and $|\psi_3\rangle$ is at $(-0.96,\ 0,\ -0.28)$. Same
+   latitude, mirrored longitude, two distinct points.
+
+   Here is what makes this the important half of the pair. In the
+   computational basis the two are *indistinguishable*: both give
+   $P(0) = 0.36$ and $P(1) = 0.64$, because squaring throws the sign away. Ask
+   in the X basis instead and they could hardly be further apart:
+
+   $$
+   P(+) = \frac{1+2\operatorname{Re}(\alpha^*\beta)}{2}, \qquad
+   P(+)_{\psi_1} = \frac{1+0.96}{2} = 0.98, \qquad
+   P(+)_{\psi_3} = \frac{1-0.96}{2} = 0.02.
+   $$
+
+   A 98/2 split against a 2/98 split, from a sign that one measurement could
+   not see at all. That is why "it's just a phase" has to be resisted until you
+   have checked which kind it is, and why choosing a basis is choosing what you
+   are able to find out.
+
+   </details>
+
 3. Explain why a state with $\alpha=0$ (i.e. proportional to $|1\rangle$)
-   can never exhibit a *relative*-phase effect from any gate, no matter
-   what phase that gate introduces.
+   can never exhibit a *relative*-phase effect from a phase gate
+   $\mathrm{diag}(1, e^{i\delta})$, no matter what $\delta$ that gate
+   introduces.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a relative phase is a phase *between* two amplitudes, and this state
+   only has one.
+
+   Apply the gate:
+
+   $$
+   \begin{pmatrix}1&0\\0&e^{i\delta}\end{pmatrix}\begin{pmatrix}0\\\beta\end{pmatrix} = \begin{pmatrix}0\\e^{i\delta}\beta\end{pmatrix} = e^{i\delta}\begin{pmatrix}0\\\beta\end{pmatrix}.
+   $$
+
+   The factor $e^{i\delta}$ was meant to touch only the $|1\rangle$ component,
+   but the $|0\rangle$ component is zero, so multiplying it by 1 and
+   multiplying it by $e^{i\delta}$ give the same thing: nothing. The phase can
+   therefore be pulled out in front of the whole state, which is the definition
+   of global. The Bloch point does not move; it was at the south pole before
+   and it is at the south pole after.
+
+   Said without algebra: "relative" is a two-place word. It needs a second
+   amplitude to be relative *to*. States with one nonzero amplitude, the two
+   poles, are precisely the states that cannot supply one, which is the same
+   fact the Bloch sphere lesson recorded as "$\varphi$ has no meaning at the
+   poles".
+
+   Note the scope of the claim, because it is narrower than it first looks.
+   Nothing here says $|1\rangle$ is immune to interesting gates. $H|1\rangle = |-\rangle$
+   creates two nonzero amplitudes out of one, and *then* a phase gate has
+   something to act on. The claim is only that a diagonal phase gate, acting on
+   a state with a single nonzero amplitude, can do nothing observable. Sequence
+   a gate that spreads the state first and the same phase becomes physical
+   immediately.
+
+   </details>
+
 4. Two experimentalists prepare what they both call "$|+\rangle$," but one
    of them has an extra $\pi$ global phase in their equipment's
    convention they don't know about. Would any experiment they run be
    able to tell their two preparations apart? Why or why not?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No experiment on those states alone can tell them apart.
+
+   Every prediction quantum mechanics makes about a single state is a
+   probability of the form $P(e) = |\langle e|\psi\rangle|^2$, for whatever
+   basis $\{|e\rangle\}$ the measurement uses. Substituting the second lab's
+   state:
+
+   $$
+   \left|\langle e|\left(e^{i\pi}|\psi\rangle\right)\right|^2 = \left|e^{i\pi}\right|^2\left|\langle e|\psi\rangle\right|^2 = \left|\langle e|\psi\rangle\right|^2,
+   $$
+
+   since $|e^{i\pi}| = 1$. The phase is squared away for *every* basis at once,
+   not just the computational one, so there is no clever choice of measurement
+   that exposes it. The same argument runs through expectation values, so the
+   two Bloch vectors coincide as well.
+
+   The qualification that matters in practice: this holds because the phase is
+   genuinely global, applied to the entire state the labs are working with.
+   It stops holding the moment the two preparations are brought into contact
+   with each other. Send both qubits into one interferometer, or use one lab's
+   qubit as the control for a gate acting on the other's, and what was a global
+   phase on one isolated state becomes a *relative* phase between two branches
+   of a single larger state. That is observable, and it is how such convention
+   mismatches are actually discovered.
+
+   So the precise answer is not "phases never matter" but "a phase common to
+   everything in the experiment never matters". As long as the two labs never
+   compare qubits, the extra $\pi$ is bookkeeping. The instant they do, it is
+   physics.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -294,7 +434,7 @@ equally (global) or only *some* of them (relative) determines that.
 - This resolves both $Y|0\rangle$ vs. $X|0\rangle$ and $R_z(2\pi)=-I$: both
   are global-phase effects, hence invisible.
 
-## Further Exploration
+## Where all of this gets used at once
 
 <NextDiscovery>
 [Putting It Together](/lessons/quantum-computing/qubits-and-quantum-states/building-qubit-circuits) is the capstone lesson for this course, where

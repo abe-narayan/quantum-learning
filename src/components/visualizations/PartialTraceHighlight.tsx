@@ -151,8 +151,8 @@ export function PartialTraceHighlight({
                       key={`${r}-${c}`}
                       title={
                         eligible
-                          ? `(ρ_AB)_{${BASIS_LABELS_4[r]},${BASIS_LABELS_4[c]}} — contributes to reduced entry (${BASIS_LABELS_2[keptBitOf(r)]},${BASIS_LABELS_2[keptBitOf(c)]})`
-                          : `(ρ_AB)_{${BASIS_LABELS_4[r]},${BASIS_LABELS_4[c]}} — excluded: ${
+                          ? `(ρ_AB)_{${BASIS_LABELS_4[r]},${BASIS_LABELS_4[c]}}: contributes to reduced entry (${BASIS_LABELS_2[keptBitOf(r)]},${BASIS_LABELS_2[keptBitOf(c)]})`
+                          : `(ρ_AB)_{${BASIS_LABELS_4[r]},${BASIS_LABELS_4[c]}}: excluded because ${
                               tracedQubit === 0 ? "qubit-0" : "qubit-1"
                             } bra/ket indices differ, so this never contributes to any reduced entry`
                       }
@@ -194,8 +194,8 @@ export function PartialTraceHighlight({
                           the legend is the explanation. */}
                       <span className="sr-only">
                         {eligible
-                          ? ` — contributes to reduced entry (${BASIS_LABELS_2[keptBitOf(r)]},${BASIS_LABELS_2[keptBitOf(c)]})`
-                          : " — excluded from every reduced entry"}
+                          ? `, contributes to reduced entry (${BASIS_LABELS_2[keptBitOf(r)]},${BASIS_LABELS_2[keptBitOf(c)]})`
+                          : ", excluded from every reduced entry"}
                       </span>
                     </div>
                   );
@@ -212,7 +212,7 @@ export function PartialTraceHighlight({
             <BasisColumn labels={BASIS_LABELS_2} />
             <div
               role="group"
-              aria-label={`${rhoALabel} — click a cell to highlight its contributing ρ_AB entries`}
+              aria-label={`${rhoALabel}. Click a cell to highlight its contributing ρ_AB entries`}
               className="inline-grid gap-px overflow-hidden rounded-(--radius-tight) border border-border bg-border"
               style={{ gridTemplateColumns: "repeat(2, minmax(3.25rem, 1fr))" }}
             >
@@ -237,7 +237,45 @@ export function PartialTraceHighlight({
                         // vertical axis was short; `min-h` rather than `h` so a
                         // longer formatted amplitude can still grow the row.
                         "flex min-h-11 items-center justify-center px-2 py-2.5 font-mono text-xs transition-colors sm:text-sm",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                        // `ring-inset`, and no `ring-offset-*`. `ring-2
+                        // ring-offset-2` compiles to two box-shadows that both
+                        // sit *outside* the border box, and every ancestor here
+                        // clips them: this grid is `overflow-hidden` with zero
+                        // padding and cells that fill it exactly, and the wrap
+                        // above it is `overflow-x-auto` (which computes
+                        // `overflow-y` from `visible` to `auto`, so it clips
+                        // vertically too) with no padding either. The ring was
+                        // therefore erased on the outer edges and reduced to a
+                        // 1px sliver of offset colour on the interior ones, a
+                        // WCAG 2.4.7 failure now that `:focus-visible` is
+                        // layered and `outline-none` actually takes effect. An
+                        // inset ring is painted inside the border box and
+                        // survives every one of those clips; the selected state
+                        // below already proves an inset shadow reads correctly
+                        // in this exact box.
+                        // `ring-4`, not `ring-2`, and the extra width is the
+                        // indicator rather than padding. A *selected* cell already
+                        // paints a 2px inset ring in `--brand` (below), so at
+                        // `ring-2` focusing it changed nothing but the ring's hue,
+                        // from `--brand` to `--pillar-accent` — and those two are
+                        // 1.43:1 apart in the dark theme and as little as 1.03:1 in
+                        // the light one (measured with the compositing method in
+                        // src/lib/design/__tests__/color.ts; the pillar ramp is
+                        // authored at the same OKLCH lightness `--brand` sits at).
+                        // The selected cell is also the one that takes focus first,
+                        // so the figure's most likely focus target was the one with
+                        // no visible indicator at all. WCAG 2.4.7.
+                        //
+                        // Width is the one channel the selected state does not use,
+                        // so 4px vs 2px separates them without depending on hue: the
+                        // 2px of extra band sits on the cell fill, where
+                        // `--pillar-accent` measures 7.30:1 to 8.10:1 (dark) and
+                        // 4.04:1 to 4.88:1 (light) across the five pillars. The
+                        // `focus-visible:` variant is specificity 0-2-0 against the
+                        // selected ring's 0-1-0, so it wins without `!important`,
+                        // and 4px of a 44px-tall cell leaves the 8px `px-2` padding
+                        // still clear of the amplitude text.
+                        "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-pillar",
                         isSelected
                           ? "bg-brand/15 font-semibold text-brand ring-2 ring-inset ring-brand"
                           : r === c
@@ -267,10 +305,10 @@ export function PartialTraceHighlight({
       <p className="text-xs text-muted-foreground">
         Dimmed entries of ρ_AB are the ones whose {tracedQubit === 0 ? "qubit-0" : "qubit-1"} bra and ket indices
         disagree. Summing over that index never pairs them with anything, so they contribute to no entry of{" "}
-        {rhoALabel.slice(0, 5)} at all — however large they are.
+        {rhoALabel.slice(0, 5)} at all, however large they are.
       </p>
 
-      <p className="text-xs text-muted-foreground" aria-live="polite">
+      <p className="text-xs text-muted-foreground" aria-live="polite" aria-atomic="true">
         {selectionText}
       </p>
 
@@ -290,7 +328,7 @@ export function PartialTraceHighlight({
 
 function BasisRow({ labels }: { labels: string[] }) {
   return (
-    <div className="ml-[3.25rem] flex gap-px text-[10px] text-muted-foreground">
+    <div className="ml-[3.25rem] flex gap-px text-micro text-muted-foreground">
       {labels.map((label, i) => (
         <span key={i} className="min-w-[3.25rem] flex-1 text-center">
           {label}
@@ -302,7 +340,7 @@ function BasisRow({ labels }: { labels: string[] }) {
 
 function BasisColumn({ labels }: { labels: string[] }) {
   return (
-    <div className="flex flex-col justify-around gap-px pr-1 text-[10px] text-muted-foreground">
+    <div className="flex flex-col justify-around gap-px pr-1 text-micro text-muted-foreground">
       {labels.map((label, i) => (
         <span key={i} className="flex h-[2.75rem] items-center sm:h-[2.9rem]">
           {label}

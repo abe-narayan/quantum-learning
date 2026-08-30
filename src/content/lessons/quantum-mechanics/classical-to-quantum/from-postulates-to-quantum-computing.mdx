@@ -45,16 +45,16 @@ export const lessonMeta = {
   prerequisites: ["quantum-mechanics/classical-to-quantum/superposition-interference-and-phase"],
   objectives: [
     "Identify a qubit as a 2-dimensional Hilbert space with the same four postulates as any other quantum system",
-    "Map each result from this course onto its counterpart in the Quantum Computing pillar",
+    "Map each result from this course onto its counterpart in the Quantum Computing track",
     "Solve synthesis problems that combine tools from more than one lesson in this course",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
-The Quantum Computing pillar is not a second subject with its own physics. It is this framework (states, observables, measurement, dynamics, uncertainty) evaluated in the smallest Hilbert space where anything interesting can happen.
+<LessonHook eyebrow="The same physics, in two dimensions">
+The Quantum Computing track is not a second subject with its own physics. It is this framework (states, observables, measurement, dynamics, uncertainty) evaluated in the smallest Hilbert space where anything interesting can happen.
 </LessonHook>
 
-## Motivation
+## A framework that never mentioned computing
 
 This course built the postulates of quantum mechanics from the ground
 up: states, observables, measurement, dynamics, uncertainty, and two
@@ -103,7 +103,7 @@ Nothing on the right side of this table is a new postulate. Every entry
 is a direct instance of the corresponding entry on the left, specialized
 to $\mathbb{C}^2$.
 
-## Worked Synthesis Examples
+## Questions that need the whole course at once
 
 **1. A quantum gate is applied to a qubit. Why must every gate be
 <Term id="unitary-operator">unitary</Term>, using this course's own derivation rather than "because that's
@@ -138,15 +138,15 @@ and a phase read in the wrong basis reads as nothing at all.
 <PredictBeforeReveal
   question="Starting from |+⟩, a phase gate with angle φ is applied. If you then measure in the {|0⟩,|1⟩} basis, how do P(0) and P(1) respond as φ sweeps from 0° to 360°?"
   options={[
-    { label: "Both swing between 0 and 1 with φ", value: "swing" },
     { label: "They stay fixed at 0.5 each, no matter what φ is", value: "fixed" },
+    { label: "Both swing between 0 and 1 with φ", value: "swing" },
     { label: "They swap discontinuously at φ = 180°", value: "swap" },
   ]}
   correctValue="fixed"
   explanation="A phase gate changes only the relative phase between |0⟩ and |1⟩, while P(0) and P(1) depend on the magnitudes |α| and |β|, which it leaves alone. The Z-basis bars therefore hold at 0.5 for every φ. The phase becomes visible only in a basis like {|+⟩,|−⟩} that mixes |0⟩ and |1⟩ together, which is exactly the move a Hadamard makes before a final measurement."
 />
 
-<InteractiveSection title="Slide φ, watch phase hide in one basis and appear in the other" description="Starting from H|0⟩ = |+⟩, a phase gate of angle φ is applied, and the qubit is then measured in the {|0⟩,|1⟩} basis and, separately, in the {|+⟩,|-⟩} basis. Every bar comes from multiplying the platform's Hadamard and phase-gate matrices, not from evaluating the formula. The Z-basis bars hold at 0.5 for every φ while the X-basis bars swing through the full range, tracing P(+) = (1+cos φ)/2. Same state, same φ, two questions, two entirely different answers.">
+<InteractiveSection title="Slide φ, watch phase hide in one basis and appear in the other" description="Starting from H|0⟩ = |+⟩, a phase gate of angle φ is applied, and the qubit is then measured in the {|0⟩,|1⟩} basis and, separately, in the {|+⟩,|-⟩} basis. Every bar comes from multiplying the platform's Hadamard and phase-gate matrices, not from evaluating the formula. Sweep φ through a full turn and read the two sets of bars against each other as it goes. Same state, same φ, two questions: whether the two questions give you the same answer is what these two rows of bars are here to settle.">
   <BarChartExplorer
     frames={phaseGateFrames}
     sliderLabel="φ (degrees)"
@@ -177,7 +177,7 @@ on simple tensors. No renormalization step is needed, and none is
 available to fix things if you get it wrong, which is a useful check when
 building multi-qubit states by hand.
 
-## Common Mistakes, Revisited
+## Two habits worth unlearning here
 
 <Callout type="note">
 **Treating quantum computing as needing its own separate physical
@@ -199,17 +199,190 @@ mathematical requirement.
 1. A qubit gate must satisfy $U^\dagger U=I$. Using the Time Evolution
    lesson's derivation, explain what physical requirement this
    corresponds to.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   That total probability stays at $1$ while the gate runs. Nothing else.
+
+   Trace it back through the two steps this course took. The Unitary
+   Operators lesson proved $U^\dagger U = I$ is equivalent to preserving
+   every inner product, hence every norm. Postulate 4 requires evolution
+   to preserve the norm because $\sum_i P(\lambda_i) = \||\psi\rangle\|^2$
+   under the Born rule, so a norm that drifted would be probabilities that
+   no longer summed to one. And the Time Evolution lesson showed the
+   condition bites at the level of an infinitesimal step: expanding
+   $U(dt) = I - \tfrac{i}{\hbar}H\,dt$ and demanding $U^\dagger U = I$
+   leaves the first-order term $\tfrac{i}{\hbar}(H^\dagger - H)\,dt$,
+   which vanishes only for Hermitian $H$.
+
+   A gate is then not a new kind of object. It is $U(t)=e^{-iHt/\hbar}$
+   run for one fixed, useful interval instead of watched continuously. The
+   $H^\dagger H = I$ check drawn at the top of this lesson is that
+   requirement evaluated for the interval a Hadamard occupies.
+
+   Two wrong answers are worth separating, because both sound reasonable.
+
+   "So the gate is reversible." Reversibility is a consequence, since
+   $U^{-1}=U^\dagger$ always exists, but mere invertibility is a strictly
+   weaker condition and does not imply unitarity. The matrix
+   $\begin{pmatrix}2&0\\0&1\end{pmatrix}$ is invertible and sends
+   $|+\rangle$ to a vector of squared norm $\tfrac52$. Reversible is not
+   the requirement; norm-preserving is, and it happens to imply
+   reversible.
+
+   "So the gate has real eigenvalues." That is Postulate 2's condition on
+   observables, and it is the wrong postulate. A unitary's eigenvalues lie
+   on the unit circle and are generally complex; the $S$ gate's are $1$
+   and $i$. Observables and evolutions are different roles played by
+   different classes of operator, and the Hamiltonian is the one object
+   that sits in both.
+
+   </details>
+
 2. The CNOT gate acts on two qubits. Using the tensor-product machinery
    from Mathematical Foundations, what is the dimension of the space it
    acts on?
-3. Explain, using this course's uncertainty-relation derivation, why
-   measuring a qubit in the $Z$ basis and then immediately in the $X$
-   basis generally disturbs the outcome of a subsequent $Z$-basis
-   measurement.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $4$, so CNOT is a $4\times4$ unitary matrix.
+
+   The Tensor Products and Composite Systems lesson proved dimensions
+   multiply: $\dim(V\otimes W) = \dim V\cdot\dim W$. Each qubit carries
+   $\mathbb{C}^2$, so the pair carries $\mathbb{C}^2\otimes\mathbb{C}^2 =
+   \mathbb{C}^4$, with basis
+   $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$, the four ways to
+   choose one basis vector from each factor.
+
+   The error this question is built to catch is answering $2+2=4$ by
+   addition and getting the right number for the wrong reason. The two
+   rules diverge immediately at three qubits: the direct sum would give
+   $6$ and the tensor product gives $8$, and the tensor product is the
+   correct one. That exponential growth, $2^n$ rather than $2n$, is the
+   entire reason simulating $n$ qubits on a classical machine gets
+   expensive, and it comes from this multiplication rule and nowhere else.
+
+   Worth naming too is what the dimension buys. A $4$-dimensional space
+   contains vectors that are *not* of the form
+   $|\psi\rangle\otimes|\phi\rangle$ for any single-qubit states, and
+   those are the entangled ones. Had the pair been described by nothing more
+   than the two qubits' own state vectors side by side, every joint state would
+   factor by construction and there would be no room for the entangled ones at
+   all. CNOT's usefulness is precisely that it maps unentangled inputs into
+   that extra room.
+
+   </details>
+
+3. Measure a qubit in the $Z$ basis, then immediately in the $X$ basis,
+   then in the $Z$ basis once more. Find the probability that the third
+   reading matches the first, and name the postulate that produces it.
+   Then explain why the uncertainty relation $\Delta Z\,\Delta X \ge
+   \tfrac12\lvert\langle[Z,X]\rangle\rvert$ is *not* what forces that
+   answer, given this course's insistence that the relation is not a
+   statement about measurement disturbance.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Exactly $\tfrac12$, whatever the qubit's initial state was. The work is
+   done by the collapse clause of Postulate 3, not by the uncertainty
+   relation.
+
+   Follow the state. The first $Z$ measurement returns some outcome and
+   leaves the qubit in the matching eigenstate; say $|0\rangle$, though
+   $|1\rangle$ runs identically. The $X$ measurement then acts on
+   $|0\rangle = \tfrac{1}{\sqrt2}(|+\rangle+|-\rangle)$, so
+
+   $$
+   P(+) = \left|\langle+|0\rangle\right|^2 = \frac12, \qquad P(-) = \frac12
+   $$
+
+   and the state becomes $|+\rangle$ or $|-\rangle$. Either one, measured
+   in $Z$, splits evenly again: $|\langle0|\pm\rangle|^2 = \tfrac12$. So
+   the third reading matches the first with probability $\tfrac12$, which
+   is the same as guessing. Every trace of the first outcome is gone.
+
+   Compare the run without the middle step: measure $Z$, then $Z$ again,
+   and the second reading matches with probability $1$, because the state
+   is already an eigenstate. So the $X$ measurement is what destroyed the
+   information, and Postulate 3's last clause is where that is written
+   down. It says a measurement leaves the system in the eigenstate
+   belonging to the outcome, and $|+\rangle$ is not a $Z$-eigenstate. That
+   single sentence is the whole mechanism.
+
+   Now the second half, which is the part worth getting right. It is
+   tempting to reach for $\Delta Z\,\Delta X \ge
+   \tfrac12|\langle[Z,X]\rangle|$ and say the trade-off forced the
+   randomization. It did not, and the numbers refute it outright.
+   $[Z,X]=2iY$, so the bound in the state $|0\rangle$ is
+   $\tfrac12|2i\langle Y\rangle_{|0\rangle}| = 0$. The relation reduces to
+   $0 \ge 0$ there and forbids nothing at all, while the disturbance is
+   nonetheless total. A statement that is vacuous in the state cannot be
+   what forces an outcome in that state.
+
+   The two results also answer different questions. The uncertainty
+   relation compares spreads of two observables in *one* state, each
+   estimable on its own fresh batch of copies with no measurement of the
+   other happening anywhere, which is exactly why the Expectation Values
+   lesson insists it is not a disturbance claim. This question is about
+   three measurements on *one* qubit in sequence, where each collapse
+   supplies the input state for the next.
+
+   What the two share is a common cause rather than an implication. Both
+   ultimately trace to $[Z,X]\ne0$ as an *operator*, which is equivalent
+   to $Z$ and $X$ having no shared eigenbasis. No shared eigenbasis means
+   a $Z$-eigenstate is necessarily spread across $X$-outcomes and back
+   again, which is the sequential story; and it is also the condition
+   under which the uncertainty bound can be nonzero in *some* state, even
+   though it happens to vanish in this one. Non-commutativity of the
+   operators is the root; the expectation value of the commutator in one
+   particular state is a much weaker, state-dependent shadow of it.
+
+   </details>
+
 4. A two-level system's Hamiltonian is $H=\tfrac{\hbar\omega}{2}X$
    instead of $\tfrac{\hbar\omega}{2}Z$. Using the rotation formula from
    Time Evolution, what axis does this Hamiltonian's evolution rotate the
    Bloch sphere about?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   About the $x$ axis, at angular velocity $\omega$.
+
+   The Time Evolution lesson wrote any traceless two-level Hamiltonian as
+   $H = \tfrac{\hbar\omega}{2}(\hat n\cdot\vec\sigma)$ and showed
+
+   $$
+   U(t) = e^{-iHt/\hbar} = \cos\!\left(\frac{\omega t}{2}\right)I - i\sin\!\left(\frac{\omega t}{2}\right)(\hat n\cdot\vec\sigma)
+   $$
+
+   which is rotation about $\hat n$ by angle $\omega t$. Matching
+   $H=\tfrac{\hbar\omega}{2}X$ against that form gives $\hat n\cdot
+   \vec\sigma = X$, so $\hat n = \hat x$. Reading the Hamiltonian is
+   reading the rotation axis: whichever Pauli operator appears *is* the
+   axis.
+
+   The consequences follow without further calculation, and checking them
+   is the fastest way to confirm the identification. Eigenstates of $H$
+   are now $|+\rangle$ and $|-\rangle$, the poles of the $x$ axis, and
+   those are the states that hold still; they are stationary under this
+   $H$ exactly as $|0\rangle$ and $|1\rangle$ were under the $Z$
+   Hamiltonian. Meanwhile $|0\rangle$, which sat frozen before, now
+   precesses, sweeping the $y$-$z$ great circle and returning after
+   $\omega t = 2\pi$.
+
+   The wrong turn is to expect the axis to depend on the starting state.
+   It does not. $\hat n$ comes from $H$ alone; the state decides only
+   which circle around that axis gets traced, or whether the state sits
+   at a pole and traces nothing. This is why "stationary" is always
+   relative to a particular Hamiltonian: $|0\rangle$ is stationary under
+   $\tfrac{\hbar\omega}{2}Z$ and is not stationary under
+   $\tfrac{\hbar\omega}{2}X$, with no change to the state itself.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -223,14 +396,14 @@ mathematical requirement.
 - Nothing about quantum computing requires new physics beyond what this
   course built, only a choice of which Hilbert space to specialize to.
 
-## Further Exploration
+## Two well-supported directions from here
 
 <NextDiscovery>
 This completes **From Classical to Quantum**. From here, two directions
 are both well-supported: continue deeper into the Quantum Mechanics
-pillar (Wave Mechanics, which builds the full continuous position
+track (Wave Mechanics, which builds the full continuous position
 representation this course previewed), or apply everything just learned
-directly to the Quantum Computing pillar's Qubits & Quantum States and
+directly to the Quantum Computing track's Qubits & Quantum States and
 Quantum Gates & Circuits courses, which are now, in a precise sense,
 worked examples of this course's postulates.
 </NextDiscovery>

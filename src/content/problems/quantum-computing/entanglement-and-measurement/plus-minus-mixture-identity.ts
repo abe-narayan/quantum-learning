@@ -39,9 +39,9 @@ export const plusMinusMixtureIdentity: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "That would mean the mixture is somehow still pure — mixing two different pure states with nonzero probability of each generally gives a mixed result.",
-      c: "That's ρ for |+⟩ alone, not a mixture of |+⟩ and |−⟩ — their off-diagonal contributions actually cancel.",
-      d: "ρ must have trace 1, never 0 — the zero matrix isn't a valid density matrix at all.",
+      b: "That would make the mixture pure. Mixing two different pure states, each with nonzero probability, gives a mixed result.",
+      c: "That is ρ for |+⟩ alone. In an equal mixture of |+⟩ and |−⟩ the off-diagonal contributions cancel.",
+      d: "ρ must have trace 1, never 0; the zero matrix is not a valid density matrix.",
     },
     defaultIncorrectFeedback: "Add the two density matrices |+⟩⟨+| and |−⟩⟨−|, each weighted by 0.5, and simplify.",
   },

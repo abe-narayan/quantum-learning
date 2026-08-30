@@ -51,11 +51,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Three variables down to one">
 Last lesson proved the angular part is already solved. This lesson cashes that in: substitute it into the full 3D Schrödinger equation and a partial differential equation in three variables collapses to one ordinary differential equation in r.
 </LessonHook>
 
-## Motivation
+## The angular part was solved before we started
 
 Two variables disappear in this lesson, and the reason they can is worth
 holding onto: the angular dependence of $\psi$ is not solved here so much
@@ -81,7 +81,7 @@ modification. Three dimensions, solved with one-dimensional tools.
   license="Attribution only, NASA/JPL-Caltech"
 />
 
-## Mathematical Development
+## Substituting the ansatz and isolating r
 
 ### The separated ansatz
 
@@ -127,23 +127,25 @@ Compare that to the 1D time-independent Schrödinger equation from Wave
 Mechanics and the two are the same equation, symbol for symbol, with an
 effective potential
 $V_{\text{eff}}(r)=V(r)+\dfrac{l(l+1)\hbar^2}{2mr^2}$ and the boundary
-condition $u(0)=0$ (so that $R(r)=u(r)/r$ stays finite at the origin).
-Every tool this platform built for 1D problems (the general solving
-strategy, boundary-condition matching) applies directly; only the
-specific $V_{\text{eff}}(r)$ for the Coulomb potential is new.
+condition $u(0)=0$. Every tool this platform built for 1D problems (the
+general solving strategy, boundary-condition matching) applies directly;
+only the specific $V_{\text{eff}}(r)$ for the Coulomb potential is new.
+
+That boundary condition is a statement about $u$, and it is worth being
+careful about what it does and does not say about $R$.
 
 <PredictBeforeReveal
   question="The boundary condition above is stated as u(0)=0, not R(0)=0. For the l=0 (1s) state specifically, does R(r)=u(r)/r also vanish at r=0?"
   options={[
+    { label: "No: R(0) can be finite and nonzero", value: "nonzero" },
     { label: "Yes: u(0)=0 forces R(0)=0 too, for any l", value: "zero" },
-    { label: "No: R(0) can stay finite and nonzero even though u(0)=0", value: "nonzero" },
     { label: "R(0) diverges to infinity", value: "diverge" },
   ]}
   correctValue="nonzero"
   explanation="No. u(r)=rR(r) can vanish at the origin simply because of the factor of r, while R(r) itself stays finite. The plot later in this lesson confirms it for the real 1s wavefunction: u(r) heads to 0 linearly as r→0, but R(r) approaches R(0)=2, not zero. That is why s-states have nonzero probability density right at the nucleus, which in turn is why s-states are the ones that feel the nucleus at all, and the reason hyperfine structure exists."
 />
 
-## Physical Interpretation
+## The payoff of last lesson's commutators
 
 Turning a 3D problem into a 1D one is not a convenience specific to
 hydrogen. It is the payoff of Lesson 1's $[H,\vec L^{\,2}]=[H,L_z]=0$
@@ -160,7 +162,7 @@ predicted one gives that galaxy's redshift directly. The same solvability
 underlies the hydrogen maser pictured above. Both applications rest on the
 $u(0)=0$ boundary-value problem set up here.
 
-## Worked Example
+## The effective potential at l = 1
 
 **Write out $V_{\text{eff}}(r)$ explicitly for hydrogen's $l=1$ states.**
 
@@ -177,22 +179,22 @@ explicit radial wavefunctions confirm it.
 Plotting $V_\text{eff}(r)$ for each $l$ makes the growing barrier
 directly visible (atomic units, $V(r)=-1/r$):
 
-<PotentialDiagram xValues={rGridEff} potential={vEffL0} ariaLabel="Effective potential for l=0: no centrifugal barrier" />
+<PotentialDiagram xValues={rGridEff} potential={vEffL0} ariaLabel="Effective potential for l=0, plotted for r from 0.05 to 8. The curve is negative everywhere and rises steadily toward zero as r grows, from -20 at r=0.05 to -0.125 at r=8. It never turns back up and has no minimum: this is the bare -1/r Coulomb well, falling without limit as the origin is approached." />
 
 $l=0$: no centrifugal term at all, so $V_\text{eff}=V(r)$ falls straight
 into the origin, unbounded below. This is the bare Coulomb attraction and
 nothing else.
 
-<PotentialDiagram xValues={rGridEff} potential={vEffL1} ariaLabel="Effective potential for l=1: a mild centrifugal barrier" />
+<PotentialDiagram xValues={rGridEff} potential={vEffL1} ariaLabel="Effective potential for l=1, same r range. Near the origin the curve is high and positive, about 380 at r=0.05, and it plunges downward, crossing zero at r=1 into a shallow well whose minimum is -0.25 at r=2, then rises slowly back toward zero. The whole shape is a repulsive wall on the left of a bound-state well." />
 
-<PotentialDiagram xValues={rGridEff} potential={vEffL2} ariaLabel="Effective potential for l=2: a stronger centrifugal barrier" />
+<PotentialDiagram xValues={rGridEff} potential={vEffL2} ariaLabel="Effective potential for l=2, same r range and the same shape as l=1 but pushed further out and further up. It starts near 1180 at r=0.05, crosses zero at r=3 rather than r=1, and its minimum is shallower and further from the origin: -0.083 at r=6. Raising l steepens the wall and pushes the well outward together." />
 
 $l=1$ and $l=2$: the curve turns sharply *upward* near $r=0$ instead of
 falling to $-\infty$, and the turn gets steeper as $l$ grows. That upturn
 is the repulsive barrier keeping higher-$l$ electrons away from the
 nucleus.
 
-## Common Mistakes
+## The centrifugal term does not vanish for l > 0
 
 <Callout type="warning">
 **Forgetting the centrifugal term for l>0 states.** Only $l=0$ ($s$
@@ -216,7 +218,7 @@ axis the $l=1$ curves would flatten into an invisible line.
 
 <ParametricCurve
   frames={uAndRNearOriginFramesL0}
-  ariaLabel="u of r and R of r near r equals 0, for l=0 (1s): the u curve vanishes at the origin while R stays near 2"
+  ariaLabel="Two curves against r from 0 to 0.5 for the l=0 1s state. R(r) starts at 2.00 at the origin and sags gently to 1.21 by r=0.5, staying well clear of the axis throughout. u(r) starts at exactly 0 and climbs in a straight line at first, reaching 0.61 at r=0.5, exactly half of R there because u is r times R. u stays below R across the whole range, and only u touches the axis."
 />
 
 For $l=0$, $u(r)\to0$ *linearly* as $r\to0$, so $R(r)=u(r)/r$ approaches
@@ -225,7 +227,7 @@ nonzero probability density at the nucleus coexist without conflict.
 
 <ParametricCurve
   frames={uAndRNearOriginFramesL1}
-  ariaLabel="u of r and R of r near r equals 0, for l=1 (2p): both the u curve and the R curve vanish at the origin"
+  ariaLabel="Two curves against r from 0 to 0.5 for the l=1 2p state. Both start at exactly 0 at the origin, unlike the l=0 case where only u did. R(r) rises almost as a straight line to 0.080 at r=0.5; u(r) rises as a curve that is flat at first and steepens, reaching 0.040. Both values are more than an order of magnitude below the l=0 plot's, which is why the two states get separate axes."
 />
 
 For $l=1$, $u(r)\to0$ even faster (quadratically, since the centrifugal
@@ -237,16 +239,168 @@ $R$: nonzero ($R(0)=2$) for $l=0$, zero for $l=1$.
 
 1. Write $V_{\text{eff}}(r)$ explicitly for hydrogen's $l=0$ states, and
    confirm it equals the bare Coulomb potential (no centrifugal term).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   At $l=0$ the centrifugal coefficient is $l(l+1)=0\cdot1=0$, so the
+   whole term disappears:
+
+   $$
+   V_{\text{eff}}(r) = -\frac{e^2}{4\pi\epsilon_0 r} + \frac{0\cdot\hbar^2}{2mr^2} = -\frac{e^2}{4\pi\epsilon_0 r}
+   $$
+
+   $s$ states are the only ones that solve the bare Coulomb problem. Every
+   $l>0$ state solves a different one-dimensional problem with its own
+   barrier, which is the first plot in the sequence above: monotonically
+   rising toward zero, with no upturn near the origin and no minimum.
+
+   The worry that ought to surface here is worth answering. With no
+   barrier, $V_{\text{eff}}\to-\infty$ as $r\to0$, so what stops the
+   electron collapsing onto the proton and releasing unbounded energy?
+   Nothing in the potential does. The kinetic term does. Confining the
+   electron to a region of size $r$ costs kinetic energy growing like
+   $\hbar^2/2mr^2$, by the uncertainty principle, and that beats the
+   potential's $-1/r$ gain in the limit. The competition between a
+   $-1/r$ attraction and a $+1/r^2$ confinement cost settles at a finite
+   radius, and that radius is the Bohr radius. The centrifugal term the
+   $l=0$ state lacks has exactly the $1/r^2$ form of the cost that saves
+   it anyway.
+
+   </details>
+
 2. Explain why the boundary condition is stated as $u(0)=0$ rather than
    $R(0)=0$, using the relationship $u(r)=rR(r)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $u(0)=0$ is the true condition and $R(0)=0$ is a stronger claim
+   that is false for exactly the states chemistry cares about most.
+
+   The physical requirement is that $R(r)$ stay *finite* at the origin: a
+   radial function blowing up like $1/r$ is not an acceptable solution of
+   the Schrödinger equation there. Feed that requirement through
+   $u=rR$ and you get $u(0)=\lim_{r\to0}rR(r)=0$, since $r\to0$ times
+   something finite is zero. The implication runs one way only. $u(0)=0$
+   can be satisfied by the factor of $r$ alone, with $R$ perfectly happy
+   and nonzero at the origin.
+
+   The $1s$ state is the case in point, and it is the case that matters.
+   Its $u(r)$ leaves the origin linearly, so $R(0)=u'(0)$ is finite and
+   nonzero, $R(0)=2$ in atomic units. Impose $R(0)=0$ instead and you
+   delete the ground state of hydrogen. You also delete every consequence
+   of $s$ electrons having density at the nucleus: hyperfine structure,
+   the 21 cm line radio astronomers map galaxies with, the Fermi contact
+   term in NMR chemical shifts. The distinction between the two boundary
+   conditions is the difference between a correct atom and no atom.
+
+   There is a second reason the condition is written on $u$, and it is the
+   reason the whole substitution was made. In the $u$ equation the problem
+   reads as a one-dimensional Schrödinger equation on the half-line
+   $r\ge0$, and $u(0)=0$ is the same boundary condition an infinite wall
+   imposes in the infinite square well from Wave Mechanics. Written that
+   way, every technique built there transfers without translation. Written
+   as a condition on $R$, it would not even be true.
+
+   </details>
+
 3. For a fixed $r$, which grows faster as $l$ increases: the centrifugal
    term or the Coulomb term? What does this suggest about how a higher-$l$
    electron's wavefunction behaves near the nucleus, compared to a
    lower-$l$ one at the same energy?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The centrifugal term, and not by a narrow margin: the Coulomb term does
+   not grow at all. There is no $l$ anywhere in $-e^2/4\pi\epsilon_0r$, so
+   at fixed $r$ it is a constant while $l(l+1)\hbar^2/2mr^2$ climbs
+   quadratically in $l$. The barrier wins at every $l>0$ once $r$ is small
+   enough, since $1/r^2$ outruns $1/r$ as $r\to0$ regardless of
+   coefficients.
+
+   The consequence for the wavefunction can be read straight off the
+   equation. Near the origin the centrifugal term dominates everything
+   else, so the radial equation reduces to
+
+   $$
+   -\frac{\hbar^2}{2m}\frac{d^2u}{dr^2} + \frac{l(l+1)\hbar^2}{2mr^2}u = 0
+   $$
+
+   whose solutions are $u\propto r^{l+1}$ and $u\propto r^{-l}$. The
+   second is discarded as singular, leaving $u\propto r^{l+1}$ and
+   therefore
+
+   $$
+   R(r) \propto r^{\,l} \quad\text{as } r\to0
+   $$
+
+   So each extra unit of $l$ adds another power of $r$ suppressing the
+   wavefunction near the nucleus. At $l=0$, $R$ is flat and finite there;
+   at $l=1$ it vanishes linearly; at $l=2$ quadratically. The three
+   states $3s$, $3p$, $3d$ all sit at the same hydrogen energy $E_3$ and
+   are nevertheless completely different in how close they get to the
+   proton.
+
+   That difference is not a curiosity, and it is where this question pays
+   off. In any atom past hydrogen, the inner electrons screen the nuclear
+   charge, so an outer electron that *penetrates* the core sees more of
+   the bare nucleus and is bound more tightly. Low $l$ penetrates, high
+   $l$ does not, so the $l$-degeneracy of hydrogen breaks with $s$ below
+   $p$ below $d$. That ordering is why $4s$ fills before $3d$ and why the
+   periodic table has the shape it has. It follows from the $r^{\,l}$
+   behaviour derived in three lines above.
+
+   </details>
+
 4. This lesson's reduction assumed a general central $V(r)$, then
    specialized to Coulomb only in the worked example. What is the ONE
    piece of the derivation that's specific to hydrogen, versus what
    applies to any central potential?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   One substitution: writing $V(r)=-e^2/4\pi\epsilon_0r$. Everything else
+   holds for every central potential there is.
+
+   Worth listing what "everything else" covers, because several of these
+   feel hydrogen-flavoured and are not:
+
+   The separation $\psi=R(r)Y_l^m$ itself, which came from
+   $[H,\vec L^{\,2}]=[H,L_z]=0$ and used nothing about the radial shape.
+
+   The angular factors $Y_l^m$, fixed by the angular momentum algebra
+   before hydrogen was mentioned.
+
+   The centrifugal term $l(l+1)\hbar^2/2mr^2$. Its coefficient is the
+   $\vec L^{\,2}$ eigenvalue, so it is the same term in a spherical well,
+   a three-dimensional oscillator, and a quantum dot.
+
+   The substitution $u=rR$, the resulting one-dimensional form, and the
+   boundary condition $u(0)=0$.
+
+   The $R\propto r^{\,l}$ behaviour near the origin, since that came from
+   the centrifugal term dominating, which happens for any $V$ less
+   singular than $1/r^2$.
+
+   So the entire machinery of this lesson is on loan, and hydrogen
+   supplies one function. What hydrogen then buys with that function
+   belongs to the next lesson: the Coulomb potential is one of only two
+   central potentials whose bound-state energies come out independent of
+   $l$, and that extra degeneracy is genuinely special rather than
+   general.
+
+   One refinement, in the interest of precision rather than correction:
+   the mass in these equations is properly the electron-proton reduced
+   mass $\mu=m_em_p/(m_e+m_p)$, which differs from $m_e$ by about one part
+   in two thousand and is measurable in the spectrum, most visibly in the
+   isotope shift between hydrogen and deuterium. That replacement is also
+   general, applying to any two-body central-force problem, so it does not
+   change the answer above.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -262,7 +416,7 @@ $R$: nonzero ($R(0)=2$) for $l=0$, zero for $l=1$.
   equation's form, with $V_{\text{eff}}(r)=V(r)+l(l+1)\hbar^2/2mr^2$ and
   boundary condition $u(0)=0$.
 
-## Further Exploration
+## Solving it for the Coulomb case
 
 <NextDiscovery>
 [Hydrogen Energy Levels](/lessons/quantum-mechanics/the-hydrogen-atom/hydrogen-energy-levels) solves this radial equation for

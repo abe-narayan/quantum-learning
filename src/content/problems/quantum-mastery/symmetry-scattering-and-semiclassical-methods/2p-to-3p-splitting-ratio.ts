@@ -34,7 +34,7 @@ export const twoPToThreePSplittingRatio: NumericProblem = {
     type: "numeric",
     value: ratio,
     tolerance: 0.01,
-    incorrectFeedback: "Every other factor in the boxed formula is identical between the two cases — only 1/n³ changes, so the ratio is (3/2)³.",
+    incorrectFeedback: "Every other factor in the boxed formula is identical between the two cases. Only 1/n³ changes, so the ratio is (3/2)³.",
     nearMisses: [
       { value: 1.5, feedback: "1.5 is the ratio of the principal quantum numbers. The splitting scales as 1/n³, so the ratio is that cubed." },
       { value: 2.25, tolerance: 0.005, feedback: "2.25 is (3/2)², one power short. The ⟨1/r³⟩ expectation gives a cubic dependence on n." },
@@ -42,8 +42,9 @@ export const twoPToThreePSplittingRatio: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Everything in the boxed formula except 1/n³ is the same for both (same l=1, same j=3/2 and j=1/2 bracket values)." },
-    { text: "So the ratio ΔE(n=2)/ΔE(n=3) = (1/2³)/(1/3³) = 3³/2³." },
+    { text: "The prompt says every factor but one is shared between the two levels. In a ratio, a shared factor does not survive." },
+    { text: "Write the ratio with that shared bracket cancelled, so that only each level's own n-dependence is left on either side." },
+    { text: "You are now dividing one reciprocal cube by another. Do that inversion carefully: dividing by 1/n³ multiplies by n³, so the larger n ends up in the numerator." },
   ],
   solution: {
     steps: [{ description: "ΔE(n=2)/ΔE(n=3) = n₃³/n₂³ = 3³/2³ = 27/8 = 3.375, since every other factor cancels in the ratio." }],

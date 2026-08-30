@@ -32,19 +32,19 @@ export const qftOfZeroIsUniform: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "The QFT is not the identity — j=0 in the formula still produces a sum over every k, not a single unchanged state.",
-      c: "There's no reason for QFT to single out |111⟩ specifically — check the formula with j=0.",
+      b: "The QFT is not the identity. At j=0 the formula still produces a sum over every k, not a single unchanged state.",
+      c: "Nothing in the QFT singles out |111⟩. Check the formula with j=0.",
       d: "The QFT formula sums over every k from 0 to N−1, not just two of them.",
     },
     defaultIncorrectFeedback: "Set j=0 in QFT|j⟩=(1/√N)Σₖ e^{2πi(0)k/N}|k⟩ and simplify every phase factor.",
   },
   hints: [
     { text: "With j=0, every phase factor e^{2πi(0)k/N} equals 1, for every k." },
-    { text: "The result is (1/√N)Σₖ|k⟩ — an equal-amplitude sum over all N basis states." },
+    { text: "The result is (1/√N)Σₖ|k⟩, an equal-amplitude sum over all N basis states." },
     { text: "This is exactly the uniform superposition, the same object H^⊗n produces." },
   ],
   solution: {
-    steps: [{ description: "j=0 makes every phase factor 1, giving (1/√8)Σₖ|k⟩ — the uniform superposition." }],
+    steps: [{ description: "j=0 makes every phase factor 1, giving (1/√8)Σₖ|k⟩, the uniform superposition." }],
     finalAnswer: "QFT|000⟩ = the uniform superposition over all 8 basis states.",
   },
   explanation: {

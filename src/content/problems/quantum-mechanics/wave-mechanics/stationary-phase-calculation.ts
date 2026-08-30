@@ -28,8 +28,9 @@ export const stationaryPhaseCalculation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The phase factor is e^(i*theta) with theta = -E*t/hbar." },
-    { text: "Substitute E=3, t=2, hbar=1 directly." },
+    { text: "The phase angle is whatever multiplies i in the exponent, sign included. Nothing has to be evaluated until that is identified." },
+    { text: "Read that combination off the given factor, then substitute the numbers with hbar set to 1." },
+    { text: "The exponent carries an explicit minus sign in front. The question asks for the angle, not its magnitude, so that sign belongs in the answer." },
   ],
   solution: {
     steps: [

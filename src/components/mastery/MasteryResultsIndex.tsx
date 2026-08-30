@@ -10,24 +10,24 @@ import { getCourse } from "@/lib/content/curriculum";
 import { cn } from "@/lib/utils";
 import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
 
-/* `firstAuthoredLessonSlug` lives in `components/apex/readiness` — one
+/* `firstAuthoredLessonSlug` lives in `components/apex/readiness`, one
    definition shared by /apex and /mastery rather than a copy per component. */
 
 /**
  * ============================================================
  * Mastery results index
  * ============================================================
- * Apex's brief got a bespoke `ApexCourseIndex` — a numbered research-paper
- * table of contents — instead of the generic `CourseTimeline` + `CourseList`
+ * Apex's brief got a bespoke `ApexCourseIndex`, a numbered research-paper
+ * table of contents, instead of the generic `CourseTimeline` + `CourseList`
  * every core pillar shares. Mastery's own identity (per the sprint brief) is
  * different from Apex's: not "the frontier," but *abstract mathematical
- * structure* — operators, spectra, decompositions, symmetry, the things the
+ * structure*, operators, spectra, decompositions, symmetry, the things the
  * core curriculum used without proving. So this is not a re-skin of
  * `ApexCourseIndex`: no §-section numbering, no research-index framing, no
  * convergence diagram (Mastery's real dependency topology already gets its
  * own bespoke instrument earlier on `/mastery`, in the page file itself).
  *
- * Instead each of the five courses is presented as a *result* — roman
+ * Instead each of the five courses is presented as a *result*, roman
  * numerals (a mathematical-text convention, not a section-index one), a
  * one-line statement of the actual theorem/structure the course makes
  * rigorous, and its module list on a single ruled rail rather than
@@ -35,7 +35,7 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  * flowing comma-separated line until this pass. It read well but every
  * lesson in it was a small inline tap target on a phone, on the one page
  * where every module is authored and therefore every one of them is a real
- * destination — so the lessons are now rows with a 44px target each, while
+ * destination, so the lessons are now rows with a 44px target each, while
  * the roman-numeral / "Result" register that distinguishes this component
  * from Apex's index is untouched.) The "Result"
  * statements paraphrase language already present in each course's own
@@ -47,8 +47,8 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  * Click targets follow `CourseList`'s stretched-link technique exactly (see
  * that file's header for the CSS 2.1 Appendix E paint-order argument): the
  * course title is a real `<a>` whose `::after` covers the whole `<li>`, and
- * every block of readable text — the Result statement, the "Requires" line,
- * the stats, the module rows — is raised with `relative z-10` so it stays
+ * every block of readable text, the Result statement, the "Requires" line,
+ * the stats, the module rows, is raised with `relative z-10` so it stays
  * selectable and its own links reach their own destinations. No separate
  * "View course" affordance: the row is the way in. As in `ApexCourseIndex`,
  * the `Reveal` between the `<li>` and the title link must stay untransformed
@@ -57,7 +57,7 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  */
 
 type Result = {
-  /** Course slug this result belongs to — must match a real Mastery course. */
+  /** Course slug this result belongs to, must match a real Mastery course. */
   course: string;
   /** The specific theorem or structure this course makes rigorous. */
   statement: string;
@@ -69,7 +69,7 @@ const RESULTS: Result[] = [
   {
     course: "hilbert-space-and-spectral-theory",
     statement:
-      "Every self-adjoint operator — bounded or not — admits a genuine spectral resolution. Formal Hermiticity, the definition used earlier in the curriculum, is not sufficient on its own.",
+      "Every self-adjoint operator, bounded or not, admits a genuine spectral resolution. Formal Hermiticity, the definition used earlier in the curriculum, is not sufficient on its own.",
     grounding: "the-spectral-theorem-for-unbounded-operators",
   },
   {
@@ -181,12 +181,12 @@ export function MasteryResultsIndex({
                 </div>
 
                 {groundingExists ? (
-                  <p className="relative z-10 mt-3 max-w-[46rem] text-sm leading-relaxed text-foreground/90">
-                    <span className="tech-label text-pillar-text">Result — </span>
+                  <p className="relative z-10 mt-3 max-w-reading text-sm leading-relaxed text-foreground/90">
+                    <span className="tech-label text-pillar-text">Result: </span>
                     {entry.statement}
                   </p>
                 ) : (
-                  <p className="relative z-10 mt-3 max-w-[46rem] text-sm leading-relaxed text-muted-foreground">
+                  <p className="relative z-10 mt-3 max-w-reading text-sm leading-relaxed text-muted-foreground">
                     {course.description}
                   </p>
                 )}
@@ -212,13 +212,13 @@ export function MasteryResultsIndex({
                   </p>
                 ) : null}
 
-                {/* Every module, every time — a reader has to be able to see
+                {/* Every module, every time, a reader has to be able to see
                     the actual lesson titles here without opening the course
                     first. A single ruled rail rather than `ApexCourseIndex`'s
                     two-column §-numbered grid, so the two indexes still read
                     as different instruments; the ordinal keeps this
                     component's roman-numeral register ("III.4", not "03.4"). */}
-                <div className="relative z-10 mt-4 max-w-[46rem]">
+                <div className="relative z-10 mt-4 max-w-reading">
                   <TechLabel as="p">Contents</TechLabel>
                   <ol className="mt-1.5 border-l border-border pl-3 sm:pl-4">
                     {course.modules.map((module, moduleIndex) => {
@@ -256,7 +256,7 @@ export function MasteryResultsIndex({
                               <span className="min-w-0 flex-1">
                                 {module.title}
                                 <span className="ml-1 text-xs text-subtle-foreground">
-                                  — not yet authored
+                                  (not yet authored)
                                 </span>
                               </span>
                             </span>

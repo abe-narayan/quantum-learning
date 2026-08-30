@@ -8,7 +8,7 @@ export type PredictOption = { id: string; label: ReactNode };
 /**
  * Predict-then-run: ask the visitor to commit to an expected outcome before
  * they see it, then tell them whether they were right. Deliberately
- * physics-agnostic — the caller supplies the choices and, once the real
+ * physics-agnostic: the caller supplies the choices and, once the real
  * outcome is known, which option id matches it; this component only owns
  * the guess/reveal interaction.
  *
@@ -103,10 +103,10 @@ export function Predict({
       >
         {resolved
           ? correct
-            ? "Correct — that is what happened."
-            : "Not quite — see how the result compares to your guess."
+            ? "Correct. That is what happened."
+            : "Not quite. See how the result compares to your guess."
           : guess !== null
-            ? "Guess locked in — run it to check."
+            ? "Guess locked in. Run it to check."
             : "Pick a guess, then run the experiment to check it."}
       </p>
     </div>

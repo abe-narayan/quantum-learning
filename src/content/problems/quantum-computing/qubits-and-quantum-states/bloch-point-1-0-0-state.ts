@@ -32,7 +32,7 @@ export const blochPoint100State: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "|0⟩ sits at the north pole, (0,0,1), not on the equator at all.",
-      c: "|-⟩ sits at (-1,0,0) — same latitude, but the opposite side of the equator (φ=π instead of φ=0).",
+      c: "|−⟩ sits at (−1,0,0): same latitude, opposite side of the equator (φ=π instead of φ=0).",
       d: "This state sits at (0,1,0), on the equator but 90° around from (1,0,0).",
     },
     defaultIncorrectFeedback: "z=0 means θ=π/2 (the equator). x=1 (with y=0) pins down φ. Which preset state has these angles?",

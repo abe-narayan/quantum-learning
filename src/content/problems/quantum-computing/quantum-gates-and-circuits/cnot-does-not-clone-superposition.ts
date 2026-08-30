@@ -17,21 +17,21 @@ export const cnotDoesNotCloneSuperposition: MultipleChoiceProblem = {
     prompt:
       "CNOT satisfies $\\text{CNOT}(|0\\rangle\\otimes|0\\rangle)=|0\\rangle\\otimes|0\\rangle$ and $\\text{CNOT}(|1\\rangle\\otimes|0\\rangle)=|1\\rangle\\otimes|1\\rangle$, which looks exactly like cloning $|0\\rangle$ and $|1\\rangle$. Why doesn't this contradict the no-cloning theorem?",
     options: [
-      { id: "a", text: "CNOT is not a unitary matrix, so the theorem doesn't apply to it." },
-      { id: "b", text: "The theorem only forbids cloning $|0\\rangle$; cloning $|1\\rangle$ is always allowed." },
+      { id: "a", text: "CNOT copies $|+\\rangle$ too: $\\text{CNOT}(|+\\rangle\\otimes|0\\rangle)=|+\\rangle\\otimes|+\\rangle$, so the theorem has an exception for the Hadamard basis." },
+      { id: "b", text: "The second qubit ends up with the control's value but not its phase, so the two output qubits fall short of being identical copies." },
       {
         id: "c",
-        text: "Applied to a superposition input, linearity forces CNOT to produce an entangled Bell state, not two independent copies of that superposition.",
+        text: "On a superposition input, linearity forces CNOT to output an entangled state, not two copies.",
       },
-      { id: "d", text: "CNOT only works on two qubits, and the theorem only applies to single-qubit devices." },
+      { id: "d", text: "The theorem constrains single-qubit devices only, and CNOT acts on a two-qubit register." },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "c",
     optionFeedback: {
-      a: "CNOT is unitary (it's one of the gates used throughout this course). That's not the issue.",
-      b: "The theorem forbids cloning any unknown state, and by symmetry a cloner that fails on one basis state generally fails on superpositions of both, not just one basis state specifically.",
+      a: "Expand it out instead of assuming it: $|+\\rangle\\otimes|0\\rangle=\\frac{1}{\\sqrt2}(|00\\rangle+|10\\rangle)$, and CNOT sends that to $\\frac{1}{\\sqrt2}(|00\\rangle+|11\\rangle)$, the Bell state. Correct cloning would need $|+\\rangle\\otimes|+\\rangle=\\frac12(|00\\rangle+|01\\rangle+|10\\rangle+|11\\rangle)$, which has four terms, not two.",
+      b: "Phase is not the missing ingredient. Run the linearity step and you get $\\frac{1}{\\sqrt2}(|00\\rangle+|11\\rangle)$, in which neither qubit is in $|+\\rangle$ at all: each one on its own is completely unpolarized. The output is entangled, not a slightly degraded pair of copies.",
       d: "The theorem is about whether a device can clone an arbitrary *unknown state* onto a blank qubit, regardless of how many qubits the device itself uses.",
     },
     defaultIncorrectFeedback: "Think about what CNOT does to $|+\\rangle\\otimes|0\\rangle$, not just to $|0\\rangle\\otimes|0\\rangle$ and $|1\\rangle\\otimes|0\\rangle$ individually.",
@@ -55,14 +55,14 @@ export const cnotDoesNotCloneSuperposition: MultipleChoiceProblem = {
         description: "This is the entangled Bell state $|\\Phi^+\\rangle$, not $|+\\rangle\\otimes|+\\rangle=\\frac12(|00\\rangle+|01\\rangle+|10\\rangle+|11\\rangle)$, which is what correct cloning of $|+\\rangle$ would require.",
       },
     ],
-    finalAnswer: "CNOT correctly copies classical basis states, but linearity forces it to entangle (not clone) a superposition input — exactly the same mechanism the no-cloning proof uses.",
+    finalAnswer: "CNOT correctly copies classical basis states, but linearity forces it to entangle a superposition input rather than clone it, the same mechanism the no-cloning proof uses.",
   },
   explanation: {
     correctIdea: "A device correctly copying $|0\\rangle$ and $|1\\rangle$ individually is, by linearity alone, forced to fail at cloning any superposition of them.",
-    whyCorrect: "This is literally the no-cloning proof's own contradiction step, run on the specific gate CNOT instead of an abstract unitary U.",
+    whyCorrect: "This is the no-cloning proof's own contradiction step, run on the specific gate CNOT instead of an abstract unitary U.",
     whyWrong: [
-      { optionId: "a", text: "CNOT is unitary, and it is used as such throughout this course. The theorem applies to it." },
-      { optionId: "b", text: "Singles out |0⟩. The theorem's force is in what linearity demands for superposition inputs, with no special status for either basis state." },
+      { optionId: "a", text: "Assumes the copy rule extends to |+⟩ instead of deriving it. Linearity gives (|00⟩+|11⟩)/√2, a two-term state, where |+⟩⊗|+⟩ has four equal terms." },
+      { optionId: "b", text: "Diagnoses a lost phase. Nothing is lost: the amplitudes are all still there, redistributed into a correlation between the two qubits that leaves neither one in |+⟩ on its own." },
       { optionId: "d", text: "Counts the device's qubits rather than what it is asked to copy. The theorem is about copying an unknown state onto a blank qubit, whatever hardware does the copying." },
     ],
   },

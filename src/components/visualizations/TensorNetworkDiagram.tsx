@@ -109,24 +109,47 @@ export function TensorNetworkDiagram({ n = 20, ariaLabel }: { n?: number; ariaLa
           `group` keeps the same `aria-label` — the summary is still announced
           on entry — while leaving the captions in the tree. The SVGs stay
           `aria-hidden`, so nothing is read twice. */}
-      {/* `tabIndex={0}` completes the fix the role change above started. The
-          right-hand MPS panel's SVG has an intrinsic `width={RIGHT_WIDTH}`
-          (280) and no responsive class, so on a 320px phone — a ~256px content
-          box inside `panel-inset p-4` — that one flex item is wider than the
-          row and `flex-wrap` cannot help, because wrapping only moves items
-          between lines, it never shrinks one. This container therefore really
-          scrolls, and an `overflow-x-auto` div is focusable by default in no
-          browser except Firefox, so a keyboard-only reader could not reach the
-          right edge of the MPS chain. The name is already on this element, so
-          the new stop announces itself. */}
+      {/* THE BOX THIS FIGURE IS REALLY PAINTED IN, AND WHY IT IS NOT A SCROLLER.
+          Measured on the dev server, both call sites are the same shape: a
+          lesson prose column inside `Container px-4`, then `InteractiveSection`
+          (an `.instrument`: 1px border + `p-4` body), then this component's own
+          `panel-inset p-4`. At a 320px viewport that is
+          320 − 32 − 2×(16+1) − 2×(16+1) = **220px**, not the 254px a figure
+          gets when `InteractiveSection` is its only frame. `InteractiveSection`
+          keeps its full chrome here because its
+          `has-[[data-mdx-slot=embed]_.instrument]` de-framing selector looks
+          for a nested `.instrument`, and `panel-inset` is not one.
+
+          At 220px the old markup — two intrinsic-width flex items in a
+          `flex-wrap … justify-center overflow-x-auto` row — put the 280-unit
+          MPS panel on a line 60px wider than the row. `justify-content: center`
+          splits that overflow across both edges, and the half that lands before
+          the scroll origin is not reachable by scrolling in any browser, so
+          ~30px of the chain was silently gone: `html, body { overflow-x: clip }`
+          means there is no scrollbar to reveal it and nothing to report.
+
+          Both SVGs are now `h-auto w-full` capped at their intrinsic widths, so
+          the figure scales instead of overflowing and nothing is cut off. The
+          only type in either SVG is the 12-unit qubit label inside a node, which
+          at the 220px worst case paints at 12 × 220/280 = **9.43px**, over the
+          ~9px floor `src/lib/design/__tests__/figureLegibility.test.ts` sets;
+          at the 254px two-column width it is 10.89px, and from 280px up it is a
+          literal 12px. Nothing overflows any more, so the `overflow-x-auto` and
+          the `tabIndex={0}` that made it keyboard-reachable are both gone: an
+          `overflow-x-auto` that can never scroll is a dead tab stop. */}
       <div
         role="group"
         aria-label={`${ariaLabel}. Currently showing bond dimension D = ${d.toLocaleString()}.`}
-        tabIndex={0}
-        className="flex flex-wrap items-start justify-center gap-8 overflow-x-auto"
+        className="grid items-start gap-6 sm:grid-cols-2 sm:gap-8"
       >
         <div className="flex flex-col items-center">
-          <svg width={LEFT_WIDTH} height={LEFT_HEIGHT} viewBox={`0 0 ${LEFT_WIDTH} ${LEFT_HEIGHT}`} aria-hidden="true">
+          <svg
+            width={LEFT_WIDTH}
+            height={LEFT_HEIGHT}
+            viewBox={`0 0 ${LEFT_WIDTH} ${LEFT_HEIGHT}`}
+            className="mx-auto h-auto w-full max-w-[210px]"
+            aria-hidden="true"
+          >
             {/* The blob's outline is the plotted region of the left panel —
                 the "one flat, fully-connected object" the right panel is
                 being contrasted against — so it is load-bearing and moves
@@ -154,7 +177,13 @@ export function TensorNetworkDiagram({ n = 20, ariaLabel }: { n?: number; ariaLa
         </div>
 
         <div className="flex flex-col items-center">
-          <svg width={RIGHT_WIDTH} height={RIGHT_HEIGHT} viewBox={`0 0 ${RIGHT_WIDTH} ${RIGHT_HEIGHT}`} aria-hidden="true">
+          <svg
+            width={RIGHT_WIDTH}
+            height={RIGHT_HEIGHT}
+            viewBox={`0 0 ${RIGHT_WIDTH} ${RIGHT_HEIGHT}`}
+            className="mx-auto h-auto w-full max-w-[280px]"
+            aria-hidden="true"
+          >
             {[0, 1, 2, 3].map((i) => (
               <line
                 key={i}
@@ -175,10 +204,12 @@ export function TensorNetworkDiagram({ n = 20, ariaLabel }: { n?: number; ariaLa
               ) : (
                 <g key={i}>
                   <circle cx={x} cy={CHAIN_Y} r={NODE_R} className="fill-brand" />
-                  {/* These SVGs carry intrinsic width attributes and no `w-full`, so
-                    the viewBox scale is 1.0 and 10 authored units was a literal
-                    10px - on the floor, not under it. 12 clears it and still fits
-                    inside the 26-unit-diameter node circle. */}
+                  {/* 12 units, not the 10 this started at. Now that the SVG is
+                    `w-full` up to its 280-unit intrinsic width, the scale is no
+                    longer a flat 1.0: at the 220px worst case measured on the
+                    wrapper above, 10 units would have painted at 7.86px, under
+                    the floor, while 12 gives 9.43px. 12 still fits inside the
+                    26-unit-diameter node circle. */}
                   <text x={x} y={CHAIN_Y + 4} textAnchor="middle" fontSize={12} className="fill-brand-foreground font-semibold">
                     {i === 0 ? "q₁" : i === 1 ? "q₂" : i === 2 ? "q₃" : "qₙ"}
                   </text>
@@ -200,13 +231,21 @@ export function TensorNetworkDiagram({ n = 20, ariaLabel }: { n?: number; ariaLa
         />
       )}
 
-      <div aria-live="polite" className="rounded-(--radius-tight) border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      {/* `aria-atomic="true"`. This is a fixed sentence with five `<span>`s
+          in it, and moving the qubit-count or bond-dimension slider rewrites
+          only those spans. A role-less element's implicit `aria-atomic` is
+          `false`, so the live region announced just the changed text nodes:
+          a run of bare numbers ("24", "2.1 KB", "16,777,216") with none of
+          the words that say which quantity each one is, which is exactly the
+          comparison this readout exists to make. Atomic re-reads the whole
+          sentence. */}
+      <div aria-live="polite" aria-atomic="true" className="rounded-(--radius-tight) border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         With <span className="font-mono">n = {n}</span> qubits and{" "}
         <span className="font-mono">D = {d.toLocaleString()}</span>, the MPS chain stores about{" "}
         <span className={cn("font-mono font-semibold", mpsBytes >= stateVectorBytes ? "text-warning" : "text-accent")}>
           32·n·D² &asymp; {formatBytes(mpsBytes)}
         </span>{" "}
-        &mdash; versus <span className="font-mono">{formatBytes(stateVectorBytes)}</span> for the full{" "}
+        versus <span className="font-mono">{formatBytes(stateVectorBytes)}</span> for the full{" "}
         <span className="font-mono">{amplitudeCount.toLocaleString()}</span>-amplitude state vector.
       </div>
     </div>

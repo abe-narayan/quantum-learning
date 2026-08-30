@@ -16,7 +16,7 @@ export const thresholdConcatenationTwoLevels: NumericProblem = {
     type: "numeric",
     prompt:
       "A fault-tolerant gadget has constant c=200, so p_th = 1/c = 0.005. The physical error rate is p0 = 0.002 (below threshold). Using the recursion p_(k+1) = c * p_k^2, compute the level-2 logical error rate p_2.",
-    inputHint: "as a decimal, e.g. 0.000128",
+    inputHint: "as a decimal, to 6 decimal places",
   },
   answer: {
     type: "numeric",
@@ -43,7 +43,7 @@ export const thresholdConcatenationTwoLevels: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Apply the recursion once to get p_1 from p_0, then apply it again to get p_2 from p_1 -- concatenation is genuinely iterative, not a one-shot formula." },
+    { text: "Apply the recursion once to get p_1 from p_0, then apply it again to get p_2 from p_1. Concatenation is iterative, not a one-shot formula." },
     { text: "p_1 = c * p_0^2 = 200 * (0.002)^2." },
     { text: "p_2 = c * p_1^2, using the p_1 you just computed, not p_0 again." },
   ],
@@ -56,11 +56,11 @@ export const thresholdConcatenationTwoLevels: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "Concatenation is applied recursively: each level's output logical error rate becomes the next level's input, exactly the p_(k+1) = c*p_k^2 recursion this lesson derived from the two-fault argument, iterated twice.",
+      "Concatenation is applied recursively: each level's output logical error rate becomes the next level's input. That is the p_(k+1) = c*p_k^2 recursion this lesson derived from the two-fault argument, iterated twice.",
     whyCorrect:
-      "The closed form after 2 levels is p_2 = (1/c)*(c*p_0)^4 = (1/200)*(0.4)^4 = (1/200)*0.0256 = 0.000128, matching the step-by-step recursion exactly.",
+      "The closed form after 2 levels is p_2 = (1/c)*(c*p_0)^4 = (1/200)*(0.4)^4 = (1/200)*0.0256 = 0.000128, matching the step-by-step recursion.",
     whyWrong: [
-      "Computing p_2 as c*p_0^4 (reusing c only once instead of at every level) gives 200*(0.002)^4 = 3.2e-9, a wildly different and incorrect number -- c must be reapplied at each concatenation level, not folded in only once at the end.",
+      "Computing p_2 as c*p_0^4 (reusing c only once instead of at every level) gives 200*(0.002)^4 = 3.2e-9, off by five orders of magnitude. c must be reapplied at each concatenation level, not folded in once at the end.",
     ],
   },
 };

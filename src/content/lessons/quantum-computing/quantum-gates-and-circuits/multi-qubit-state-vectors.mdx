@@ -43,11 +43,11 @@ export const productExample = StateVector.zero(1).tensor(
   new StateVector([new Complex(Math.SQRT1_2), new Complex(Math.SQRT1_2)])
 );
 
-<LessonHook eyebrow="Why this matters">
-The last lesson built multi-qubit states out of single-qubit ones, via ⊗. Does every valid multi-qubit state arise that way? The answer is no, and the states that don't are the ones this pillar is really about.
+<LessonHook eyebrow="The states that refuse to factor">
+The last lesson built multi-qubit states out of single-qubit ones, via ⊗. Does every valid multi-qubit state arise that way? The answer is no, and the states that don't are the ones this track is really about.
 </LessonHook>
 
-## Motivation
+## If every state factored, none of this would matter
 
 Suppose every two-qubit state could be built as $|a\rangle\otimes|b\rangle$
 from two single-qubit states. Then two qubits would be two separate qubits
@@ -65,10 +65,10 @@ outside that slice, which is most of it, is entangled.
   caption="An actual JILA/NIST measurement of ultracold molecules splitting into entangled atom pairs flying apart. A state like this has no separate description for 'this atom alone': the kind of state this lesson shows can't be written as any single-particle product |a⟩⊗|b⟩."
   credit="Markus Greiner / JILA; NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Physics;_Paired_Atoms;_Untrapped_Atom_Pairs_(5941065432).jpg"
-  license="Public Domain (U.S. Government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Intuition
+## Two counts that ought to agree, and don't
 
 Compare two ways of specifying a 2-qubit state. A **product state**
 $|a\rangle\otimes|b\rangle$ is fully determined by two points on two
@@ -78,7 +78,7 @@ counts don't match, there must be states of the second kind that no choice
 of the first kind can reach. They don't match, and the gap between them is
 what <Term id="entanglement">entanglement</Term> means.
 
-## Mathematical Development
+## Counting the parameters on each side
 
 ### The general 2-qubit state
 
@@ -110,9 +110,24 @@ Those are the **entangled** states.
 
 ### A state that isn't a product
 
-Take the (unnormalized-looking, but check it) state
-$\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$: you'll recognize this in two
-lessons as a specific, famous state. Suppose it *were* a product state
+The parameter count says entangled states have to exist. It does not say
+which states those are, so pick a candidate and test it:
+$\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$, a state you will meet again in
+two lessons under a famous name. Commit to an answer before doing the
+algebra.
+
+<PredictBeforeReveal
+  question="Does (|00⟩+|11⟩)/√2 factor as some |a⟩⊗|b⟩?"
+  options={[
+    { label: "No: no choice of |a⟩, |b⟩ works", value: "no" },
+    { label: "Yes, it's just |+⟩⊗|+⟩ written differently", value: "yes-plus" },
+    { label: "Yes, for some other choice of |a⟩ and |b⟩", value: "yes-other" },
+  ]}
+  correctValue="no"
+  explanation="Matching coefficients against a0b0=1/√2, a0b1=0, a1b0=0, a1b1=1/√2 forces a contradiction no matter what you try: a0b1=0 needs a0=0 or b1=0, and either choice zeroes out one of the two nonzero terms. No product state reproduces this amplitude pattern. It is one of the states the parameter-counting argument above predicted had to exist. (|+⟩⊗|+⟩ is a genuine near-miss worth checking by hand: it expands to (|00⟩+|01⟩+|10⟩+|11⟩)/2, with all four terms present, not two.)"
+/>
+
+Here is the algebra. Suppose the state *were* a product
 $|a\rangle\otimes|b\rangle = a_0b_0|00\rangle+a_0b_1|01\rangle+a_1b_0|10\rangle+a_1b_1|11\rangle$.
 Matching coefficients:
 
@@ -128,17 +143,6 @@ covers every possible attempt at once rather than ruling out one guess at a
 time. A fully worked version of this proof, for this state, is the
 centerpiece of the next lesson.
 
-<PredictBeforeReveal
-  question="Before running the coefficient-matching argument: does (|00⟩+|11⟩)/√2 factor as some |a⟩⊗|b⟩?"
-  options={[
-    { label: "Yes, it's just |+⟩⊗|+⟩ written differently", value: "yes-plus" },
-    { label: "Yes, for some other choice of |a⟩ and |b⟩", value: "yes-other" },
-    { label: "No, no choice of |a⟩, |b⟩ works", value: "no" },
-  ]}
-  correctValue="no"
-  explanation="Matching coefficients against a0b0=1/√2, a0b1=0, a1b0=0, a1b1=1/√2 forces a contradiction no matter what you try: a0b1=0 needs a0=0 or b1=0, and either choice zeroes out one of the two nonzero terms. No product state reproduces this amplitude pattern. It is one of the states the parameter-counting argument above predicted had to exist."
-/>
-
 <QuantumStateDisplay state={bellNumerator} label="Cannot be factored as |a⟩ ⊗ |b⟩" />
 
 Compare with a state that *does* factor, to make sure you can tell the
@@ -146,7 +150,7 @@ difference:
 
 <QuantumStateDisplay state={productExample} label="|0⟩ ⊗ |+⟩: an ordinary product state" />
 
-## Physical Interpretation
+## A description you could hand to someone else
 
 A product state means the two qubits are physically independent: you
 could describe qubit A's state completely on its own, hand it to someone
@@ -157,7 +161,7 @@ limitation of the notation. It shows up as a difference in how the system
 behaves, starting next lesson with what happens when you measure one of
 the two qubits and leave the other alone.
 
-## Interactive Experiment
+## Run the separability check both ways
 
 The factorability check above, matching coefficients and hunting for a
 contradiction, is what the simulator's real separability check
@@ -168,7 +172,7 @@ factors, and one that provably doesn't.
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
-## Worked Example
+## One candidate, factored successfully
 
 **Does $\frac{1}{\sqrt2}(|00\rangle + |01\rangle)$ factor as a product
 state?**
@@ -184,7 +188,7 @@ it factors. This state, unlike the Bell numerator above, is *not*
 entangled: qubit 0 is definitely $|0\rangle$, qubit 1 is independently
 $|+\rangle$.
 
-## Common Mistakes
+## The gap only widens with more qubits
 
 <Callout type="warning">
 **Assuming every multi-qubit state is "really" two separate qubits.**
@@ -206,13 +210,170 @@ or look for a contradiction the way the Bell-numerator proof does.
    (after removing normalization and global phase)? How many does a
    product of three single-qubit states have? Is the gap bigger or
    smaller than in the 2-qubit case?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Run the lesson's count with $n=3$. A general 3-qubit state has
+   $2^3 = 8$ complex amplitudes, so $16$ real numbers. Normalization is one
+   real constraint and global phase is one unobservable real direction, so
+
+   $$
+   16 - 1 - 1 = 14 \text{ real parameters.}
+   $$
+
+   A product $|a\rangle\otimes|b\rangle\otimes|c\rangle$ is three points on
+   three Bloch spheres, $2$ angles each:
+
+   $$
+   3 \times 2 = 6 \text{ real parameters.}
+   $$
+
+   The gap is $14 - 6 = 8$. In the 2-qubit case it was $6 - 4 = 2$, so the
+   gap is four times larger, and it is growing far faster than the counts
+   themselves. The general formula makes the trend explicit: an $n$-qubit
+   state has $2^{n+1} - 2$ parameters against a product state's $2n$, so
+   the gap is $2^{n+1} - 2n - 2$. At $n = 10$ that is $2026$ against $20$.
+
+   The lesson to draw is stronger than "entangled states exist". Product
+   states are a $2n$-dimensional surface sitting inside an exponentially
+   large space, so as qubit count rises they become a vanishingly thin
+   sliver of it. Entanglement is not an exotic special case you have to go
+   looking for. It is the generic condition, and an unentangled multi-qubit
+   state is the rarity.
+
+   The miscount to avoid is subtracting a global phase from every factor
+   separately, getting $3\times 2 = 6$ for the product side but $16 - 1 - 3 = 12$
+   for the general side. There is only one global phase for the whole
+   system, not one per qubit. The relative phases *between* the factors are
+   exactly the physically meaningful information you must not throw away,
+   and discarding three phases would quietly delete two of them.
+
+   </details>
+
 2. Does $\frac{1}{2}(|00\rangle+|01\rangle+|10\rangle+|11\rangle)$ factor
    as a product state? Find $|a\rangle,|b\rangle$ or show it's impossible.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes. It is $|+\rangle\otimes|+\rangle$.
+
+   Set up the four coefficient equations against
+   $a_0b_0, a_0b_1, a_1b_0, a_1b_1$, all four equal to $\tfrac12$ here. No
+   coefficient is zero, so no factor can be zero, and the equations are
+   consistent: $a_0 = a_1$ (from $a_0b_0 = a_1b_0$ and $b_0 \neq 0$) and
+   $b_0 = b_1$ likewise. Normalizing each factor gives
+   $|a\rangle = |b\rangle = \tfrac{1}{\sqrt2}(|0\rangle+|1\rangle) = |+\rangle$,
+   and the check runs forward:
+
+   $$
+   |+\rangle\otimes|+\rangle = \tfrac12\left(|00\rangle+|01\rangle+|10\rangle+|11\rangle\right) \checkmark
+   $$
+
+   There is a faster test worth carrying forward. Arrange the amplitudes as
+   a $2\times2$ array with rows indexed by qubit 0 and columns by qubit 1.
+   A product state's array is an outer product $a_ib_j$, whose rows are all
+   proportional to each other, so its determinant $c_{00}c_{11} - c_{01}c_{10}$
+   must vanish. Here $\tfrac12\cdot\tfrac12 - \tfrac12\cdot\tfrac12 = 0$, and
+   the platform's separability routine returns exactly this: separable, with
+   determinant magnitude $0$. That single number decides factorability for
+   any two-qubit state, and question 3 is the case where it does not vanish.
+
+   The wrong turn is pattern-matching on "all four basis states are
+   present, so the qubits must be correlated". Presence of all four terms is
+   the *signature of independence* here, not of entanglement, because two
+   independent coin flips also produce all four outcomes. What entanglement
+   requires is that the four amplitudes fail to factor as row times column,
+   and these do factor.
+
+   </details>
+
 3. Does $\frac{1}{\sqrt2}(|00\rangle - |11\rangle)$ factor? (Use the same
    coefficient-matching method as the Bell-numerator proof.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. It is entangled, and the minus sign changes nothing about that.
+
+   Matching coefficients requires
+
+   $$
+   a_0b_0=\frac{1}{\sqrt2}, \quad a_0b_1=0, \quad a_1b_0=0, \quad a_1b_1=-\frac{1}{\sqrt2}.
+   $$
+
+   From $a_0b_1 = 0$, either $a_0 = 0$ or $b_1 = 0$. If $a_0 = 0$ then
+   $a_0b_0 = 0 \neq \tfrac{1}{\sqrt2}$. If $b_1 = 0$ then
+   $a_1b_1 = 0 \neq -\tfrac{1}{\sqrt2}$. Both branches contradict, so no
+   $|a\rangle, |b\rangle$ exists. The determinant test agrees:
+   $c_{00}c_{11} - c_{01}c_{10} = \left(\tfrac{1}{\sqrt2}\right)\left(-\tfrac{1}{\sqrt2}\right) - 0 = -\tfrac12$,
+   magnitude $\tfrac12$, and the engine's separability check reports exactly
+   that value with `separable: false`. Its entanglement entropy is $1$ bit,
+   the maximum a two-qubit state can carry.
+
+   The structural point is that the *zeros* do the work, not the signs.
+   Whenever a two-qubit state has two vanishing amplitudes sitting diagonally
+   opposite each other and two nonvanishing ones on the other diagonal, the
+   same two-branch contradiction fires. Sign, and more generally phase, never
+   enters the argument.
+
+   That is what makes the seductive answer seductive. A student who has just
+   seen the proof for $\tfrac{1}{\sqrt2}(|00\rangle+|11\rangle)$ often reads
+   the minus as "a different, less symmetric state, so maybe this one does
+   factor", or tries to absorb the sign into $|b\rangle$ by taking
+   $b_1 \to -b_1$. Absorbing the sign is legitimate and completely useless:
+   it moves the minus around but leaves the two off-diagonal zeros exactly
+   where they were. A cleaner way to see it in one line is that this state is
+   $(I \otimes Z)$ applied to $\tfrac{1}{\sqrt2}(|00\rangle+|11\rangle)$, and
+   a gate acting on one qubit alone cannot create or destroy entanglement, so
+   the two states must be equally entangled.
+
+   </details>
+
 4. Explain in one or two sentences why "entangled" is a property of the
    *state*, not of the *qubits themselves*: the same two physical qubits
    can be prepared in either an entangled or a product state.
+
+   <details className="answer-reveal">
+   <summary>A defensible answer</summary>
+
+   This one is marked on the defence rather than on a unique wording, so
+   what follows is one full version, then the alternatives that earn the
+   same credit and the ones that do not.
+
+   A worked version: entanglement is a statement about the amplitude
+   pattern of the joint state vector, namely whether it factors as
+   $|a\rangle\otimes|b\rangle$, and the same pair of physical qubits carries
+   whatever state you last prepared on them. Two qubits sitting in
+   $|00\rangle$ are a product state; apply $H$ to qubit 0 and then
+   $\text{CNOT}(0,1)$ and the very same two qubits are in
+   $\tfrac{1}{\sqrt2}(|00\rangle+|11\rangle)$, which provably does not
+   factor. Nothing about the hardware changed, only the vector describing
+   it, and one more $\text{CNOT}$ and $H$ would take them back.
+
+   Equally defensible routes to the same point. You can argue from the
+   parameter count: the set of product states is a measure-zero surface
+   inside the full state space, and preparation moves a system around inside
+   that space, so "entangled" labels a region, not a device. You can argue
+   operationally: entanglement is detected by correlations across many
+   repeated preparations, so it is a property of the preparation procedure,
+   which is another name for the state. You can also note that entanglement
+   is always relative to a chosen split of the system into parts, so it
+   cannot be an intrinsic property of any one qubit.
+
+   What a bad answer looks like: "the qubits become entangled particles",
+   or anything that treats entanglement as a substance deposited on the
+   hardware, a connection or channel that now exists between the two chips.
+   That picture predicts things that are false, most obviously that you
+   could use the connection to signal. It also has no room for the fact
+   that a single $\text{CNOT}$ removes the entanglement completely, which
+   is easy to check and hard to explain if entanglement is a physical
+   attachment rather than a description of the state. Also insufficient:
+   restating the definition without addressing the "same two qubits, either
+   way" claim the question actually asks about.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -228,7 +389,7 @@ or look for a contradiction the way the Bell-numerator proof does.
 - A state's own two qubits, considered separately, may have no
   well-defined individual state at all.
 
-## Further Exploration
+## Drawing all of this instead of writing it
 
 <NextDiscovery>
 Up next, [Quantum Circuit Notation](/lessons/quantum-computing/quantum-gates-and-circuits/quantum-circuit-notation) covers the diagrams used to describe

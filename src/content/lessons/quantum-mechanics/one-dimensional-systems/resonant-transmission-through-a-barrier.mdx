@@ -88,26 +88,26 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Perfectly transparent, at exact energies">
   At most energies a barrier partially reflects a particle that
   classically should sail right over it. At a specific, predictable
   sequence of energies, it becomes perfectly, exactly transparent.
 </LessonHook>
 
-## Motivation
+## Above the barrier, where classical physics gets dull
 
 Tunneling and the Finite Barrier covered $E<V_0$: a barrier taller than
 the particle's energy, crossed only by the exponentially-suppressed
-<Term id="quantum-tunneling">tunneling mechanism</Term>. This lesson covers the complementary regime,
-$E>V_0$: the particle has enough energy to classically cross the
-barrier, so *something* transmits. Classically all of it does, every
-time, and the barrier is no obstacle worth mentioning. Quantum mechanics
-disagrees on both counts. At most energies the barrier reflects part of
-the beam even though the particle "should" sail over it. Then, at a
-specific and predictable sequence of energies, the reflection vanishes
-*completely*: $T=1$, exactly, not approximately. A barrier that is by
-every classical measure a solid obstruction becomes perfectly
-transparent.
+<Term id="quantum-tunneling">tunneling mechanism</Term>. Now turn the energy up past the top of the
+barrier, to $E>V_0$, and ask what a particle with energy to spare does
+with an obstacle it can plainly clear. Classically the question is dull:
+all of it crosses, every time, and the barrier is no obstacle worth
+mentioning. Quantum mechanics disagrees on both counts. At most energies
+the barrier reflects part of the beam even though the particle "should"
+sail over it. Then, at a specific and predictable sequence of energies,
+the reflection vanishes *completely*: $T=1$, exactly, not approximately.
+Why should a solid obstruction turn perfectly transparent at some
+energies and stay partly reflective at all the others?
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/9/90/Reflective_and_anti-reflective_lens.jpg"
@@ -115,10 +115,10 @@ transparent.
   caption="An anti-reflective coating cancels reflection at specific wavelengths through the same interference mechanism this lesson derives for a quantum barrier: destructive interference between reflections at two boundaries, tuned so transmission is exactly 1."
   credit="Maximilian Schönherr / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Reflective_and_anti-reflective_lens.jpg"
-  license="CC0 (public domain)"
+  license="CC0 1.0 (public domain)"
 />
 
-## Intuition
+## The same three regions, one more boundary
 
 A barrier with $E>V_0$ has the *same* three-region structure as the
 step-potential problem, just with a third region (transmitted wave)
@@ -130,7 +130,7 @@ one from entering the barrier and one from leaving it, and those two can
 interfere with each other. Where they cancel, nothing reflects. That
 cancellation is the resonance.
 
-## Mathematical Development
+## The transmission formula, and where it hits one
 
 ### The three-region setup
 
@@ -151,17 +151,8 @@ This platform's `barrierScatteringTransmission` function implements that
 formula, tested against the $V_0\to0$ limit ($T\to1$, no barrier) and
 against the resonance condition below.
 
-### The resonance condition
-
-$T=1$ exactly whenever $\sin(k_2L)=0$, i.e.
-
-$$
-k_2L = n\pi, \qquad n=1,2,3,\ldots
-$$
-
-At these special energies, the barrier is **perfectly transparent**:
-every incident particle transmits and none reflects, despite the barrier
-being, in every other sense, a real obstacle.
+The formula is worth reading before it is plotted. Only $L$ appears
+inside a $\sin$, and only in the denominator.
 
 <PredictBeforeReveal
   question="Fix E=5 and V0=2, then slowly widen the barrier L from near 0. What does the transmission probability T(L) do?"
@@ -172,8 +163,20 @@ being, in every other sense, a real obstacle.
     { label: "T stays essentially constant near 1 for any width", value: "constant" },
   ]}
   correctValue="resonant"
-  explanation="T = [1 + V0²sin²(k2L)/(4E(E−V0))]⁻¹ hits exactly 1 whenever sin(k2L)=0, i.e. k2L = nπ. That is a periodic, exact return to perfect transmission, not a decaying oscillation. The curve below plots the formula and touches T=1 at each of those widths."
+  explanation="The whole L-dependence sits in sin²(k₂L), which returns to exactly 0 every time k₂L passes a multiple of π. At those widths the correction term in the denominator vanishes and T is exactly 1, not approximately. Widening the barrier further does not degrade it: the next resonance is just as perfect as the first. Watch for what the curve does between the peaks, too, since a wider barrier is not obviously a more transparent one."
 />
+
+### The resonance condition
+
+$T=1$ exactly whenever $\sin(k_2L)=0$, i.e.
+
+$$
+k_2L = n\pi, \qquad n=1,2,3,\ldots
+$$
+
+At these special widths, the barrier is **perfectly transparent**:
+every incident particle transmits and none reflects, despite the barrier
+being, in every other sense, a real obstacle.
 
 Sweeping barrier width
 $L$ at fixed $E=5,V_0=2$ makes the oscillation, and the resonance peaks
@@ -183,13 +186,17 @@ hitting exactly $T=1$, directly visible:
   frames={[
     { paramLabel: `E=${resonanceEnergy}, V0=${resonanceBarrierHeight}`, series: [{ label: "T(L)", color: "brand", points: Array.from({ length: 200 }, (_, i) => ({ x: 0.05 + (i / 199) * (4 - 0.05), y: transmissionAt(0.05 + (i / 199) * (4 - 0.05)) })) }] }
   ]}
-  sliderLabel="Barrier width"
-  ariaLabel="Transmission probability T versus barrier width L for E=5, V0=2, showing oscillation between resonance peaks at T=1"
+  ariaLabel="Transmission probability T against barrier width L from 0.05 to 4, at E=5 and V0=2. The curve is a regular wave confined to a narrow band near the top of the axis: it touches exactly 1 at L = 1.283, 2.565 and 3.848, and dips to 0.9375 at L = 0.641, 1.924 and 3.207, never going lower and never going higher than 1. Every peak has the same height and every trough the same depth; the pattern does not decay as L grows."
 />
 
 Every peak touches exactly $1$, never overshooting, and the peaks repeat
-with spacing $\pi/k_2$ in $L$, the periodicity $\sin^2(k_2L)=0$
-predicts.
+with spacing $\pi/k_2\approx1.283$ in $L$, the periodicity
+$\sin^2(k_2L)=0$ predicts. Read the troughs as well: at this energy they
+only fall to $T=0.9375$, so a barrier well above which the particle is
+travelling is a weak obstacle at every width, and the resonances are
+sharpening a small effect rather than rescuing transmission from near
+zero. Lower $E$ toward $V_0$ and the troughs deepen sharply, since the
+$4E(E-V_0)$ in the denominator shrinks.
 
 That $T(L)$ curve is the aggregate outcome. The mechanism behind each
 peak is the standing wave $|\psi(x)|^2$ forms: oscillating for
@@ -201,7 +208,7 @@ survives:
 <ScatteringStandingWave
   frames={barrierWaveFrames}
   sliderLabel="Barrier width"
-  ariaLabel="Probability density |psi(x)|^2 overlaid on a rectangular barrier of height V0=2 at energy E=5: an oscillating standing wave for x less than 0, an oscillating pattern inside the barrier between its two edges, and a flat uniform density for x greater than L, as the barrier width L is scanned through resonant and non-resonant values"
+  ariaLabel="Probability density |psi(x)|^2 overlaid on a rectangular barrier of height V0=2 at energy E=5, as the barrier width L is scanned. Past x = L the density is always flat, since only the transmitted wave survives there. Inside the barrier it always oscillates. To the left of x = 0 the density oscillates at non-resonant widths, between about 0.56 and 1.56 at the widest, but at the two resonant widths L = 1.283 and L = 2.565 it is flat at exactly 1 across the whole region, because the reflection has cancelled completely"
 />
 
 Watch the interior pattern as the slider crosses
@@ -213,7 +220,7 @@ outside-the-barrier ripple for $x<0$ visibly flattens, the spatial
 picture of $R\to0,T\to1$. At non-resonant widths, the interior pattern
 doesn't close up evenly at $x=L$, and some ripple persists for $x<0$.
 
-## Physical Interpretation
+## The physics of an anti-reflective coating
 
 This is the quantum-mechanical counterpart of an anti-reflective optical
 coating. A thin film reflects light at both of its surfaces, and at
@@ -238,7 +245,7 @@ device runs on the same physics as this lesson's single barrier, just
 with two barriers instead of one and the resonance tuned electrically
 instead of by sweeping $L$ by hand.
 
-## Worked Example
+## The first resonant width at E = 5
 
 **For $E=5$, $V_0=2$ (natural units), find the barrier width $L$ that
 produces the first resonance, and confirm $T=1$ there.**
@@ -255,7 +262,7 @@ For comparison, at a *non*-resonant width like $L=1$: $k_2L\approx2.449$
 (not a multiple of $\pi$), giving $T\approx0.9736$, still high (a
 narrow barrier relative to the wavelength), but not exactly 1.
 
-## Common Mistakes
+## Oscillating with width, rather than decaying
 
 <Callout type="warning">
 **Confusing this formula with the tunneling ($E<V_0$) case.** The
@@ -277,12 +284,165 @@ coincidence.
 
 ## Practice Questions
 
-1. For $E=6,V_0=3,L=1$, compute $T$ using the boxed formula.
+1. For $E=6,V_0=3,L=1$, compute $T$ using the boxed formula. Then find
+   the nearest resonant width for these $E$ and $V_0$, and say how far
+   $L=1$ actually sits from it.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $T\approx0.9516$, and the nearest resonance is at $L\approx1.2825$, so
+   $L=1$ falls about $0.28$ short of it.
+
+   Start with the wavenumber inside the barrier:
+
+   $$
+   k_2 = \sqrt{2(E-V_0)} = \sqrt{2(6-3)} = \sqrt6 \approx 2.44949
+   $$
+
+   At $L=1$ that gives $k_2L\approx2.44949$ radians, so
+   $\sin(k_2L)\approx0.63823$ and $\sin^2(k_2L)\approx0.40734$. The
+   prefactor is
+
+   $$
+   \frac{V_0^2}{4E(E-V_0)} = \frac{9}{4(6)(3)} = \frac{9}{72} = 0.125
+   $$
+
+   and therefore
+
+   $$
+   T = \left[1 + 0.125(0.40734)\right]^{-1} = \frac{1}{1.050918} \approx 0.95156
+   $$
+
+   matching the engine's `barrierScatteringTransmission(6, 3, 1)`.
+
+   **Where the resonances are.** $T=1$ requires $\sin(k_2L)=0$, so
+   $L_n = n\pi/k_2 = n\pi/\sqrt6 \approx 1.28255n$. The first sits at
+   $L_1\approx1.2825$ and the second at $L_2\approx2.5651$. Our $L=1$ is
+   $0.2825$ below the first, or equivalently $k_2L=2.449$ against the
+   $\pi\approx3.142$ that resonance demands: about $78\%$ of the way
+   there.
+
+   That distance is why $T$ came out at $0.95$ rather than $1$, and it is
+   also why $0.95$ is still high. Read the prefactor: $0.125$ is small, so
+   even at the *worst* width, where $\sin^2=1$, transmission only falls to
+   $1/1.125\approx0.889$. At this energy the barrier is a weak obstacle
+   everywhere, and the resonance is sharpening an already-small effect.
+   Push $E$ down toward $V_0$ and the $4E(E-V_0)$ in the denominator
+   collapses, the prefactor blows up, and the troughs between resonances
+   become deep.
+
+   The slip to watch is evaluating $\sin(k_2L)$ in degrees. In radians
+   $k_2L=2.449$ gives $\sin=0.638$; read as degrees it gives $0.043$, and
+   $T$ comes out at $0.99977$, wrong in the fourth decimal and wrong in
+   its reasoning. Every angle in this formula is a phase, and phases are
+   radians.
+
+   </details>
+
 2. Find the *second* resonant width ($n=2$) for the $E=5,V_0=2$ example
-   above.
+   above, confirm $T=1$ there, and then say how the whole family of
+   resonant widths would move if the barrier height were doubled to
+   $V_0=4$ at the same energy.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $L_2 = 2\pi/\sqrt6 \approx 2.5651$. Doubling $V_0$ to $4$ pushes every
+   resonant width out to $L_n\approx2.2214n$, spacing them nearly $1.7$
+   times further apart.
+
+   For the original barrier, $k_2=\sqrt{2(5-2)}=\sqrt6\approx2.44949$ and
+   the condition $k_2L=n\pi$ gives
+
+   $$
+   L_1 = \frac{\pi}{\sqrt6} \approx 1.28255, \qquad L_2 = \frac{2\pi}{\sqrt6} \approx 2.56510
+   $$
+
+   exactly twice the first, since the condition is linear in $n$.
+   Confirming $T=1$: $\sin(k_2L_2)=\sin(2\pi)=0$ exactly, so the entire
+   correction term in the denominator vanishes and $T=1/[1+0]=1$. The
+   engine returns $1$ at both widths, not $0.999$: this is an exact
+   cancellation, not a numerical near-miss.
+
+   **Doubling the barrier height.** At $V_0=4$ with $E=5$ still,
+
+   $$
+   k_2 = \sqrt{2(5-4)} = \sqrt2 \approx 1.41421, \qquad L_n = \frac{n\pi}{\sqrt2} \approx 2.22144\,n
+   $$
+
+   so $L_1$ moves from $1.2825$ out to $2.2214$ and every later resonance
+   moves with it. The reason is physical rather than algebraic: a taller
+   barrier leaves the particle less kinetic energy inside it, so it
+   travels more slowly there, so its wavelength inside is *longer*. The
+   resonance condition asks the barrier to hold a whole number of half
+   wavelengths, and a longer wavelength needs a wider barrier to fit one.
+
+   Two consequences follow from the same reading.
+
+   The spacing between consecutive resonances is $\pi/k_2$, independent of
+   $n$: they are evenly spaced, all the way up, which is what the plot's
+   uniform peaks show. It is the *scale* of that spacing that responds to
+   $E$ and $V_0$, never its uniformity.
+
+   And the resonances vanish entirely once $E<V_0$. Then $k_2$ turns
+   imaginary, $\sin(k_2L)$ becomes $i\sinh(\kappa L)$, and the $\sin^2$
+   in the denominator becomes a $\sinh^2$ that only ever grows. There are
+   no zeros left, transmission decays monotonically, and the formula turns
+   smoothly into the tunneling regime the Wave Mechanics course covered.
+   One formula, two behaviours, with $E=V_0$ as the switch.
+
+   </details>
+
 3. Explain in one or two sentences why the resonance condition depends
    only on $k_2L$ (not on $V_0$ or $E$ separately). Connect this to the
-   optical thin-film analogy's "round-trip phase" language.
+   optical thin-film analogy's "round-trip phase" language. Then say what
+   $V_0$ and $E$ *do* control in the formula, given that they plainly
+   appear in it.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because resonance is the condition that the term $\sin^2(k_2L)$
+   vanishes, and $E$ and $V_0$ reach that term only through the single
+   combination $k_2L$: the phase the wave accumulates crossing the
+   barrier once. $E$ and $V_0$ appear separately elsewhere in the formula,
+   and what they control there is how *deep the troughs* between
+   resonances get, never where the peaks sit.
+
+   **The round-trip reading.** A wave crossing the barrier and reflecting
+   back off the far boundary accumulates phase $2k_2L$ on the round trip.
+   The two reflected waves, one from each boundary, cancel when that
+   round-trip phase is a whole number of full turns, $2k_2L=2n\pi$, which
+   is $k_2L=n\pi$. That is the same condition an anti-reflective coating
+   is engineered to meet, and the derivation never asked what kind of wave
+   it was: only that it obeys a wave equation and is matched across two
+   boundaries. Light and electrons agree here for that reason rather than
+   by analogy.
+
+   **What $E$ and $V_0$ do control.** Look at where they sit:
+
+   $$
+   T = \left[1 + \frac{V_0^2\sin^2(k_2L)}{4E(E-V_0)}\right]^{-1}
+   $$
+
+   The prefactor $V_0^2/[4E(E-V_0)]$ multiplies the $\sin^2$, so it sets
+   the *amplitude* of the oscillation without touching its zeros. At the
+   troughs, where $\sin^2=1$, transmission dips to
+   $[1+V_0^2/(4E(E-V_0))]^{-1}$, and that is the number the prefactor
+   governs. For $E=5,V_0=2$ it is $0.9375$, a shallow trough; drive $E$
+   toward $V_0$ and $4E(E-V_0)$ collapses, the prefactor diverges, and the
+   troughs plunge toward zero while the peaks stay pinned at exactly $1$.
+   That is the behaviour the lesson's own $V_0$-slider chart shows: the
+   peak never degrades, only the transmission on either side of it does.
+
+   So the formula separates cleanly into two jobs. $k_2L$ decides *where*
+   the barrier is transparent, and $V_0^2/[4E(E-V_0)]$ decides *how much
+   it matters* to be off resonance. The first is pure interference
+   geometry; the second is the impedance mismatch inherited from the
+   single-step problem.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -299,7 +459,7 @@ coincidence.
   Together, $E<V_0$ and $E>V_0$ describe scattering off a rectangular
   barrier at every energy.
 
-## Further Exploration
+## The spacing between consecutive resonances
 
 <ChallengePrompt prompt="The resonance condition gives a whole family of widths L_n = nπ/k2. Does the spacing between consecutive resonant widths, L_(n+1) − L_n, grow, shrink, or stay constant as n increases?">
   Write $L_{n+1}-L_n$ directly from the boxed condition $k_2L=n\pi$. No

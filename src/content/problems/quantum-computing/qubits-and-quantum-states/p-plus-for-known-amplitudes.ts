@@ -29,7 +29,7 @@ export const pPlusForKnownAmplitudes: NumericProblem = {
     type: "numeric",
     value: pPlus,
     tolerance: 0.01,
-    incorrectFeedback: "Recompute $\\langle+|\\psi\\rangle$ directly, then square its magnitude. Measuring in the X-basis in this course is the same as applying H, then reading the computational-basis probability of |0⟩.",
+    incorrectFeedback: "Recompute $\\langle+|\\psi\\rangle$ directly, then square its magnitude. Measuring in the X-basis in this course is the same as applying H, then reading the computational-basis probability of $|0\rangle$.",
     nearMisses: [
       { value: 0.25, feedback: "0.25 is P(0), the computational-basis probability |α|². The X-basis question asks for the overlap with |+⟩ instead." },
       { value: (0.5 + Math.sqrt(3) / 2) / Math.SQRT2, tolerance: 0.005, feedback: "That is ⟨+|ψ⟩, the overlap itself. The Born rule squares it to give a probability." },
@@ -55,7 +55,7 @@ export const pPlusForKnownAmplitudes: NumericProblem = {
     correctIdea: "P(+) is the squared magnitude of the inner product with |+⟩, which for real amplitudes reduces to $\\left(\\frac{\\alpha+\\beta}{\\sqrt2}\\right)^2$.",
     whyCorrect: "This state's amplitudes are both positive and real, so they add constructively in the |+⟩ overlap, giving a probability well above 1/2.",
     whyWrong: [
-      "Using $P(0)=|\\alpha|^2=0.25$ answers a different question — that's the computational-basis probability, not the X-basis one.",
+      "Using $P(0)=|\\alpha|^2=0.25$ answers a different question: that is the computational-basis probability, not the X-basis one.",
       "Forgetting to square the overlap gives a number that looks plausible but isn't a probability computed correctly from the Born rule.",
     ],
   },

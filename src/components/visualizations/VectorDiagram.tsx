@@ -113,6 +113,38 @@ const FILL_CLASS: Record<NonNullable<PlaneVector["color"]>, string> = {
 };
 
 /**
+ * A short, stable, per-figure suffix for this diagram's SVG `<marker>` ids.
+ *
+ * The four arrowhead markers used to be emitted as the bare, global ids
+ * `vector-arrow-brand` / `-accent` / `-muted` / `-foreground`. Every instance
+ * of this component on a page emitted all four, so any page carrying two
+ * diagrams shipped four duplicate `id`s (a rendered-HTML scan found exactly
+ * that on `quantum-mastery/quantum-shannon-theory/povms-and-generalized-
+ * measurement`). Duplicate ids are invalid HTML, and `url(#…)` resolves to
+ * whichever element comes first in the document, so the second diagram's
+ * arrowheads are drawn from the *first* diagram's `<defs>`: they survive only
+ * as long as that unrelated figure is present and rendered. Hiding, lazily
+ * mounting or reordering the first diagram silently takes the second one's
+ * arrowheads with it, and nothing about the second diagram's own source hints
+ * at the dependency.
+ *
+ * Derived from `ariaLabel` rather than `useId()` because this is a Server
+ * Component (hooks are unavailable) and rather than a module counter because
+ * an id has to be identical in the server HTML and in any client re-render.
+ * `ariaLabel` is required and names the figure, so two diagrams sharing one is
+ * already an accessibility defect of its own. FNV-1a, base 36, same hash this
+ * codebase uses in `components/problems/optionOrder.ts`.
+ */
+function markerScope(ariaLabel: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < ariaLabel.length; i++) {
+    hash ^= ariaLabel.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+/**
  * A 2D vector-arrow diagram on a plane: each vector drawn as an arrow from
  * `from` (default origin) to `(x, y)`, auto-scaled to fit every vector's
  * tail and tip. All coordinates must come from the caller's own computation
@@ -138,6 +170,7 @@ export function VectorDiagram({
   height?: number;
   bounds?: { minX: number; maxX: number; minY: number; maxY: number };
 }) {
+  const scope = markerScope(ariaLabel);
   const points = vectors.flatMap((v) => [v.from ?? { x: 0, y: 0 }, { x: v.x, y: v.y }]);
   const xs = points.map((p) => p.x).concat(0);
   const ys = points.map((p) => p.y).concat(0);
@@ -215,7 +248,7 @@ export function VectorDiagram({
                 strokeWidth={2.5}
                 className={STROKE_CLASS[d.color]}
                 strokeDasharray={d.v.dashed ? "4 3" : undefined}
-                markerEnd={d.showArrowhead ? `url(#vector-arrow-${d.color})` : undefined}
+                markerEnd={d.showArrowhead ? `url(#vector-arrow-${scope}-${d.color})` : undefined}
               />
               <text
                 x={anchor.x}
@@ -242,7 +275,7 @@ export function VectorDiagram({
         <circle cx={origin.x} cy={origin.y} r={2} className="fill-foreground" />
         <defs>
           {(Object.keys(STROKE_CLASS) as (keyof typeof STROKE_CLASS)[]).map((color) => (
-            <marker key={color} id={`vector-arrow-${color}`} markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+            <marker key={color} id={`vector-arrow-${scope}-${color}`} markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
               <path d="M0,0 L8,4 L0,8 Z" className={FILL_CLASS[color]} />
             </marker>
           ))}

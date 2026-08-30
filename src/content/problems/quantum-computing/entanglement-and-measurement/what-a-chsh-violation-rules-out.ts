@@ -15,13 +15,17 @@ export const whatAChshViolationRulesOut: ConceptualProblem = {
   question: {
     type: "conceptual",
     prompt:
-      "A real laboratory experiment measures |S|>2. Explain why this is a stronger conclusion than 'quantum mechanics is confirmed' — what specific class of alternative theories does it rule out, and which class does it leave untouched?",
+      "A real laboratory experiment measures |S|>2. Explain why this is a stronger conclusion than 'quantum mechanics is confirmed'. Which class of alternative theories does it rule out, and which class does it leave untouched?",
     placeholder: "Think about what the CHSH inequality was actually proven to bound...",
   },
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["local hidden variable", "local hidden-variable", "local hidden var", "lhv", "every local", "all local", "any local", "local theor", "local model", "local realis", "locally realistic"],
+      {
+        phrases: ["local hidden variable", "local hidden-variable", "local hidden var", "lhv", "every local", "all local", "any local", "local theor", "local model", "local realis", "locally realistic"],
+        missingFeedback:
+          "Name the class of theories the inequality was proven about, and say that a violation takes out all of them at once rather than confirming one theory.",
+      },
       {
         phrases: [
           "nonlocal",
@@ -43,11 +47,15 @@ export const whatAChshViolationRulesOut: ConceptualProblem = {
           "survive",
         ],
         missingFeedback:
-          "You have named what the violation excludes. The question also asks what escapes: theories that drop the locality assumption, such as Bohmian mechanics, were never covered by the proof, so a measured |S|>2 leaves them standing.",
+          "You have named what the violation excludes. The question also asks what escapes: identify the assumption the proof leans on, then ask what happens to a hidden-variable theory that simply declines to make it.",
       },
     ],
     incorrectFeedback: "Recall what the CHSH inequality proof assumed: a class of theories defined by one specific property, not 'classical physics' in general.",
-    partialFeedback: "Good start. Name both halves explicitly: which category is excluded, and which specific kind of alternative escapes.",
+    partialFeedback: "Name both halves: which category is excluded, and which kind of alternative escapes.",
+    modelAnswers: [
+      "It rules out every local hidden-variable theory in one go, not just one particular model, which is much stronger than saying quantum mechanics passed another test. It leaves nonlocal hidden-variable theories like de Broglie-Bohm completely untouched.",
+      "A |S|>2 result kills the whole class of locally realistic models at once. It says nothing about pilot-wave style nonlocal theories, which are still viable.",
+    ],
   },
   hints: [
     { text: "What defining assumption did the CHSH derivation make about how each side's outcome may depend on the measurement settings? The proof covers every theory sharing that assumption." },
@@ -65,6 +73,6 @@ export const whatAChshViolationRulesOut: ConceptualProblem = {
   explanation: {
     correctIdea: "Bell's theorem's power comes from covering an entire category of theories with one proof, not from testing one specific alternative.",
     whyCorrect: "This is precisely why physicists treat CHSH violations as ruling out local realism in general, rather than just disproving one particular classical model.",
-    whyWrong: ["Saying it 'proves quantum mechanics is correct' overstates the result — it specifically rules out local hidden-variable theories, not every conceivable alternative."],
+    whyWrong: ["Saying it 'proves quantum mechanics is correct' overstates the result: it rules out local hidden-variable theories, not every conceivable alternative."],
   },
 };

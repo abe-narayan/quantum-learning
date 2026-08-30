@@ -26,20 +26,21 @@ export const outerProductType: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "c",
     optionFeedback: {
-      a: "A complex number is what a bra times a ket (⟨·|·⟩) gives — the reverse order, ket times bra, gives a matrix instead.",
-      b: "A ket is a column vector on its own — |0⟩⟨1| is a column times a row, which is a matrix.",
+      a: "A complex number is what a bra times a ket (⟨·|·⟩) gives. The reverse order, ket times bra, gives a matrix instead.",
+      b: "A ket is a column vector on its own; |0⟩⟨1| is a column times a row, which is a matrix.",
       d: "A bra is a row vector on its own, not the product of a ket and a bra.",
     },
-    defaultIncorrectFeedback: "Column vector times row vector is matrix multiplication — think about the shapes involved.",
+    defaultIncorrectFeedback: "Column vector times row vector is matrix multiplication. Think about the shapes involved.",
   },
   hints: [
-    { text: "|0⟩ is a column vector; ⟨1| is a row vector." },
-    { text: "Multiplying a column by a row (in that order) is an outer product." },
+    { text: "Read the shapes first: a ket is a column and a bra is a row, and the order in which they appear fixes what their product can be." },
+    { text: "A row times a column is the inner product and gives a single number. This expression has them the other way round." },
+    { text: "Count the dimensions of the result: a $2\\times1$ times a $1\\times2$. The size of the object that comes out is what the question is asking for." },
   ],
   solution: {
     steps: [
       { description: "$|0\\rangle$ is a $2\\times1$ column; $\\langle1|$ is a $1\\times2$ row." },
-      { description: "A $2\\times1$ times a $1\\times2$ gives a $2\\times2$ matrix — an operator, not a number." },
+      { description: "A $2\\times1$ times a $1\\times2$ gives a $2\\times2$ matrix: an operator, not a number." },
     ],
     finalAnswer: "$|0\\rangle\\langle1|$ is an operator (a $2\\times2$ matrix).",
   },

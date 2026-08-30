@@ -15,7 +15,7 @@ export const capacityEntanglementBreakingThreshold: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "Sending half of a maximally entangled pair through the depolarizing channel N_p(rho) = (1-p)rho + p*I/2 produces the Choi-like state (1-p)|Phi+><Phi+| + p*I_4/4. Its partial transpose (over the channel's output qubit) has eigenvalues 1/2 - p/4 (three-fold, symmetric subspace) and 3p/4 - 1/2 (the antisymmetric singlet direction). The channel becomes entanglement-breaking, hence exactly quantum-capacity zero, exactly when the singlet eigenvalue first reaches 0. Solve 3p/4 - 1/2 = 0 for p.",
+      "Sending half of a maximally entangled pair through the depolarizing channel N_p(rho) = (1-p)rho + p*I/2 produces the Choi-like state (1-p)|Phi+><Phi+| + p*I_4/4. Its partial transpose (over the channel's output qubit) has eigenvalues 1/2 - p/4 (three-fold, symmetric subspace) and 3p/4 - 1/2 (the antisymmetric singlet direction). The channel becomes entanglement-breaking, and so has quantum capacity zero, exactly when the singlet eigenvalue first reaches 0. Solve 3p/4 - 1/2 = 0 for p.",
     inputHint: "as a decimal, 4 decimal places",
   },
   answer: {
@@ -44,12 +44,12 @@ export const capacityEntanglementBreakingThreshold: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "The depolarizing channel becomes entanglement-breaking (every state it helps produce via one shared half is separable) exactly at p=2/3, and every entanglement-breaking channel has quantum capacity exactly zero, since no entanglement -- hence no quantum information -- can survive it even in principle.",
+      "The depolarizing channel becomes entanglement-breaking (every state it helps produce via one shared half is separable) at p=2/3, and every entanglement-breaking channel has quantum capacity exactly zero, since no entanglement, and therefore no quantum information, can survive it even in principle.",
     whyCorrect:
-      "This matches the capstone's own numerically verified computation: the singlet eigenvalue, computed directly from this platform's real convexCombination and partial-transpose machinery, comes out negative at p=0.5 and lands at exactly 0 (to numerical precision) at p=2/3, exactly where the closed-form solution above says it must.",
+      "This matches the capstone's numerically verified computation: the singlet eigenvalue comes out negative at p=0.5 and lands at 0, to numerical precision, at p=2/3, where the closed-form solution above says it must.",
     whyWrong: [
-      "Solving 1/2 - p/4 = 0 instead gives p=2, outside the physical range [0,1] -- that eigenvalue never causes a problem for any valid depolarizing parameter, only the singlet direction does.",
-      "This threshold (p=2/3, exact and rigorous) is a different, larger number than the hashing bound's zero-crossing (p≈0.2524, only a lower-bound certification failing, not a proof the true capacity is already zero there) -- confusing the two conflates a rigorous zero with a merely uncertified region.",
+      "Solving 1/2 - p/4 = 0 instead gives p=2, outside the physical range [0,1]. That eigenvalue never causes a problem for any valid depolarizing parameter; only the singlet direction does.",
+      "This threshold (p=2/3, exact and rigorous) is a different, larger number than the hashing bound's zero-crossing (p≈0.2524, where a lower-bound certification fails rather than the true capacity provably vanishing). Confusing the two conflates a rigorous zero with a merely uncertified region.",
     ],
   },
 };

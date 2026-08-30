@@ -16,9 +16,9 @@ export const whySingleQubitScope: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "Why is this platform's runNoisyCircuit scoped to single-qubit circuits, per the lesson's explicit explanation?",
     options: [
-      { id: "a", text: "Extending it means expanding every gate to a 2ⁿ×2ⁿ unitary via tensor products: understood machinery, just not needed by anything in this course" },
-      { id: "b", text: "Kraus channels are defined for a single system, so a two-qubit channel needs a different formalism altogether" },
-      { id: "c", text: "A multi-qubit density matrix has 4ⁿ entries, which makes even two qubits impractical in a browser" },
+      { id: "a", text: "Extending it means expanding every gate to a 2ⁿ×2ⁿ unitary, standard machinery that nothing here needs yet" },
+      { id: "b", text: "Kraus channels are defined for a single system, so a two-qubit channel needs a different formalism" },
+      { id: "c", text: "A multi-qubit density matrix has 4ⁿ entries, which makes even two qubits impractical in a browser tab" },
       { id: "d", text: "Correlated noise across qubits has no agreed model, so a multi-qubit simulator would have to guess at the physics" },
     ],
   },
@@ -43,7 +43,7 @@ export const whySingleQubitScope: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "A deliberate scope decision and a theoretical limitation look alike from outside. The tell is that the lesson can name what the extension would take.",
-    whyCorrect: "Matches the lesson's 'An honest scope limitation' section.",
+    whyCorrect: "Nothing in the physics blocks a multi-qubit version: Kraus operators lift to n qubits by tensoring each one up to the full space. The limit here is scope rather than formalism, and saying so is different from claiming the extension would be hard.",
     whyWrong: [
       { optionId: "b", text: "Restricts the Kraus formalism to one qubit. It is dimension-agnostic." },
       { optionId: "c", text: "Cites a cost that does not bite until far past two qubits." },

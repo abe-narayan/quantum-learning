@@ -73,11 +73,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Finite walls cost you the closed form">
 The infinite square well's walls are an idealization: no real potential is infinite. Make the walls finite and the <Term id="wavefunction">wavefunction</Term> stops vanishing at the boundary, which costs you the closed-form answer.
 </LessonHook>
 
-## Motivation
+## Swapping hard walls for walls that leak
 
 This lesson swaps the infinite well's hard walls for walls of finite
 depth $V_0$, and the wavefunction responds by leaking into them. The
@@ -95,7 +95,7 @@ rather than a zero one; this lesson applies that same mechanism to a
   license="Public domain"
 />
 
-## Intuition
+## Oscillating inside, decaying outside
 
 Picture the well the same way as before, a dip in potential energy from
 $-a$ to $a$, but now only $V_0$ deep, not infinitely deep. A particle
@@ -105,7 +105,7 @@ exponentially decaying behavior *outside* it, on both sides. At
 $x=\pm a$ the wavefunction is no longer forced to zero; it is only
 small.
 
-## Mathematical Development
+## Three regions, matched at the boundary
 
 ### Three regions, two kinds of solution
 
@@ -194,7 +194,7 @@ solvable in closed form ($kL=n\pi$) *because* the outside region was
 forbidden outright, which removed the $\kappa$ side of the equation
 altogether.
 
-## Physical Interpretation
+## Deeper or wider, and more tightly bound
 
 The transcendental equation packages a real physical trade-off: a deeper
 or wider well (larger $V_0$ or $a$) pushes $k\tan(ka)$ and $\kappa$ into
@@ -216,7 +216,7 @@ qualitatively different prediction from the systems already solved.
   explanation="Worked out below: as V0 → ∞, κ → ∞ forces tan(ka) → ∞, which happens at ka → π/2, i.e. k → π/(2a). That is the infinite well's own ground-state wavenumber. Drag the slider in the interactive further down and watch finiteSquareWellGroundStateEnergy trace out that approach for each half-width a."
 />
 
-## Worked Example
+## Recovering the infinite well as the walls rise
 
 **Confirm that as $V_0\to\infty$ (with $a$ fixed), the transcendental
 equation forces $k\to\pi/(2a)$, the infinite well's ground-state
@@ -242,11 +242,11 @@ pass.
   <ParametricCurve
     frames={finiteWellKFrames}
     sliderLabel="Half-width a"
-    ariaLabel="Ground-state wavenumber k versus well depth V0, for half-width a, approaching the infinite-well limit pi over 2a as V0 grows large"
+    ariaLabel="Ground-state wavenumber k against well depth V0, from 0.5 to 49.5, with a flat dashed line at the infinite-well value pi/(2a). Each frame shows k rising steeply at first and then flattening under that line without touching it. At half-width a=1 the dashed line is at 1.571 and k climbs from 0.739 to 1.427. At a=2 the line drops to 0.785 and k runs 0.515 to 0.748. At a=3 the line is at 0.524 and k runs 0.390 to 0.507. The wider the well, the lower the ceiling but the closer the curve gets to it: 91 percent of the limit at a=1 against 97 percent at a=3."
   />
 </InteractiveSection>
 
-## Common Mistakes
+## k and kappa are one unknown, not two
 
 <Callout type="warning">
 **Forgetting that $k$ and $\kappa$ both depend on the same $E$.** They
@@ -265,15 +265,170 @@ a different sign.
 ## Practice Questions
 
 1. Derive the odd-parity matching conditions explicitly (using
-   $\psi=A\sin(kx)$ inside, $\psi=\mp Be^{\mp\kappa x}$ outside for
+   $\psi=A\sin(kx)$ inside, $\psi=\pm Be^{\mp\kappa x}$ outside for
    $x\gtrless a$) and confirm the resulting equation is
    $-k\cot(ka)=\kappa$.
-2. For a very shallow, wide well, would you expect $k$ (and hence the
-   binding energy) to be small or large? Justify using the transcendental
-   equation's structure.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Write the three regions with the sign pattern the question specifies,
+   which is what makes the whole function odd:
+
+   $$
+   \psi(x) = \begin{cases} -B\,e^{\kappa x} & x<-a \\ A\sin(kx) & |x|\le a \\ B\,e^{-\kappa x} & x>a \end{cases}
+   $$
+
+   Check the parity before matching anything: $\sin$ is odd, and the two
+   outside pieces carry opposite signs, so $\psi(-x)=-\psi(x)$
+   throughout. Matching at $x=+a$ then settles the whole problem, since
+   oddness carries the result to $x=-a$ automatically.
+
+   Continuity of $\psi$ at $x=a$:
+
+   $$
+   A\sin(ka) = B\,e^{-\kappa a}
+   $$
+
+   Continuity of $\psi'$ at $x=a$, differentiating each piece:
+
+   $$
+   Ak\cos(ka) = -B\kappa\,e^{-\kappa a}
+   $$
+
+   Divide the second by the first. Both unknown amplitudes cancel, exactly
+   as in the even case:
+
+   $$
+   \frac{Ak\cos(ka)}{A\sin(ka)} = \frac{-B\kappa e^{-\kappa a}}{B e^{-\kappa a}} \quad\Longrightarrow\quad k\cot(ka) = -\kappa \quad\Longrightarrow\quad -k\cot(ka) = \kappa \;\checkmark
+   $$
+
+   Two features are worth pausing on.
+
+   The minus sign is not decoration and not a slip. $\kappa>0$ always, so
+   the equation demands $\cot(ka)<0$, which happens only for
+   $ka\in(\pi/2,\pi)$ and its later analogues. The even condition
+   $k\tan(ka)=\kappa$ instead demands $\tan(ka)>0$, putting its solutions
+   in $(0,\pi/2)$ and its analogues. Even and odd states therefore live on
+   *interleaved* stretches of the $k$ axis, which is why the bound states
+   alternate parity as you climb the ladder, exactly as the infinite
+   well's $\sin(n\pi x/L)$ alternate.
+
+   The odd solutions can fail to exist. The even branch reaches all the way
+   down to $k\to0$, where $k\tan(ka)\to0$ and the quarter circle
+   $\kappa=\sqrt{2V_0-k^2}$ starts at $\sqrt{2V_0}>0$: the two must cross,
+   which is the content of question 3. The odd branch does not start until
+   $ka=\pi/2$, so if $\sqrt{2V_0}\,a<\pi/2$ the quarter circle never
+   reaches it and there is no odd bound state at all. A shallow enough
+   well binds exactly one particle state, and it is even.
+
+   </details>
+
+2. For a very shallow, wide well, would you expect $k$ to be small or
+   large? Justify using the transcendental equation's structure. Then say
+   what that implies about the binding energy $|E|$, taking care over
+   whether $|E|$ moves with $k$ or against it.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $k$ is small. The binding energy $|E|$ is also small in absolute terms,
+   because the well is shallow, but relative to the well's own depth the
+   state is *tightly* bound, and that is where the two quantities move in
+   opposite directions.
+
+   **Why $k$ is small.** Two separate pressures push it down. Wide: the
+   even condition's first branch runs over $ka\in(0,\pi/2)$, so every
+   solution obeys $k<\pi/(2a)$, and a large $a$ lowers that ceiling
+   directly. Shallow: $k^2+\kappa^2=2V_0$, so $k\le\sqrt{2V_0}$, and a
+   small $V_0$ lowers that ceiling too. Whichever is smaller does the
+   binding, and both are small here. Running the platform's bisection at
+   $a=5$, $V_0=0.1$ gives $k\approx0.214$; at $a=1$, $V_0=0.1$ it is
+   $\approx0.410$. Widening the well halved the wavenumber, as predicted.
+
+   **What that says about $|E|$, carefully.** The two are linked by
+
+   $$
+   |E| = V_0 - \frac{k^2}{2}
+   $$
+
+   which is the definition $k=\sqrt{2(E+V_0)}$ rearranged. Read it and
+   the two effects separate cleanly.
+
+   At *fixed* $V_0$, a smaller $k$ means a *larger* $|E|$: the state sits
+   closer to the well's floor and is more tightly bound. That is the
+   widening effect, and it is why the answers above give $|E|=0.077$ at
+   $a=5$ against $|E|=0.016$ at $a=1$, both at $V_0=0.1$: the wider well
+   binds nearly $77\%$ of its own depth where the narrow one binds $16\%$.
+   So $|E|$ moves *against* $k$ here.
+
+   Lowering $V_0$ pushes both down at once, since $|E|\le V_0$ caps the
+   binding energy outright. That is the shallowing effect, and it is why
+   the absolute binding energy is tiny in this regime whatever the width.
+
+   The reading to avoid is "small $k$ means weakly bound." It does not.
+   Small $k$ means a long wavelength inside the well, which is what a
+   low-lying state looks like; how *weakly* bound it is depends on how
+   much of $V_0$ is left over, and in the widening case that fraction goes
+   up. The absolute answer here is "weakly bound" only because $V_0$
+   itself is small.
+
+   </details>
+
 3. Explain, without solving anything numerically, why a finite well must
    have *at least* one bound state, no matter how shallow (hint: consider
    $k\to0$ in the boxed equation).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the two sides of $k\tan(ka)=\kappa$ start on opposite sides of
+   each other and both are continuous, so they must cross somewhere in
+   between. The Intermediate Value Theorem does the rest.
+
+   Define $g(k)=k\tan(ka)-\kappa(k)$ with $\kappa(k)=\sqrt{2V_0-k^2}$, and
+   look at the ends of the interval $k\in(0,\sqrt{2V_0})$ where bound
+   states can live.
+
+   **At the left end.** As $k\to0^+$, $\tan(ka)\approx ka$, so
+   $k\tan(ka)\approx k^2a\to0$, while $\kappa\to\sqrt{2V_0}$, which is
+   strictly positive for any $V_0>0$ however small. So $g(0^+)<0$.
+
+   **At the right end.** Two cases, and both give $g>0$. If the tangent
+   diverges first, that is if $\pi/(2a)<\sqrt{2V_0}$, then
+   $k\tan(ka)\to+\infty$ as $ka\to\pi/2^-$ while $\kappa$ stays finite, so
+   $g>0$ there. If the quarter circle runs out first, that is if
+   $\sqrt{2V_0}<\pi/(2a)$, then as $k\to\sqrt{2V_0}^-$ we have
+   $\kappa\to0^+$ while $k\tan(ka)$ is a strictly positive finite number
+   (since $ka<\pi/2$ keeps the tangent positive), so again $g>0$.
+
+   $g$ is continuous on the interval between, so it has a root. That root
+   is a bound state, and the argument used no numbers at all.
+
+   The graphical statement of the same thing is the picture the next
+   lesson draws: the quarter circle starts *above* the first tangent
+   branch at $k=0$ and ends *below* it, so the two must cross once. What
+   makes the crossing unavoidable is that the tangent branch begins at
+   the origin, at zero height, no matter what, while the quarter circle
+   begins at a strictly positive height for any nonzero depth.
+
+   Two boundaries on the claim, both worth carrying.
+
+   It is a statement about *one* dimension. The same argument fails in
+   three dimensions, where a sufficiently shallow spherically symmetric
+   well genuinely has no bound state at all: the radial equation's
+   effective boundary condition at the origin kills the analogue of the
+   branch that starts at zero. That is why the deuteron being only barely
+   bound is a fact worth remarking on, and why the one-dimensional
+   intuition should not be exported.
+
+   And "at least one" is exactly right. The count is finite: the quarter
+   circle has radius $\sqrt{2V_0}$ and can only reach finitely many
+   tangent and cotangent branches, so a finite well never has the infinite
+   well's endless ladder. Deepening the well adds states one at a time,
+   which is how the infinite ladder is recovered in the limit.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -288,7 +443,7 @@ a different sign.
   closed-form ground-state result, a consistency check across two
   courses' derivations.
 
-## Further Exploration
+## Solving it anyway
 
 <NextDiscovery>
 This lesson stopped at an equation nobody can solve by hand.

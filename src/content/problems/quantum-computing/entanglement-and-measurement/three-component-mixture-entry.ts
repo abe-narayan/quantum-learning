@@ -33,7 +33,7 @@ export const threeComponentMixtureEntry: NumericProblem = {
     type: "numeric",
     value: entry,
     tolerance: 0.005,
-    incorrectFeedback: "Only |+⟩⟨+| contributes a nonzero (0,1) entry among the three components — |0⟩⟨0| and |1⟩⟨1| are both diagonal.",
+    incorrectFeedback: "Among the three components, only |+⟩⟨+| contributes a nonzero (0,1) entry; |0⟩⟨0| and |1⟩⟨1| are both diagonal.",
     nearMisses: [
       { value: 0.5, feedback: "0.5 is |+⟩⟨+|'s own (0,1) entry. In the mixture it enters weighted by its 0.25 probability." },
       { value: 0.25, feedback: "0.25 is the probability of the |+⟩ component. It multiplies that component's (0,1) entry, which is 0.5, rather than being the answer itself." },
@@ -41,7 +41,7 @@ export const threeComponentMixtureEntry: NumericProblem = {
     ],
   },
   hints: [
-    { text: "|0⟩⟨0| and |1⟩⟨1| are diagonal — they contribute 0 to the (0,1) entry." },
+    { text: "|0⟩⟨0| and |1⟩⟨1| are diagonal, so they contribute 0 to the (0,1) entry." },
     { text: "Only the |+⟩⟨+| term, weighted by its probability, contributes to (0,1)." },
     { text: "|+⟩⟨+|'s (0,1) entry is 0.5; scale it by the |+⟩ component's probability, 0.25." },
   ],

@@ -27,6 +27,11 @@ export const amplitudeDampingTraceCheck: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
+    nearMisses: [
+      { value: 0.4, tolerance: 0.005, feedback: "0.4 is γ on its own, the second term only. The completeness condition sums the contributions of both Kraus operators." },
+      { value: 0.6, tolerance: 0.005, feedback: "0.6 is 1−γ on its own, the first term only. The second Kraus operator still contributes to the same entry." },
+      { value: 0, tolerance: 0.005, feedback: "0 would come from subtracting the two terms. Completeness is a sum over Kraus operators, and it has to land on the identity for the channel to preserve trace." },
+    ],
     incorrectFeedback: "If your sum depends on γ, revisit the algebra: the γ pieces cancel when the two entries are added. That cancellation is the trace-preservation property itself, and it holds for every γ.",
   },
   hints: [

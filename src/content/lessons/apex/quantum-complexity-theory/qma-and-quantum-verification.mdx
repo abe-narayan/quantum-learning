@@ -3,6 +3,7 @@ import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { ComplexityClassDiagram } from "@/components/visualizations/ComplexityClassDiagram";
+import { ScrollableFigure } from "@/components/mdx/ScrollableFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "apex/quantum-complexity-theory/qma-and-quantum-verification"
@@ -27,7 +28,7 @@ export function exactMajorityFailureProbability(k, perCopyErrorProb) {
 }
 
 export const qmaPerCopyError = 1 / 3;
-export const qmaK = [1, 3, 5, 7, 9, 11, 15, 21, 31, 41, 51];
+export const qmaK = [1, 3, 5, 7, 9, 11, 15, 21, 31, 41, 45, 47, 51];
 export const qmaExactFailure = qmaK.map((k) => exactMajorityFailureProbability(k, qmaPerCopyError));
 export const qmaHoeffdingBound = qmaK.map((k) => Math.exp(-k / 18));
 
@@ -52,7 +53,7 @@ export const qmaToyWitnessPresets = [
 ];
 
 export const qmaToyVerifierPresets = qmaToyWitnessPresets.map((w) => ({
-  label: `${w.name} — Pr[accept] = ${(w.b * w.b * 100).toFixed(0)}%`,
+  label: `${w.name}: Pr[accept] = ${(w.b * w.b * 100).toFixed(0)}%`,
   panels: [
     {
       label: "ρ = |ψ⟩⟨ψ| (bottom-right entry is the accept probability)",
@@ -72,7 +73,7 @@ export const qmaAmplificationCurveFrames = [
         points: qmaK.map((k, i) => ({ x: k, y: Math.log10(qmaExactFailure[i]) })),
       },
       {
-        label: "log₁₀(Hoeffding bound exp(-k/18)) — illustrative, not tight",
+        label: "log₁₀(Hoeffding bound exp(-k/18)), a valid but loose certificate",
         color: "muted",
         points: qmaK.map((k, i) => ({ x: k, y: Math.log10(qmaHoeffdingBound[i]) })),
       },
@@ -92,48 +93,48 @@ export const lessonMeta = {
   prerequisites: ["apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp"],
   objectives: [
     "Define QMA precisely: decision problems where a YES instance has a polynomial-size QUANTUM state (the 'quantum witness') that a polynomial-time quantum verifier circuit accepts with probability >= 2/3, while every witness for a NO instance is accepted with probability <= 1/3",
-    "Explain the amplitude/soundness-completeness gap and why it can be amplified (via parallel repetition, with a genuine care taken over exactly how many repetitions are needed and why naive intuition about independent trials needs adjustment for quantum witnesses)",
+    "Explain the amplitude/soundness-completeness gap and why it can be amplified (via parallel repetition, with care taken over how many repetitions are needed and why naive intuition about independent trials needs adjustment for quantum witnesses)",
     "State the known containment NP subseteq QMA subseteq PSPACE, and explain conceptually why a quantum witness could plausibly be MORE powerful than a classical NP witness for some problems",
   ],
   related: [
     {
       slug: "apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp",
-      note: "That lesson defines BQP as the quantum analogue of BPP (a decider with no help); this lesson defines QMA as the quantum analogue of NP (a decider with an untrustworthy, all-powerful helper), reusing the same 2/3-vs-1/3 bounded-error convention and the same Chernoff-Hoeffding amplification citation, but now applied to a witness that can't simply be re-read for free.",
+      note: "That lesson defines BQP as the quantum analogue of BPP (a decider with no help); this lesson defines QMA as the quantum analogue of NP (a decider with an untrustworthy, all-powerful helper), reusing the same 2/3-vs-1/3 bounded-error convention and the same Chernoff-Hoeffding amplification citation, but now applied to a witness that can't be re-read for free.",
     },
   ],
 };
 
 <LessonHook eyebrow="A witness no classical string can be">
   Some ground states of physical interest are believed to need
-  exponentially many classical bits to describe — yet a quantum computer
+  exponentially many classical bits to describe, yet a quantum computer
   can hold one in a handful of qubits and check it. What happens to
   "NP-style verification" when the certificate itself has to be quantum?
 </LessonHook>
 
-## Motivation
+## NP With a Quantum Certificate
 
 The prerequisite lesson defined $\mathsf{BQP}$ by direct analogy with
 $\mathsf{BPP}$: a lone quantum computer, no outside help, bounded error.
 But classical complexity theory's single richest class isn't $\mathsf{BPP}$,
 it's $\mathsf{NP}$: problems where a *solution*, once handed to you, is easy
 to check even if it's hard to find. $\mathsf{NP}$ is formalized as a game
-between two fictional characters — **Merlin**, an all-powerful but
-untrustworthy prover, and **Arthur**, a skeptical polynomial-time verifier —
-where Merlin sends a candidate certificate and Arthur checks it.
+between two fictional characters: **Merlin**, an all-powerful but
+untrustworthy prover, and **Arthur**, a skeptical polynomial-time verifier.
+Merlin sends a candidate certificate and Arthur checks it.
 
 This lesson asks the natural next question: what happens when Merlin is
 allowed to send a *quantum* state instead of a classical string, and Arthur
 verifies it with a quantum circuit? The resulting class, $\mathsf{QMA}$
 (Quantum Merlin-Arthur), looks at first like a routine relabeling of
-$\mathsf{NP}$'s definition. It isn't. Two genuinely new phenomena show up
+$\mathsf{NP}$'s definition. It isn't. Two new phenomena show up
 immediately: amplifying $\mathsf{QMA}$'s error gap runs straight into the
 no-cloning theorem (a classical certificate can be re-read as many times as
 Arthur likes, for free; a quantum witness generally cannot), and some
-problems' most natural witness is a highly-entangled quantum state with no
-known compact classical description at all — foreshadowing this course's
+problems' most natural witness is a highly entangled quantum state with no
+known compact classical description at all, which foreshadows this course's
 next lesson, the Local Hamiltonian problem.
 
-## Mathematical Development
+## Defining QMA, and Amplifying Without Cloning
 
 ### Defining QMA precisely
 
@@ -149,25 +150,25 @@ $|x\rangle|\psi\rangle|0\cdots0\rangle$ and measuring a designated output
 qubit, outputs $1$ with probability $\geq 2/3$.
 
 **Soundness.** If $x \notin L$, then **for every** possible $p(n)$-qubit
-state $|\psi\rangle$ Merlin might send — including states with no relation
+state $|\psi\rangle$ Merlin might send (including states with no relation
 to any "intended" witness, entangled across every qubit, chosen with full
-knowledge of $V_n$ and adversarial intent — $V_n$ outputs $1$ with
+knowledge of $V_n$ and adversarial intent), $V_n$ outputs $1$ with
 probability $\leq 1/3$.
 
 </DefinitionBox>
 
-The quantifier structure is worth stating with exactly the same care
+The quantifier structure is worth stating with the same care
 $\mathsf{NP}$'s own definition demands, because it's the entire content of
 the definition: completeness is **existential** (one good witness is
 enough), soundness is **universal** (every possible state, not just the
-ones a well-behaved prover would send, must fail). Getting this backwards —
-checking only the witness Merlin was "supposed" to send — doesn't define a
+ones a well-behaved prover would send, must fail). Getting this backwards,
+checking only the witness Merlin was "supposed" to send, doesn't define a
 soundness condition at all; see the first Common Mistake below.
 
-<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-<svg viewBox="0 0 760 300" width={760} className="w-full" role="img" aria-label="Two side-by-side panels contrasting QMA's completeness and soundness quantifiers. Left panel, titled 'x in L (completeness, existential)': Merlin picks one witness state, sends it to Arthur's verifier circuit V_n alongside the input x and blank ancillas, and a probability gauge shows the output qubit accepting with probability at least 2/3, satisfied by that one chosen witness. Right panel, titled 'x not in L (soundness, universal)': a cloud of many different, even entangled, candidate witness states funnels into the same verifier circuit V_n, and the probability gauge shows every single one of them accepted with probability at most 1/3, with no exceptions allowed.">
-  <text x={190} y={24} textAnchor="middle" className="fill-brand text-[13px] font-semibold">x ∈ L — completeness (∃)</text>
-  <text x={570} y={24} textAnchor="middle" className="fill-danger text-[13px] font-semibold">x ∉ L — soundness (∀)</text>
+<ScrollableFigure label="Side by side panels contrasting the completeness and soundness quantifiers of QMA">
+<svg viewBox="0 0 760 300" width={760} height={300} role="img" aria-label="Two side-by-side panels contrasting QMA's completeness and soundness quantifiers. Left panel, titled 'x in L (completeness, existential)': Merlin picks one witness state, sends it to Arthur's verifier circuit V_n alongside the input x and blank ancillas, and a probability gauge shows the output qubit accepting with probability at least 2/3, satisfied by that one chosen witness. Right panel, titled 'x not in L (soundness, universal)': a cloud of many different, even entangled, candidate witness states funnels into the same verifier circuit V_n, and the probability gauge shows every single one of them accepted with probability at most 1/3, with no exceptions allowed.">
+  <text x={190} y={24} textAnchor="middle" className="fill-brand text-[13px] font-semibold">x ∈ L: completeness (∃)</text>
+  <text x={570} y={24} textAnchor="middle" className="fill-danger text-[13px] font-semibold">x ∉ L: soundness (∀)</text>
   <line x1={380} y1={10} x2={380} y2={290} className="stroke-border" strokeWidth={1.5} strokeDasharray="4 4" />
 
   <circle cx={70} cy={90} r={30} className="fill-brand/10 stroke-brand" strokeWidth={2} />
@@ -212,38 +213,39 @@ soundness condition at all; see the first Common Mistake below.
     </marker>
   </defs>
 </svg>
-</div>
+</ScrollableFigure>
 
 The left panel is satisfied by exhibiting a single witness; the right panel
 is a claim about the *entire* space of $2^{p(n)}$-dimensional states,
 including ones with no resemblance to any witness a cooperative prover
-would send. That asymmetry — one witness suffices on the YES side,
-literally none may work on the NO side — is exactly what the rest of this
-section's amplification argument has to respect: amplifying the left panel
-is ordinary independent-trials probability, and amplifying the right panel
-has to hold up against an adversary who gets to choose the worst possible
-state across all $k$ copies at once.
+would send. That asymmetry (one witness suffices on the YES side, none at
+all may work on the NO side) is what the rest of this section's
+amplification argument has to respect. Amplifying the left panel is
+ordinary independent-trials probability; amplifying the right panel has to
+hold up against an adversary who gets to choose the worst possible state
+across all $k$ copies at once.
 
 ### Amplifying the gap: where no-cloning bites
 
-Exactly as with $\mathsf{BQP}$, the constants $2/3$ and $1/3$ aren't
+As with $\mathsf{BQP}$, the constants $2/3$ and $1/3$ aren't
 fundamental. The classical intuition for fixing that is *parallel
 repetition*: run $k$ independent copies of the verification circuit and
 take a majority vote. For $\mathsf{NP}$, this costs Arthur nothing extra
-from Merlin's side — Merlin's certificate is a classical string, and a
+from Merlin's side. Merlin's certificate is a classical string, and a
 classical string can be copied and re-examined by $k$ independent checking
 procedures as many times as anyone likes, entirely for free.
 
 For $\mathsf{QMA}$ this shortcut is unavailable. The no-cloning theorem
-(Quantum Computing pillar) says there is no way to produce $k$ independent
+(Quantum Computing track) says there is no way to produce $k$ independent
 copies of an unknown quantum state $|\psi\rangle$ from a single copy. So
-amplification for $\mathsf{QMA}$ requires Merlin to send $k$ **independent**
-copies of the witness up front — $|\psi\rangle^{\otimes k}$, $k$ separate
-$p(n)$-qubit registers — and Arthur runs one independent instance of $V_n$
-on each register, then takes a majority vote over the $k$ output bits. This
-is a genuine, concrete resource cost with no classical counterpart: the
-witness itself grows by a factor of $k$, not just the verifier's running
-time.
+the simplest amplification procedure for $\mathsf{QMA}$ requires Merlin to
+send $k$ **independent** copies of the witness up front,
+$|\psi\rangle^{\otimes k}$ on $k$ separate $p(n)$-qubit registers, and
+Arthur runs one independent instance of $V_n$ on each register, then takes
+a majority vote over the $k$ output bits. This is a concrete resource cost
+with no classical counterpart: the witness itself grows by a factor of $k$,
+not just the verifier's running time. (Whether that growth is forced turns
+out to be a separate question, taken up after the theorem.)
 
 <TheoremBox title="Amplification via independent witness copies" provenance="cited">
 
@@ -267,28 +269,28 @@ without modification.
 
 The soundness side is the subtle part. $\mathsf{QMA}$'s soundness
 quantifier ranges over **every** $kp(n)$-qubit state Merlin might send for
-a NO instance — and there is nothing forcing an adversarial Merlin to send
+a NO instance, and there is nothing forcing an adversarial Merlin to send
 a product state $|\phi\rangle^{\otimes k}$ of $k$ identical registers.
 Merlin could just as well send some single, exotic state **entangled
 across all $k$ registers**. When the joint state isn't a product state, the
 $k$ individual accept/reject outcomes are no longer obviously independent
 random variables, so the naive move of "plug $k$ i.i.d. Bernoulli trials
-into Chernoff-Hoeffding" isn't immediately justified on this side — exactly
+into Chernoff-Hoeffding" isn't immediately justified on this side. That is
 the "naive intuition about independent trials needs adjustment" this
-lesson's objectives flag. The theorem above is still true — each of the
-$k$ sub-verifications is still applied by a circuit that touches only its
-own register, and a more careful operator-level argument (due to Kitaev and
+lesson's objectives flag. The theorem above survives it. Each of the $k$
+sub-verifications is applied by a circuit that touches only its own
+register, and a more careful operator-level argument (due to Kitaev and
 Watrous; strengthened further by Marriott and Watrous, who showed the same
 exponential amplification is achievable even reusing a *single* witness
 copy coherently) recovers the same exponential decay for the worst case
-over all, including entangled, adversarial states. That argument is cited
-here, not re-derived: the point to take away is that the conclusion
-survives, but "just apply the classical Chernoff bound" is not, by itself,
+over all states, entangled and adversarial ones included. That argument is
+cited here, not re-derived. The point to take away is that the conclusion
+holds, but "just apply the classical Chernoff bound" is not, by itself,
 a valid proof of the soundness side the way it is for completeness.
 
 <ResearchConnection
   title="QMA's amplification, and the survey that collects it"
-  source="Aharonov & Naveh, 'Quantum NP — A Survey' (arXiv:quant-ph/0210077); Marriott & Watrous, Computational Complexity 14, 122 (2005)"
+  source="Aharonov & Naveh, 'Quantum NP - A Survey' (arXiv:quant-ph/0210077); Marriott & Watrous, Computational Complexity 14, 122 (2005)"
   url="https://arxiv.org/abs/quant-ph/0210077"
 >
   Aharonov and Naveh's survey is the compact place to see this lesson's
@@ -300,7 +302,7 @@ a valid proof of the soundness side the way it is for completeness.
   repeatedly with a pair of projectors rather than consuming $k$ copies.
   So the $k$-fold witness blow-up described above is a consequence of the
   simplest amplification procedure, not an inherent price $\mathsf{QMA}$
-  charges — a distinction worth keeping straight, because the informal
+  charges. The distinction is worth keeping straight, because the informal
   claim "no-cloning makes QMA amplification expensive" is, stated that
   way, false.
 </ResearchConnection>
@@ -331,14 +333,14 @@ the witness to be $|w\rangle$, a computational basis state, for a valid
 classical certificate $w$.
 
 Because $|w\rangle$ is a basis state, $V_n$'s action on it is entirely
-classical — no superposition, no interference — so it accepts with
+classical (no superposition, no interference), so it accepts with
 probability exactly $1 \geq 2/3$ when $x \in L$ (completeness). For
 soundness, take a general $p(n)$-qubit state $|\psi\rangle = \sum_w a_w
 |w\rangle$. Because $V_n$ was built by reversibly simulating $C$, it maps
 each basis state coherently: $|w\rangle|0\rangle \mapsto
 |w\rangle|C(x,w)\rangle$. By linearity, measuring the output qubit on
 input $|\psi\rangle$ accepts with probability exactly $\sum_w |a_w|^2
-\cdot C(x,w)$ — a probability-weighted average of the classical
+\cdot C(x,w)$, a probability-weighted average of the classical
 accept/reject bit over every classical string $w$ that appears in the
 superposition. If $x \notin L$, $C(x,w) = 0$ for *every* string $w$ (that's
 exactly $\mathsf{NP}$'s own soundness), so this sum is $0$ regardless of
@@ -350,7 +352,7 @@ is satisfied trivially, with slack to spare.
 simplest non-trivial verifier circuit $V_n$ of exactly this reversible
 form: a single CNOT gate, witness qubit as control, one ancilla
 (initialized $|0\rangle$) as target, so $|w\rangle|0\rangle \mapsto
-|w\rangle|w\rangle$ — this is literally $C(x,w)=w$ compiled the way the
+|w\rangle|w\rangle$. That is $C(x,w)=w$ compiled the way the
 proof above describes. Measuring the ancilla accepts (outputs $1$) with
 probability exactly $|b|^2$ for a general witness $|\psi\rangle=a|0\rangle+b|1\rangle$,
 by the same linearity argument used above. Toggle through four witnesses
@@ -362,15 +364,14 @@ bottom-right diagonal entry of $\rho=|\psi\rangle\langle\psi|$:
   ariaLabel="Density matrix of four candidate witness states sent to the toy verifier V_n = CNOT(witness, ancilla), with the bottom-right diagonal entry showing the real acceptance probability for each witness"
 />
 
-$|1\rangle$ is the single witness that achieves probability $1$ — the
+$|1\rangle$ is the single witness that achieves probability $1$, the
 one existential witness completeness needs. $|0\rangle$ achieves
 probability $0$, and $|{+}\rangle$ only $0.5$: most $p(n)$-qubit states
-are bad witnesses even for a YES instance, which is exactly why
-completeness only requires *some* witness to work, not every witness.
-The last preset, $\sqrt{0.1}|0\rangle+\sqrt{0.9}|1\rangle$, accepts with
-probability $0.9\geq2/3$ — a legitimate, if imperfect, witness, showing
-the $2/3$ threshold has real slack rather than demanding a "perfect"
-witness state.
+are bad witnesses even for a YES instance, which is why completeness
+only requires *some* witness to work, not every witness. The last preset,
+$\sqrt{0.1}|0\rangle+\sqrt{0.9}|1\rangle$, accepts with probability
+$0.9\geq2/3$: a legitimate if imperfect witness, showing the $2/3$
+threshold has real slack rather than demanding a "perfect" witness state.
 
 ### QMA ⊆ PSPACE: the same resource argument, with one more layer
 
@@ -385,26 +386,27 @@ exponentially many terms and the computation itself takes exponential
 **maximizing** over every possible witness state, not just evaluating one
 fixed input.
 
-That extra step is where the "slightly more care" is genuinely needed.
+That extra step is where the argument needs more than the
+$\mathsf{BQP}$ version did.
 The acceptance probability, as a function of the witness, is a quadratic
 form in the witness's amplitude vector; its maximum over all unit-norm
 witnesses equals the largest eigenvalue of an associated $2^{p(n)}$-
 dimensional Hermitian matrix built from $V_n$. A $\mathsf{PSPACE}$ machine
-cannot write that exponential-size matrix down, but — exactly as with the
-path-sum for $\mathsf{BQP}$ — it doesn't need to: it has enough *space*, if
+cannot write that exponential-size matrix down, but, as with the
+path-sum for $\mathsf{BQP}$, it doesn't need to: it has enough *space*, if
 not time, to run a space-efficient eigenvalue-estimation procedure that
 touches the matrix's exponentially many entries one small piece at a time,
 recomputing rather than storing. Kitaev and Watrous established
 $\mathsf{QMA} \subseteq \mathsf{PSPACE}$ along exactly these lines (cited
-here, not re-derived — the full argument is a substantial piece of
+here, not re-derived; the full argument is a substantial piece of
 space-bounded linear algebra on its own). Combined with the previous
 section:
 
 <EquationReveal
   terms={[
     { id: "NP", symbol: "NP", gloss: "Classical certificate, classical polynomial-time verifier." },
-    { id: "QMA", symbol: "QMA", gloss: "Quantum witness, quantum polynomial-time verifier — proven to contain NP, since a classical certificate is a valid computational-basis quantum witness." },
-    { id: "PSPACE", symbol: "PSPACE", gloss: "Everything decidable with polynomial workspace, however much time it takes — QMA's acceptance probability is a maximization that a space-efficient procedure can still evaluate piece by piece." },
+    { id: "QMA", symbol: "QMA", gloss: "Quantum witness, quantum polynomial-time verifier. Proven to contain NP, since a classical certificate is a valid computational-basis quantum witness." },
+    { id: "PSPACE", symbol: "PSPACE", gloss: "Everything decidable with polynomial workspace, however much time it takes. QMA's acceptance probability is a maximization that a space-efficient procedure can still evaluate piece by piece." },
   ]}
 >
 $$
@@ -417,61 +419,59 @@ $$
   ring={{ id: "QMA", label: "QMA" }}
   lensB={{ id: "NP", label: "NP" }}
   footnote="Both containments are proven: NP is a valid computational-basis QMA witness, and QMA's acceptance probability is a space-efficient maximization, exactly as BQP ⊆ PSPACE's path-sum argument was."
-  ariaLabel="A containment diagram: a solid outer boundary labeled PSPACE contains a solid ring labeled QMA, which in turn contains a solid ellipse labeled NP — both containments proven, not conjectured."
+  ariaLabel="A containment diagram: a solid outer boundary labeled PSPACE contains a solid ring labeled QMA, which in turn contains a solid ellipse labeled NP. Both containments are proven, not conjectured."
 />
 
 ### Could a quantum witness ever help? A concrete flavor
 
 Nobody has proven $\mathsf{NP} \neq \mathsf{QMA}$ or found a problem
-provably requiring a quantum witness — that separation remains open,
-exactly like $\mathsf{P}$ vs. $\mathsf{NP}$ and $\mathsf{BPP}$ vs.
-$\mathsf{BQP}$ before it. But it's worth seeing, concretely, *why* a
-quantum witness could plausibly matter for some problems, without needing
-a formal proof.
+provably requiring a quantum witness; that separation remains open, like
+$\mathsf{P}$ vs. $\mathsf{NP}$ and $\mathsf{BPP}$ vs. $\mathsf{BQP}$
+before it. Even without a proof, though, one can see concretely *why* a
+quantum witness could plausibly matter for some problems.
 
 Consider a problem whose natural witness isn't a string or a formula, but
-the **ground state of a many-body quantum Hamiltonian** — the
+the **ground state of a many-body quantum Hamiltonian**, the
 lowest-energy quantum state of a system of interacting qubits. A generic
 such ground state is highly entangled across all the qubits, and is known,
 in general, to require exponentially many classical bits to describe
 exactly: there is no known efficient classical encoding that a classical
 $\mathsf{NP}$ certificate could use to specify it. Yet a poly-size quantum
-state — the ground state itself, physically prepared — is exactly the
-right size to serve as a $\mathsf{QMA}$ witness. This is precisely the
+state (the ground state itself, physically prepared) is exactly the
+right size to serve as a $\mathsf{QMA}$ witness. This is the
 **Local Hamiltonian problem** (decide whether a given local Hamiltonian's
 ground-state energy is below one threshold or above another), the subject
 of this course's next lesson, where this intuition is made precise and the
 problem is shown to be $\mathsf{QMA}$-complete.
 
-## Physical Interpretation: Why This Matters
+## What a Quantum Witness Can Carry
 
 <InsightBlock>
   QMA is what NP looks like once the certificate is allowed to be a
-  quantum state — and no-cloning means amplifying confidence in that
-  certificate costs real, additional copies of it, with no classical
-  free lunch.
+  quantum state, and the first thing that breaks is the free reuse of the
+  certificate that NP's own amplification argument silently assumes.
 </InsightBlock>
 
 $\mathsf{QMA}$ is the natural target class for a question the quantum
 chemistry material elsewhere on this platform runs into directly: *does
 this molecule's Hamiltonian have a low-energy state below some physically
 important threshold?* That's a decision problem about a real physical
-system, and it's exactly Local-Hamiltonian-shaped. Classifying such
-problems as $\mathsf{QMA}$ rather than $\mathsf{NP}$ isn't a technicality —
+system, and it is Local-Hamiltonian-shaped. Classifying such
+problems as $\mathsf{QMA}$ rather than $\mathsf{NP}$ isn't a technicality;
 it's an honest statement that the natural certificate is a quantum state,
 checkable by a quantum computer, with no known classical shortcut.
 
-$\mathsf{QMA}$-completeness results — proving a specific problem is exactly
-as hard as *any* problem in $\mathsf{QMA}$ — are the precise tool for
+$\mathsf{QMA}$-completeness results (proving a specific problem is exactly
+as hard as *any* problem in $\mathsf{QMA}$) are the precise tool for
 identifying the hardest problems in this class, in exact analogy to how
 $\mathsf{NP}$-completeness identifies the hardest classical search and
 decision problems. This isn't an abstract exercise: $\mathsf{QMA}$-hardness
 results for physically motivated problems (the Local Hamiltonian problem
-foremost among them) are a genuinely active research area connecting
-complexity theory directly to condensed-matter physics and quantum
-chemistry — telling physicists, in a precise and provable sense, which
-"find the ground state" questions are unlikely to ever have an efficient
-answer, quantum or classical.
+foremost among them) are an active research area connecting complexity
+theory directly to condensed-matter physics and quantum chemistry. They
+tell physicists, in a precise and provable sense, which "find the ground
+state" questions are unlikely ever to have an efficient answer, quantum or
+classical.
 
 <PredictBeforeReveal
   question="Starting from a 2/3-vs-1/3 gap (per-copy error 1/3), both the exact majority-vote failure probability and the looser Hoeffding tail bound exp(-k/18) eventually drop below 1% as the number of independent witness copies k grows. Predict which one crosses below 1% at a smaller k, and roughly how far apart the two crossing points are."
@@ -481,22 +481,22 @@ answer, quantum or classical.
     { label: "The Hoeffding bound crosses first, since it's built to be conservative", value: "bound_first" },
   ]}
   correctValue="exact_first"
-  explanation="The exact binomial failure probability first drops to 1% at k=47 (about 0.90%). The Hoeffding bound doesn't cross 1% until k=83 (about 0.99% there). Both statements are correct — the true failure probability really is below 1% already at k=47, and the bound only guarantees that once k=83 — the bound is simply loose, not wrong. This is the same honest gap between 'exact value' and 'certified bound' the adversary-method lesson draws for query complexity."
+  explanation="The exact binomial failure probability first drops to 1% at k=47 (about 0.90%). The Hoeffding bound doesn't cross 1% until k=83 (about 0.99% there). Both statements are correct: the true failure probability really is below 1% already at k=47, and the bound only guarantees that once k=83. The bound is loose, not wrong. This is the same gap between 'exact value' and 'certified bound' the adversary-method lesson draws for query complexity."
 />
 
-## Worked Example
+## Driving the Gap Below One Percent
 
 **How many independent witness copies does it take to drive the
 completeness/soundness gap below $1\%$, starting from the standard $2/3$
-vs. $1/3$ gap — and how does the honest, exactly-computed answer compare to
-the naive Chernoff-Hoeffding bound's own answer to the same question?**
+vs. $1/3$ gap, and how does the exactly-computed answer compare to the
+Chernoff-Hoeffding bound's own answer to the same question?**
 
 Take the completeness side, where the amplification argument is fully
 rigorous (independent, honestly-sent witness copies): with $k$ independent
 copies and each copy wrong with probability exactly $1/3$ in the worst
 case the theorem needs to cover, the majority vote fails only if at least
 $(k+1)/2$ of the $k$ copies are wrong. That's an exact binomial tail,
-computed here — not merely bounded — by `exactMajorityFailureProbability(k, 1/3)`:
+computed here rather than merely bounded, by `exactMajorityFailureProbability(k, 1/3)`:
 
 <BarChart
   bars={qmaK.map((k, i) => ({
@@ -504,8 +504,9 @@ computed here — not merely bounded — by `exactMajorityFailureProbability(k, 
     value: qmaExactFailure[i],
     highlight: k === qmaSmallestKBelow1Percent,
   }))}
+  maxValue={qmaPerCopyError}
   formatCaption={(v) => `${(v * 100).toFixed(2)}%`}
-  ariaLabel={`Exact majority-vote failure probability versus number of independent witness copies k, for k = ${qmaK.join(", ")}, each copy wrong with probability 1/3 in the worst case; the failure probability shrinks from ${(qmaExactFailure[0] * 100).toFixed(1)}% at k=1 toward under 1% by k=${qmaSmallestKBelow1Percent}`}
+  ariaLabel={`Exact majority-vote failure probability versus number of independent witness copies k, for k = ${qmaK.join(", ")}, each copy wrong with probability 1/3 in the worst case; bars are drawn against a fixed 1/3 scale, so each bar's height is the fraction of the un-amplified k=1 error that survives, and the highlighted bar at k=${qmaSmallestKBelow1Percent} is the first to fall below 1%`}
 />
 
 The exact values, all reproduced by `exactMajorityFailureProbability`
@@ -519,21 +520,22 @@ Compare that to the loose-but-honest Hoeffding tail bound
 $\exp(-k/18)$ (one clean instance of the "Chernoff-bound-style argument"
 cited above, derived from Hoeffding's inequality with the gap
 $1/2 - 1/3 = 1/6$): at that same $k=47$, the bound only *guarantees*
-failure probability $\leq 7.3\%$ (`qmaHoeffdingAtSmallestK`) — nowhere
-near $1\%$ yet. The bound doesn't actually cross $1\%$ until $k=83$
+failure probability $\leq 7.3\%$ (`qmaHoeffdingAtSmallestK`), nowhere
+near $1\%$ yet. The bound doesn't cross $1\%$ until $k=83$
 (`qmaHoeffdingKBelow1Percent`), where $\exp(-83/18) \approx 0.99\%$
-(`qmaHoeffdingAtItsOwnThreshold`). Both statements are correct — the exact
+(`qmaHoeffdingAtItsOwnThreshold`). Both statements are correct: the exact
 value really is below $1\%$ already at $k=47$, and the bound really is
-only *guaranteed* to be below $1\%$ once $k=83$ — the bound is simply not
-tight, which is exactly the honest caveat this platform's $\mathsf{BQP}$
-amplification citation carries too: Chernoff-Hoeffding bounds *certify*
-exponential decay, they don't claim to pin down the sharpest possible
-constant in the exponent.
+only *guaranteed* to be below $1\%$ once $k=83$. The bound is not tight,
+which is the caveat this platform's $\mathsf{BQP}$ amplification citation
+carries too: Chernoff-Hoeffding bounds *certify* exponential decay, they
+don't claim to pin down the sharpest possible constant in the exponent.
 
-## Interactive Visualization
+## Watching the Gap Amplify
 
 <ParametricCurve
   frames={qmaAmplificationCurveFrames}
+  xAxisLabel="witness copies k"
+  yAxisLabel="log₁₀(failure probability)"
   ariaLabel="Log10 of failure probability versus number of independent witness copies k, showing two curves: the exact binomial majority-vote failure probability (computed from real combinatorics, per-copy error 1/3), and the looser Hoeffding tail bound exp(-k/18), both decreasing roughly linearly on the log scale as k grows from 1 to 51, with the exact curve consistently below (better than) the bound"
 />
 
@@ -542,14 +544,14 @@ Both curves are real arithmetic: the brand curve is
 the muted curve is the closed-form Hoeffding bound $\exp(-k/18)$. Plotting
 $\log_{10}$ of each turns the exponential decay $2^{-\Omega(k)}$ into a
 straight line, the same log-axis trick the $\mathsf{BQP}$ lesson used for
-Grover's quadratic speedup: a genuinely exponential quantity looks like a
-flat, uninformative curve on a linear axis and a clean straight line once
-logged. Both lines trend downward at roughly the same order of slope,
+Grover's quadratic speedup: an exponentially decaying quantity looks like
+a flat, uninformative curve on a linear axis and a clean straight line
+once logged. Both lines trend downward at roughly the same order of slope,
 confirming both really are exponential in $k$; the exact curve sits
-strictly below the bound at every $k$ shown, visualizing exactly how loose
-a valid Chernoff-Hoeffding certificate can be relative to the truth.
+strictly below the bound at every $k$ shown, showing how loose a valid
+Chernoff-Hoeffding certificate can be relative to the truth.
 
-## Common Mistakes
+## Assuming a Witness Can Be Copied
 
 <Callout type="mistake">
 **Assuming the witness copies for amplification can be reused, the way a
@@ -557,16 +559,20 @@ classical $\mathsf{NP}$ certificate can be.** A classical verifier can run
 $k$ independent checks on the *same* certificate string $w$, since reading
 $w$ doesn't consume or disturb it. A quantum verifier cannot: the no-cloning
 theorem forbids producing $k$ independent copies of an unknown witness
-state from one copy, so $\mathsf{QMA}$ amplification genuinely requires
-Merlin to send $k$ separate copies of $|\psi\rangle$ up front — a concrete
-witness-size cost with no classical analogue.
+state from one copy, so the *parallel-repetition* procedure requires Merlin
+to send $k$ separate copies of $|\psi\rangle$ up front, a witness-size cost
+with no classical analogue. Note the limit of that statement: it indicts
+the procedure, not the class. Marriott and Watrous amplify the same gap
+from a single witness copy, so "no-cloning makes QMA amplification
+expensive" is false as a claim about $\mathsf{QMA}$ even though it is
+accurate as a claim about the naive scheme.
 </Callout>
 
 <Callout type="warning">
 **Checking only the "intended" cheating witness instead of every possible
 quantum state.** $\mathsf{QMA}$'s soundness condition is a **universal**
 quantifier over every $p(n)$-qubit state Merlin might send for a NO
-instance — including exotic, fully entangled states with no resemblance to
+instance, including exotic, fully entangled states with no resemblance to
 any "obvious" fake witness. Verifying that one plausible-looking bad
 witness fails is not a soundness proof; it's exactly the same error as
 believing an $\mathsf{NP}$ verifier is sound because one wrong guess for
@@ -581,14 +587,166 @@ sub-verifications aren't automatically independent trials.
 1. Using `exactMajorityFailureProbability`, find the smallest odd number of
    independent witness copies $k$ that drives the exact majority-vote
    failure probability (per-copy error exactly $1/3$) to $5\%$ or below.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $k=23$.
+
+   The relevant stretch of the exact binomial tail, each value from
+   `exactMajorityFailureProbability(k, 1/3)`:
+
+   | $k$ | failure probability |
+   |---|---|
+   | $19$ | $0.0648$ |
+   | $21$ | $0.0557$ |
+   | $23$ | $0.0481$ |
+   | $25$ | $0.0415$ |
+
+   $k=21$ is still above $5\%$ and $k=23$ is the first odd value below
+   it. Only odd $k$ is admissible, since an even count can tie and a
+   majority vote has no answer for a tie.
+
+   **What the Hoeffding bound would have told you.** Its certificate is
+   $\exp(-k/18)\le0.05$, which needs $k \ge 18\ln20 = 53.9$, so $k=55$.
+   The bound demands almost two and a half times as many witness copies
+   as the truth requires, and every one of those copies is a full
+   $p(n)$-qubit quantum state that Merlin has to send and Arthur has to
+   store. The gap is the same phenomenon the lesson computes at the $1\%$
+   level ($47$ exact against $83$ from the bound), and it is worth
+   internalizing as a general habit: **a Chernoff-Hoeffding bound
+   certifies exponential decay, it does not measure it.** When the
+   quantity being bounded is a resource someone has to pay for, compute
+   the exact tail.
+
+   **The wrong turn** is reading the exact answer as a correction to the
+   bound, as though Hoeffding were slightly wrong. It is not wrong; it is
+   an upper bound and it holds. Its job is to prove that *some* finite
+   $k$ suffices and that $k$ grows only linearly in $\log(1/\delta)$,
+   which is the asymptotic statement the amplification theorem needs. Its
+   job is not to be tight, and using it as a design number is asking a
+   proof technique to do an engineering calculation.
+
+   </details>
+
 2. State precisely which of the two quantifiers in $\mathsf{QMA}$'s
    definition (completeness vs. soundness) is existential and which is
-   universal, and explain why swapping them would fail to define a
-   meaningful complexity class at all.
+   universal, and explain why swapping them would stop describing
+   verification by an untrusted prover. What do the swapped conditions
+   actually define instead?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Completeness is existential and soundness is universal.** On a YES
+   instance, *some* witness makes the verifier accept with probability at
+   least $2/3$. On a NO instance, *every* state, without exception, is
+   accepted with probability at most $1/3$.
+
+   That asymmetry is the entire content of "untrusted prover," and each
+   half fails differently when reversed.
+
+   **Requiring every witness to work on YES instances makes the prover
+   redundant.** If all states are accepted, then in particular
+   $|0\cdots0\rangle$ is, so the verifier can hardcode it and never read
+   the message. A witness that any state satisfies carries no
+   information, and the class collapses back to a verifier deciding on
+   its own.
+
+   **Requiring only some witness to be rejected on NO instances gives no
+   protection.** A cheating Merlin is choosing what to send. Telling him
+   that one particular state would have been rejected constrains him not
+   at all; he sends a different one. Soundness has to be universal
+   precisely because it is a promise about an adversary's best move, and
+   a bound on an adversary's best move is a bound over all his moves.
+
+   **What the swap actually defines,** since it is worth being accurate
+   rather than dismissive. Read the two swapped conditions as statements
+   about $\min_\psi \Pr[\text{accept}]$: it is at least $2/3$ on YES
+   instances and at most $1/3$ on NO instances. Flip the verifier's
+   output bit and $\min_\psi\Pr[\text{accept}]$ becomes
+   $1-\max_\psi\Pr[\text{accept}]$, so the swapped conditions say exactly
+   that the *complement* language has a $\mathsf{QMA}$ verifier. The
+   swapped definition is $\mathsf{coQMA}$, a perfectly real class, and
+   whether it equals $\mathsf{QMA}$ is open in the same way
+   $\mathsf{NP}$ versus $\mathsf{coNP}$ is.
+
+   So the honest verdict is not that the swap is meaningless. It is that
+   the swap silently changes the subject. It stops being a model of "a
+   powerful, untrustworthy helper convinces a bounded verifier of a yes
+   answer" and becomes a model of the mirror-image question, about
+   convincing the verifier of a no answer. Those coincide in
+   $\mathsf{BQP}$, where the verifier can flip its own output, and they
+   are not known to coincide anywhere a witness is doing real work.
+
+   </details>
+
 3. Explain, in your own words, why the *completeness* side of the
    amplification theorem is a direct application of the classical
    Chernoff-Hoeffding bound, while the *soundness* side needs the more
    careful, cited operator-level argument instead.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because on the completeness side we get to choose the witness, and we
+   choose one that makes the trials genuinely independent. On the
+   soundness side the witness is chosen against us, and a cheating prover
+   is under no obligation to hand over anything independent.
+
+   **Completeness.** The quantifier is existential, so it is enough to
+   exhibit one good witness for the $k$-copy verifier, and the natural
+   choice is $|\psi\rangle^{\otimes k}$: $k$ separate copies of the
+   single good witness, in a product state. Each copy goes into its own
+   run of $V$, and because the state is a product and the runs touch
+   disjoint registers, the $k$ accept/reject outcomes are independent
+   Bernoulli variables with success probability at least $2/3$.
+   Chernoff-Hoeffding is a theorem about sums of independent bounded
+   random variables, and its hypothesis is literally satisfied. No
+   quantum mechanics enters the probability argument at all; the quantum
+   part finished when the product state was chosen.
+
+   **Soundness.** The quantifier is universal, so the claim has to hold
+   for *every* state of the $k$ witness registers. A cheating Merlin can
+   send a state entangled across all $k$ of them, and then the $k$
+   outcomes are not independent random variables. They are measurements
+   on a correlated system, so Chernoff-Hoeffding's one hypothesis fails
+   before the argument starts. It is not that the bound gives a weak
+   answer; it does not apply.
+
+   Nor can the entanglement be argued away cheaply. The witness cannot be
+   cloned, so the verifier cannot manufacture independent copies. It
+   cannot be re-read after measurement, so the runs cannot be made
+   sequential and treated as fresh. And correlation is exactly the
+   resource that could, a priori, push a majority of accepts above what
+   $k$ independent biased coins would deliver.
+
+   **What replaces it.** The maximum acceptance probability over all
+   states is not an average, it is a supremum, and a supremum of
+   $\langle\psi|\Pi_{\text{acc}}|\psi\rangle$ over unit vectors is the
+   largest eigenvalue of $\Pi_{\text{acc}}$. So the right object is an
+   operator norm, and the Kitaev-Watrous argument bounds the top
+   eigenvalue of the $k$-fold verification's accepting operator directly.
+   That covers every input state in one stroke, entangled ones included,
+   without ever needing the outcomes to be independent. The conclusion is
+   the one the naive argument wanted, exponential decay in $k$, reached
+   by a tool that matches the shape of the statement.
+
+   The moral generalizes past this theorem. **Completeness is about an
+   average over one chosen state; soundness is about a maximum over all
+   states.** Averages are the natural home of concentration inequalities
+   and maxima are the natural home of spectral bounds, and reaching for
+   the wrong one is the standard way a quantum proof-system argument goes
+   wrong.
+
+   Worth knowing where the story ends up. Marriott and Watrous later
+   showed that $\mathsf{QMA}$ amplifies *without* asking Merlin for extra
+   copies at all, re-using a single witness register. That matters for
+   more than elegance: repetition-based amplification multiplies the
+   witness length by $k$, and witness length is the resource
+   $\mathsf{QMA}$'s definition is stingiest about.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -597,25 +755,26 @@ sub-verifications aren't automatically independent trials.
 - $\mathsf{QMA}$ is $\mathsf{NP}$'s quantum-verification analogue: YES
   instances have *some* poly-qubit witness accepted with probability
   $\geq 2/3$ (existential); NO instances have *every* possible witness
-  accepted with probability $\leq 1/3$ (universal) — the same care about
-  quantifier direction that $\mathsf{NP}$'s own definition demands.
+  accepted with probability $\leq 1/3$ (universal). Quantifier direction
+  matters exactly as much here as in $\mathsf{NP}$'s own definition.
 - The $2/3$-vs-$1/3$ gap amplifies to any constant via $k$ independent
-  witness copies and majority vote, but no-cloning forces Merlin to send
-  $k$ genuinely separate copies — unlike a classical $\mathsf{NP}$
-  certificate, reusable for free. The completeness side is a direct
-  classical Chernoff-Hoeffding argument; the soundness side needs a more
-  careful, cited argument to handle adversarial witnesses entangled across
-  all $k$ registers.
+  witness copies and majority vote, and no-cloning makes Merlin send $k$
+  separate copies, unlike a classical $\mathsf{NP}$ certificate,
+  which is reusable for free. The completeness side is a direct classical
+  Chernoff-Hoeffding argument; the soundness side needs a more careful,
+  cited argument to handle adversarial witnesses entangled across all $k$
+  registers. The $k$-fold witness cost belongs to this procedure, not to
+  $\mathsf{QMA}$: Marriott-Watrous gets the same gap from one copy.
 - $\mathsf{NP} \subseteq \mathsf{QMA}$ (a classical certificate is a
   computational-basis quantum witness) and $\mathsf{QMA} \subseteq
   \mathsf{PSPACE}$ (the $\mathsf{BQP}\subseteq\mathsf{PSPACE}$ path-sum
   argument, plus a space-efficient maximization over all candidate
   witnesses).
 - A quantum witness could plausibly exceed a classical one in power for
-  problems like the Local Hamiltonian problem, whose natural witness — a
-  many-body ground state — has no known compact classical description.
+  problems like the Local Hamiltonian problem, whose natural witness, a
+  many-body ground state, has no known compact classical description.
 
-## Further Exploration
+## QMA's Own Complete Problem
 
 <NextDiscovery>
   [The Local Hamiltonian Problem](/lessons/apex/quantum-complexity-theory/the-local-hamiltonian-problem)

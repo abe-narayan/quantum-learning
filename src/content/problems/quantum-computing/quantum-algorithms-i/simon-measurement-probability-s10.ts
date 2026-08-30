@@ -42,7 +42,7 @@ export const simonMeasurementProbabilityS10: NumericProblem = {
     value: probabilityOfZ01,
     tolerance: 0.01,
     incorrectFeedback:
-      "First check whether $z=01$ satisfies $z\\cdot s\\equiv0\\pmod2$ for $s=10$ — if it's orthogonal to $s$, the nonzero probability is spread uniformly over the $2^{n-1}$ orthogonal strings.",
+      "First check whether $z=01$ satisfies $z\\cdot s\\equiv0\\pmod2$ for $s=10$. If it is orthogonal to $s$, the nonzero probability is spread uniformly over the $2^{n-1}$ orthogonal strings.",
     nearMisses: [
       {
         value: 0.25,
@@ -53,8 +53,8 @@ export const simonMeasurementProbabilityS10: NumericProblem = {
     ],
   },
   hints: [
-    { text: "$z\\cdot s \\bmod 2$ for $z=01$, $s=10$: the bitwise AND is $00$, so the dot product is $0$ — $z=01$ is orthogonal to $s$." },
-    { text: "The orthogonal strings for $s=10$ are exactly $\\{00, 01\\}$ — two of the four possible $z$'s." },
+    { text: "$z\\cdot s \\bmod 2$ for $z=01$, $s=10$: the bitwise AND is $00$, so the dot product is $0$ and $z=01$ is orthogonal to $s$." },
+    { text: "The orthogonal strings for $s=10$ are $\\{00, 01\\}$: two of the four possible $z$'s." },
     { text: "Nonzero probability is spread uniformly over $2^{n-1}=2$ strings, so each gets probability $1/2$." },
   ],
   solution: {

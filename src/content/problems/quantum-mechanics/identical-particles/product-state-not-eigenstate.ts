@@ -29,7 +29,7 @@ export const productStateNotEigenstate: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "P₁₂|0⟩⊗|1⟩ = |1⟩⊗|0⟩, a completely different basis vector from |0⟩⊗|1⟩ — compute the norm of their difference.",
+    incorrectFeedback: "P₁₂|0⟩⊗|1⟩ = |1⟩⊗|0⟩, a different basis vector from |0⟩⊗|1⟩. Compute the norm of their difference.",
     nearMisses: [
       { value: 0, feedback: "Zero would mean the exchange left the state alone, making it an eigenstate. Swapping the two particles here produces a different basis vector entirely." },
       { value: 2, feedback: "2 is the squared distance. The norm takes the square root of the sum of squared components." },
@@ -46,8 +46,8 @@ export const productStateNotEigenstate: NumericProblem = {
     finalAnswer: "√2 ≈ 1.414",
   },
   explanation: {
-    correctIdea: "A nonzero distance directly confirms the product state is NOT an exchange eigenstate — exactly the lesson's central claim, checked numerically rather than just asserted.",
+    correctIdea: "A nonzero distance confirms the product state is NOT an exchange eigenstate, the lesson's central claim, checked numerically rather than asserted.",
     whyCorrect: "Matches exchangeParticles applied to tensorProduct(e0,e1) in the engine.",
-    whyWrong: ["A result of 0 here would mean the product state IS an eigenstate, contradicting the lesson's worked example — it would indicate either e0=e1 or a real bug."],
+    whyWrong: ["A result of 0 here would mean the product state IS an eigenstate, contradicting the lesson's worked example. It would indicate either e0=e1 or a real bug."],
   },
 };

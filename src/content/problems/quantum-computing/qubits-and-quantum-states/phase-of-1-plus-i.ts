@@ -46,9 +46,9 @@ export const phaseOf1PlusI: NumericProblem = {
   },
   explanation: {
     correctIdea: "The phase of a + bi is the angle its position vector makes with the positive real axis, computed via atan2(b, a), not simply b/a.",
-    whyCorrect: "Since a = b = 1 here, the point lies exactly on the diagonal, at 45° = π/4 radians — you can also verify $\\sqrt2\\, e^{i\\pi/4} = \\sqrt2(\\cos\\frac{\\pi}{4}+i\\sin\\frac{\\pi}{4}) = 1+i$ directly from Euler's formula.",
+    whyCorrect: "Since a = b = 1 here, the point lies exactly on the diagonal, at 45° = π/4 radians. You can check it from Euler's formula: $\\sqrt2\\, e^{i\\pi/4} = \\sqrt2(\\cos\\frac{\\pi}{4}+i\\sin\\frac{\\pi}{4}) = 1+i$.",
     whyWrong: [
-      "Using plain arctan(b/a) = arctan(1) without checking the quadrant happens to work here, but the same formula silently gives the wrong angle whenever the real part is negative — atan2 handles this correctly in general.",
+      "Using plain arctan(b/a) = arctan(1) without checking the quadrant happens to work here, but the same formula silently gives the wrong angle whenever the real part is negative. atan2 handles the quadrant for you.",
       "Reporting the modulus (√2 ≈ 1.41) instead of the phase confuses the two separate pieces of polar form.",
     ],
   },

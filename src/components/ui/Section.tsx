@@ -20,7 +20,7 @@ type Width = "reading" | "wide" | "full";
 
 const WIDTH_CLASSES: Record<Width, string> = {
   /** The measured column: long-form text, ~68 characters. */
-  reading: "mx-auto w-full max-w-[46rem]",
+  reading: "mx-auto w-full max-w-reading",
   /** The default page width — the same as `Container`. */
   wide: "",
   /** Edge to edge; the caller owns its own padding. */

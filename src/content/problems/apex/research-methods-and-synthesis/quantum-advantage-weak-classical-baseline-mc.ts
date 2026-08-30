@@ -19,19 +19,19 @@ export const quantumAdvantageWeakClassicalBaselineMc: MultipleChoiceProblem = {
     options: [
       {
         id: "a",
-        text: "The claim fails the checklist's baseline question: it was not benchmarked against the best known classical approach available at the time, so the quantum-advantage claim is not yet established against the actual state of the art -- the device should be compared against the faster, already-published classical algorithm before any advantage claim can stand.",
+        text: "It fails the checklist's baseline question: the device was never compared against the best classical algorithm at announcement time",
       },
       {
         id: "b",
-        text: "The claim is valid regardless, since any comparison against any real classical algorithm counts as establishing quantum advantage.",
+        text: "It passes the baseline question, since the newer classical algorithm appeared after the quantum runs were performed on the device",
       },
       {
         id: "c",
-        text: "The claim is meaningless and task Z must fall into one of the classical-simulability loopholes (Gottesman-Knill or bounded bond dimension), since a fast classical algorithm for it exists.",
+        text: "It fails question 4 instead: a fast classical algorithm existing means task Z must fall into a named simulability loophole after all",
       },
       {
         id: "d",
-        text: "The claim can only be evaluated once someone proves whether the polynomial hierarchy collapses, since that is the only thing that determines whether a quantum advantage claim is valid.",
+        text: "It fails question 3 instead: the classical-hardness argument for task Z rests on an assumption nobody has managed to prove yet",
       },
     ],
   },
@@ -39,23 +39,23 @@ export const quantumAdvantageWeakClassicalBaselineMc: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "The checklist's second question is specifically whether the comparison was against the *best known* classical approach, not merely *a* classical approach. A claim that ignores a faster, already-published classical algorithm has not established advantage over the actual state of the art, regardless of how it compares to some older or weaker baseline.",
-      c: "A faster classical algorithm existing doesn't automatically mean the task falls into one of the two named structural loopholes -- it could also just mean the field's best known classical algorithm for this specific task has genuinely improved, which is a question about the state of the art (question 2), not necessarily about the task's underlying structure (question 4). The two questions are related but not identical.",
-      d: "The polynomial-hierarchy assumption is relevant to question 3 (what does the classical-hardness argument rest on), but it doesn't resolve question 2 at all -- a claim can be comparing against a weak baseline regardless of what complexity-theoretic assumption underlies classical hardness in general.",
+      b: "The scenario puts the faster classical algorithm in print before the announcement, so it was available to the people making the claim. The checklist asks about the best known approach at the time of the claim, not at the time of the first run.",
+      c: "Question 4 asks about structure inside the task, such as a stabilizer circuit or a bounded bond dimension. A better classical algorithm turning up is a fact about the state of the art, which is question 2's territory.",
+      d: "Question 3 asks what a hardness argument rests on, and it applies whatever baseline was used. The problem here sits upstream of that: the comparison itself was run against the wrong algorithm.",
     },
     defaultIncorrectFeedback:
-      "Work through the checklist in order. Which specific question asks whether the classical comparison used the actual best known classical approach, rather than any classical approach?",
+      "Work through the checklist in order and find the question that asks whether the classical comparison used the actual best known classical approach, rather than merely some classical approach.",
   },
   hints: [
-    { text: "The checklist's second question is not just 'was there a classical comparison' -- it's specifically whether that comparison used the best known classical approach at the time." },
-    { text: "A faster, already-published classical algorithm existing at the time of the announcement is exactly the situation question 2 is designed to catch." },
+    { text: "The checklist's second question is not just 'was there a classical comparison'. It asks whether that comparison used the best known classical approach at the time." },
+    { text: "A faster, already-published classical algorithm existing at the time of the announcement is the situation question 2 is designed to catch." },
     { text: "This is a question about which classical baseline was used for comparison, not about the task's structural simulability (question 4) or the assumption behind classical hardness (question 3)." },
   ],
   solution: {
     steps: [
       { description: "The checklist's second question asks specifically whether the classical comparison used the best known classical approach at the time, not merely some classical algorithm." },
       { description: "Here, a faster classical algorithm was already published before the announcement, so the comparison used a weaker baseline than the actual state of the art." },
-      { description: "This means the advantage claim, as reported, has not established anything relative to the real best-known classical approach -- the correct next step is to re-run the comparison against the faster algorithm before accepting or rejecting the claim." },
+      { description: "This means the advantage claim, as reported, has not established anything relative to the best known classical approach. The next step is to re-run the comparison against the faster algorithm before accepting or rejecting the claim." },
     ],
     finalAnswer: "The claim fails the checklist's baseline question: it was never benchmarked against the best known classical algorithm available at the time.",
   },
@@ -65,9 +65,9 @@ export const quantumAdvantageWeakClassicalBaselineMc: MultipleChoiceProblem = {
     whyCorrect:
       "Naming the violated checklist question (the baseline question) and the remedy that follows from it, comparing against the best known classical algorithm before drawing any conclusion, is the whole move the checklist asks for.",
     whyWrong: [
-      { optionId: "b", text: "Treats 'compared against some classical algorithm' as sufficient, collapsing the distinction between a weak baseline and the state of the art." },
-      { optionId: "c", text: "Jumps to a structural conclusion the scenario does not warrant. The comparison being outdated says nothing about the task falling into one of the two named simulability loopholes." },
-      { optionId: "d", text: "Conflates question 3's complexity-theoretic assumption with question 2's baseline-quality question. They are independent parts of the checklist." },
+      { optionId: "b", text: "Moves the goalposts to when the runs happened. The faster algorithm was already published when the claim was made, which is the moment the checklist asks about." },
+      { optionId: "c", text: "Jumps to a structural conclusion the scenario does not support. A better classical algorithm says something about the state of the art, not about the task falling into a named simulability loophole." },
+      { optionId: "d", text: "Reaches for the right checklist question at the wrong moment. Whatever the hardness argument assumes, this claim was already compared against a baseline that had been superseded." },
     ],
   },
 };

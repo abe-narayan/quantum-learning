@@ -115,4 +115,30 @@ export type ProblemMath = {
   /** Hint text, in authored (ladder) order. */
   hints: MathRuns[];
   solution: SolutionMath;
+  /**
+   * Grading feedback, keyed by the **authored string itself**, and holding
+   * only the strings that actually carry a `$…$` run.
+   *
+   * Keyed by the string rather than by an id or an index because the string is
+   * the only identity a `ValidationResult` has: it is `{ status, message }`
+   * and nothing else, and `Feedback` is handed the result, not the branch of
+   * the validator that produced it. Threading an id out of three validators
+   * (a near miss, an option-feedback entry, a concept group's
+   * `missingFeedback`) would put a synthetic key on every authored feedback
+   * field in 556 content files to answer a question the text already answers.
+   * The string key is also self-deduplicating: two options sharing a sentence
+   * share one entry.
+   *
+   * Sparse on purpose. Roughly 62 of the corpus's ~2,135 authored feedback
+   * strings contain math, so most problems contribute an empty object and
+   * pay nothing; the rest of the corpus renders as plain text through the
+   * fallback below, byte for byte as it always did.
+   *
+   * A lookup miss is normal and must stay renderable: `validateNumeric`'s
+   * unparseable-submission messages, `validateConceptual`'s framing and
+   * predication feedback, and the "select an option first" guards are all
+   * composed at runtime and can never appear in a build-time map. `Feedback`
+   * falls back to the plain string for those.
+   */
+  feedback: Record<string, MathRuns>;
 };

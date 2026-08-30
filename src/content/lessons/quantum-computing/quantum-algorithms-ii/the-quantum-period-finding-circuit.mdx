@@ -42,11 +42,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
-Order-finding needs the period of the function f(x)=aˣ mod N, and periods are exactly what the QFT is built to extract from a phase pattern. This lesson connects the two.
+<LessonHook eyebrow="The circuit does not output the period">
+Run the period-finding circuit and the counting register does not hand you r. It lands on one of r evenly spaced peaks, picked at random, and turning that single number back into r is a classical problem the quantum part never touches.
 </LessonHook>
 
-## Motivation
+## Two pieces that fit like a key in a lock
 
 Two pieces are already in hand. The last lesson reduced factoring to
 finding the period of $f(x)=a^x\bmod N$, and Quantum Algorithms I built a
@@ -57,7 +57,7 @@ Shor found the reduction *because* he knew what the QFT could do. Build the
 right state, transform the counting register, and read the period off the
 positions where the amplitude concentrates.
 
-## Mathematical Development
+## The state, the transform, and where the peaks land
 
 ### The period-finding state
 
@@ -91,7 +91,7 @@ the algorithm turns on.
 *(Shown with four counting qubits for legibility; the worked examples below
 use $t=6$.)*
 
-This schematic shows the *shape* of that circuit, not a running one: each
+This schematic shows the *shape* of that circuit rather than a running one: each
 counting qubit $q$ starts with an $H$, then controls one
 $U_a^{2^{t-1-q}}$ box that conditionally multiplies the target register
 by a power of $a$, exactly mirroring phase estimation's controlled-$U^{2^k}$
@@ -112,16 +112,11 @@ function's Fourier transform is itself concentrated at multiples of the
 reciprocal period. `quantumFourierTransformOnQubits` (a QFT restricted to
 an explicit list of qubits, rather than an entire register) applies the
 QFT to just the counting register, leaving the second register alone,
-exactly what the real circuit's QFT step does.
+which is what the real circuit's QFT step does.
 
-### Checked, not just claimed
-
-For $a=7$, $N=15$ (order $r=4$, from the last lesson) with $t=6$ counting
-qubits, `periodFindingMeasurementDistribution` gives probability exactly
-$0.25$ at outcomes $0,16,32,48$, precisely the multiples of
-$2^6/4=16$, and numerically zero everywhere else. Sampling every fourth
-outcome from the real distribution shows it: four sharp peaks against a
-flat floor of zeros, not a smoothly decaying curve.
+That rule, "amplitude concentrates at multiples of $2^t/r$," is enough to
+say where the peaks land before running anything. Take the case the rest
+of this lesson uses and work it out.
 
 <PredictBeforeReveal
   question="For a=7, N=15 (order r=4), with t=6 counting qubits (so 2^t=64 possible outcomes), where should the measurement probability peak after applying the QFT?"
@@ -135,13 +130,22 @@ flat floor of zeros, not a smoothly decaying curve.
   explanation="A period-r function's QFT concentrates amplitude at multiples of 2^t/r. Here r=4 and 2^t=64, so 64/4=16, and the peaks land at outcomes 0, 16, 32, 48, each with probability 1/r=0.25. That is what the engine computes below: four sharp peaks against a floor of exact zeros, not a smoothly decaying spread. Note that the peak spacing carries r, not the peak heights, which is why one measurement plus arithmetic suffices."
 />
 
+### Checked against the engine
+
+For $a=7$, $N=15$ (order $r=4$, from the last lesson) with $t=6$ counting
+qubits, `periodFindingMeasurementDistribution` gives probability exactly
+$0.25$ at outcomes $0,16,32,48$, the multiples of
+$2^6/4=16$, and numerically zero everywhere else. Sampling every fourth
+outcome from the real distribution shows it: four sharp peaks standing on
+a flat floor of zeros, with nothing decaying away between them.
+
 <BarChart
   bars={Array.from({ length: 16 }, (_, i) => ({ label: String(i * 4), value: periodDistribution[i * 4], highlight: periodDistribution[i * 4] > 0 }))}
   maxValue={0.5}
   ariaLabel="Measurement probability at every fourth outcome of the period-finding distribution for a=7, N=15, t=6 counting qubits"
 />
 
-<InteractiveSection title="Peak count tracks the order r" description="Slide through every base a coprime to 15. The peak count and spacing change with r=classicalOrder(a,15): a=4, a=11, and a=14 all have order r=2, so probability concentrates into exactly 2 peaks (0 and 32) at 1/2 each; a=2, a=7, a=8, and a=13 all have order r=4, giving 4 peaks at 1/4 each, exactly the 'splits evenly across r peaks' claim above, now checked for six different bases, not just a=7.">
+<InteractiveSection title="Peak count tracks the order r" description="Slide through every base a coprime to 15 (a=1 excluded as trivial). The peak count and spacing change with r=classicalOrder(a,15): a=4, a=11, and a=14 all have order r=2, so probability concentrates into exactly 2 peaks (0 and 32) at 1/2 each; a=2, a=7, a=8, and a=13 all have order r=4, giving 4 peaks at 1/4 each, exactly the 'splits evenly across r peaks' claim above, now checked for seven different bases, not just a=7.">
   <BarChartExplorer
     frames={periodFrames}
     sliderLabel="base a (coprime to 15)"
@@ -154,13 +158,13 @@ Measuring this
 distribution and dividing the observed outcome by $2^t$ gives a fraction
 very close to $k/r$ for some integer $k$; a classical algorithm called the
 **continued fractions algorithm** recovers $r$ from that fraction exactly.
-This platform does not implement continued fractions (a well-understood,
-purely classical algorithm, not a quantum one). The worked example next
+This platform does not implement continued fractions, which is a
+well-understood and entirely classical algorithm. The worked example next
 lesson identifies $r$ directly from the observed peak locations instead,
 which is sufficient to demonstrate the mechanism honestly without
 reimplementing a standard classical number-theory routine.
 
-## Physical Interpretation
+## Periodicity is the structure being exploited
 
 Nothing new happens physically beyond what phase estimation established.
 Modular exponentiation supplies a *periodic* function rather than an
@@ -172,7 +176,7 @@ problems do not. Factoring has a period hiding in it, and the QFT is a
 period detector. Take away the periodicity and the algorithm has nothing to
 grip.
 
-## Worked Example
+## Predicting the peaks before computing them
 
 **Predict, before computing, where `periodFindingMeasurementDistribution(7,
 15, 6)`'s probability peaks should occur.**
@@ -184,19 +188,19 @@ across exactly $r$ peaks by the symmetry of a period-$r$ function's
 Fourier transform). This is exactly what the engine computes, not
 approximately, to six decimal places.
 
-## Common Mistakes
+## What this engine builds directly, and why
 
 <Callout type="note">
 **Assuming this platform runs a literal controlled-modular-multiplication
 circuit.** It doesn't. `periodFindingState` constructs the *exact output*
-of such a circuit directly from its closed-form amplitudes, an explicit
-and documented scope choice, not a hidden shortcut.
+of such a circuit directly from its closed-form amplitudes. That is an
+explicit, documented scope choice, and it is written down as one.
 </Callout>
 
 <Callout type="warning">
 **Expecting exactly one sharp peak.** A periodic function with period $r$
-concentrates its amplitude near multiples of $2^t/r$, not into one single
-outcome. Order finding needs at least one of them, and the
+spreads its amplitude across every multiple of $2^t/r$, and there are $r$
+of those. Order finding needs at least one of them, and the
 continued-fractions post-processing step (not implemented here) is what
 turns "a peak location" into "the actual value of $r$" reliably. When
 $2^t$ happens to be an exact multiple of $r$ (as in this lesson's $a=7$
@@ -207,7 +211,7 @@ exactly on $r$ of them, still usable by continued fractions, but not the
 clean picture the sharp case suggests.
 </Callout>
 
-<InteractiveSection title="Find the smear yourself" description="Every example above uses N=15, where 2^t/r always happens to come out to a whole number, so the peaks are always perfectly sharp. Switch N to 21 below and try different bases a (and different counting-qubit counts t) until 2^t/r is NOT a whole number, for instance a=2 with t=6 gives r=6 and 2^6/6=64/6≈10.67, a non-integer spacing. Watch the single sharp peaks from the N=15 case turn into clusters of nearby outcomes sharing the probability instead, the 'smear across roughly 2r nearby outcomes' this callout just described, not merely asserted.">
+<InteractiveSection title="Find the smear yourself" description="Every example above uses N=15, where 2ᵗ/r always happens to come out to a whole number, so the peaks are always perfectly sharp. Switch N to 21 below and try different bases a (and different counting-qubit counts t) until 2ᵗ/r is NOT a whole number: a=2 with t=6 gives r=6 and 2⁶/6 = 64/6 ≈ 10.67, a non-integer spacing. Watch the single sharp peaks from the N=15 case turn into clusters of nearby outcomes sharing the probability instead, the 'smear across roughly 2r nearby outcomes' this callout just described, not merely asserted.">
   <LazyPeriodFindingExplorer />
 </InteractiveSection>
 
@@ -216,17 +220,170 @@ clean picture the sharp case suggests.
 1. For $a=4,N=15$ (order $r=2$, check this by direct computation),
    predict where `periodFindingMeasurementDistribution`'s peaks occur
    using $t=6$ counting qubits, and confirm $2^t/r$ is a whole number
-   first.
+   first. Then say what changes about the prediction when $2^t/r$ is
+   *not* a whole number, and name an $(a,N)$ pair from this course where
+   it isn't.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Check the order first: $4^1=4$ and $4^2=16\equiv1\pmod{15}$, so $r=2$,
+   which `classicalOrder(4,15)` confirms. Then $2^t/r = 64/2 = 32$, a whole
+   number, so the clean rule applies and the peaks land at multiples of
+   $32$ below $64$: outcomes $0$ and $32$, each with probability
+   $1/r = 0.5$. The engine returns exactly $0.5$ at $0$ and at $32$, with
+   only two nonzero outcomes in the whole distribution.
+
+   When $2^t/r$ is not a whole number the peaks cannot sit on exact
+   multiples, because those multiples are not integers and the measurement
+   outcome is. What happens instead is that amplitude concentrates at the
+   *nearest integers* to $k\cdot2^t/r$, and the rest leaks into a
+   surrounding spread rather than being exactly zero.
+
+   The course's own example is $a=2$, $N=21$, where $r=6$ and
+   $2^6/6 = 10.667$. The engine's distribution has all $64$ outcomes
+   nonzero, but the six largest sit at $0, 11, 21, 32, 43, 53$, which are
+   precisely the nearest integers to $0, 10.67, 21.33, 32, 42.67, 53.33$.
+   Their probabilities are $0.167$ at $0$ and $32$ (where the multiple is
+   exact) and $0.114$ at the four rounded ones, totalling about $79\%$;
+   the remaining $21\%$ is spread thinly over the other $58$ outcomes.
+
+   That contrast is the honest picture of the algorithm. The exact-peak
+   case is a coincidence of toy examples where $r$ happens to divide
+   $2^t$, and no real factoring run enjoys it, since $r$ is unknown and
+   generically shares no factor with $2^t$. The wrong turn is generalizing
+   from $N=15$ and expecting exactly $r$ nonzero outcomes always; the
+   general guarantee is a concentration bound, and it is what makes
+   continued fractions necessary rather than optional.
+
+   </details>
+
 2. Explain why the total probability across all peaks must sum to
    exactly $1$, and why (for this platform's exactly-periodic toy
-   examples) it splits evenly across exactly $r$ of them.
+   examples) it splits evenly across exactly $r$ of them. Then say which
+   of those two facts survives when $2^t/r$ is not an integer.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The total is $1$ because the distribution is the Born-rule
+   distribution of a normalized state, and every gate that produced it,
+   the Hadamards, the modular-exponentiation state preparation, and the
+   QFT, is unitary. Unitaries preserve the norm, so the squared amplitudes
+   still sum to $1$ no matter what the interference did with them. The
+   engine confirms $1.000000000$ for every case tested, including the
+   messy $N=21$ one.
+
+   The even split has a different source. When $r$ divides $2^t$, the sum
+   over $x$ of $e^{2\pi i x k/ (2^t)}$ within each residue class is a
+   complete geometric series: it vanishes exactly unless the outcome is a
+   multiple of $2^t/r$, and where it does not vanish, every surviving
+   outcome gets the same magnitude by symmetry, since the residue classes
+   are all the same size. So the probability is $1/r$ on each of $r$
+   outcomes, and exactly zero elsewhere. For $a=7,N=15$ that is $0.25$
+   four times; for $a=4,N=15$ it is $0.5$ twice.
+
+   Of the two facts, only the first survives. Normalization is a theorem
+   about unitarity and holds for every $(a,N,t)$. The even split over
+   exactly $r$ outcomes is a special property of the divisible case, and
+   at $a=2,N=21$ the engine shows it failing in both respects at once:
+   more than $r$ nonzero outcomes ($64$ of them), and unequal peak heights
+   ($0.167$ against $0.114$).
+
+   The wrong turn is treating "probabilities sum to one" as evidence the
+   peak structure is right. It is evidence of nothing beyond the code
+   being unitary; a completely uniform distribution over all $64$ outcomes
+   would also sum to $1$ and would carry no information about $r$ at all.
+   The two claims have to be checked separately, which is why the lesson
+   states them separately.
+
+   </details>
+
 3. What specifically would need to be built for this platform to run
    period-finding on an $N$ too large for brute-force
    `classicalOrder` to check answers against?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Two things, and they are different in kind.
+
+   First, the **controlled modular-exponentiation circuit**. This platform
+   writes the period-finding state directly from its closed-form
+   amplitudes, placing $1/\sqrt{2^t}$ at index $(x,\ a^x\bmod N)$. That is
+   exactly the state a real circuit outputs, and producing it this way
+   requires computing $a^x\bmod N$ classically for every $x$, which is
+   $2^t$ classical modular exponentiations. Fine for a toy, and the very
+   thing a real machine must not do. The replacement is a gate-level
+   quantum-arithmetic subroutine: reversible modular multipliers, each
+   controlled on one counting qubit, multiplying the target register by
+   $a^{2^{t-1-q}}\bmod N$. That is substantial engineering, and the lesson
+   is explicit that it is scoped out.
+
+   Second, **continued fractions**. Without `classicalOrder` to check
+   against, the measured outcome $x$ has to be turned into $r$ on its own,
+   and the reduced fraction of $x/2^t$ is not reliably $1/r$: the
+   factoring-15 example's $x=32$ reduces to $1/2$ and undersells the true
+   $r=4$. The continued-fraction expansion of $x/2^t$ finds the best
+   rational approximation with denominator below $N$, which is provably
+   $k/r$, and a few repetitions plus a least-common-multiple step recovers
+   $r$ itself.
+
+   Neither is a limitation of the physics, and that is the point worth
+   drawing. The interference mechanism, the part that is genuinely
+   quantum, is fully built and fully verified here. What is missing is a
+   piece of reversible arithmetic and a piece of classical number theory,
+   both entirely conventional, and both large enough that building them
+   badly would teach less than saying plainly that they are not built.
+
+   The wrong turn is to assume the missing piece is somehow the quantum
+   part, or that simulating it would show something new about
+   interference. It would not: the state is identical either way, which is
+   exactly why building it directly is an honest shortcut rather than a
+   fudge.
+
+   </details>
+
 4. Why is choosing $t$ larger than $\log_2N$ (rather than exactly
    $\log_2N$) generally necessary for reliable period recovery in a real
    implementation? (You don't need the full continued-fractions argument,
    just the resolution intuition from phase estimation.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the counting register has to resolve $1/r$ finely enough to
+   tell it from its neighbours, and $r$ can be almost as large as $N$.
+   Phase estimation with $t$ qubits divides the unit interval into $2^t$
+   bins of width $2^{-t}$, and the measured $x/2^t$ is an approximation of
+   $k/r$ to within about one bin. To recover $r$ from that approximation
+   you need the bins narrower than the gap between neighbouring fractions
+   with denominators up to $N$, and two such fractions can be as close as
+   $1/N^2$. That forces $2^{-t}<1/N^2$, so $t \gtrsim 2\log_2 N$: roughly
+   double, not equal.
+
+   The engine's $a=2,N=21$ run shows the pressure at small scale. With
+   $t=6$, $2^t/r = 10.667$ is not an integer, so the peaks are smeared
+   over neighbouring outcomes and only about $79\%$ of the probability
+   sits on the six main ones. More counting qubits narrow the bins,
+   sharpen each peak, and push more probability into it, which is what
+   makes a single shot reliable rather than merely suggestive.
+
+   The comparison with the toy cases is the useful part. At $a=7,N=15$
+   with $t=6$, $r=4$ divides $64$ exactly, so the peaks are perfect and
+   $t=6$ looks generous. That is a coincidence of a small $r$ dividing a
+   power of two. In a real run $r$ is unknown, generically shares no
+   factor with $2^t$, and the exactness disappears, so the extra qubits
+   are buying the resolution the toy example got for free.
+
+   The wrong turn is reasoning that $t=\log_2N$ suffices because the
+   answer $r$ is smaller than $N$ and so "fits" in that many bits. Fitting
+   is not the constraint; distinguishing is. The measured value is
+   $k/r$ for an unknown $k$, and telling $k/r$ apart from every other
+   fraction with denominator under $N$ takes about twice as many bits as
+   writing $r$ down.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -242,14 +399,14 @@ clean picture the sharp case suggests.
   fractions algorithm, also not implemented here: an honestly scoped
   limitation, not a hidden gap.
 
-## Further Exploration
+## The complete pipeline, end to end
 
 <NextDiscovery>
 Up next, [Worked Example: Factoring 15](/lessons/quantum-computing/quantum-algorithms-ii/worked-example-factoring-15) runs the complete pipeline,
 period finding, the classical reduction, and gcd, on the smallest number
-that actually demonstrates Shor's algorithm end to end.
+that demonstrates Shor's algorithm end to end.
 
-Later, in the Quantum Mastery pillar, [Hamiltonian Simulation and
+Later, in the Quantum Mastery track, [Hamiltonian Simulation and
 Trotterization](/lessons/quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization)
 picks up this lesson's controlled-$U^{2^k}$-style structure and derives
 a genuine, verified error bound for simulating time evolution under a

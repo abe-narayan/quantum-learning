@@ -20,28 +20,40 @@ export const pennylaneFitsWhichStep: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["step 3", "deciding the next", "computing the cost", "gradient"],
-      ["differentiable", "gradient computation", "ergonomic"],
+      {
+        phrases: ["step 3", "step three", "deciding the next", "choosing the next parameters", "computing the cost", "the optimizer step"],
+        missingFeedback:
+          "The hybrid loop has four steps. Name the one this library's design is aimed at, and say what happens in it.",
+      },
+      {
+        phrases: ["differentiable", "gradient computation", "ergonomic"],
+        missingFeedback:
+          "You have the step. Now say what the library provides that makes that step easier, and why that particular capability is what the step needs.",
+      },
     ],
-    incorrectFeedback: "Identify the SPECIFIC step number/description from this lesson's four-step loop, and connect it to PennyLane's gradient-computation strength.",
-    partialFeedback: "Good — now be explicit about WHY gradients matter specifically for that step (deciding the next parameters).",
+    incorrectFeedback: "Name the stage of the lesson's four-part loop that the library is aimed at, by number or by description, then say what makes it the right target. The library's selling point is a derivative, so the answer has to say whose derivative, with respect to what, and why that stage is the one that wants it.",
+    partialFeedback: "Good. Now say why a derivative matters at that stage in particular: what is being chosen there, and what would you do without one?",
+    modelAnswers: [
+      "It targets step 3 of the hybrid loop, deciding the next parameters. That step needs the gradient of the cost function, and PennyLane's differentiable programming design makes gradient computation ergonomic rather than something you hand-roll.",
+      "The optimizer step is the one it makes easy, choosing the next parameters, because it treats the circuit as differentiable so the gradient comes for free.",
+    ],
   },
   hints: [
-    { text: "The loop's step 3 is: compute the cost function, then decide the next parameters to try." },
-    { text: "Gradient-based optimization (deciding parameters efficiently) needs the derivative of the cost function with respect to each parameter." },
-    { text: "PennyLane's differentiable-programming design makes computing this gradient ergonomic." },
+    { text: "The loop's third stage is: evaluate the cost function, then choose the next parameters to try." },
+    { text: "Choosing the next parameters efficiently needs the derivative of the cost with respect to each one." },
+    { text: "Ask what PennyLane's design is built around, and which stage of the loop that serves." },
   ],
   solution: {
     steps: [
       { description: "The general loop's step 3 is: compute the cost function from measurement results, then decide the next parameters to try (often via gradient-based optimization)." },
-      { description: "Gradient-based optimization needs the derivative of the cost function with respect to each ansatz parameter — a genuinely nontrivial computation for a quantum circuit's output." },
-      { description: "PennyLane's differentiable-programming design is specifically built to make this gradient computation ergonomic, which is exactly why Quantum SDKs Overview highlighted it for VQE-style algorithms." },
+      { description: "Gradient-based optimization needs the derivative of the cost function with respect to each ansatz parameter, a nontrivial computation for a quantum circuit's output." },
+      { description: "PennyLane's differentiable-programming design is built to make this gradient computation ergonomic, which is why Quantum SDKs Overview highlighted it for VQE-style algorithms." },
     ],
     finalAnswer: "PennyLane targets step 3 (deciding the next parameters) specifically by making gradient computation of the cost function ergonomic.",
   },
   explanation: {
-    correctIdea: "This connects two separate lessons (Quantum SDKs Overview's PennyLane discussion and this lesson's four-step loop) into one precise, specific claim rather than a vague 'PennyLane is good for VQE.'",
-    whyCorrect: "Matches both lessons' explicit content directly.",
-    whyWrong: ["A vague answer ('PennyLane helps with VQE') without identifying the SPECIFIC step and mechanism (gradients for parameter updates) misses the precision this question asks for."],
+    correctIdea: "This connects two lessons, Quantum SDKs Overview's PennyLane discussion and this lesson's four-step loop, into one specific claim rather than a vague 'PennyLane is good for VQE'.",
+    whyCorrect: "The loop's third step chooses the next parameters, and choosing them well means differentiating the cost with respect to each one. Treating a circuit as a differentiable function makes that derivative fall out of the same machinery that evaluates it, rather than out of hand-written finite differences.",
+    whyWrong: ["A vague answer such as 'PennyLane helps with VQE', without identifying the specific step and the mechanism of gradients for parameter updates, misses the precision this question asks for."],
   },
 };

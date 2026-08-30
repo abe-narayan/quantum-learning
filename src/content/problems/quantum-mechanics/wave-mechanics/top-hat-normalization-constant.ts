@@ -15,7 +15,7 @@ export const topHatNormalizationConstant: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "A particle's wavefunction is psi(x) = A for 0 <= x <= 8, and 0 elsewhere. Find A (take A real and positive).",
-    inputHint: "a decimal",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -28,8 +28,9 @@ export const topHatNormalizationConstant: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Normalization requires integral of |psi(x)|^2 dx = 1 over the region where psi is nonzero." },
-    { text: "Here that's |A|^2 times the interval's length, set equal to 1." },
+    { text: "Normalization is a statement about total probability, which is the area under the squared modulus rather than under psi itself." },
+    { text: "Set the integral of the squared modulus over the region where psi is nonzero equal to 1. With psi constant, that integral is a single multiplication." },
+    { text: "What that gives you is A squared. If your answer came out as 0.125, the root is still outstanding." },
   ],
   solution: {
     steps: [
@@ -41,6 +42,6 @@ export const topHatNormalizationConstant: NumericProblem = {
   explanation: {
     correctIdea: "Normalization fixes the overall scale of a wavefunction by requiring total probability to equal 1.",
     whyCorrect: "$A=1/\\sqrt{L}$ makes $\\int_0^L|A|^2dx=1$ exactly, for any interval length $L$.",
-    whyWrong: ["Forgetting to take the square root (using $A=1/L$ instead of $1/\\sqrt L$) is the most common slip — normalization involves $|A|^2$, not $A$."],
+    whyWrong: ["Forgetting to take the square root (using $A=1/L$ instead of $1/\\sqrt L$) is the most common slip: normalization involves $|A|^2$, not $A$."],
   },
 };

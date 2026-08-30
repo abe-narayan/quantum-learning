@@ -30,8 +30,9 @@ export const classicalSumComparison: NumericProblem = {
     ],
   },
   hints: [
-    { text: "|ψ1|² = 0.3² = 0.09." },
-    { text: "|ψ2|² = 0.3² = 0.09 as well. The phase doesn't affect an individual amplitude's own magnitude." },
+    { text: "The word \"classical\" is carrying the whole question: ordinary probability theory adds the chances of the two paths and has nowhere to put a relative phase." },
+    { text: "Convert each amplitude into the probability its own path would carry alone, then add those two numbers. No cross term appears anywhere." },
+    { text: "A magnitude is unchanged by the phase factor attached to it, so both paths contribute equally. Square each one before adding, not after." },
   ],
   solution: {
     steps: [

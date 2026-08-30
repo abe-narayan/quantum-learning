@@ -48,13 +48,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="One label cannot address a state">
   Hydrogen's energy cannot tell two different orbital shapes apart; they
   share the same <Term id="eigenvalue-eigenvector">eigenvalue</Term>. Labeling a real quantum state takes more
   than one <Term id="observable">observable</Term>.
 </LessonHook>
 
-## Motivation
+## When one eigenvalue names two states
 
 The very first worked example of this course used $N=\mathrm{diag}(1,1,2)$,
 an operator whose eigenvalue $1$ doesn't tell you which of two
@@ -65,14 +65,14 @@ observable that commutes with $N$ (so it's simultaneously measurable,
 last lesson's theorem) and takes *different* values on the degenerate
 eigenvectors.
 
-## Intuition
+## Which shelf, and which position on it
 
 Think of $N$'s eigenvalue as a coarse label, "which shelf," and a
 second, compatible observable as a finer label, "which position on the
 shelf." Together, the two labels uniquely address every state, even
 though neither one alone does the job.
 
-## Mathematical Development
+## Resolving a degeneracy, and what completeness means
 
 ### Resolving a degeneracy
 
@@ -98,11 +98,13 @@ $(N,M)$ now uniquely labels every basis state:
 | $\lvert1\rangle$ | 1 | $-5$ |
 | $\lvert2\rangle$ | 2 | 7 |
 
-No single column has three different entries. $N$ alone can't
-distinguish $|0\rangle$ from $|1\rangle$, and (in this particular example)
-$M$ alone happens to distinguish everything on its own. What generalizes
+Read the rows, not the columns: no two rows carry the same pair, which is
+what "uniquely labels" means. The $N$ column on its own repeats, so $N$
+cannot tell $|0\rangle$ from $|1\rangle$. The $M$ column happens not to
+repeat, which makes $M$ alone sufficient here, but that is an accident of
+a three-dimensional toy example and nothing to build on. What generalizes
 is the *pair* $(N,M)$ working as a joint label, because in real physical
-systems there is often no single observable that suffices by itself.
+systems there is usually no single observable that suffices by itself.
 
 ### What "complete" means
 
@@ -115,7 +117,7 @@ pairwise, so the last lesson guarantees a shared eigenbasis exists for
 the whole set at once), and together they leave no degeneracy
 unresolved.
 
-## Physical Interpretation
+## Where quantum numbers come from
 
 This is the structure behind labeling real quantum states with
 multiple **quantum numbers**. A preview, not derived here: the hydrogen
@@ -136,7 +138,7 @@ idea.
   license="Public domain"
 />
 
-## Worked Example
+## Confirming two observables commute by hand
 
 **Confirm $[N,M]=0$ for the $N,M$ above by direct matrix multiplication.**
 
@@ -163,9 +165,9 @@ care about order.
 
 ### A non-diagonal partner, worked in full
 
-Every $M$ so far has been diagonal in the same basis as $N$. That is
-convenient, but it is not required, and seeing why sharpens what
-$[N,M]=0$ demands. Consider
+Every $M$ so far has been diagonal in the same basis as $N$, which is
+what made $[N,M]=0$ automatic. Whether being diagonal was doing the real
+work is a separate question. Consider
 
 $$
 \tilde M = \begin{pmatrix}0&5&0\\5&0&0\\0&0&7\end{pmatrix}
@@ -177,12 +179,12 @@ $|1\rangle$.
 <PredictBeforeReveal
   question="N = diag(1,1,2) is diagonal and M̃ is not. Does [N, M̃] = 0 still hold?"
   options={[
+    { label: "Yes: M̃ mixes only within N's degenerate eigenspace", value: "block" },
     { label: "No: a non-diagonal matrix can never commute with a diagonal one", value: "never" },
-    { label: "Yes, because M̃ only mixes states inside N's degenerate eigenspace", value: "block" },
     { label: "Only in the limit where the off-diagonal entries are small", value: "limit" },
   ]}
   correctValue="block"
-  explanation="Entry by entry, (NM̃ − M̃N)ᵢⱼ = (nᵢ − nⱼ)M̃ᵢⱼ, so a commuting M̃ may have a nonzero entry wherever nᵢ = nⱼ. The only off-diagonal entries M̃ uses sit in the |0⟩,|1⟩ block, where N's eigenvalues are equal (both 1), so every term (nᵢ − nⱼ)M̃ᵢⱼ vanishes. Non-diagonal freedom lives inside degenerate eigenspaces, and only there: if N's three eigenvalues were all distinct, commuting would force M̃ to be diagonal."
+  explanation="It holds. The identity worked out just below, (NM̃ − M̃N)ᵢⱼ = (nᵢ − nⱼ)M̃ᵢⱼ, says a commuting M̃ may carry a nonzero entry wherever nᵢ = nⱼ. The only off-diagonal entries M̃ uses sit in the |0⟩,|1⟩ block, where N's eigenvalues are both 1, so those terms vanish. Non-diagonal freedom lives inside degenerate eigenspaces and nowhere else: were N's three eigenvalues all distinct, commuting would force M̃ to be diagonal."
 />
 
 **Confirm it by direct multiplication.** $N\tilde M$ scales the *rows*
@@ -197,6 +199,20 @@ The two off-diagonal $5$s sit in rows and columns where $N$'s
 eigenvalue is the same ($1$ and $1$), so scaling rows or columns makes
 no difference there, and the corner entry picks up the factor $2$
 either way. So $[N,\tilde M]=0$.
+
+That row-versus-column reading is worth stating once as a formula, since
+it settles every such question at a glance. For any diagonal
+$N=\mathrm{diag}(n_1,\ldots,n_d)$ and any matrix $M$, left-multiplying
+scales row $i$ by $n_i$ and right-multiplying scales column $j$ by $n_j$,
+so
+
+$$
+(NM-MN)_{ij} = (n_i - n_j)\,M_{ij}
+$$
+
+entry by entry. Commuting with $N$ therefore permits $M_{ij}\neq0$
+exactly where $n_i=n_j$: on the diagonal always, and off it only inside a
+degenerate block. $\tilde M$ uses that allowance and nothing more.
 
 **Does $\tilde M$ resolve the degeneracy?** Its upper block is
 $5\sigma_x$, with eigenvectors and eigenvalues
@@ -220,9 +236,9 @@ $\{|+\rangle,|-\rangle,|2\rangle\}$ rather than
 $\{|0\rangle,|1\rangle,|2\rangle\}$. Both are eigenbases of $N$
 (any basis of a degenerate eigenspace is), and the second observable is
 what picks one out. That is the CSCO idea in its full form: the set does
-not merely label a basis you already had, it *determines* the basis.
+not merely label a basis you already had; it *determines* the basis.
 
-## Common Mistakes
+## A compatible observable that resolves nothing
 
 <Callout type="warning">
 **Assuming any second observable resolves a degeneracy.** It must both
@@ -243,13 +259,135 @@ suffices for a fully nondegenerate spectrum, and real physical systems
 1. For $N=\mathrm{diag}(1,1,1)$ (every eigenvalue equal, total
    degeneracy), what is the smallest additional information needed to
    fully label a basis state? Is $N$ itself useful at all here?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   One extra observable suffices, provided its three eigenvalues are
+   distinct. And no, $N$ contributes nothing: it is the identity in
+   disguise, so it takes the same value on every state and separates
+   none of them.
+
+   $N=\mathrm{diag}(1,1,1)=I$. Its only eigenvalue is $1$, with a
+   three-dimensional eigenspace, namely the entire space. Measuring it
+   returns $1$ with certainty on any state whatsoever and leaves the state
+   untouched, since the projector is $I$. Knowing the outcome tells you
+   what you already knew.
+
+   To label a basis of $\mathbb{C}^3$ you need the joint eigenvalues to
+   take three distinct values, and a single observable can do that on its
+   own if its spectrum is fully nondegenerate: $M=\mathrm{diag}(5,-5,7)$
+   gives $|0\rangle,|1\rangle,|2\rangle$ the labels $5,-5,7$ and the job is
+   done. So the answer to "smallest" is one observable, and $\{N,M\}$ is a
+   CSCO only in the trivial sense that $\{M\}$ already was.
+
+   Two things this brings out.
+
+   The identity commutes with everything, so it can be added to any set of
+   commuting observables without breaking commutativity, and it never
+   advances completeness. Compatibility is cheap; *resolving power* is what
+   costs something. A useful second observable has to satisfy two separate
+   conditions, and the Common Mistakes warning above names them both: it
+   must commute with the first, and it must take different values across
+   the degenerate eigenspace. $I$ passes the first and fails the second.
+
+   And "one observable suffices" is a statement about mathematics, not
+   about laboratories. A nondegenerate $M$ always exists on a
+   finite-dimensional space, but there is no guarantee that any *physically
+   measurable* quantity of a given system has a fully nondegenerate
+   spectrum. Hydrogen is the standard case: no single measurable observable
+   labels its states, so the CSCO $\{H,L^2,L_z\}$ grows to three, which is
+   the next question.
+
+   </details>
+
 2. Give a different diagonal $M'$ (not equal to the one above) that also
    resolves $N$'s degeneracy, and confirm it works using the table method
    from the worked example.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $M'=\mathrm{diag}(3,-1,9)$ works, and so does the more surprising
+   $M''=\mathrm{diag}(0,1,0)$. Any diagonal matrix whose first two entries
+   differ will do.
+
+   Take $M'=\mathrm{diag}(3,-1,9)$ first. It is diagonal, so
+   $[N,M']=0$ automatically, and the engine's commutator confirms it. The
+   joint labels, read as rows:
+
+   $|0\rangle$ carries $(N,M')=(1,3)$; $|1\rangle$ carries $(1,-1)$;
+   $|2\rangle$ carries $(2,9)$. No two rows agree, so the pair is a CSCO.
+
+   Now $M''=\mathrm{diag}(0,1,0)$, which is worth more attention because
+   it looks as though it should fail. Its own spectrum is degenerate:
+   eigenvalue $0$ on both $|0\rangle$ and $|2\rangle$. But the labels are
+   $(1,0)$, $(1,1)$ and $(2,0)$, and those three pairs are still distinct.
+   $M''$ separates $|0\rangle$ from $|1\rangle$, which is the only job
+   $N$ left undone, and $N$ separates $|0\rangle$ from $|2\rangle$, which
+   is the only job $M''$ left undone. Between them nothing is unresolved.
+
+   That is the general condition, and it is weaker than it first looks.
+   $M'$ does not need three distinct eigenvalues. It needs to distinguish
+   states *within each of $N$'s degenerate eigenspaces*, and it may freely
+   repeat values across different eigenspaces, because $N$ has already
+   separated those. Completeness is a property of the set, not a
+   requirement imposed on each member.
+
+   The failure case is the one the lesson's warning describes: any
+   $M'$ constant on $\{|0\rangle,|1\rangle\}$, such as
+   $\mathrm{diag}(4,4,9)$, commutes with $N$ perfectly well and resolves
+   nothing, leaving both states labelled $(1,4)$. Commuting was never the
+   hard part.
+
+   </details>
+
 3. Explain, in your own words, why $\{H,L^2,L_z\}$ needing three
    observables (rather than one) to label a hydrogen state is consistent
    with this lesson's central idea, even though you haven't derived
    $L^2$ or $L_z$ yet.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because hydrogen's energy is massively degenerate, and this lesson's
+   idea is precisely that you keep adding compatible observables until the
+   joint labels become unique. Three is simply how many that takes here.
+
+   The structure is the same as $N=\mathrm{diag}(1,1,2)$, scaled up. A
+   hydrogen energy level $E_n$ is a single eigenvalue whose eigenspace has
+   dimension $n^2$: at $n=3$ that is nine distinct states behind one
+   number. $H$ alone therefore locates a state only within a
+   nine-dimensional subspace, exactly as $N$'s eigenvalue $1$ located a
+   state only within a two-dimensional one.
+
+   Adding $L^2$ splits that eigenspace by orbital shape, into the
+   $s,p,d,\ldots$ families, and it is a legitimate partner because it
+   commutes with $H$. That still leaves degeneracy: at $n=3$ the $d$
+   family has five states sharing both $E_3$ and the same $L^2$
+   eigenvalue. Adding $L_z$, which commutes with both, separates those
+   five by orientation. Only after the third observable is every state
+   uniquely labelled, and the familiar $|n,l,m\rangle$ notation is the
+   joint eigenvalue tuple written down.
+
+   Two points make this more than an analogy.
+
+   The count is not a convention. Three is forced by how much degeneracy
+   there is and by which compatible observables the system's symmetry
+   makes available; a different potential with less symmetry would need
+   fewer, and adding a magnetic field, which is what Zeeman did, lifts some
+   of the degeneracy so that fewer labels are needed to say the same thing.
+   The Common Mistakes note above makes the general point: the size of a
+   CSCO is set by the system, not fixed at two.
+
+   And every member has to commute with every other, pairwise, or the
+   labels would not coexist. $\{H,L^2,L_z\}$ satisfies that; $\{H,L_x,L_z\}$
+   would not, because $L_x$ and $L_z$ fail to commute, and no state has
+   definite values of both. So the choice of *which* three is constrained
+   too, not just how many, and that is the previous lesson's theorem doing
+   work inside this one.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -263,7 +401,7 @@ suffices for a fully nondegenerate spectrum, and real physical systems
 - This is the general mechanism behind multi-quantum-number labeling in
   real systems, previewed here and derived concretely in later courses.
 
-## Further Exploration
+## Which entries a nondegenerate spectrum permits
 
 <ChallengePrompt prompt="Try to build a non-diagonal Hermitian M that commutes with N = diag(1,2,3), all eigenvalues distinct. What goes wrong, and what does the failure tell you about where non-diagonal freedom lives?">
   Use the entrywise identity from the worked example:

@@ -43,11 +43,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="More iterations isn't always better">
-Grover's algorithm needs the right number of iterations, not "more". Run it past the optimum and the success probability does not plateau. It swings back down.
+<LessonHook eyebrow="A rotation you can count">
+Two reflections compose into a rotation by a fixed angle. Pin that angle down and Grover's whole behaviour becomes trigonometry: how many queries it needs, how confident you can be when you stop, and what running longer does to your odds.
 </LessonHook>
 
-## Motivation
+## Making the rotation exact
 
 The last lesson showed that both Grover building blocks are reflections,
 and that composing two reflections is a rotation. This lesson makes the
@@ -64,7 +64,7 @@ an answer most people guess wrong.
 The original paper. A quadratic speedup over classical unstructured search, from a fixed rotation angle applied once per query.
 </ResearchConnection>
 
-## Mathematical Development
+## A 2D subspace, a closed form, and an optimum
 
 ### The 2D subspace
 
@@ -118,7 +118,7 @@ $$
 
 Checked directly against the engine across $k=0,1,2,5,8$ for $N=16$: the
 formula and `runGrover`'s actual output agree to 6 decimal places at every
-one of those iteration counts, not just near the optimum.
+one of those iteration counts, and at every count away from the optimum too.
 
 ### The optimal iteration count
 
@@ -134,31 +134,35 @@ be an integer, e.g. $N=4,M=1$: $\theta=\pi/6$, giving
 $\frac{\pi}{4(\pi/6)}-\frac12=\frac32-\frac12=1$ exactly, matching the
 engine's $P=1.0$ at $k=1$ noted below. Most $N$ aren't this lucky: rounding
 to the nearest integer iteration count generally leaves a small gap below
-certainty, confirmed directly by the engine's $94$–$99\%$ success rates at
-$N=8$ through $64$, not the misleading "exactly 100%" a purely asymptotic
-formula might suggest).
+certainty, confirmed directly by the engine's success rates from
+$94.5\%$ at $N=8$ to $99.9\%$ at $N=32$, none of them the "exactly 100%"
+a purely asymptotic formula might suggest).
 
-### More iterations isn't always better
+### What the closed form says about running longer
+
+The closed form settles what happens past the optimum without any further
+argument, so read $\sin^2((2k+1)\theta)$ as a function of $k$ and commit
+to an answer before the paragraph after this one gives it.
+
+<PredictBeforeReveal
+  question="You run Grover well past the k that maximizes P(marked), and keep going. What does P(marked) do over the long run?"
+  options={[
+    { label: "It falls, then climbs back to the peak, over and over forever", value: "oscillate" },
+    { label: "It plateaus at its peak value", value: "plateau" },
+    { label: "It keeps climbing toward 1, getting arbitrarily close to certainty", value: "climb" },
+    { label: "It falls to 0 and stays there", value: "zero" },
+  ]}
+  correctValue="oscillate"
+  explanation="It oscillates, forever, and never settles. (2k+1)θ is an angle that grows without bound as k grows, and sin² of a growing angle cycles between 0 and 1 endlessly. So a run continued long enough passes back through the peak again and again, and also passes through near-zero success probability again and again. Two consequences worth separating: the probability does not decay to nothing, and it also never stabilizes anywhere, so 'run it longer to be safe' is not a strategy that converges on anything. It is also why Grover needs N in advance: without N there is no θ, and without θ there is no way to know which part of the cycle you are in."
+/>
 
 Because $P(\text{marked})=\sin^2((2k+1)\theta)$ is periodic in $k$,
 running *past* the optimal count doesn't keep improving the odds: it
-oscillates back down and later back up, exactly like an ordinary rotation
+oscillates back down and later back up, like an ordinary rotation
 overshooting a target angle and coming back around. Grover's algorithm
 needs the *right* number of iterations, not "more."
 
-<PredictBeforeReveal
-  question="If you keep running Grover iterations well past the count that gives the highest P(marked), what happens to P(marked)?"
-  options={[
-    { label: "It plateaus at its peak value", value: "plateau" },
-    { label: "It keeps climbing toward 1", value: "climb" },
-    { label: "It oscillates back down, then rises again later", value: "oscillate" },
-    { label: "It drops permanently to 0", value: "zero" },
-  ]}
-  correctValue="oscillate"
-  explanation="P(marked)=sin²((2k+1)θ) is periodic in k, like any rotation that overshoots a target angle and keeps going. Running past the optimal count does not lock in the peak. The probability falls, then rises again, and the closed form says exactly when. This is the practical reason Grover's algorithm needs to know N before you run it: without N you cannot compute θ, and without θ you do not know when to stop."
-/>
-
-<InteractiveSection title="Watch the rotation itself, not just the bars" description="This is the geometry the derivation above is about: the plane spanned by |α⟩ (x-axis) and |β⟩ (y-axis). The dashed vector is the fixed starting state |s⟩ at angle θ. The solid vector is the state after k iterations, at angle (2k+1)θ, computed from the exact θ=arcsin(1/√N) for N=16 (matching the Worked Example below). Drag the slider through k and watch the solid vector sweep by a constant 2θ every step. It comes closest to |β⟩ around the optimal k, then keeps going, overshoots, and swings back: the same periodicity as the closed form, seen as a rotation rather than a bar height.">
+<InteractiveSection title="Watch the rotation itself, not just the bars" description="This is the geometry the derivation above is about: the plane spanned by |α⟩ (x-axis) and |β⟩ (y-axis). The dashed vector is the fixed starting state |s⟩ at angle θ. The solid vector is the state after k iterations, at angle (2k+1)θ, computed from the exact θ=arcsin(1/√N) for N=16 (matching the three-iteration walkthrough below). At k=0 those two are the same vector, since (2·0+1)θ is θ, so the opening frame draws them on top of each other with overlapping labels; step to k=1 and they separate. Drag the slider through k and watch how far the solid vector moves per step, then follow it well past the optimal k rather than stopping there: the same behaviour the closed form describes, seen as a rotation rather than a bar height.">
   <VectorDiagramExplorer
     frames={Array.from({ length: 13 }, (_, k) => groverRotationFrame(k))}
     sliderLabel="Iterations k"
@@ -166,7 +170,7 @@ needs the *right* number of iterations, not "more."
   />
 </InteractiveSection>
 
-<InteractiveSection title="Predict the peak, then overshoot it" description="Set N and the marked item below, then predict how many steps it will take to reach maximum probability before you click. Then keep stepping past that point and watch P(marked) fall back down exactly as the closed form predicts, not plateau at its peak.">
+<InteractiveSection title="Predict the peak, then overshoot it" description="Set N and the marked item below, then predict how many steps it will take to reach maximum probability before you click. Then keep stepping well past that point and watch what P(marked) does next. The closed form above has already committed to an answer; this is where you find out whether your intuition agreed with it.">
   <LazyGroverExplorer />
 </InteractiveSection>
 
@@ -179,7 +183,7 @@ bar's rise and its fall are both visible in the same control:
   <GroverAmplitudeSweep n={4} markedIndices={[5]} ariaLabel="Grover amplitude amplification over iterations for N=16, showing the marked state's probability rise past its peak then fall back down as iterations continue past the optimum." />
 </InteractiveSection>
 
-## Physical Interpretation
+## Geometry, and nothing else
 
 Grover's speedup comes from geometry and nothing else. Each iteration
 rotates by a fixed $2\theta\approx2/\sqrt N$, so reaching the marked
@@ -192,19 +196,19 @@ it never exploits structure in the search space, because there is none to
 exploit. The speedup is what remains available when a problem offers no
 handholds at all, which is also why it is only quadratic.
 
-## Worked Example
+## Success probability at three iterations
 
 **For $N=16$ ($n=4$), one marked item, compute $\theta$ and the exact
 success probability at $k=3$ iterations.**
 
 $\theta=\arcsin(1/4)\approx0.2527$ rad. At $k=3$:
 $(2(3)+1)\theta=7\theta\approx1.769$ rad, so
-$P=\sin^2(1.769)\approx\sin^2(101.4°)\approx0.961$. This matches
+$P=\sin^2(1.769)\approx\sin^2(101.3°)\approx0.961$. This matches
 `runGrover(4, [marked], 3)`'s actual output exactly (to floating-point
 precision): $96.1\%$, not $100\%$, since $k=3$ is close to but not
 exactly the continuous optimum for $N=16$.
 
-## Common Mistakes
+## When the optimum lands between two integers
 
 <Callout type="warning">
 **Assuming Grover's algorithm always finds the marked item with
@@ -225,15 +229,161 @@ substantially worse, not better.
 
 1. Compute $\theta=\arcsin(1/\sqrt N)$ for $N=64$, and find the optimal
    (real-valued) iteration count $\frac{\pi}{4\theta}-\frac12$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $1/\sqrt{64} = 1/8 = 0.125$, so
+   $\theta = \arcsin(0.125) = 0.1253278$ radians, about $7.18°$. Then
+
+   $$
+   \frac{\pi}{4\theta} - \frac12 = \frac{0.7853982}{0.1253278} - 0.5 = 6.26675 - 0.5 = 5.76675 .
+   $$
+
+   Iterations have to be whole numbers, so `optimalGroverIterations(6)`
+   rounds to $6$, and the closed form gives
+   $P = \sin^2(13\theta) = 0.996586$ there. The engine's `runGrover` agrees
+   to eight decimals, and confirms $0.963515$ at $k=5$: rounding down would
+   also work but is a little worse.
+
+   Two checks on the number. The asymptotic shorthand
+   $k_{\text{opt}}\approx\frac{\pi}{4}\sqrt N - \frac12$ gives
+   $\frac{\pi}{4}(8) - 0.5 = 5.7832$, within $0.02$ of the exact value,
+   because $\arcsin u \approx u$ is already good at $u=0.125$. And
+   $\sqrt{64}=8$ against the classical $64$ is the quadratic speedup in
+   miniature: about six queries against an average of thirty-two.
+
+   The reason $\theta$ is defined by $\sin\theta = 1/\sqrt N$ rather than
+   $1/N$ is worth keeping straight. $|s\rangle$ has *amplitude*
+   $1/\sqrt N$ on the marked item, and $\theta$ is the angle whose sine is
+   that amplitude, so the initial success probability is
+   $\sin^2\theta = 1/N$. Using $1/N$ for the sine gives an angle roughly
+   $\sqrt N$ times too small and an iteration count of order $N$, which
+   silently reproduces the classical cost.
+
+   </details>
+
 2. Using the closed form, compute $P(\text{marked})$ at $k=0$ (zero
    iterations) and confirm it equals $1/N$, the plain guessing
    probability, as it should before any amplification happens.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Put $k=0$ into $P(k)=\sin^2\big((2k+1)\theta\big)$:
+
+   $$
+   P(0) = \sin^2(\theta) = \left(\frac{1}{\sqrt N}\right)^2 = \frac{1}{N}
+   $$
+
+   by the definition $\sin\theta = 1/\sqrt N$. For $N=64$ that is
+   $0.015625$, and the engine's `runGrover` with zero iterations returns
+   exactly $0.01562500$. For $N=16$ it is $0.0625$.
+
+   This is the sanity check the closed form has to pass, and it is worth
+   seeing why it is not trivial. Zero iterations means measuring
+   $|s\rangle$ itself, the uniform superposition, which gives every one of
+   the $N$ items probability $1/N$: the same odds as picking an item at
+   random with no quantum computer at all. A formula that gave anything
+   else at $k=0$ would be wrong before it started.
+
+   The other endpoint is worth checking at the same time. At the optimum
+   $(2k+1)\theta$ reaches $\pi/2$ and $P\to1$, so the algorithm interpolates
+   between "no better than guessing" and "certain", and the whole content
+   of the $O(\sqrt N)$ claim is how many iterations that trip takes.
+
+   The wrong turn is reading $P(0)=1/N$ as a defect, or expecting the first
+   iteration to be worth $1/\sqrt N$ rather than a modest bump. At $N=64$
+   the first iteration takes $P$ from $0.0156$ to $0.1348$, an
+   eightfold-ish gain, and the gains keep coming at a fixed angular rate
+   rather than a fixed probability rate. Amplitude, not probability, is
+   what grows linearly.
+
+   </details>
+
 3. For $N=4$, $M=1$, show the closed form gives *exactly* $P=1$ at
    $k=1$, the one case where Grover's algorithm succeeds with total
    certainty.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $N=4$, $\sin\theta = 1/\sqrt4 = 1/2$, so $\theta = \pi/6$ exactly.
+   At $k=1$ the angle is $(2\cdot1+1)\theta = 3\times\pi/6 = \pi/2$, and
+
+   $$
+   P(1) = \sin^2\left(\frac{\pi}{2}\right) = 1
+   $$
+
+   exactly, not approximately. The engine's `runGrover(2, [2], 1)` returns
+   probability $1.0000000000000004$ on the marked item, which is $1$ to
+   floating-point precision.
+
+   What makes this case exact is that $\frac{\pi}{4\theta}-\frac12$ lands
+   on a whole number: $\frac{\pi}{4(\pi/6)} - \frac12 = \frac32 - \frac12 = 1$.
+   For every other $N$ the optimum falls between integers and the rounded
+   iteration count leaves a small residual, which is why $N=16$ tops out at
+   $0.9613$ and $N=64$ at $0.9966$. There is nothing special about $N=4$
+   physically; it is an arithmetic coincidence that $\arcsin(1/2)$ is a
+   rational multiple of $\pi$ with the right denominator.
+
+   The single iteration is also the whole search: two items' worth of
+   information from one query, on a set of four. A classical algorithm
+   needs up to three queries to be certain, or $2.25$ on average, so even
+   this smallest nontrivial case shows a real gap.
+
+   The wrong turn is reading "exactly $1$" as the general promise. Grover's
+   algorithm is usually a high-probability algorithm rather than a certain
+   one, and the honest statement is that $P$ can be pushed as close to $1$
+   as you like by choosing $N$ conveniently or by adding a final partial
+   rotation, and is exactly $1$ only when the optimum happens to be an
+   integer.
+
+   </details>
+
 4. Explain, using the rotation picture, why running $2k_{\text{opt}}$
    iterations (double the optimum) does not give a "doubly confident"
    result.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because each iteration rotates the state by a fixed angle $2\theta$ in
+   the $\{|\alpha\rangle,|\beta\rangle\}$ plane, and the optimum is where
+   the state has arrived at $|\beta\rangle$, at angle $\pi/2$. Rotating
+   past that point does not push further into $|\beta\rangle$; it carries
+   the state back down the other side, and the amplitude on the marked
+   item starts shrinking again. At double the optimum the total angle is
+   about $\pi$, which is $|\alpha\rangle$ negated, and the marked item is
+   back to essentially zero probability.
+
+   The numbers are stark. For $N=64$, $k_{\text{opt}}=6$ gives
+   $P=0.9966$. At $k=12$ the closed form gives
+   $\sin^2(25\theta) = 0.0000705$, and the engine returns the identical
+   value: worse than the $0.0156$ you started with, and about fourteen
+   thousand times worse than stopping on time. Doubling the work turned a
+   near-certain answer into a near-impossible one.
+
+   The behaviour is periodic, not monotonic, and that is the fact to carry
+   away. $P(k)=\sin^2\big((2k+1)\theta\big)$ oscillates forever, coming
+   back up to near $1$ at around $3k_{\text{opt}}$ and falling again. The
+   engine shows the climb back: $P=0.0656$ at $k=11$ and $0.0576$ at
+   $k=13$, either side of the trough. So "run it longer to be safer",
+   which is sound advice for essentially every classical randomized
+   algorithm, is actively harmful here.
+
+   The practical consequence is that Grover's algorithm needs $N$, or at
+   least the number of marked items, known in advance to set $k$. When it
+   is not known, you cannot just run long; the standard fix is to try
+   exponentially increasing iteration counts with randomization, which
+   preserves the $O(\sqrt N)$ scaling at the cost of a constant factor.
+
+   The wrong turn is reasoning that more iterations must at worst waste
+   time, by analogy with repeating a coin flip. Grover's iterations are not
+   independent trials whose successes accumulate; they are one continuous
+   rotation, and where you stop is the answer.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -244,24 +394,24 @@ substantially worse, not better.
   $\theta=\arcsin(1/\sqrt N)$.
 - Success probability after $k$ iterations is exactly
   $\sin^2((2k+1)\theta)$, a closed form checked directly against the
-  engine, not just derived.
+  engine as well as derived on paper.
 - The optimal iteration count $\approx\frac\pi4\sqrt N$ is where this
   probability peaks, the source of Grover's $O(\sqrt N)$ <Term id="query-complexity-black-box-model">query complexity</Term>.
 - Because $k$ must be an integer and the probability is periodic, success
   is generally high but not exactly certain, and more iterations isn't
   always better.
 
-## Further Exploration
+## Two speedups, placed side by side
 
 <NextDiscovery>
 Next, the capstone: [Comparing Quantum Advantage](/lessons/quantum-computing/quantum-algorithms-i/capstone-comparing-quantum-advantage), which places
 Deutsch-Jozsa's exponential separation and Grover's quadratic one side by
 side, with an honest look at what each does and doesn't prove.
 
-Later, in the Quantum Mastery pillar, [BQP and Oracle
+Later, in the Quantum Mastery track, [BQP and Oracle
 Complexity](/lessons/quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity)
 proves exactly what this lesson's optimal iteration count establishes
 (and doesn't establish): the BBBV lower bound that makes Grover's
 algorithm provably optimal for unstructured black-box search
-specifically, not a blanket claim about quantum search in general.
+specifically. Quantum search in general carries no such blanket claim.
 </NextDiscovery>

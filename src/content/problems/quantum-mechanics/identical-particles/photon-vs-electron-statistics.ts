@@ -26,8 +26,8 @@ export const photonVsElectronStatistics: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "This reverses the spin-statistics connection: integer spin (photons) is bosonic, half-integer spin (electrons) is fermionic — not the other way around.",
-      c: "Being 'elementary' has nothing to do with statistics — the deciding factor is specifically integer vs. half-integer spin.",
+      b: "This reverses the spin-statistics connection: integer spin (photons) is bosonic and half-integer spin (electrons) is fermionic, not the other way around.",
+      c: "Being 'elementary' has nothing to do with statistics. The deciding factor is integer versus half-integer spin.",
       d: "Spin-statistics is a fixed property of the particle species, not something that varies by experimental setup.",
     },
     defaultIncorrectFeedback: "Integer spin (like the photon's spin 1) means bosonic (symmetric); half-integer spin (like the electron's spin 1/2) means fermionic (antisymmetric).",

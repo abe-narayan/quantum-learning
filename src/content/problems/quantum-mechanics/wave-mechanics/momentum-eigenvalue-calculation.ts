@@ -21,11 +21,16 @@ export const momentumEigenvalueCalculation: NumericProblem = {
     type: "numeric",
     value: 4,
     tolerance: 0.001,
+    nearMisses: [
+      { value: -4, feedback: "The sign is inverted. The derivative supplies one factor of i and the operator supplies a factor of -i; their product is +1, not -1." },
+      { value: 16, feedback: "16 is what p-hat squared returns on this state, which is twice the energy in these units. The prompt asks for the momentum itself." },
+    ],
     incorrectFeedback: "Differentiating the exponential brings down i times the exponent's coefficient, and the -i prefactor then turns that into a real number. If your answer came out imaginary or negative, the two factors of i were not combined.",
   },
   hints: [
-    { text: "An eigenvalue problem asks: after applying the operator, is the result the same function times a constant? Differentiate the given plane wave once and see what constant comes down." },
-    { text: "Multiply the derivative by the operator's -i prefactor, then compare against p times the original function. The two factors of i combine into a real constant." },
+    { text: "An eigenvalue problem asks whether applying the operator returns the same function times a constant. Differentiate the given plane wave once and see what comes down in front." },
+    { text: "Multiply that derivative by the operator's own prefactor, then compare the result against the original function times an unknown p." },
+    { text: "Two factors of i meet in that product: one from the derivative, one from the operator. Multiply them out rather than cancelling them by eye, since their product decides the sign." },
   ],
   solution: {
     steps: [

@@ -53,11 +53,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="No dot to paint, no trajectory to follow">
 Two classical billiard balls of the same mass and color are identical in every measurable property, yet you could in principle paint a tiny dot on one and track it. Two electrons cannot be told apart even in principle: there is no dot to paint, no trajectory to follow between measurements.
 </LessonHook>
 
-## Motivation
+## Information nobody bothered to collect
 
 Classical indistinguishability is a statement about information nobody
 bothered to collect. Two billiard balls of the same mass and colour have
@@ -80,7 +80,7 @@ explain why atoms have structure at all.
   license="Public domain (U.S. federal government work)"
 />
 
-## Mathematical Development
+## The swap operator, and what its square forces
 
 ### The exchange operator
 
@@ -136,9 +136,21 @@ the original nor its negative; applied to `symmetrize(a,b)` or
 So the four-dimensional space of two-particle states in a
 two-state basis is not all available. Only the symmetric part is open to
 bosons and only the antisymmetric part to fermions, and a real pair of
-identical particles never occupies the rest of it.
+identical particles never occupies the rest of it. It is worth counting
+how much of the space that leaves.
 
-## Physical Interpretation
+<PredictBeforeReveal
+  question="Two identical particles share a single-particle basis with just two states, so their combined space has four dimensions. How many of those four are open to a boson pair, and how many to a fermion pair?"
+  options={[
+    { label: "3 for bosons and 1 for fermions", value: "three-one" },
+    { label: "2 each, splitting the four evenly", value: "two-two" },
+    { label: "All 4 for bosons and 2 for fermions", value: "four-two" },
+  ]}
+  correctValue="three-one"
+  explanation="Write out the four basis products. |0⟩⊗|0⟩ and |1⟩⊗|1⟩ are already symmetric, and the remaining pair combines into one symmetric state (|0⟩⊗|1⟩ + |1⟩⊗|0⟩)/√2 and one antisymmetric state (|0⟩⊗|1⟩ − |1⟩⊗|0⟩)/√2. That is 3 symmetric against 1 antisymmetric, and the split is never even. Look at what the fermion count says: with two orbitals available, two identical fermions have exactly one state to be in, the one that uses both orbitals. Neither of them can double up. The Pauli exclusion principle is already visible in the dimension count, two lessons before it is named."
+/>
+
+## Why a product state describes nothing real
 
 Because a plain product state is not an exchange eigenstate, "particle 1
 in state $a$, particle 2 in state $b$" is not a physically meaningful
@@ -154,18 +166,7 @@ two electrons from doing the same, which is why atoms have shells and
 matter takes up space. Two lessons from here, both follow from the sign
 chosen in this section.
 
-<PredictBeforeReveal
-  question="Apply the exchange operator P₁₂ to the product state |0⟩⊗|1⟩ (particle 1 in state 0, particle 2 in state 1). What comes back?"
-  options={[
-    { label: "The same vector, |0⟩⊗|1⟩", value: "same" },
-    { label: "Its negative, −|0⟩⊗|1⟩", value: "negative" },
-    { label: "A different vector, |1⟩⊗|0⟩", value: "different" },
-  ]}
-  correctValue="different"
-  explanation="P₁₂ relabels which particle sits in which state, handing back |1⟩⊗|0⟩, which is not a multiple of the original vector. An eigenstate has to come back as itself times a number, and this does not, which is why a bare product state cannot describe two identical particles. Note the sum and the difference of these two vectors do work, and that is the whole construction of the next lesson."
-/>
-
-## Worked Example
+## Checking that a product state fails the test
 
 **Confirm numerically that $|0\rangle\otimes|1\rangle$ is not an
 eigenstate of exchange, using a 3-dimensional single-particle basis
@@ -185,11 +186,11 @@ fact being displaced.
 <InteractiveSection title="See which entry moves" description="Each grid's (row, column) entry is the amplitude for 'particle 1 in the row state, particle 2 in the column state'. Switch between a ≠ b, where exchange moves the 1 into a different cell and the state fails the eigenstate test, and a = b, where the 1 sits on the diagonal and does not move at all, making it a +1 eigenstate. That second case is practice question 3, and it is the one product state that happens to be legal.">
   <ExchangeDiagramExplorer
     presets={exchangePresets}
-    ariaLabel="A two-particle product state's coefficient grid before and after the exchange operator swaps particle labels"
+    ariaLabel="Two 3-by-3 coefficient grids side by side, before and after the exchange operator, with rows and columns labelled 0, 1, 2. In the a ≠ b preset the single entry of 1 starts at row 0, column 1, and afterwards sits at row 1, column 0: a different cell, so the state is not an eigenstate. In the a = b preset the single 1 starts at row 0, column 0, on the diagonal, and the after grid is identical to the before grid, so that state is an eigenstate with eigenvalue +1. Every other cell in both grids is zero."
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Hard to tell apart is the weaker claim
 
 <Callout type="mistake">
 **Thinking indistinguishability just means "hard to tell apart in
@@ -211,14 +212,148 @@ special property that must be built in explicitly (next lesson).
 
 1. Show algebraically that $P_{12}^2=I$ follows directly from the
    definition $P_{12}\psi(1,2)=\psi(2,1)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Name the intermediate function, apply the rule to *it*, and the two
+   swaps undo each other.
+
+   Let $\phi=P_{12}\psi$, so that $\phi(1,2)=\psi(2,1)$ by definition.
+   Now apply $P_{12}$ a second time, to $\phi$ rather than to $\psi$:
+
+   $$
+   P_{12}^2\psi(1,2) = P_{12}\phi(1,2) = \phi(2,1) = \psi(1,2)
+   $$
+
+   The last step reads $\phi$'s defining relation with the labels
+   interchanged. Since this holds for every $\psi$, the operator identity
+   is $P_{12}^2=I$.
+
+   The step people skip is exactly the one named above. Writing
+   "$P_{12}\psi(2,1)=\psi(1,2)$" directly looks like the same thing and is
+   sloppy in a way that matters: $P_{12}$ acts on a function, not on a
+   particular set of arguments, so the rule has to be applied to whatever
+   function it is handed. Introducing $\phi$ makes that explicit and the
+   argument stops being a shuffle of symbols.
+
+   Two consequences worth banking. $P_{12}$ is its own inverse, and since
+   it is also unitary (it permutes an orthonormal basis, preserving inner
+   products), $P_{12}^\dagger=P_{12}^{-1}=P_{12}$, so it is Hermitian too.
+   Being Hermitian is why it has real eigenvalues and an orthogonal
+   eigenbasis, which is what the next question makes use of.
+
+   </details>
+
 2. Why does $P_{12}^2=I$ restrict its eigenvalues to exactly $\{+1,-1\}$,
    and not, say, any value with $|\lambda|=1$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the constraint is $\lambda^2=1$, not $|\lambda|=1$, and those
+   are very different conditions: the first has two solutions, the second
+   has a whole circle of them.
+
+   From $P_{12}\psi=\lambda\psi$ and $P_{12}^2=I$:
+
+   $$
+   \psi = P_{12}^2\psi = P_{12}(\lambda\psi) = \lambda^2\psi \implies \lambda^2 = 1 \implies \lambda = \pm1
+   $$
+
+   Test a candidate to see the difference bite. Take
+   $\lambda=e^{i\pi/3}$, which certainly has modulus $1$. Then
+   $\lambda^2=e^{2i\pi/3}\neq1$, so applying the swap twice would return
+   $e^{2i\pi/3}\psi$ rather than $\psi$, and the labels would not be back
+   where they started. Only $\theta=0$ and $\theta=\pi$ survive.
+
+   Tracing where each condition came from is the real content here.
+   Physical indistinguishability, $|P_{12}\psi|^2=|\psi|^2$, gives only
+   $|\lambda|=1$: it permits any phase, because a phase is unobservable.
+   What cuts the circle down to two points is the *operator* identity
+   $P_{12}^2=I$, which is a statement about the geometry of exchanging
+   labels twice in three-dimensional space, not about what is observable.
+
+   And that is precisely the step that fails in two dimensions, as the
+   note above flags. Confined to a plane, exchanging two particles twice
+   traces a loop that winds one around the other, and no continuous
+   deformation unwinds it, so $P_{12}^2\ne I$. The circle reopens and
+   arbitrary phases $e^{i\theta}$ become available. Those are anyons, and
+   the fact that they exist in real two-dimensional systems is the best
+   evidence that the $\pm1$ here was earned by an argument rather than
+   assumed.
+
+   </details>
+
 3. If $|a\rangle=|b\rangle$ (both particles assigned to the *same*
    single-particle state), is the bare product $|a\rangle\otimes|a\rangle$
    an eigenstate of $P_{12}$? What eigenvalue?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes, with eigenvalue $+1$. Exchanging the two labels sends
+   $|a\rangle\otimes|a\rangle$ to $|a\rangle\otimes|a\rangle$, the same
+   vector, so it is returned as $+1$ times itself.
+
+   This is the one product state that is legal, and it is legal for a
+   reason worth stating: there is no fact about which particle is which to
+   displace, because both assignments are the same assignment. The
+   explorer above shows it as the entry sitting on the diagonal of the
+   coefficient grid, where the swap has nothing to move.
+
+   Two payoffs follow immediately, and they are the whole of the next two
+   lessons in miniature.
+
+   Bosons can occupy the same state. $|a\rangle\otimes|a\rangle$ is
+   symmetric, hence available, which is what a Bose-Einstein condensate
+   does at scale: every atom in one single-particle state, the
+   photographed peak at the top of this lesson.
+
+   Fermions cannot. Antisymmetrizing $|a\rangle$ with itself gives
+   $\tfrac{1}{\sqrt2}(|a\rangle\otimes|a\rangle - |a\rangle\otimes|a\rangle)=0$,
+   the zero vector, which is not a state at all. The exclusion principle
+   is not an extra rule bolted on later; it is what antisymmetry says when
+   two labels coincide.
+
+   </details>
+
 4. Explain, in one sentence, why "particle 1 is in state $a$" is not a
    physically meaningful statement for two identical particles, using
    this lesson's exchange-operator argument.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the only state that could express it, the product
+   $|a\rangle\otimes|b\rangle$, is not an eigenstate of $P_{12}$ and
+   therefore is not an allowed state of identical particles at all, while
+   every allowed state gives both particles the same amplitude to be found
+   in $a$, leaving no fact in the state for the sentence to be true of.
+
+   The distinction that keeps this from collapsing into "nothing can be
+   said" is worth drawing carefully, because it is where the idea usually
+   gets over-applied.
+
+   Meaningless: "particle 1 is in $a$." That is an assignment of labels to
+   states, and both the symmetric and antisymmetric combinations
+   $\tfrac1{\sqrt2}(|a\rangle\otimes|b\rangle\pm|b\rangle\otimes|a\rangle)$
+   spread their amplitude across both assignments with equal magnitude.
+
+   Perfectly meaningful: "one particle is in $a$ and one is in $b$." That
+   is a statement about *occupation*, it is true of both combinations
+   above, and it survives exchange untouched. Measuring the two particles'
+   energies really does return $E_a$ and $E_b$; what no measurement
+   returns is which of the two is the one you would have called particle 1.
+
+   Which is why the natural language for identical particles is occupation
+   numbers, "how many particles are in each single-particle state," a
+   description in which the labels never appear and so cannot be asked
+   about. That reformulation is second quantization, and it exists mainly
+   to stop people writing down states like $|a\rangle\otimes|b\rangle$ in
+   the first place.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -234,7 +369,7 @@ special property that must be built in explicitly (next lesson).
   `exchangeParticles` function, so it isn't, by itself, a valid state
   of two identical particles.
 
-## Further Exploration
+## Building the eigenstates the test demands
 
 <NextDiscovery>
 Up next, [Bosons & Fermions](/lessons/quantum-mechanics/identical-particles/bosons-and-fermions) builds the actual $+1$ and $-1$

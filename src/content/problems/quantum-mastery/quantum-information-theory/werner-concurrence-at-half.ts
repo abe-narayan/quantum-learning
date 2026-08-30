@@ -42,6 +42,6 @@ export const wernerConcurrenceAtHalf: NumericProblem = {
   },
   explanation: {
     correctIdea: "The Werner-state concurrence formula is linear in p above the p=1/3 separability threshold.",
-    whyCorrect: "This is below the lesson's own worked value at p=0.7 (C=0.55), consistent with less entanglement at a smaller mixing weight p.",
+    whyCorrect: "The result sits below the lesson's own value at p=0.7 (C=0.55), which is the right direction of travel: a smaller mixing weight leaves less entanglement for the concurrence to find.",
   },
 };

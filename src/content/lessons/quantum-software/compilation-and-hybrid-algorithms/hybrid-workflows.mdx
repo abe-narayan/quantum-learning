@@ -23,28 +23,28 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Paid once, or paid 200 times">
-Every time VQE's classical optimizer proposes a new parameter vector, the exact same ansatz circuit gets rebuilt, transpiled, and rerun from scratch. Pay that overhead once and it's a rounding error. Pay it 200 times, a realistic VQE run, and it becomes the dominant cost of the entire computation.
+Every time VQE's classical optimizer proposes a new parameter vector, the same ansatz circuit gets rebuilt, transpiled, and rerun from scratch. Pay that overhead once and it's a rounding error. Pay it 200 times, a realistic VQE run, and it becomes the dominant cost of the entire computation.
 </LessonHook>
 
-## Motivation
+## VQE and QAOA as Software, Not Physics
 
 Quantum Algorithms II built <Term id="vqe">VQE</Term> and QAOA as physics:
 minimize $\langle\psi(\vec\theta)|H|\psi(\vec\theta)\rangle$ over
 parameters $\vec\theta$. This lesson looks at the same algorithms from a
-software angle: what does actually running one look like, step by step,
+software angle: what does running one look like, step by step,
 and what does this course's compilation machinery cost when it repeats
 hundreds of times?
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/e/ee/Simplified_scale_model_of_the_quantum_computing_demonstrator_housed_in_two_19-inch_racks_with_major_components_labeled.png"
   alt="A labeled scale model of a compact trapped-ion quantum computing demonstrator built into two standard 19-inch equipment racks, with optics modules marked in red, communication and readout in green, and electronics and amplifiers in blue"
-  caption="A whole quantum computer drawn to scale in two 19-inch racks. The ion trap is one module in the right-hand rack; almost everything else is optics (red), readout and communication (green), and control electronics and amplifiers (blue). That machinery is the other half of every loop in this lesson — the classical optimizer's parameters go down through it, and the measured expectation values come back up."
+  caption="A whole quantum computer drawn to scale in two 19-inch racks. The ion trap is one module in the right-hand rack; almost everything else is optics (red), readout and communication (green), and control electronics and amplifiers (blue). That machinery is the other half of every loop in this lesson: the classical optimizer's parameters go down through it, and the measured expectation values come back up."
   credit="I. Pogorelov et al., PRX Quantum 2, 020343 (2021), via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Simplified_scale_model_of_the_quantum_computing_demonstrator_housed_in_two_19-inch_racks_with_major_components_labeled.png"
   license="CC BY 4.0"
 />
 
-## Intuition
+## Tuning by Ear
 
 Think of the loop like tuning a guitar by ear: pluck a string (quantum),
 listen for how far off it is (classical), turn the peg a little
@@ -54,7 +54,7 @@ re-plucking cycle runs hundreds of times before the string settles, and
 every single pluck pays this course's full compilation cost again from
 scratch. The slider further down makes that multiplication concrete.
 
-## Engineering Development
+## The Loop, and Where Its Cost Lives
 
 ### The general hybrid loop
 
@@ -71,12 +71,12 @@ Every variational algorithm follows the same repeated pattern:
    gradient-based method).
 4. **Repeat** until convergence.
 
-This is exactly what `runVqe` and `runQaoa` (Quantum Algorithms II)
+This is what `runVqe` and `runQaoa` (Quantum Algorithms II)
 already implement, just described here as a general software pattern
 rather than a physics algorithm, the SAME structure Quantum SDKs
-Overview named as PennyLane's specific area of strength. As a loop
-rather than a list, the classical-quantum handoff (and where it repeats
-from) is easier to see at a glance:
+Overview named as PennyLane's specific area of strength. Drawn as a
+loop, the classical-quantum handoff (and where it repeats from) is
+easier to see at a glance than it was in the list above:
 
 <PipelineDiagram
   ariaLabel="The hybrid quantum-classical optimization loop"
@@ -101,10 +101,11 @@ is paid 100 times over, not once. That's often the dominant cost
 driver for hybrid algorithms, distinct from a single-shot
 circuit's one-time compilation cost.
 
-<InteractiveSection title="Watch per-iteration overhead compound" description="Slide across the iteration count N. Both bars are scaled to whichever is larger in each frame, so the per-iteration bar (a fixed 6 SWAP gates, this section's overhead figure) visibly shrinks relative to the total-run bar (N times 6) as N grows. This chart is deliberately the simplified view: it tracks only the SWAP-gate line of the bill. The worked example below multiplies out the fuller pipeline arithmetic (shots per Pauli term, terms per Hamiltonian, iterations per run) that this one bar stands in for.">
+<InteractiveSection title="Watch per-iteration overhead compound" description="Slide across the iteration count N. Both bars share one fixed axis, topping out at the 1,200 SWAP gates a 200-iteration run costs, so watch the two bars against each other as N grows, given that the per-iteration overhead is a fixed 6 SWAP gates. Which of the two that fixed figure actually governs, and which one the run's real cost lives in, is the point of putting them on one axis. This chart is deliberately the simplified view: it tracks only the SWAP-gate line of the bill. The worked example below multiplies out the fuller pipeline arithmetic (shots per Pauli term, terms per Hamiltonian, iterations per run) that this one bar stands in for.">
   <BarChartExplorer
     sliderLabel="Iterations (N)"
-    ariaLabel="Per-iteration SWAP overhead (fixed at 6 gates) versus total SWAP gates across the full optimization run (6 times N), as iteration count N grows from 1 to 200. Bars are scaled per frame, so the per-iteration bar shrinks visibly relative to the total-run bar as N increases"
+    ariaLabel="Per-iteration SWAP overhead (fixed at 6 gates) versus total SWAP gates across the full optimization run (6 times N), as iteration count N grows from 1 to 200, on a fixed axis topping out at 1200 gates so the per-iteration bar stays a constant sliver while the total-run bar grows"
+    maxValue={1200}
     frames={[1, 20, 50, 100, 150, 200].map((n) => ({
       paramLabel: `N = ${n}`,
       bars: [
@@ -117,39 +118,27 @@ circuit's one-time compilation cost.
 
 ### What runs where
 
-<PredictBeforeReveal
-  question="Looking at the four-step loop above (propose θ, run ansatz circuit, compute cost, update θ), how many of those steps actually need a quantum device?"
-  options={[
-    { label: "All four — it's a quantum algorithm end to end", value: "four" },
-    { label: "Three — only proposing θ is classical", value: "three" },
-    { label: "One — only running the ansatz circuit touches quantum hardware", value: "one" },
-    { label: "Zero — VQE is normally run on a classical simulator anyway", value: "zero" },
-  ]}
-  correctValue="one"
-  explanation="Only 'Run ansatz circuit' touches actual quantum hardware. Proposing θ, computing the cost from the returned measurement statistics, and deciding the next θ are all ordinary classical computation. The quantum device's job is narrowly scoped to state preparation and measurement, nothing else."
-/>
-
 The quantum device does exactly one job: prepare $|\psi(\vec\theta)\rangle$
 and report measurement statistics. EVERY OTHER STEP, proposing new
 parameters, computing the cost function from measurement results,
 deciding convergence, runs on ordinary classical hardware. This
-division is precisely why these are called "hybrid" algorithms: neither
-purely classical nor purely quantum, but a genuine collaboration between
-the two, with the quantum device doing only the one piece (native
-quantum-mechanical evaluation) classical computers fundamentally cannot
-do efficiently.
+division is why these are called "hybrid" algorithms: neither purely
+classical nor purely quantum, but a division of labor between the two,
+with the quantum device doing only the one piece (native
+quantum-mechanical evaluation) classical computers cannot do
+efficiently.
 
-## Physical Interpretation
+## Why the Loop Shape Explains the Runtime
 
 Recognizing this loop structure explains a practical fact about
 NISQ-era algorithms (Noise, Decoherence & Scaling): their total runtime
 is often dominated by the NUMBER OF ITERATIONS times per-iteration
-overhead, not by any single circuit's raw gate count. That's exactly
-why minimizing per-circuit compilation and execution overhead (this
+overhead, not by any single circuit's raw gate count. That's why
+minimizing per-circuit compilation and execution overhead (this
 course's entire subject) matters disproportionately for hybrid
 algorithms.
 
-## Worked Example
+## Counting the Cost of One Iteration
 
 **A VQE run needs 200 iterations; each iteration's ansatz circuit needs
 6 SWAP gates for connectivity (Quantum Compilation & Transpilation) on
@@ -184,6 +173,20 @@ for the full optimization run. Two million executions, to estimate one
 ground-state energy, from a loop whose every individual piece sounded
 modest.
 
+Two million executions is a lot of jobs to put through a shared cloud
+device's queue, which raises an obvious scheduling question:
+
+<PredictBeforeReveal
+  question="This run's jobs all go to one shared cloud device with a long queue. Could you cut the wall-clock time by submitting all 200 iterations at once and letting them queue together?"
+  options={[
+    { label: "No; each iteration needs the previous one's results", value: "sequential" },
+    { label: "Yes; the jobs are independent and can queue in parallel", value: "parallel" },
+    { label: "Yes; the device batches whatever arrives into one run", value: "batched" },
+  ]}
+  correctValue="sequential"
+  explanation="The loop is sequential by construction: the optimizer cannot write iteration 43's parameters until iteration 42's measurements come back, so iteration 43's circuit does not exist yet at submission time. Every iteration is therefore its own queued job, and the queue wait is paid 200 times over. Shot counts can at least be traded against precision; this cost cannot be batched away at all."
+/>
+
 Shot count still isn't the worst of it on real cloud hardware. The
 loop is *sequential*: the optimizer cannot propose iteration 43's
 parameters until iteration 42's measurement results come back, so each
@@ -191,11 +194,11 @@ parameter update is a separate job submitted to the device's queue
 (Simulators vs. Real Hardware's queue-time constraint). Wall-clock
 time for the run is then roughly 200 times the queue wait per job, and
 on a shared device that queue wait routinely dwarfs the circuit's
-actual execution time. This is why hybrid algorithms feel so much
+execution time. This is why hybrid algorithms feel so much
 slower in practice than their raw circuit counts suggest: the queue is
 paid once per iteration, and iterations cannot be batched away.
 
-## Common Mistakes
+## Treating the Classical Half as Plumbing
 
 <Callout type="note">
 **Treating VQE/QAOA's classical optimizer as a minor implementation
@@ -215,14 +218,204 @@ optimization run needs.
 ## Practice Questions
 
 1. List the four steps of the general hybrid loop, in order.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   1. **Classical:** propose parameters $\vec\theta$, initially a guess
+      and later informed by previous iterations.
+   2. **Quantum:** build and run a circuit implementing the parametrized
+      ansatz $|\psi(\vec\theta)\rangle$, through transpilation, and
+      return measurement statistics.
+   3. **Classical:** compute the cost function, typically $\langle
+      H\rangle$, from those measurement results, and decide the next
+      $\vec\theta$.
+   4. **Repeat** until convergence.
+
+   Three properties of that list carry the rest of the lesson, and are
+   worth reading off it deliberately.
+
+   **What crosses each boundary is classical.** Going down, a list of
+   real numbers, the parameters. Coming up, a list of measurement counts.
+   No quantum state ever leaves the device, which is why the loop can be
+   split across a laptop and a machine in another country at all.
+
+   **Three of the four steps are classical.** The device's entire job is
+   step 2. Proposing, evaluating and deciding are ordinary numerical
+   computing, which is what "hybrid" is naming, and question 3 is about
+   why that division falls where it does.
+
+   **The loop is strictly sequential.** Step 1 of iteration $k+1$ needs
+   step 3 of iteration $k$. Iteration 43's circuit does not exist until
+   iteration 42's results come back, so the iterations cannot be
+   submitted together, batched, or run in parallel. That single
+   structural fact is why a shared device's queue wait is paid once per
+   iteration rather than once per run, and it is the cost that cannot be
+   negotiated down by accepting less precision.
+
+   The wrong turn is reading the loop as "a quantum algorithm with some
+   classical glue around it." The classical optimizer is not plumbing; it
+   is the part that decides what the algorithm does next, and the quality
+   of the answer depends on it as much as on the device.
+
+   </details>
+
 2. For a VQE run with 500 iterations and 4 SWAP gates of overhead per
    iteration, compute the total SWAP-gate count across the full run.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   500 \times 4 = 2{,}000 \text{ SWAP gates.}
+   $$
+
+   And since each SWAP compiles to 3 CNOTs, that is $6{,}000$ extra
+   two-qubit gates, executed on the noisiest operation the device has,
+   to route a circuit whose logical content never changed.
+
+   The point of the multiplication is where the four came from. It is a
+   *per-circuit* cost: four SWAPs is what routing this ansatz onto this
+   chip's connectivity costs, once. In a single-shot circuit you would
+   pay it once and stop thinking about it. In a loop you pay it on every
+   iteration, because every iteration submits a fresh circuit with new
+   parameter values, and transpilation happens again from scratch.
+
+   **The fuller bill is larger still, and multiplies the same way.** One
+   cost evaluation is not one circuit execution. Each Pauli term in the
+   Hamiltonian needs its own measurement setting, and each setting needs
+   enough shots to beat down statistical noise. Take the lesson's modest
+   figures, 2,000 shots per term and 5 terms:
+
+   $$
+   500 \times 5 \times 2{,}000 = 5{,}000{,}000 \text{ circuit executions}
+   $$
+
+   for the run. Five million executions to estimate one ground-state
+   energy, and 2,000 SWAP gates is the routing line of that same bill.
+
+   The wrong turn is treating four SWAPs as small and therefore
+   negligible. Every quantity in a hybrid algorithm's cost is small per
+   iteration; that is what makes it a NISQ algorithm. The costs are
+   multiplied by the iteration count, and the iteration count is set by
+   how hard the optimization is, not by anything the circuit designer
+   controls. Which is exactly why connectivity-aware ansatz design is
+   high leverage here specifically: shaving the four to two halves a
+   thousand two-qubit gates across the run.
+
+   </details>
+
 3. Which specific step in the hybrid loop is the ONLY one that must run
    on an actual quantum device, and why can't classical hardware perform
-   it efficiently instead?
+   it efficiently instead? Then state the honest limit of that "can't"
+   for the ansätze actually used in practice.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Step 2:** preparing the ansatz state $|\psi(\vec\theta)\rangle$ and
+   measuring it.
+
+   The way to see it is to walk the loop asking what data each step
+   touches. Steps 1, 3 and 4 handle lists of real numbers: parameters
+   going out, counts coming back, a cost value, a convergence test.
+   Ordinary classical machines do all of that routinely, and nothing
+   about it is quantum. Step 2 is the only one whose input is a
+   parameterized circuit and whose output is a sample from that circuit's
+   output distribution.
+
+   **Why a classical machine struggles.** Doing step 2 classically means
+   representing the state, and a general $n$-qubit state needs $2^n$
+   complex amplitudes, the wall the Simulating Quantum Systems course
+   computes exactly. Beyond roughly fifty qubits there is no machine to
+   hold it.
+
+   **The honest form of that claim**, since "cannot do it efficiently"
+   is doing heavy lifting. What is established is that no efficient
+   classical algorithm is *known* for sampling from a general
+   parameterized quantum circuit's output, and there are
+   complexity-theoretic reasons to believe none exists. What is not
+   established is that the *specific* ansätze used in practice are hard.
+   Low-depth circuits on sparse interaction graphs are often exactly the
+   states tensor networks handle well, which is why classical simulation
+   has repeatedly caught up with variational demonstrations, and why no
+   NISQ variational advantage has been demonstrated. The right statement
+   is that step 2 is the only step with any *prospect* of being
+   classically hard, and whether a given ansatz realizes that prospect is
+   a live question.
+
+   Three tempting alternatives, each of which puts the quantum work in
+   the wrong place.
+
+   **"Proposing the next parameters, because the search space is
+   exponential."** It is a continuous optimization over a handful of
+   angles, and classical optimizers do that for a living. A large search
+   space is not a quantum one.
+
+   **"Computing the cost, because the expectation value sums over $2^n$
+   amplitudes."** The $2^n$ sum is performed by the device, physically,
+   in the act of preparing and measuring the state. What comes back to
+   the classical side is a table of counts, and averaging counts is
+   arithmetic over a few numbers.
+
+   **"Checking convergence, because the estimates are noisy."** Comparing
+   two noisy numbers is still classical arithmetic. Noise in the input
+   does not make a computation quantum.
+
+   </details>
+
 4. Explain why PennyLane's differentiable-programming design (Quantum
    SDKs Overview) is particularly well-suited to STEP 3 of this lesson's
-   general loop specifically.
+   general loop specifically. Then say where the gradient is actually
+   computed, and what that costs.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because step 3's second half, "decide the next $\vec\theta$," is
+   exactly where a gradient is wanted, and PennyLane's design is that the
+   gradient falls out of the framework rather than being assembled.
+
+   Step 3 has two halves and they are unequal. Computing $\langle
+   H\rangle$ from measurement counts is a weighted average, and any
+   framework does it. Deciding the next parameters is an optimization
+   step, and a gradient-based optimizer needs $\partial\langle H\rangle/
+   \partial\theta_i$ for every parameter. PennyLane makes a circuit an
+   ordinary differentiable function inside a familiar autodiff
+   framework, so writing that optimizer is writing the same code you
+   would write for any differentiable model, and composing quantum and
+   classical layers into one trainable object is the default rather than
+   a project.
+
+   **One clarification that makes the fit sharper rather than vaguer.**
+   The gradient is not computed analytically inside the classical step.
+   The parameter-shift rule evaluates it by running the circuit again at
+   shifted parameter values, so obtaining a gradient reaches back into
+   step 2 and multiplies the circuit executions in question 2's
+   arithmetic by roughly two per parameter. PennyLane's contribution is
+   that this bookkeeping, which circuits to run, at which shifts, and how
+   to combine the results, happens behind the differentiation call
+   instead of in the user's code. So it makes step 3 ergonomic by
+   automating work that lands in step 2.
+
+   Three overstatements to avoid, each of which turns an ergonomics claim
+   into something false.
+
+   **Not exclusivity.** The parameter-shift rule is general and every
+   major SDK implements it. Any of them can run this loop.
+
+   **Not exactness.** Parameter-shift is exact wherever it applies, in
+   PennyLane and everywhere else. It is not a finite-difference
+   approximation, and it carries no step-size tradeoff.
+
+   **Not relocation of the optimizer.** The optimizer stays classical and
+   the round trip to the device stays. Nothing about differentiable
+   programming removes the sequential structure of question 1, or the
+   queue wait paid on every iteration, which on a shared cloud device
+   usually dominates the wall-clock time regardless of which SDK wrote
+   the circuit.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -230,17 +423,17 @@ optimization run needs.
 
 - Every variational algorithm follows the same loop: classical parameter
   proposal, quantum circuit execution, classical cost evaluation,
-  repeat, exactly what `runVqe`/`runQaoa` already implement.
+  repeat, what `runVqe`/`runQaoa` already implement.
 - Compilation overhead (SWAP gates, native-gate decomposition) applies
   PER ITERATION, compounding substantially across a full optimization
-  run — often the dominant cost for hybrid algorithms.
+  run, often the dominant cost for hybrid algorithms.
 - The quantum device's role is narrowly scoped to state preparation and
-  measurement; every other step is genuine classical computation.
+  measurement; every other step is ordinary classical computation.
 
-## Further Exploration
+## Building the Loop for Real
 
 <NextDiscovery>
-[Variational Algorithm Implementation](/lessons/quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation) builds this exact
+[Variational Algorithm Implementation](/lessons/quantum-software/compilation-and-hybrid-algorithms/variational-algorithm-implementation) builds this
 loop end to end using this platform's own `QuantumCircuit`, closing the
 gap between this course's software concepts and Quantum Algorithms II's
 physics.

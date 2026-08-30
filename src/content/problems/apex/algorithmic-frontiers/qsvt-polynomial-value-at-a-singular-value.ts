@@ -18,7 +18,7 @@ export const qsvtPolynomialValueAtASingularValue: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "A QSVT phase sequence realizes the degree-4 polynomial P(x) = 1 - x^2/2 + x^4/24 (this lesson's worked-example polynomial). A block-encoded Hermitian matrix A has a singular value σ = 0.5. According to the QSVT main theorem, what is P(σ) — the value the corresponding term of P(A) contributes — to three decimal places?",
+      "A QSVT phase sequence realizes the degree-4 polynomial P(x) = 1 - x^2/2 + x^4/24 (this lesson's worked-example polynomial). A block-encoded Hermitian matrix A has a singular value σ = 0.5. According to the QSVT main theorem, what is P(σ), the value the corresponding term of P(A) contributes, to three decimal places?",
     inputHint: "as a decimal, three decimal places",
   },
   answer: {
@@ -44,13 +44,13 @@ export const qsvtPolynomialValueAtASingularValue: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The QSVT main theorem says P(A) = Σᵢ P(σᵢ)|uᵢ⟩⟨vᵢ| — you just need P evaluated at this one σ, exactly as in single-qubit QSP." },
+    { text: "The QSVT main theorem says P(A) = Σᵢ P(σᵢ)|uᵢ⟩⟨vᵢ|, so you need P evaluated at this one σ, as in single-qubit QSP." },
     { text: "σ=0.5, so σ²=0.25 and σ⁴=0.0625." },
     { text: "Divide σ² by 2 and σ⁴ by 24, then combine with the leading 1, watching the alternating signs: the quadratic term subtracts, the quartic adds back." },
   ],
   solution: {
     steps: [
-      { description: "By the QSVT main theorem, the subspace for singular value σ contributes exactly P(σ) to P(A) — the same value single-qubit QSP would produce for signal x=σ." },
+      { description: "By the QSVT main theorem, the subspace for singular value σ contributes P(σ) to P(A), the same value single-qubit QSP would produce for signal x=σ." },
       { description: "Compute σ²=0.25 and σ⁴=0.0625 for σ=0.5.", latex: "\\sigma^2=0.25,\\qquad \\sigma^4=0.0625" },
       { description: "Substitute: P(0.5) = 1 - 0.25/2 + 0.0625/24 = 1 - 0.125 + 0.0026042.", latex: "P(0.5)=1-0.125+0.0026042\\approx0.878" },
     ],
@@ -58,7 +58,7 @@ export const qsvtPolynomialValueAtASingularValue: NumericProblem = {
   },
   explanation: {
     correctIdea: "QSVT guarantees that whatever polynomial the underlying QSP phases realize gets applied, unchanged, to every one of A's singular values independently.",
-    whyCorrect: "0.878 is close to cos(0.5)≈0.8776, exactly as expected since P is a degree-4 truncation of cos's Taylor series — a small, honest truncation error, not a sign of a mistake.",
+    whyCorrect: "0.878 sits close to cos(0.5)≈0.8776, as expected: P is a degree-4 truncation of the Taylor series for cos, so the gap is truncation error, not a mistake.",
     whyWrong: ["Answering exactly 1 would ignore the -x²/2 and +x⁴/24 correction terms entirely, treating P as if it were the constant polynomial 1."],
   },
 };

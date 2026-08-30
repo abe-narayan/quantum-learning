@@ -15,7 +15,7 @@ export const stepScatteringCalculation: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "For E = 8 and step height V0 = 2 (natural units), find the reflection probability R.",
-    inputHint: "a decimal",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -29,8 +29,9 @@ export const stepScatteringCalculation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "k1 = sqrt(16) = 4, k2 = sqrt(12) ≈ 3.4641." },
-    { text: "R = ((k1-k2)/(k1+k2))^2." },
+    { text: "With $E$ above the step, nothing is trapped anywhere. The reflection comes purely from the mismatch between the wavenumbers on the two sides." },
+    { text: "Compute the wavenumber on each side from the local kinetic energy, then form their difference over their sum." },
+    { text: "That ratio is a reflected amplitude, not a probability. One further operation stands between it and $R$." },
   ],
   solution: {
     steps: [

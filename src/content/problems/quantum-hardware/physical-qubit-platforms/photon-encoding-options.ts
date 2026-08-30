@@ -16,10 +16,10 @@ export const photonEncodingOptions: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "A photonic qubit is encoded in some two-valued property of a single photon. Which of these photon properties could not serve that role at all?",
     options: [
-      { id: "a", text: "Rest mass (light versus heavy photons)" },
-      { id: "b", text: "Polarization (horizontal versus vertical)" },
-      { id: "c", text: "Path (which of two waveguides or fibers it travels)" },
-      { id: "d", text: "Arrival time (which of two time bins the photon lands in)" },
+      { id: "a", text: "Rest mass (a light photon versus a heavy one)" },
+      { id: "b", text: "Polarization (horizontal versus vertical axis)" },
+      { id: "c", text: "Path (which of two waveguides it travels)" },
+      { id: "d", text: "Arrival time (which of two time bins it lands in)" },
     ],
   },
   answer: {
@@ -43,7 +43,7 @@ export const photonEncodingOptions: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "A qubit encoding needs a physical property that can take two distinguishable values on the same particle. Rest mass fails that test for photons before any hardware question arises.",
-    whyCorrect: "Matches the lesson's Engineering Development section, which introduces polarization and path as two-valued carriers.",
+    whyCorrect: "An encoding needs a property that takes two distinguishable values. Rest mass takes exactly one value for every photon there is, so there is nothing to label |1⟩ with, while polarization, path and time bin each supply the required pair.",
     whyWrong: [
       { optionId: "b", text: "Names the lesson's primary encoding. Horizontal and vertical are two settings of one property." },
       { optionId: "c", text: "Names the lesson's second encoding. Which of two waveguides the photon is in is two-valued." },

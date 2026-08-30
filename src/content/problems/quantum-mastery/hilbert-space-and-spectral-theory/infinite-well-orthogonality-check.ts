@@ -31,11 +31,20 @@ export const infiniteWellOrthogonalityCheck: NumericProblem = {
     value: 0,
     tolerance: 1e-6,
     incorrectFeedback:
-      "This is exactly the theorem's orthogonality prediction — ψ₂ and ψ₄ belong to different eigenvalues of the same Sturm-Liouville problem (w=1), so ∫wψ₂ψ₄dx must be zero.",
+      "Read off the theorem's orthogonality prediction. ψ₂ and ψ₄ belong to different eigenvalues of the same Sturm-Liouville problem (w=1), so ∫wψ₂ψ₄dx must be zero.",
+    // 1 is the answer to the adjacent question, and answering the adjacent
+    // question is the failure mode here rather than an arithmetic slip.
+    nearMisses: [
+      {
+        value: 1,
+        feedback:
+          "1 is ⟨ψₙ|ψₙ⟩, the normalization condition, which is what you get overlapping an eigenstate with itself. This overlap is between two different eigenstates, and orthogonality is the separate claim the theorem makes about that case.",
+      },
+    ],
   },
   hints: [
     { text: "ψ₂ and ψ₄ are eigenfunctions of the same operator with different eigenvalues (E₂≠E₄)." },
-    { text: "The Sturm-Liouville orthogonality theorem applies to ANY two eigenfunctions with different eigenvalues, not just adjacent n values." },
+    { text: "The Sturm-Liouville orthogonality theorem applies to any two eigenfunctions with different eigenvalues, not just adjacent n values." },
     { text: "The predicted overlap is exactly zero (up to floating-point roundoff)." },
   ],
   solution: {
@@ -52,10 +61,10 @@ export const infiniteWellOrthogonalityCheck: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "Orthogonality isn't special to adjacent quantum numbers or to any particular pair — it holds for every pair of distinct eigenvalues of the same self-adjoint Sturm-Liouville problem.",
+      "Orthogonality is not special to adjacent quantum numbers or to any particular pair. It holds for every pair of distinct eigenvalues of the same self-adjoint Sturm-Liouville problem.",
     whyCorrect: `Directly verified: this platform's real infiniteSquareWellEigenstate/innerProduct computation gives an overlap of ${overlap.toExponential(3)} for n=2, n=4 (halfWidth=1), consistent with exactly 0 up to floating-point roundoff.`,
     whyWrong: [
-      "Expecting a nonzero overlap because n=2 and n=4 are 'far apart' misunderstands the theorem — orthogonality is exact for any two distinct eigenvalues, not a matter of degree that fades with the gap between quantum numbers.",
+      "Expecting a nonzero overlap because n=2 and n=4 are 'far apart' misunderstands the theorem. Orthogonality is exact for any two distinct eigenvalues, not a matter of degree that fades with the gap between quantum numbers.",
     ],
   },
 };

@@ -36,11 +36,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="You have been using it already">
 The last three lessons built two codes from scratch, gate by gate. The stabilizer formalism is the language every real code is written in, and the point of this lesson is that you have been using it already without the name.
 </LessonHook>
 
-## Motivation
+## Truth tables run out fast
 
 Three-qubit codes can be described with a truth table. Real codes cannot:
 the surface code two lessons from now has hundreds of parity checks, and
@@ -52,7 +52,7 @@ decode table you read off a diagram is derivable instead from which
 operators anticommute with which. Once you can compute the syndrome from
 the algebra, the size of the code stops mattering.
 
-## Mathematical Development
+## Generators, and syndromes as eigenvalue flips
 
 ### Stabilizer generators, defined
 
@@ -93,14 +93,24 @@ $$
 
 so $E|\psi\rangle$ is a **$-1$** eigenstate of $g$: measuring $g$ after
 the error gives $-1$ (syndrome bit $1$) instead of $+1$ (syndrome bit
-$0$). $X_0$ anticommutes with $Z_0Z_1$ (since $X$ and $Z$ anticommute on
-the same qubit: $XZ=-ZX$, checked directly in an earlier lesson's $HXH=Z$
-computation's building blocks) but *commutes* with $Z_1Z_2$ (acting on
-different qubits, so the operators trivially commute), exactly
-reproducing Lesson 2's decode table entry $(1,0)\to$ qubit 0, now derived
+$0$). $X_0$ anticommutes with $Z_0Z_1$, since $X$ and $Z$ anticommute on
+the same qubit:
+$XZ=\begin{pmatrix}0&-1\\1&0\end{pmatrix}$ while
+$ZX=\begin{pmatrix}0&1\\-1&0\end{pmatrix}$, so $XZ=-ZX$. It *commutes*
+with $Z_1Z_2$, which acts on different qubits entirely. That reproduces
+Lesson 2's decode table entry $(1,0)\to$ qubit 0, now derived
 from (anti)commutation rather than read off a truth table.
 
-## Physical Interpretation
+The general rule, and the reason this scales, is a counting statement:
+two Pauli strings commute when they anticommute on an *even* number of
+qubits (zero included) and anticommute when they do so on an odd number.
+Each qubit contributes its own factor of $-1$ or $+1$, and the strings'
+overall sign is the product of those factors. A single-qubit error
+overlaps a generator on at most one qubit, so in this course the count is
+only ever zero or one, but the same rule settles every commutation
+question in a code with hundreds of generators.
+
+## No new physics, a better language
 
 The stabilizer formalism adds no physics to what Lessons 2 and 3 built. It
 gives the same syndrome-measurement idea an algebraic language: which Pauli
@@ -112,7 +122,7 @@ errors; an anticommutation rule's does not. That is what makes codes with
 hundreds of checks, like the <Term id="surface-codes">surface codes</Term> two lessons from now, describable
 at all.
 
-## Worked Example
+## Which stabilizers one error anticommutes with
 
 **Verify $X_1$ anticommutes with both $Z_0Z_1$ and $Z_1Z_2$, reproducing
 the decode table's $(1,1)\to$ qubit 1 entry.**
@@ -144,7 +154,7 @@ checking it.
   explanation="An operator anticommutes with a stabilizer only through the qubits they both act on. X_2 touches qubit 2; g1 = Z0Z1 never touches qubit 2, so they commute trivially. g2 = Z1Z2 has a Z on qubit 2, and X and Z on the same qubit anticommute, so g2 flips. Syndrome (0,1), which is Lesson 2's qubit-2 decode entry. Notice that you did not need to know what the code was protecting, or what α and β were, to work that out."
 />
 
-<StabilizerTable generators={generatorEntries} ariaLabel="Interactive table of the bit-flip code's two stabilizer generators g1 (Z0Z1) and g2 (Z1Z2) across qubits 0 through 2, with a qubit and X/Z error-type selector that highlights which generators anticommute with the chosen single-qubit error" defaultQubit={2} qubitLabelOffset={1} />
+<StabilizerTable generators={generatorEntries} ariaLabel="Interactive table of the bit-flip code's two stabilizer generators g1 (Z0Z1) and g2 (Z1Z2) across qubits 0 through 2, with a qubit and X/Z error-type selector that highlights which generators anticommute with the chosen single-qubit error" defaultQubit={3} qubitLabelOffset={1} />
 
 Try qubit $0$ or qubit $1$ afterward to reproduce the lesson's other two
 hand-derived cases the same way.
@@ -153,7 +163,7 @@ hand-derived cases the same way.
   <LazySyndromeExplorer mode="bit-flip" />
 </InteractiveSection>
 
-## Common Mistakes
+## This is not unrelated new material
 
 <Callout type="note">
 **Treating the stabilizer formalism as unrelated new material.** Every
@@ -172,16 +182,184 @@ $Z_0Z_1$ and $Z_0$ alone) commute.
 
 ## Practice Questions
 
-1. Verify $X_2$ anticommutes with $Z_1Z_2$ but commutes with $Z_0Z_1$,
-   reproducing the decode table's qubit-2 entry.
+1. A $Y_1$ error acts as $Y$ on qubit 1. Using $Y=iXZ$ and the
+   even/odd counting rule, work out which of $Z_0Z_1$ and $Z_1Z_2$ it
+   anticommutes with, and compare the answer to the $X_1$ case worked
+   out above.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Both, giving syndrome $(1,1)$: the identical answer to $X_1$. That
+   coincidence is the whole content of the question.
+
+   Take it factor by factor. $Y_1=iX_1Z_1$, and the global $i$ has no
+   effect on commutation, since it passes through everything. On qubit 1,
+   the $X$ factor meets a $Z$ from the generator and anticommutes; the
+   $Z$ factor meets the same $Z$ and commutes. One anticommuting
+   contribution, an odd count, so $Y_1$ anticommutes with $Z_0Z_1$. The
+   same reasoning runs unchanged against $Z_1Z_2$, which also carries a
+   $Z$ on qubit 1. Both syndrome bits flip.
+
+   The shorter route to the same place: any two *different* Paulis on the
+   same qubit anticommute, so on qubit 1 the pair $(Y,Z)$ behaves exactly
+   as $(X,Z)$ does. Since $X_1$ and $Y_1$ differ only in a factor that
+   commutes with everything the generators contain, they are
+   indistinguishable to this code's checks.
+
+   Now the consequence, which is the reason to ask. Syndrome $(1,1)$
+   sends the decoder to the table entry for qubit 1, and it applies
+   $X_1$. What remains on the register is $X_1Y_1 \propto Z_1$, an
+   uncorrected phase flip, which is a logical $Z$ on the encoded qubit.
+   The code confidently reports a repair and delivers a logical error,
+   the same failure Lesson 3's question 3 traced by hand and this
+   formalism now predicts in two lines.
+
+   The stabilizer language also says exactly when two errors *can* be
+   told apart: $E$ and $E'$ produce different syndromes precisely when
+   $E^\dagger E'$ anticommutes with some generator. Here
+   $X_1^\dagger Y_1\propto Z_1$, which commutes with both generators and
+   is not itself in the stabilizer group $\{I,Z_0Z_1,Z_1Z_2,Z_0Z_2\}$, so
+   the pair is neither distinguishable nor harmlessly degenerate. That is
+   the algebraic signature of a blind spot.
+
+   </details>
+
 2. Explain why $Z_0$ (a phase-flip error, not the code's stabilizer)
    commutes with both $Z_0Z_1$ and $Z_1Z_2$, consistent with Lesson 2's
    finding that this code is blind to $Z$ errors entirely.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Both counts come out zero, which is even, so $Z_0$ commutes with each
+   generator.
+
+   Against $Z_0Z_1$ the two operators overlap on qubit 0, and there they
+   are the *same* Pauli. Identical Paulis commute, so that site
+   contributes $+1$ and there is no anticommuting site anywhere. Against
+   $Z_1Z_2$ there is no overlap at all: $Z_0$ acts as the identity on
+   qubits 1 and 2, and $Z_1Z_2$ acts as the identity on qubit 0.
+   Operators on disjoint qubits always commute. Syndrome $(0,0)$.
+
+   Nothing about that is special to $Z_0$. Every generator of this code
+   is built from $Z$s, and $Z$ commutes with $Z$, so *no* product of $Z$
+   operators can ever anticommute with them. The blindness is not a gap
+   in the design that a cleverer choice of parity checks would close. It
+   is forced by the fact that the checks and the errors are drawn from
+   the same commuting family.
+
+   Two further facts finish the picture. First, $Z_0$ is not in the
+   stabilizer group $\{I,Z_0Z_1,Z_1Z_2,Z_0Z_2\}$, so it is not a
+   do-nothing operator on the code space; it acts as the logical $Z$.
+   An operator that commutes with every generator but lies outside the
+   group is exactly the definition of a logical operator, and it is
+   undetectable by construction. Second, multiplying by stabilizers,
+   $Z_0\cdot Z_0Z_1=Z_1$ and $Z_1\cdot Z_1Z_2=Z_2$, so $Z_0$, $Z_1$ and
+   $Z_2$ are the same logical operator wearing different labels. That is
+   why the three single-$Z$ errors do the identical thing to a codeword,
+   and why no syndrome could locate one even in principle.
+
+   Since a logical operator of weight $1$ exists, the code's distance as
+   a general quantum code is $1$. Its distance $3$ is a claim about $X$
+   errors only, and the difference between those two sentences is the
+   entire reason Lessons 3 and 4 exist.
+
+   </details>
+
 3. For the phase-flip code (Lesson 3), what are the stabilizer generators,
    in terms of $X$ instead of $Z$? (Hint: use the $HZH=X$ conjugation.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $X_0X_1$ and $X_1X_2$.
+
+   The derivation is one line, because conjugation carries the entire
+   stabilizer group along with the code. If $g|\psi\rangle=+|\psi\rangle$
+   then
+
+   $$
+   \big(H^{\otimes3}gH^{\otimes3}\big)\big(H^{\otimes3}|\psi\rangle\big)
+   = H^{\otimes3}g|\psi\rangle = +H^{\otimes3}|\psi\rangle,
+   $$
+
+   so the conjugated operator stabilizes the conjugated state. Apply
+   $HZH=X$ on each qubit and $Z_0Z_1\to X_0X_1$, $Z_1Z_2\to X_1X_2$.
+
+   The direct check confirms it. The codewords are $|+++\rangle$ and
+   $|---\rangle$, and $X|+\rangle=+|+\rangle$ while $X|-\rangle=-|-\rangle$,
+   so $X_0X_1$ gives $(+1)(+1)=+1$ on the first and $(-1)(-1)=+1$ on the
+   second. Both codewords are $+1$ eigenstates, and so is any
+   superposition of them.
+
+   Everything else transfers by the same conjugation, including the blind
+   spot, mirrored. This code's undetectable weight-1 operator is $X_0$
+   (or $X_1$, or $X_2$, all equal modulo the stabilizers), which commutes
+   with both $X$-type generators and acts as the logical $Z$. Bit flips
+   pass through it untouched, exactly as phase flips pass through the
+   bit-flip code.
+
+   The habit worth taking from this is that you never re-derive a
+   conjugated code. Generators, logical operators, decode table and blind
+   spot all move together under $H^{\otimes n}$, so one line of algebra
+   relocates the whole structure.
+
+   </details>
+
 4. Why must a code's stabilizer generators always commute *with each
    other* (not just with the code's own states)? What would go wrong if
    two stabilizers anticommuted?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because otherwise the code space is empty. Not smaller, not
+   degenerate: empty. Two anticommuting operators have no simultaneous
+   $+1$ eigenstate at all.
+
+   Suppose $g_1g_2=-g_2g_1$ and some $|\psi\rangle$ satisfies both
+   $g_1|\psi\rangle=|\psi\rangle$ and $g_2|\psi\rangle=|\psi\rangle$.
+   Evaluate $g_1g_2|\psi\rangle$ two ways:
+
+   $$
+   g_1g_2|\psi\rangle = g_1|\psi\rangle = |\psi\rangle,
+   \qquad
+   g_1g_2|\psi\rangle = -g_2g_1|\psi\rangle = -g_2|\psi\rangle = -|\psi\rangle.
+   $$
+
+   So $|\psi\rangle=-|\psi\rangle$, which forces $|\psi\rangle=0$. There
+   is nothing to encode into.
+
+   The same fact has a second face worth seeing, because it is how the
+   condition is usually stated. Anticommuting Pauli strings satisfy
+
+   $$
+   (g_1g_2)^2 = g_1(g_2g_1)g_2 = -g_1^2g_2^2 = -I,
+   $$
+
+   so $-I$ is a product of stabilizers and therefore in the group. But
+   $-I|\psi\rangle=|\psi\rangle$ has the same empty solution set. The
+   requirements "the generators commute" and "$-I$ is not in the group"
+   are two ways of ruling out the same collapse.
+
+   The operational failure is just as concrete. A syndrome is supposed to
+   be a stable, repeatable readout. Measuring $g_1$ then $g_2$ then $g_1$
+   again, with the two anticommuting, returns a fresh coin flip on the
+   third measurement, because measuring $g_2$ destroys any definite value
+   of $g_1$. There would be no syndrome to decode, only noise, and no way
+   to tell an error from the previous measurement's back-action.
+
+   This is not a hypothetical constraint that never binds. It is exactly
+   what blocks the cheap fix from Lesson 3: bolting the phase-flip
+   checks onto the bit-flip code's three qubits fails because $Z_0Z_1$
+   and $X_1X_2$ overlap on qubit 1 alone, an odd count, so they
+   anticommute. The commuting requirement is also what fixes a code's
+   size. An $[[n,k,d]]$ code has exactly $n-k$ independent commuting
+   generators, which is why three qubits holding one logical qubit have
+   room for two checks and not a third.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -193,10 +371,13 @@ $Z_0Z_1$ and $Z_0$ alone) commute.
   eigenvalue; an error flips it exactly when the error anticommutes with
   that stabilizer.
 - Every entry in Lesson 2's decode table is re-derivable from
-  (anti)commutation relations alone, the stabilizer formalism is a
-  compact restatement, not new content.
+  (anti)commutation relations alone. The stabilizer formalism is a
+  compact restatement of what Lesson 2 already built, not new content.
+- Two Pauli strings commute exactly when they anticommute on an even
+  number of qubits, which is the rule that lets codes with hundreds of
+  generators be handled without a lookup table.
 
-## Further Exploration
+## Formalizing the whole correction loop
 
 <NextDiscovery>
 Up next, [Syndrome Measurement and the Recovery Map](/lessons/quantum-computing/error-correction-and-fault-tolerance/syndrome-measurement-and-the-recovery-map) formalizes the

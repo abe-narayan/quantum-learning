@@ -20,11 +20,23 @@ export const accountingTableRecall: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["modular exponentiation", "controlled modular", "modular arithmetic", "circuit itself", "state-building circuit"],
-      ["continued fractions", "recover r", "extract the period"],
+      {
+        phrases: ["modular exponentiation", "controlled modular", "modular arithmetic", "circuit itself", "state-building circuit"],
+        missingFeedback:
+          "Name both gaps. One of them is the machinery that would put the register into the right state in the first place.",
+      },
+      {
+        phrases: ["continued fractions", "recover r", "extract the period"],
+        missingFeedback:
+          "One gap is on the circuit side. The other is classical post-processing that runs after the measurement; name it and say what it computes.",
+      },
     ],
-    incorrectFeedback: "Recall the capstone's table specifically — it names two distinct missing pieces for Shor's algorithm.",
-    partialFeedback: "Good — name the second missing piece as well, not just the first.",
+    incorrectFeedback: "The capstone's table names two distinct missing pieces for Shor's algorithm. Both are needed here.",
+    partialFeedback: "One piece is named. There is a second one in the same table.",
+    modelAnswers: [
+      "The two scoped-out pieces are the controlled modular exponentiation circuit, which is what would actually build the state, and the continued fractions step, which is what turns the measured value into the period r.",
+      "Modular exponentiation as a gate-level circuit is not built, and neither is continued fractions, the classical post-processing that would recover r from the measurement peak.",
+    ],
   },
   hints: [
     { text: "One gap concerns how the period-finding state is actually produced, gate by gate." },
@@ -33,10 +45,10 @@ export const accountingTableRecall: ConceptualProblem = {
   ],
   solution: {
     steps: [
-      { description: "Gap 1: the controlled-modular-exponentiation circuit itself — the gate sequence that would build the period-finding state from scratch, rather than constructing it directly from its amplitudes." },
-      { description: "Gap 2: the continued fractions algorithm — the classical post-processing step that reliably recovers r from a measured peak location." },
+      { description: "Gap 1: the controlled-modular-exponentiation circuit itself, meaning the gate sequence that would build the period-finding state from scratch rather than constructing it directly from its amplitudes." },
+      { description: "Gap 2: the continued fractions algorithm, the classical post-processing step that recovers r from a measured peak location." },
     ],
-    finalAnswer: "The controlled-modular-exponentiation circuit (state-building gates) and the continued fractions algorithm (period recovery from a measurement) — both named explicitly, not silently omitted.",
+    finalAnswer: "The controlled-modular-exponentiation circuit (state-building gates) and the continued fractions algorithm (period recovery from a measurement). The capstone names both rather than passing over them.",
   },
   explanation: {
     correctIdea: "A complete, honest accounting names every scoped-out piece specifically, rather than leaving gaps implicit.",

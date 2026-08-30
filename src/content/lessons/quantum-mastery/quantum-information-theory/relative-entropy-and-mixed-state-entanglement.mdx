@@ -82,17 +82,43 @@ export const concurrenceWerner = Math.max(0, sqrtEigs[0] - sqrtEigs[1] - sqrtEig
 
 export const wernerPurity = purity(rhoWerner);
 
+export const wernerConcurrenceAt = (pv) => {
+  const rw = convexCombination([
+    { probability: pv, density: rhoPsiMinus },
+    { probability: 1 - pv, density: maximallyMixedState(4) },
+  ]);
+  const Rp = rw.mul(YY.mul(conjugateMatrix(rw)).mul(YY));
+  const block = new Matrix([
+    [Rp.get(1, 1), Rp.get(1, 2)],
+    [Rp.get(2, 1), Rp.get(2, 2)],
+  ]);
+  const [b1, b2] = eigenvaluesHermitian2x2(block);
+  const roots = [b1, b2, Rp.get(0, 0).re, Rp.get(3, 3).re]
+    .map((v) => Math.sqrt(Math.max(0, v)))
+    .sort((x, y) => y - x);
+  return Math.max(0, roots[0] - roots[1] - roots[2] - roots[3]);
+};
+
+export const wernerPValues = Array.from({ length: 41 }, (_, i) => i / 40);
+export const wernerEngineConcurrence = wernerPValues.map((pv) => wernerConcurrenceAt(pv));
+export const wernerClosedForm = wernerPValues.map((pv) => Math.max(0, (3 * pv - 1) / 2));
+export const wernerConcurrenceMaxGap = Math.max(
+  ...wernerPValues.map((_, i) => Math.abs(wernerEngineConcurrence[i] - wernerClosedForm[i]))
+);
+
 export const concurrenceFrames = [
   {
     paramLabel: "",
     series: [
       {
-        label: "C(p) = max(0, (3p-1)/2)",
+        label: "C(p) computed from the engine's own R matrix at each p",
         color: "brand",
-        points: Array.from({ length: 41 }, (_, i) => {
-          const pv = i / 40;
-          return { x: pv, y: Math.max(0, (3 * pv - 1) / 2) };
-        }),
+        points: wernerPValues.map((pv, i) => ({ x: pv, y: wernerEngineConcurrence[i] })),
+      },
+      {
+        label: "closed form max(0, (3p-1)/2)",
+        color: "muted",
+        points: wernerPValues.map((pv, i) => ({ x: pv, y: wernerClosedForm[i] })),
       },
     ],
   },
@@ -104,7 +130,7 @@ export const concurrenceFrames = [
   limitation to quietly work around.
 </LessonHook>
 
-## Motivation
+## When Purity Stops Measuring Entanglement
 
 Concurrence: A Two-Qubit Entanglement Measure computed a real
 entanglement measure for pure states and then stopped, naming the
@@ -119,19 +145,19 @@ still exactly enough to compute it.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/3/3d/NIST_Physicists_Boost_Entanglement_of_Atom_Pairs_%285940505535%29.jpg"
   alt="NIST researchers illuminating trapped beryllium ion pairs with ultraviolet laser pulses during an experiment to purify and boost entanglement between them"
-  caption="This NIST experiment purifies entanglement out of noisy, mixed pairs of trapped ions — the physical version of this lesson's question: how much entanglement survives once a state is no longer pure, and how do you extract or quantify it."
+  caption="This NIST experiment purifies entanglement out of noisy, mixed pairs of trapped ions. That is the physical version of this lesson's question: how much entanglement survives once a state is no longer pure, and how do you extract or quantify it."
   credit="Bill Pietsch / NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:NIST_Physicists_Boost_Entanglement_of_Atom_Pairs_(5940505535).jpg"
-  license="Public domain (U.S. government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Mathematical Development
+## Klein's Inequality, Concurrence, and Peres-Horodecki
 
 ### Quantum relative entropy
 
 <EquationReveal
   terms={[
-    { id: "Srel", symbol: "S(ρ‖σ)", gloss: "Quantum relative entropy — how costly it is to mistake σ for the true state ρ." },
+    { id: "Srel", symbol: "S(ρ‖σ)", gloss: "Quantum relative entropy, a measure of how costly it is to mistake σ for the true state ρ." },
     { id: "rho", symbol: "ρ", gloss: "The true state." },
     { id: "sigma", symbol: "σ", gloss: "The (possibly wrong) reference state being compared against." },
   ]}
@@ -189,7 +215,7 @@ Kullback–Leibler statement.
   <DerivationStep annotation="D_cl(p‖r) ≥ 0 by a second application of Jensen.">
     $-D_{cl}(p\|r)=\sum_ip_i\log_2(r_i/p_i)\leq\log_2\big(\sum_ip_i\cdot r_i/p_i\big)=\log_2\big(\sum_ir_i\big)=\log_2(1)=0$
   </DerivationStep>
-  <DerivationStep annotation="Chaining both steps proves the inequality. Equality throughout requires both Jensen steps to saturate, which forces pᵢ = rᵢ for every i and c_ij to reduce to a permutation matrix — i.e. ρ and σ commute and share eigenvectors with identical eigenvalues, i.e. ρ = σ.">
+  <DerivationStep annotation="Chaining both steps proves the inequality. Equality throughout requires both Jensen steps to saturate, which forces pᵢ = rᵢ for every i and c_ij to reduce to a permutation matrix, i.e. ρ and σ commute and share eigenvectors with identical eigenvalues, i.e. ρ = σ.">
     $S(\rho\|\sigma)\geq D_{cl}(p\|r)\geq0$ $\blacksquare$
   </DerivationStep>
 </DerivationSteps>
@@ -250,11 +276,11 @@ $0$). Then $C=\sqrt{\mu_1}=|\langle\psi|\tilde\psi\rangle|$. Direct
 symbolic computation for $|\psi\rangle=a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$
 with fully general complex amplitudes $a,b,c,d$ confirms
 $|\langle\psi|\tilde\psi\rangle|=2|ad-bc|$ exactly: the two formulas
-agree completely on every pure state, confirming the general definition
-extends the pure-state one rather than being a different quantity that
-happens to share a name.
+agree completely on every pure state, confirming that the general
+definition extends the pure-state one; the shared name is not a
+coincidence.
 
-### An actually mixed worked example: the Werner state
+### A properly mixed worked example: the Werner state
 
 Take $\rho=p|\Psi^-\rangle\langle\Psi^-|+(1-p)\,I/4$ (a **Werner
 state**: a mixture of the singlet Bell state with the maximally mixed
@@ -272,12 +298,12 @@ cannot handle at all.
 <PredictBeforeReveal
   question="p=0.7 means this Werner state is a 70/30 mix of a maximally entangled singlet and pure noise (I/4). Is it still entangled at all, or has the noise already washed the entanglement out?"
   options={[
-    { label: "Still entangled — 70% singlet should dominate", value: "entangled" },
-    { label: "Separable — mixing in any maximally mixed state destroys entanglement", value: "separable" },
+    { label: "Still entangled, since 70% singlet should dominate", value: "entangled" },
+    { label: "Separable, since mixing in any maximally mixed state destroys entanglement", value: "separable" },
     { label: "Impossible to say without a full convex-roof optimization", value: "unknowable" },
   ]}
   correctValue="entangled"
-  explanation="C(0.7) = 0.55, computed below: a real, nonzero amount of entanglement survives. The formula's own max(0, ...) clipping only kicks in below p=1/3 (derived later from the closed form C(p)=max(0,(3p-1)/2)). A Werner state stays entangled for a wide range of mixing before the noise finally wins; entanglement does not vanish the moment the state stops being pure."
+  explanation="C(0.7) = 0.55, computed below: a nonzero amount of entanglement survives. The formula's own max(0, ...) clipping only kicks in below p=1/3 (derived later from the closed form C(p)=max(0,(3p-1)/2)). A Werner state stays entangled for a wide range of mixing before the noise finally wins; entanglement does not vanish the moment the state stops being pure."
 />
 
 Building $\tilde\rho$ and $R=\rho\tilde\rho$
@@ -302,16 +328,36 @@ $$
 \sqrt{\mu}: \{0.775,\ 0.075,\ 0.075,\ 0.075\} \qquad\Longrightarrow\qquad C(\rho) = \max(0,\ 0.775-0.075-0.075-0.075) = 0.55
 $$
 
-A concrete, nonzero, **computed** mixed-state concurrence: this Werner
-state at $p=0.7$ is actually entangled, verified via this exact
-number, not merely presumed. It matches the known closed form for
-Werner states, $C(p)=\max(0,(3p-1)/2)$, exactly ($(3\times0.7-1)/2=0.55$),
-across the whole family:
+A concrete, nonzero, **computed** mixed-state concurrence. This Werner
+state at $p=0.7$ is entangled, and the number says by how much. It also
+matches the known closed form for Werner states,
+$C(p)=\max(0,(3p-1)/2)$, exactly: $(3\times0.7-1)/2=0.55$.
+
+Agreement at one point is not much, so the figure below runs the entire
+construction again at
+each of $41$ values of $p$: build $\rho_W(p)$ with `convexCombination`,
+form $\tilde\rho$ and $R$, pull the block eigenvalues out with
+`eigenvaluesHermitian2x2`, and take
+$\max(0,\sqrt{\mu_1}-\sqrt{\mu_2}-\sqrt{\mu_3}-\sqrt{\mu_4})$. The
+closed form is plotted underneath as a separate series.
 
 <ParametricCurve
   frames={concurrenceFrames}
-  ariaLabel="Werner-state concurrence C(p) = max(0, (3p-1)/2) plotted for p from 0 to 1, showing entanglement vanishing below p=1/3"
+  xAxisLabel="Werner parameter p"
+  yAxisLabel="concurrence C(p)"
+  ariaLabel="Werner-state concurrence plotted against p from 0 to 1, as two series that lie exactly on top of one another: one computed at each p from the engine's own R matrix and eigensolver, the other the closed form max(0, (3p-1)/2). Both are flat at zero up to p=1/3 and then rise as a straight line of slope 3/2 to C=1 at p=1"
 />
+
+The two series coincide: the largest discrepancy anywhere on the sweep is
+{wernerConcurrenceMaxGap.toExponential(1)}, which is floating-point
+roundoff. Two features of the curve repay a look. The block-diagonal
+structure of $R$ that made this computable holds at every $p$, not only at
+$p=0.7$, so the engine really does produce the whole curve and not one
+lucky point. And the kink at $p=1/3$ is a computed feature: the engine's
+raw $\sqrt{\mu_1}-\sqrt{\mu_2}-\sqrt{\mu_3}-\sqrt{\mu_4}$ goes negative
+below that threshold and the $\max(0,\cdot)$ clips it, which flattens the
+left half of the curve where it would otherwise slope down into
+meaningless negative entanglement.
 
 Below $p=1/3$, $C(p)=0$: the Werner state becomes **separable**, not
 just weakly entangled, a qualitatively different physical regime this
@@ -431,7 +477,7 @@ a phenomenon with no two-qubit analogue, and it is one reason mixed-state
 entanglement theory is still an active research area rather than a closed
 chapter.
 
-## Physical Interpretation
+## Two Questions That Come Apart for Mixed States
 
 <InsightBlock>
   For a pure state, "how mixed is the part I hold?" and "how entangled is
@@ -456,7 +502,7 @@ away as classical mixing. That minimization is why the general formula
 was hard to find and why its equality with entanglement of formation is a
 theorem rather than a definition.
 
-## Common Mistakes
+## Assuming the Two-Qubit Shortcut Always Applies
 
 <Callout type="warning">
 **Assuming $R=\rho\tilde\rho$ is Hermitian in general, and that
@@ -472,7 +518,7 @@ an arbitrary mixed two-qubit state.
 **Forgetting the $\max(0,\cdot)$ clipping in the concurrence formula.**
 Without it, $\sqrt{\mu_1}-\sqrt{\mu_2}-\sqrt{\mu_3}-\sqrt{\mu_4}$ can come
 out negative (it does for any Werner state with $p<1/3$): the clipping
-is not a numerical-safety afterthought, it's the formula correctly
+is not a numerical-safety afterthought; it's the formula correctly
 reporting zero entanglement for a state that really is separable.
 </Callout>
 
@@ -480,16 +526,205 @@ reporting zero entanglement for a state that really is separable.
 
 1. Verify $S(\rho\|\rho)=0$ directly from the definition, for any valid
    density matrix $\rho$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Substituting $\sigma=\rho$ into the definition makes the two terms
+   literally the same expression:
+
+   $$
+   S(\rho\|\rho)=\mathrm{Tr}(\rho\log_2\rho)-\mathrm{Tr}(\rho\log_2\rho)=0.
+   $$
+
+   No spectral decomposition is needed, but it is worth doing one anyway to
+   see that nothing is being swept under the rug in the singular case. With
+   $\rho=\sum_ip_i|i\rangle\langle i|$ the overlap matrix is
+   $c_{ij}=|\langle i|j\rangle|^2=\delta_{ij}$, so the proof's general
+   expression collapses to $\sum_ip_i(\log_2p_i-\log_2p_i)=0$, term by
+   term. Any $p_i=0$ contributes $0\log_20=0$ under the standard
+   convention, which is not an evasion: the limit
+   $x\log_2 x\to0$ as $x\to0^+$ makes it the only continuous choice. And
+   the finiteness hypothesis $\mathrm{supp}(\rho)\subseteq\mathrm{supp}(\sigma)$
+   is satisfied with room to spare, since the two supports are identical.
+
+   The result is the "if" half of Klein's equality condition, and it is the
+   half that gives relative entropy its meaning: the quantity measures the
+   cost of using $\sigma$ as a model when the truth is $\rho$, and a
+   correct model costs nothing.
+
+   What this emphatically does not make relative entropy is a distance. It
+   fails symmetry outright. With $\rho=\mathrm{diag}(0.9,0.1)$ and
+   $\sigma=I/2$ from the worked example,
+
+   $$
+   S(\rho\|\sigma)=0.531\ \text{bits},\qquad S(\sigma\|\rho)=0.737\ \text{bits},
+   $$
+
+   two different numbers for the same pair. It fails the triangle
+   inequality too, and it can be $+\infty$ while the two states are
+   perfectly ordinary. $S(\rho\|\rho)=0$ is one metric axiom holding by
+   accident, not evidence of the others.
+
+   </details>
+
 2. Using Klein's inequality's equality condition, explain why
    $S(\rho\|\sigma)=0$ is only possible when $\rho=\sigma$ exactly, not
    merely when they have the same eigenvalues.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the eigenvectors enter the proof through $c_{ij}=|\langle i|j\rangle|^2$,
+   and equality demands that this matrix be a permutation, which is a
+   statement about *bases*, not spectra.
+
+   Follow the two Jensen steps backwards. The second one,
+   $D_{cl}(p\|r)\geq0$, saturates only when $r_i=p_i$ for every $i$. The
+   first one, $\sum_jc_{ij}\log_2q_j\leq\log_2\sum_jc_{ij}q_j$, uses the
+   *strict* concavity of $\log_2$, so it saturates only when the $q_j$
+   carrying nonzero weight $c_{ij}$ are all equal for each fixed $i$. Put
+   together with double stochasticity, that forces each row of $c$ to be
+   supported where $\sigma$'s eigenvalue is constant, which makes $c$ a
+   permutation (up to relabelling inside degenerate eigenspaces). A
+   permutation $c$ says $\rho$'s eigenvectors are $\sigma$'s eigenvectors,
+   and $r_i=p_i$ then says the matched eigenvalues agree. Together:
+   $\rho=\sigma$.
+
+   So sharing a spectrum is not enough, and the gap is not small. Take
+   $\rho=\mathrm{diag}(0.9,0.1)$ in the $z$ basis and
+   $\sigma=0.9|{+}\rangle\langle{+}|+0.1|{-}\rangle\langle{-}|$, the *same*
+   eigenvalues rotated into the $x$ basis. Both have von Neumann entropy
+   $0.469$ bits, so every spectrum-only quantity agrees. But
+   $\langle{+}|\rho|{+}\rangle=\langle{-}|\rho|{-}\rangle=\tfrac12$, so
+
+   $$
+   \mathrm{Tr}(\rho\log_2\sigma)=\tfrac12\log_2 0.9+\tfrac12\log_2 0.1=-1.737,
+   $$
+
+   $$
+   S(\rho\|\sigma)=-0.469-(-1.737)=1.268\ \text{bits},
+   $$
+
+   nearly two and a half times the divergence from $\rho$ to the
+   maximally mixed state. Identical spectra, wildly different states.
+
+   Where the proof felt it: here $c_{ij}=\tfrac12$ for all four entries,
+   about as far from a permutation matrix as a $2\times2$ doubly stochastic
+   matrix can get, so the first Jensen step is maximally slack. That is the
+   general lesson worth carrying: $c_{ij}$ is the only place the two
+   eigenbases meet, and it is exactly the term that vanishes from the
+   argument when $\rho$ and $\sigma$ commute. Relative entropy is sensitive
+   to the mismatch between eigenbases, which is precisely the sensitivity
+   that makes it, and not the entropy difference, the right measure of how
+   wrong a model is.
+
+   </details>
+
 3. At exactly $p=1/3$, confirm $C(p)=0$ using the closed form
    $C(p)=\max(0,(3p-1)/2)$, and explain physically why this is the exact
    threshold where the Werner state stops being entangled.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $C(1/3)=\max\big(0,(3\cdot\tfrac13-1)/2\big)=\max(0,0)=0$, the one point
+   where the clipped and unclipped expressions meet.
+
+   The physical reason is best seen by rewriting the Werner state in the
+   Bell basis. Since $I/4$ is an equal mixture of the four Bell
+   projectors,
+
+   $$
+   \rho_W(p)=\underbrace{\left(p+\frac{1-p}{4}\right)}_{\textstyle F=\frac{1+3p}{4}}|\Psi^-\rangle\langle\Psi^-|
+   +\frac{1-p}{4}\Big(|\Psi^+\rangle\langle\Psi^+|+|\Phi^+\rangle\langle\Phi^+|+|\Phi^-\rangle\langle\Phi^-|\Big),
+   $$
+
+   so the state is completely described by one number: $F$, its overlap
+   with the singlet, with the remaining weight spread evenly over the other
+   three Bell states. At $p=1/3$,
+
+   $$
+   F=\frac{1+3(1/3)}{4}=\frac12.
+   $$
+
+   The threshold is exactly **singlet fidelity one half**, and $\tfrac12$
+   is the ceiling any separable state can reach against a maximally
+   entangled target. So $F>\tfrac12$ certifies entanglement for any
+   two-qubit state, which settles the $p>1/3$ side immediately. The
+   converse direction is not true in general, but it is true within this
+   family: for a Bell-diagonal state, which is what $\rho_W$ is, the
+   largest Bell weight is the whole story, and $F\leq\tfrac12$ leaves the
+   singlet no longer dominant enough to survive. The Horodecki converse
+   cited in this lesson then guarantees an explicit decomposition of
+   $\rho_W$ into product states exists at $p\leq1/3$, since the partial
+   transpose is positive there.
+
+   The partial-transpose route reaches the same point from a different
+   direction, which is the cross-check worth having. The only eigenvalue of
+   $\rho_W^{T_B}$ that can go negative is $(1-3p)/4$, and it changes sign
+   at $p=1/3$. Two tests, one built from an eigenvalue formula and one from
+   a transpose, agree on the boundary to the digit.
+
+   One thing $p>1/3$ does *not* buy is Bell violation, and this is where
+   Werner states earn their name. The CHSH value for $\rho_W$ is
+   $2\sqrt2\,p$, which exceeds $2$ only for $p>1/\sqrt2\approx0.707$. The
+   lesson's own worked example sits at $p=0.7$: concurrence $0.55$, so
+   definitely entangled, yet CHSH value $2\sqrt2(0.7)=1.980<2$, so no
+   violation at all. Werner's 1989 point was exactly this, that
+   entanglement and Bell nonlocality are different properties and the first
+   does not imply the second for mixed states.
+
+   </details>
+
 4. Explain why the pure-state reduction ($R$ rank 1, three of its four
    eigenvalues exactly zero) makes the $\max(0,\cdot)$ clipping
    automatically inactive for every pure state, i.e. why a pure state's
    concurrence is never "clipped."
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the clipping only ever matters when the three subtracted roots
+   are competing with the first, and for a pure state they are all
+   identically zero.
+
+   The rank-1 structure does it in one line. For $\rho=|\psi\rangle\langle\psi|$,
+
+   $$
+   R=\rho\tilde\rho=|\psi\rangle\langle\psi|\tilde\psi\rangle\langle\tilde\psi|=\langle\psi|\tilde\psi\rangle\;|\psi\rangle\langle\tilde\psi|,
+   $$
+
+   an outer product times a scalar, so $\mathrm{rank}(R)\leq1$ and its
+   spectrum is $\{\mu_1,0,0,0\}$ with $\mu_1=|\langle\psi|\tilde\psi\rangle|^2$.
+   The raw expression is therefore
+
+   $$
+   \sqrt{\mu_1}-\sqrt{0}-\sqrt{0}-\sqrt{0}=\sqrt{\mu_1}=|\langle\psi|\tilde\psi\rangle|\geq0,
+   $$
+
+   non-negative before the $\max$ is applied. The clipping has nothing to
+   remove, and $C=2|ad-bc|$ follows.
+
+   The structural reason behind the algebra is the one to remember. The
+   concurrence formula is the closed-form solution of a convex-roof
+   minimization over all pure-state decompositions of $\rho$, and the three
+   subtracted roots are what that optimization charges for having several
+   pure components that partially cancel. A pure state has exactly one
+   component, so there is nothing to cancel against and no penalty to
+   assess. The clipping is a genuinely mixed-state phenomenon; it fires for
+   a Werner state below $p=1/3$ precisely because the classical mixture in
+   it can be redistributed into an all-product decomposition, and there is
+   no such redistribution available to a pure state.
+
+   A precision worth keeping. "Never clipped" is not "never zero". A pure
+   product state such as $|00\rangle$ has $ad-bc=0$, hence $\mu_1=0$, and
+   $C=0$ arrives honestly as $\sqrt{\mu_1}$ rather than through the
+   $\max$. What cannot happen for a pure state is the situation the
+   clipping exists for: the unclipped quantity coming out strictly
+   negative, which would be a meaningless amount of entanglement.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -508,7 +743,7 @@ reporting zero entanglement for a state that really is separable.
   the exact gap Concurrence: A Two-Qubit Entanglement Measure named and
   left open.
 
-## Further Exploration
+## Entanglement as a Resource in Protocols
 
 <NextDiscovery>
   [Rigorous Teleportation and Superdense Coding](/lessons/quantum-mastery/quantum-information-theory/rigorous-teleportation-and-superdense-coding)

@@ -24,7 +24,7 @@ export const variationalEnergyNeverBelowExact: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "The optimized Gaussian trial energy for the harmonic oscillator is ≈0.50002; the exact ground energy is 0.5. What is (trial energy − exact energy), and what sign should it always have, per the variational theorem?",
-    inputHint: "as a small decimal (can be very close to 0, but its sign matters)",
+    inputHint: "as a small decimal, to 5 decimal places (it can be very close to 0, but its sign matters)",
   },
   answer: {
     type: "numeric",
@@ -35,6 +35,11 @@ export const variationalEnergyNeverBelowExact: NumericProblem = {
     // can never be negative. 1e-5 accepts plausible roundings (1.9e-5,
     // 1.94e-5, 2e-5) while rejecting 0 and everything below it.
     tolerance: 0.00001,
+    nearMisses: [
+      { value: -0.00001938946280999332, tolerance: 0.00001, feedback: "The sign is inverted, and the sign is the entire point: the variational theorem forbids a trial energy below the exact ground-state energy, so this difference can never come out negative." },
+      { value: 0.50002, tolerance: 0.000005, feedback: "That is the trial energy itself. The exact ground energy still has to be subtracted from it." },
+      { value: 0, tolerance: 0.000005, feedback: "Zero would say the Gaussian trial reproduces the exact ground state. It comes very close, but the gap in the fifth decimal place is real, and its being strictly positive is what the theorem asserts." },
+    ],
     incorrectFeedback: "Subtract: optimized trial energy minus exact ground energy. The variational theorem guarantees this is never negative.",
   },
   hints: [

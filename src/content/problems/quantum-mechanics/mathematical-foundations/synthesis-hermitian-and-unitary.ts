@@ -30,21 +30,21 @@ export const synthesisHermitianAndUnitary: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Pauli-X is real, symmetric, and satisfies X²=I, but X is not the identity matrix — a direct counterexample.",
+      b: "Pauli-X is real, symmetric, and satisfies X²=I, but X is not the identity matrix, so it is a direct counterexample.",
       c: "Pauli-X has eigenvalue -1 (with eigenvector |−⟩), so this is false.",
-      d: "Pauli-X is real, symmetric, satisfies X²=I, and is not diagonal — another direct counterexample.",
+      d: "Pauli-X is real, symmetric, satisfies X²=I, and is not diagonal, so it is another direct counterexample.",
     },
     defaultIncorrectFeedback: "Real + symmetric gives Hermitian directly; combine that with M²=I to check the unitarity condition M†M=I.",
   },
   hints: [
-    { text: "Real and symmetric means M† = Mᵀ = M — so M is Hermitian." },
+    { text: "Real and symmetric means M† = Mᵀ = M, so M is Hermitian." },
     { text: "Since M is Hermitian, M†M = M·M = M²." },
-    { text: "You're told M² = I — what does that make M†M?" },
+    { text: "You're told M² = I. What does that make M†M?" },
   ],
   solution: {
     steps: [
-      { description: "Real and symmetric gives $M^\\dagger = M^T = M$ — Hermitian." },
-      { description: "Since $M^\\dagger=M$, $M^\\dagger M = M\\cdot M = M^2 = I$ (given) — this is exactly the unitarity condition." },
+      { description: "Real and symmetric gives $M^\\dagger = M^T = M$, which is the Hermitian condition." },
+      { description: "Since $M^\\dagger=M$, $M^\\dagger M = M\\cdot M = M^2 = I$ (given), which is the unitarity condition." },
     ],
     finalAnswer: "$M$ must be both Hermitian and unitary.",
   },

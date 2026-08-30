@@ -5,15 +5,46 @@ import { Eyebrow, Lede, Readouts, SectionTitle } from "@/components/ui/Typograph
 import { Panel, Instrument } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
-import { NAV_ITEMS, START_LEARNING_HREF } from "@/lib/nav";
+import { NAV_ITEMS, START_LEARNING_HREF, navDescription } from "@/lib/nav";
+import { pageOpenGraph, SITE_NAME } from "@/lib/pageMetadata";
+import { PROBLEM_COUNT } from "@/lib/structuredData";
+
+const NOT_FOUND_TITLE = "Page not found";
+const NOT_FOUND_DESCRIPTION = "The page you're looking for doesn't exist.";
 
 export const metadata: Metadata = {
-  title: "Page not found",
-  description: "The page you're looking for doesn't exist.",
-  // A 404 has no real canonical URL of its own, so unlike every other page
-  // it deliberately skips alternates.canonical/openGraph — but it must still
-  // tell crawlers not to index it, which was missing before this fix.
+  title: NOT_FOUND_TITLE,
+  description: NOT_FOUND_DESCRIPTION,
+  // It must tell crawlers not to index itself, which was missing before this
+  // fix.
   robots: { index: false, follow: true },
+  // `canonical: null`, not "omit the key". Omitting it is what this file used
+  // to do, and it does NOT mean "no canonical": Next resolves metadata by
+  // walking the segment tree and a segment that says nothing inherits the
+  // parent's value, so the root layout's `alternates: { canonical: BASE_URL }`
+  // reached this page unchanged. Every 404 on the site — every mistyped
+  // lesson URL, every dead link from anywhere on the web — was emitting
+  // `<link rel="canonical" href="https://studyquantum.org">`, i.e. declaring
+  // itself a duplicate of the homepage. `noindex` above limits the damage,
+  // but the two claims contradict each other and only one of them is true.
+  // An explicit null is Next's documented opt-out and drops the tag.
+  alternates: { canonical: null },
+  // Same inheritance trap, same page: without this, `og:title` and `og:url`
+  // were the homepage's, so a 404 pasted into Slack unfurled as the front
+  // page of the site — a preview of a page the reader is not looking at.
+  // Declared with no `url`, because a 404 genuinely has no canonical address
+  // of its own; `pageOpenGraph` omits `og:url` in that case and still carries
+  // the social card and `og:site_name`.
+  openGraph: pageOpenGraph({
+    title: `${NOT_FOUND_TITLE} · ${SITE_NAME}`,
+    description: NOT_FOUND_DESCRIPTION,
+    type: "website",
+  }),
+  twitter: {
+    card: "summary_large_image",
+    title: `${NOT_FOUND_TITLE} · ${SITE_NAME}`,
+    description: NOT_FOUND_DESCRIPTION,
+  },
 };
 
 // Direct links to the entry points a lost visitor is most likely to want,
@@ -40,15 +71,14 @@ export default function NotFound() {
         <SectionTitle level={1} size="xl" className="mt-4">
           This state doesn&rsquo;t exist
         </SectionTitle>
-        <Lede className="mt-5 max-w-[42rem]">
-          The page, lesson, or simulator you&rsquo;re looking for may have moved, been renamed, or
-          never existed in the first place — much like measuring a qubit outside its basis. Try one
-          of the destinations below, or press Ctrl K (Cmd K on Mac) to search.
+        <Lede className="mt-5 max-w-lede">
+          The page, lesson, or simulator you&rsquo;re looking for may have moved or never existed.
+          Try one of the destinations below, or press Ctrl K (Cmd K on Mac) to search.
         </Lede>
       </Reveal>
 
       <Reveal delay={80} className="mt-8">
-        <Instrument label="Route readout" footnote="No amplitude, no page — the console falls back to what it knows exists.">
+        <Instrument label="Route readout" footnote="No amplitude, no page. The console falls back to what it knows exists.">
           <Readouts
             items={[
               { label: "Requested state", value: "|ψ_target⟩" },
@@ -78,7 +108,13 @@ export default function NotFound() {
             <Link key={item.href} href={item.href} className="block">
               <Panel interactive className="p-5">
                 <span className="block text-base font-semibold text-foreground">{item.label}</span>
-                <span className="mt-1 block text-sm text-muted-foreground">{item.description}</span>
+                {/* `navDescription`, not `item.description`: the "Problems"
+                    copy states the size of the corpus through a `{problems}`
+                    token, and this page is a Server Component, so it reads
+                    the count directly rather than being handed it. */}
+                <span className="mt-1 block text-sm text-muted-foreground">
+                  {navDescription(item, PROBLEM_COUNT)}
+                </span>
               </Panel>
             </Link>
           ))}

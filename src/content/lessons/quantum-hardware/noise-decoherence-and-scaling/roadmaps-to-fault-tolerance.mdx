@@ -28,19 +28,18 @@ export const lessonMeta = {
   objectives: [
     "Summarize how this course's noise sources feed into the physical-to-logical qubit overhead question",
     "Explain the NISQ (noisy intermediate-scale quantum) era's defining characteristic, honestly",
-    "State what 'fault tolerant' actually means as a target, distinguishing it from simply 'more qubits'",
+    "State what 'fault tolerant' means as a target, distinguishing it from 'more qubits'",
   ],
 };
 
 <LessonHook eyebrow="The thousand-to-one tax">
-A modest 50-logical-qubit algorithm, protected the way the threshold theorem requires, can cost on the order of 50,000 physical qubits — paid before a single "useful" qubit does any work.
+A modest 50-logical-qubit algorithm, protected the way the threshold theorem requires, can cost on the order of 50,000 physical qubits, paid before a single "useful" qubit does any work.
 </LessonHook>
 
-## Motivation
+## A Thousand to One, and What It Buys
 
 Fault tolerance carries a steep price: on the order of a thousand
-physical qubits for every logical qubit an algorithm actually gets to
-use. Every noise source this course covered, T1/T2, crosstalk,
+physical qubits for every logical qubit an algorithm gets to use. Every noise source this course covered, T1/T2, crosstalk,
 compounding error, feeds directly into that cost. This capstone lesson
 connects them to the physical-to-logical overhead real hardware
 roadmaps target, and stays honest about how far current devices are
@@ -49,13 +48,13 @@ from paying it off.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/IQM_Quantum_Computer_Espoo_Finland.jpg/1280px-IQM_Quantum_Computer_Espoo_Finland.jpg"
   alt="A working IQM superconducting quantum computer installed in Espoo, Finland, showing the full system housing and cabling around the cryostat"
-  caption="A real, currently-operating quantum computer (IQM, Espoo, Finland). This is the class of NISQ-era hardware this lesson is honest about being orders of magnitude short of the physical-qubit counts a fault-tolerant roadmap targets."
+  caption="A currently-operating quantum computer (IQM, Espoo, Finland). This is the class of NISQ-era hardware this lesson is honest about being orders of magnitude short of the physical-qubit counts a fault-tolerant roadmap targets."
   credit="Ragsxl / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:IQM_Quantum_Computer_Espoo_Finland.jpg"
   license="CC BY-SA 4.0"
 />
 
-## Intuition
+## Why Encoding Is Not Free
 
 Error correction's promise sounds almost free: encode a <Term id="logical-qubit">logical qubit</Term>
 redundantly across several <Term id="physical-qubit">physical ones</Term>, and the <Term id="logical-error-rate">logical error rate</Term>
@@ -66,7 +65,7 @@ this lesson closes the course with. Further down, a slider lets you
 sweep across a realistic range of exchange rates and watch the
 physical-qubit bill move.
 
-## Synthesis
+## The Exchange Rate, the Era, and the Target
 
 ### From physical error rate to logical qubits
 
@@ -86,7 +85,7 @@ qubits** that repeatedly measure error syndromes without disturbing the
 encoded information. The small patch below makes the physical-to-logical
 overhead visual, though it's illustrative, not to scale: a real
 fault-tolerant logical qubit needs the low-hundreds-to-thousands overhead
-just described, not the handful of physical qubits pictured here.
+just described, where the picture shows you a handful.
 
 <LogicalQubitPatchDiagram ariaLabel="A small grid of data qubits interleaved with ancilla syndrome qubits, boxed and labeled as one logical qubit, illustrating the physical-to-logical overhead" />
 
@@ -98,10 +97,10 @@ full error correction, whose usefulness is bounded by this course's own
 compounding-error problem (Scaling Challenges). <Term id="nisq">NISQ</Term>-era algorithms
 (Quantum Algorithms II's VQE and QAOA both belong here) are specifically
 designed to extract value from shallow circuits, few enough sequential
-gates that compounding error stays tolerable, rather than assuming
-fault tolerance is already available.
+gates that compounding error stays tolerable. They assume no fault
+tolerance, because there is none yet to assume.
 
-### What "fault tolerant" actually targets
+### What "fault tolerant" targets
 
 A fault-tolerant quantum computer needs more than "more qubits." The
 target is a device where logical error rates are suppressed far enough
@@ -119,8 +118,8 @@ predict a timeline for reaching fault tolerance. That timeline is an
 active, evolving engineering question across the whole field, not a
 settled fact this platform can state with false precision.
 
-For a sense of what one real, published target currently looks like:
-IBM's public hardware roadmap names a specific planned system, Quantum
+For a sense of what one real, published target looks like, as stated in
+IBM's 2025 hardware roadmap: it names a specific planned system, Quantum
 Starling, targeted for 2029 with 200 logical qubits capable of roughly
 100 million quantum operations, built on quantum LDPC codes the company
 says can cut physical-to-logical qubit overhead by up to 90% relative to
@@ -129,7 +128,7 @@ timeline holds is a prediction this lesson declines to make; it's
 included only to show concretely what one company's current, stated
 roadmap target looks like, not as a platform-endorsed forecast.
 
-## Worked Example
+## Counting Physical Qubits for One Algorithm
 
 **A target logical error rate requires roughly 1000 physical qubits per
 logical qubit (a representative, illustrative estimate). How many
@@ -141,7 +140,7 @@ $$
 
 Far more than any current device's qubit count, which is why
 fault-tolerant quantum computing at a useful scale gets described as a
-longer-term target rather than an immediate one.
+longer-term target.
 
 The 1000-to-1 ratio is too wide to show on a linear scale without the
 smaller bar vanishing entirely, so the heights below are $\log_{10}$ of
@@ -152,14 +151,15 @@ each count; the captions show the real numbers:
     { label: "Logical qubits", value: Math.log10(50), caption: "50" },
     { label: "Physical qubits", value: Math.log10(50000), caption: "50,000", highlight: true },
   ]}
+  maxValue={Math.log10(50 * 5000)}
   ariaLabel="50 logical qubits require roughly 50,000 physical qubits at a representative 1000-to-1 overhead ratio, shown on a log scale"
 />
 
 The Synthesis section above named a range, not a single number: "the low
-hundreds to several thousand physical qubits per logical qubit." Sliding
+hundreds to several thousand physical qubits per logical qubit." Slide
 across representative values from that range, still fixed at 50 logical
-qubits, shows how much the physical-qubit bill depends on where in that
-wide range a real device lands:
+qubits, and you can see how much the physical-qubit bill depends on
+where in that wide range a real device lands:
 
 <PredictBeforeReveal
   question="Still 50 logical qubits, but now at the high end of the stated range, a 5000-to-1 overhead ratio. How many physical qubits does that need?"
@@ -169,7 +169,7 @@ wide range a real device lands:
     { label: "250,000", value: "250k" },
   ]}
   correctValue="250k"
-  explanation="50 × 5000 = 250,000 physical qubits, five times the worked example's 50,000, because the ratio itself is five times higher. The overhead scales linearly with the ratio for a fixed logical-qubit target, which is exactly why the honest range quoted above, low hundreds to several thousand to one, translates into such a wide range of physical-qubit bills."
+  explanation="50 × 5000 = 250,000 physical qubits, five times the worked example's 50,000, because the ratio itself is five times higher. The overhead scales linearly with the ratio for a fixed logical-qubit target, which is why the honest range quoted above, low hundreds to several thousand to one, translates into such a wide range of physical-qubit bills."
 />
 
 <InteractiveSection title="Explore the overhead-ratio range" description="Slide from a 100-to-1 ratio (the low end of the stated range) up to 5000-to-1 (several thousand, the high end). Logical qubits stay fixed at 50; the physical-qubit bar is 50 times the ratio, the same multiplication the worked example performs for the single 1000-to-1 case.">
@@ -181,7 +181,7 @@ wide range a real device lands:
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Reading Logical Counts as Physical Ones
 
 <Callout type="mistake">
 **Conflating "large qubit count" with "fault tolerant."** As the worked
@@ -201,15 +201,228 @@ remain.
 ## Practice Questions
 
 1. Using the worked example's 1000-to-1 estimate, how many physical
-   qubits would a 10-logical-qubit fault-tolerant algorithm need?
+   qubits would a 10-logical-qubit fault-tolerant algorithm need? Then
+   work the same algorithm at the low and high ends of the range this
+   lesson quotes, and say what the spread means for reading a roadmap.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   10 \times 1000 = 10{,}000 \text{ physical qubits}.
+   $$
+
+   For ten usable qubits, spent entirely on protecting a register small
+   enough to simulate on a laptop. To put that in proportion without
+   quoting a number that will be stale by the time you read it: through
+   the mid-2020s the largest gate-based superconducting registers were on
+   the order of a thousand physical qubits, so 10,000 is roughly an order
+   of magnitude beyond them. Larger *atom* counts have been reported in
+   tweezer arrays, but Neutral Atoms is explicit that a trapped-atom
+   count is not a gate-ready qubit count, and it is the second number
+   this arithmetic wants.
+
+   **Across the quoted range,** which runs from the low hundreds to
+   several thousand physical qubits per logical qubit:
+
+   at 100 to 1, $10\times100=1{,}000$ physical qubits;
+
+   at 1000 to 1, $10\times1000=10{,}000$;
+
+   at 5000 to 1, $10\times5000=50{,}000$.
+
+   A fiftyfold spread for the same algorithm, from one honest statement
+   of uncertainty in a single parameter. The scaling is linear in the
+   ratio at fixed logical count, which is what makes the spread survive
+   intact all the way to the answer rather than being damped somewhere
+   along the way.
+
+   **What that means for reading a roadmap.** A stated physical-qubit
+   target is not a fact about the algorithm; it is the algorithm's
+   logical requirement multiplied by an assumed exchange rate, and the
+   exchange rate is the part doing most of the work. So the question to
+   ask of any such figure is which code was assumed, at what target
+   logical error rate, and at what physical error rate, because the
+   answer moves the total by a factor of fifty. IBM's stated Starling
+   target makes the same point from the other direction: it claims
+   quantum LDPC codes cutting the overhead by up to 90% against the
+   surface code, which is a claim about the exchange rate rather than
+   about the algorithm.
+
+   The wrong turn is treating 1000 to 1 as a physical constant. It is a
+   representative, illustrative figure standing in for the output of a
+   resource estimate, and this lesson labels it as one. Multiply by it
+   and report the result to four significant figures and you have
+   invented precision that was never in the input.
+
+   </details>
+
 2. What specifically does NISQ stand for, and what does it describe
    about current hardware?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Noisy Intermediate-Scale Quantum.** Taking the words in order:
+
+   **Noisy:** no full error correction is running, so the physical
+   per-gate error rate is the rate the algorithm sees, and it compounds
+   as $p^N$ over circuit depth exactly as Scaling Challenges computed.
+
+   **Intermediate-Scale:** tens to a few thousand physical qubits. Large
+   enough that classical state-vector simulation is out of reach past a
+   few dozen, small enough to be nowhere near the physical-qubit counts
+   question 1 just totalled.
+
+   **Quantum:** the machines are genuinely quantum devices, not
+   simulators or proposals.
+
+   What it *describes* is a **regime of hardware capability**, and that
+   framing is the part most often mishandled. Three specific wrong turns.
+
+   It is not an algorithm. VQE and QAOA were designed for the NISQ era,
+   which makes them NISQ-era algorithms; the term names the machines, not
+   the code run on them.
+
+   It is not a hardware platform. Superconducting, trapped-ion,
+   neutral-atom and spin-qubit devices are all NISQ devices right now. It
+   cuts across every row of the Physical Qubit Platforms comparison
+   table rather than picking one.
+
+   It is not a ceiling. It is a description of where hardware is today,
+   and this lesson's own Common Mistakes box is explicit that fault
+   tolerance is the stated destination rather than something ruled out.
+   Reading a snapshot as a permanent limit is the error.
+
+   One thing the name gets right that is worth noticing: it puts the
+   noise first. The defining constraint of the era is not the qubit
+   count. It is that the error rate is unmitigated, which is what makes
+   the qubit count you have unusable at depth.
+
+   </details>
+
 3. Why are VQE and QAOA (Quantum Algorithms II) specifically well-suited
    to the NISQ era, connecting to this course's Scaling Challenges
-   lesson?
+   lesson? Then name one thing that being well-suited to the constraint
+   does not guarantee.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because they are built out of *shallow* circuits repeated many times,
+   and $p^N$ punishes depth while leaving repetition alone.
+
+   That asymmetry is the whole argument. At 99.9% per-gate fidelity, a
+   depth-20 circuit succeeds with probability $0.999^{20}\approx0.980$,
+   and it does so on the millionth repetition exactly as well as on the
+   first, because each run is independent. A depth-100,000 circuit at the
+   same fidelity succeeds with probability around $3.5\times10^{-44}$ and
+   no amount of repetition rescues it. Both algorithms are structured to
+   put their work on the side of that trade that scales.
+
+   Three specific features do that work.
+
+   **The quantum part is a short parameterized ansatz.** All the
+   iteration lives in a classical optimizer, which proposes new
+   parameters between runs. The quantum device is asked only to prepare a
+   state and measure it, which is a handful of layers, and the loop's
+   length is paid in wall-clock time rather than in circuit depth.
+
+   **The output is an expectation value, not a specific bit string.** An
+   average over many shots is statistically robust; a small error rate
+   perturbs the estimate rather than destroying it. Contrast an algorithm
+   whose answer is one particular measured string, where a single
+   uncorrected error in the run that mattered gives you the wrong number
+   with no indication that anything went wrong.
+
+   **The optimizer absorbs part of the error.** This one is easy to miss
+   and genuinely important. Because the parameters are tuned against the
+   *actual device* rather than against an idealized model, a systematic
+   coherent error, a slightly mistuned rotation of the kind Calibration
+   describes, is partly compensated by the optimizer choosing a
+   parameter that lands the physical device where it wanted to be.
+   Incoherent error is not absorbed this way, since it reduces purity and
+   the optimizer has no unitary knob that raises purity.
+
+   Two honest caveats, since "well-suited to NISQ" is a statement about
+   relative fit and not about success.
+
+   Cheap circuits do not mean cheap runs. Estimating an expectation value
+   to chemical accuracy can require enormous shot counts, and the
+   sampling cost is where a great deal of variational work actually
+   stalls.
+
+   And the optimization itself is hard. Barren plateaus, where gradients
+   vanish exponentially in the number of qubits, are a documented
+   obstruction for many ansatz families, and there is at present no
+   demonstrated case of a NISQ variational algorithm outperforming the
+   best classical methods on a problem anyone cares about. Well-suited to
+   the constraint is not the same as known to be useful.
+
+   </details>
+
 4. Explain, in your own words, why "more qubits" alone does not equal
    "closer to fault tolerant," using this lesson's physical-vs-logical
    distinction.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the two counts measure different things, and the conversion
+   between them is not a number you can apply to an arbitrary device.
+
+   Start with the arithmetic. A thousand physical qubits with no code
+   running is a thousand noisy qubits. The same thousand, arranged as a
+   surface-code patch with syndrome extraction, is roughly *one* logical
+   qubit. Identical headline figure, and the two machines are not the
+   same kind of object. As this lesson's Common Mistakes box puts it, a
+   1000-qubit NISQ device and a 1000-qubit slice of a fault-tolerant
+   system are not comparable simply because the numbers match.
+
+   **Then the part that makes it more than an accounting point.** Whether
+   additional qubits move a device toward fault tolerance depends on
+   which side of the threshold its physical error rate sits. Below the
+   threshold, adding physical qubits to a code makes the logical qubit
+   better, exponentially so in the code distance. Above it, adding
+   physical qubits makes it *worse*, because each new component is
+   another chance to fail and the code cannot correct faster than errors
+   arrive. So a 10,000-qubit device above threshold is not closer to
+   fault tolerance than a 100-qubit device below it. It is further away,
+   because it cannot be encoded at all, and the extra qubits are not
+   partial progress toward a state it cannot reach.
+
+   **And counting misses several requirements outright**, none of which
+   appear in a qubit-count headline.
+
+   Syndrome extraction runs continuously, so fault tolerance needs fast,
+   high-fidelity mid-circuit measurement and reset, thousands of rounds
+   per logical operation.
+
+   The syndromes have to be decoded in real time, by classical hardware
+   fast enough to keep up with the rounds, or the backlog grows without
+   bound.
+
+   The connectivity has to match the code's lattice, which is a
+   constraint on layout rather than on count.
+
+   Leakage out of the computational subspace has to be rare and
+   detectable, because a qubit that has left the code space is invisible
+   to a code built for bit flips and phase flips.
+
+   And every one of these is built from the same imperfect gates the code
+   is meant to protect, which is why the threshold is a threshold rather
+   than a formality.
+
+   The wrong turn is the arithmetic one: taking the 1000-to-1 figure and
+   running it backwards on any device you are handed, so that a
+   1,121-qubit processor "has" one logical qubit. It does not. It has
+   1,121 physical qubits and zero logical qubits, unless those qubits are
+   below threshold, connected the way the code needs, and actually
+   running syndrome extraction. The exchange rate is what encoding costs
+   when it is possible, not a property that a large pile of qubits
+   acquires by being large.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -225,12 +438,12 @@ remain.
   qubits." It requires suppressing logical error rates far below
   physical ones, at real and substantial physical-qubit overhead cost.
 
-## Further Exploration
+## Where the Software Track Picks This Up
 
 <NextDiscovery>
 This closes **Noise, Decoherence & Scaling**, and the entire Quantum
-Hardware pillar. The Quantum Software pillar's courses (Programming
+Hardware track. The Quantum Software track's courses (Programming
 Quantum Computers, Simulating Quantum Systems, Compilation & Hybrid
-Algorithms) pick up from here, covering how software actually targets
-and works around the hardware constraints this pillar described.
+Algorithms) pick up from here, covering how software targets and works
+around the hardware constraints this track described.
 </NextDiscovery>

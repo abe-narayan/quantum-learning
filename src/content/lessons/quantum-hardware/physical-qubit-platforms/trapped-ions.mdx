@@ -24,7 +24,7 @@ export const lessonMeta = {
   objectives: [
     "Explain how an ion trap confines a charged atom using oscillating electric fields",
     "State why trapped ions have much longer coherence times than superconducting qubits, and at what cost",
-    "Explain how the shared motional (vibrational) mode enables two-qubit gates between ANY pair of trapped ions, not just neighbors",
+    "Trace how the shared motional (vibrational) mode enables two-qubit gates between ANY pair of trapped ions, not just neighbors",
   ],
 };
 
@@ -32,7 +32,7 @@ export const lessonMeta = {
 Suspend a single charged atom in empty space, no walls, no wires, nothing physically touching it, then hold it steady enough that a laser can address its internal states one operation at a time.
 </LessonHook>
 
-## Motivation
+## Starting From a Single Charged Atom
 
 A trapped-ion quantum computer starts from a single charged atom
 suspended in vacuum, and its first engineering problem is simply
@@ -58,8 +58,9 @@ tradeoffs.
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg/1280px-Quantum_Computing%3B_Ion_Trapping_%285941055642%29.jpg"
   alt="Two trapped beryllium ions held roughly 40 micrometers apart above a gold chip trap, surrounded by copper shielding and gold mesh, at NIST"
   caption="Two real trapped beryllium ions at NIST, held above a gold chip trap and swapping energy back and forth. This is the actual apparatus behind this lesson's Paul trap: oscillating electric fields confining charged atoms in place for use as qubits."
+  aspect="aspect-[3756/2564]"
   pins={[
-    { id: "trap", x: 50, y: 43, label: "The gold chip trap itself — the ions are held here, roughly 40 μm apart, by the Paul trap's oscillating RF field." },
+    { id: "trap", x: 50, y: 43, label: "The gold chip trap itself. The ions are held here, roughly 40 μm apart, by the Paul trap's oscillating RF field." },
     { id: "clamp", x: 50, y: 8, label: "Copper mount, clamping and thermally anchoring the trap package in place." },
     { id: "rf", x: 83, y: 23, label: "RF feedthrough, carrying the oscillating drive field into the vacuum chamber." },
     { id: "traces", x: 30, y: 48, label: "Wire-bonded control lines routing RF and DC voltages to the trap electrodes." },
@@ -67,14 +68,14 @@ tradeoffs.
   ]}
   credit="Y. Colombe / NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Computing;_Ion_Trapping_(5941055642).jpg"
-  license="Public Domain (U.S. Government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Engineering Development
+## The Paul Trap and the Shared Motional Mode
 
 ### The trap itself
 
-The answer to the Motivation section's puzzle is a **Paul trap**: it
+The answer to the puzzle just posed is a **Paul trap**: it
 confines the ion using rapidly oscillating (radio-frequency) electric
 fields rather than a static one, because Earnshaw's theorem rules the
 static option out. The field oscillates fast enough that the ion feels
@@ -88,9 +89,20 @@ The chain's ions aren't independent; the dashed line through them above
 is the shared vibrational mode the next section relies on for two-qubit
 gates.
 
+The schematic shows the RF electrodes and leaves one thing out that a
+real linear trap has. The oscillating field confines the ion in the two
+directions *transverse* to the chain; confinement *along* the chain axis
+comes from a pair of static DC endcap electrodes at the ends, held at a
+voltage that pushes the ions inward. That is not a violation of the
+theorem just invoked. Earnshaw forbids a static minimum in all three
+directions at once, and these endcaps supply exactly one of them, with
+the RF pseudopotential covering the other two. The division of labour is
+worth carrying, because the axial mode those DC electrodes define is the
+one a two-qubit gate usually drives.
+
 Two physical conditions are worth fixing in mind, because they are the
 opposite of a superconducting chip's. The trap electrodes themselves sit
-near room temperature — no dilution refrigerator — but the ion has to be
+near room temperature (no dilution refrigerator), but the ion has to be
 in ultra-high vacuum, below roughly $10^{-11}$ mbar, or a stray
 background-gas collision knocks it out of the trap mid-computation. And
 the "wiring" is optical: every gate, every state preparation, and every
@@ -106,7 +118,14 @@ lithographically-fabricated superconducting circuit, identical for every
 ion of the same species and extremely well isolated from environmental
 noise. Nature already built a "device" whose levels don't drift.
 Trapped-ion <Term id="coherence">coherence times</Term> routinely reach seconds, several orders of
-magnitude longer than superconducting qubits' microseconds. The cost
+magnitude longer than superconducting qubits' microseconds. Read the
+"about 1 s" this lesson computes with as a deliberately conservative
+round number for a working register, not a record: dedicated
+single-ion experiments on hyperfine qubits, with magnetic shielding and
+dynamical decoupling, have reported coherence surviving for minutes.
+Neutral atoms sit in the same regime for the same reason, both being
+real atoms with hyperfine levels, and the capstone's chart is explicit
+that it is not ranking the two. The cost
 falls mainly on **two-qubit** gate speed: these mediate the interaction
 through the ions' shared mechanical (vibrational) motion, which is slow
 compared to a superconducting circuit's direct capacitive coupling, often
@@ -116,18 +135,18 @@ involved, isn't bottlenecked the same way and can be considerably faster;
 it's the entangling step specifically that pays the speed cost.
 
 <PredictBeforeReveal
-  question="If the driving laser is tuned slightly off the ion's resonance (nonzero detuning) instead of exactly on it, what happens to the maximum population you can transfer?"
+  question="If the driving laser is tuned slightly off the ion's resonance (nonzero detuning) instead of onto it, what happens to the maximum population you can transfer?"
   options={[
     { label: "Still reaches 100%, just more slowly", value: "full-slower" },
-    { label: "Caps below 100%, no matter how long you drive", value: "capped" },
-    { label: "Overshoots past 100%", value: "overshoot" },
-    { label: "Nothing changes; detuning doesn't matter for lasers", value: "no-change" },
+    { label: "Overshoots past 100%, then settles back", value: "overshoot" },
+    { label: "Nothing changes; detuning matters only for microwaves", value: "no-change" },
+    { label: "Caps below 100%, however long you drive", value: "capped" },
   ]}
   correctValue="capped"
-  explanation="Off resonance, the two-level Rabi formula caps the achievable population below 1, the same physics driving any resonantly-controlled qubit, laser or microwave. Move detuning away from zero in the Explorer below and watch the peak population drop measurably below 1, exactly the resonance-imperfection penalty every driven platform pays."
+  explanation="Off resonance, the two-level Rabi formula caps the achievable population below 1, the same physics driving any resonantly-controlled qubit, laser or microwave. Move detuning away from zero in the Explorer below and watch the peak population drop measurably below 1, the resonance-imperfection penalty every driven platform pays."
 />
 
-<InteractiveSection title="Drive an atomic transition resonantly" description="A single-qubit gate here works exactly like the superconducting-qubit lesson's microwave drive, just implemented with a laser tuned to the ion's internal transition instead: set detuning to zero and vary the coupling strength V (playing the role of the laser's Rabi frequency) to watch the population sweep from 0 to 1 and back at t_π=π/(2V), the same two-level Rabi physics driving any resonantly-controlled qubit, regardless of whether the drive is a laser or a microwave tone. Move detuning away from zero and see the achievable population drop below 1, exactly the penalty for imperfect resonance on any platform.">
+<InteractiveSection title="Drive an atomic transition resonantly" description="The same two-level Rabi problem the superconducting-qubit lesson drove with a microwave tone, driven here by a laser tuned to the ion's own internal transition. Rather than re-deriving t_π=π/(2V), use the explorer to see what this platform's headline numbers leave out: everything on screen is the single-qubit gate, and on an ion that is the fast operation. Drive it to a full π-pulse and note how quickly and cleanly it completes. The microsecond gate time this lesson quotes belongs to the two-qubit gate, which routes through the ions' shared motional mode and has no counterpart anywhere on this instrument.">
   <LazyRabiExplorer />
 </InteractiveSection>
 
@@ -188,14 +207,14 @@ contrast concrete rather than just asserted in prose:
     { from: "2", to: "3" },
     { from: "3", to: "4" }
   ]}
-  ariaLabel="Five superconducting qubits arranged in a pentagon with edges only between adjacent neighbors, showing nearest-neighbor connectivity"
+  ariaLabel="The same five qubits on a superconducting chip, coupled in an open chain: 0 to 1 to 2 to 3 to 4, with no direct coupling between 0 and 4"
 />
 <p className="mt-1 text-center text-xs text-muted-foreground">Superconducting: nearest-neighbor</p>
 </div>
 
 </div>
 
-## Physical Interpretation
+## The Tradeoff, Now Visible
 
 The core platform tradeoff is now visible directly: superconducting
 qubits sacrifice coherence time for speed and (relatively) easier
@@ -220,7 +239,7 @@ once, and a number quoted without a system name and a year is not worth
 much. When you see one, check what it was measured on, when, and whether
 it is a best pair or a median over the whole device.
 
-## Worked Example
+## Gate Budget, Ion Against Superconductor
 
 **A trapped-ion two-qubit gate takes about $10\mu s$; the ion's coherence
 time is about $1s$. Compare this "gate count budget" to a superconducting
@@ -233,7 +252,7 @@ much longer coherence time gives them a *larger* raw gate budget in this
 comparison, a concrete numerical illustration of why "gate speed alone"
 is a misleading platform comparison metric.
 
-## Common Mistakes
+## Comparing Coherence Times Without Gate Times
 
 <Callout type="warning">
 **Assuming faster gates always mean a "better" platform.** As the worked
@@ -252,15 +271,213 @@ engineering constraint the Noise, Decoherence & Scaling course develops.
 ## Practice Questions
 
 1. Why can't a static (non-oscillating) electric field alone trap a
-   charged ion in 3D?
+   charged ion in 3D? Then name the one trap design that does hold an ion
+   with static fields, and say why it is not a counterexample.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because trapping requires a genuine minimum of the potential energy,
+   and a static electric field in empty space cannot produce one.
+
+   In the charge-free region where the ion sits, the electrostatic
+   potential obeys Laplace's equation, $\nabla^2\varphi=0$. The ion's
+   potential energy is $U=q\varphi$, so $\nabla^2U=0$ too, which written
+   out is
+
+   $$
+   \frac{\partial^2U}{\partial x^2}+\frac{\partial^2U}{\partial y^2}+\frac{\partial^2U}{\partial z^2}=0.
+   $$
+
+   A minimum in 3D needs all three of those second derivatives positive,
+   which would make the sum positive. The sum is zero. So if the field
+   curves upward in $x$ and $y$, it must curve downward in $z$ by exactly
+   as much. Every static configuration gives a saddle, never a bowl. That
+   is Earnshaw's theorem, and the ion always finds the downhill direction
+   and leaves.
+
+   The wrong turn here is treating this as an engineering shortfall:
+   "make the field stronger," or "add more electrodes and shape it
+   better." Neither can work, and it is worth being clear about why.
+   Laplace's equation holds for *every* static configuration in the
+   region, whatever the electrode geometry or voltage. Adding electrodes
+   adds more solutions to the same equation, so it produces a different
+   saddle, not a bowl. This is a theorem, not a limit of current
+   fabrication.
+
+   The Paul trap's answer is to keep the saddle and spin it. An RF drive
+   flips the confining and anti-confining axes fast compared to the ion's
+   response, so the ion is pushed inward along whichever axis is
+   momentarily downhill before it can travel far along the other one.
+   Averaged over a drive cycle, the ion feels an effective pseudopotential
+   that does have a real minimum. Nothing about Earnshaw has been
+   evaded; the field is simply no longer static.
+
+   The design worth naming is the **Penning trap**, which confines an ion
+   with a static electric quadrupole plus a static magnetic field. It is
+   not a counterexample. Earnshaw's theorem is a statement about forces
+   derived from a potential satisfying Laplace's equation, and the
+   magnetic force $q\mathbf v\times\mathbf B$ is not one of those: it
+   depends on the ion's velocity, and it does no work. The static
+   electric part still provides confinement along one axis and
+   anti-confinement in the perpendicular plane, exactly as the theorem
+   demands; the magnetic field bends the resulting outward motion into a
+   circle. Penning traps are standard in precision mass spectrometry and
+   have been used for qubit work, but the quantum computing platforms in
+   this lesson are overwhelmingly Paul traps.
+
+   </details>
+
 2. Using the worked example's numbers, if a superconducting device
    somehow achieved a $100\mu s$ coherence time at the same $10ns$ gate
    speed, would its gate budget exceed the trapped ion's $10^5$? Compute
    the new ratio.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. It reaches $10^4$, still a factor of 10 short.
+
+   $$
+   \frac{100\ \mu\text{s}}{10\text{ ns}} = \frac{100\times10^{-6}}{10\times10^{-9}} = 10^4 \text{ gates}.
+   $$
+
+   The tenfold improvement in coherence time bought exactly a tenfold
+   improvement in budget, from $10^3$ to $10^4$, because the budget is
+   linear in coherence time. Nothing accelerates here. To match the ion's
+   $10^5$ at a 10 ns gate you would need $10^5\times10\text{ ns}=1$ ms of
+   coherence, a hundred times the lesson's baseline rather than ten.
+
+   The wrong turn is an order-of-magnitude blur: seeing "100 μs" next to
+   "1 s" and reading them as roughly comparable because both are "much
+   longer than a nanosecond." They differ by four orders of magnitude,
+   and on a log axis that is most of the chart. Write both budgets as
+   powers of ten before comparing them and the gap is unmissable.
+
+   One caveat that cuts against the superconducting side, so it is worth
+   stating rather than quietly enjoying. The two numbers being divided
+   are not the same kind of gate. The ion's 10 μs is its *two-qubit*
+   entangling gate, the operation that routes through the shared motional
+   mode and sets the platform's pace. The superconducting 10 ns is a
+   single-qubit gate; a two-qubit gate on that platform is more like tens
+   to a few hundred nanoseconds. Count the operation that actually
+   bottlenecks each platform and the hypothetical device's budget shrinks
+   further. The comparison as posed is generous to the superconducting
+   entry, and it still loses.
+
+   </details>
+
 3. Explain, in your own words, how the shared vibrational mode allows a
-   two-qubit gate between two ions that aren't in direct contact.
+   two-qubit gate between two ions that aren't in direct contact. Then
+   say what has to be true of that vibrational mode when the gate
+   finishes, and what goes wrong if it isn't.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The motion is a bus, and the gate is two conditional trips on it.
+
+   Ions in one trap are not independent objects. Each one's charge pushes
+   on its neighbours, so their positions are coupled and the chain moves
+   in collective normal modes, like beads on a shared spring. A laser
+   tuned to a *motional sideband* of an ion's internal transition couples
+   that ion's internal state to one of those shared modes: it can add or
+   remove a quantum of the chain's vibration, conditioned on which
+   internal state the ion is in.
+
+   That is the whole trick. Illuminate ion A so that it excites the
+   shared mode only if it is in $|1\rangle$. The chain is now vibrating
+   in a way that depends on A's internal state, and every ion in the
+   chain shares that vibration, including one sitting several ions away.
+   Now illuminate ion B so that its internal state responds to whether
+   that vibration is there. B's state has become correlated with A's,
+   with no direct A-to-B interaction anywhere in the story. Because the
+   mode belongs to the whole chain rather than to any pair, it works for
+   any two ions, which is where the platform's all-to-all connectivity
+   comes from.
+
+   **What has to be true at the end:** the motional mode must come back
+   to exactly the state it started in, and be left unentangled with
+   either qubit. A real entangling gate is designed so the excursion into
+   the motional degree of freedom closes: the trajectory in phase space
+   returns to its origin, and the vibration is handed back untouched
+   while a state-dependent phase is kept.
+
+   If it does not close, the two internal states end up entangled with
+   the vibration. Nobody measures the vibration, so it is traced out, and
+   tracing out a system that your qubits are entangled with leaves a
+   *mixed* two-qubit state instead of a clean Bell state. The gate does
+   not fail loudly; it returns a state with reduced purity, which reads
+   as reduced fidelity. This is also the mechanism behind the lesson's
+   warning that all-to-all connectivity does not scale for free: more
+   ions in a trap means more, more closely spaced motional modes, more
+   spectator modes for the drive to touch accidentally, and more heating,
+   all of which make the closure condition harder to satisfy for every
+   pair at once.
+
+   Two seductive wrong answers are worth separating out. The first is
+   "their Coulomb repulsion couples the internal states." It does not.
+   The charge couples the ions' *positions*; the qubit lives in
+   electronic or hyperfine levels that two ions micrometres apart have
+   essentially no direct interaction between. Coulomb repulsion builds
+   the bus; it is not the gate. The second is "one laser hits both ions,
+   so they are linked." A beam that addresses two ions separately applies
+   a product of single-ion operations, and a product of single-qubit
+   operations can never create entanglement, however many ions it lands
+   on.
+
+   </details>
+
 4. Name one advantage and one disadvantage of trapped ions relative to
    superconducting qubits, using this lesson's specific numbers.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Advantage: coherence, and so gate budget.** About 1 s against about
+   10 μs is five orders of magnitude, and it converts into $10^5$ gates
+   inside a coherence time against $10^3$. There is a second advantage in
+   the same lesson, connectivity: within one trap every ion can be
+   entangled with every other, which on five qubits is ten available
+   pairs against the superconducting chain's four.
+
+   **Disadvantage: speed.** The entangling gate takes about 10 μs against
+   roughly 10 ns, so each operation is about a thousand times slower.
+   That is wall-clock time, and it is not free just because the budget is
+   larger: a circuit of fixed depth takes a thousand times longer to run,
+   and the number of shots per second, which is what a variational
+   algorithm's runtime is actually made of, drops by the same factor.
+
+   The wrong turn to avoid is concluding "so trapped ions are better."
+   The two numbers point in opposite directions, and which one binds
+   depends entirely on the workload. A deep circuit run once is limited
+   by the gate budget, where ions win. A shallow circuit run a million
+   times, which is what most near-term variational work looks like, is
+   limited by throughput, where they lose badly.
+
+   Three further honest notes, since the question asks for the lesson's
+   own numbers.
+
+   The coherence figures are not the same kind of quantity. A trapped
+   ion's qubit levels are properties of an atom, identical for every ion
+   of the species and stable by nature; a transmon's $T_1$ is a median
+   over a chip that drifts between calibrations as two-level-system
+   defects move around.
+
+   The engineering burden moved rather than vanished. A trapped-ion
+   system needs no dilution refrigerator, and instead needs ultra-high
+   vacuum below about $10^{-11}$ mbar, plus a frequency-stabilized laser
+   pointed at every individual atom. Room-temperature electrodes are not
+   the same thing as a simple machine.
+
+   Finally, resist quoting a fidelity as the advantage. Quantinuum's
+   ion systems have repeatedly reported among the best published
+   two-qubit fidelities, but that record has changed hands more than
+   once, and a fidelity number without a system name, a year, and a note
+   on whether it is a best pair or a device median is not evidence of
+   anything.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -272,11 +489,11 @@ engineering constraint the Noise, Decoherence & Scaling course develops.
   in place of coaxial lines.
 - Coherence times reach seconds (vs. superconducting qubits' microseconds),
   at the cost of slower gates (microseconds, not nanoseconds).
-- The shared motional mode gives real all-to-all connectivity within
-  one trap, a real architectural advantage, though one that faces its
-  own scaling limits.
+- The shared motional mode gives all-to-all connectivity within one
+  trap, an architectural advantage that nevertheless faces its own
+  scaling limits.
 
-## Further Exploration
+## Losing the Charge, Keeping the Atom
 
 <NextDiscovery>
 [Neutral Atoms](/lessons/quantum-hardware/physical-qubit-platforms/neutral-atoms)

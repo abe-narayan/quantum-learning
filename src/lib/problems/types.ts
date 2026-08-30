@@ -161,11 +161,38 @@ export type ConceptGroup =
       phrases: string[];
       /** Shown when this group alone blocks full correctness. */
       missingFeedback?: string;
+      /**
+       * The lint's one escape hatch, and it must be *annotated*.
+       *
+       * A phrase written in notation — "⁴", "±", "π}", "ρ", "|+⟩" — survives
+       * `normalize()` as nothing at all, so it can never be matched by the
+       * word-level machinery; it is only ever found as raw text. That is
+       * sometimes exactly what the author wants (a student writing "ρ" really
+       * has written ρ) and sometimes an accident (a phrase that silently
+       * grades nothing). The two are indistinguishable from the outside, so
+       * `conceptualLint.ts` rejects every such phrase unless it appears here
+       * as a key, mapped to a short sentence saying why the raw glyph is the
+       * thing being tested.
+       *
+       * Keys must be phrases that also appear in `phrases`. Declaring a phrase
+       * here does not change how it is matched — it is a statement of intent,
+       * checked by the lint, not a matcher directive.
+       */
+      anchors?: Record<string, string>;
     };
 
 /** The phrase list of a `ConceptGroup`, regardless of which form it was authored in. */
 export function conceptGroupPhrases(group: ConceptGroup): string[] {
   return Array.isArray(group) ? group : group.phrases;
+}
+
+/**
+ * The phrases of a `ConceptGroup` that the author has explicitly declared to be
+ * raw-notation anchors (see `anchors` above). Array-form groups can never
+ * declare one — switching to the object form *is* the declaration.
+ */
+export function conceptGroupAnchors(group: ConceptGroup): Record<string, string> {
+  return Array.isArray(group) ? {} : (group.anchors ?? {});
 }
 
 export type ConceptualAnswer = {
@@ -181,6 +208,15 @@ export type ConceptualAnswer = {
   incorrectFeedback: string;
   /** Shown when some but not all concept groups are matched. */
   partialFeedback?: string;
+  /**
+   * Optional extra phrasings that MUST grade `correct` — a regression test the
+   * author writes alongside the problem. `conceptualCorpus.test.ts` already
+   * requires the problem's own model answer (`solution.finalAnswer`,
+   * `explanation.correctIdea`, or the joined solution steps) to pass; add
+   * entries here for the *student* wordings you care about, especially the
+   * plain-English one a beginner would actually type. Never shown to anyone.
+   */
+  modelAnswers?: string[];
 };
 
 export type Answer = MultipleChoiceAnswer | NumericAnswer | ConceptualAnswer;

@@ -26,8 +26,8 @@ export const oneStateDensityMatrixChoice: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "That's ρ for |0⟩, not |1⟩ — check which basis vector has the amplitude.",
-      c: "That matrix isn't even a valid outer product of |1⟩ with itself — it's not diagonal, but |1⟩⟨1| must be.",
+      b: "That is ρ for |0⟩, not |1⟩. Check which basis vector carries the amplitude.",
+      c: "That matrix is not an outer product of |1⟩ with itself. It carries off-diagonal entries, and |1⟩⟨1| is diagonal.",
       d: "That matrix isn't Hermitian, so it can't be any valid density matrix.",
     },
     defaultIncorrectFeedback: "Compute the outer product directly: |1⟩⟨1| = (0,1)ᵀ(0,1).",

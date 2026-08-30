@@ -21,33 +21,16 @@ export const bb84WhySamplingDetectsEavesdropping: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      [
-        "spread evenly",
-        "uniformly across",
-        "uniform",
-        "evenly",
-        "applies to every sifted bit",
-        "every bit",
-        "each bit",
-        "same error rate throughout",
-        "same probability",
-        "randomly distributed",
-        "independently",
-        "not concentrated",
-      ],
-      [
-        "representative sample",
-        "representative",
-        "statistically reflect",
-        "statistic",
-        "estimate the error rate",
-        "estimate the error",
-        "estimate",
-        "with high confidence",
-        "confidence",
-        "a large enough sample",
-        "law of large numbers",
-      ],
+      {
+        phrases: ["spread evenly", "uniformly across", "uniform", "evenly", "applies to every sifted bit", "every bit", "each bit", "same error rate throughout", "same probability", "randomly distributed", "independently", "not concentrated"],
+        missingFeedback:
+          "Sampling only works if what you are sampling sits the same way everywhere. Say how Eve's disturbance is distributed across the sifted bits.",
+      },
+      {
+        phrases: ["representative sample", "representative", "statistically reflect", "statistic", "estimate the error rate", "estimate the error", "estimate", "with high confidence", "confidence", "a large enough sample", "law of large numbers"],
+        missingFeedback:
+          "You have said how the disturbance is distributed. Now say what the sample buys them: what can they work out about the bits they never checked, and how sure can they be of it?",
+      },
       {
         phrases: [
           "discard the sample",
@@ -65,22 +48,26 @@ export const bb84WhySamplingDetectsEavesdropping: ConceptualProblem = {
           "never revealed",
         ],
         missingFeedback:
-          "You have explained why a sample estimates the error rate reliably. The other half is why it costs nothing: the compared positions are revealed publicly and then discarded, so they never form part of the retained key and leak nothing about it.",
+          "You have explained why a sample tracks the true error rate. The other half is why it costs nothing: say what happens to the positions Alice and Bob read out over the public channel, and whether any of them survives into the final key.",
       },
     ],
     incorrectFeedback:
-      "Address three things: why an eavesdropper's disturbance is spread evenly (not concentrated) across the sifted key, why that means a random sample statistically reflects the true error rate, and why revealing the sampled bits publicly doesn't compromise the rest of the key.",
+      "You answered that 'checking some bits is faster', which is a cost argument rather than a correctness one. Three things have to hold: how an eavesdropper's damage is distributed across the sifted key, what that distribution lets a random subset tell you about the whole, and why the bits compared in public are harmless afterwards.",
     partialFeedback:
-      "Good start — make sure you cover both why a sample is statistically representative and why discarding it afterward keeps the remaining key secret.",
+      "Some of it is there. Check all three: how the damage is spread, what a random subset therefore tells you about the whole, and what becomes of the positions you compared in public.",
+    modelAnswers: [
+      "Eve's disturbance is spread evenly across the sifted key, not concentrated in a few positions, so a random sample is representative and lets Alice and Bob estimate the error rate of the whole key with high confidence. The sampled bits are then discarded, so revealing them costs no secrecy.",
+      "Because Eve has to guess a basis on every bit independently, the same probability of a flip applies to each bit. A large enough sample therefore statistically reflects the whole key, and since those bits are thrown away afterwards the rest of the key stays secret.",
+    ],
   },
   hints: [
-    { text: "Eve's intercept-resend attack disturbs every sifted bit independently with the same probability (1/4) — it doesn't concentrate errors on a few positions." },
-    { text: "A random sample of a large key, if the true error rate is uniform, statistically reflects that rate with high confidence — you don't need to check every bit to estimate it." },
-    { text: "Alice and Bob never use the sampled bits as part of their actual secret key — they're revealed publicly and thrown away, so revealing them leaks nothing about the retained key." },
+    { text: "Eve's intercept-resend attack hits each sifted position on its own, at one fixed rate, with no preference for any particular position. Say what that means for where the errors end up." },
+    { text: "If a rate is the same everywhere along the key, a random subset of positions has a rate of its own. How close should the two be, and what makes them close?" },
+    { text: "Now account for the cost. The compared positions were read out over a public channel. Say what Alice and Bob do with them next, and what that means for the secrecy of what is left." },
   ],
   solution: {
     steps: [
-      { description: "An intercept-resend eavesdropper disturbs each sifted bit independently with the same $25\\%$ probability — the error is spread uniformly, not concentrated on a few bits." },
+      { description: "An intercept-resend eavesdropper disturbs each sifted bit independently with the same $25\\%$ probability, so the error is spread uniformly rather than concentrated on a few bits." },
       { description: "Because the error rate is uniform, a random subset of the sifted key is a statistically representative sample of the whole: comparing it publicly gives a reliable estimate of the true error rate without touching every bit." },
       { description: "The sampled positions are discarded afterward and never used as key material, so publicly revealing their bit values leaks nothing about the remaining, retained key." },
     ],

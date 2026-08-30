@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { PillarScope } from "@/components/field/PillarScope";
-import { Section } from "@/components/ui/Section";
+import { Section, Marginalia } from "@/components/ui/Section";
 import { Eyebrow, SectionTitle, Lede, Readouts } from "@/components/ui/Typography";
 import { Instrument } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/motion/Reveal";
-import { CourseList } from "@/components/curriculum/CourseList";
 import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
 import { getCourseHref } from "@/components/curriculum/courseHref";
 import {
@@ -15,6 +14,8 @@ import {
   pillarFacts,
   pillarReadoutItems,
 } from "@/components/pillar/PillarFraming";
+import { PillarPipeline } from "@/components/pillar/PillarPipeline";
+import { TierLadder } from "@/components/pillar/TierLadder";
 import { CircuitStateStepper } from "@/components/visualizations/CircuitStateStepper";
 import { getCoursesByPillar } from "@/lib/content/curriculum";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
@@ -32,21 +33,25 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 const PIPELINE_STEPS = [
-  { label: "Circuit", detail: "Built as data — gates + qubit indices, exactly like a real SDK" },
+  { label: "Circuit", detail: "Built as data: gates plus qubit indices, exactly like a real SDK" },
   { label: "Transpile", detail: "Decomposed into a native gate set for the target's real connectivity" },
   { label: "Run", detail: "A state-vector simulator, or a real QPU" },
   { label: "Bitstrings", detail: "Sampled measurement outcomes, ready to post-process" },
 ] as const;
 
 /**
- * A left-to-right flow strip: this pillar's own composition language,
- * distinct from Mechanics' reading column, Computing's split, and
- * Hardware's schematic. Deliberately hand-rolled rather than reusing the
- * generic `PipelineDiagram` visualization component, which hard-codes the
- * site-level `--accent` token — this stays in the pillar channel so it
- * retints correctly under `data-pillar="quantum-software"`. Demoted to a
- * caption beneath the live transpile/execute instrument below — the four
- * static boxes name the stages; the instrument is what actually runs one.
+ * The four stages a circuit passes through, as a left-to-right flow strip.
+ * It is the caption under the live transpile/execute instrument, and it is
+ * also the argument for the shape the curriculum takes further down the
+ * page: `PillarPipeline` draws the three courses as three stages of one
+ * line, with each stage's inputs and outputs read out of the registry. Both
+ * are flows because the subject is one.
+ *
+ * Deliberately hand-rolled rather than reusing the generic
+ * `PipelineDiagram` visualization component, which hard-codes the
+ * site-level `--accent` token; this stays in the pillar channel so it
+ * retints correctly under `data-pillar="quantum-software"`. The four static
+ * boxes name the stages; the instrument above them is what actually runs one.
  */
 function CompilationPipeline() {
   return (
@@ -54,8 +59,8 @@ function CompilationPipeline() {
     // (`linear-gradient(to right, black 88%, transparent)`) was static, so it
     // did not track scroll position and did not know whether there was
     // anything left to scroll to. Two consequences, both bad: at desktop
-    // widths the four steps fit with room to spare — 4 × 10.5rem plus arrows
-    // is well inside the container — and the fade dimmed the tail of the
+    // widths the four steps fit with room to spare, 4 × 10.5rem plus arrows
+    // is well inside the container, and the fade dimmed the tail of the
     // last card's text anyway, for no reason; and on a phone, once the reader
     // scrolled to the end, the fade was still over the rightmost card, so
     // "Bitstrings" could never be read at full opacity no matter what they
@@ -68,19 +73,19 @@ function CompilationPipeline() {
     // a trackpad. This strip holds four `min-w-[10.5rem]` (168px) cards with
     // `gap-3` and a ~14px arrow between each, so its minimum content width is
     // 4 × 168 + 3 × 38 ≈ 786px against the ~288px of column a 320px viewport
-    // leaves — and it contains no link, no button, no focusable descendant of
+    // leaves, and it contains no link, no button, no focusable descendant of
     // any kind. A `div` with `overflow-x: auto` is focusable by default only
     // in Firefox, so on a phone or in a keyboard-only session three of the
     // four pipeline stages were simply unreachable: WCAG 2.1.1. Worse than
     // the usual case, too, because `html, body { overflow-x: clip }`
     // (globals.css §"Full-bleed overhang") means there is no page-level
-    // scrollbar to hint that the row continues — the clipped fourth card is
+    // scrollbar to hint that the row continues, the clipped fourth card is
     // the only signal, and it is invisible to anyone not looking at pixels.
     //
     // The fix is `src/mdx-components.tsx`'s `Table` wrapper, one role weaker:
     // `tabIndex={0}` makes it a real tab stop, and a name tells whoever lands
     // on it what they just took focus of and that it moves. `role="group"`
-    // rather than `Table`'s `role="region"` deliberately — `region` is a
+    // rather than `Table`'s `role="region"` deliberately, `region` is a
     // landmark, worth spending on a wide data table a reader may want to find
     // from a landmark list, but this is a four-box caption under a live
     // instrument and does not belong in that list. The visible focus ring is
@@ -90,7 +95,7 @@ function CompilationPipeline() {
     //
     // The name says "scrollable" in words, and uses a comma rather than the
     // em dash the rest of this file's prose would take: several screen
-    // readers pronounce "—" outright ("em dash") instead of pausing on it, so
+    // readers pronounce ", " outright ("em dash") instead of pausing on it, so
     // punctuation that reads well on screen can read badly aloud in an
     // accessible name.
     <div
@@ -102,7 +107,7 @@ function CompilationPipeline() {
       {PIPELINE_STEPS.map((step, index) => (
         <div key={step.label} className="flex shrink-0 items-center gap-3">
           <div className="min-w-[10.5rem] rounded-(--radius-tight) border border-pillar-edge bg-pillar-wash px-4 py-3">
-            <p className="font-tech text-[0.65rem] uppercase tracking-[0.12em] text-pillar-text">
+            <p className="tech-label text-pillar-text">
               {String(index + 1).padStart(2, "0")}
             </p>
             <p className="mt-1 text-sm font-semibold text-foreground">{step.label}</p>
@@ -123,7 +128,7 @@ function CompilationPipeline() {
  * The transpiled circuit an Instrument below actually runs: a logical
  * H(q0) then CNOT(q0, q2), routed onto LINEAR-CHAIN hardware connectivity
  * (qubit i can only interact with qubit i±1) the way
- * `cnotOnLinearChain` in `src/lib/quantum/transpilation.ts` does it —
+ * `cnotOnLinearChain` in `src/lib/quantum/transpilation.ts` does it,
  * swap the control into position next to the target, apply the real
  * CNOT, then swap back. Written out explicitly here (rather than calling
  * that function, which operates on a StateVector rather than emitting an
@@ -164,7 +169,7 @@ export default async function SoftwarePage() {
 
   // One derivation over the real registries for every figure this page quotes
   // about itself, and for the primary action (the real first course, in
-  // curriculum order) — see `pillarFacts`, shared with the other three track
+  // curriculum order), see `pillarFacts`, shared with the other three track
   // pages, and mechanics/page.tsx for why `getCourseHref` (→
   // `/courses/<slug>`) is the right destination.
   const facts = pillarFacts(courses, lessons);
@@ -190,17 +195,22 @@ export default async function SoftwarePage() {
             quantum-classical loops that turn an abstract circuit into something real hardware
             can run.
           </Lede>
-          <p className="mt-4 max-w-[42rem] text-sm leading-relaxed text-muted-foreground">
-            This is the SDK, simulation, and compilation stack — not the physics or the physical
+          <p className="mt-4 max-w-lede text-sm leading-relaxed text-muted-foreground">
+            This is the SDK, simulation, and compilation stack, not the physics or the physical
             device, but the code and infrastructure layer that sits between them.
           </p>
         </Reveal>
 
         <Reveal delay={80}>
+          {/* Same four-rung ladder, same position, as every other pillar
+              page: it is the one element that carries the hierarchy between
+              them, so it cannot be styled per page. */}
+          <TierLadder pillar="quantum-software" className="mt-8" />
+
           <PillarBriefing
             className="mt-8"
             facts={facts}
-            outcome="Trace a circuit from source, through transpilation onto a real device's connectivity, to the bitstrings that come back — and say why a 50-qubit simulation is not an option."
+            outcome="Trace a circuit from source, through transpilation onto a real device's connectivity, to the bitstrings that come back, and say why a 50-qubit simulation is not an option."
           />
         </Reveal>
 
@@ -236,15 +246,15 @@ export default async function SoftwarePage() {
               { label: "50 qubits", value: formatBytes(stateVectorMemoryBytes(50)) },
             ]}
           />
-          <p className="mt-3 max-w-[42rem] text-xs leading-relaxed text-subtle-foreground">
+          <p className="mt-3 max-w-lede text-xs leading-relaxed text-subtle-foreground">
             Doubling with every added qubit, computed directly from{" "}
-            <code className="text-pillar-text">stateVectorMemoryBytes</code> — not a quoted
+            <code className="text-pillar-text">stateVectorMemoryBytes</code>, not a quoted
             figure. This is why 30-50 qubits is where exact state-vector simulation stops being
             practical on ordinary hardware.
           </p>
-          <p className="mt-6 max-w-[42rem] border-l-2 border-pillar-edge pl-4 text-xs leading-relaxed text-subtle-foreground">
+          <p className="mt-6 max-w-lede border-l-2 border-pillar-edge pl-4 text-xs leading-relaxed text-subtle-foreground">
             The gates streaming behind this page are not decoration either:{" "}
-            {field.fieldCaption.toLowerCase()} — a circuit actually executing, the same model the
+            {field.fieldCaption.toLowerCase()}: a circuit actually executing, the same model the
             live instrument below runs for real.
           </p>
         </Reveal>
@@ -269,7 +279,7 @@ export default async function SoftwarePage() {
           <p className="mt-3 max-w-2xl text-muted-foreground">
             The logical circuit below calls for a Hadamard, then a CNOT directly between qubits 0
             and 2. This hardware only allows adjacent qubits to interact, so the transpiler routes
-            the CNOT with a SWAP network first — the same linear-chain routing this platform&rsquo;s
+            the CNOT with a SWAP network first, the same linear-chain routing this platform&rsquo;s
             own tested <code className="text-pillar-text">cnotOnLinearChain</code> implements. Step
             or play through the compiled sequence; the bars are the real |amplitude|&sup2; of the
             state after exactly the highlighted gates, not an animation standing in for one.
@@ -285,7 +295,7 @@ export default async function SoftwarePage() {
                 connectivity
               </span>
             }
-            footnote="Qubits 0 and 2 end up entangled even though the compiled circuit never applies a gate directly between them — the SWAP network carries qubit 0's amplitude next to qubit 2, the CNOT entangles them there, and a SWAP carries it back. That routing overhead is exactly what Programming Quantum Computers' transpilation unit derives in full."
+            footnote="Qubits 0 and 2 end up entangled even though the compiled circuit never applies a gate directly between them: the SWAP network carries qubit 0's amplitude next to qubit 2, the CNOT entangles them there, and a SWAP carries it back. That routing overhead is exactly what Programming Quantum Computers' transpilation unit derives in full."
           >
             <CircuitStateStepper
               numQubits={3}
@@ -303,20 +313,28 @@ export default async function SoftwarePage() {
         </Reveal>
       </Section>
 
-      <Section width="wide" aria-labelledby="software-curriculum-heading">
+      <Section width="reading" aria-labelledby="software-curriculum-heading">
         <Reveal>
           <Eyebrow>Curriculum</Eyebrow>
           <SectionTitle level={2} size="lg" id="software-curriculum-heading" className="mt-3">
             {courses.length} courses, source to hardware
           </SectionTitle>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
+          <p className="mt-3 text-muted-foreground">
             Programming model first, then simulation and its real limits, then the compilation
-            pipeline that gets a circuit onto actual hardware.
+            pipeline that gets a circuit onto actual hardware. Each course is a stage: what has to
+            arrive before it can run, the lessons it runs, and what downstream takes its output.
           </p>
         </Reveal>
 
-        <Reveal delay={80} className="mt-10 block">
-          <CourseList courses={courses} lessons={lessons} />
+        <Marginalia className="mt-6">
+          Every edge below is read out of the curriculum registry. A{" "}
+          <em>Requires</em> line is a course&rsquo;s declared prerequisites, with the track named
+          when one comes from outside Software. A <em>Feeds</em> line is the same edges reversed,
+          minus the next stage down, which the rule between the two stages already draws.
+        </Marginalia>
+
+        <Reveal delay={80} className="mt-8 block">
+          <PillarPipeline courses={courses} lessons={lessons} pillar="quantum-software" />
         </Reveal>
       </Section>
 

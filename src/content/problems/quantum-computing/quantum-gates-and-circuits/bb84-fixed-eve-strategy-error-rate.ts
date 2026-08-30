@@ -19,36 +19,36 @@ export const bb84FixedEveStrategyErrorRate: MultipleChoiceProblem = {
     options: [
       { id: "a", text: "It drops to $0\\%$, since Eve now measures correctly whenever Alice happens to use Z." },
       { id: "b", text: "It rises above $25\\%$, since a fixed strategy is more disruptive than a random one." },
-      { id: "c", text: "It stays at exactly $25\\%$, since Alice's basis is chosen independently of Eve's fixed guess, so the marginal chance of a basis mismatch is unchanged." },
-      { id: "d", text: "It becomes impossible to characterize as a single percentage, since Eve's strategy is deterministic rather than random." },
+      { id: "c", text: "It stays at $25\\%$, since Alice picks her basis independently of Eve's fixed guess." },
+      { id: "d", text: "It stops being a single percentage, since Eve's strategy is now deterministic." },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "c",
     optionFeedback: {
-      a: "Eve does guess correctly whenever Alice happens to use Z (half the time) — but the other half, when Alice uses X, Eve is guaranteed wrong. Averaged together, the error rate isn't 0.",
-      b: "Eve's strategy being fixed rather than random doesn't matter to Alice, who doesn't know Eve's strategy and picks her own basis independently of it — the disturbance mechanism is unaffected.",
+      a: "Eve does guess correctly whenever Alice uses Z, which is half the time. On the other half, when Alice uses X, Eve is certain to be wrong. Averaged over both, the error rate is not 0.",
+      b: "Eve's strategy being fixed rather than random doesn't matter to Alice, who does not know Eve's strategy and picks her own basis independently of it. The disturbance mechanism is unaffected.",
       d: "The error rate is still a well-defined average over the two cases (Alice picks Z, or Alice picks X), each with fixed probability 1/2.",
     },
     defaultIncorrectFeedback:
       "Compute Eve's probability of guessing correctly (matching Alice's actual basis) under this fixed strategy, and compare it to the random-guessing case.",
   },
   hints: [
-    { text: "Eve's basis guess is correct exactly when Alice happens to pick Z — probability $1/2$, since Alice's choice is independent of Eve's fixed strategy." },
+    { text: "Eve's basis guess is correct exactly when Alice picks Z, which has probability $1/2$ because Alice chooses independently of Eve's fixed strategy." },
     { text: "That's the exact same $1/2$ probability of a correct guess a uniformly random strategy would give." },
-    { text: "The $25\\%$ derivation only used $P(\\text{Eve guesses wrong})=1/2$ — it never assumed Eve's guesses were themselves random, only that they're uncorrelated with Alice's basis." },
+    { text: "The $25\\%$ derivation used only $P(\\text{Eve guesses wrong})=1/2$. It never assumed Eve's guesses were themselves random, only that they are uncorrelated with Alice's basis." },
   ],
   solution: {
     steps: [
-      { description: "Eve's guess (always Z) matches Alice's actual basis exactly when Alice happens to choose Z, which happens with probability $1/2$ — independent of Eve's strategy." },
+      { description: "Eve's guess (always Z) matches Alice's actual basis exactly when Alice happens to choose Z, which happens with probability $1/2$, independent of Eve's strategy." },
       { description: "This is identical to the probability a uniformly random guess would match: $1/2$." },
-      { description: "The $25\\%$ sifted-key error rate derivation depends only on $P(\\text{Eve's basis is wrong}) = 1/2$, not on how Eve chose her (wrong) guesses — so it's unchanged." },
+      { description: "The $25\\%$ sifted-key error rate derivation depends only on $P(\\text{Eve's basis is wrong}) = 1/2$, not on how Eve chose her wrong guesses, so it is unchanged." },
     ],
     finalAnswer: "The sifted-key error rate stays exactly $25\\%$.",
   },
   explanation: {
-    correctIdea: "A fixed eavesdropping strategy is exactly as detectable as a random one, as long as it's uncorrelated with Alice's basis choice — which it is, since Eve can't know Alice's random pick in advance.",
+    correctIdea: "A fixed eavesdropping strategy is exactly as detectable as a random one, as long as it is uncorrelated with Alice's basis choice, and it is, since Eve cannot know Alice's random pick in advance.",
     whyCorrect: "The error-rate derivation only ever used the marginal probability that Eve's basis disagrees with Alice's, and that marginal probability is $1/2$ regardless of whether Eve's guesses are fixed or randomized.",
     whyWrong: [
       { optionId: "a", text: "Counts only the half of the qubits where Eve happens to be right. On the other half she is guaranteed wrong, and the average is what the sifted-key error rate reports." },

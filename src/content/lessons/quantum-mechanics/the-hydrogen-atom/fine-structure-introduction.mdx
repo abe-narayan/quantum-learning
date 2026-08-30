@@ -39,21 +39,20 @@ export const lessonMeta = {
   objectives: [
     "State what fine structure is (spin-orbit coupling + relativistic kinetic correction) at a qualitative level",
     "Explain which of this course's specific results (e.g. exact l-independence of Eₙ) fine structure breaks, and why",
-    "Correctly state this course's scope: energies and wavefunctions derived here are the non-relativistic, spin-free approximation",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Real hydrogen has neither property">
 Every energy value this course computed, Eₙ=−13.6 eV/n², independent of l and m, came from solving the non-relativistic Schrödinger equation with a spin-free electron. Real hydrogen has neither property exactly.
 </LessonHook>
 
-## Motivation
+## Small, real, and worth naming
 
 The gap between the model and the real atom is small but real. The
 electron carries spin, which the Schrödinger treatment ignored, and it
 moves fast enough ($v/c\sim\alpha\approx1/137$) that relativistic
 corrections enter at the $\alpha^2$ level. This closing lesson is honest
-about that gap rather than pretending it doesn't exist, and previews
+about that gap instead of pretending it doesn't exist, and previews
 (without deriving) what the next level of approximation adds.
 
 <ExternalFigure
@@ -65,7 +64,7 @@ about that gap rather than pretending it doesn't exist, and previews
   license="Free use with attribution"
 />
 
-## Conceptual Overview
+## Two corrections of about the same size
 
 ### Two corrections, roughly the same size
 
@@ -100,8 +99,8 @@ single.
   question="|Eₙ| shrinks like 1/n² as n grows, while the fine-structure correction scales like α²×13.6 eV/n³. As n increases from 1 to 4, does the correction become a bigger or smaller fraction of |Eₙ|?"
   options={[
     { label: "Bigger fraction of |Eₙ| at higher n", value: "bigger" },
-    { label: "Smaller fraction of |Eₙ| at higher n", value: "smaller" },
     { label: "Always the same fraction, regardless of n", value: "same" },
+    { label: "Smaller fraction of |Eₙ| at higher n", value: "smaller" },
   ]}
   correctValue="smaller"
   explanation="The correction falls off as 1/n³, one power of n faster than |Eₙ| itself, so their ratio goes as α²/n. Fine structure matters most for the ground state and fades at higher n, both in absolute size and as a share of the level. The chart below plots exactly that ratio: it starts at α²≈5.3×10⁻⁵ for n=1 and falls by a factor of 4 by n=4."
@@ -109,7 +108,7 @@ single.
 
 <InteractiveSection
   title="Slide n, size up the fine-structure gap"
-  description="Each bar is the α²×13.6 eV/n³ fine-structure scale divided by |Eₙ| itself. Plotting the ratio rather than the two energies side by side is the only way both survive on one axis: at n=1 the correction is roughly one part in twenty thousand of the level it sits on, far too small to see against a 13.6 eV bar. Slide n and watch the ratio fall as α²/n; the frame label above the chart carries both raw eV numbers."
+  description="Each bar is the α²×13.6 eV/n³ fine-structure scale divided by |Eₙ| itself. Plotting the ratio rather than the two energies side by side is the only way both survive on one axis: at n=1 the correction is roughly one part in twenty thousand of the level it sits on, far too small to see against a 13.6 eV bar. Slide n and read the ratio at both ends of the range before deciding which way it moves; the frame label above the chart carries both raw eV numbers."
   mode="observe"
 >
   <BarChartExplorer
@@ -135,7 +134,7 @@ $j$ get slightly different energies.
   caption="Schematic, not to scale: the fine-structure splitting is real but tiny (parts in 10⁵ of |Eₙ|), and its actual size is computed later in Quantum Mastery."
 />
 
-## Honest Scope Statement
+## What this course got right, and where it stops
 
 This course derived the leading-order, non-relativistic, spin-free
 hydrogen atom completely and correctly. The energies, orbitals, and
@@ -145,15 +144,15 @@ course does not derive; doing so requires either full relativistic
 quantum mechanics (the Dirac equation) or
 <Term id="degenerate-perturbation-theory">degenerate perturbation theory</Term> applied to $\vec L\cdot\vec S$, both
 beyond this course's scope. What is offered here is a map of what is
-missing, not the missing calculation.
+missing, which is a different thing from the calculation itself.
 
-## Common Mistakes
+## The l-independence is a model artifact
 
 <Callout type="warning">
 **Thinking the $l$-independence of $E_n$ (Hydrogen Energy Levels) is
 exact in real hydrogen.** It's exact only in the non-relativistic,
 spin-free model this course builds; real hydrogen's spectral lines show
-fine splitting that depends on $j$, not just $n$.
+fine splitting that depends on $j$ as well as $n$.
 </Callout>
 
 <Callout type="note">
@@ -168,13 +167,165 @@ high-resolution spectroscopy.
 
 1. What two physical effects combine to produce fine structure, at a
    qualitative level?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Spin-orbit coupling and the relativistic correction to the kinetic
+   energy.
+
+   Spin-orbit coupling is a magnetic effect. In the electron's own rest
+   frame the proton is the thing that moves, and a moving charge is a
+   current, which makes a magnetic field at the electron. The electron's
+   spin magnetic moment has an orientation energy in that field, which
+   turns out to be proportional to $\vec L\cdot\vec S$. It is an
+   interaction between the electron's motion and its own spin, mediated by
+   the frame change, which is why it exists at all only for a particle
+   with spin and only when it is orbiting.
+
+   The relativistic kinetic correction has nothing to do with spin or
+   magnetism. This course used $T=p^2/2m$, the first term of
+
+   $$
+   \sqrt{p^2c^2+m^2c^4}-mc^2 = \frac{p^2}{2m} - \frac{p^4}{8m^3c^2} + \cdots
+   $$
+
+   and the $-p^4/8m^3c^2$ term is the next one. It lowers the energy of
+   states whose electron moves fastest, which are the low-$l$ states
+   penetrating closest to the nucleus, so it depends on $l$ as well as
+   $n$.
+
+   The reason they are grouped together rather than treated separately is
+   that they come out the same size. Both are suppressed by $\alpha^2$
+   relative to $E_n$, which is not a coincidence: $\alpha=v/c$ for the
+   ground-state electron in the Bohr picture, and both are the
+   leading $(v/c)^2$ correction to a non-relativistic treatment, reached
+   by different routes. Keeping one and dropping the other would be
+   inconsistent.
+
+   One honesty note about the count. A complete accounting has a third
+   piece of the same order, the Darwin term, which affects $l=0$ states
+   only. It is needed precisely because $\vec L\cdot\vec S$ vanishes when
+   $\vec L=0$, so without it the $s$ states would receive only the kinetic
+   correction and the final answer would not come out depending on $j$
+   alone. "Two effects" is the right summary of the physics; "two terms"
+   is one short of the calculation.
+
+   </details>
+
 2. Which specific result from Hydrogen Energy Levels does fine structure
    modify, and why does adding electron spin make this modification
    necessary?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It breaks the exact $l$-independence of $E_n$. In this course's model
+   all $n^2$ states of a shell share one energy; with fine structure the
+   shell splits, and the surviving label is $j$ rather than $l$.
+
+   Spin's role deserves splitting in two, because only half of it depends
+   on spin.
+
+   The kinetic correction $-p^4/8m^3c^2$ needs no spin whatsoever. It
+   already depends on $l$, through how deeply each orbital penetrates
+   toward the nucleus, so the $l$-degeneracy would break even for a
+   spinless electron. The accidental degeneracy is fragile, and
+   relativity alone is enough to spoil it.
+
+   What spin supplies is the $\vec L\cdot\vec S$ term, and with it the
+   reason the final answer organizes by $j$. Set $\vec S=0$ and that term
+   is identically zero: there is no magnetic moment for the orbital field
+   to act on and nothing to couple. Spin also doubles the state space,
+   from $n^2$ orbital states to $2n^2$, so there are more levels available
+   to split apart than the spin-free model had.
+
+   The upshot is that $2s_{1/2}$ and $2p_{1/2}$ end up degenerate while
+   $2p_{3/2}$ sits above them: same $n$, different $l$, and the energy
+   tracks $j$. Fine structure does not merely shift the levels. It changes
+   which quantum number the answer is a function of, and that is a
+   statement about which observables are still conserved.
+
+   </details>
+
 3. Roughly how large is the fine-structure correction relative to
    $E_n$ itself (order of magnitude)?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   About $\alpha^2\approx5\times10^{-5}$, so a few parts in $10^5$, and it
+   shrinks further as $\alpha^2/n$ at higher $n$.
+
+   In absolute terms at $n=1$ that is roughly
+   $5.3\times10^{-5}\times13.6\text{ eV}\approx7\times10^{-4}\text{ eV}$,
+   under a millielectronvolt, against a level depth of $13.6\text{ eV}$.
+
+   The reason the ratio falls rather than staying fixed is that the
+   correction goes as $1/n^3$ while $|E_n|$ goes as $1/n^2$, so their
+   quotient carries one leftover power of $n$. Fine structure is largest
+   where the electron is deepest, fastest, and closest to the nucleus, and
+   fades into irrelevance for Rydberg states.
+
+   The practical reading: this course's $E_n=-13.6\text{ eV}/n^2$ is
+   correct to four or five significant figures, which is better than most
+   purposes need. It is not, however, below the noise floor of a
+   spectrometer, and it was not below the noise floor of one in 1887,
+   which is how Michelson and Morley found the splitting decades before
+   anyone could explain it.
+
+   </details>
+
 4. Why is $\vec J=\vec L+\vec S$, rather than separate $L_z$ and $S_z$
    eigenstates, the right <Term id="basis">basis</Term> once spin-orbit coupling is included?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $\vec L\cdot\vec S$ does not commute with $L_z$ or $S_z$
+   separately, but does commute with $\vec J^{\,2}$ and $J_z$. A basis is
+   the right one when it diagonalizes the Hamiltonian, and only the total
+   angular momentum basis does.
+
+   The algebra makes this immediate. Square the total:
+
+   $$
+   \vec J^{\,2} = (\vec L+\vec S)^2 = \vec L^{\,2} + \vec S^{\,2} + 2\,\vec L\cdot\vec S \implies \vec L\cdot\vec S = \frac12\left(\vec J^{\,2} - \vec L^{\,2} - \vec S^{\,2}\right)
+   $$
+
+   Every operator on the right is diagonal in the $|j,m_j,l,s\rangle$
+   basis, so the perturbation is too, with eigenvalue
+
+   $$
+   \langle \vec L\cdot\vec S\rangle = \frac{\hbar^2}{2}\Big[j(j+1)-l(l+1)-s(s+1)\Big]
+   $$
+
+   No matrix has to be diagonalized. The right basis turns the hard part
+   into an identity, which is the usual signature of having chosen it
+   correctly.
+
+   Run it for the $2p$ states, $l=1$ and $s=\tfrac12$, where addition of
+   angular momentum gives $j=\tfrac32$ and $j=\tfrac12$:
+
+   $$
+   j=\tfrac32:\ \frac{\hbar^2}{2}\left[\tfrac{15}4 - 2 - \tfrac34\right] = +\frac{\hbar^2}{2}, \qquad j=\tfrac12:\ \frac{\hbar^2}{2}\left[\tfrac34 - 2 - \tfrac34\right] = -\hbar^2
+   $$
+
+   One level up, one down, in the ratio $1:-2$, which is the $2:1$
+   degeneracy ratio inverted, as it must be for the shifts to average to
+   zero. The state count checks out too: $3\times2=6$ states before
+   coupling, and $4+2=6$ after, split as $2p_{3/2}$ and $2p_{1/2}$.
+
+   The physical reading behind the algebra. $\vec L\cdot\vec S$ is a
+   torque each angular momentum exerts on the other, so neither is
+   conserved on its own any more, and $m_l$ and $m_s$ stop being good
+   quantum numbers. What is still conserved is the total, because the
+   interaction is internal to the atom and the atom as a whole remains
+   rotationally symmetric. That is the general lesson, not a hydrogen
+   trick: when two subsystems couple, the conserved quantity is the sum,
+   and the basis to work in is the one the sum diagonalizes.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -187,11 +338,11 @@ high-resolution spectroscopy.
 - It breaks this course's exact $l$-independence of $E_n$: real
   hydrogen's energy levels split slightly by total angular momentum $j$.
 - This course's results are the correct non-relativistic, spin-free
-  hydrogen atom: a foundation to build on rather than a simplification
+  hydrogen atom: a foundation to build on, and never a simplification
   to unlearn, with one clearly stated next-order correction sitting
   beyond its scope.
 
-## Further Exploration
+## The tools a full calculation would need
 
 <NextDiscovery>
 This closes **The Hydrogen Atom**. The next course, **Approximation

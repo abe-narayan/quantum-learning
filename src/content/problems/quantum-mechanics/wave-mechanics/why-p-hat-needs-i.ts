@@ -21,26 +21,42 @@ export const whyPHatNeedsI: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["hermitian", "real eigenvalues", "observable must be hermitian"],
-      ["plain derivative", "d/dx alone", "anti-hermitian", "not hermitian without i"],
+      // Bare "hermitian" is a substring of the second group's "anti-hermitian",
+      // so "d/dx alone is anti-Hermitian" satisfied both groups without ever
+      // stating the requirement that observables be Hermitian.
+      {
+        phrases: ["real eigenvalues", "must be hermitian", "has to be hermitian", "have to be hermitian", "needs to be hermitian", "observable must be hermitian", "observables are hermitian", "hermitian operator", "self-adjoint"],
+        missingFeedback:
+          "Say what a valid observable has to be, and what property of its measured values that requirement exists to guarantee.",
+      },
+      {
+        phrases: ["plain derivative", "d/dx alone", "anti-hermitian", "not hermitian without i"],
+        missingFeedback:
+          "You have the requirement. Now test the bare derivative against it: say what it is on its own, and what the extra factor does about that.",
+      },
     ],
-    incorrectFeedback: "Name both pieces: that observables must be Hermitian (for real eigenvalues), and that a bare derivative d/dx alone fails that requirement while -i*d/dx satisfies it.",
-    partialFeedback: "You're partway there — be explicit that a plain derivative operator alone is not Hermitian.",
+    incorrectFeedback: "You justified the i by units, or by matching the plane-wave answer e^(ikx). Neither forces it: any real multiple of d/dx carries the same units, and a constant can be absorbed into k. The constraint comes from what a measurement is allowed to hand back.",
+    partialFeedback: "You have one half. The other half is a specific calculation: integrate by parts and compare the integral of f* (dg/dx) with the integral of (df/dx)* g. The sign that comes back is what rules the bare derivative out.",
+    modelAnswers: [
+      "Momentum is an observable, so it must be hermitian in order to have real eigenvalues. The plain derivative is anti-hermitian, not hermitian on its own; multiplying by -i converts it into a hermitian operator, which is why the factor is not optional.",
+      "Observables are hermitian, and d/dx alone is not: it is anti-hermitian. The factor of i is exactly what fixes that, so the eigenvalues come out real.",
+    ],
   },
   hints: [
-    { text: "What property must every valid observable operator satisfy, from Mathematical Foundations?" },
-    { text: "Is the plain derivative operator d/dx, on its own, Hermitian?" },
+    { text: "Momentum is something you measure, and every measured value is a real number. That is already a constraint on the operator before you write it down." },
+    { text: "Test the bare d/dx against that constraint: integrate f* (dg/dx) by parts over the whole line, with f and g vanishing at infinity." },
+    { text: "The boundary term drops and you are left with the same integral carrying a minus sign in front. Ask what constant factor out front would cancel that minus once it is conjugated." },
   ],
   solution: {
     steps: [
       { description: "Observables must be Hermitian, to guarantee real eigenvalues (measurable outcomes)." },
-      { description: "Integration by parts shows $d/dx$ alone is anti-Hermitian; multiplying by $-i$ flips this into exactly the Hermitian condition." },
+      { description: "Integration by parts shows $d/dx$ alone is anti-Hermitian; multiplying by $-i$ flips it into the Hermitian condition." },
     ],
     finalAnswer: "The factor of i converts the anti-Hermitian plain derivative into a Hermitian operator, as required for p-hat to be a valid observable.",
   },
   explanation: {
-    correctIdea: "Momentum must be a valid observable, which means Hermitian — and only -i*hbar*d/dx (not a bare derivative) satisfies that.",
-    whyCorrect: "This is exactly the lesson's integration-by-parts calculation: the boundary term vanishes and the sign flip from d/dx becomes the correct Hermitian match once multiplied by -i.",
-    whyWrong: ["Saying 'it's needed to match units' is incomplete — units alone don't force a complex factor; the actual reason is the Hermiticity requirement for real, measurable eigenvalues."],
+    correctIdea: "Momentum must be a valid observable, which means Hermitian, and only -i*hbar*d/dx (not a bare derivative) satisfies that.",
+    whyCorrect: "This is the lesson's integration-by-parts calculation: the boundary term vanishes and the sign flip from d/dx becomes the correct Hermitian match once multiplied by -i.",
+    whyWrong: ["Saying 'it's needed to match units' is incomplete: units alone do not force a complex factor. The reason is the Hermiticity requirement for real, measurable eigenvalues."],
   },
 };

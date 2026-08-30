@@ -2,74 +2,24 @@
 
 import { useLayoutEffect, useSyncExternalStore, type ReactElement } from "react";
 import { IconButton } from "@/components/ui/IconButton";
+import {
+  applyTheme,
+  getServerThemeSnapshot,
+  getThemeSnapshot,
+  hasReaderChosenTheme,
+  isTheme,
+  nextTheme,
+  setTheme,
+  subscribe,
+  type Theme,
+} from "@/components/layout/themeStore";
 import { cn } from "@/lib/utils";
-
-type Theme = "light" | "dark" | "system";
-
-/** Matches the `quantumlearn:lesson-progress:` prefix convention used by
- * src/lib/content/progress/localStorageStore.ts. "system" is represented by
- * the *absence* of a stored value, not an explicit "system" string — see
- * `applyTheme` below. */
-const STORAGE_KEY = "quantumlearn:theme";
-
-const THEME_CYCLE: readonly Theme[] = ["light", "dark", "system"];
 
 const THEME_LABEL: Record<Theme, string> = {
   light: "Light",
   dark: "Dark",
   system: "System",
 };
-
-// Store plumbing mirrors src/lib/content/progress/useLessonProgress.ts: a
-// module-level listener set notified on write, read through
-// `useSyncExternalStore` so the pre-hydration client render matches the
-// server (both fall back to `getServerSnapshot`) with no
-// setState-in-effect needed to reconcile them.
-const listeners = new Set<() => void>();
-
-function notify() {
-  listeners.forEach((listener) => listener());
-}
-
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
-
-function getSnapshot(): Theme {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "light" || stored === "dark" || stored === "system") return stored;
-  } catch {
-    // Storage unavailable (private browsing, quota, etc.) — fall back to the
-    // site default for this session.
-  }
-  // Dark, not "system". The absence of a stored choice is not a preference
-  // for the OS setting, it is the absence of a choice — and the site's answer
-  // to that is its own identity. See the theme note at the top of
-  // globals.css: a first-time visitor on a light-default OS used to get a
-  // white page, which the dark-first palette exists to prevent. "System" is
-  // now something a reader picks, not something they fall into.
-  return "dark";
-}
-
-/** Matches the `<html>` server render in src/app/layout.tsx, which carries no
- * `data-theme` attribute until the inline no-flash script or this component
- * sets one — and the unattributed default is dark. */
-function getServerSnapshot(): Theme {
-  return "dark";
-}
-
-/** Mirrors the inline no-flash script in src/app/layout.tsx: all three states
- * write an explicit `data-theme`, including "system", which globals.css pairs
- * with a `prefers-color-scheme: light` query. Clearing the attribute would
- * now mean *dark*, not "follow the OS", so "system" can no longer be encoded
- * as its absence. */
-function applyTheme(theme: Theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-}
 
 function SunIcon() {
   return (
@@ -111,9 +61,12 @@ const THEME_ICON: Record<Theme, () => ReactElement> = {
  * `localStorage` so it survives reloads (read on load by the inline script
  * in src/app/layout.tsx, which sets `data-theme` on `<html>` before first
  * paint to avoid a flash of the wrong theme).
+ *
+ * All of the state lives in `themeStore.ts`, including the `storage` listener
+ * that keeps other tabs on this origin in step.
  */
 export function ThemeToggle({ className }: { className?: string }) {
-  const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const theme = useSyncExternalStore(subscribe, getThemeSnapshot, getServerThemeSnapshot);
 
   // Keeps <html data-theme> synced to the resolved theme — a legitimate
   // effect (syncing React state to an external system, the DOM outside this
@@ -122,26 +75,48 @@ export function ThemeToggle({ className }: { className?: string }) {
   // which resets attributes JSX doesn't own and would otherwise clear
   // whatever the inline script set (see the Next.js "preventing flash
   // before hydration" guide, "Re-applying attributes in development").
+  //
+  // WHY IT DEFERS TO AN ATTRIBUTE ALREADY ON <html>
+  // ----------------------------------------------
+  // Unconditionally writing `theme` here reintroduced exactly the flash the
+  // no-flash script exists to prevent, for every reader whose theme is not
+  // dark. `useSyncExternalStore` serves `getServerThemeSnapshot()` (hard-coded
+  // "dark", to match the attribute-less server HTML) for the whole hydration
+  // render, and reconciles with `getThemeSnapshot()` in a **passive** effect:
+  // `mountSyncExternalStore` in react-dom pushes `updateStoreInstance` with
+  // `HasEffect | Passive`. Layout effects run before passive effects and
+  // before paint, so the order on a cold load was:
+  //
+  //   inline script writes data-theme="light"  ->  page paints light
+  //   hydration commit, layout effect          ->  applyTheme("dark")
+  //   browser paints                           ->  DARK FLASH
+  //   passive effect reconciles to "light"     ->  re-render
+  //   layout effect                            ->  applyTheme("light")
+  //
+  // A reader on "light" or on "system" with a light OS therefore saw the site
+  // blink dark on every full page load. The attribute the script wrote is the
+  // authority until the theme is changed in this document, so honour it: once
+  // the store has reconciled, `theme` equals what is already on the element
+  // and this writes nothing anyway. After a real change — a click here, or a
+  // `storage` event from another tab, both of which set the store's
+  // `readerHasChosen` flag — every subsequent value is let through. Also
+  // correct when the script wrote nothing (storage blocked): there is no
+  // attribute to defer to, and both this component and the script agree the
+  // answer is dark.
   useLayoutEffect(() => {
+    if (!hasReaderChosenTheme()) {
+      const current = document.documentElement.getAttribute("data-theme");
+      if (isTheme(current)) return;
+    }
     applyTheme(theme);
   }, [theme]);
 
   function cycleTheme() {
-    const next = THEME_CYCLE[(THEME_CYCLE.indexOf(theme) + 1) % THEME_CYCLE.length];
-    try {
-      // "system" is stored explicitly rather than removed: with dark as the
-      // unattributed default, removing the key would read back as "dark" on
-      // the next load and silently discard the reader's choice.
-      window.localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      // Storage unavailable — the effect above still applies the theme for
-      // this page view, it just won't survive a reload.
-    }
-    notify();
+    setTheme(nextTheme(theme));
   }
 
   const Icon = THEME_ICON[theme];
-  const next = THEME_CYCLE[(THEME_CYCLE.indexOf(theme) + 1) % THEME_CYCLE.length];
+  const next = nextTheme(theme);
 
   return (
     // `IconButton` owns the 40px painted face *and* the 44px hit area it

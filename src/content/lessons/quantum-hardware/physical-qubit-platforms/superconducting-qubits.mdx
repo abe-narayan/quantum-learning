@@ -12,7 +12,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Superconducting Qubits",
   description:
-    "A qubit built from a nonlinear LC circuit cooled to millikelvin temperatures: the Josephson junction that makes it anharmonic (so it behaves like a two-level system, not a harmonic oscillator), driven by microwave pulses whose duration is a real, computable gate time reusing this platform's own two-level Rabi model.",
+    "A qubit built from a nonlinear LC circuit cooled to millikelvin temperatures: the Josephson junction that makes it anharmonic (so it behaves like a two-level system, not a harmonic oscillator), driven by microwave pulses whose duration is a computable gate time reusing this platform's own two-level Rabi model.",
   course: "physical-qubit-platforms",
   module: "superconducting-qubits",
   order: 1,
@@ -33,10 +33,10 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="An engineered artificial atom">
-A plain LC circuit is a <Term id="quantum-harmonic-oscillator">quantum harmonic oscillator</Term>, and its evenly-spaced levels make a terrible qubit — a "0→1" drive pulse would just as happily drive "1→2," "2→3," and so on.
+A plain LC circuit is a <Term id="quantum-harmonic-oscillator">quantum harmonic oscillator</Term>, and its evenly-spaced levels make a terrible qubit. A "0→1" drive pulse would just as happily drive "1→2," "2→3," and so on.
 </LessonHook>
 
-## Motivation
+## A Qubit You Can Fabricate
 
 A superconducting qubit is, physically, a tiny electrical circuit: an
 inductor and capacitor, cooled in a <Term id="dilution-refrigerator">dilution refrigerator</Term> to
@@ -48,20 +48,20 @@ here as real hardware.
 <AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/07/Google_Sycamore_Chip_001.png"
   alt="Google's Sycamore superconducting quantum processor chip: a dark silicon die at the center of a metallic carrier whose fan-out traces radiate to the package edge"
-  caption="Google's Sycamore processor: a real superconducting chip built from exactly the Josephson-junction transmon circuits this lesson describes, cooled in a dilution refrigerator and driven by microwave pulses computed from the same Rabi model this lesson reuses."
+  caption="Google's Sycamore processor: a real superconducting chip built from the Josephson-junction transmon circuits this lesson describes, cooled in a dilution refrigerator and driven by microwave pulses computed from the same Rabi model this lesson reuses."
   aspect="aspect-[16/9]"
   pins={[
-    { id: "die", x: 55, y: 47, label: "The processor die itself — a grid of Josephson-junction transmon circuits. Each one is the nonlinear LC circuit this lesson develops, an engineered artificial atom rather than a real one." },
+    { id: "die", x: 55, y: 47, label: "The processor die itself, a grid of Josephson-junction transmon circuits. Each one is the nonlinear LC circuit this lesson develops, an engineered artificial atom rather than a real one." },
     { id: "fanout", x: 27, y: 54, label: "Fan-out traces radiating from the die: the control lines carrying each qubit's microwave drive pulse, whose duration is the computable π-pulse time t = π/(2Ω) derived below." },
-    { id: "edge", x: 15, y: 36, label: "The carrier's edge, where every one of those traces terminates and wiring runs up out of the dilution refrigerator — the qubits themselves sit at millikelvin temperatures, colder than deep space, so thermal noise doesn't wash out the states." },
-    { id: "bond", x: 62, y: 66, label: "The bonded edge where die meets carrier. Wiring up many identical lithographed circuits like this is exactly why every major commercial player bet on this platform first: it's a chip." },
+    { id: "edge", x: 15, y: 36, label: "The carrier's edge, where every one of those traces terminates and wiring runs up out of the dilution refrigerator. The qubits themselves sit at millikelvin temperatures, colder than deep space, so thermal noise doesn't wash out the states." },
+    { id: "bond", x: 62, y: 66, label: "The bonded edge where die meets carrier. Wiring up many identical lithographed circuits like this is why every major commercial player bet on this platform first: it's a chip." },
   ]}
   credit="Google"
   creditUrl="https://commons.wikimedia.org/wiki/File:Google_Sycamore_Chip_001.png"
   license="CC BY 3.0"
 />
 
-## Engineering Development
+## Anharmonicity From a Josephson Junction
 
 ### The Josephson junction: breaking the harmonic spacing
 
@@ -77,8 +77,8 @@ This nonlinearity makes the energy levels
 0→1 gap no longer resonantly drives 1→2 as well. That is what makes an
 artificial "atom" out of a circuit, isolating a clean two-level qubit
 ($|0\rangle,|1\rangle$) from what would otherwise be an infinite
-oscillator ladder. The two ladders side by side make the difference
-visible directly, not just in words:
+oscillator ladder. Put the two ladders side by side and you can see the
+difference directly:
 
 <div className="not-prose grid gap-4 sm:grid-cols-2">
 
@@ -116,10 +116,11 @@ microwave pulse address only the qubit subspace.
 ### Coherence time and gate speed
 
 Superconducting qubits' defining tradeoff is relatively short coherence
-times (typically microseconds, with energy relaxation $T_1$ and dephasing
-$T_2$ both in this range; modern transmons commonly reach order 100 μs,
-and the 10 μs figure this pillar's worked comparisons use is a
-deliberately conservative round number) but very fast gates
+times (typically microseconds, with the energy-relaxation time $T_1$ and
+the coherence time $T_2$ both in this range; through the mid-2020s
+transmons commonly reached order 100 μs, and the 10 μs figure this
+track's worked comparisons use is a deliberately conservative round
+number) but very fast gates
 (<Term id="single-qubit-gates">single-qubit gates</Term> typically tens of nanoseconds). The *ratio* of gate
 time to coherence time, not either number alone, is what determines
 how many operations fit before decoherence dominates; the Noise,
@@ -129,14 +130,14 @@ This is also the platform every major commercial player bet on first,
 specifically because it's a chip. IBM's public roadmap ran from the
 127-qubit Eagle processor (2021) through the 1,121-qubit Condor (2023),
 then pivoted toward smaller, higher-fidelity "Heron" chips linked
-together into modular systems rather than chasing qubit count in
-isolation. Google went the other way and scaled the <Term id="surface-codes">surface code</Term>
+together into modular systems. Qubit count in isolation stopped being
+the target. Google went the other way and scaled the <Term id="surface-codes">surface code</Term>
 instead of the register. Neither move required inventing new physics;
 both are the same lithographic, wire-up-many-identical-circuits argument
 this section opened with, playing out at production scale.
 
 <HistoricalMoment date="2024">
-Google's Willow chip reports that its surface-code <Term id="logical-error-rate">logical error rate</Term> keeps dropping as the code is scaled up — the first real evidence that error correction on this platform gets easier, not harder, with size.
+Google's Willow chip reports that its surface-code <Term id="logical-error-rate">logical error rate</Term> keeps dropping as the code is scaled up: the first real evidence that error correction on this platform gets easier, not harder, with size.
 </HistoricalMoment>
 
 ### What this platform is bad at
@@ -162,21 +163,20 @@ Two more weaknesses belong in any honest account of the platform:
   junction host microscopic defects that couple to the qubit and drift
   over hours. A qubit's $T_1$ is not a fixed device constant; it moves
   from one calibration to the next, which is why coherence figures are
-  quoted as medians over a chip and a time window rather than as a
-  single number.
+  quoted as medians over a chip and a time window.
 
 ### Gate time from the Rabi model
 
 A single-qubit gate is implemented by driving the qubit at its resonance
 frequency for a carefully timed pulse. In the idealized resonant-drive
-model, the population transfer follows exactly the two-level Rabi
+model, the population transfer follows the two-level Rabi
 formula $P_1(t)=\sin^2(\Omega t)$. This platform's `exactTwoLevelTransitionProbability`,
 evaluated with equal energies ($E_i=E_f$, exact resonance), reproduces
 this closed form to machine precision (already verified in
 Approximation Methods' time-dependent perturbation theory context, now
 reused directly for real hardware). A full population transfer
 ("$\pi$-pulse," implementing an X gate) occurs at
-$t=\pi/(2\Omega)$, a genuine, computable gate time from a given drive
+$t=\pi/(2\Omega)$, a computable gate time from a given drive
 strength $\Omega$ (the Rabi frequency), not a hardcoded number.
 
 <Callout type="warning">
@@ -200,14 +200,14 @@ time you compute will be wrong by that factor of 2.
     { label: "It quadruples", value: "quadruples" },
   ]}
   correctValue="halves"
-  explanation="t_π is inversely proportional to Ω, so doubling the drive strength halves the gate time. That is why pushing more microwave power into the chip is one real lever for faster gates — right up until stronger driving starts exciting the 1→2 transition the anharmonicity was supposed to protect, or heating the fridge. Set V (playing Ω) below and watch the population reach 1 sooner as V grows."
+  explanation="t_π is inversely proportional to Ω, so doubling the drive strength halves the gate time. That is why pushing more microwave power into the chip is one real lever for faster gates, right up until stronger driving starts exciting the 1→2 transition the anharmonicity was supposed to protect, or heating the fridge. Set V (playing Ω) below and watch the population reach 1 sooner as V grows."
 />
 
-<InteractiveSection title="Drive the transmon's two-level subspace" description="Set detuning to zero and vary the coupling strength V, playing the role of this platform's microwave drive strength Ω: watch the population climb to 1 exactly at t_π=π/(2V), the same π-pulse formula this section just derived, and the Bloch vector sweep from the north pole to the south pole and back. Then move detuning away from zero and watch the population's ceiling drop below 1: this is what happens when the microwave tone isn't exactly resonant with the anharmonic 0-1 gap.">
+<InteractiveSection title="Drive the transmon's two-level subspace" description="Set detuning to zero and vary the coupling strength V, playing the role of this platform's microwave drive strength Ω: find the time at which the population peaks and check it against t_π=π/(2V), the π-pulse formula this section just derived, watching the Bloch vector's path between the poles as you go. Then move detuning away from zero and read the population's ceiling again: this is what happens when the microwave tone isn't exactly resonant with the anharmonic 0-1 gap.">
   <LazyRabiExplorer />
 </InteractiveSection>
 
-## Worked Example
+## A Pi Pulse in Ten Nanoseconds
 
 **A superconducting qubit is driven at Rabi frequency
 $\Omega=2\pi\times25\text{ MHz}$. How long is a $\pi$-pulse (X gate)?**
@@ -222,7 +222,7 @@ platform's own engine, reused unchanged from a purely mathematical
 context, correctly predicts a realistic superconducting-qubit gate
 time (tens of nanoseconds, matching the "fast gates" claim above).
 
-## Common Mistakes
+## Forgetting Why the Ladder Must Be Uneven
 
 <Callout type="mistake">
 **Thinking a plain LC circuit alone makes a good qubit.** Its evenly
@@ -243,12 +243,173 @@ not either number in isolation.
 
 1. Why does an evenly-spaced (harmonic) energy ladder make a poor
    two-level qubit, specifically in terms of pulse resonance?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because "resonant with the 0→1 gap" and "resonant with the 1→2 gap"
+   are the same statement when the gaps are equal. A drive pulse is a
+   tone at one frequency, and what makes it act on a transition is that
+   its frequency matches that transition's energy gap. In a harmonic
+   ladder $E_1-E_0=E_2-E_1=E_3-E_2=\dots$, so a tone tuned to the bottom
+   rung is tuned, with exactly zero detuning, to every rung above it.
+
+   Follow what that does to a would-be X gate. Population driven from
+   $|0\rangle$ into $|1\rangle$ does not stop there; the same tone keeps
+   pushing it into $|2\rangle$, then $|3\rangle$. Instead of the clean
+   two-level Rabi oscillation this lesson's $\pi$-pulse formula assumes,
+   the circuit climbs the ladder, and there is no pulse duration at which
+   it sits cleanly in $|1\rangle$.
+
+   The wrong turn worth naming is "just use a weaker or a longer pulse,
+   so the drive is spectrally narrow enough to pick out only 0→1."
+   Spectral selectivity is a real lever, and it is exactly how a
+   transmon's anharmonicity gets exploited in practice. But selectivity
+   works by *detuning*: a narrow pulse rejects a transition because that
+   transition sits some distance away in frequency. In a harmonic ladder
+   that distance is zero. Narrowing the pulse does nothing but make the
+   gate slower, because there is nothing to narrow away from.
+
+   One more consequence, since it changes what kind of error this is.
+   Population that ends up in $|2\rangle$ has left the computational
+   subspace entirely. It is not a bit flip and not a phase flip, so it is
+   not the kind of error a code built for bit flips and phase flips can
+   detect. That is a leakage error, and it is the reason anharmonicity is
+   treated as a hard requirement of the platform rather than a
+   convenience.
+
+   </details>
+
 2. Using $t_\pi=\pi/(2\Omega)$, find the $\pi$-pulse duration for
    $\Omega=2\pi\times50\text{ MHz}$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   t_\pi = \frac{\pi}{2\Omega} = \frac{\pi}{2(2\pi\times50\times10^6)} = \frac{1}{4\times50\times10^6} = \frac{1}{2\times10^8}\text{ s} = 5\text{ ns}.
+   $$
+
+   Do the cancellation before reaching for a calculator: the $\pi$ in the
+   numerator kills the $2\pi$ inside $\Omega$, leaving $1/(4f)$ with
+   $f=50$ MHz. Checked against the engine,
+   `exactTwoLevelTransitionProbability(0, 0, Omega, 5e-9)` returns
+   $1.0000000000000004$, so the drive really has moved the full
+   population to $|1\rangle$ at that instant.
+
+   Compare with the lesson's worked example: doubling $\Omega$ from
+   $2\pi\times25$ MHz to $2\pi\times50$ MHz halved the gate from 10 ns to
+   5 ns. $t_\pi$ and $\Omega$ are inversely proportional, which is why
+   pushing more microwave power at the chip is a genuine lever for faster
+   gates, up to the point where a stronger drive starts reaching the 1→2
+   transition that the anharmonicity was supposed to protect.
+
+   The mistake this question is set to catch is dropping the factor of 2
+   and computing $t=\pi/\Omega=10$ ns. That is not merely "a bit long."
+   Evaluating the engine at $t=\pi/\Omega$ gives $P_1\approx10^{-28}$: the
+   state has gone all the way to $|1\rangle$ and all the way back to
+   $|0\rangle$. A gate mistuned this way does not degrade gracefully; it
+   looks, on a readout histogram, exactly like a pulse that never fired.
+   Note that this is also the answer you get by taking a Rabi frequency
+   out of a paper written in the other convention
+   ($P_1=\sin^2(\Omega t/2)$, $t_\pi=\pi/\Omega$) and feeding it straight
+   into this text's formula. Check which convention a number was quoted
+   in before you use it.
+
+   </details>
+
 3. What physical role does the Josephson junction play that a plain
    inductor cannot provide?
-4. Why is comparing "gate time vs. coherence time" more informative than
-   either quantity in isolation, when judging a hardware platform?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It is a *nonlinear* inductor, and nonlinearity is precisely what an
+   ordinary inductor is defined not to have.
+
+   A plain inductor obeys $\Phi=LI$, a straight line. Combine it with a
+   capacitor and the circuit's energy is quadratic in the flux variable,
+   which is the definition of a harmonic oscillator, and a harmonic
+   oscillator's levels are evenly spaced. This is not a fixable
+   imperfection in the fabrication; it is what "linear element" means.
+   Any circuit built only from capacitors and linear inductors is
+   harmonic, and question 1 already said what that costs.
+
+   A Josephson junction instead has the current-phase relation
+   $I=I_c\sin\delta$, and its energy $U=-E_J\cos\delta$. Expand the
+   cosine and the quadratic term reproduces an ordinary inductor while
+   the quartic and higher terms do not. Those extra terms are what make
+   the rungs of the ladder unequal, so the 1→2 gap sits a measurable
+   distance from the 0→1 gap and a pulse can be aimed at one and not the
+   other.
+
+   Two wrong turns are worth naming, because both are common and both
+   sound reasonable.
+
+   The first is "the junction is what makes the circuit
+   superconducting." It is not. The capacitor plates, the leads and the
+   electrodes on either side of the junction are all superconducting
+   already. The junction is a thin insulating barrier interrupting that
+   superconductor, and its contribution is the nonlinear current-phase
+   relation across the barrier, nothing else.
+
+   The second is subtler: "any nonlinear element would do, so why not a
+   nonlinear resistor?" It would indeed break the even spacing, and it
+   would also dissipate. Dissipation is an energy channel out of the
+   qubit into the rest of the world, which is the same thing as $T_1$
+   decay. The Josephson junction is valuable specifically because it is
+   the one circuit element that is nonlinear *and* non-dissipative. That
+   pairing, not nonlinearity on its own, is what makes the platform
+   possible.
+
+   </details>
+
+4. Two devices are proposed. Device A does 10 ns gates and holds
+   coherence for 10 μs. Device B does 100 ns gates and holds coherence
+   for 500 μs. Which has the larger gate budget, and by what factor?
+   Then say why neither the gate-time column nor the coherence-time
+   column would have told you on its own.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Device B, by a factor of 5.
+
+   $$
+   \frac{10\ \mu\text{s}}{10\text{ ns}} = 10^3 \text{ gates}, \qquad \frac{500\ \mu\text{s}}{100\text{ ns}} = 5\times10^3 \text{ gates}.
+   $$
+
+   Now look at what each column said in isolation. On gate time alone,
+   Device A wins outright: its gates are ten times faster. On coherence
+   time alone, Device B wins outright: it lives fifty times longer. Both
+   comparisons are true, and neither of them is the number you care
+   about, because the question a circuit actually asks is "how many
+   operations fit before the state is gone," and that is a count, not a
+   duration.
+
+   The units make the argument by themselves. Coherence time is in
+   seconds. Gate time is in seconds. A count of gates is dimensionless,
+   so the only combination of the two that can be a gate budget is the
+   ratio. This is also why the tempting-looking alternative, coherence
+   time *minus* gate time, cannot be right: subtracting two times leaves
+   a time, and $10\ \mu\text{s} - 10\text{ ns}$ is still about 10 μs no
+   matter how the gates perform.
+
+   The pattern generalizes past these two rows, and the rest of this
+   course leans on it. A platform can be a thousand times slower per gate
+   and still have the larger budget, provided its coherence time is more
+   than a thousand times longer. Trapped Ions works exactly that case:
+   about $10^5$ gates against a superconducting device's $10^3$, from a
+   gate that is roughly 1000 times slower.
+
+   One honest caveat, because the ratio is a ceiling and not a promise.
+   It counts how many gates fit inside the coherence window; it says
+   nothing about whether they are accurate enough to be worth running.
+   A device can have room for $10^5$ gates and a per-gate error rate that
+   makes the answer meaningless well before then, which is the separate
+   compounding-error problem Scaling Challenges takes up.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -267,7 +428,7 @@ not either number in isolation.
   drifting two-level-system defects that make $T_1$ a median rather than
   a constant.
 
-## Further Exploration
+## The Same Job, a Different Starting Point
 
 <NextDiscovery>
 [Trapped Ions](/lessons/quantum-hardware/physical-qubit-platforms/trapped-ions) is a different physical platform with the

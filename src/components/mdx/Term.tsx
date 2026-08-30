@@ -11,7 +11,7 @@ const TERMS_BY_ID = new Map(GLOSSARY_TERMS.map((entry) => [entry.id, entry]));
 export function unknownTermMessage(id: string): string {
   return (
     `<Term id="${id}"> does not match any entry in GLOSSARY_TERMS (src/lib/content/glossary.ts). ` +
-    `Fix the id, or add the term to the glossary first — this must not silently render with no gloss.`
+    `Fix the id, or add the term to the glossary first. This must not silently render with no gloss.`
   );
 }
 
@@ -202,10 +202,10 @@ export function Term({
             name; the `hidden` one is `display: none` and therefore excluded
             from the name computation rather than merely unread. */}
         <span className="sr-only group-has-[:checked]/term:hidden">
-          {` — ${titlePrefix}show glossary definition`}
+          {`, ${titlePrefix}show glossary definition`}
         </span>
         <span className="sr-only hidden group-has-[:checked]/term:inline">
-          {` — ${titlePrefix}hide glossary definition`}
+          {`, ${titlePrefix}hide glossary definition`}
         </span>
       </label>
       <span
@@ -216,14 +216,41 @@ export function Term({
         )}
       >
         <TechLabel className="text-pillar">{term.title}</TechLabel>
-        <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
+        {/* `text-base`, not `text-sm`. This component has no `not-prose` and
+            sits inline in a lesson paragraph, so it inherits `.prose`'s 18px;
+            an absolute `text-sm` set the definition at 0.78x the sentence the
+            reader hit the unknown word in. The glossary link below stays
+            `text-sm` — it is a subordinate affordance, not the definition. */}
+        <span className="mt-1 block text-base leading-relaxed text-muted-foreground">
           {term.definition}
         </span>
+        {/* `aria-label`, and the arrow marked decorative. `Term` is called
+            ~570 times across the lesson corpus and a single lesson routinely
+            renders several glosses, so this link text repeated verbatim two
+            or three times per page with a different destination each time: a
+            rotor "Links" list, which strips the surrounding panel away,
+            showed three identical entries with no way to tell which term each
+            one belonged to. The panel that names the term is a
+            `role="definition"` span, not one of the containers SC 2.4.4
+            counts as programmatically determined context, so the name has to
+            carry the term itself.
+
+            The visible words stay a contiguous run at the front of the label
+            ("Full glossary entry" then " for X"), which is what SC 2.5.3 asks
+            so a speech-input user can still say what they can see. The arrow
+            is `aria-hidden` + `data-decorative`, like every other glyph on the
+            site: it was previously inside the accessible name, where it is
+            spoken as "right arrow" and is not a word a voice user would
+            utter. */}
         <Link
           href={`/glossary#${term.id}`}
+          aria-label={`Full glossary entry for ${term.title}`}
           className="mt-1.5 inline-block text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar"
         >
-          Full glossary entry →
+          Full glossary entry{" "}
+          <span aria-hidden="true" data-decorative="">
+            →
+          </span>
         </Link>
       </span>
     </span>

@@ -47,7 +47,7 @@ export const trotterStepsForTargetError: NumericProblem = {
   },
   explanation: {
     correctIdea: "The derived bound directly determines the minimum step count for any target accuracy: a real, checkable resource estimate, not a qualitative guess.",
-    whyCorrect: "This is exactly the kind of quantitative resource-scaling calculation the lesson's derivation makes possible.",
+    whyCorrect: "Inverting the error bound turns a target accuracy into a step count, which is the practical form the derivation was aimed at: resource estimates come straight out of it.",
     whyWrong: ["Rounding down, or forgetting the factor of 2 from t²/(2n), both give an n that doesn't actually satisfy the bound."],
   },
 };

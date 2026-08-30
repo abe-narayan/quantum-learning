@@ -10,6 +10,7 @@ import { useCompletedLessonSlugs } from "@/lib/content/progress";
 import { Eyebrow, Readouts, SectionTitle, TechValue } from "@/components/ui/Typography";
 import { Instrument } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
+import { ListBypassEnd, ListBypassLink } from "@/components/ui/ListBypass";
 import { PILLAR_ORDER, pillarVisual } from "@/lib/design/pillars";
 import { DIFFICULTY_LABEL, type Pillar } from "@/lib/content/types";
 import { PROBLEM_TO_DIFFICULTY } from "@/lib/problems/types";
@@ -17,6 +18,14 @@ import { DifficultyScale, TypeMark } from "./ProblemMetaMarks";
 import { cn } from "@/lib/utils";
 import type { ProblemProgress } from "@/lib/problems/progress";
 import type { ProblemDifficulty, ProblemMeta, ProblemType } from "@/lib/problems/types";
+
+/**
+ * Fragment targets for the end-of-list bypass pair (`ui/ListBypass.tsx`).
+ * Literals, not `useId`: a fragment target is a URL, and this catalog is
+ * mounted once per page, so a fixed id has nothing to collide with.
+ */
+const RESULTS_ID = "problem-results";
+const LIST_END_ID = "problems-list-end";
 
 type PillarFilter = "all" | Pillar;
 type DifficultyFilter = "all" | ProblemDifficulty;
@@ -35,14 +44,24 @@ const STATUS_OPTIONS: { id: StatusFilter; label: string }[] = [
   { id: "ready", label: "Ready for you" },
 ];
 
+/**
+ * Track chips, in curriculum order, labelled with the *short* pillar name.
+ *
+ * The names were spelled out ("Quantum Mechanics", "Quantum Computing", …) and
+ * hand-listed, which put this page's filter row in a different vocabulary from
+ * the navbar dropdown, the footer, the homepage strip and `/current-quantum`'s
+ * identical control — all of which say "Mechanics", "Computing". A chip
+ * labelled one way on one page and another way on the next is two taxonomies
+ * for one axis, and the short form is the one that already dominates and the
+ * one that fits a chip at 320px. `pillarVisual().short` is the site's single
+ * source for it, so this row can no longer drift from the pillar table, and it
+ * matches the group headings this same component already renders from it
+ * below. The full title still appears wherever a heading or a sentence
+ * introduces a track.
+ */
 const PILLAR_OPTIONS: { id: PillarFilter; label: string }[] = [
   { id: "all", label: "All" },
-  { id: "quantum-mechanics", label: "Quantum Mechanics" },
-  { id: "quantum-computing", label: "Quantum Computing" },
-  { id: "quantum-hardware", label: "Quantum Hardware" },
-  { id: "quantum-software", label: "Quantum Software" },
-  { id: "quantum-mastery", label: "Quantum Mastery" },
-  { id: "apex", label: "Apex" },
+  ...PILLAR_ORDER.map((pillar) => ({ id: pillar as PillarFilter, label: pillarVisual(pillar).short })),
 ];
 
 // Labels are read through the shared `DIFFICULTY_LABEL` (translating each
@@ -322,11 +341,20 @@ export function ProblemsCatalog({
     const solo = (override: Partial<FilterState>) =>
       problems.reduce((total, problem) => total + (matches(problem, { ...none, ...override }) ? 1 : 0), 0);
 
-    const list: { key: string; group: string; label: string; soloCount: number; clear: () => void }[] = [];
+    type ActiveFilter = {
+      key: string;
+      group: string;
+      label: string;
+      soloCount: number;
+      /** Release just this row. Used by the "Active" chips, where the list
+       *  around them survives the change and focus stays on the strip. */
+      clear: () => void;
+    };
+    const list: ActiveFilter[] = [];
     if (pillar !== "all") {
       list.push({
         key: "topic",
-        group: "Topic",
+        group: "Track",
         label: PILLAR_OPTIONS.find((option) => option.id === pillar)?.label ?? pillar,
         soloCount: solo({ pillar }),
         clear: () => setPillar("all"),
@@ -361,6 +389,29 @@ export function ProblemsCatalog({
     }
     return list;
   }, [problems, matches, pillar, difficulty, type, status]);
+
+  /**
+   * Release one filter row and land the reader on the results header.
+   *
+   * The "Active" chips do not need the second half — the list around them
+   * survives the change, so focus stays where it was. The empty state does:
+   * its whole block, including the button being pressed, unmounts the moment
+   * the list stops being empty, and without a destination focus falls to
+   * `<body>` and the reader's next Tab restarts at the top of the page.
+   *
+   * A component-level callback taking the row's own `clear`, rather than a
+   * `clearAndShowResults` composed per row: `goToResults` reads a ref, and
+   * anything that composes it inside a `.map` in the JSX (or inside the
+   * `useMemo` above, which also runs during render) is a ref read during
+   * render as far as `react-hooks/refs` is concerned.
+   */
+  const clearFilterAndShowResults = useCallback(
+    (clear: () => void) => {
+      clear();
+      goToResults();
+    },
+    [goToResults]
+  );
 
   const clearAll = useCallback(() => {
     setPillar("all");
@@ -434,10 +485,10 @@ export function ProblemsCatalog({
             label="Recommended practice problem"
             footnote={
               recommendation.resumed
-                ? "You've already started this one — pick it back up."
+                ? "You've already started this one. Pick it back up."
                 : lessonTitleBySlug[recommendation.problem.lesson ?? ""]
                   ? `Unlocked by finishing "${lessonTitleBySlug[recommendation.problem.lesson ?? ""]}".`
-                  : "Its prerequisites are complete — you're ready for this one."
+                  : "Its prerequisites are complete, so you're ready for this one."
             }
           >
             <Readouts
@@ -472,8 +523,8 @@ export function ProblemsCatalog({
           <p className="text-sm leading-relaxed text-muted-foreground">
             <span className="text-foreground">
               {foundationalCount} of these {problems.length} problems are foundational
-            </span>{" "}
-            — they assume a first lesson, not a degree. Everything else stays open to you; nothing here
+            </span>{": "}
+            they assume a first lesson, not a degree. Everything else stays open to you; nothing here
             is locked.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3">
@@ -482,7 +533,7 @@ export function ProblemsCatalog({
               href={`/problems/${startingPoint.slug}`}
               className="inline-flex min-h-11 items-center rounded-(--radius-tight) text-sm text-pillar-text underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
             >
-              Or open the first one: &ldquo;{startingPoint.title}&rdquo;
+              Or start with &ldquo;{startingPoint.title}&rdquo;
             </Link>
           </div>
         </Instrument>
@@ -491,8 +542,14 @@ export function ProblemsCatalog({
       <div className="instrument overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-2.5 sm:px-5">
           <span className="tech-label">Filters</span>
+          {/* "12 of 547" beside the word "Filters" is two numbers and no noun
+              in the accessibility tree. The unit is `sr-only` rather than
+              painted because the visible figure sits under a page heading that
+              already says what is being counted, and the header strip is the
+              one row here with no width to spare at 320px. */}
           <span className="tech-value text-xs text-muted-foreground">
             <TechValue>{filtered.length}</TechValue> of {problems.length}
+            <span className="sr-only"> problems shown</span>
           </span>
         </div>
         {/*
@@ -505,24 +562,42 @@ export function ProblemsCatalog({
           exposes `pillar`, which *is* `--pillar-accent`), so the selected
           chip's outline compiled to nothing and the state really was
           color-only. The one thing lost in the swap is the small pillar-hued
-          dot the Topic row used to carry; the count is the better use of that
+          dot the Track row used to carry; the count is the better use of that
           slot, and the dot was decorative color anyway.
         */}
+        {/* `countNoun` on every row: `FilterChips` renders the count as a bare
+            figure and appends this word `sr-only`, so without it these chips
+            announce as "All, 12" — a number with no unit — under the
+            component's generic "results" default. */}
         <div className="flex flex-wrap gap-x-8 gap-y-5 p-4 sm:p-5">
-          <FilterChips label="Topic" options={withCounts(PILLAR_OPTIONS, optionCounts.pillar)} selected={pillar} onChange={setPillar} />
+          <FilterChips
+            label="Track"
+            countNoun="problems"
+            options={withCounts(PILLAR_OPTIONS, optionCounts.pillar)}
+            selected={pillar}
+            onChange={setPillar}
+          />
           <FilterChips
             label="Difficulty"
+            countNoun="problems"
             options={withCounts(DIFFICULTY_OPTIONS, optionCounts.difficulty)}
             selected={difficulty}
             onChange={setDifficulty}
           />
-          <FilterChips label="Type" options={withCounts(TYPE_OPTIONS, optionCounts.type)} selected={type} onChange={setType} />
+          <FilterChips
+            label="Type"
+            countNoun="problems"
+            options={withCounts(TYPE_OPTIONS, optionCounts.type)}
+            selected={type}
+            onChange={setType}
+          />
           {/* Only offered once there is progress to filter *against* — with
               nothing completed, "Ready for you" and "Unsolved" would both be
               synonyms for "All" and the row would be three dead controls. */}
           {hasProgress ? (
             <FilterChips
               label="Showing"
+              countNoun="problems"
               options={withCounts(STATUS_OPTIONS, optionCounts.status)}
               selected={status}
               onChange={setStatus}
@@ -551,7 +626,7 @@ export function ProblemsCatalog({
                 <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="shrink-0">
                   <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
                 </svg>
-                <span className="sr-only">— remove this filter</span>
+                <span className="sr-only">, remove this filter</span>
               </button>
             ))}
             <button
@@ -582,12 +657,25 @@ export function ProblemsCatalog({
       */}
       <div
         ref={resultsRef}
+        // An `id` as well as the ref, because the end-of-list "Back to the
+        // filters" link (`ui/ListBypass.tsx`) is a plain fragment anchor with
+        // no JavaScript behind it, and this header is already the one
+        // `tabIndex={-1}` element at the top of the results, so a fragment
+        // link lands focus here exactly the way `goToResults()` does.
+        id={RESULTS_ID}
         tabIndex={-1}
         role="group"
         aria-label="Problem results"
         className="mt-5 flex items-center justify-between gap-3 scroll-mt-24 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
       >
-        <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
+        {/* `aria-atomic` because React renders this sentence as several
+            adjacent text nodes (the figure, the noun, the plural "s", the
+            "matching …" clause) and a filter change usually mutates only one
+            of them: switching Foundational → Advanced can change the number
+            and nothing else, and a non-atomic region is permitted to announce
+            just "37". The count without its filters is not the answer to the
+            question the reader just asked, so the whole line is re-read. */}
+        <p role="status" aria-live="polite" aria-atomic="true" className="text-sm text-muted-foreground">
           {filtered.length} problem{filtered.length === 1 ? "" : "s"}
           {activeFilters.length > 0
             ? ` matching ${activeFilters.map((filter) => filter.label.toLowerCase()).join(", ")}`
@@ -599,6 +687,17 @@ export function ProblemsCatalog({
           </p>
         ) : null}
       </div>
+
+      {/* The bypass pair, shared with /glossary and /lessons, see
+          `ui/ListBypass.tsx`. Served, this page is 1,138 anchors and 21
+          buttons, and the only skip link on it lands above all of them. The
+          link sits below the results header so that a reader who has just
+          filtered hears the count first and then gets the option to leave. */}
+      {filtered.length > 0 ? (
+        <ListBypassLink targetId={LIST_END_ID}>
+          Skip past the {filtered.length} {filtered.length === 1 ? "problem" : "problems"} below
+        </ListBypassLink>
+      ) : null}
 
       {filtered.length > 0 ? (
         pillarGroups ? (
@@ -662,10 +761,16 @@ export function ProblemsCatalog({
           drop everything, or fall back to the foundational set — in reach.
         */
         <div className="mt-10 rounded-panel border border-dashed border-border p-8 text-center">
+          {/* "Nothing here yet" was the single-filter wording, and "yet"
+              promised something this page will never do: the corpus is fixed,
+              and "Ready for you" being empty is a fact about the reader's
+              progress, not a queue that fills in later. State the fact. */}
           <p className="text-sm text-foreground">
             {activeFilters.length > 1
               ? `No problem is all of these at once: ${activeFilters.map((filter) => filter.label).join(" + ")}.`
-              : `Nothing here yet: ${activeFilters[0]?.label ?? "no problems"}.`}
+              : activeFilters.length === 1
+                ? `No problem matches ${activeFilters[0].label}.`
+                : "There are no problems to show."}
           </p>
           {activeFilters.length > 0 ? (
             /* Each filter's own standalone total, so the emptiness reads as a
@@ -687,7 +792,20 @@ export function ProblemsCatalog({
             >
               Show all {problems.length} problems
             </Button>
-            {foundationalCount > 0 && difficulty !== "beginner" ? (
+            {/*
+              The surgical escape, not just the nuclear one. With two or more
+              rows on, "show all 547" throws away the constraint the reader
+              still wants along with the one that emptied the list — so each
+              active row also gets its own release here, worded exactly as the
+              "Active" chip above it ("Track: Apex"), so the two read as the
+              same control in two places. Offered only above one filter:
+              dropping the only active filter *is* "show all", already the
+              primary button beside this.
+            */}
+            {activeFilters.length > 1 ? (
+              <FilterEscapes filters={activeFilters} onClear={clearFilterAndShowResults} />
+            ) : null}
+            {activeFilters.length <= 1 && foundationalCount > 0 && difficulty !== "beginner" ? (
               <Button variant="secondary" onClick={showFoundational}>
                 Show the {foundationalCount} foundational problems
               </Button>
@@ -695,7 +813,45 @@ export function ProblemsCatalog({
           </div>
         </div>
       )}
+
+      {filtered.length > 0 ? (
+        <ListBypassEnd
+          id={LIST_END_ID}
+          backTo={RESULTS_ID}
+          backLabel="Back to the filters"
+        >
+          End of the problem catalog. {filtered.length} of {problems.length} problems listed.
+        </ListBypassEnd>
+      ) : null}
     </div>
+  );
+}
+
+/**
+ * One release control per active filter, for the empty state.
+ *
+ * Its own component rather than a `.map` inside `ProblemsCatalog`'s JSX, and
+ * the reason is a lint one worth writing down so nobody inlines it back:
+ * `onClear` composes `goToResults`, which reads `resultsRef`, and
+ * `react-hooks/refs` treats a closure built inside a render-time `.map` as a
+ * ref read during render. Passing the handler in as a prop puts the ref
+ * behind a boundary the rule does not look through, and costs one component.
+ */
+function FilterEscapes({
+  filters,
+  onClear,
+}: {
+  filters: { key: string; group: string; label: string; clear: () => void }[];
+  onClear: (clear: () => void) => void;
+}) {
+  return (
+    <>
+      {filters.map((filter) => (
+        <Button key={filter.key} variant="secondary" onClick={() => onClear(filter.clear)}>
+          Clear {filter.group}: {filter.label}
+        </Button>
+      ))}
+    </>
   );
 }
 

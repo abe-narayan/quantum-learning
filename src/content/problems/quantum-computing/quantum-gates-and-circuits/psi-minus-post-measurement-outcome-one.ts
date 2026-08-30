@@ -37,16 +37,16 @@ export const psiMinusPostMeasurementOutcomeOne: MultipleChoiceProblem = {
       { id: "a", text: `$${ketLatex(collapsed)}$` },
       { id: "b", text: `$${ketLatex(stillSuperposed)}$` },
       { id: "c", text: `$${ketLatex(wrongOutcomeCollapse)}$` },
-      { id: "d", text: "$(-0.71)|01\\rangle + (0.71)|10\\rangle$, unchanged" },
+      { id: "d", text: "$(-0.71)|10\\rangle$" },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "The state can't stay in superposition after a measurement outcome is observed — only the term(s) consistent with qubit 0 = 1 can survive.",
-      c: "That's the collapse for outcome 0, not outcome 1 — it keeps the |01⟩ term instead of the |10⟩ term.",
-      d: "This keeps both terms, which contradicts the outcome having actually been observed — a measured outcome collapses the state to only the consistent term(s).",
+      b: "The state cannot stay in superposition once an outcome is observed. Only the terms consistent with qubit 0 = 1 survive.",
+      c: "That is the collapse for outcome 0, not outcome 1: it keeps the |01⟩ term instead of the |10⟩ term.",
+      d: "Right term, wrong normalization. This is the surviving amplitude straight out of |Ψ−⟩, still −1/√2. Collapse divides it by √P(1) = √(1/2), which rescales it to −1.",
     },
     defaultIncorrectFeedback: "Only the basis term(s) with qubit 0 = 1 can survive; zero out the rest and renormalize what's left.",
   },
@@ -67,11 +67,11 @@ export const psiMinusPostMeasurementOutcomeOne: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Measuring outcome 1 zeros out the |01⟩ term and renormalizes the surviving |10⟩ term, including its original minus sign.",
-    whyCorrect: "The |10⟩ term's original amplitude, -1/√2, divided by √(1/2), gives exactly -1 — a global phase on |10⟩, physically the same measured state as |10⟩.",
+    whyCorrect: "The |10⟩ term's original amplitude, -1/√2, divided by √(1/2), gives −1, a global phase on |10⟩ and so physically the same measured state as |10⟩.",
     whyWrong: [
       { optionId: "b", text: "Keeps the superposition alive, which ignores that observing an outcome is what collapse means." },
       { optionId: "c", text: "This is the collapse for outcome 0: it renormalizes the |01⟩ term instead of the |10⟩ term." },
-      { optionId: "d", text: "Keeps both terms, contradicting the fact that an outcome was observed at all." },
+      { optionId: "d", text: "Drops the renormalization step. The surviving amplitude −1/√2 has to be divided by √P(1) so the collapsed state has total probability 1." },
     ],
   },
 };

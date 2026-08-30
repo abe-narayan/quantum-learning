@@ -32,14 +32,14 @@ export const stateWithCertainPlusOutcome: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "$|0\\rangle$ gives $P(+)=P(-)=\\frac12$ — an even coin flip in the X-basis, not certainty.",
+      b: "$|0\\rangle$ gives $P(+)=P(-)=\\frac12$, an even coin flip in the X-basis rather than certainty.",
       c: "$|1\\rangle$ also gives $P(+)=P(-)=\\frac12$, the same as $|0\\rangle$: both poles are equally split between $+$ and $-$.",
-      d: "$|{-i}\\rangle$ sits on the equator too, but 90° of longitude away from $|+\\rangle$ — as far as possible while staying on the equator, giving $P(+)=\\frac12$, not certainty.",
+      d: "$|{-i}\\rangle$ sits on the equator too, but 90° of longitude away from $|+\\rangle$, which gives $P(+)=\\frac12$ rather than certainty.",
     },
     defaultIncorrectFeedback: "Use $P(+)=\\left|\\frac{\\alpha+\\beta}{\\sqrt2}\\right|^2$ and check which option's amplitudes make this exactly 1.",
   },
   hints: [
-    { text: "P(+) = 1 means the state overlaps completely with |+⟩ — in other words, it IS |+⟩, up to a phase that doesn't matter." },
+    { text: "P(+) = 1 means the state overlaps completely with |+⟩, so it is |+⟩ itself, up to a global phase that changes nothing." },
     { text: "Try each option's amplitudes in the X-basis formula and see which one gives exactly 1." },
     { text: "Certainty in a basis means the state is already one of that basis's own states, so ask which option lives in the X basis." },
   ],

@@ -17,7 +17,7 @@ export const occupationYAt = (i) => Math.log10(thermalPhotonOccupation(QUBIT_FRE
 export const lessonMeta = {
   title: "Cryogenic Systems",
   description:
-    "Why superconducting and spin qubits need millikelvin cooling, made precise: the Bose-Einstein thermal occupation n̄=1/(exp(ħω/k_BT)-1) for a 5 GHz qubit is ~10⁻⁷ at 15 mK, jumps above 1 already at 4 K, and exceeds 1000 at room temperature. A real, computed reason dilution refrigerators exist.",
+    "Why superconducting and spin qubits need millikelvin cooling, made precise: the Bose-Einstein thermal occupation n̄=1/(exp(ħω/k_BT)-1) for a 5 GHz qubit is ~10⁻⁷ at 15 mK and exceeds 1000 at room temperature, and the same formula fixes exactly where in between a qubit stops having a reliable ground state. A computed reason dilution refrigerators exist.",
   course: "control-and-readout",
   module: "cryogenic-systems",
   order: 1,
@@ -32,39 +32,40 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mechanics/classical-to-quantum/the-quantum-harmonic-oscillator",
-      note: "The Bose-Einstein occupation formula this lesson computes describes the thermal population of exactly that lesson's equally-spaced ħω energy ladder, the reason a qubit needs millikelvin cooling to sit reliably in its ground state.",
+      note: "The Bose-Einstein occupation formula this lesson computes describes the thermal population of that lesson's equally-spaced ħω energy ladder, the reason a qubit needs millikelvin cooling to sit reliably in its ground state.",
     },
   ],
 };
 
 <LessonHook eyebrow="Colder than deep space">
-The leftover glow of the Big Bang keeps empty intergalactic space at about 2.7 K. A <Term id="dilution-refrigerator">dilution refrigerator</Term>'s mixing chamber runs colder than that — typically 10-20 mK, on the order of two hundred times colder than deep space.
+The leftover glow of the Big Bang keeps empty intergalactic space at about 2.7 K. A <Term id="dilution-refrigerator">dilution refrigerator</Term>'s mixing chamber runs colder than that: typically 10-20 mK, on the order of two hundred times colder than anywhere you could take a thermometer outside a laboratory.
 </LessonHook>
 
-## Motivation
+## Why Millikelvin, and Not Merely Cold
 
 Physical Qubit Platforms mentioned superconducting and <Term id="spin-qubits">spin qubits</Term>
 operate at millikelvin temperatures almost in passing. That number is
-worth stopping on. This lesson works out exactly why a chip needs to sit
+worth stopping on. This lesson works out why a chip needs to sit
 that cold: not "cold is generally good for delicate things," but a
 specific, computable physical requirement.
 
 <AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/IBM_Quantum_System_One.jpg/1280px-IBM_Quantum_System_One.jpg"
   alt="An IBM Quantum System One, showing the gold-colored, chandelier-like stack of a dilution refrigerator's staged cooling plates enclosed in its glass case"
-  caption="An IBM Quantum System One's dilution refrigerator, photographed at IBM's TJ Watson Research Center. The nested gold stages are exactly the staged cooling this lesson describes, room temperature down to the millikelvin mixing chamber where the qubit chip sits."
+  caption="An IBM Quantum System One's dilution refrigerator, photographed at IBM's TJ Watson Research Center. The nested gold stages are the staged cooling this lesson describes, room temperature down to the millikelvin mixing chamber where the qubit chip sits."
+  aspect="aspect-[6144/8160]"
   pins={[
-    { id: "flange", x: 50, y: 15, label: "Top mounting flange — the vacuum can's room-temperature perimeter, where the whole assembly attaches to its support frame." },
+    { id: "flange", x: 50, y: 15, label: "Top mounting flange: the vacuum can's room-temperature perimeter, where the whole assembly attaches to its support frame." },
     { id: "upper-stage", x: 32, y: 30, label: "An upper cooling stage, wrapped in braided copper thermal straps and coax wiring on its way down to the colder plates below." },
-    { id: "stack", x: 68, y: 58, label: "The nested gold plates: each stage is colder, smaller, and closer to the center than the one above it — the staged cooling this lesson describes." },
-    { id: "mixing-chamber", x: 50, y: 91, label: "The bottommost, smallest plate — the mixing chamber, the coldest stage, where the qubit chip itself is bolted down and wired." },
+    { id: "stack", x: 68, y: 58, label: "The nested gold plates: each stage is colder, smaller, and closer to the center than the one above it, the staged cooling this lesson describes." },
+    { id: "mixing-chamber", x: 50, y: 91, label: "The bottommost, smallest plate is the mixing chamber, the coldest stage, where the qubit chip itself is bolted down and wired." },
   ]}
   credit="Onri Jay Benally / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:IBM_Quantum_System_One.jpg"
   license="CC BY 4.0"
 />
 
-## Engineering Development
+## Thermal Occupation, Computed
 
 ### Thermal photon occupation
 
@@ -77,8 +78,8 @@ photons occupying that mode follows the **Bose-Einstein distribution**:
 <EquationReveal
   terms={[
     { id: "n", symbol: "n̄", gloss: "The mean number of thermal photons occupying the qubit's mode." },
-    { id: "hw", symbol: "ħω", gloss: "The qubit's transition energy — Planck's constant times its frequency." },
-    { id: "kT", symbol: "k_BT", gloss: "The thermal energy scale at temperature T — Boltzmann's constant times T." },
+    { id: "hw", symbol: "ħω", gloss: "The qubit's transition energy: Planck's constant times its frequency." },
+    { id: "kT", symbol: "k_BT", gloss: "The thermal energy scale at temperature T: Boltzmann's constant times T." },
   ]}
 >
 $$
@@ -87,8 +88,7 @@ $$
 </EquationReveal>
 
 $\bar n\ll1$ means the mode is almost always found in its ground state,
-exactly the reliable, well-defined starting point a qubit computation
-needs. $\bar n\gtrsim1$ means the mode is thermally populated: even with
+the reliable, well-defined starting point a qubit computation needs. $\bar n\gtrsim1$ means the mode is thermally populated: even with
 no computation happening yet, thermal noise has already randomized which
 level the system sits in, before any gate is applied.
 
@@ -97,10 +97,10 @@ level the system sits in, before any gate is applied.
   options={[
     { label: "Yes, 4 K is comfortably cold enough", value: "yes" },
     { label: "No, n̄ is still well above 1 at 4 K", value: "no" },
-    { label: "It's right at the n̄=1 crossover", value: "crossover" },
+    { label: "It sits right on the n̄=1 crossover", value: "crossover" },
   ]}
   correctValue="no"
-  explanation="n̄≈16.2 at 4 K, over an order of magnitude too warm — thermal noise is still randomizing which level the qubit sits in before any gate runs. That's exactly why dilution refrigerators push further, to the 10-20 mK range, instead of stopping at the comparatively easy-to-reach 4 K stage."
+  explanation="n̄≈16.2 at 4 K, over an order of magnitude too warm. Thermal noise is still randomizing which level the qubit sits in before any gate runs. That is why dilution refrigerators push further, to the 10-20 mK range, instead of stopping at the comparatively easy-to-reach 4 K stage."
 />
 
 ### The numbers, computed directly
@@ -131,7 +131,7 @@ axis plotted as $\log_{10}(T/\text{K})$ and the vertical axis as
 $\log_{10}(\bar n)$ so both the $10^{-7}$ and $10^3$ ends stay visible on
 the same plot:
 
-<InteractiveSection title="Cross the n̄=1 line" description="Drag the temperature slider from 15 mK toward 4 K. Watch the accent marker cross the dashed n̄=1 line well before it reaches 4 K. That crossing is the same ≈350 mK estimate the Worked Example below derives by hand.">
+<InteractiveSection title="Cross the n̄=1 line" description="Drag the temperature slider up from 15 mK and read where the vertical accent marker meets the n̄(T) curve. That meeting point sits far below the dashed n̄=1 line at the 100 mK stop and lands almost exactly on it at 350 mK, which is the crossover the worked example below derives by hand. Every stop past it is already above 1, and all of them are still colder than the 4 K stage.">
   <ParametricCurve
     frames={[0.015, 0.05, 0.1, 0.35, 1, 2, 4].map((temperatureK) => ({
       paramLabel:
@@ -154,6 +154,8 @@ the same plot:
       ]
     }))}
     sliderLabel="Temperature"
+    xAxisLabel="log₁₀(T / K)"
+    yAxisLabel="log₁₀(n̄)"
     referenceLines={[{ y: 0, label: "n̄ = 1" }]}
     ariaLabel="Log-log plot of thermal photon occupation versus temperature for a 5 GHz qubit, with a movable temperature marker"
   />
@@ -164,8 +166,8 @@ the same plot:
 A dilution refrigerator cools in stages: roughly room temperature, then
 two stages of a mechanical **pulse-tube cryocooler**, a first stage at
 roughly $50$ K anchoring the outer radiation shield, and a second at
-$\sim4$ K, and finally the dilution stage itself (a fundamentally
-different cooling mechanism, based on the physics of mixing two
+$\sim4$ K, and finally the dilution stage itself (a different
+cooling mechanism, based on the physics of mixing two
 isotopes of helium) reaching the millikelvin range. Modern "dry"
 fridges, including every machine photographed in this course, cool
 those upper stages this way, with no cryogenic liquids to refill;
@@ -191,7 +193,7 @@ temperature tolerance allows, cheapest (room temperature) components as
 far out as possible, and only the qubit chip itself at the very
 coldest, hardest-to-reach stage.
 
-What actually removes heat at the bottom is a form of evaporative
+What removes heat at the bottom is a form of evaporative
 cooling, with a twist: the "evaporation" happens into another liquid.
 Cooled far enough, a mixture of the two helium isotopes separates into
 two liquid phases, a concentrated ³He-rich phase floating on a dilute
@@ -199,8 +201,8 @@ phase that is mostly ⁴He with a small dissolved fraction of ³He. In
 the **mixing chamber**, the boundary between the two phases sits right
 where the qubit chip's plate is anchored, and every ³He atom that
 crosses from the concentrated phase into the dilute one absorbs heat,
-exactly as a molecule evaporating from a liquid into vapor does.
-Crucially, the dilute phase keeps accepting ³He even in the
+just as a molecule evaporating from a liquid into vapor does. The
+dilute phase keeps accepting ³He even in the
 millikelvin range, so this evaporation-into-a-liquid keeps pumping
 heat where ordinary evaporation would have long since stalled. The
 **still** is what keeps the cycle going: warmed to its
@@ -210,16 +212,16 @@ circulate that ³He back around the loop, down through the **cold
 plate**'s pre-cooling stage, to re-condense and cross the phase
 boundary again.
 
-## Physical Interpretation
+## The Gap Between 4 K and 15 mK
 
 The 4 K vs. 15 mK gap in the table above is the single most important
 number in this lesson: it's not a matter of "colder is nicer," but a
 specific, computed threshold. $\bar n$ crosses from safely below 1 to
-well above 1 somewhere in that gap, which is exactly why the last,
+well above 1 somewhere in that gap, which is why the last,
 hardest cooling stage (the dilution refrigerator itself, not just a
 simpler mechanical cryocooler) is unavoidable for this class of qubit.
 
-## Worked Example
+## The Temperature Where One Photon Arrives
 
 **At what rough temperature does $\bar n=1$ for a 5 GHz qubit?**
 
@@ -234,7 +236,7 @@ Consistent with the table: at $100$ mK, $\bar n\approx0.10$ (below 1);
 by $4$ K, $\bar n\approx16$ (well above 1). The crossover sits
 somewhere in between, matching this estimate.
 
-## Common Mistakes
+## Assuming Liquid Helium Is Cold Enough
 
 <Callout type="warning">
 **Thinking any cryogenic temperature is "cold enough."** As the table
@@ -255,25 +257,225 @@ frequencies rather than much lower ones.
 
 1. Compute $\bar n$ for a 5 GHz qubit at 50 mK, and state whether this is
    "safe" ($\bar n\ll1$) by this lesson's standard.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \frac{\hbar\omega}{k_BT} = \frac{(1.055\times10^{-34})(2\pi\times5\times10^{9})}{(1.381\times10^{-23})(0.05)} \approx 4.80, \qquad \bar n = \frac{1}{e^{4.80}-1} \approx 8.3\times10^{-3}.
+   $$
+
+   Checked against the engine, `thermalPhotonOccupation(5e9, 0.05)`
+   returns $0.008304$. So yes, it clears the lesson's bar: $\bar n$ is
+   about $1/120$, comfortably below 1, and 50 mK sits well on the cold
+   side of the 350 mK crossover.
+
+   It is worth reading the number rather than just the verdict, because
+   "safe" hides a lot of range. The dilution fridge base of 15 mK gives
+   $\bar n\approx1.1\times10^{-7}$. Moving from 15 mK to 50 mK, barely a
+   factor of three in temperature, costs almost five orders of magnitude
+   in occupation, because $\bar n$ depends on temperature through
+   $e^{-\hbar\omega/k_BT}$ and an exponential of a reciprocal moves
+   violently.
+
+   And $8.3\times10^{-3}$ is not negligible for every purpose. To leading
+   order the residual thermal excited-state population of the qubit is
+   $\bar n$ itself, so about 0.8% of the time the chip starts a circuit
+   in $|1\rangle$ rather than $|0\rangle$, before a single gate has run.
+   Set that against a device targeting 99.9% gate fidelity and the
+   state-preparation error alone is eight times the per-gate error
+   budget. "Safe" by the $\bar n\ll1$ criterion and "good enough for a
+   deep circuit" are different questions, and this is why fridges are
+   specified at 10 to 20 mK rather than at the loosest temperature that
+   technically passes.
+
+   The wrong turn to avoid is reaching for a linear intuition: 50 mK is
+   about three times 15 mK, so surely $\bar n$ is about three times
+   worse. It is roughly 74,000 times worse. Nothing about this formula is
+   linear in $T$.
+
+   </details>
+
 2. Using the worked example's method, estimate the temperature at which
    $\bar n=1$ for a 10 GHz qubit (double the frequency). Is it higher or
    lower than the 5 GHz case's 350 mK, and does this match the
    frequency-dependence stated in Common Mistakes?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **About 690 mK: higher, and exactly double.**
+
+   Setting $\bar n=1$ gives $\exp(\hbar\omega/k_BT)=2$, so
+   $T=\hbar\omega/(k_B\ln2)$. With $\omega=2\pi\times10\times10^{9}$:
+
+   $$
+   T = \frac{(1.055\times10^{-34})(2\pi\times10\times10^{9})}{(1.381\times10^{-23})(\ln 2)} \approx 0.69\text{ K} = 690\text{ mK}.
+   $$
+
+   Confirmed: `thermalPhotonOccupation(10e9, 0.6924)` returns exactly
+   1.0.
+
+   The doubling is not a coincidence and is worth extracting as a
+   general fact. In the crossover formula $T$ appears linearly in
+   $\omega$, so the $\bar n=1$ temperature is strictly proportional to
+   the qubit frequency. More generally, $\bar n$ depends on $\omega$ and
+   $T$ only through their ratio, so any two operating points with the
+   same $\omega/T$ have identical thermal occupation. Doubling the
+   frequency buys exactly a doubling of the temperature you are allowed
+   to run at.
+
+   **Does it match Common Mistakes?** Yes, and it is the same statement
+   read from the other side. Common Mistakes says a *higher* $\omega$ at
+   fixed $T$ gives a *smaller* $\bar n$, because $\hbar\omega/k_BT$ grows
+   and the exponential in the denominator grows with it. Here the
+   quantity held fixed is $\bar n=1$ instead of $T$, so the extra
+   headroom shows up as a warmer permitted temperature rather than as a
+   smaller occupation. Both are the same monotonicity.
+
+   Sanity check against the table's fixed points: at 4 K the 5 GHz qubit
+   has $\bar n\approx16.2$, and the 10 GHz qubit has $\bar
+   n\approx7.84$, comfortably smaller as predicted. At 100 mK the 5 GHz
+   qubit has $\bar n\approx0.0998$ and the 10 GHz qubit
+   $\approx0.0083$, and notice that this last number is precisely the 5
+   GHz value at 50 mK from question 1. Same ratio $\omega/T$, same
+   answer.
+
+   The wrong turn worth naming is the intuition that a higher-frequency
+   qubit is "more energetic" and therefore more thermally exposed. The
+   opposite is true, and the reason is the thermal bath's point of view:
+   a bigger $\hbar\omega$ is a *more expensive* quantum for the bath to
+   supply at a given $k_BT$, so it supplies one less often.
+
+   </details>
+
 3. Why is reaching 4K comparatively "easy" while continuing to 15mK is
    comparatively "hard"? What does this lesson say motivates a
    multi-stage cooling design instead of one big cooling step?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Two different reasons, and it is worth keeping them apart: the first
+   is about mechanism, the second about cost.
+
+   **4 K is reached by a machine; 15 mK needs a different physical
+   process.** A mechanical pulse-tube cryocooler compresses and expands
+   ordinary helium gas in a closed cycle, plugs into the wall, and holds
+   its second stage near 4 K indefinitely with nothing to refill. Below
+   about 1 K that approach stops working, because ordinary evaporative
+   cooling of liquid helium stalls: the vapour pressure over the liquid
+   falls exponentially as it cools, so there are eventually no atoms
+   leaving to carry heat away. The dilution stage is a different
+   mechanism entirely, evaporation into another *liquid* rather than into
+   vapour. Cooled far enough, a ³He/⁴He mixture separates into a
+   concentrated ³He phase floating on a dilute one, and every ³He atom
+   crossing the boundary absorbs heat. That keeps working in the
+   millikelvin range because the dilute phase keeps accepting ³He even as
+   $T\to0$, where ordinary evaporation has long since given up. So the
+   step from 4 K to 15 mK is not "the same cooler, turned up." It is a
+   different physical process, requiring the still, the cold plate, the
+   mixing chamber and a circulating ³He loop.
+
+   **Cooling power collapses as it gets colder.** A pulse tube removes
+   watts at 4 K. A mixing chamber removes hundreds of microwatts at 100
+   mK and only tens of microwatts near 20 mK, a fall of several orders
+   of magnitude over two decades of temperature. Every milliwatt that
+   reaches the bottom of the fridge is therefore catastrophic in a way
+   the same milliwatt at 4 K is not.
+
+   **Which is what motivates the stages.** The lesson puts it as an
+   engineering cost tradeoff, and the mechanism is heat interception.
+   Radiation from the room and conduction down the coaxial control lines
+   both have to be stopped, and the cheapest place to stop any watt of it
+   is at the warmest stage that can absorb it. So the 50 K shield
+   intercepts nearly all the room-temperature radiative load, the 4 K
+   stage takes the next tranche, the still and cold plate take more, and
+   the mixing chamber is left with only the residue. Hardware follows the
+   same rule: everything sits at the warmest stage its own tolerance
+   allows, and only the qubit chip itself goes all the way down.
+
+   The wrong turn is imagining one very powerful cooler could do the
+   whole job in a single step. The Carnot bound alone will not settle
+   this, and it is worth being careful about why. A reversible cascade
+   of stages has exactly the same efficiency as one reversible jump, so
+   thermodynamics does not favour staging by itself. What it does supply
+   is the scale of the bill: lifting heat from 15 mK to a 300 K room has
+   a Carnot coefficient of performance of
+   $T_c/(T_h-T_c)\approx5\times10^{-5}$, so even a perfect machine spends
+   about 20 mW of work per microwatt removed at the bottom, and real
+   dilution units fall orders of magnitude short of Carnot. The case for
+   staging is the two arguments above it: no single working fluid spans
+   300 K to 15 mK, and the heat intercepted at a warm stage never reaches
+   the cold one, where removing it would be thousands of times more
+   expensive.
+
+   </details>
+
 4. If a research group discovered a qubit design with a much LOWER
    transition frequency (say, 500 MHz instead of 5 GHz), would this make
    the cryogenic requirement easier or harder to meet, holding
    temperature fixed? Use the formula to justify your answer.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Much harder,** and by a margin that would put the design out of
+   reach of a standard dilution refrigerator.
+
+   Everything is in the exponent. Dropping the frequency by a factor of
+   ten drops $\hbar\omega/k_BT$ by a factor of ten, and $\bar n$ depends
+   on that ratio exponentially. At the fridge base of 15 mK:
+
+   $$
+   \bar n(5\text{ GHz}, 15\text{ mK}) \approx 1.1\times10^{-7}, \qquad \bar n(500\text{ MHz}, 15\text{ mK}) \approx 0.253.
+   $$
+
+   Both from `thermalPhotonOccupation`. That is a factor of about
+   $2.2\times10^{6}$ worse, from a tenfold change in frequency, and
+   $0.253$ is not $\ll1$ by any reading. A qubit sitting at the coldest
+   place in the building would spend roughly a fifth of its idle time
+   thermally excited.
+
+   The crossover formula makes the same point more cleanly. $T$ for
+   $\bar n=1$ is proportional to $\omega$, so a 500 MHz qubit crosses
+   $\bar n=1$ at
+
+   $$
+   T = \frac{346\text{ mK}}{10} \approx 34.6\text{ mK},
+   $$
+
+   which is *below* nothing at all: a mixing chamber at 15 mK is colder
+   than that, so the qubit is technically under its crossover. Being just
+   under $\bar n=1$ is not the standard, though. To recover the same
+   $1.1\times10^{-7}$ that a 5 GHz qubit enjoys at 15 mK you would need
+   the same ratio $\omega/T$, which means 1.5 mK. That is roughly a
+   factor of ten below the base temperature of a standard commercial
+   dilution refrigerator, and it is not a matter of buying a bigger one.
+
+   That scaling relation is the compact way to hold all of this. $\bar n$
+   is a function of $\omega/T$ alone, so lowering the frequency by a
+   factor $k$ demands lowering the temperature by the same factor $k$ to
+   stay where you were.
+
+   The wrong turn is a plausible-sounding one: a lower-frequency qubit is
+   a lower-energy, gentler, less demanding device, so surely it is easier
+   on the fridge. Lower energy is exactly the problem. A cheap quantum is
+   one the thermal bath can afford to supply often. This is the same fact
+   as Common Mistakes' warning, run in the unfavourable direction, and it
+   is a real design constraint rather than a curiosity: it is part of why
+   superconducting qubit frequencies sit in the gigahertz range instead
+   of somewhere more convenient for the control electronics.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
 - Thermal photon occupation $\bar n=1/(\exp(\hbar\omega/k_BT)-1)$
-  quantifies exactly how "safe" a given qubit frequency and temperature
-  combination is.
+  turns "is this cold enough?" into a number for a given qubit
+  frequency and temperature.
 - For a representative 5 GHz qubit: $\bar n\approx10^{-7}$ at 15 mK
   (safe), but already $\approx16$ at 4 K. 4 K alone is insufficient,
   which is why dilution refrigerators exist as a distinct, harder cooling
@@ -284,7 +486,7 @@ frequencies rather than much lower ones.
   phase boundary in the mixing chamber, with the still pumping ³He
   around the loop.
 
-## Further Exploration
+## What Comes Down the Fridge
 
 <NextDiscovery>
 [Control Electronics](/lessons/quantum-hardware/control-and-readout/control-electronics) covers how microwave pulses are

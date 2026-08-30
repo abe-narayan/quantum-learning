@@ -41,8 +41,8 @@ export const flopsFor1000Gates30Qubits: NumericProblem = {
     finalAnswer: "≈1.07×10¹²",
   },
   explanation: {
-    correctIdea: "At ~10¹² operations/second (the worked example's assumed hardware speed), this circuit would take roughly 1 second — a useful comparison point against the worked example's 35-qubit, 500-gate case (≈17 seconds).",
-    whyCorrect: "Matches estimatedGateFlops(30,1000) computed directly from the engine.",
+    correctIdea: "At about 10¹² operations per second, the worked example's assumed hardware speed, this circuit would take roughly 1 second. That is a useful comparison point against the worked example's 35-qubit, 500-gate case, at about 17 seconds.",
+    whyCorrect: "Each gate touches every amplitude, and there are 2³⁰ ≈ 1.07 × 10⁹ of them, so the work scales as gates × 2ⁿ. A thousand gates therefore costs about 10¹² operations, and one more qubit doubles the bill. estimatedGateFlops(30,1000) returns the same figure.",
     whyWrong: ["Forgetting the multiplication by numGates (using just 2^30 alone) would understate the total cost by a factor of 1000."],
   },
 };

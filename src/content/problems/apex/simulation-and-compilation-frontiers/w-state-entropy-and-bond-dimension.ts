@@ -15,7 +15,7 @@ export const wStateEntropyAndBondDimension: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "The 3-qubit W state |W> = (|100> + |010> + |001>)/sqrt(3) is reshaped into a matrix across the cut between qubit 1 and qubits {2,3}, exactly as this lesson's GHZ example was. Its reduced density matrix on qubit 1 works out to rho_1 = diag(2/3, 1/3). Compute the entanglement entropy S(rho_1) across this cut, in bits. (Bond dimension here is also exactly 2, same as GHZ at this cut -- the point of this problem is that entropy is not the same number just because the rank is.)",
+      "The 3-qubit W state |W> = (|100> + |010> + |001>)/sqrt(3) is reshaped into a matrix across the cut between qubit 1 and qubits {2,3}, as this lesson's GHZ example was. Its reduced density matrix on qubit 1 works out to rho_1 = diag(2/3, 1/3). Compute the entanglement entropy S(rho_1) across this cut, in bits. (Bond dimension here is also 2, the same as GHZ at this cut. The point of the problem is that entropy is not the same number just because the rank is.)",
     inputHint: "bits, to 3 decimal places",
   },
   answer: {
@@ -55,7 +55,7 @@ export const wStateEntropyAndBondDimension: NumericProblem = {
   },
   explanation: {
     correctIdea: "Bond dimension (Schmidt rank, 2 here, identical to GHZ) counts how many Schmidt terms survive; entanglement entropy weighs how evenly they're weighted. The W state's uneven (2/3, 1/3) split carries less entropy than GHZ's even (1/2, 1/2) split despite the identical rank.",
-    whyCorrect: "This is the bond-dimension-versus-entropy distinction this lesson's second Common Mistake callout makes, worked out here for a different state instead of just asserted.",
+    whyCorrect: "Bond dimension counts the nonzero Schmidt coefficients; entropy weighs them. The W state and the GHZ state have the same rank at this cut and different entropies, which is why neither number can be read off the other.",
     whyWrong: ["Assuming bond dimension 2 automatically means 'the same entanglement as GHZ' ignores that entropy depends on the actual eigenvalue values, not merely how many of them are nonzero."],
   },
 };

@@ -21,7 +21,7 @@ function makeFakeLocalStorage() {
   };
 }
 
-const KEY = "quantumlearn:problem-progress:some-problem";
+const KEY = "studyquantum:problem-progress:some-problem";
 
 describe("handleExternalStorageChange (problem progress)", () => {
   beforeEach(() => {

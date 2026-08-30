@@ -27,8 +27,8 @@ export const correctOperatorOrderHThenX: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "This reads the operator product in the same order as the diagram, left to right — but operator products compose right to left. H, being drawn first, must be the rightmost (first-applied) factor.",
-      c: "Gates compose by multiplication (matrix product), not addition — addition doesn't even preserve normalization in general.",
+      b: "This reads the operator product left to right, in diagram order. Operator products compose right to left, so H, drawn first, is the rightmost factor.",
+      c: "Gates compose by matrix multiplication, not addition. A sum of two unitaries does not generally preserve normalization.",
       d: "There's no inverse involved here; both gates are actually applied, not undone.",
     },
     defaultIncorrectFeedback: "Remember: a circuit reads left to right, but its operator product is written and multiplied right to left.",

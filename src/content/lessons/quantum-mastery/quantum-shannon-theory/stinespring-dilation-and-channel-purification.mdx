@@ -101,7 +101,7 @@ export const purityFrames = [
     paramLabel: "",
     series: [
       {
-        label: "Joint system+environment purity Tr(rho_SE^2) — pure throughout",
+        label: "Joint system+environment purity Tr(rho_SE^2), pure throughout",
         color: "muted",
         points: puritySweep.map((s) => ({ x: s.gamma, y: s.joint })),
       },
@@ -157,13 +157,13 @@ export const krausComparisonPresets = [
   },
 ];
 
-<LessonHook eyebrow="Where does a Kraus operator actually come from?">
-  Every noisy quantum process — decay, dephasing, loss — is secretly
+<LessonHook eyebrow="Where does a Kraus operator come from?">
+  Every noisy quantum process (decay, dephasing, loss) is secretly
   nothing but ordinary Schrödinger evolution on a bigger, closed system
   that nobody is fully looking at.
 </LessonHook>
 
-## Motivation
+## Every Channel as a Unitary in Disguise
 
 Quantum Channels: Kraus and Choi proved every completely positive,
 trace-preserving map $\mathcal E$ has a Kraus representation
@@ -179,9 +179,9 @@ closed system, followed by not looking at part of it. That
 <Term id="stinespring-dilation">theorem is the **Stinespring dilation**</Term>, and building its qubit-scale
 realization explicitly is this lesson's payoff.
 
-## Mathematical Development
+## The Isometry Hiding Inside a Kraus Set
 
-### The isometry hiding inside a Kraus set
+### Building V out of the Kraus set
 
 Take any CPTP map $\mathcal E$ on a $d$-dimensional system $S$ with
 Kraus operators $\{K_i\}_{i=1}^r$, $\sum_iK_i^\dagger K_i=I_S$ (the
@@ -207,7 +207,7 @@ makes it extendable to a full unitary, computed below.
     \langle\phi|V^\dagger V|\psi\rangle = \sum_{i,j}\langle\phi|K_i^\dagger K_j|\psi\rangle\langle i|j\rangle_E = \sum_i\langle\phi|K_i^\dagger K_i|\psi\rangle = \langle\phi|\Big(\sum_iK_i^\dagger K_i\Big)|\psi\rangle = \langle\phi|\psi\rangle
     $$
   </DerivationStep>
-  <DerivationStep annotation="V's image is a d-dimensional subspace of the d·r-dimensional joint space, isometric to H_S itself. Complete an orthonormal basis of that image's orthogonal complement, and map any fixed orthonormal basis of the 'extra' domain onto it — the same completion-to-an-orthonormal-basis move Schmidt Decomposition and Purification used to extend a basis beyond a degenerate eigenspace. This produces a unitary U on H_S ⊗ H_E, for the fixed reference state |0⟩_E.">
+  <DerivationStep annotation="V's image is a d-dimensional subspace of the d·r-dimensional joint space, isometric to H_S itself. Complete an orthonormal basis of that image's orthogonal complement, and map any fixed orthonormal basis of the 'extra' domain onto it. This is the same completion-to-an-orthonormal-basis move Schmidt Decomposition and Purification used to extend a basis beyond a degenerate eigenspace. This produces a unitary U on H_S ⊗ H_E, for the fixed reference state |0⟩_E.">
     $$
     U\big(|\psi\rangle_S\otimes|0\rangle_E\big) = V|\psi\rangle_S = \sum_iK_i|\psi\rangle_S\otimes|i\rangle_E
     $$
@@ -228,14 +228,21 @@ This is the theorem:
 
 <TheoremBox title="Stinespring dilation" provenance="derived">
 
-Every CPTP map $\mathcal E$ on a $d$-dimensional system arises as
+**Hypotheses.** $\mathcal E$ is completely positive and trace-preserving
+on a Hilbert space of *finite* dimension $d$. Complete positivity is
+what supplies the Kraus set the isometry is built from; trace
+preservation is what makes $V^\dagger V=I$ rather than $\leq I$; and
+finiteness is what lets the isometry be completed to a *unitary* instead
+of stopping at an isometry.
+
+Every such $\mathcal E$ arises as
 
 <EquationReveal
   terms={[
-    { id: "E", symbol: "ℰ(ρ)", gloss: "The channel's output — the same CPTP map whose Kraus form was built in the prior lesson." },
-    { id: "U", symbol: "U", gloss: "A unitary acting on system + environment together — ordinary, reversible Schrödinger evolution." },
-    { id: "env", symbol: "|0⟩⟨0|_E", gloss: "A fixed, pure environment state — the ancilla the system is coupled to." },
-    { id: "TrE", symbol: "Tr_E[·]", gloss: "Partial trace over the environment — discarding (not measuring) it after the joint evolution." },
+    { id: "E", symbol: "ℰ(ρ)", gloss: "The channel's output, the same CPTP map whose Kraus form was built in the prior lesson." },
+    { id: "U", symbol: "U", gloss: "A unitary acting on system + environment together, which is ordinary reversible Schrödinger evolution." },
+    { id: "env", symbol: "|0⟩⟨0|_E", gloss: "A fixed, pure environment state, the ancilla the system is coupled to." },
+    { id: "TrE", symbol: "Tr_E[·]", gloss: "Partial trace over the environment, discarding (not measuring) it after the joint evolution." },
   ]}
 >
 
@@ -248,6 +255,23 @@ $$
 for some unitary $U$ on system + environment and some fixed pure
 environment state $|0\rangle_E$, with environment dimension always
 achievable at $\leq d^2$.
+
+**Uniqueness.** The dilation is not unique, but the *minimal* one (the
+one with $\dim\mathcal H_E$ equal to the Kraus rank) is unique up to a
+unitary acting on $E$ alone. That is the same statement the
+non-uniqueness section below reads off from the Kraus side.
+
+Stinespring's original 1955 theorem is stated for completely positive
+maps on C\*-algebras and does not need $d<\infty$, so the finiteness
+above is a convenience rather than a necessity, but dropping it changes
+the shape of the conclusion. In infinite dimensions the environment may
+have to be infinite-dimensional, and what the theorem delivers is an
+*isometry* $V:\mathcal H_S\to\mathcal H_S\otimes\mathcal H_E$ with
+$\mathcal E(\rho)=\text{Tr}_E[V\rho V^\dagger]$. Promoting $V$ to a
+unitary requires completing an orthonormal basis of its cokernel, and the
+two complements need not have equal dimension. The isometric form is the
+one that always holds; the unitary form is the finite-dimensional gloss
+on it.
 
 </TheoremBox>
 
@@ -337,7 +361,7 @@ are not two separate facts this course happens to cover back to back:
 they are the same fact about extending to a larger system, once applied
 to a state and once applied to a channel's Choi state.
 
-## Physical Interpretation: Why This Matters
+## Purity Is Not Conserved, and That Is the Point
 
 <InsightBlock>
   Purity is not conserved, and that is the whole point. What *is*
@@ -351,12 +375,14 @@ noise process is unitary evolution on system-plus-environment, followed
 by discarding $E$. Nothing leaves the universe. Things leave the
 *system's description* the moment its correlated partner is inaccessible.
 
-The dilation built above lets that be watched rather than asserted.
+The dilation built above lets that be watched happening.
 Sweeping $\gamma$ from $0$ to $1$ and computing three purities from the
 same joint state:
 
 <ParametricCurve
   frames={purityFrames}
+  xAxisLabel="damping strength γ"
+  yAxisLabel="purity Tr(ρ²)"
   ariaLabel="Three purities plotted against amplitude-damping strength gamma from 0 to 1. The joint system-plus-environment purity is a flat line at 1 across the whole range, because unitary evolution of a pure state stays pure. The system purity starts at 1, dips through a shallow minimum of 0.875 at gamma = 0.5, and climbs back to 1 at gamma = 1, where every input is mapped to the pure state ket zero. The environment purity traces the same curve, lying on top of the system curve at every point."
 />
 
@@ -383,7 +409,7 @@ strongest mixing sits where the entanglement is greatest, not where the
 noise parameter is largest.
 
 The amplitude-damping construction makes the bookkeeping literal: the
-"missing" excitation after decay did not vanish, it is sitting in the
+"missing" excitation after decay did not vanish; it is sitting in the
 environment qubit's $|1\rangle_E$ amplitude, $\sqrt\gamma$, the same
 number that used to be the qubit's own decay amplitude.
 
@@ -403,17 +429,17 @@ quantum state: the precise condition later error-correction lessons
 build codes to satisfy.
 
 Finally, this is the **discrete-time seed of the Lindblad master
-equation** already covered in this pillar. Chop a continuous-time open
+equation** already covered in this track. Chop a continuous-time open
 evolution into many short steps of duration $dt$; each step is its own
 tiny Stinespring dilation against a *fresh*, never-before-touched patch
 of environment (the Markovian assumption). Amplitude damping's own
 $\gamma(dt)=1-e^{-dt/T_1}\approx dt/T_1$ for small $dt$ (from
-`decayProbabilityForTimestep`, used throughout this pillar) shows the
+`decayProbabilityForTimestep`, used throughout this track) shows the
 pattern directly: $K_1(dt)=O(\sqrt{dt})$, $K_0(dt)=I+O(dt)$, and
 resumming infinitely many such small dilations is what produces
 a first-order-in-$dt$ Lindblad generator in the continuum limit.
 
-## Worked Example
+## Amplitude Damping, Dilated Explicitly
 
 **Take $\gamma=0.3$ and $\rho=|+\rangle\langle+|=\begin{pmatrix}0.5&0.5\\0.5&0.5\end{pmatrix}$
 (the same state and channel strength Quantum Channels: Kraus and Choi
@@ -457,10 +483,10 @@ $K_0'=(K_0+K_1)/\sqrt2$, $K_1'=(K_0-K_1)/\sqrt2$. These are visibly
 *different* matrices from $K_0,K_1$.
 
 <PredictBeforeReveal
-  question="K0' and K1' above are built from a Hadamard-style mix of the original K0 and K1 — visibly different matrices. Does swapping this rotated pair into the Kraus sum change the physical channel, i.e. the actual output state Σ K_i' ρ K_i'†?"
+  question="K0' and K1' above are built from a Hadamard-style mix of the original K0 and K1, and they are visibly different matrices. Does swapping this rotated pair into the Kraus sum change the physical channel, i.e. the output state Σ K_i' ρ K_i'†?"
   options={[
-    { label: "Yes — different Kraus operators always mean a different physical process", value: "yes" },
-    { label: "No — it's the exact same channel, just read out through a rotated environment basis", value: "no" },
+    { label: "No, it is the exact same channel, just read out through a rotated environment basis", value: "no" },
+    { label: "Yes, different Kraus operators always mean a different physical process", value: "yes" },
     { label: "It depends on whether the input state rho is pure or mixed", value: "depends" },
   ]}
   correctValue="no"
@@ -483,7 +509,7 @@ physical channel, read out through a rotated environment basis.
   digits={4}
 />
 
-## Common Mistakes
+## Forgetting the Environment Must Start Pure
 
 <Callout type="warning">
 **Assuming the environment can start mixed or correlated with the
@@ -512,15 +538,180 @@ that labeling, which is why $\text{Tr}_E$ erases it.
    $V|\psi\rangle=\sum_iK_i|\psi\rangle\otimes|i\rangle_E$ satisfies
    $V^\dagger V=I$, and explain in one sentence why that makes $V$
    extendable to a unitary on the joint space.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Compute the inner product of two images and watch the environment
+   labels do the work:
+
+   $$
+   \langle\phi|V^\dagger V|\psi\rangle
+   =\sum_{i,j}\langle\phi|K_i^\dagger K_j|\psi\rangle\,\langle i|j\rangle_E
+   =\sum_i\langle\phi|K_i^\dagger K_i|\psi\rangle
+   =\langle\phi|\Big(\sum_iK_i^\dagger K_i\Big)|\psi\rangle
+   =\langle\phi|\psi\rangle,
+   $$
+
+   using $\langle i|j\rangle_E=\delta_{ij}$ to collapse the double sum and
+   trace preservation in the final step. Holding for every $|\phi\rangle$
+   and $|\psi\rangle$, this is $V^\dagger V=I$.
+
+   Notice which hypothesis each step consumed. The orthonormality of the
+   environment basis kills the $i\neq j$ cross terms, which is why the
+   Kraus index has to become a *label on a fresh system* rather than
+   anything internal to $S$. And $\sum_iK_i^\dagger K_i=I$, exactly trace
+   preservation, is what makes the answer $I$ rather than some other
+   positive operator. A trace-*decreasing* CP map, one branch of a
+   measurement, would give $V^\dagger V\leq I$ and would not be an
+   isometry.
+
+   The extendability, in one sentence: an isometry preserves inner
+   products, so it carries an orthonormal basis of the $d$-dimensional
+   $\mathcal H_S$ to $d$ orthonormal vectors inside the $dr$-dimensional
+   joint space, and $d$ orthonormal vectors in a $dr$-dimensional space can
+   always be completed to a full orthonormal basis by Gram-Schmidt on the
+   orthogonal complement.
+
+   Spelled out slightly, since the counting is the whole content: $U$ is
+   already determined on the $d$-dimensional subspace
+   $\mathcal H_S\otimes|0\rangle_E$, and what remains is to define it on
+   the orthogonal complement of that subspace, of dimension $d(r-1)$, by
+   mapping it isometrically onto the orthogonal complement of $V$'s range,
+   of dimension $dr-d=d(r-1)$. The two numbers are equal, so an
+   isometric identification exists and the result is unitary.
+
+   That equality is precisely what fails in infinite dimensions, which is
+   why the theorem box states the general result as an *isometry* rather
+   than a unitary. Two subspaces of an infinite-dimensional space can both
+   be infinite-dimensional and still fail to be unitarily identifiable in
+   the way this counting assumes; the finite-dimensional case is the one
+   where dimension alone settles it. Note also that $V^\dagger V=I$ does
+   not give $VV^\dagger=I$: the latter is $\mathbb 1$ on the joint space
+   and is false, since $VV^\dagger$ is the projector onto $V$'s
+   $d$-dimensional range. Isometry, not unitarity, is what $V$ is.
+
+   </details>
+
 2. The dephasing channel has
    $K_0=\sqrt{1-\lambda/2}\,I$, $K_1=\sqrt{\lambda/2}\,Z$. Following the
    same pattern as this lesson's amplitude-damping construction, write
    down its $4\times4$ Stinespring unitary $U_{\text{dephasing}}(\lambda)$
    explicitly, and check it reduces to the identity at $\lambda=0$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Write $c=\sqrt{1-\lambda/2}$ and $s=\sqrt{\lambda/2}$, so $c^2+s^2=1$.
+   The isometry is fixed by its action on the two system basis states:
+
+   $$
+   V|0\rangle_S=c\,|0\rangle_S|0\rangle_E+s\,Z|0\rangle_S|1\rangle_E=c|00\rangle+s|01\rangle,
+   $$
+
+   $$
+   V|1\rangle_S=c\,|1\rangle_S|0\rangle_E+s\,Z|1\rangle_S|1\rangle_E=c|10\rangle-s|11\rangle,
+   $$
+
+   the minus sign being the only trace $Z$ leaves. Those two vectors are
+   the images of $|00\rangle$ and $|10\rangle$, so they are the first and
+   third columns of $U$. Completing with anything orthonormal in the two
+   leftover directions, the tidiest choice gives
+
+   $$
+   U_{\text{dephasing}}(\lambda)=\begin{pmatrix}
+   c & -s & 0 & 0\\
+   s & \phantom{-}c & 0 & 0\\
+   0 & \phantom{-}0 & c & s\\
+   0 & \phantom{-}0 & -s & c
+   \end{pmatrix}
+   \qquad\text{(basis order }|00\rangle,|01\rangle,|10\rangle,|11\rangle\text{, system first).}
+   $$
+
+   It is unitary for every $\lambda\in[0,1]$, being block diagonal with two
+   $2\times2$ rotation blocks, and at $\lambda=0$ we have $c=1$, $s=0$, so
+   both blocks are the identity and $U=I_4$: no coupling to the
+   environment, no dephasing, exactly as it should be.
+
+   The structure is more informative than the matrix. Writing
+   $c=\cos\varphi$, $s=\sin\varphi$, the two blocks are rotations by
+   $+\varphi$ and $-\varphi$, so
+
+   $$
+   U=|0\rangle\langle0|_S\otimes R(\varphi)+|1\rangle\langle1|_S\otimes R(-\varphi):
+   $$
+
+   a controlled rotation that turns the environment one way if the system
+   is $|0\rangle$ and the other way if it is $|1\rangle$. The environment
+   is being asked which state the system is in, and how sharply it learns
+   the answer is set by how distinguishable the two environment outcomes
+   are. Those outcomes are $R(\pm\varphi)|0\rangle_E=(c,\pm s)$, with
+   overlap
+
+   $$
+   \langle e_0|e_1\rangle=c^2-s^2=\left(1-\tfrac\lambda2\right)-\tfrac\lambda2=1-\lambda,
+   $$
+
+   which is exactly the factor by which dephasing shrinks the system's
+   coherence. The which-path slogan is a theorem here: the surviving
+   coherence *equals* the overlap of the environment states, so the
+   information the environment gains is the coherence the system loses,
+   with no slack between them.
+
+   Contrast with the amplitude-damping dilation in the lesson body, where
+   the joint unitary moves an *excitation* into the environment and the
+   fixed points are $|00\rangle$ and $|11\rangle$. Dephasing moves no
+   population at all: every diagonal element of $U$'s action leaves the
+   system's populations alone, and the entire effect is on the relative
+   phase. Two channels, two very different unitaries, the same theorem.
+
+   </details>
+
 3. Using the fact that a single qubit's Choi matrix is $4\times4$ (so
    has minimal Kraus rank at most $4$), explain why *no* single-qubit
    channel ever needs an environment larger than two qubits in its
    Stinespring dilation.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the environment dimension in the construction is the number of
+   Kraus operators, and that number is capped by the rank of a $4\times4$
+   matrix.
+
+   Chain the three facts. Choi's theorem builds one Kraus operator per
+   nonzero eigenvalue of $J(\mathcal E)$, so the minimal Kraus rank is
+   $r=\mathrm{rank}\,J(\mathcal E)$. For a single qubit $J$ is
+   $d^2\times d^2=4\times4$, so $r\leq4$. The Stinespring isometry
+   $V|\psi\rangle=\sum_{i=1}^{r}K_i|\psi\rangle\otimes|i\rangle_E$ needs
+   the environment only to hold the index $i$, so
+   $\dim\mathcal H_E=r\leq4=2^2$: two qubits, and never more.
+
+   The bound is tight, which is worth checking so it does not read as
+   pessimism. The fully depolarizing channel
+   $\rho\mapsto\mathrm{Tr}(\rho)\,I/2$ has Kraus set
+   $\{I,X,Y,Z\}/2$, rank exactly $4$, and genuinely needs two environment
+   qubits. At the other end, both channels in this course, amplitude
+   damping and dephasing, have rank $2$ and need only one, which is why
+   their dilations came out $4\times4$ rather than $8\times8$.
+
+   The general statement scales the same way: an $n$-qubit channel has a
+   $4^n\times4^n$ Choi matrix, so $r\leq4^n$ and the environment never
+   needs more than $2n$ qubits. Doubling the register is always enough.
+
+   Two clarifications keep this from being over-read. The bound is on the
+   *minimal* dilation; nothing stops a non-minimal one from using a huge
+   environment, and the theorem only promises that a small one exists.
+   And it is a statement about mathematics, not about physics. A real
+   qubit is coupled to an enormous physical environment of phonons,
+   two-level defects and stray photons. What the bound says is that
+   whatever that environment does to the qubit, its effect is exactly
+   reproducible by two qubits, because only a two-qubit worth of the
+   environment ever becomes correlated with the system. Everything else in
+   the bath is a spectator that the partial trace was going to discard
+   anyway.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -549,12 +740,15 @@ that labeling, which is why $\text{Tr}_E$ erases it.
   frames what an error-correcting code must prevent an environment from
   learning, and the discrete-time seed of the Lindblad master equation.
 
-## Further Exploration
+## From Dilation to a Generator
 
 <NextDiscovery>
-  [The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation)
-  develops the continuous-time limit this lesson's Physical
-  Interpretation section only sketched: resumming infinitely many
-  infinitesimal Stinespring dilations, one per timestep, into a single
-  differential generator for open-system evolution.
+  [Quantum Entropy and Information Measures](/lessons/quantum-mastery/quantum-shannon-theory/quantum-entropy-and-information-measures)
+  turns from the structure of a channel to what it costs: von Neumann
+  entropy, mutual information, and a conditional entropy that goes
+  negative for exactly the entangled states a dilation manufactures.
+  For the continuous-time limit "Purity Is Not Conserved" only sketched
+  above, resumming infinitely many infinitesimal dilations into a single
+  differential generator, see [The Lindblad Master
+  Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation).
 </NextDiscovery>

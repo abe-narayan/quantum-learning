@@ -20,28 +20,40 @@ export const whyCoulombEnergyIgnoresL: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["not a contradiction", "no contradiction", "consistent"],
-      ["specific to", "1/r", "Coulomb", "exact form", "special"],
+      {
+        phrases: ["not a contradiction", "no contradiction", "consistent"],
+        missingFeedback:
+          "Answer the question that was asked before you explain anything: is the situation actually inconsistent, or not?",
+      },
+      {
+        phrases: ["specific to", "1/r", "Coulomb", "exact form", "special"],
+        missingFeedback:
+          "You have the verdict. Now say what it is about this one potential that makes the energy come out independent of l, and whether the same would happen for a different central potential.",
+      },
     ],
-    incorrectFeedback: "Address directly whether this is a contradiction, then explain what makes the exact 1/r Coulomb potential special compared to a generic central potential.",
-    partialFeedback: "Good — make sure you explicitly note this l-independence is NOT a general feature of central potentials, only of the exact Coulomb form.",
+    incorrectFeedback: "You answered that l 'cancels out', which is not what happens: l genuinely changes the radial equation and its solutions. Decide first whether the two facts actually conflict, then explain what is unusual about this particular potential that lets both hold at once.",
+    partialFeedback: "You have answered the yes-or-no part. The other half is a restriction: say for which potentials the degeneracy survives, and give one where it does not.",
+    modelAnswers: [
+      "Not a contradiction. l really does change the effective potential and therefore the shape of the radial wavefunction; it just happens that for the exact 1/r Coulomb potential the resulting eigenvalue comes out the same for every l. That is special to that potential, not a general fact about central potentials.",
+      "There is no contradiction here. The centrifugal term changes the wavefunction, but the Coulomb potential's exact form gives an extra degeneracy so the energy is l-independent. Any other central potential would show l dependence.",
+    ],
   },
   hints: [
-    { text: "l does change the shape of V_eff(r) and hence the radial wavefunction R_nl(r) itself." },
-    { text: "But solving the ODE for the resulting energy eigenvalue happens to give the same E_n regardless of which l was used, only for the exact 1/r potential." },
-    { text: "This is not true for other central potentials, like a finite spherical well — there, E does depend on l." },
+    { text: "l does change the radial equation, and the solutions R_nl really do differ from one l to the next. So the first fact is genuine." },
+    { text: "Now ask a separate question about the same equation: does the eigenvalue it returns depend on l, or only the eigenfunction? Those are different things." },
+    { text: "The eigenvalue's l-independence is an accident of one potential shape. Try the same question for a spherical well of finite depth and see whether it survives." },
   ],
   solution: {
     steps: [
-      { description: "No contradiction: l genuinely changes V_eff(r), and correspondingly changes the shape of the radial wavefunction R_nl(r) — this is why 2s and 2p look different." },
+      { description: "No contradiction: l does change V_eff(r), and correspondingly changes the shape of the radial wavefunction R_nl(r). That is why 2s and 2p look different." },
       { description: "What's special is that solving the full radial ODE for the exact 1/r Coulomb potential happens to produce the same energy eigenvalue E_n regardless of which l was used to define V_eff." },
-      { description: "This is a specific, 'accidental' degeneracy of the 1/r potential — for a different central potential (e.g. a finite spherical well), the energy genuinely would depend on l." },
+      { description: "This is a specific, 'accidental' degeneracy of the 1/r potential. For a different central potential, such as a finite spherical well, the energy would depend on l." },
     ],
-    finalAnswer: "Not a contradiction — l changes the wavefunction's shape via V_eff, but only the exact Coulomb potential's eigenvalue happens to come out l-independent; this doesn't hold for central potentials in general.",
+    finalAnswer: "Not a contradiction. l changes the wavefunction's shape via V_eff, but only the exact Coulomb potential's eigenvalue comes out l-independent, and that does not hold for central potentials in general.",
   },
   explanation: {
-    correctIdea: "This distinguishes a general structural fact (energy eigenstates can be labeled by l, from Central Potentials) from a specific numerical coincidence of the Coulomb potential (the eigenvalue not actually depending on that label).",
-    whyCorrect: "Matches the lesson's explicit framing of l-independence as special to the exact Coulomb form, not a general central-potential rule.",
-    whyWrong: ["Claiming l has no physical effect at all ignores that it fully determines the radial wavefunction's shape, degeneracy count, and centrifugal barrier — only the energy eigenvalue is unaffected."],
+    correctIdea: "This distinguishes a general structural fact (energy eigenstates can be labeled by l, from Central Potentials) from a specific numerical coincidence of the Coulomb potential (the eigenvalue not depending on that label).",
+    whyCorrect: "l genuinely changes the radial equation and so genuinely changes the wavefunction. What is special about the 1/r potential is that the resulting eigenvalue happens to come out the same for every allowed l, and that coincidence disappears the moment the potential departs from exact 1/r.",
+    whyWrong: ["Claiming l has no physical effect at all ignores that it fully determines the radial wavefunction's shape, degeneracy count, and centrifugal barrier. Only the energy eigenvalue is unaffected."],
   },
 };

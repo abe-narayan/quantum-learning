@@ -35,13 +35,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Two operations, one job description">
   A list of stock prices, a musical chord, and a quantum state share
   almost nothing. But you can add two of them and scale one by a number,
   and that is the whole job description of a vector.
 </LessonHook>
 
-## Motivation
+## Stock prices, chords, and quantum states
 
 An arrow in 3D space is a vector. So is a list of stock prices, a
 polynomial, a musical chord, and, the case this course cares about, a
@@ -63,7 +63,7 @@ throws at you.
   license="Public domain"
 />
 
-## Intuition
+## Forget arrows; keep the two operations
 
 Forget arrows for a moment. The only things you ever *do* with a
 vector are: add two of them to get a third, and stretch/shrink one by a
@@ -72,7 +72,7 @@ behave the way you'd expect (addition doesn't care about order, scaling by
 $1$ does nothing, and so on), it's a vector space, full stop, regardless
 of whether "vector" conjures an arrow in your head or not.
 
-## Mathematical Development
+## Eight axioms, then span, basis, and dimension
 
 ### The axioms
 
@@ -176,7 +176,7 @@ physical object versus its coordinates in a chosen basis, matters a great
 deal once operators enter the picture: a matrix representation always
 depends on a choice of basis, even though the underlying operator doesn't.
 
-<InteractiveSection title="Rotate the basis, not the vector" description="Drag the slider to rotate the basis {e1', e2'} (solid) away from the standard basis {e1, e2} (dashed). Watch v (gray) stay put the whole time; only the axes you are describing it against move.">
+<InteractiveSection title="Rotate the basis, not the vector" description="Drag the slider to rotate the basis {e1', e2'} (solid) away from the standard basis {e1, e2} (dashed). Keep your eye on v itself and on the components printed beside it, and decide which of the two the rotation is really changing.">
   <VectorDiagramExplorer
     frames={Array.from({ length: 19 }, (_, i) => rotatedBasisFrame(i * 5))}
     sliderLabel="Basis rotation angle θ"
@@ -205,7 +205,7 @@ information, leaves 2). If you've seen the Bloch sphere in the Quantum
 Computing track, this is the dimension-counting behind why it's a
 2-dimensional surface rather than some higher-dimensional object.
 
-## Physical Interpretation
+## One algebra, many things to call a vector
 
 Physics gets to choose, for each system, what plays the role of "vector."
 For a qubit it's a pair of complex amplitudes; for a particle's spatial
@@ -214,7 +214,7 @@ abstract axioms is that *the same linear algebra*, span, independence,
 basis, and everything built on top of it later in this course, applies
 to both without modification.
 
-## Worked Example
+## Do these three vectors form a basis?
 
 **Is $\{(1,1,0), (0,1,1), (1,0,1)\}$ a basis for $\mathbb{C}^3$?**
 
@@ -245,7 +245,7 @@ $-a+(-a)=0 \Rightarrow -2a=0 \Rightarrow a=0$, forcing $b=c=0$ too. Only
 the trivial combination gives zero, so the set is independent, and with
 exactly $3=\dim\mathbb{C}^3$ vectors, it's a basis.
 
-## Common Mistakes
+## Spanning, and the field you check over
 
 <Callout type="note">
 **Confusing "spans the space" with "is a basis."** A spanning set can have
@@ -270,13 +270,136 @@ problem is asking for.
 
 1. Is $\{(1,2),(2,4)\}$ linearly independent in $\mathbb{C}^2$? Justify
    your answer.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. The second vector is twice the first, $(2,4) = 2(1,2)$, so there is a
+   combination with coefficients not both zero that gives the zero vector:
+
+   $$
+   2\,(1,2) + (-1)\,(2,4) = (0,0).
+   $$
+
+   That is exactly what linear dependence means, and exhibiting one such
+   combination is a complete proof. The set spans only the one-dimensional
+   subspace $\{c(1,2) : c \in \mathbb{C}\}$, a line through the origin, not the
+   whole plane, so it cannot be a basis for $\mathbb{C}^2$.
+
+   The check worth internalizing: two vectors in any space are dependent
+   precisely when one is a scalar multiple of the other, so scan the ratios
+   componentwise. Here $2/1 = 2$ and $4/2 = 2$ agree, which is the dependence.
+   Had they disagreed, the pair would have been independent.
+
+   For $2\times2$ matrices the determinant says the same thing:
+   $\det\begin{pmatrix}1&2\\2&4\end{pmatrix} = 4-4 = 0$, and a vanishing
+   determinant means dependent columns. That shortcut is convenient but does
+   not generalize to non-square collections, whereas producing an explicit
+   nontrivial combination always does.
+
+   </details>
+
 2. Find the coordinates of $v=(3,5)$ relative to the basis
    $e_1'=(1,1), e_2'=(1,-1)$ of $\mathbb{R}^2$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $v = 4e_1' - e_2'$, so the coordinates are $(4,-1)$.
+
+   Write $v = a e_1' + b e_2'$ and read off both components:
+
+   $$
+   a + b = 3, \qquad a - b = 5.
+   $$
+
+   Adding gives $2a = 8$, so $a = 4$; subtracting gives $2b = -2$, so $b = -1$.
+   Check: $4(1,1) - (1,-1) = (4-1,\ 4+1) = (3,5) \checkmark$.
+
+   The point of the exercise is that "the coordinates of $v$" is not a property
+   of $v$ alone. The same vector is $(3,5)$ in the standard basis and $(4,-1)$
+   in this one; the arrow has not moved, only the two rulers being used to
+   describe it. Every later appearance of a change of basis, and every claim
+   that some quantum result is "basis independent", is a claim about which of
+   these two kinds of object is being talked about.
+
+   The one shortcut available here is worth flagging as a shortcut. Because
+   $e_1'$ and $e_2'$ happen to be orthogonal, the coefficients can also be got
+   by projection, $a = \langle e_1', v\rangle / \|e_1'\|^2 = 8/2 = 4$. That
+   works only for an orthogonal basis; for a general basis, solving the linear
+   system is the method.
+
+   </details>
+
 3. What is $\dim_{\mathbb{C}}(\mathbb{C}^4)$? What is
    $\dim_{\mathbb{R}}(\mathbb{C}^4)$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\dim_{\mathbb{C}}(\mathbb{C}^4) = 4$ and $\dim_{\mathbb{R}}(\mathbb{C}^4) = 8$.
+
+   Over $\mathbb{C}$, the four vectors $e_1,\dots,e_4$ are a basis: every
+   element of $\mathbb{C}^4$ is a complex combination of them, and no fewer
+   will do.
+
+   Over $\mathbb{R}$, complex scalars are no longer available, so $ie_1$ can no
+   longer be reached from $e_1$ by scaling and has to be supplied separately.
+   A real basis is $\{e_1, ie_1, e_2, ie_2, e_3, ie_3, e_4, ie_4\}$: eight
+   vectors. Equivalently, each complex coordinate carries two independent real
+   numbers.
+
+   Dimension is a property of the pair (space, field of scalars), never of the
+   set alone. The same $\mathbb{C}^4$ has dimension 4 or 8 depending on what
+   you are allowed to multiply by, which is why the subscript on $\dim$ is not
+   decoration.
+
+   This is the counting a single qubit already uses. A qubit state lives in
+   $\mathbb{C}^2$: two complex amplitudes, so four real parameters, from which
+   normalization removes one and global phase another, leaving the two that
+   place a point on the Bloch sphere.
+
+   </details>
+
 4. Is the set of all $2\times2$ complex matrices a vector space under
    matrix addition and scalar multiplication? If so, propose a basis and
    state its dimension.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes, and $\dim_{\mathbb{C}} = 4$.
+
+   All eight axioms hold, and each for an unremarkable reason: matrices add
+   entrywise, so commutativity and associativity of addition are inherited from
+   $\mathbb{C}$ one entry at a time; the zero matrix is the zero vector;
+   $-A$ is the additive inverse; and the two distributive laws and
+   $1 \cdot A = A$ are again entrywise facts.
+
+   A basis is the four matrix units:
+
+   $$
+   E_{11} = \begin{pmatrix}1&0\\0&0\end{pmatrix},\quad E_{12} = \begin{pmatrix}0&1\\0&0\end{pmatrix},\quad E_{21} = \begin{pmatrix}0&0\\1&0\end{pmatrix},\quad E_{22} = \begin{pmatrix}0&0\\0&1\end{pmatrix}.
+   $$
+
+   They span, since $\begin{pmatrix}a&b\\c&d\end{pmatrix} = aE_{11}+bE_{12}+cE_{21}+dE_{22}$,
+   and they are independent, since that combination is the zero matrix only
+   when $a=b=c=d=0$. So the space is $\mathbb{C}^4$ with the entries written in
+   a square instead of a column.
+
+   The trap in the question is matrix multiplication. Matrices come with a
+   product, and the product is *not* part of what makes this a vector space;
+   the definition asks only for addition and scaling. Nothing here needs to be
+   checked about $AB$, and in particular the fact that $AB \ne BA$ is
+   irrelevant to the answer. (A vector space that also carries a compatible
+   product has a longer name, an algebra, and that extra structure is what the
+   Linear Operators lesson goes on to use.)
+
+   The Pauli matrices with the identity, $\{I, X, Y, Z\}$, form another basis
+   of this same space, which is the fact behind writing any single-qubit
+   Hamiltonian as a combination of Paulis.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -292,7 +415,7 @@ problem is asking for.
   $\dim_{\mathbb{R}}(\mathbb{C}^n)=2n$, a distinction that directly
   explains the Bloch sphere's dimension count.
 
-## Further Exploration
+## Counting the Bloch sphere's dimensions
 
 <ChallengePrompt prompt="What is dim_ℂ(ℂ³) and dim_ℝ(ℂ³)? Then, applying the same two subtractions used for the qubit/Bloch-sphere count above (normalization, then overall phase), how many real parameters does a qutrit's (3-level system) physical state space have?">
   Same recipe as the Bloch-sphere count: start from the real dimension,

@@ -28,8 +28,9 @@ export const xzCommutatorEntry: NumericProblem = {
     ],
   },
   hints: [
-    { text: "XZ = [[0,-1],[1,0]] and ZX = [[0,1],[-1,0]]. Compute these first." },
-    { text: "Subtract to get [X,Z], then take the magnitude of the top-right entry." },
+    { text: "X and Z anticommute, so ZX is not merely a different matrix from XZ: it is the same matrix with every sign flipped." },
+    { text: "Multiply the two Paulis in each order, then subtract the second product from the first." },
+    { text: "Because the two products are negatives of each other, the subtraction doubles rather than cancels. Then report the magnitude of the entry asked for, discarding its sign." },
   ],
   solution: {
     steps: [

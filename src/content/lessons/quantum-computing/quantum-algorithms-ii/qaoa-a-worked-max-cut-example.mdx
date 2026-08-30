@@ -13,7 +13,7 @@ export const practiceProblems = getProblemMetaForLesson(
 
 export const landscapeEdges = [[0, 1], [1, 2], [0, 2]];
 export const landscapeTrueMax = bruteForceMaxCut(3, landscapeEdges);
-export const landscapeBaseline = 1.5;
+export const landscapeBaseline = landscapeEdges.length / 2;
 export const landscapeBetas = [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9];
 export const landscapeGammas = Array.from({ length: 41 }, (_, i) => (i / 40) * Math.PI);
 export const landscapeFrames = landscapeBetas.map((beta) => ({
@@ -58,11 +58,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Checked against the true answer">
 Picture splitting a graph's vertices into two teams so that as many edges as possible cross between them: that's Max-Cut. This lesson runs the actual circuit at good parameters and checks the result against the true brute-force answer.
 </LessonHook>
 
-## Motivation
+## The mechanism, now pointed at two graphs
 
 The last lesson
 built the mechanism (cost phases, then a mixer) that biases the
@@ -73,20 +73,24 @@ single edge, and checks the result against `bruteForceMaxCut`, the true
 answer, computable directly since these graphs are small enough to check
 every one of the $2^n$ colorings.
 
+Before any of that, the target has to be pinned down, and the triangle's
+target is less obvious than it looks. Three vertices, three edges, two
+colors.
+
 <PredictBeforeReveal
-  question="For a single layer (p=1) of QAOA on the triangle graph, run at good (γ,β), how close do you expect the achieved cut to land to the true maximum of 2?"
+  question="A triangle's three vertices are each painted one of two colors. An edge counts as 'cut' when its two ends have different colors. Across every possible 2-coloring, what is the largest number of the three edges that can be cut at once?"
   options={[
-    { label: "Barely above the |E|/2 = 1.5 baseline", value: "barely" },
-    { label: "Clearly better than baseline, but well short of 2", value: "partial" },
-    { label: "Within a few percent of the true maximum", value: "close" },
-    { label: "Exactly 2, every single time", value: "exact" },
+    { label: "3: paint one vertex red and the other two blue, and all three edges cross", value: "three" },
+    { label: "1, since only one edge can ever separate the two colors", value: "one" },
+    { label: "It depends on the coloring; a triangle has no single Max-Cut value", value: "depends" },
+    { label: "2, and never all 3", value: "two" },
   ]}
-  correctValue="close"
-  explanation="Grid-searched p=1 QAOA on the triangle reaches an expected cut of about 1.999, within 0.05% of the true maximum of 2, close for the shallowest possible circuit, but not exact: QAOA is a heuristic, and 'within a few percent' is the honest shape of that heuristic's result, not the 'always exactly optimal' guarantee Grover's or Deutsch-Jozsa give."
+  correctValue="two"
+  explanation="Three vertices into two colors means two of them share a color, and the edge between that pair is never cut. So 2 is a hard ceiling, and it is reached by any 1-versus-2 split. The tempting answer is 3: paint vertex 0 red and vertices 1 and 2 blue, and edges (0,1) and (0,2) do cross, but edge (1,2) has blue at both ends. Cutting all three would require 2-coloring an odd cycle, which is impossible. Max-Cut on a triangle is 2, and that is the number every result below is measured against."
 />
 
-Is that closeness luck, or is $p=1$ just enough structure for a graph
-this small? The rest of this lesson runs the actual numbers, on two
+So $2$ is the target and $|E|/2 = 1.5$ is what an unoptimized coin flip
+gets. The rest of this lesson runs the actual numbers, on two
 graphs, and you can explore the cost landscape driving them yourself a
 bit further down.
 
@@ -99,7 +103,7 @@ bit further down.
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## One edge, one triangle, and one grid search
 
 ### Single edge (2 nodes, 1 edge)
 
@@ -120,7 +124,7 @@ $\approx1.999$, within $0.05\%$ of the true maximum $2$, again at
 $p=1$.
 
 Every optimal triangle coloring is a 1-vertex-vs-2-vertex split (the
-"pigeonhole" argument in the Worked Example below explains why 2 is the
+"pigeonhole" argument below explains why 2 is the
 ceiling); the grid-searched parameters push the circuit's measured
 distribution to land on one of these split colorings almost every time:
 
@@ -166,16 +170,20 @@ has to navigate:
   ariaLabel="Heatmap of expected triangle cut size over a 21 by 21 grid of cost angle gamma and mixer angle beta, both ranging from 0 to pi, with the grid's best cell marked and compared to the true brute-force maximum"
 />
 
-This $21\times21$ grid's own best cell sits at $\gamma\approx
-{heatmapBestCell.theta.toFixed(2)}$, $\beta\approx
-{heatmapBestCell.phi.toFixed(2)}$, giving $\langle\text{cut}\rangle\approx
-{heatmapBestCell.value.toFixed(4)}$, a *different* corner of the
-landscape from the $\gamma\approx0.6,\beta\approx0.3$ region singled out
-below, and further evidence this surface has more than one near-optimal
-spot rather than a single unique peak: {heatmapGreenCellCount} of the
-{heatmapSteps * heatmapSteps} grid cells already exceed
-$\langle\text{cut}\rangle=1.9$, spread across more than one green patch,
-not clustered around one location.
+This $21\times21$ grid's own best cell sits at $\gamma\approx$
+{heatmapBestCell.theta.toFixed(2)}, $\beta\approx$
+{heatmapBestCell.phi.toFixed(2)}, giving $\langle\text{cut}\rangle\approx$
+{heatmapBestCell.value.toFixed(4)}. That is the grid's nearest available
+point to the $\gamma\approx0.6,\beta\approx0.3$ region singled out below:
+the same region, reached by a coarse search instead of a fine one. What
+the grid adds is a warning about how alone that peak is. Three other cells
+tie with it to four decimal places, symmetry images of it under
+$\gamma\to\pi-\gamma$ paired with $\beta\to\pi/2-\beta$, and under
+$\beta\to\beta+\pi/2$; the `.reduce` above reports whichever of the four
+it happened to reach first. {heatmapGreenCellCount} of the
+{heatmapSteps * heatmapSteps} grid cells exceed
+$\langle\text{cut}\rangle=1.9$, and they sit in four separate green
+patches scattered across the landscape.
 
 <InteractiveSection title="A bumpy landscape, not a single peak" description="Slide β across the values a grid search would try. Each curve sweeps γ continuously at that fixed β for the real triangle circuit, which is a horizontal slice through the heatmap above. The curve bumps up and down rather than showing one obvious peak, and which β gives the best peak height changes as you slide. That is why a 2D grid was needed rather than a 1D formula. At β=0.30 the curve's peak sits at the grid-searched γ≈0.6, brushing the true maximum (dashed line at 2) and matching the ≈1.999 result quoted above.">
   <ParametricCurve
@@ -190,7 +198,7 @@ not clustered around one location.
   <LazyQAOAExplorer />
 </InteractiveSection>
 
-## Physical Interpretation
+## Close but not exact, the honest signature
 
 Both results land close to, but not exactly at, the true maximum: the
 honest, typical signature of a heuristic algorithm at low <Term id="circuit-depth">circuit depth</Term>
@@ -200,7 +208,7 @@ arbitrarily close to $1$ for hard instances, an open, actively studied
 question this course's two small worked examples can illustrate the
 flavor of but not settle.
 
-## Worked Example
+## Why no odd cycle can be fully cut
 
 **Confirm the triangle result is consistent with the "no odd cycle can be
 fully cut" fact used above.**
@@ -211,7 +219,7 @@ two same-colored vertices is *not* cut. So at most 2 of the 3 edges can
 ever be cut, confirming `bruteForceMaxCut`'s answer of $2$ from a
 structural argument, not just by checking all 8 colorings by computer.
 
-## Common Mistakes
+## Small and simple does not generalize
 
 <Callout type="warning">
 **Assuming QAOA's near-100% result here generalizes to larger, harder
@@ -233,16 +241,172 @@ each time.
 
 1. Using the pigeonhole argument from the worked example, explain why
    *any* odd cycle (not just a triangle) has a Max-Cut strictly less than
-   its total edge count.
+   its total edge count. Then state the exact Max-Cut of an odd cycle with
+   $2k+1$ edges, and check it against the triangle.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Cutting *every* edge of a graph means giving the two endpoints of each
+   edge different colours, which is exactly a proper 2-colouring. Walk
+   around a cycle of length $n$ and the colours must alternate, so the
+   vertices at even positions share one colour and those at odd positions
+   share the other. Returning to the start after $n$ steps demands that
+   position $n$ and position $0$ differ, and they differ only when $n$ is
+   even. For odd $n$ the walk arrives back at the starting vertex with the
+   colour it would have to differ from, a contradiction, so at least one
+   edge has matching endpoints and Max-Cut $< n$.
+
+   The pigeonhole version for the triangle is the $n=3$ case: three
+   vertices into two colours forces two to share, and the edge between
+   that pair is uncut.
+
+   The exact answer is $2k$ for a cycle with $2k+1$ edges: exactly one
+   edge must go uncut, and one is achievable, by alternating colours all
+   the way around and letting the single closing edge match.
+   `bruteForceMaxCut` confirms it at every size checked: $n=3$ gives $2$,
+   $n=5$ gives $4$, $n=7$ gives $6$. The triangle is $k=1$, so $2$, which
+   is the target the whole lesson measures against.
+
+   Worth noticing what this does to the baseline comparison. An odd cycle
+   with $2k+1$ edges has a random-guessing baseline of $(2k+1)/2$ and a
+   ceiling of $2k$, so as the cycle grows the ratio ceiling-to-baseline
+   approaches $2$ but the *absolute* headroom grows without bound. Small
+   odd cycles are the hardest case for the approximation ratio and the
+   easiest for absolute error.
+
+   The wrong turn is concluding that odd cycles are hard instances for
+   Max-Cut. They are not: the answer is $2k$, computable by inspection at
+   any size. What they are is instances where the obvious upper bound
+   $|E|$ is not achievable, which is what makes them a useful check on any
+   algorithm that would otherwise report the trivial ceiling.
+
+   </details>
+
 2. For a 4-node cycle (square: edges (0,1),(1,2),(2,3),(3,0)), is a
    perfect cut (all 4 edges) possible? Find the 2-coloring that achieves
    it if so.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes. The colouring $z=0101$ cuts all four edges, and
+   `bruteForceMaxCut(4, square)` returns $4$, the full edge count.
+
+   Check each edge against $z=0101$, reading the bits as vertices
+   $0,1,2,3$ in order. Edge $(0,1)$: bits $0$ and $1$, different, cut.
+   Edge $(1,2)$: bits $1$ and $0$, cut. Edge $(2,3)$: bits $0$ and $1$,
+   cut. Edge $(3,0)$: bits $1$ and $0$, cut. All four.
+
+   The contrast with question 1 is the point. The square is an *even*
+   cycle, so alternating colours closes up consistently when the walk
+   returns to the start, and the parity obstruction that costs an odd
+   cycle one edge simply is not there. The general statement is that a
+   graph admits a perfect cut exactly when it is bipartite, and a cycle is
+   bipartite exactly when its length is even.
+
+   Note also that the complement $z=1010$ works identically, as it must:
+   swapping the two groups leaves every edge's cut status unchanged. Every
+   Max-Cut solution comes in such a pair, which is why the QAOA
+   distribution in this lesson always shows optimal colourings in
+   symmetric pairs rather than singling one out.
+
+   The wrong turn is generalizing from the triangle that "some edge always
+   has to give". That is a fact about odd cycles, not about graphs, and
+   the square with the same baseline of $|E|/2=2$ reaches double it. A
+   quick check on whether the graph is bipartite tells you the ceiling
+   before any circuit is run.
+
+   </details>
+
 3. Why does `expectedCutSize` need to average over *all* measurement
    outcomes (weighted by probability) rather than just checking the most
    likely one?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the quantity QAOA optimizes is $\langle C\rangle$, the
+   expectation of the cost Hamiltonian, and an expectation is by
+   definition $\sum_z P(z)\,\mathrm{cut}(z)$ over every outcome. That is
+   also the physically honest number: run the circuit once and you get one
+   sampled $z$, so the average cut you achieve over many shots is exactly
+   this weighted sum, not the cut of the modal outcome.
+
+   Using only the most likely outcome would be wrong in both directions.
+   It ignores the probability mass sitting on everything else, which can
+   easily be most of it: the triangle at $\gamma=0.6,\beta=0.3$ scores
+   $1.999$, and that number comes from spreading nearly all the weight
+   across the *six* optimal $1$-versus-$2$ splits, not from one dominant
+   peak. Report only the top outcome and you would be describing a
+   distribution the circuit does not have. It can also flatter a bad
+   circuit, since a state with a slim plurality on the true optimum and
+   the rest on terrible colourings would look perfect while performing
+   near the baseline.
+
+   The expectation is also what makes the classical optimizer's job
+   well-posed. $\langle C\rangle$ is a smooth function of $\gamma$ and
+   $\beta$, so a grid search or gradient method has a continuous landscape
+   to move on. "Cut size of the most likely outcome" is a step function
+   that jumps whenever the argmax changes and is flat in between, which
+   gives an optimizer nothing to follow.
+
+   The wrong turn is thinking that because you only get one sample per
+   run, only the best outcome matters. In practice you take many samples
+   and can keep the best cut you ever saw, which is a legitimate and
+   different figure of merit. But that is a statement about
+   post-processing, and the quantity the circuit's parameters are tuned
+   against is still the expectation.
+
+   </details>
+
 4. What would need to change about this lesson's approach, not
    necessarily in detail, just in kind, to handle a graph with, say, 20
    nodes, where brute-force checking is no longer practical?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Three things, in increasing order of difficulty.
+
+   First, **the ground truth goes away**. `bruteForceMaxCut` checks all
+   $2^n$ colourings, which is a million at $n=20$ and still fine, but
+   hopeless by $n=50$. Without it there is no "true maximum" to divide by,
+   so the approximation ratio becomes unmeasurable and the honest report
+   changes to a comparison against a classical heuristic, typically the
+   Goemans-Williamson semidefinite relaxation with its $0.878$ guarantee,
+   rather than against the optimum.
+
+   Second, **the grid search goes away**. This lesson found
+   $\gamma\approx0.6,\beta\approx0.3$ by sweeping a two-dimensional grid,
+   which works because $p=1$ has two parameters. At $p$ layers there are
+   $2p$ of them, and a grid over $2p$ dimensions is exponential in $p$. A
+   real implementation runs an actual classical optimizer on the
+   parameters, which is the outer loop the capstone's accounting table
+   lists as scoped out here.
+
+   Third, **the state vector goes away**. This lesson computes
+   $\langle C\rangle$ exactly from all $2^n$ amplitudes. On hardware you
+   cannot see amplitudes at all: you sample measurement outcomes and
+   estimate the expectation from a finite number of shots, which
+   introduces statistical error of order $1/\sqrt{\text{shots}}$ into the
+   very quantity the optimizer is descending. Optimizing a noisy objective
+   is a different problem from optimizing an exact one, and it is where
+   much of the practical difficulty in NISQ-era variational algorithms
+   actually lives.
+
+   What does *not* change is the circuit. $U_C$ is still one two-qubit
+   rotation per edge and $U_B$ is still one single-qubit rotation per
+   vertex, both of depth independent of $n$. The quantum part scales
+   gracefully; the scaffolding around it is what has to be rebuilt.
+
+   The wrong turn is answering "use more qubits and more layers". More
+   layers without re-optimized parameters demonstrably makes things worse,
+   as the capstone's depth sweep shows, and more qubits without a
+   replacement for brute force means you can no longer tell whether the
+   answer is any good.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -257,7 +421,7 @@ each time.
   doesn't affect QAOA's own circuit, only this course's ability to verify
   it by brute force.
 
-## Further Exploration
+## Two bets on different hardware
 
 <NextDiscovery>
 Next, the capstone: [Hybrid Algorithms, NISQ, and Honest Scope](/lessons/quantum-computing/quantum-algorithms-ii/capstone-hybrid-algorithms-nisq-and-honest-scope), which

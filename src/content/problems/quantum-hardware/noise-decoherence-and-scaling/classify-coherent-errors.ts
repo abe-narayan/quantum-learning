@@ -16,10 +16,10 @@ export const classifyCoherentErrors: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "A device's gate fidelity degrades slowly over several hours, then returns to its original value immediately after recalibration, with no hardware changes. Is this a coherent or incoherent error?",
     options: [
-      { id: "a", text: "Coherent: recalibration alone restoring fidelity is the signature of a systematic parameter drift" },
+      { id: "a", text: "Coherent: recalibration alone restoring fidelity is the signature of a systematic drift in a control parameter" },
       { id: "b", text: "Incoherent: fidelity falling off over hours is the hallmark of energy and phase leaking to the environment" },
-      { id: "c", text: "Incoherent, because the drift was slow; a coherent error would show up as a fixed offset from the first shot onward" },
-      { id: "d", text: "Coherent, but only because no hardware was swapped; a recalibration that also retuned the readout would make it incoherent" },
+      { id: "c", text: "Incoherent, because the drift was slow; a coherent error shows up as a fixed offset from the first shot onward" },
+      { id: "d", text: "Coherent, but only because no hardware was swapped; retuning the readout too would make it incoherent" },
     ],
   },
   answer: {

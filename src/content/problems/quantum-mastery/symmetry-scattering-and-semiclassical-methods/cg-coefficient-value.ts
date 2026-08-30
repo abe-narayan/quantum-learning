@@ -20,7 +20,7 @@ export const cgCoefficientValue: NumericProblem = {
     type: "numeric",
     prompt:
       "From the lesson's l=1⊗s=1/2 table, |3/2,−1/2⟩ = √(2/3)|1,0⟩|1/2,−1/2⟩ + √(1/3)|1,−1⟩|1/2,1/2⟩. What is the numeric value of the Clebsch-Gordan coefficient ⟨1,0;1/2,−1/2|3/2,−1/2⟩?",
-    inputHint: "as a decimal",
+    inputHint: "as a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -33,8 +33,9 @@ export const cgCoefficientValue: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The coefficient is stated directly in the table: it's the coefficient multiplying |1,0⟩|1/2,−1/2⟩ in the |3/2,−1/2⟩ expansion." },
-    { text: "Evaluate √(2/3) as a decimal. It should come out larger than the other term's coefficient, since 2/3 outweighs 1/3." },
+    { text: "A Clebsch-Gordan coefficient is, by definition, the number multiplying one uncoupled product state inside the expansion of a coupled state. Match the labels in the bra-ket against the two terms written out." },
+    { text: "Only one of the two terms carries the labels the question asks for. Identify which, and read off the surd sitting in front of it." },
+    { text: "Convert that surd to a decimal. As a check, the squares of the two coefficients in the expansion have to add to one, since the coupled state is normalised." },
   ],
   solution: {
     steps: [{ description: "⟨1,0;1/2,−1/2|3/2,−1/2⟩ = √(2/3) ≈ 0.8165, read directly from the lesson's derived and verified coupled-state expansion." }],

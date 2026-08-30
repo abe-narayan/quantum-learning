@@ -16,19 +16,19 @@ export const oneQueryInformationLimit: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "You apply U_f once to a uniform superposition over all x, then immediately measure both registers. What do you learn?",
     options: [
-      { id: "a", text: "One (x, f(x)) pair, chosen randomly — no more than one classical query would give" },
+      { id: "a", text: "One (x, f(x)) pair, chosen at random, which is what one classical query gives" },
       { id: "b", text: "The complete truth table of f" },
       { id: "c", text: "Whether f is constant or balanced" },
-      { id: "d", text: "Nothing at all — the state carries no information about f" },
+      { id: "d", text: "A value $f(x)$, but with no way to tell which $x$ produced it" },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Measurement collapses the superposition to one branch — the other values of f are lost, not read out.",
+      b: "Measurement collapses the superposition to one branch. The other values of f are lost, not read out.",
       c: "That requires the specific interference circuit built in later lessons (Deutsch-Jozsa), not a single immediate measurement.",
-      d: "The measured (x, f(x)) pair genuinely is information about f — just not more than one classical query's worth.",
+      d: "Both registers are measured, and they collapse together: the two outcomes come from the same surviving branch, so the x you read is the x that produced the f(x) you read. The pair arrives matched.",
     },
     defaultIncorrectFeedback: "Think about what measurement does to a superposition, and compare to what one classical query gives.",
   },
@@ -38,16 +38,16 @@ export const oneQueryInformationLimit: MultipleChoiceProblem = {
     { text: "Compare this to a single classical query at a chosen x." },
   ],
   solution: {
-    steps: [{ description: "Immediate measurement collapses the state to one random (x, f(x)) pair — exactly the information one classical query gives, no more." }],
+    steps: [{ description: "Immediate measurement collapses the state to one random (x, f(x)) pair: the information one classical query gives, and no more." }],
     finalAnswer: "One (x, f(x)) pair, no more than a single classical query.",
   },
   explanation: {
     correctIdea: "Superposition alone, without a deliberate interference step before measuring, gives no advantage over classical querying.",
-    whyCorrect: "This is precisely the point the lesson makes: parallelism requires interference to become useful.",
+    whyCorrect: "The $2^n$ branches are all there before you measure, but measurement is a projection onto one of them, and its probability is uniform: every $x$ is equally likely and none is yours to choose. Parallelism only pays once amplitudes from many branches are made to meet and cancel, which is what an interference step does and what a bare measurement never does.",
     whyWrong: [
       { optionId: "b", text: "Reading off the whole truth table would need the superposition to survive measurement. It doesn't: collapse keeps one branch and discards the rest." },
       { optionId: "c", text: "Deciding constant versus balanced needs the interference circuit built in later lessons, not a query followed immediately by measurement." },
-      { optionId: "d", text: "The measured (x, f(x)) pair is information about f, just not more than one classical query's worth." },
+      { optionId: "d", text: "Treats the two registers as collapsing independently. They collapse to the same branch, so the input and output you read off belong to each other." },
     ],
   },
 };

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProblem } from "@/lib/problems/registry";
 // Meta-only source for generateStaticParams: enumerating slugs must not be
-// the thing that pulls the full 547-problem graph in — though this page's
+// the thing that pulls the full 547-problem graph in, though this page's
 // render genuinely needs it via `getProblem` above.
 import { getAllProblemMeta } from "@/lib/problems/metaRegistry";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
@@ -15,6 +15,7 @@ import {
   buildProblemSchema,
   pillarUrl,
 } from "@/lib/structuredData";
+import { pageOpenGraph } from "@/lib/pageMetadata";
 
 export function generateStaticParams() {
   return getAllProblemMeta().map((meta) => ({ slug: meta.slug }));
@@ -33,13 +34,17 @@ export async function generateMetadata({ params }: ProblemPageProps): Promise<Me
 
   const description = `Practice problem: ${problem.meta.title}.`;
   const url = `${BASE_URL}/problems/${slug}`;
-  const fullTitle = `${problem.meta.title} · QuantumLearn`;
+  const fullTitle = `${problem.meta.title} · StudyQuantum`;
 
   return {
     title: problem.meta.title,
     description,
     alternates: { canonical: url },
-    openGraph: { title: fullTitle, description, url, type: "article" },
+    // See the note on the lesson route's `generateMetadata`: declaring
+    // `openGraph` here replaces the root layout's object, taking the
+    // file-convention social card with it, so all 556 problem pages had no
+    // `og:image`. `pageOpenGraph` re-declares the card and `og:site_name`.
+    openGraph: pageOpenGraph({ title: fullTitle, description, url, type: "article" }),
     twitter: { card: "summary_large_image", title: fullTitle, description },
   };
 }
@@ -83,7 +88,7 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify([problemSchema, breadcrumbSchema]) }}
       />
       {/* Resolved here, server-side, from the lesson corpus `ProblemLayout`
-          already needs — so a wrong answer can offer "re-read the lesson this
+          already needs, so a wrong answer can offer "re-read the lesson this
           came from" next to the feedback itself, without `ProblemView` (a
           client component) importing anything that reaches the content
           registry. See docs/DESIGN_SYSTEM.md §10. */}
@@ -93,7 +98,7 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
         lessonTitle={homeLesson?.title}
         /* Only offered when there is something for the anchor to show: a
            problem with no declared prerequisites renders the readout's "No
-           prerequisites — this is a starting point" line, which is not a
+           prerequisites, this is a starting point" line, which is not a
            useful destination for a reader who just got the answer wrong. */
         prerequisiteAnchorId={
           (problem.meta.prerequisites?.length ?? 0) > 0 ? PREREQUISITE_ANCHOR_ID : undefined

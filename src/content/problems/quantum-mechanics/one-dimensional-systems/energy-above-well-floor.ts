@@ -15,7 +15,7 @@ export const energyAboveWellFloor: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "For the lesson's worked well (half-width a = 1, depth V0 = 5, ground state E ≈ -4.2964), find the energy above the well's floor, E + V0.",
-    inputHint: "a decimal",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -27,7 +27,11 @@ export const energyAboveWellFloor: NumericProblem = {
       { value: 9.2964, tolerance: 0.001, feedback: "The sign slipped: E is negative, so E + V₀ is smaller than V₀, not larger." },
     ],
   },
-  hints: [{ text: "E + V0 directly, using the lesson's own numbers." }],
+  hints: [
+    { text: "Two different zero-points are in play: the quoted $E$ is measured against the potential outside the well, while the well's floor sits a depth $V_0$ lower." },
+    { text: "To express the energy above the floor, take the state's energy relative to the floor's potential value rather than relative to the outside." },
+    { text: "$E$ is negative and $V_0$ is positive, so keep the sign of $E$ when you combine them. The result must be a positive number smaller than $V_0$." },
+  ],
   solution: {
     steps: [{ description: "$E+V_0 \\approx -4.2964+5 = 0.7036$." }],
     finalAnswer: "$\\approx 0.7036$",

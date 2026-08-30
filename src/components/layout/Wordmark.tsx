@@ -31,7 +31,7 @@ export function LogoMark({ className }: { className?: string }) {
  *  `labelClassName` exists so the navbar can drop the word on the narrowest
  *  phones while the footer — which has a whole column to itself and no
  *  competing controls — always keeps it. The name is never *truncated*: a
- *  half-rendered "Quantu…" beside the mark reads as a rendering fault, so the
+ *  half-rendered "StudyQu…" beside the mark reads as a rendering fault, so the
  *  only two states are the full word and the mark alone. See the call site in
  *  Navbar.tsx for the width arithmetic that forces the choice. */
 export function Wordmark({
@@ -47,7 +47,7 @@ export function Wordmark({
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <LogoMark className={markClassName} />
       <span className={cn("text-base font-semibold tracking-tight text-foreground", labelClassName)}>
-        QuantumLearn
+        StudyQuantum
       </span>
     </span>
   );

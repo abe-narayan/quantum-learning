@@ -31,8 +31,8 @@ export type Transform = { x: number; y: number; scale: number };
 export type Rect = { left: number; top: number };
 
 /**
- * The single clamp used by *every* zoom path — pinch, the +/- buttons and the
- * wheel — so the three can never disagree about how far in or out the map goes.
+ * The single clamp used by *every* zoom path, pinch, the +/- buttons and the
+ * wheel, so the three can never disagree about how far in or out the map goes.
  */
 export function clampScale(scale: number): number {
   // NaN would survive both Math.min and Math.max and poison the transform;
@@ -62,7 +62,7 @@ export function toWorld(local: Point, transform: Transform): Point {
  * a gesture is only valid for the exact pair of pointers it was seeded from,
  * so a third finger landing (or one of the original two lifting while a
  * different one stays down) forces a re-seed instead of silently re-reading
- * `startDist` against a different pair — which is what makes the map jump.
+ * `startDist` against a different pair, which is what makes the map jump.
  */
 export type PinchState = {
   pointerIds: readonly [number, number];
@@ -72,7 +72,7 @@ export type PinchState = {
   /** The world point under the pinch's midpoint, held fixed for the gesture. */
   worldX: number;
   worldY: number;
-  /** Cached at gesture start — the viewport's screen position cannot change
+  /** Cached at gesture start, the viewport's screen position cannot change
    *  mid-gesture (the element is `touch-none`, so the page cannot scroll
    *  under the fingers), and re-reading it per pointermove would force a
    *  layout on every frame. */
@@ -123,7 +123,7 @@ export function applyPinch(pinch: PinchState, a: Point, b: Point): Transform {
 
 /**
  * Zoom to `nextScale` while holding the local point (`anchorX`, `anchorY`)
- * still — used by the +/- buttons (anchored on the viewport's centre, so the
+ * still, used by the +/- buttons (anchored on the viewport's centre, so the
  * thing you were looking at stays put) and by the wheel (anchored under the
  * cursor). Same clamp as `applyPinch`.
  */

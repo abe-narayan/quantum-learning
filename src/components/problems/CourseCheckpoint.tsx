@@ -57,7 +57,7 @@ export function CourseCheckpoint({ courseTitle, problems }: { courseTitle: strin
       }
     >
       <p className="text-sm text-muted-foreground">
-        {problems.length} problems pulled from across {courseTitle} — a quick self-check, not new material.
+        {problems.length} problems pulled from across {courseTitle}. A quick self-check, not new material.
       </p>
 
       <div className="mt-5 space-y-3">
@@ -77,12 +77,20 @@ export function CourseCheckpoint({ courseTitle, problems }: { courseTitle: strin
                 // resolves to nothing is invalid.
                 aria-controls={isOpen ? panelId : undefined}
               >
-                <span className="flex items-center gap-3">
+                {/* `min-w-0` on both this group and the title inside it: a
+                    flex item's `min-width` is `auto`, so at 320px the button's
+                    ~222px of content could not shrink below the title's widest
+                    token (the corpus's longest is 22 characters, ~154px at
+                    text-sm) and the row overflowed into `.instrument`'s
+                    `overflow: hidden`, where it was clipped rather than
+                    scrollable. `break-words` finishes the case wrapping alone
+                    cannot. */}
+                <span className="flex min-w-0 items-center gap-3">
                   <span
                     className={
                       solved
                         ? "flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-pillar-wash text-pillar-text"
-                        : "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border-strong text-[0.65rem] text-muted-foreground"
+                        : "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border-strong text-micro text-muted-foreground"
                     }
                   >
                     {solved ? (
@@ -93,9 +101,12 @@ export function CourseCheckpoint({ courseTitle, problems }: { courseTitle: strin
                       index + 1
                     )}
                   </span>
-                  <span className="text-sm font-medium text-foreground">{problem.meta.title}</span>
+                  <span className="min-w-0 break-words text-sm font-medium text-foreground">{problem.meta.title}</span>
                 </span>
-                <span className="tech-label !text-[0.6875rem]">{isOpen ? "Hide" : "Open"}</span>
+                {/* "Solve", not "Open": the row already reads as a disclosure
+                    (`aria-expanded` carries that to assistive tech), so the
+                    word's only job is to say what is behind it. */}
+                <span className="tech-label shrink-0">{isOpen ? "Hide" : "Solve"}</span>
               </button>
 
               {isOpen ? (

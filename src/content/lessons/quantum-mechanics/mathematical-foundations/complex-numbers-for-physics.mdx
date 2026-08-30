@@ -41,13 +41,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Real numbers predict the wrong physics">
   Quantum mechanics is not merely easier with complex numbers. Build the
   theory with real numbers only and it predicts different, wrong physics.
   Experiments have been done to check.
 </LessonHook>
 
-## Motivation
+## The equation real numbers cannot solve
 
 Real numbers can't solve $x^2 = -1$. For most of the history of mathematics
 that was fine: nothing in ordinary experience needed such a solution. Then
@@ -81,26 +81,26 @@ it's used rather than slipped past.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Leonhard_Euler.jpg"
   alt="1753 pastel portrait of Leonhard Euler by Jakob Emanuel Handmann"
-  caption="Leonhard Euler, whose formula e^{iθ} = cos θ + i sin θ, derived later in this lesson, ties complex exponentials directly to rotation. Portrait by Jakob Emanuel Handmann, 1753."
+  caption="Leonhard Euler. His formula, derived later in this lesson, rewrites cos θ + i sin θ as a single complex exponential and ties that exponential directly to rotation. Portrait by Jakob Emanuel Handmann, 1753."
   credit="Jakob Emanuel Handmann / Kunstmuseum Basel / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Leonhard_Euler.jpg"
   license="Public domain"
 />
 
-## Intuition
+## Multiplying by i is a quarter turn
 
 A complex number $z = a + bi$ can be pictured as a point $(a, b)$ in the
 **complex plane**, rather than a point on a line. Addition
 works just like vector addition. Multiplication is where something new
-happens: multiplying by $i$ doesn't move you along either axis, it **rotates**
-you $90°$ counterclockwise. Check it directly: $i \cdot (a + bi) = ai +
+happens: multiplying by $i$ doesn't move you along either axis. It
+**rotates** you $90°$ counterclockwise. Check it directly: $i \cdot (a + bi) = ai +
 bi^2 = -b + ai$, which is the point $(a,b)$ rotated a quarter turn. Once
 you see multiplication as a geometric operation (rotate and rescale) rather
 than an algebra rule, polar form and Euler's formula stop looking
 mysterious. They are the natural language for describing rotation and
 scaling, and nothing more than that.
 
-## Mathematical Development
+## From power series to Euler's formula
 
 ### Rectangular form and arithmetic
 
@@ -214,7 +214,7 @@ Before reading the derivation, predict what kind of relationship it
 establishes.
 
 <PredictBeforeReveal
-  question="Is e^{iθ} = cos θ + i sin θ an exact identity for every real θ, or just a convenient approximation?"
+  question="Is the identity e^iθ = cos θ + i sin θ exact for every real θ, or just a convenient approximation?"
   options={[
     { label: "Exact for every real θ", value: "exact" },
     { label: "An approximation, good for small θ", value: "approx" },
@@ -222,7 +222,7 @@ establishes.
     { label: "It depends on whether the series converges", value: "conditional" },
   ]}
   correctValue="exact"
-  explanation="It's exact, for every real θ, with no approximation anywhere. Substituting x=iθ into the Taylor series for e^x and separating real from imaginary terms reproduces the Maclaurin series for cos θ and sin θ term by term, not approximately. A direct consequence: |e^{iθ}|=1 for every θ, exactly, no matter how large θ gets. Multiplying by e^{iθ} only ever rotates a number, never stretches it."
+  explanation="It's exact, for every real θ, with no approximation anywhere. Substituting x = iθ into the Taylor series for e^x and separating real from imaginary terms reproduces the Maclaurin series for cos θ and sin θ term by term, not approximately. A direct consequence: e^iθ has modulus exactly 1 for every θ, no matter how large θ gets, so multiplying by it only ever rotates a number and never stretches it."
 />
 
 ### Deriving Euler's formula
@@ -260,8 +260,9 @@ circle makes the identity register as geometry instead of symbols on a
 page:
 
 <InteractiveSection
-  title="Sweep θ, trace e^{iθ}'s unit circle"
-  description="Set the phase slider to sweep from 0 to 2π. Watch the point trace the unit circle while the modulus stays fixed at 1. This is e^{iθ}. Now change the magnitude away from 1: does the point still trace a circle, and if so, what changes about it?">
+  title="Sweep θ, trace the unit circle"
+  description="Set the phase slider to sweep from 0 to 2π, keeping one eye on the point's path and the other on the modulus readout, and settle which of the two the sweep is actually changing. The point you are watching is e^iθ. Now change the magnitude away from 1: does the point still trace a circle, and if so, what changes about it?"
+  mode="observe">
   <LazyComplexAmplitudeExplorer />
 </InteractiveSection>
 
@@ -290,9 +291,16 @@ $$
 
 This is **De Moivre's theorem**, a one-line consequence of Euler's formula
 rather than a separate fact to memorize. It answers a question that looks
-hard in rectangular form: solve $z^n = 1$. Writing $z = e^{i\theta}$,
-the equation becomes $e^{in\theta}=1=e^{i\cdot 0}$, so $n\theta$ must be an
-integer multiple of $2\pi$:
+hard in rectangular form: solve $z^n = 1$.
+
+Start in polar form, $z = re^{i\theta}$. Taking the modulus of both sides
+of $z^n=1$ gives $r^n = 1$, and since $r=|z|$ is a non-negative real
+number, the only solution is $r=1$: every root of unity sits on the unit
+circle before any angle has been chosen. That leaves $z = e^{i\theta}$,
+and the equation becomes $e^{in\theta}=1$. Now $e^{i\varphi}=\cos\varphi +
+i\sin\varphi$ equals $1$ only when $\cos\varphi=1$ and $\sin\varphi=0$,
+which happens at $\varphi = 0, \pm2\pi, \pm4\pi,\ldots$ and nowhere else.
+So $n\theta$ must be an integer multiple of $2\pi$:
 
 $$
 z_k = e^{2\pi i k/n}, \qquad k = 0, 1, \ldots, n-1
@@ -304,7 +312,8 @@ where this exact spacing is the whole mechanism.
 
 <InteractiveSection
   title="Scrub n, watch the roots of unity space themselves out"
-  description="Drag the slider to change n. Each frame plots all n roots z_k = e^{2πik/n}, k = 0, …, n−1, as unit vectors. z_0 = 1 is highlighted; watch the other n−1 roots stay evenly spaced around the circle, 2π/n apart, no matter what n is.">
+  description="Drag the slider to change n. Each frame plots all n roots of unity, one for each k from 0 to n−1, as unit vectors, with the root at 1 highlighted. Measure the angular gap between two neighbouring roots at n = 3, then at n = 8, and decide whether that gap depends on which neighbouring pair you picked."
+  mode="observe">
   <VectorDiagramExplorer
     frames={Array.from({ length: 7 }, (_, i) => rootsOfUnityFrame(i + 2))}
     sliderLabel="Number of roots n"
@@ -316,7 +325,7 @@ where this exact spacing is the whole mechanism.
 
 Here is a fact that previews the rest of this course: the number $i$ can be
 represented by the real matrix $\begin{pmatrix}0&-1\\1&0\end{pmatrix}$, a
-$90°$ rotation matching the geometric picture from the Intuition section,
+$90°$ rotation matching the quarter-turn picture this lesson opened with,
 and a general complex number $a+bi$ by
 $\begin{pmatrix}a&-b\\b&a\end{pmatrix}$. Multiply two such matrices and
 check that the result matches complex multiplication:
@@ -332,7 +341,7 @@ dramatically more convenient. Once this course reaches Linear Operators,
 you'll have the language to see this as: complex numbers are one
 particular, especially simple, family of linear operators.
 
-## Physical Interpretation
+## Amplitudes carry a phase as well as a size
 
 In quantum mechanics, a state is described by complex numbers called
 **probability amplitudes**. An amplitude's modulus-squared will turn out to
@@ -347,7 +356,7 @@ give you only two "directions" (positive and negative) to interfere with,
 while a complex phase gives you a full continuous circle of them. That
 richer structure is what the rest of quantum mechanics needs.
 
-## Worked Example
+## Euler's identity, and the cube roots of unity
 
 **Compute $e^{i\pi}$, and find the three cube roots of unity.**
 
@@ -365,7 +374,7 @@ $$
 
 You can verify $z_1^3=1$ directly: $z_1^3 = e^{2\pi i} = \cos(2\pi)+i\sin(2\pi)=1$. ✓
 
-## Common Mistakes
+## i is a fixed object, not an unknown
 
 <Callout type="note">
 **Treating $i$ as an unknown to "solve for" instead of a fixed object with
@@ -390,13 +399,158 @@ phase can sum to a modulus of zero.
 ## Practice Questions
 
 1. Compute $(2+3i)(1-i)$ in rectangular form.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   (2+3i)(1-i) = 2 - 2i + 3i - 3i^2 = 2 + i + 3 = 5 + i.
+   $$
+
+   Expand as with any two binomials, then apply $i^2 = -1$ exactly once, at the
+   end. The term that decides the answer is $-3i^2$, which becomes $+3$: the
+   explicit minus and the minus hidden inside $i^2$ cancel.
+
+   Two ways to check without redoing the multiplication. Moduli multiply, so
+   $|5+i| = \sqrt{26}$ should equal $|2+3i|\,|1-i| = \sqrt{13}\cdot\sqrt2 = \sqrt{26} \checkmark$.
+   And phases add: $\arctan(3/2) \approx 0.983$ plus $\arctan(-1) = -0.785$ gives
+   $\approx 0.197$, which is $\arctan(1/5) \approx 0.197 \checkmark$.
+
+   Reading $-3i^2$ as $-3$ gives $-1+i$, and it is the single most common
+   arithmetic error in complex multiplication.
+
+   </details>
+
 2. Write $z = -1+i$ in polar form ($r$ and $\theta$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   r = \sqrt{(-1)^2 + 1^2} = \sqrt2, \qquad \theta = \frac{3\pi}{4}, \qquad z = \sqrt2\,e^{i3\pi/4}.
+   $$
+
+   The modulus is Pythagoras on the components. The argument requires attention
+   to quadrant: $z$ has negative real part and positive imaginary part, so it
+   lies in the second quadrant and $\theta$ must fall between $\pi/2$ and
+   $\pi$.
+
+   The naive computation $\theta = \arctan(b/a) = \arctan(1/{-1}) = \arctan(-1) = -\pi/4$
+   returns a fourth-quadrant angle, which points at $1-i$, the reflection of
+   the number actually asked about. The cause is structural rather than
+   careless: $\arctan$ has range $(-\pi/2,\pi/2)$, a half turn, so it cannot
+   distinguish $z$ from $-z$, and the division $b/a$ has already destroyed the
+   information needed to tell them apart. The repair is to add $\pi$ whenever
+   the real part is negative: $-\pi/4 + \pi = 3\pi/4 \checkmark$. This is
+   precisely why numerical libraries provide a two-argument `atan2(b, a)`,
+   which sees both signs.
+
+   Verify by going back: $\sqrt2\left(\cos\frac{3\pi}{4} + i\sin\frac{3\pi}{4}\right) = \sqrt2\left(-\tfrac{1}{\sqrt2} + i\tfrac{1}{\sqrt2}\right) = -1+i \checkmark$.
+
+   </details>
+
 3. Use De Moivre's theorem to compute $(1+i)^4$. (Hint: convert to polar
    form first.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   (1+i)^4 = -4.
+   $$
+
+   In polar form $1+i = \sqrt2\,e^{i\pi/4}$: modulus $\sqrt{1+1} = \sqrt2$,
+   argument $\arctan(1/1) = \pi/4$ (first quadrant, so $\arctan$ is safe here).
+   De Moivre raises modulus and argument separately:
+
+   $$
+   (1+i)^4 = \left(\sqrt2\right)^4 e^{i\cdot4\cdot\pi/4} = 4\,e^{i\pi} = 4(-1) = -4.
+   $$
+
+   The point of the hint is that the polar route is not merely a shortcut here,
+   it is the difference between one line and three rounds of binomial
+   expansion. That gap widens fast: $(1+i)^{20}$ is a moment's work in polar
+   form and unpleasant in rectangular form.
+
+   A useful cross-check is the halfway result. $(1+i)^2 = 1 + 2i + i^2 = 2i$,
+   and squaring again gives $(2i)^2 = 4i^2 = -4 \checkmark$.
+
+   The error to avoid is raising the modulus while forgetting to multiply the
+   argument, giving $4e^{i\pi/4} = 2\sqrt2(1+i)$. De Moivre does two things at
+   once, and only one of them is exponentiation.
+
+   </details>
+
 4. Find all four fourth roots of unity, and plot them mentally on the unit
    circle. What shape do they form?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   1,\quad i,\quad -1,\quad -i,
+   $$
+
+   which are the four corners of a square inscribed in the unit circle, one on
+   each axis.
+
+   Solve $z^4 = 1$ in polar form. Writing $z = re^{i\theta}$ gives
+   $r^4e^{4i\theta} = 1$, so $r = 1$ (all roots sit on the unit circle) and
+   $4\theta$ must be a whole number of turns: $\theta = 0, \tfrac{\pi}{2}, \pi, \tfrac{3\pi}{2}$.
+   Those four angles give $e^{0}=1$, $e^{i\pi/2}=i$, $e^{i\pi}=-1$,
+   $e^{i3\pi/2}=-i$. Taking $k=4$ returns $\theta = 2\pi$, the same point as
+   $k=0$, which is why there are exactly four and not more.
+
+   The evenly spaced arrangement is general: the $n$th roots of unity always
+   form a regular $n$-gon on the unit circle starting at 1, because the
+   equation only ever asks for $n$ equal shares of a full turn. This is the
+   structure the discrete Fourier transform is built on, and the reason a
+   quantum Fourier transform's phases are powers of $e^{2\pi i/N}$.
+
+   Two consequences worth noticing. Their sum is zero, $1+i-1-i = 0$, as the
+   symmetry of the square requires and as every complete set of $n$th roots of
+   unity for $n>1$ satisfies. And only two of them are real, which is the
+   concrete sense in which working over $\mathbb{C}$ rather than $\mathbb{R}$
+   is what makes the count come out to exactly the degree of the polynomial.
+
+   The common wrong answer is $\{1,-1\}$: those solve $z^2=1$, and it is easy
+   to stop once the real solutions run out. Over $\mathbb{C}$ a degree-4
+   equation has four roots.
+
+   </details>
+
 5. If $z=re^{i\theta}$, explain in one sentence why $zz^*=r^2$ regardless of
    $\theta$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Conjugation flips the sign of the phase, so the two phases cancel in the
+   product and only the moduli survive:
+
+   $$
+   zz^* = \left(re^{i\theta}\right)\left(re^{-i\theta}\right) = r^2e^{i(\theta-\theta)} = r^2e^0 = r^2.
+   $$
+
+   The $\theta$ never had a chance to appear in the answer, which is the whole
+   content of "regardless of $\theta$".
+
+   The rectangular route gives the same result and shows why it is not an
+   accident of notation: with $z = a+bi$,
+   $zz^* = (a+bi)(a-bi) = a^2 - (bi)^2 = a^2+b^2 = |z|^2$, a difference of
+   squares in which the cross terms $-abi$ and $+abi$ cancel.
+
+   This one identity is why quantum mechanics can extract real, non-negative
+   probabilities from complex amplitudes. $|\psi|^2 = \psi\psi^*$ is guaranteed
+   real and $\ge 0$ no matter what phase $\psi$ carries, and it is also why a
+   global phase is invisible: multiplying $\psi$ by $e^{i\gamma}$ multiplies
+   $\psi\psi^*$ by $e^{i\gamma}e^{-i\gamma} = 1$.
+
+   The thing to keep distinct is $z^2$ from $zz^*$. Squaring gives
+   $r^2e^{2i\theta}$, which very much does depend on $\theta$; it is only the
+   conjugate product that is phase-blind.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -416,7 +570,7 @@ phase can sum to a modulus of zero.
 - A complex number can be represented as a real $2\times2$ matrix, a
   preview of Linear Operators.
 
-## Further Exploration
+## The same number, written as a 2x2 matrix
 
 <ChallengePrompt prompt="Using the 2×2 real-matrix representation from this lesson (a+bi ↔ [[a,−b],[b,a]]), represent z=2+3i as a matrix, then compute z² two ways: directly via complex multiplication, and via matrix multiplication. Do the two results match?">
   Square the complex number the ordinary way first, then square the

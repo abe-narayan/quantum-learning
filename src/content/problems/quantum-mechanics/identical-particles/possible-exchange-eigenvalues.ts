@@ -19,16 +19,16 @@ export const possibleExchangeEigenvalues: MultipleChoiceProblem = {
       { id: "a", text: "+1 and −1" },
       { id: "b", text: "Any complex number with magnitude 1" },
       { id: "c", text: "0 and 1" },
-      { id: "d", text: "Any real number" },
+      { id: "d", text: "+1 only" },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "This would be the answer for a general unitary operator, but P₁₂²=I is a stronger constraint than unitarity alone — it pins λ² to exactly 1, not just |λ|=1.",
+      b: "This would be the answer for a general unitary operator, but P₁₂²=I is a stronger constraint than unitarity alone: it pins λ² to exactly 1, not just |λ| to 1.",
       c: "0 is not possible: P₁₂ is invertible (it's its own inverse), so it cannot have a zero eigenvalue.",
-      d: "λ²=1 restricts real λ to exactly ±1, not any real number.",
+      d: "That would follow if P₁₂²=I forced P₁₂=I, but squaring to the identity does not make an operator the identity: λ²=1 has a second root, λ=−1, and a state can perfectly well pick up that sign. Discarding it would leave no fermions.",
     },
     defaultIncorrectFeedback: "Use λ²=1 (from P₁₂²=I applied to an eigenstate) to narrow down the possible eigenvalues.",
   },
@@ -47,7 +47,7 @@ export const possibleExchangeEigenvalues: MultipleChoiceProblem = {
     whyWrong: [
       { optionId: "b", text: "Applies the weaker constraint. Unitarity gives |λ| = 1; squaring to the identity gives λ² = 1, which is stronger." },
       { optionId: "c", text: "Allows a zero eigenvalue on an operator that is its own inverse, and an invertible operator has none." },
-      { optionId: "d", text: "Drops the constraint entirely. Among the reals, λ² = 1 admits only ±1." },
+      { optionId: "d", text: "Solves λ² = 1 halfway. Keeping only the positive root reads P₁₂² = I as P₁₂ = I and erases fermions from the theory." },
     ],
   },
 };

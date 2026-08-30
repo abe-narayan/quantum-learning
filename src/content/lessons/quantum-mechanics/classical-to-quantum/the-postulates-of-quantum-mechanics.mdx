@@ -62,13 +62,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Four statements, and the rest is application">
   Four short statements. Every calculation in the rest of this course,
-  and in the whole Quantum Computing pillar, is one of them applied to
+  and in the whole Quantum Computing track, is one of them applied to
   one more specific system.
 </LessonHook>
 
-## Motivation
+## Two halves that have not met yet
 
 Everything up to this point has been in two separate pieces. The
 Mathematical Foundations course built the linear-algebra toolkit,
@@ -84,7 +84,7 @@ physics, and the fourth says how the mathematics moves in time. Nothing
 else gets added later. What changes from system to system is only which
 Hilbert space and which operators you plug in.
 
-## Intuition
+## What a postulate has to earn
 
 A postulate is the starting assumption a theory is built from, not
 something proven the way a theorem is: it earns its place by how well
@@ -95,10 +95,10 @@ course you already have all the mathematical machinery each one needs.
 One more thing is worth saying before the list. These four have been
 stable since the late 1920s, and every experiment aimed at them since has
 agreed with them. What has *not* stabilized is what they mean, which is a
-separate question this pillar returns to at the very end, in Advanced
+separate question this track returns to at the very end, in Advanced
 Topics' capstone. The formalism below is not in dispute.
 
-## Mathematical Development
+## The four, stated in order
 
 ### Postulate 1: States
 
@@ -175,7 +175,7 @@ from $1$ just from time passing), and unitarity is the precise, necessary
 and sufficient condition for that. This course's Time Evolution and the
 Schrödinger Equation lesson makes $U(t)$ fully explicit.
 
-<InteractiveSection title="Watch U(t) act, one step at a time" description="Prepare a state and apply rotation gates repeatedly. The state moves over the sphere's surface and never off it: its length is unchanged by every gate you apply. That norm preservation is what makes an operator unitary, and what qualifies it as valid time evolution under Postulate 4.">
+<InteractiveSection title="Watch U(t) act, one step at a time" description="Prepare a state and apply rotation gates repeatedly. Watch where the point goes relative to the sphere's surface, and check the state's length after each gate. Whatever that length does under every gate you apply is precisely the property that makes an operator unitary, and so qualifies it as valid time evolution under Postulate 4.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
@@ -189,10 +189,10 @@ Schrödinger Equation lesson makes $U(t)$ fully explicit.
 | 4. Dynamics | Time evolution = unitary operator | Normalization must be preserved over time |
 
 Every calculation the rest of this course, and the entire Quantum
-Computing pillar, performs is an application of these four statements to
+Computing track, performs is an application of these four statements to
 a specific system.
 
-## Physical Interpretation
+## What the postulates deliberately leave out
 
 Notice what's *not* here: nothing about position, momentum, particles, or
 waves specifically. The postulates are deliberately general. They say
@@ -201,12 +201,24 @@ for any given physical system, only how states, observables, measurement,
 and evolution relate to each other once you've identified them. A qubit
 (finite-dimensional Hilbert space, spin-like observables) and a particle
 in space (infinite-dimensional Hilbert space, position and momentum
-observables) are both governed by the identical four postulates; only
-the specific Hilbert space and operators differ. Later lessons in this
-course apply the postulates to position and momentum; the Quantum
-Computing pillar applies the same four, unchanged, to qubits.
+observables) are both governed by the same four postulates; only the
+specific Hilbert space and operators differ.
 
-## Worked Example
+One qualification belongs with that claim rather than after it. Postulate
+3 is written above for an observable whose spectrum is discrete, with one
+eigenvector per outcome. That is what a qubit has, and what every
+calculation in this course uses. Position and momentum have neither:
+their spectra are continuous, and $\hat x$ has no normalizable
+eigenvector at all, so the sum over $i$ becomes an integral and
+$P(\lambda_i)$ becomes a probability *density*. The physical content of
+the postulate survives that translation intact, though the formula does
+not, and
+[What Is a Wavefunction?](/lessons/quantum-mechanics/wave-mechanics/what-is-a-wavefunction)
+in the Wave Mechanics course carries it out step by step. Later lessons in
+this course apply the postulates to position and momentum; the Quantum
+Computing track applies the same four, unchanged, to qubits.
+
+## A two-level system, worked end to end
 
 **A two-level system (any system with exactly two possible outcomes for
 some observable $A$, with eigenvalues $+1,-1$ and eigenvectors
@@ -225,7 +237,8 @@ $\langle A\rangle = (+1)(\tfrac34)+(-1)(\tfrac14)=\tfrac12$.
     { label: "P(+1)", value: workedExamplePPlus, highlight: true, caption: `${(workedExamplePPlus * 100).toFixed(0)}%` },
     { label: "P(-1)", value: workedExamplePMinus, caption: `${(workedExamplePMinus * 100).toFixed(0)}%` },
   ]}
-  ariaLabel="Bar chart of P(+1) and P(-1) for the two-level worked example"
+  maxValue={1}
+  ariaLabel="Two bars on a scale running to 1: P(+1) at 0.75, three quarters of full height, and P(-1) at 0.25, one quarter. The first bar is exactly three times the second."
 />
 
 A $3:1$ split, matching the $\cos^2(\pi/6):\sin^2(\pi/6)$ ratio the
@@ -243,7 +256,7 @@ algebra above predicts.
   explanation="P(+1)=cos²θ and P(-1)=sin²θ are equal when cosθ and sinθ match in magnitude, which happens at θ=45°: both equal 1/√2, so both probabilities equal 1/2. Slide the control to 45° below and check that the two bars land on 0.5 each, halfway between the two certain extremes."
 />
 
-<InteractiveSection title="Slide θ, watch the split move" description="The worked example fixed θ = π/6 = 30°. Drag θ from 0° to 90° and watch P(+1) = cos²θ and P(-1) = sin²θ recompute live, always summing to 1, with the 30° worked-example point marked.">
+<InteractiveSection title="Slide θ, watch the split move" description="The worked example fixed θ = π/6 = 30°. Drag θ from 0° to 90° and watch P(+1) = cos²θ and P(-1) = sin²θ recompute live, with the 30° worked-example point marked. Add the two bars together at a few values of θ along the way.">
   <BarChartExplorer
     frames={postulatesFrames}
     sliderLabel="θ (degrees)"
@@ -252,7 +265,7 @@ algebra above predicts.
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Starting assumptions are not theorems
 
 <Callout type="note">
 **Treating the postulates as things to be "proven" from something deeper.**
@@ -276,12 +289,183 @@ state, even though they look different as vectors.
    $|\psi\rangle=\frac{1}{\sqrt5}|e_+\rangle+\frac{2}{\sqrt5}|e_-\rangle$
    (same eigenvalues as the worked example). Find $P(+1)$ and $\langle
    A\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $P(+1)=\tfrac15=0.2$ and $\langle A\rangle = -0.6$.
+
+   Postulate 3 says the probability is the squared magnitude of the
+   coefficient on the corresponding eigenvector:
+
+   $$
+   P(+1) = \left|\frac{1}{\sqrt5}\right|^2 = \frac15, \qquad P(-1) = \left|\frac{2}{\sqrt5}\right|^2 = \frac45
+   $$
+
+   Check normalization first, because if it fails, nothing downstream is
+   meaningful: $\tfrac15+\tfrac45=1$, so Postulate 1 is satisfied and this
+   really is a state.
+
+   The expectation value weights each eigenvalue by its probability:
+
+   $$
+   \langle A\rangle = (+1)\left(\tfrac15\right)+(-1)\left(\tfrac45\right) = \tfrac15-\tfrac45 = -\tfrac35 = -0.6
+   $$
+
+   The error to avoid is squaring the wrong thing. $\tfrac{2}{\sqrt5}$
+   squared is $\tfrac45$, not $\tfrac{2}{5}$ and not $\tfrac{4}{\sqrt5}$;
+   the denominator gets squared along with the numerator. Getting that
+   wrong here shows up immediately as probabilities that fail to sum to
+   $1$, which is why checking normalization is worth the ten seconds.
+
+   One structural point. $\langle A\rangle = -0.6$ is a number the
+   observable can never return: $A$ has only two possible outcomes, $+1$
+   and $-1$. An expectation value is the long-run average over many
+   identically prepared copies, not a prediction about any single
+   measurement. A student who reports "the measurement gives $-0.6$" has
+   confused a statistic of the distribution with a member of it.
+
+   </details>
+
 2. Explain, citing the specific earlier lesson, why Postulate 2 requires
    Hermitian operators rather than allowing any linear operator.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the Hermitian Operators lesson proved that Hermiticity is
+   exactly what guarantees two things a measurement needs: real
+   eigenvalues, and an orthonormal eigenbasis.
+
+   The first is the obvious one. Postulate 2 says the possible measured
+   values *are* the eigenvalues, and a laboratory reading is a real
+   number. An operator with complex eigenvalues would predict outcomes no
+   instrument can display. Hermiticity delivers real eigenvalues, and the
+   same lesson showed the converse direction too, so this is not merely a
+   convenient sufficient condition.
+
+   The second is the one that gets skipped, and it is the reason "any
+   operator with real eigenvalues" is not good enough. Take
+
+   $$
+   A = \begin{pmatrix}1&1\\0&2\end{pmatrix}
+   $$
+
+   Its eigenvalues are $1$ and $2$, both perfectly real, and it is not
+   Hermitian. Its eigenvectors are $\begin{pmatrix}1\\0\end{pmatrix}$ and
+   $\tfrac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix}$, whose inner
+   product is $\tfrac{1}{\sqrt2}$, not zero. Now run Postulate 3 on the
+   state $|\psi\rangle=\begin{pmatrix}0\\1\end{pmatrix}$: the two
+   Born-rule numbers come out $0$ and $\tfrac12$, summing to $\tfrac12$
+   instead of $1$. Half the probability has vanished. The postulate is not
+   merely inelegant for such an operator, it is inconsistent.
+
+   Orthogonality is also what makes distinct outcomes perfectly
+   distinguishable. If two outcomes belonged to non-orthogonal
+   eigenvectors, a system left in one of them after a measurement would
+   still have a nonzero chance of yielding the other outcome on an
+   immediate repeat, and the repeatability the collapse clause promises
+   would fail.
+
+   So the requirement is not "Hermitian because measurements are real."
+   It is "Hermitian because the spectral theorem for Hermitian operators
+   is precisely the statement that the Born rule is well defined," and
+   that theorem is what the Hermitian Operators lesson proved.
+
+   </details>
+
 3. Explain, citing the specific earlier lesson, why Postulate 4 requires
    unitary operators rather than allowing any invertible operator.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the Unitary Operators lesson proved that unitary operators are
+   exactly the ones preserving inner products, hence norms, and total
+   probability has to stay at $1$ as time passes.
+
+   Invertibility alone is far too weak. Take
+   $M=\begin{pmatrix}2&0\\0&1\end{pmatrix}$, which is invertible and not
+   unitary, and apply it to the normalized state
+   $|+\rangle=\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$:
+
+   $$
+   M|+\rangle = \frac{1}{\sqrt2}\begin{pmatrix}2\\1\end{pmatrix}, \qquad \|M|+\rangle\|^2 = \frac{4}{2}+\frac{1}{2} = \frac52
+   $$
+
+   Total probability has grown to $2.5$ after one step of "evolution."
+   Nothing physical happened to make outcomes more likely; the map simply
+   does not conserve length.
+
+   The reply that tempts most students is: fine, divide by the norm
+   afterwards. That does restore the number, and it costs more than it
+   looks. The dividing factor depends on which state you started from, so
+   the corrected map is no longer linear. Superposition then breaks:
+   evolving $c_1|\psi_1\rangle+c_2|\psi_2\rangle$ stops being the same
+   thing as evolving each piece and adding. Every interference result this
+   course has built rests on that linearity, and nonlinear quantum
+   evolutions are also known to permit faster-than-light signalling. The
+   patch is worse than the disease.
+
+   The precise logic is worth stating in the direction the lesson proved
+   it. Preserving the norm of every vector is equivalent to preserving
+   every inner product, which is equivalent to $U^\dagger U = I$. So
+   unitarity is not one candidate condition among several that happen to
+   work. It is a restatement of the requirement itself, which is why
+   Postulate 4 can name it without further justification.
+
+   </details>
+
 4. Why does Postulate 1 need a full vector space rather than, say, a
    single real number per state?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the interference data from earlier in this course requires
+   states to be *added*, and requires the result of that addition to
+   depend on a continuous relative phase. A single real number per state
+   supports neither.
+
+   Take the requirements one at a time.
+
+   States have to combine. The double-slit result was that a particle
+   reaching the screen has a contribution from each path and the
+   contributions combine before any probability is computed. "Combine
+   linearly" is the definition of a vector space's addition, so the state
+   set needs an addition operation with a scaling operation beside it.
+   That already rules out labelling a state by one number and calling the
+   combination "the sum of the labels," because you would still have to
+   say what physical state the summed label names, and for a single real
+   number the answer runs straight into the next requirement.
+
+   The combination has to carry a continuous relative phase. The last
+   lesson showed a single sign bit is not enough, so the coefficients have
+   to come from a field with a continuum of directions, which is
+   $\mathbb{C}$. A state labelled by one real number has one degree of
+   freedom and no phase to speak of.
+
+   Probabilities have to come from overlaps in an arbitrary basis. The
+   Born rule reads $P = |\langle e_i|\psi\rangle|^2$, an inner product
+   between the state and each possible outcome. An inner product is a
+   structure on a vector space; there is nowhere to hang it on a bare
+   number.
+
+   And the number of outcomes has to be free. A system with $n$
+   distinguishable outcomes needs $n$ mutually orthogonal states, which is
+   what dimension $n$ means. One real number per state gives no way to say
+   how many perfectly distinguishable alternatives a system has.
+
+   The instructive near-miss is a classical probability distribution,
+   which does have addition and scaling and can represent $n$
+   alternatives. It fails on the phase: mixing distributions gives
+   $P = \lambda P_1 + (1-\lambda)P_2$, which never produces a cross term
+   and so can never send a probability to zero where both contributions
+   are positive. Postulate 1 does not just need *a* space with structure;
+   it needs a complex one, and the previous three lessons are the argument
+   for each of those words.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -298,7 +482,7 @@ state, even though they look different as vectors.
 - The postulates say nothing about which physical system they apply to;
   that specificity comes from choosing the Hilbert space and operators.
 
-## Further Exploration
+## The same rule with an overall phase attached
 
 <ChallengePrompt prompt="Take |ψ'⟩ = e^(iπ/3)|ψ⟩, where |ψ⟩ = cos(π/6)|e₊⟩ + sin(π/6)|e₋⟩ is the worked example's state above. Postulate 1's phase-invariance clause says |ψ'⟩ and |ψ⟩ represent the identical physical situation. Confirm it by computing P(+1) and P(-1) for |ψ'⟩ directly with Postulate 3, and show they land on exactly the same 3:1 split as the worked example.">
   No new machinery required: Postulate 3's $|\langle e_i|\psi\rangle|^2$ rule, applied to a state carrying an overall phase instead of a new pair of coefficients.

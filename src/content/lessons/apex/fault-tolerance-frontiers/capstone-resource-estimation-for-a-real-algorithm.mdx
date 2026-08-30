@@ -56,6 +56,14 @@ export const altFactoryQubits = distillationInputStatesPerRound * altQubitsPerLo
 export const altTotalPhysicalQubits = altTotalDataQubits + altTotalAncillaQubits + altFactoryQubits;
 export const altFactoryShareOfTotal = altFactoryQubits / altTotalPhysicalQubits;
 
+export const scalingPrefactor = 1;
+export const scalingPrefactorAlt = 0.1;
+export const prefactorAltMinCodeDistanceRaw = 2 * (Math.log(perGateBudget / scalingPrefactorAlt) / Math.log(errorRatio)) - 1;
+export const prefactorAltCodeDistance = smallestOddAtLeast(prefactorAltMinCodeDistanceRaw);
+export const prefactorAltQubitsPerPatch = 2 * prefactorAltCodeDistance * prefactorAltCodeDistance - 1;
+export const prefactorAltTotalPhysicalQubits =
+  logicalQubitCount * prefactorAltQubitsPerPatch + distillationInputStatesPerRound * prefactorAltQubitsPerPatch;
+
 export const resourceBars = [
   { label: "Data qubits", value: totalDataQubits, caption: `${totalDataQubits}` },
   { label: "Ancilla qubits", value: totalAncillaQubits, caption: `${totalAncillaQubits}` },
@@ -76,22 +84,23 @@ export const lessonMeta = {
     "Combine every ingredient of this course, code distance/logical error rate, magic-state distillation cost, and lattice-surgery gate overhead, into one complete physical-resource estimate for a small, concrete toy algorithm",
     "Show explicitly how the required code distance depends on the algorithm's total gate count and target overall success probability",
     "State honestly which parts of a real resource estimate (like those published for Shor's algorithm factoring cryptographically-relevant numbers) are well-established methodology versus which numbers are sensitive to architecture-specific assumptions",
+    "Work out what fraction of the final qubit count the magic-state factories claim, and why that share, not the data patches, is what a serious estimate argues about",
   ],
   related: [
     {
       slug: "apex/fault-tolerance-frontiers/magic-states-and-distillation",
-      note: "This capstone reuses that lesson's 15-to-1 distillation output-error formula p_out = 35 p_in³ directly, and the arithmetic below shows its 'the factory dominates the qubit count' finding recurring here as an exact 5/7 share, not just a qualitative echo.",
+      note: "This capstone reuses that lesson's 15-to-1 distillation output-error formula p_out = 35 p_in³ directly, and the arithmetic below turns its 'the factory dominates the qubit count' finding into an exactly computed share rather than a qualitative echo.",
     },
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Where the whole course becomes one number">
   Code distance, distillation cost, lattice-surgery overhead: every
-  ingredient this course built chains into one number, how many physical
-  qubits a real fault-tolerant algorithm actually costs.
+  ingredient this course built chains into one number, which is how many
+  physical qubits a real fault-tolerant algorithm actually costs.
 </LessonHook>
 
-## Motivation
+## Five Lessons, One Number
 
 Five lessons, one running argument: **Surface Codes in Depth** gave the
 2D lattice and its logical $X$/$Z$ operators, **Decoding Surface Codes**
@@ -102,10 +111,12 @@ Distillation** gave the unavoidable, non-Clifford cost of a universal
 gate set, and **The Threshold Theorem** proved that all of this composes
 into an arbitrarily low logical error rate, provided the physical error
 rate sits below $p_{\mathrm{th}}$. Every one of those lessons ended with
-a number. This capstone's only job is to chain those numbers together,
-for one small, fully computable toy circuit, into a single physical
-qubit count, and to be completely explicit about every assumption that
-number depends on.
+a number, and none of them ended with *the* number. Each was an answer to
+one question about the machine, and a hardware programme has to answer
+all five at once before it can say what a given algorithm costs. This
+capstone chains those numbers together, for one small, fully computable
+toy circuit, into a single physical qubit count, and is explicit about
+every assumption that number depends on.
 
 **The toy algorithm** (stated as a given, illustrative example, not a
 real published algorithm's actual gate count): a circuit requiring
@@ -115,7 +126,7 @@ $100$ and $500$ is derived from any real compiled circuit; they're
 chosen purely to be small enough to compute by hand while still
 exercising every step this course built.
 
-## Mathematical Development
+## The Four-Step Pipeline
 
 ### Step 1: the per-gate logical error budget
 
@@ -147,15 +158,24 @@ That is `perGateBudget` computed directly above: **{perGateBudget.toExponential(
 ### Step 2: solving for the code distance
 
 The Decoding Surface Codes lesson's scaling law is
-$p_L \sim (p/p_{\mathrm{th}})^{(d+1)/2}$ for a physical error rate $p$
-comfortably below threshold $p_{\mathrm{th}}$. Take the threshold value
+$p_L \sim A\,(p/p_{\mathrm{th}})^{(d+1)/2}$ for a physical error rate $p$
+comfortably below threshold $p_{\mathrm{th}}$, where $A$ is a roughly
+constant prefactor.
+
+**Everything below takes $A=1$**, which is a choice worth naming rather
+than absorbing silently. It is the conservative end: $A=1$ makes the
+predicted $p_L$ larger and so pushes the required distance up. Decoding
+Surface Codes itself plots the same law at $A=0.1$, and the comparison
+after the derivation shows what that alternative costs.
+
+Take the threshold value
 that lesson established, $p_{\mathrm{th}} = 1\%$, and operate at a
 standard "comfortably below threshold" point, $p = p_{\mathrm{th}}/10 =
 0.001$, so $p/p_{\mathrm{th}} = 0.1$. Setting the scaling law equal to
 the Step 1 target and solving for $d$:
 
 <DerivationSteps>
-  <DerivationStep annotation="Set the threshold-theorem scaling law equal to the Step 1 target and take the log of both sides.">
+  <DerivationStep annotation="Set the scaling law, with the prefactor A fixed at 1 as named above, equal to the Step 1 target and take the log of both sides.">
     $$
     \left(\frac{p}{p_{\mathrm{th}}}\right)^{(d+1)/2} \le p_L^{\text{target}}
     \quad\Longrightarrow\quad
@@ -187,6 +207,22 @@ necessary and sufficient: at $d=9$, $(0.1)^{(9+1)/2} = 10^{-5}$
 (`achievedLogicalErrorRate` = **{achievedLogicalErrorRate.toExponential(3)}**),
 just under the {perGateBudget.toExponential(3)} target, while $d=7$
 would give $(0.1)^{4} = 10^{-4}$, an order of magnitude *over* budget.
+
+<Callout type="warning">
+**That whole result rests on $A=1$.** Rerun the same two lines with the
+prefactor Decoding Surface Codes actually plots, $A=0.1$: the target
+becomes $p_L^{\text{target}}/A$, the raw requirement drops to
+{prefactorAltMinCodeDistanceRaw.toFixed(3)}, the distance rounds to
+{prefactorAltCodeDistance}, the patch shrinks to
+{prefactorAltQubitsPerPatch} qubits, and the Step 4 total lands at
+{prefactorAltTotalPhysicalQubits} instead of {totalPhysicalQubits}:
+about
+{(100 * (1 - prefactorAltTotalPhysicalQubits / totalPhysicalQubits)).toFixed(0)}%
+less machine, from a single constant that nobody in this chain measured.
+Everything downstream, Steps 3 and 4 included, inherits the $A=1$ choice.
+This is exactly the kind of assumption "Where an Estimate Goes Wrong"
+below is about, named here rather than buried.
+</Callout>
 
 ### Step 3: magic-state cost
 
@@ -278,7 +314,7 @@ the factory and the compute patches share that distance. Doubling $d$
 would more than triple the total qubit count without changing this
 ratio at all.
 
-## Physical Interpretation: what generalizes and what doesn't
+## What Generalizes, and What Was Just This Circuit
 
 <InsightBlock>
   The four-step pipeline, not any single number it outputs, is the real
@@ -334,9 +370,9 @@ factory serving 100 T gates has to run 100 sequential distillation
 rounds, and each logical two-qubit gate costs on the order of $d=9$
 surface-code cycles of lattice surgery. Two designs with the same 3381
 qubits can differ by an order of magnitude in runtime, and nothing in
-Step 4 would tell them apart. Gidney and Ekerå's estimate below is quoted
+Step 4 would tell them apart. Gidney and Ekerå's estimate above is quoted
 as "20 million qubits **for 8 hours**" for exactly this reason: the
-second half of that phrase is not colour.
+second half of that phrase is not decoration.
 </Callout>
 
 Real estimates also model complications this toy example
@@ -355,7 +391,7 @@ and Step 3 (parallel factory count). A reader should take away the
 structure of a real estimate, not treat any specific published qubit
 count as a universal constant.
 
-## Worked Example
+## The Full Estimate, End to End
 
 Putting all four steps together end to end, for this toy circuit:
 
@@ -392,17 +428,19 @@ produce.
 
 <BarChart
   bars={resourceBars}
-  ariaLabel={`Physical qubit breakdown for the toy resource estimate: ${totalDataQubits} data qubits, ${totalAncillaQubits} ancilla qubits, and ${factoryQubits} magic-state factory qubits, totaling ${totalPhysicalQubits} physical qubits, with the factory alone accounting for ${(factoryShareOfTotal * 100).toFixed(1)}% of the total`}
+  maxValue={totalPhysicalQubits}
+  ariaLabel={`Physical qubit breakdown for the toy resource estimate, all three bars drawn against a fixed scale whose full height is the ${totalPhysicalQubits}-qubit total: ${totalDataQubits} data qubits, ${totalAncillaQubits} ancilla qubits, and ${factoryQubits} magic-state factory qubits, so the factory bar fills about ${(factoryShareOfTotal * 100).toFixed(1)} percent of the axis while the other two together fill the rest`}
 />
 
-The factory bar dominates the chart, the same finding the Magic
-States and Distillation lesson already flagged as the single most
-expensive part of a real fault-tolerant architecture: even a toy
-circuit needing only $100$ T gates spends most of its physical qubits
-manufacturing the states those gates consume, not running the logical
-computation itself.
+Because the axis runs to the full {totalPhysicalQubits}-qubit total, each
+bar's height reads directly as its share, and the factory bar takes about
+five-sevenths of it. That is the same finding the Magic States and
+Distillation lesson already flagged as the single most expensive part of
+a real fault-tolerant architecture: even a toy circuit needing only $100$
+T gates spends most of its physical qubits manufacturing the states those
+gates consume, not running the logical computation itself.
 
-## Common Mistakes
+## Where an Estimate Goes Wrong
 
 <Callout type="warning">
 **Applying the per-gate budget to the whole circuit's error, not each
@@ -421,8 +459,9 @@ $N_2=500$, $6$ logical qubits, $p = p_{\mathrm{th}}/10$, one factory
 reused sequentially. Change any one of those (as the alternate-scenario
 calculation above does for $p$) and the total changes, sometimes by a
 large factor. What's stable across such changes is the four-step
-*method*, not any individual output number, which is this
-lesson's Physical Interpretation point about published estimates too.
+*method*, not any individual output number, which is the point What
+Generalizes, and What Was Just This Circuit makes about published
+estimates too.
 </Callout>
 
 ## Practice Questions
@@ -432,17 +471,165 @@ lesson's Physical Interpretation point about published estimates too.
    $9$ logical qubits (with $d=9$ and the same single-round, $15$-input
    factory unchanged), what would the new factory share of the total be?
    Use the same $15/(15+L)$ relationship derived in Step 4.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $15/(15+9) = 15/24 = 62.5\%$.
+
+   Confirming it against the qubit counts rather than the ratio alone,
+   since the ratio is only trustworthy if the per-patch cost really is
+   common to both terms. At $d=9$ a patch costs
+   {qubitsPerLogicalPatch} qubits, so nine compute patches cost
+   $9\times81=729$ data plus $9\times80=720$ ancilla, the factory still
+   costs {factoryQubits}, and the total is $729+720+2415=3864$. Then
+   $2415/3864 = 0.625$ exactly.
+
+   Read the direction carefully, because it is easy to take as good news.
+   The factory's share fell from $71.4\%$ to $62.5\%$, but the factory
+   did not get any cheaper: it costs the same {factoryQubits} qubits it
+   always did. The share fell only because the denominator grew. The
+   machine got $14\%$ bigger and the factory's absolute cost did not
+   move. Nothing was saved.
+
+   The share drops below half only when $15/(15+L) < 0.5$, that is when
+   $L>15$, so the compute register has to outnumber the factory's input
+   patches before the factory stops being the largest single line item.
+   That is the quantitative version of the claim Magic States and
+   Distillation made qualitatively.
+
+   **The caveat that matters most, and it undercuts the whole
+   calculation.** This model has exactly one factory, reused
+   sequentially, and it counts qubits without counting time. A machine
+   with $9$ logical qubits instead of $6$ is a machine running a bigger
+   algorithm, with more T gates, needing magic states faster. A single
+   sequential factory delivers one state per round of distillation
+   regardless, so it becomes a throughput bottleneck, and a real design
+   answers that by building *more factories in parallel*, which pushes
+   the factory share back up rather than down. Read as written, the
+   $15/(15+L)$ formula says the factory dilutes as the algorithm grows.
+   Read with time in the picture, it says the opposite. That is exactly
+   the kind of assumption Where an Estimate Goes Wrong is about, and it
+   is why published estimates argue about factory count and factory
+   throughput rather than about data patches.
+
+   </details>
+
 2. Suppose a different toy circuit needed $N_T = 20$ and
    $N_2 = 180$ gates at the same $99\%$ overall success target. Compute
    its per-gate budget $p_L^{\text{target}}$, and state whether it is
    larger or smaller than this lesson's $600$-gate circuit's budget, and
    why that direction makes sense from the union bound.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   p_L^{\text{target}} = \frac{0.01}{20+180} = \frac{0.01}{200} = 5\times10^{-5},
+   $$
+
+   which is three times *larger* (looser) than the $600$-gate circuit's
+   $1.667\times10^{-5}$, the ratio $600/200$ exactly.
+
+   The direction is what the union bound is for. A fixed total failure
+   allowance of $1\%$ has to be shared out among the gates, and fewer
+   gates means each one's slice is bigger. A short circuit is allowed
+   sloppier gates for the same end-to-end reliability, and a long one is
+   not. Nothing about the hardware changed between the two cases; only
+   how many chances it gets to fail.
+
+   **Now push it one step further than the question asks, because the
+   result is not what the arithmetic suggests.** Feed the looser budget
+   through Step 2:
+
+   $$
+   d \ge 2\,\frac{\ln(5\times10^{-5})}{\ln(0.1)} - 1 = 2(4.301) - 1 = 7.60,
+   $$
+
+   and the smallest odd integer at or above $7.60$ is $9$. **The same
+   distance as before.** A three-fold relaxation of the error budget buys
+   no reduction in code distance at all, and therefore not one qubit of
+   savings anywhere in the estimate.
+
+   The reason is that $d$ depends on the *logarithm* of the budget, and
+   it is quantized to odd integers. Each step of $2$ in $d$ multiplies
+   $p_L$ by $p/p_{\text{th}} = 0.1$, so the design has a resolution of
+   one order of magnitude per available distance. A factor of $3$ is
+   below that resolution. To actually reach $d=7$, the budget would have
+   to loosen to $10^{-4}$, which needs $N_T+N_2 \le 100$: a six-fold
+   shorter circuit, not a three-fold one.
+
+   That is worth carrying into any resource estimate you read or write.
+   Gate counts have to move by an order of magnitude before the code
+   distance notices, which cuts both ways. A compiler optimization that
+   shaves $30\%$ off a T-count is often free in qubits, so it is not
+   where a design gets smaller, while a factor-of-ten reduction changes
+   the machine.
+
+   </details>
+
 3. Using this lesson's Step 3 numbers, explain in your own words why a
    single round of $15$-to-$1$ distillation was enough for $N_T=100$ T
    gates here, but a circuit needing, say, $10^6$ T gates at a much
    tighter per-gate budget might need a *second* distillation level
    (recall $p_{\text{out}} \approx 35\,p_{\text{in}}^3$ applied twice,
    once to the output of the first round).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the distillation output is a fixed number and the budget is
+   not. One round delivers
+   $p_{\text{out}} = 35(10^{-3})^3 = 3.5\times10^{-8}$ whatever the
+   circuit does, while the budget $0.01/(N_T+N_2)$ shrinks in proportion
+   to the circuit's length. Enough gates and the budget walks under the
+   fixed number.
+
+   Here the budget is $1.667\times10^{-5}$ and one round lands
+   {magicStateHeadroom.toFixed(0)} times below it, so a second round
+   would be spending qubits on accuracy nobody asked for.
+
+   Locate the crossover exactly. One round suffices while
+
+   $$
+   \frac{0.01}{N} > 3.5\times10^{-8} \quad\Longleftrightarrow\quad N < 2.9\times10^{5},
+   $$
+
+   so at these parameters a second round becomes necessary somewhere
+   around $300{,}000$ total gates. A $10^6$-T-gate circuit is past that:
+   its budget is about $10^{-8}$, and one round's $3.5\times10^{-8}$
+   misses by a factor of $3.5$. Two rounds give
+   $35(3.5\times10^{-8})^3 \approx 1.5\times10^{-21}$, which clears the
+   requirement by thirteen orders of magnitude, because a cubic recursion
+   has nothing in between.
+
+   **What the second round costs depends on which resource you are
+   short of.** Its 15 inputs are themselves round-1 outputs, so you can
+   either build $15\times15=225$ patches and run both rounds in
+   parallel, or keep the single 15-patch factory and run it 16 times in
+   sequence. This lesson's model chose sequential reuse, so the second
+   round shows up as a $16\times$ slowdown in magic-state throughput
+   rather than as extra qubits. For a circuit with $10^6$ T gates, each
+   of which must wait for a state, that is likely the harder of the two
+   costs.
+
+   **The cheaper lever, worth naming because it is the one a real design
+   reaches for first.** The cubic law means input quality is worth three
+   times as much as it looks: improving $p_{\text{in}}$ from $10^{-3}$ to
+   $10^{-4}$ takes one round's output from $3.5\times10^{-8}$ to
+   $3.5\times10^{-11}$, clearing the $10^6$-gate budget with a thousand
+   times the margin and no second round at all. So the question "do I
+   need another distillation level" is usually really the question "can I
+   inject a cleaner raw state," which is answered by the injection
+   protocol and the patch distance rather than by the factory.
+
+   **The wrong turn** is treating "one round was enough" as a property of
+   the 15-to-1 protocol. It is a property of this circuit's length. The
+   protocol has no idea how many T gates it is being asked to serve; the
+   number of rounds is decided entirely by the budget the union bound
+   handed down in Step 1.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -472,12 +659,12 @@ lesson's Physical Interpretation point about published estimates too.
   parallelization, decoder throughput) this toy example deliberately
   set aside, not the underlying structure of the calculation.
 
-## Further Exploration
+## Every Number Here Had a Choice Behind It
 
 <NextDiscovery>
   Every number in this capstone came from a chosen toy circuit and a
   chosen set of simplifying assumptions, stated explicitly at each step.
-  The next, and final, skill this pillar builds is knowing how to read a
+  The next, and final, skill this track builds is knowing how to read a
   *real* resource-estimation paper critically: which of its numbers rest
   on the same solid methodology derived here, and which rest on
   architecture-specific assumptions worth questioning. That's

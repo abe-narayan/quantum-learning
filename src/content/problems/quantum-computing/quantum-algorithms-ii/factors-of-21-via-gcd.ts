@@ -28,8 +28,8 @@ export const factorsOf21ViaGcd: MultipleChoiceProblem = {
     options: [
       { id: "a", text: "3 and 7" },
       { id: "b", text: "1 and 21" },
-      { id: "c", text: "7 and 9, the raw values $2^{r/2}\\pm1$ with no gcd taken" },
-      { id: "d", text: "1 and 1, from gcd($2^{r/2}$, 21) with the ±1 dropped" },
+      { id: "c", text: "7 and 9" },
+      { id: "d", text: "1 and 1" },
     ],
   },
   answer: {
@@ -37,15 +37,15 @@ export const factorsOf21ViaGcd: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "1 and 21 would mean the reduction failed (trivial factors). Check whether 2^(r/2) is actually ≡ ±1 mod 21 first.",
-      c: "These are the inputs to the gcd, not its outputs. 9 does not divide 21 at all; running gcd(7,21) and gcd(9,21) is the step that turns them into factors.",
-      d: "Dropping the ±1 is what breaks it. gcd(8,21)=1, a trivial factor, and the whole point of the shift by one is to land on a number sharing a factor with 21.",
+      c: "7 and 9 are the raw values 2^(r/2)±1, the inputs to the gcd rather than its outputs. 9 does not divide 21; running gcd(7,21) and gcd(9,21) is the step that turns them into factors.",
+      d: "1 and 1 is what gcd(2^(r/2), 21) gives when the ±1 is dropped: gcd(8,21)=1 both times. The shift by one is the step that lands on a number sharing a factor with 21.",
     },
     defaultIncorrectFeedback: "Compute 2^(6/2) mod 21 = 2^3 mod 21 first, then take gcd with 21 on both sides.",
   },
   hints: [
     { text: "2^(r/2) = 2^3 = 8." },
-    { text: "8 mod 21 = 8, not ±1, so the reduction applies cleanly." },
-    { text: "gcd(8-1,21)=gcd(7,21) and gcd(8+1,21)=gcd(9,21)." },
+    { text: "8 mod 21 is 8, not ±1, so the reduction does not collapse to trivial factors." },
+    { text: "The two candidates are gcd(8−1,21)=gcd(7,21) and gcd(8+1,21)=gcd(9,21). Run Euclid on each." },
   ],
   solution: {
     steps: [{ description: `gcd(7,21)=7, gcd(9,21)=3, giving factors ${correctPair}.` }],

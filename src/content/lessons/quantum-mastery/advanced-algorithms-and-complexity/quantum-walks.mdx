@@ -159,18 +159,18 @@ export const lessonMeta = {
   ],
   objectives: [
     "Derive the coined discrete-time quantum walk on a line from a coin operator and a conditional shift operator",
-    "Derive the walk's momentum-space dispersion relation and show it forces ballistic (∝t) rather than diffusive (∝√t) spreading",
+    "Read off the walk's momentum-space dispersion relation and show it forces ballistic (∝t) rather than diffusive (∝√t) spreading",
     "Verify ballistic vs. diffusive spreading numerically for a real coined walk against a real classical random walk, and connect continuous-time quantum walks to Hamiltonian simulation of a graph's adjacency matrix",
   ],
 };
 
 <LessonHook eyebrow="Diffusive versus ballistic">
   A classical random walker spreads as $O(\sqrt T)$. A quantum walker,
-  on the same line with the same step size, spreads
-  ballistically — $O(T)$, quadratically farther.
+  on the same line with the same step size, spreads ballistically. That
+  is $O(T)$, quadratically farther.
 </LessonHook>
 
-## Motivation
+## Diffusive Against Ballistic
 
 A classical random walker on a line diffuses: after $T$ steps its
 typical displacement is $O(\sqrt T)$, the signature of a sum of
@@ -185,13 +185,13 @@ Grover-style speedup on graph search problems.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Yakir_aharonov.jpg"
   alt="Yakir Aharonov, physicist who co-introduced the quantum random walk"
-  caption="Aharonov, Davidovich, and Zagury's 1993 paper 'Quantum Random Walks' first framed a coin-and-shift process on a line as a unitary evolution rather than a quantum-dressed classical Markov chain — the object this lesson diagonalizes to derive its dispersion relation. The same coined-walk construction now underlies quantum walk search algorithms and has been physically realized with trapped ions and single photons."
+  caption="Aharonov, Davidovich, and Zagury's 1993 paper 'Quantum Random Walks' first framed a coin-and-shift process on a line as a unitary evolution rather than a quantum-dressed classical Markov chain. That unitary is the object this lesson diagonalizes to derive its dispersion relation. The same coined-walk construction now underlies quantum walk search algorithms and has been physically realized with trapped ions and single photons."
   credit="Kobi Kalmanowitz / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Yakir_aharonov.jpg"
   license="CC BY-SA 3.0"
 />
 
-## Mathematical Development
+## The Coin, the Shift, and the Dispersion Relation
 
 ### The coined walk: coin operator and conditional shift
 
@@ -223,8 +223,8 @@ from *interfering amplitudes* rather than summed probabilities.
 
 **Initial coin state.** Starting in $|\uparrow\rangle$ produces an
 asymmetric distribution (the Hadamard coin doesn't treat $\uparrow$ and
-$\downarrow$ symmetrically). The standard fix (Konno 2002, cited here
-rather than re-derived) is the symmetric initial coin state
+$\downarrow$ symmetrically). The standard fix (Konno 2002, cited here)
+is the symmetric initial coin state
 $|\psi_c\rangle=\frac1{\sqrt2}(|\uparrow\rangle+i|\downarrow\rangle)$,
 which makes the resulting position distribution exactly symmetric under
 $x\to-x$, the choice used throughout this lesson's numerics below.
@@ -234,7 +234,27 @@ $x\to-x$, the choice used throughout this lesson's numerics below.
 Because the walk is translation-invariant (every position behaves
 identically), it's diagonalized by momentum eigenstates $|k\rangle$,
 as in Momentum Space and the Fourier Transform: translation by
-one unit acts on $|k\rangle$ as multiplication by a pure phase. Shifting
+one unit acts on $|k\rangle$ as multiplication by a pure phase.
+
+One piece of bookkeeping deserves to be said out loud, because the
+finite-dimensional habit of "diagonalize the matrix" does not apply
+here. The position register is $\ell^2(\mathbb Z)$, which is
+infinite-dimensional, and $W$ acts on
+$\ell^2(\mathbb Z)\otimes\mathbb C^2$. The states $|k\rangle$ are *not*
+eigenvectors of $W$ in that space: they are not square-summable, exactly
+as the plane waves $e^{ipx/\hbar}$ are not in $L^2(\mathbb R)$. What is
+true is that the discrete-time Fourier transform is a unitary
+$\ell^2(\mathbb Z)\cong L^2([-\pi,\pi))$ carrying $W$ to multiplication
+by the $2\times2$ matrix family $W(k)$, so $W$ has purely *absolutely
+continuous* spectrum, filling the two bands
+$e^{i(\pi/2\pm\omega(k))}$ and containing no eigenvalues at all. That is
+why "the eigenvalues of $W(k)$" below is a legitimate calculation while
+"the eigenvectors of $W$" would not be, and it is the same
+direct-integral decomposition the Hilbert space course makes precise. The
+band structure is also what makes the whole argument work: an operator
+with a pure point spectrum would give a walk that never spreads.
+
+Shifting
 by $-1$ (the $\uparrow$ branch) contributes phase $e^{ik}$, shifting by
 $+1$ (the $\downarrow$ branch) contributes $e^{-ik}$, so in the
 $2$-dimensional coin subspace at fixed momentum $k$, one step acts as
@@ -273,13 +293,13 @@ contribution sits near $x\approx v(k)\,T$ (stationary-phase reasoning,
 the same principle used for wave-packet spreading in Wave Mechanics).
 Since **every** mode's speed is bounded by $v_{\max}=1/\sqrt2$, the
 entire distribution stays confined to a "light cone" $|x|\lesssim T/
-\sqrt2$ that grows *linearly* in $T$, precisely what
-**ballistic** spreading means, and it's derived directly from the
-dispersion relation's bounded-but-nonzero group velocity, not merely
-observed after the fact. The exact limiting probability density inside
+\sqrt2$ that grows *linearly* in $T$, which is what
+**ballistic** spreading means. It follows from the dispersion relation's
+bounded-but-nonzero group velocity, before any simulation is run.
+The exact limiting probability density inside
 this light cone, and the resulting exact variance prefactor
 $(1-1/\sqrt2)$ used below, is a more technical stationary-phase integral
-(Konno 2002; Nayak & Vishwanath 2000), cited here rather than re-derived
+(Konno 2002; Nayak & Vishwanath 2000), cited here without re-derivation
 in full; but the light cone's *linear* growth, the qualitative and
 quantitative origin of ballistic-vs-diffusive scaling, is fully derived
 above.
@@ -293,7 +313,7 @@ an $O(\sqrt T)$ typical displacement, growing strictly slower than the
 quantum walk's $O(T)$. No dispersion relation or interference is
 involved at all; this is pure independence.
 
-## Physical Interpretation
+## A Walker That Does Not Forget
 
 The classical walk forgets its history at every step: each $\pm1$ move
 is drawn independently, so the central limit theorem's $\sqrt T$
@@ -306,7 +326,7 @@ of interference-driven speedup Grover's algorithm exploits (quadratic in
 its own arena), here appearing as a literal quadratic difference in how
 fast probability mass can move through space.
 
-## Worked Example
+## Spreading, Computed Step by Step
 
 **Compute both distributions after $T=4$ steps by direct simulation (a
 self-contained implementation using this platform's real `Complex`
@@ -349,7 +369,7 @@ of a classical bell curve, which stays single-peaked at the center and
 widens only $\propto\sqrt T$, quadratically slower; the trend is not
 perfectly monotonic frame to frame (scrub from $T=32$ to $T=40$ and the
 peak ticks back up slightly, an interference fringe near the
-light cone's edge, not a bug; see Common Mistakes below), but the
+light cone's edge, not a bug; see the cautions below), but the
 overall envelope shrinking against the classical curve's fixed center
 height is unmistakable.
 
@@ -377,8 +397,8 @@ positions, mean threshold $\approx0.0769$):
 The classical walk lights up one cluster, centered on the origin, and
 goes dark toward the edges: probability mass diffusing outward from
 where it started, thinning as it goes. The quantum walk lights up *two*
-clusters, straddling $\pm8\approx T/\sqrt2$ — the light-cone edge
-derived above — while the center goes dark: the "pushed
+clusters, straddling $\pm8\approx T/\sqrt2$ (the light-cone edge
+derived above), while the center goes dark: the "pushed
 outward, not spread inward" signature the bar charts above already
 showed, now visible as literal geography on the line the walker moves
 along rather than as bar heights.
@@ -387,17 +407,19 @@ along rather than as bar heights.
   question="Quadruple the number of steps T (say from 10 to 40). The classical walk's typical displacement scales as √T. What happens to the quantum walk's typical displacement, which scales as T?"
   options={[
     { label: "It also roughly doubles, same as the classical walk", value: "double" },
-    { label: "It roughly quadruples — the same factor T was multiplied by", value: "quadruple" },
+    { label: "It roughly quadruples, matching the factor T was multiplied by", value: "quadruple" },
     { label: "It grows by 16×, the square of the classical factor", value: "sixteen" },
   ]}
   correctValue="quadruple"
-  explanation="Classical displacement ∝ √T, so quadrupling T only doubles it (√4=2). That is the diffusive slowdown. Quantum displacement ∝ T directly, so quadrupling T quadruples it. The table below shows this: going from T=10 to T=40, √(classical variance) goes from √10≈3.16 to √40≈6.32 (doubled), while √(quantum variance) goes from √29.95≈5.47 to √469.1≈21.66 (quadrupled) — the same gap the dispersion relation's bounded group velocity predicts, now checked against real simulated numbers instead of just the scaling exponent."
+  explanation="Classical displacement ∝ √T, so quadrupling T only doubles it (√4=2). That is the diffusive slowdown. Quantum displacement ∝ T directly, so quadrupling T quadruples it. The table below shows this: going from T=10 to T=40, √(classical variance) goes from √10≈3.16 to √40≈6.32 (doubled), while √(quantum variance) goes from √29.95≈5.47 to √469.1≈21.66 (quadrupled). That is the same gap the dispersion relation's bounded group velocity predicts, now checked against real simulated numbers instead of just the scaling exponent."
 />
 
 **Scaling check across $T=10,20,40,80,160$:**
 
 <ParametricCurve
   frames={walkCurveFrames}
+  xAxisLabel="steps T"
+  yAxisLabel="⟨x²⟩"
   ariaLabel="Quantum walk variance and classical walk variance, both plotted against number of steps T, showing quantum growing much faster (quadratically) than classical (linearly)"
 />
 
@@ -409,14 +431,24 @@ along rather than as bar heights.
 | $80$ | $1875.002$ | $80.000$ | $0.2930$ | $1.0000$ |
 | $160$ | $7498.565$ | $160.000$ | $0.2929$ | $1.0000$ |
 
-`classical/T` sits at exactly $1.0000$ throughout: the exact classical
-$\text{Var}(x_T)=T$ result derived above, reproduced by direct
-Markov-chain simulation, not just asserted. `quantum/T²` converges to
-$0.2929\ldots$ as $T$ grows, matching $1-\tfrac1{\sqrt2}=0.292893\ldots$
-to four decimal places, the cited Konno constant confirmed directly by
-this lesson's own real simulation, not merely quoted from a textbook.
+`classical/T` sits at exactly $1.0000$ throughout, reproducing the
+$\text{Var}(x_T)=T$ identity derived above by direct Markov-chain
+recursion. `quantum/T²` converges to $0.2929\ldots$ as $T$ grows,
+matching $1-\tfrac1{\sqrt2}=0.292893\ldots$ to four decimal places: the
+Konno constant, cited above from a stationary-phase calculation this
+lesson does not reproduce, recovered here from the walk itself.
 
-## Common Mistakes
+Two remarks on what the simulation is entitled to claim. The line is
+truncated to the $2T+1$ sites reachable in $T$ steps, which costs
+nothing, because the conditional shift moves amplitude by one site per
+step and so cannot have reached the boundary: the truncated evolution
+agrees with the one on $\ell^2(\mathbb Z)$ exactly, not approximately.
+And the classical row is an identity that holds at every finite $T$,
+while the quantum row is an asymptotic statement, which is why
+`quantum/T²` is still drifting ($0.2995$ at $T=10$, $0.2929$ at
+$T=160$) while `classical/T` is pinned.
+
+## Assuming Quantum Always Means Faster
 
 <Callout type="warning">
 **Assuming any quantum evolution on a line automatically spreads
@@ -442,13 +474,13 @@ the edges, as the $T=4$ worked example already shows) density within it.
 This lesson's own explorer above shows otherwise: computed directly
 with the same `hadamardWalk` function driving the frames, the peak
 height across $T=0,4,8,16,24,32,40$ is $1.000,\,0.375,\,0.2266,
-\,0.2105,\,0.1596,\,0.1156,\,0.1235$, a real, reproducible *increase*
+\,0.2105,\,0.1596,\,0.1156,\,0.1235$, a reproducible *increase*
 from $T=32$ to $T=40$, not a mistake to hide. The overall $1/\sqrt T$-
 style envelope (peak $\times$ light-cone width stays order-$1$, since
 probability is conserved) does shrink on average, but the exact density
 inside the light cone has interference fringes near its edges,
-so the peak — which tracks whichever fringe happens to be tallest at a
-given $T$ — can tick up locally even while the envelope it rides on is
+so the peak (which tracks whichever fringe happens to be tallest at a
+given $T$) can tick up locally even while the envelope it rides on is
 trending down. This is the discrete-walk analog of the fringes in a
 diffraction pattern getting locally brighter or dimmer while the
 envelope narrows.
@@ -460,15 +492,154 @@ envelope narrows.
    compute the classical walk's typical displacement $\sqrt{\text{Var}}$
    at $T=10000$, and compare it to the quantum walk's typical
    displacement $\sqrt{(1-1/\sqrt2)}\,T$ at the same $T$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Classical: $\sqrt{10000}=100$ sites. Quantum:
+   $\sqrt{1-1/\sqrt2}\times10000=0.541196\times10000=5411.96$ sites. The
+   quantum walker is about $54$ times further out.
+
+   The factor is worth writing symbolically, because it is the whole
+   content of the comparison:
+
+   $$
+   \frac{\sqrt{(1-1/\sqrt2)}\,T}{\sqrt T}=\sqrt{1-\tfrac1{\sqrt2}}\;\sqrt T=0.5412\sqrt T.
+   $$
+
+   The advantage is not a constant factor, it grows as $\sqrt T$. At
+   $T=100$ the ratio is only $5.4$; at $T=10^4$ it is $54$; at $T=10^6$ it
+   would be $541$. There is no crossover point and no regime where the
+   classical walk catches up, which is what "different power law" means as
+   distinct from "better constant".
+
+   Two calibrations worth keeping. The quantum figure $5412$ sits at
+   $77\%$ of the light-cone edge $T/\sqrt2=7071$, which is the right
+   relationship: no probability can be outside the cone, and the root mean
+   square lands inside it but not far inside, because most of the mass
+   piles up near the horns rather than spreading evenly. And the words
+   "typical displacement" are doing more work on the quantum side than the
+   classical one. The classical distribution is a single bell curve, so its
+   standard deviation really is where a typical walker is found. The
+   quantum distribution is bimodal, so a typical measurement returns
+   something near $\pm7000$, not near $\pm5412$; $\sqrt{\langle x^2\rangle}$
+   is the right thing to *compare* because it is the same statistic in both
+   cases, not because it describes where the quantum walker usually is.
+
+   </details>
+
 2. From the dispersion relation $\cos\omega(k)=\sin(k)/\sqrt2$, verify
-   directly that $k=\pi/2$ gives $\omega=\pi/2$ and (using the group
+   directly that $k=\pi/2$ gives $\omega=\pi/4$ and (using the group
    velocity formula) $v(\pi/2)=0$, a "trapped," non-propagating mode.
    What feature of the $T=4$ worked example's quantum distribution (a
    local peak or dip at the center) is this mode responsible for?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Both checks are immediate, and the feature is the center's persistent
+   but *locally minimal* probability: $0.125$ at $x=0$, a dip between the
+   horns yet twice the $0.0625$ sitting at the extreme edges $x=\pm4$.
+
+   **The dispersion value.** $\sin(\pi/2)=1$, so
+   $\cos\omega=1/\sqrt2$ and $\omega(\pi/2)=\pi/4$.
+
+   **The group velocity.** From
+   $v(k)=-\cos k/\big(\sqrt2\sin\omega(k)\big)$, the numerator is
+   $\cos(\pi/2)=0$ while the denominator is
+   $\sqrt2\sin(\pi/4)=\sqrt2\cdot\tfrac1{\sqrt2}=1$, safely nonzero. So
+   $v(\pi/2)=0/1=0$ exactly. The mode is stationary: whatever amplitude the
+   walker carries at $k=\pi/2$ stays where it started, forever. The same
+   holds at $k=-\pi/2$, where $\cos\omega=-1/\sqrt2$ and $\omega=3\pi/4$.
+
+   **What it produces.** Stationary-phase reasoning places mode $k$ near
+   $x\approx v(k)T$, so the $k=\pm\pi/2$ modes deposit weight near the
+   origin at every $T$. That is the origin of the center's stubborn
+   refusal to empty out. The full distribution after four steps is
+
+   $$
+   P(-4)=0.0625,\quad P(-2)=0.375,\quad P(0)=0.125,\quad P(2)=0.375,\quad P(4)=0.0625,
+   $$
+
+   so the center is a local minimum relative to its neighbours and, at the
+   same time, is carrying twice the weight of the light-cone edge. A naive
+   reading of "ballistic spreading" would predict the middle empties out
+   entirely as all the probability rushes to the edges; the stationary
+   modes are exactly why it does not.
+
+   This survives to the asymptotic limit rather than being a small-$T$
+   artifact, which is the check worth doing. The limiting density inside
+   the light cone is
+   $f(y)=1/\big(\pi(1-y^2)\sqrt{1-2y^2}\big)$ for $y=x/T\in(-1/\sqrt2,1/\sqrt2)$,
+   whose minimum is at $y=0$ with the finite value $1/\pi\approx0.3183$ and
+   which diverges as $y\to\pm1/\sqrt2$. Simulating out to $T=400$ and
+   smoothing over the interference fringes reproduces it: $0.3185$ at
+   $y=0$, $0.3903$ at $y=0.3$, $0.9394$ at $y=0.6$, against $0.3183$,
+   $0.3863$ and $0.9399$ from the formula. The center is the global minimum
+   of the density and is never zero.
+
+   The tempting wrong turn is to expect $v=0$ to produce a *peak* at the
+   origin, on the reasoning that trapped modes accumulate. They do not
+   accumulate: each mode carries a fixed share of the initial amplitude and
+   deposits it once. The peaks appear where $dv/dk=0$ instead, at the
+   extremes of the group velocity, which is why the horns sit at the
+   light-cone edge rather than at the centre. Stationary *velocity* builds
+   a peak; zero velocity merely refuses to move.
+
+   </details>
+
 3. Explain, using only the fact that classical steps are independent,
    why $\text{Var}(x_T)=T$ exactly for *any* number of classical steps
    $T$, with no large-$T$ approximation needed; contrast this with the
    quantum result, which is only an asymptotic ($T\to\infty$) statement.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because variance is additive over uncorrelated summands, and that is an
+   algebraic identity rather than a limit theorem.
+
+   Write $x_T=\sum_{i=1}^Ts_i$ with each $s_i=\pm1$ equally likely. Then
+   $\mathbb E[s_i]=0$ and $\mathrm{Var}(s_i)=\mathbb E[s_i^2]=1$. Expanding
+   the square,
+
+   $$
+   \mathrm{Var}(x_T)=\mathbb E\Big[\Big(\sum_i s_i\Big)^2\Big]=\sum_i\mathbb E[s_i^2]+\sum_{i\neq j}\mathbb E[s_is_j]=T+0=T,
+   $$
+
+   where the cross terms vanish because $\mathbb E[s_is_j]=\mathbb E[s_i]\mathbb E[s_j]=0$
+   for $i\neq j$. Every step is exact. The result holds at $T=1$, at
+   $T=7$, at any $T$, and the simulation's `classical/T` column pinned at
+   exactly $1.0000$ for every row is that identity being reproduced rather
+   than approached.
+
+   Note how little was used: not the central limit theorem, not
+   identically distributed steps, not even full independence, only that
+   distinct steps are *uncorrelated* and have unit second moment. The CLT
+   is a separate and genuinely asymptotic statement, about the *shape* of
+   the distribution converging to a Gaussian. The variance was never the
+   asymptotic part.
+
+   The quantum side cannot run this argument, and the reason is structural
+   rather than technical. The walker's displacement is not a sum of
+   independent increments: the coin is entangled with the position, so
+   whether step $i$ moved left or right is correlated with every earlier
+   step through the coin state it inherited. There is nothing to
+   decorrelate and no additivity to exploit. What replaces the argument is
+   a stationary-phase evaluation of an oscillatory Fourier integral, which
+   is by construction a leading-order-in-$1/T$ result with corrections from
+   the interference fringes near the light-cone edge. That is why the table
+   shows `quantum/T²` drifting from $0.2995$ at $T=10$ down to $0.2929$ at
+   $T=160$ while `classical/T` never moves: one column is a theorem about
+   every $T$, the other is a limit being approached.
+
+   The practical moral for reading such a table: a column that is exactly
+   constant is reporting an identity and a column that is converging is
+   reporting an asymptotic, and confusing the two leads to treating
+   finite-$T$ drift as a bug in the simulation.
+
+   </details>
+
 4. A continuous-time quantum walk on a graph with adjacency matrix $A$
    evolves by $i\,d|\psi\rangle/dt=A|\psi\rangle$. Explain precisely why
    this is *literally* an instance of Hamiltonian simulation from the
@@ -476,6 +647,73 @@ envelope narrows.
    practical tool for running it on a graph whose adjacency matrix is a
    sum of non-commuting pieces (e.g. edge sets from different graph
    colors).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $i\,d|\psi\rangle/dt=A|\psi\rangle$ *is* the Schrödinger
+   equation in units $\hbar=1$, and $A$ satisfies the one hypothesis that
+   makes it a Hamiltonian.
+
+   That hypothesis is Hermiticity, and for an undirected simple graph it
+   comes free: $A_{uv}=A_{vu}\in\{0,1\}$ makes $A$ real symmetric, hence
+   self-adjoint, hence a legitimate $H$ with $e^{-iAt}$ unitary and
+   probability conserved. Nothing is being analogized. Solving the walk and
+   simulating $H=A$ are the same computational task, so every bound from
+   the previous lesson transfers verbatim, with $\|[A_1,A_2]\|$ read off
+   the graph rather than off a physical Hamiltonian. The hypothesis is also
+   where a directed graph fails: a non-symmetric $A$ generates non-unitary
+   evolution and the whole framework needs replacing, which is why
+   continuous-time quantum walks on directed graphs are a genuinely
+   separate subject.
+
+   Now the practical part. The state space has one dimension per vertex, so
+   an $N$-vertex graph needs $\lceil\log_2N\rceil$ qubits and $A$ is a
+   $2^n\times2^n$ matrix. Exponentiating it directly is exactly the
+   $O(N^3)$ classical computation the quantum computer was supposed to
+   avoid, so $e^{-iAt}$ has to be *compiled* out of pieces whose
+   exponentials are individually easy.
+
+   The standard decomposition is an edge colouring. Split
+   $A=\sum_{c=1}^{C}A_c$, where colour class $c$ is a set of edges no two
+   of which share a vertex. Each $A_c$ is then a perfect or partial
+   matching, so as a matrix it is a direct sum of $2\times2$ blocks
+   $\big(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\big)$, and
+
+   $$
+   e^{-iA_c t}=\bigoplus_{\text{edges}}\begin{pmatrix}\cos t&-i\sin t\\-i\sin t&\cos t\end{pmatrix},
+   $$
+
+   a single rotation applied independently on disjoint vertex pairs, all in
+   parallel. Vizing's theorem guarantees $C\leq\Delta+1$ colours for
+   maximum degree $\Delta$, so a bounded-degree graph splits into a
+   constant number of easy pieces.
+
+   The catch is that two colour classes generally share vertices, and
+   $[A_c,A_{c'}]\neq0$ whenever they do. Sharing a vertex is precisely what
+   makes the walk interesting, since it is how amplitude moves from one
+   edge to the next, so the non-commutativity cannot be engineered away. So
+
+   $$
+   e^{-iAt}\approx\left(\prod_{c=1}^{C}e^{-iA_c t/n}\right)^{n},
+   $$
+
+   with the error controlled by the previous lesson's commutator bound and
+   the step count set by $n=O(t^2\sum_{c<c'}\|[A_c,A_{c'}]\|/\epsilon)$, or
+   $O(t^{3/2}/\sqrt\epsilon)$ with the symmetric splitting. This is the
+   textbook route to sparse-Hamiltonian simulation, and continuous-time
+   quantum walk search algorithms are compiled exactly this way.
+
+   One caveat, so the tool is not over-applied. Trotterization is what you
+   reach for when the graph has *no* exploitable structure. A
+   translation-invariant graph such as a cycle is diagonalized by the
+   quantum Fourier transform, so $e^{-iAt}$ can be implemented exactly as
+   QFT, a diagonal phase, then inverse QFT, with no Trotter error at all.
+   That is the continuous-time counterpart of the momentum-space
+   diagonalization this lesson used on the coined walk, and it is worth
+   checking for before paying for $n$ steps.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -486,7 +724,7 @@ envelope narrows.
   both unitary, so the whole walk is unitary evolution.
 - Diagonalizing in momentum space gives an exact dispersion relation
   $\cos\omega(k)=\sin(k)/\sqrt2$, whose bounded, nonzero group velocity
-  (maximum $1/\sqrt2$, derived via calculus, not asserted) forces
+  (maximum $1/\sqrt2$, from the group-velocity calculation above) forces
   ballistic ($\propto T$, so $\langle x^2\rangle\propto T^2$) spreading.
 - The classical random walk's $\text{Var}(x_T)=T$ follows directly from
   independence (central limit theorem territory), diffusive,
@@ -494,14 +732,18 @@ envelope narrows.
 - A real coined-walk simulation (using this platform's `Complex`
   arithmetic) confirms $\langle x^2\rangle/T^2\to1-1/\sqrt2\approx0.2929$
   as $T$ grows, matching the cited Konno constant to four decimal
-  places, computed, not quoted.
+  places.
+- $W$ acts on the infinite-dimensional $\ell^2(\mathbb Z)\otimes\mathbb C^2$
+  and has purely absolutely continuous, two-band spectrum with no
+  eigenvectors; the momentum labels $|k\rangle$ are a direct-integral
+  decomposition, not eigenvectors of $W$.
 - Continuous-time quantum walks ($i\,d|\psi\rangle/dt=A|\psi\rangle$ for
   graph adjacency matrix $A$) are literally Hamiltonian simulation with
   $H=A$, directly connecting to the previous lesson's Trotterization
   machinery for graphs whose adjacency matrix doesn't split into
   commuting pieces.
 
-## Further Exploration
+## Precision Where the Register Is Finite
 
 <NextDiscovery>
   [Phase Estimation Precision and QFT Depth](/lessons/quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth)

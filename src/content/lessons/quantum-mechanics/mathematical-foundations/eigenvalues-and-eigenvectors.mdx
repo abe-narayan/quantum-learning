@@ -44,18 +44,19 @@ export const lessonMeta = {
   prerequisites: ["quantum-mechanics/mathematical-foundations/linear-operators"],
   objectives: [
     "Derive and use the characteristic equation to find eigenvalues",
-    "Find eigenvectors for a given eigenvalue and verify $Av=\\lambda v$ directly",
+    "Find eigenvectors for a given eigenvalue and verify Av = λv directly",
     "Use the trace/determinant shortcut to check eigenvalue calculations",
+    "Diagonalize a 2x2 operator and read its action off the eigenbasis",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="What the readout hardware actually reports">
   On a real quantum computer, the bit a measurement reports back is not an
   abstraction. It is a statement of which eigenvalue the readout hardware
   found.
 </LessonHook>
 
-## Motivation
+## The few vectors that keep their direction
 
 Most vectors, hit with an operator, come out pointing in some new
 direction. A special few come out pointing the *same* direction, only
@@ -64,7 +65,7 @@ carry most of the physical content of the theory: for the operators
 representing physical observables, the eigenvectors are the states with a
 definite, predictable value of that <Term id="observable">observable</Term>, and nothing else is.
 
-## Intuition
+## Axes that only get stretched
 
 Picture an operator as a transformation of the plane. Most directions get
 tilted somewhere else, but there are usually a couple of special axes that
@@ -111,7 +112,7 @@ treats as an axis of pure scaling, nothing else.
   />
 </InteractiveSection>
 
-## Mathematical Development
+## The characteristic equation, and diagonalization
 
 ### Definition
 
@@ -213,7 +214,7 @@ never mixing coordinates, which is why finding an eigenbasis is usually
 the first move when an operator has to be applied repeatedly, exponentiated,
 or evolved in time.
 
-## Physical Interpretation
+## The states where the outcome is certain
 
 For an operator representing a physical observable, eigenvalues are the
 only values that observable can ever be measured to have, and its
@@ -230,7 +231,7 @@ that comes back, the bit reported as $0$ or $1$, is a label for which
 eigenvalue was found. The eigenvalue equation on this page is the equation
 real readout hardware is built to resolve.
 
-## Worked Example
+## Both eigenvalues and both eigenvectors of a 2x2
 
 **Find the eigenvalues and eigenvectors of $A=\begin{pmatrix}2&1\\1&2\end{pmatrix}$.**
 
@@ -249,7 +250,7 @@ $\frac{1}{\sqrt2}(1,1)$.
 Check: eigenvalues sum to $1+3=4=\operatorname{tr}(A)$ ✓, and multiply to
 $1\cdot3=3=\det(A)$ ✓.
 
-## Common Mistakes
+## Zero is never an eigenvector
 
 <Callout type="warning">
 **Accepting $v=0$ as an eigenvector.** The eigenvalue equation is trivially
@@ -267,12 +268,130 @@ trace, you've made an arithmetic error somewhere.
 
 1. Find the eigenvalues of Pauli-$Y=\begin{pmatrix}0&-i\\i&0\end{pmatrix}$
    using the trace/determinant shortcut.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\lambda = +1$ and $\lambda = -1$.
+
+   For a $2\times2$ matrix the characteristic equation is
+   $\lambda^2 - (\operatorname{tr}A)\lambda + \det A = 0$. Here
+
+   $$
+   \operatorname{tr}Y = 0 + 0 = 0, \qquad \det Y = (0)(0) - (-i)(i) = 0 - 1 = -1,
+   $$
+
+   so the equation is $\lambda^2 - 1 = 0$ and $\lambda = \pm1$.
+
+   The determinant is where this goes wrong. $(-i)(i) = -i^2 = +1$, so
+   subtracting it gives $\det Y = -1$, not $+1$. Getting $\det Y = +1$ produces
+   $\lambda^2+1=0$ and the eigenvalues $\pm i$, which should be rejected on
+   sight: $Y$ is Hermitian ($Y^\dagger = Y$, since transposing swaps $-i$ and
+   $i$ and conjugating swaps them back), and a Hermitian operator's eigenvalues
+   are real. That is the value of the shortcut, not the arithmetic saving but
+   the two independent checks it hands you.
+
+   The result is also physics rather than algebra. $Y$ represents a spin
+   measurement along the $y$-axis, and $\pm1$ are the only two outcomes such a
+   measurement can produce. All three Pauli matrices share this spectrum,
+   which is the formal statement of "two spots, whichever axis you choose".
+
+   </details>
+
 2. Find an eigenvector of $Y$ for its eigenvalue $+1$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $|{+i}\rangle = \frac{1}{\sqrt2}\begin{pmatrix}1\\i\end{pmatrix}$, or any nonzero multiple of it.
+
+   Solve $Yv = v$ with $v = (a,b)^\mathsf{T}$:
+
+   $$
+   \begin{pmatrix}0&-i\\i&0\end{pmatrix}\begin{pmatrix}a\\b\end{pmatrix} = \begin{pmatrix}-ib\\ia\end{pmatrix} \overset{!}{=} \begin{pmatrix}a\\b\end{pmatrix}.
+   $$
+
+   The first row gives $a = -ib$. The second row gives $b = ia$, which is the
+   same equation rearranged (multiply the first by $i$), not new information.
+   That redundancy is expected and is a sign the calculation is right: the
+   whole point of $\lambda$ being an eigenvalue is that $Y - \lambda I$ is
+   singular, so its two rows must be proportional. If both rows had given
+   genuinely independent conditions, the only solution would be $v=0$ and
+   $\lambda$ would not have been an eigenvalue.
+
+   Choosing $a = 1$ gives $b = i$, so $v = (1, i)^\mathsf{T}$, normalized to
+   $\frac{1}{\sqrt2}(1,i)^\mathsf{T}$. Check:
+   $Y(1,i)^\mathsf{T} = (-i\cdot i,\ i\cdot 1)^\mathsf{T} = (1, i)^\mathsf{T} \checkmark$.
+
+   An eigenvector is only ever determined up to a scalar, so
+   $(-i, 1)^\mathsf{T}$ is the same answer wearing a factor of $-i$; both
+   describe one line through the origin, and after normalization both describe
+   one physical state. Marking one "wrong" because it differs by a phase is a
+   misreading of what the equation asks for.
+
+   </details>
+
 3. Find the eigenvalues of $\begin{pmatrix}3&0\\0&5\end{pmatrix}$ without
    any calculation. Explain why a diagonal matrix's eigenvalues are
    immediate.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\lambda = 3$ and $\lambda = 5$: the diagonal entries.
+
+   The basis vectors are already eigenvectors. $A e_1 = (3,0)^\mathsf{T} = 3e_1$
+   and $A e_2 = (0,5)^\mathsf{T} = 5e_2$, so each one is rescaled and not
+   rotated, which is the definition. A diagonal matrix acts on each coordinate
+   axis independently, stretching axis $i$ by the factor $A_{ii}$, and an
+   eigenvalue problem asks precisely for the directions that get stretched.
+
+   The characteristic polynomial agrees, of course:
+   $\det(A-\lambda I) = (3-\lambda)(5-\lambda) = 0$, already factored, which is
+   the algebraic shadow of the same fact.
+
+   This is worth stating as a general principle because it runs in both
+   directions. Reading eigenvalues off a diagonal matrix is trivial, and the
+   spectral theorem's promise is that a Hermitian operator can *always* be
+   brought to this form by choosing the right orthonormal basis. Diagonalizing
+   is not a computational trick; it is the search for the basis in which an
+   operator is as simple as this one already is.
+
+   One boundary worth marking: it holds for triangular matrices too, where the
+   eigenvalues are still the diagonal entries even though the basis vectors are
+   no longer all eigenvectors. It does *not* hold for a general matrix, and
+   reading the diagonal of, say, $\begin{pmatrix}0&1\\1&0\end{pmatrix}$ would
+   give $0, 0$ rather than the correct $\pm1$.
+
+   </details>
+
 4. A $2\times2$ matrix has trace $6$ and one eigenvalue is $2$. What is
    the other?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $4$, since $\lambda_1 + \lambda_2 = \operatorname{tr}A$ gives $2 + \lambda_2 = 6$.
+
+   The sum rule falls straight out of the characteristic equation. Expanding
+   $(\lambda-\lambda_1)(\lambda-\lambda_2) = \lambda^2 - (\lambda_1+\lambda_2)\lambda + \lambda_1\lambda_2$
+   and matching it against
+   $\lambda^2 - (\operatorname{tr}A)\lambda + \det A$ identifies the trace with
+   the sum of the eigenvalues and the determinant with their product.
+
+   Notice how little the question had to tell you. The matrix's entries are
+   never given, and they are not needed: trace and determinant are basis
+   independent, so they constrain the spectrum no matter what basis the matrix
+   happened to be written in. As a by-product, $\det A = 2 \times 4 = 8$, also
+   determined without seeing a single entry.
+
+   The mistake to avoid is reaching for the determinant relation instead and
+   answering $3$, from $2\lambda_2 = 6$. Trace goes with the *sum*, determinant
+   with the *product*. A quick way to keep them straight: $\operatorname{tr}I = 2$
+   for a $2\times2$ identity whose eigenvalues are $1$ and $1$, and
+   $1+1 = 2 \checkmark$ while $1\times1 = 1 = \det I \checkmark$.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -285,7 +404,7 @@ trace, you've made an arithmetic error somewhere.
 - Pauli-$X$ has eigenvalues $\pm1$ with eigenvectors $|+\rangle,|-\rangle$.
 - A full eigenbasis diagonalizes an operator's matrix.
 
-## Further Exploration
+## The determinant half of the shortcut
 
 <ChallengePrompt prompt="A 2×2 matrix has determinant 10 and one eigenvalue is 5. What is the other eigenvalue, and what is the matrix's trace?">
   Eigenvalues multiply to the determinant: the same shortcut derived

@@ -28,7 +28,7 @@ export const biasedMixturePurity: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.005,
-    incorrectFeedback: "ρ is diagonal here — Tr(ρ²) is just the sum of the squared diagonal entries.",
+    incorrectFeedback: "ρ is diagonal here, so Tr(ρ²) is the sum of the squared diagonal entries.",
     nearMisses: [
       { value: 0.5, feedback: "0.5 is the purity of the maximally mixed state, which needs a balanced 50/50 split. An 80/20 mixture is closer to pure than that." },
       { value: 1, feedback: "Purity 1 means a pure state. A probabilistic mixture of two orthogonal states is mixed, so its purity has to fall below 1." },
@@ -49,7 +49,7 @@ export const biasedMixturePurity: NumericProblem = {
   },
   explanation: {
     correctIdea: "For a diagonal ρ, purity is just the sum of squared diagonal entries.",
-    whyCorrect: "0.68 is strictly between 0.5 (maximally mixed) and 1 (pure), matching an unbalanced but still genuinely mixed state.",
+    whyCorrect: "0.68 is strictly between 0.5 (maximally mixed) and 1 (pure), matching an unbalanced but still mixed state.",
     whyWrong: ["Answering exactly 0.5 would assume this is maximally mixed, but 80/20 is not a balanced mixture."],
   },
 };

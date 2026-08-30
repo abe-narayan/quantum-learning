@@ -9,9 +9,15 @@ import { measure } from "@/lib/quantum/measurement";
 import { stateToBlochVector, type BlochVector } from "@/lib/quantum/bloch";
 import { BlochSphereCanvas } from "./BlochSphereCanvas";
 import { FIXED_GATES, type FixedGateDefinition, type FixedGateId } from "./gateDefinitions";
+import { easeInOutCubic, GATE_ROTATION_MS, slerpBlochVector } from "./useAnimatedBlochPoint";
 import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
 
-const ANIMATION_MS = 550;
+/**
+ * Same 550ms as the full `BlochSphereExplorer`, and now literally the same
+ * constant: a reader who meets the sphere here and then opens the full
+ * explorer should not find the identical H gate sweeping at a different rate.
+ */
+const ANIMATION_MS = GATE_ROTATION_MS;
 const HERO_GATE_IDS: readonly FixedGateId[] = ["H", "X", "Z"];
 const HERO_GATES = FIXED_GATES.filter((gate) => HERO_GATE_IDS.includes(gate.id));
 
@@ -19,7 +25,7 @@ const HERO_GATES = FIXED_GATES.filter((gate) => HERO_GATE_IDS.includes(gate.id))
  * The state this hero opens on: |+⟩ = H|0⟩, the equal superposition.
  *
  * It used to open on |0⟩, and |0⟩ is the one point on this sphere that
- * teaches nothing — the vector stands straight up at the north pole, which is
+ * teaches nothing: the vector stands straight up at the north pole, which is
  * indistinguishable at a glance from a classical bit reading 0, and the whole
  * reason the Bloch sphere exists is to show the states a bit cannot reach.
  * A homepage visitor who never presses a button therefore saw a picture that
@@ -38,78 +44,48 @@ function initialSuperposition() {
   return applySingleQubitGate(StateVector.zero(1), hadamard.matrix, 0);
 }
 
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
-}
-
-/** An arbitrary unit vector perpendicular to `v` — used only for the antipodal slerp case
- * below, where any one meridian is as good as any other. */
-function arbitraryPerpendicular(v: BlochVector): BlochVector {
-  const reference = Math.abs(v.z) < 0.9 ? { x: 0, y: 0, z: 1 } : { x: 1, y: 0, z: 0 };
-  const cx = v.y * reference.z - v.z * reference.y;
-  const cy = v.z * reference.x - v.x * reference.z;
-  const cz = v.x * reference.y - v.y * reference.x;
-  const norm = Math.hypot(cx, cy, cz) || 1;
-  return { x: cx / norm, y: cy / norm, z: cz / norm };
-}
-
-/** The rotation axis for the degenerate (near-π) slerp branch below. Prefers `cross(a, b)`
- * — the true meridian axis, which stays numerically meaningful far below the `sinTheta < 1e-6`
- * cutoff that gates this branch — and only falls back to the direction-agnostic
- * `arbitraryPerpendicular(a)` once that cross product has itself collapsed to noise (`a` and
- * `b` are bit-for-bit antipodal, or close enough that no meridian is distinguishable). Without
- * this, a vector approaching antipodal along a fixed azimuth would track that azimuth right up
- * to the branch cutoff and then visibly snap to the unrelated arbitrary axis. */
-function degenerateSlerpAxis(a: BlochVector, b: BlochVector): BlochVector {
-  const cx = a.y * b.z - a.z * b.y;
-  const cy = a.z * b.x - a.x * b.z;
-  const cz = a.x * b.y - a.y * b.x;
-  const norm = Math.hypot(cx, cy, cz);
-  if (norm > 1e-9) return { x: cx / norm, y: cy / norm, z: cz / norm };
-  return arbitraryPerpendicular(a);
-}
-
-/** Rotates unit vector `v` by `angle` about a perpendicular `axis` (Rodrigues' formula with
- * the axis·v term dropped, since it's zero when axis ⟂ v). */
-function rotateAboutPerpendicularAxis(v: BlochVector, axis: BlochVector, angle: number): BlochVector {
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-  const crossX = axis.y * v.z - axis.z * v.y;
-  const crossY = axis.z * v.x - axis.x * v.z;
-  const crossZ = axis.x * v.y - axis.y * v.x;
-  return { x: v.x * cos + crossX * sin, y: v.y * cos + crossY * sin, z: v.z * cos + crossZ * sin };
-}
-
-function slerp(a: BlochVector, b: BlochVector, t: number): BlochVector {
-  const dot = Math.min(1, Math.max(-1, a.x * b.x + a.y * b.y + a.z * b.z));
-  const theta = Math.acos(dot);
-  const sinTheta = Math.sin(theta);
-
-  if (sinTheta < 1e-6) {
-    if (dot < 0) {
-      // Antipodal (e.g. Reset from |1⟩ back to |0⟩): the great-circle direction is undefined,
-      // and the naive lerp-then-normalize below divides by a norm that passes through exactly
-      // zero at t=0.5 — the vector visibly collapses to the sphere's center instead of
-      // sweeping along a meridian. Rotate about the (near-)meridian axis instead.
-      return rotateAboutPerpendicularAxis(a, degenerateSlerpAxis(a, b), Math.PI * t);
-    }
-    const lerped = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t };
-    const norm = Math.hypot(lerped.x, lerped.y, lerped.z) || 1;
-    return { x: lerped.x / norm, y: lerped.y / norm, z: lerped.z / norm };
-  }
-
-  const wa = Math.sin((1 - t) * theta) / sinTheta;
-  const wb = Math.sin(t * theta) / sinTheta;
-  return { x: wa * a.x + wb * b.x, y: wa * a.y + wb * b.y, z: wa * a.z + wb * b.z };
-}
-
 /**
+ * WHY THE SLERP IS IMPORTED RATHER THAN LIVING HERE.
+ *
+ * This file used to carry its own `slerp`, plus its own `easeInOutCubic`,
+ * `arbitraryPerpendicular`, `degenerateSlerpAxis` and
+ * `rotateAboutPerpendicularAxis`: a line-for-line copy of what
+ * `useAnimatedBlochPoint` exports, forked at some point and then maintained
+ * in neither place. The shared one has since been fixed and the copy had not:
+ * it read `a·b` as the cosine of the angle between its inputs, which is only
+ * true for *unit* vectors, so for a shorter vector it over-reports the angle
+ * and the weights sin((1-t)θ)/sinθ and sin(tθ)/sinθ stop summing to 1. The
+ * drawn arrow then grows mid-tween, by up to √2 (41%) in the worst case.
+ *
+ * Nothing was wrong on screen here, and that is exactly the trap: the hero
+ * only ever animates *pure* states (every `renderPoint` and `endPoint` below
+ * comes from `stateToBlochVector`, whose output is a unit vector), so the
+ * bug was unreachable through this file and would have stayed unreachable
+ * right up until someone added a decoherence demo to the homepage. The Noise
+ * Explorer and the Density Matrix Explorer, which do animate mixed states,
+ * had the live version of it.
+ *
+ * Importing costs nothing: `useAnimatedBlochPoint` is already in the client
+ * graph (`BlochSphereExplorer` and four other simulators use it), it pulls in
+ * only React and this folder's own `usePrefersReducedMotion`, which this file
+ * already imports, and it deletes ~60 lines from here. `slerpBlochVector` is
+ * bit-for-bit the old `slerp` on unit input: it normalizes, sweeps the
+ * direction along the identical great-circle arc through the identical
+ * degenerate-case branches, and rescales to a radius that interpolates from 1
+ * to 1. Rendering is unchanged.
+ *
+ * The full hook is deliberately not adopted wholesale: `runAnimation` below
+ * drives `pointAtT` callbacks that are not slerps at all (a gate animates by
+ * re-deriving the state from a real `rotationAboutAxis` at each t, which is
+ * the thing that makes this hero honest), and it needs the completion
+ * callback to settle `state` as well as the point.
+ *
  * A compact, genuinely interactive Bloch sphere for the homepage hero: real
  * quantum state (src/lib/quantum), the same 3D-projected canvas as the full
  * BlochSphereExplorer, and a small set of gate/measure/reset controls. This
  * is a deliberately trimmed-down sibling of BlochSphereExplorer (drops
  * presets, angle sliders, and the state readout panel) so it fits a hero
- * layout — not a decorative substitute for it.
+ * layout, not a decorative substitute for it.
  */
 export function BlochSphereHeroExplorer() {
   const [state, setState] = useState(initialSuperposition);
@@ -186,11 +162,11 @@ export function BlochSphereHeroExplorer() {
 
     setLastMeasurement(outcomeIndex);
     setNarration(
-      `Measured |${outcomeIndex}⟩ (random, weighted by probability) — the superposition has collapsed.`
+      `Measured |${outcomeIndex}⟩ (random, weighted by probability). The superposition has collapsed.`
     );
 
     runAnimation(
-      (t) => slerp(renderPoint, endPoint, t),
+      (t) => slerpBlochVector(renderPoint, endPoint, t),
       () => settleAt(collapsed, endPoint)
     );
   }, [isAnimating, state, renderPoint, runAnimation, settleAt]);
@@ -205,7 +181,7 @@ export function BlochSphereHeroExplorer() {
     setNarration("Reset to |0⟩.");
 
     runAnimation(
-      (t) => slerp(startPoint, endPoint, t),
+      (t) => slerpBlochVector(startPoint, endPoint, t),
       () => settleAt(zero, endPoint)
     );
   }, [isAnimating, renderPoint, runAnimation, settleAt]);
@@ -225,7 +201,7 @@ export function BlochSphereHeroExplorer() {
   // their own keystroke, spent the 600ms animation with no focus anywhere, and
   // found their next Tab restarting from the top of the document. On the
   // homepage hero that means you cannot apply two gates in a row from the
-  // keyboard without re-tabbing through the whole page between them — the
+  // keyboard without re-tabbing through the whole page between them. The
   // single most-reached instrument on the site, unusable in sequence.
   //
   // `aria-disabled` announces the identical "dimmed, unavailable" state while
@@ -249,10 +225,34 @@ export function BlochSphereHeroExplorer() {
         }}
       />
 
-      <div className="rounded-panel border border-border bg-surface p-6 shadow-sm sm:p-8">
+      {/* No frame of its own; see the long note in
+          `WavefunctionHeroExplorer`. This used to be a `rounded-panel border
+          border-border bg-surface p-6 shadow-sm sm:p-8` root, and inside the
+          `<Instrument>` that `home/ComputingSection` mounts it in that drew a
+          second hairline at the identical radius under `.instrument::after`'s
+          corner ticks. `bodyClassName="p-0"` never cancelled it: `cn()` does
+          not merge, so the class landed beside `p-4 sm:p-5` and the cascade
+          picked the later rule.
+          `relative` (and only `relative`) stays, because the glow above is
+          `-z-10`: a negative-z sibling paints behind in-flow content, and the
+          `bg-surface` that used to do that job has gone with the frame.
+          It also un-shrinks the canvas. At a 320px viewport the `<Instrument>`
+          hands this 254px; the border and `p-6` took 50 of them, leaving the
+          sphere 204px, at which the 15-unit axis labels on the 400-unit
+          viewBox rendered at 15 × 204 ÷ 400 = 7.65px — under the ~9px floor
+          the type in `BlochSphereCanvas` was raised to clear. At the full
+          254px they are 9.53px, which is the figure that file's own note
+          derives. */}
+      <div className="relative">
         <BlochSphereCanvas blochPoint={renderPoint} className="mx-auto h-auto w-full max-w-xs" />
 
-        <p aria-live="polite" className="mt-4 min-h-[2.5rem] text-center text-xs text-muted-foreground">
+        {/* `aria-atomic="true"` is load-bearing here rather than tidy-up: the
+            region is two children, a narration sentence and a measurement
+            chip, and only the chip changes when a measurement lands. Without
+            atomic, a role-less element's implicit `aria-atomic="false"` means
+            that update announces the bare "→ |1⟩" with no sentence around it.
+            `role="status"` carries the polite live region itself. */}
+        <p role="status" aria-live="polite" aria-atomic="true" className="mt-4 min-h-[2.5rem] text-center text-xs text-muted-foreground">
           {narration}
           {lastMeasurement !== null ? (
             <span className="ml-1 font-mono text-pillar">→ |{lastMeasurement}⟩</span>
@@ -268,7 +268,7 @@ export function BlochSphereHeroExplorer() {
               onClick={() => applyGate(gate)}
               title={gate.explanation}
               // A button whose entire content is the letter "H" announces as
-              // "H, button" — no indication it is a gate, or that pressing it
+              // "H, button", with no indication it is a gate, or that pressing it
               // does anything to the sphere. `title` alone does not fix that:
               // it becomes the accessible *description*, which many screen
               // readers skip. The visible letter stays as it is.
@@ -288,7 +288,7 @@ export function BlochSphereHeroExplorer() {
 
         {/* The rotate hint sits outside the link on purpose. It used to be the
             link's second line, which made the link announce as "Bloch sphere
-            Drag to rotate the view Full explorer" — an instruction about the
+            Drag to rotate the view Full explorer", an instruction about the
             canvas above welded onto the accessible name of a control that goes
             somewhere else entirely. It now describes what it is about, and the
             link's name is just its destination. */}

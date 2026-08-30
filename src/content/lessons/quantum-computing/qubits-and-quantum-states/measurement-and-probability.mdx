@@ -39,7 +39,7 @@ export const lessonMeta = {
 The computational basis picks out two points on a whole sphere of states. "Is this |+⟩ or |−⟩?" is an equally legitimate question to ask a qubit, and it comes with its own menu of answers.
 </LessonHook>
 
-## Motivation
+## The question the Born rule leaves open
 
 The <Term id="born-rule">Born rule</Term> ($P(0)=|\alpha|^2$, $P(1)=|\beta|^2$) has been used
 informally since Lesson 1. Here is the question it leaves open: what if you
@@ -52,7 +52,7 @@ like. The payoff arrives in the X-basis calculation, where the relative
 phase $\varphi$, invisible to every measurement you have made so far,
 becomes something you can read off a detector.
 
-## Intuition
+## Asking a different question of the same qubit
 
 Measuring is like asking a question with a fixed menu of possible answers.
 "Is this 0 or 1?" is one question: the menu is $\{|0\rangle,|1\rangle\}$.
@@ -75,7 +75,7 @@ overlaps with each possible answer.
 The Stern-Gerlach experiment sends a beam of silver atoms through an inhomogeneous magnetic field. It splits into two discrete spots on a detector, never a continuous smear. Rotating the magnet does not add outcomes; it changes which two you get.
 </HistoricalMoment>
 
-## Mathematical Development
+## Any orthonormal basis, and what it gives
 
 ### The measurement postulate
 
@@ -107,7 +107,7 @@ $$
 
 using $\langle0|\psi\rangle=\langle0|(\alpha|0\rangle+\beta|1\rangle)=\alpha$
 by orthonormality: the amplitude $\alpha$ *is* the inner product with
-$|0\rangle$, not just notation that happens to look like one.
+$|0\rangle$, and the resemblance in the notation is no accident.
 
 ### Measuring in the X-basis
 
@@ -145,7 +145,7 @@ computing the fraction of 0s. This is a hard physical constraint, not a
 technological limitation: once you measure, the superposition is gone, so
 you cannot "measure again more carefully."
 
-## Physical Interpretation
+## Choosing a basis is choosing what to observe
 
 Choosing a measurement basis is choosing which physical property to
 observe (for a real qubit, e.g. photon polarization, this might mean
@@ -154,7 +154,7 @@ outcome's randomness is not error or noise to be engineered away. The
 postulate puts it in the theory at the ground floor, and nothing in
 quantum mechanics predicts which outcome a given run will give.
 
-## Interactive Experiment
+## Borrowing one gate a lesson early
 
 The experiment below needs one gate, the **Hadamard gate** $H$, a lesson
 ahead of where it is properly introduced. Two facts about it are enough
@@ -169,7 +169,7 @@ $$
 That is everything the prediction needs: apply those two rules to
 $|+\rangle = \tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$, collect terms, and
 read off what the Born rule then says about a $Z$-basis measurement of
-the result. It is a two-line calculation, not a guess.
+the result, and it takes two lines of calculation to get there.
 
 <PredictBeforeReveal
   question="Prepare |+⟩, apply an H gate to it, then measure in the computational (Z) basis. What outcome do you expect?"
@@ -187,7 +187,7 @@ the result. It is a two-line calculation, not a guess.
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
-## Worked Example
+## X-basis probabilities for the plus-i state
 
 **Compute $P(+)$ and $P(-)$ for $|\psi\rangle = |{+i}\rangle = \frac{1}{\sqrt2}(|0\rangle+i|1\rangle)$.**
 
@@ -213,7 +213,7 @@ preference for either X-basis outcome.
   <LazyComplexAmplitudeExplorer twoAmplitudeVariant="basis-change" />
 </InteractiveSection>
 
-## Common Mistakes
+## One measurement is one bit
 
 <Callout type="warning">
 **Believing a measurement "reveals" $\theta$ or $\varphi$.** A single
@@ -236,13 +236,148 @@ directly.
 
 1. Compute $P(0)$ and $P(1)$ for $|\psi\rangle=\frac{1}{2}|0\rangle+\frac{\sqrt3}{2}|1\rangle$,
    then compute $P(+)$ and $P(-)$ for the same state.
-2. For which states is $P(+)=1$ exactly? Name the state and justify it
-   using the formula for $P(+)$ above.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   In the computational basis, read the amplitudes off and square:
+
+   $$
+   P(0) = \left|\tfrac12\right|^2 = \tfrac14 = 25\%, \qquad P(1) = \left|\tfrac{\sqrt3}{2}\right|^2 = \tfrac34 = 75\%.
+   $$
+
+   In the X basis you cannot read anything off, because $\alpha$ and $\beta$ are
+   the overlaps with $|0\rangle$ and $|1\rangle$, not with $|\pm\rangle$. Use
+   $P(+) = \frac{1+2\operatorname{Re}(\alpha^*\beta)}{2}$. Here
+   $\alpha^*\beta = \tfrac12 \cdot \tfrac{\sqrt3}{2} = \tfrac{\sqrt3}{4}$, which
+   is real, so $\operatorname{Re}(\alpha^*\beta) = \tfrac{\sqrt3}{4}$ and
+
+   $$
+   P(+) = \frac{1 + \tfrac{\sqrt3}{2}}{2} \approx 0.933, \qquad P(-) = \frac{1 - \tfrac{\sqrt3}{2}}{2} \approx 0.067.
+   $$
+
+   Check: they sum to 1, as any complete set of outcomes must.
+
+   The result is worth pausing on. This state is heavily biased toward 1 in the
+   Z basis (75/25) and *more* heavily biased toward $+$ in the X basis (93/7).
+   There is no conservation law forcing a state that is lopsided in one basis
+   to be balanced in another; the two questions are close to independent.
+
+   The common wrong answer is $P(+) = P(-) = \tfrac12$, from an unspoken rule
+   that "measuring in the wrong basis gives a coin flip". That is true only for
+   states sitting on the $y$-$z$ great circle, the ones with Bloch
+   $x$-coordinate zero, where $\operatorname{Re}(\alpha^*\beta) = 0$. It is not
+   a general fact, and this state is the counterexample.
+
+   </details>
+
+2. For which state is $P(+)=1$ exactly? Name it, and show from the formula
+   for $P(+)$ above that no other state can reach it.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $|+\rangle$ itself, and nothing else (up to a global phase).
+
+   Start from $P(+) = |\langle+|\psi\rangle|^2 = 1$. Since $|\psi\rangle$ and
+   $|+\rangle$ are both unit vectors, the Cauchy-Schwarz inequality says
+   $|\langle+|\psi\rangle| \le 1$ with equality only when the two vectors are
+   parallel, so $|\psi\rangle = e^{i\gamma}|+\rangle$: the same physical state.
+
+   The same conclusion falls out of the expanded formula without invoking a
+   named theorem. $P(+) = \frac{1+2\operatorname{Re}(\alpha^*\beta)}{2} = 1$
+   requires $\operatorname{Re}(\alpha^*\beta) = \tfrac12$. But
+   $|\alpha^*\beta| \le \tfrac{|\alpha|^2+|\beta|^2}{2} = \tfrac12$ for any
+   normalized state (that is the arithmetic-geometric mean inequality), so
+   $\tfrac12$ is the largest the real part could possibly be, and it is reached
+   only when two things happen at once: $|\alpha| = |\beta| = \tfrac{1}{\sqrt2}$,
+   so the bound is tight, and $\alpha^*\beta$ is real and positive, so nothing
+   is lost taking the real part. Those two conditions say the amplitudes are
+   equal in size and in phase, which is $|+\rangle$.
+
+   The reason to insist on the uniqueness argument rather than just naming the
+   state: "certainty in the X basis" is a much stronger constraint than
+   "50/50 in the Z basis". Plenty of states satisfy the second, including
+   $|-\rangle$, $|{+i}\rangle$ and $|{-i}\rangle$, and all of them have
+   $P(+) \ne 1$. $|-\rangle$ in particular has $P(+) = 0$, the opposite extreme,
+   despite being indistinguishable from $|+\rangle$ in the computational basis.
+
+   </details>
+
 3. A friend claims they measured a single qubit once and determined
    $\theta=47°$. Explain what's wrong with this claim.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   A single measurement returns one bit, and $47°$ is not one bit.
+
+   Two separate problems, and it is worth keeping them apart.
+
+   *What comes out.* Measuring in the computational basis produces the symbol
+   0 or 1, nothing else. There is no dial reading $\theta$. To estimate
+   $\theta$ you need $P(0) = \cos^2(\theta/2)$, and a probability is only
+   approached by a *frequency*: prepare the state, measure, record, prepare an
+   identical copy, measure again, hundreds of times, then invert
+   $\cos^2(\theta/2)$ on the observed fraction. One trial gives you a fraction
+   of either 0 or 1, from which $\theta$ would come out as $180°$ or $0°$.
+   Nothing in between is reachable.
+
+   *What is left afterwards.* The friend cannot fix this by measuring the same
+   qubit again. Measurement collapses the state, so after the first outcome the
+   qubit is exactly $|0\rangle$ or exactly $|1\rangle$ and every later
+   measurement of it just repeats that answer with certainty. The repetitions
+   have to come from re-preparing the state, not from re-reading one copy.
+
+   And even done properly, one basis is not enough for a full answer. The Z
+   statistics give $\theta$ and say nothing at all about $\varphi$; recovering
+   the longitude needs a second series in a different basis. The claim is
+   wrong about the number of outcomes, the number of trials, and the number of
+   bases at once.
+
+   </details>
+
 4. Two states have the same $\theta$ and differ only in $\varphi$. Under
    what condition on $\varphi$ do they have *identical* $P(+)$ and $P(-)$,
    even though they're different states?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   When their longitudes are reflections of each other about the $x$-axis:
+   $\varphi_2 = -\varphi_1$, equivalently $\varphi_2 = 2\pi - \varphi_1$.
+
+   Substitute the canonical form into the X-basis formula. With
+   $\alpha = \cos(\theta/2)$ and $\beta = e^{i\varphi}\sin(\theta/2)$,
+
+   $$
+   \operatorname{Re}(\alpha^*\beta) = \cos\!\left(\tfrac{\theta}{2}\right)\sin\!\left(\tfrac{\theta}{2}\right)\cos\varphi = \tfrac12\sin\theta\cos\varphi,
+   $$
+
+   so
+
+   $$
+   P(+) = \frac{1+\sin\theta\cos\varphi}{2}.
+   $$
+
+   With $\theta$ held fixed, $P(+)$ depends on $\varphi$ only through
+   $\cos\varphi$, and cosine is an even function: $\cos(-\varphi) = \cos\varphi$.
+   So $\varphi$ and $-\varphi$ give identical $P(+)$, hence identical $P(-)$,
+   while being different states everywhere else. Geometrically the two Bloch
+   points are mirror images across the $x$-$z$ plane, so they have the same
+   $x$-coordinate, and $P(+)$ depends only on $x$.
+
+   Concretely: $|{+i}\rangle$ ($\varphi = \pi/2$) and $|{-i}\rangle$
+   ($\varphi = -\pi/2$) both give $P(+) = P(-) = \tfrac12$, yet they are
+   orthogonal, as different as two qubit states can be. An X measurement simply
+   cannot tell them apart; a Y measurement separates them completely.
+
+   One degenerate case to name: if $\sin\theta = 0$, the poles, then $\varphi$
+   drops out of the formula entirely and *every* pair of longitudes agrees.
+   That is not a real exception, because at a pole the two states were never
+   different in the first place.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -258,10 +393,10 @@ directly.
 - A single measurement yields one classical bit; probabilities require
   many repeated preparations and measurements.
 
-## Further Exploration
+## The six operators, defined at last
 
 <NextDiscovery>
 Up next, [Quantum Gates](/lessons/quantum-computing/qubits-and-quantum-states/quantum-gates) finally defines the $X,Y,Z,H,S,T$
-operators precisely, and connect each one to a specific rotation of the
+operators precisely, and connects each one to a specific rotation of the
 Bloch vector.
 </NextDiscovery>

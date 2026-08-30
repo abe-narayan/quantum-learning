@@ -29,8 +29,9 @@ export const uncertaintyProductGaussian: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Delta x for a Gaussian packet is exactly its width parameter, sigma." },
-    { text: "Delta p equals Delta k = 1/(2*sigma) in natural units (hbar=1)." },
+    { text: "Two different widths are in play: the packet's own position width, and the spread of the Fourier components that build it. Decide which one the prompt has handed you." },
+    { text: "For a Gaussian, the position uncertainty is the width parameter itself; and with hbar set to 1, the momentum uncertainty and the wavenumber spread are the same number." },
+    { text: "Now form the product. Sigma appears once above the line and once below it, so check whether the answer can depend on sigma at all." },
   ],
   solution: {
     steps: [

@@ -39,10 +39,10 @@ export const steaneCodespaceDimension: NumericProblem = {
       { description: "$k = n - (n-k) = 7 - 6 = 1$" },
       { description: "Codespace dimension $= 2^k = 2^1 = 2$." },
     ],
-    finalAnswer: "The codespace dimension is 2, i.e. exactly 1 logical qubit -- matching the [[7,1,3]] label.",
+    finalAnswer: "The codespace dimension is 2, that is, exactly 1 logical qubit, matching the [[7,1,3]] label.",
   },
   explanation: {
     correctIdea: "Each independent stabilizer generator constraint halves the dimension of the ambient 2^n-dimensional Hilbert space.",
-    whyCorrect: "This matches k1-k2 = 4-3 = 1 from the classical CSS construction directly, a consistency check between the two ways of counting logical qubits.",
+    whyCorrect: "The classical CSS bookkeeping gives the same answer by a different route, k1-k2 = 4-3 = 1, so the two independent ways of counting logical qubits agree.",
   },
 };

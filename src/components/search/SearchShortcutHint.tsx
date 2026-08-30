@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  * site has no shortcut for them, which is exactly the discoverability failure
  * the badge exists to prevent." The detection then stayed private to that
  * file, so every *other* place that names the shortcut printed a hardcoded
- * "Ctrl K" — the glossary's zero-result state being the one that matters,
+ * "Ctrl K", the glossary's zero-result state being the one that matters,
  * since it is offered to a reader who has just failed to find something and
  * is being told how to search properly. Telling that reader to press a key
  * their laptop does not have is worse than saying nothing.

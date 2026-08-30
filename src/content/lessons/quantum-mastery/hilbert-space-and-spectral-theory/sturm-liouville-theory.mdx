@@ -28,7 +28,7 @@ export const slHydrogenPotential = slHydrogenGrid.map((r) => -2 / r);
 export const lessonMeta = {
   title: "Sturm-Liouville Theory",
   description:
-    "The general eigenvalue-problem theorem hiding behind every solvable potential this platform has taught: real eigenvalues, orthogonal eigenfunctions, and a complete eigenbasis, proved once from a single boundary-term identity, then shown to cover the infinite well and the hydrogen radial equation as the exact same theorem, not two lucky coincidences.",
+    "The general eigenvalue-problem theorem hiding behind every solvable potential this platform has taught: real eigenvalues, orthogonal eigenfunctions, and a complete eigenbasis, proved once from a single boundary-term identity, then tested against two problems that look nothing alike, the infinite well and the hydrogen radial equation.",
   course: "hilbert-space-and-spectral-theory",
   module: "sturm-liouville-theory",
   order: 5,
@@ -40,7 +40,7 @@ export const lessonMeta = {
   ],
   objectives: [
     "Derive the Sturm-Liouville orthogonality theorem from Lagrange's identity and a vanishing boundary term",
-    "Derive that Sturm-Liouville eigenvalues are real, by the same boundary-term technique applied to a function and its own conjugate",
+    "Establish that Sturm-Liouville eigenvalues are real, by the same boundary-term technique applied to a function and its own conjugate",
     "Show explicitly that the infinite square well and the hydrogen radial equation are both special cases of one Sturm-Liouville problem, with different p, q, w, and boundary conditions",
   ],
   related: [
@@ -53,18 +53,18 @@ export const lessonMeta = {
 
 <LessonHook eyebrow="One proof, four lessons">
   Every eigenvalue problem this platform has solved proved real energies
-  and orthogonal eigenfunctions by redoing essentially the same
+  and orthogonal eigenfunctions by redoing what is very nearly the same
   integration by parts. Prove the general theorem once, and every solved
   potential inherits it for free.
 </LessonHook>
 
-## Motivation
+## One Theorem Behind Every Solved Potential
 
 The Infinite Square Well, the Finite Square Well, the Harmonic Oscillator,
 and the Radial Equation all produced eigenvalue problems that were proved,
 separately, in each lesson, to have real energies and orthogonal
-eigenfunctions, each proof redoing essentially the same integration by
-parts. **<Term id="sturm-liouville-theory">Sturm-Liouville theory</Term>** is the observation that all four proofs
+eigenfunctions, each proof redoing what is very nearly the same
+integration by parts. **<Term id="sturm-liouville-theory">Sturm-Liouville theory</Term>** is the observation that all four proofs
 are literally the same argument, applied to the same general class of
 differential operator, differing only in three functions ($p,q,w$) and a
 boundary condition. Prove the general theorem once, and every solved
@@ -79,7 +79,7 @@ potential in this platform's entire curriculum inherits it for free.
   license="Public domain"
 />
 
-## Intuition
+## Every 1D Schrodinger Equation in One Form
 
 Every 1D time-independent Schrödinger equation, $-\frac{\hbar^2}{2m}
 \psi''+V(x)\psi=E\psi$, is already a special case (with $p=\hbar^2/2m$
@@ -93,7 +93,7 @@ orthogonal eigenvectors" theorem is the same statement, applied here to
 an *infinite*-dimensional operator built from derivatives instead of a
 matrix.
 
-## Mathematical Development
+## Lagrange's Identity, and What Follows From It
 
 ### The Sturm-Liouville form
 
@@ -142,8 +142,10 @@ $$
 
 If the boundary conditions make the left side vanish (Dirichlet or
 Neumann individually kill each term at each endpoint; a singular
-endpoint with $p(a)=0$ or $p(b)=0$ kills it regardless of $y$'s value
-there), then for $\lambda_1\ne\lambda_2$:
+endpoint with $p(a)=0$ or $p(b)=0$ kills it as long as $y$ stays
+bounded and $py'\to0$ there, which is exactly what the finiteness or
+square-integrability condition at a singular endpoint is imposed to
+secure), then for $\lambda_1\ne\lambda_2$:
 
 $$
 \int_a^bw(x)\,y_1(x)\,y_2(x)\,dx = 0
@@ -218,14 +220,14 @@ rather than construct from scratch.
 ### Two "different" problems, one Sturm-Liouville problem
 
 <PredictBeforeReveal
-  question="The orthogonality and reality proofs above never used q(x) at all — only p, w, and the vanishing boundary term. Given that, do you expect the infinite well's flat q=0 and hydrogen's singular Coulomb-plus-centrifugal q(r) to both satisfy the same Sturm-Liouville theorem?"
+  question="The orthogonality and reality proofs above never used q(x) at all, only p, w, and the vanishing boundary term. Given that, do you expect the infinite well's flat q=0 and hydrogen's singular Coulomb-plus-centrifugal q(r) to both inherit those two conclusions, orthogonality and reality?"
   options={[
-    { label: "No — hydrogen's q(r) blows up at the origin, so the proof needs redoing", value: "no" },
-    { label: "Yes — q never entered the orthogonality/reality argument", value: "yes" },
+    { label: "No, because hydrogen's q(r) blows up at the origin, so the proofs need redoing", value: "no" },
+    { label: "Yes, since q never entered the orthogonality/reality argument", value: "yes" },
     { label: "Only for l=0, where the centrifugal term vanishes", value: "l0-only" },
   ]}
   correctValue="yes"
-  explanation="Lagrange's identity only needs the boundary term [p(y₂y₁′−y₁y₂′)] to vanish at each endpoint — a fact about p and the boundary condition, not about q. The table below shows p=w=1 and a vanishing boundary term hold for both problems despite wildly different q(x), so both inherit orthogonality and reality for free, for every l."
+  explanation="Lagrange's identity only needs the boundary term [p(y₂y₁′−y₁y₂′)] to vanish at each endpoint, which is a fact about p and the boundary condition, not about q. The table below shows p=w=1 and a vanishing boundary term hold for both problems despite wildly different q(x), so both inherit orthogonality and reality for free, for every l. Note the question asks only about those two conclusions: the boxed theorem's other conclusions, completeness and a purely discrete spectrum, are exactly the ones hydrogen goes on to violate, as the section after the table works out."
 />
 
 **The infinite square well** ($-a<x<a$, $\hbar=m=1$): $-y''=\lambda y$
@@ -256,7 +258,7 @@ end).
 
 Same $p$, same $w$, same eigenvalue convention: only $q(x)$ (whether
 the potential is a flat zero or a Coulomb-plus-centrifugal well) and the
-interval actually differ. Visually, the two potentials that go into
+interval differ. Visually, the two potentials that go into
 $q$ look nothing alike:
 
 <PotentialDiagram
@@ -274,7 +276,8 @@ $q$ look nothing alike:
 yet both inherit orthogonality and reality from the two proofs above,
 neither of which touched $q$. The finite well and the harmonic oscillator
 fit the same template ($p=1,w=1$ for both; $q(x)$ a finite-well shape or
-$\frac12m^2\omega^2x^2$), with matching and decay conditions playing the
+$m^2\omega^2x^2$, the same $q$ Practice Question 1 asks for), with
+matching and decay conditions playing the
 role of the boundary condition on the whole line: a domain choice, again,
 of the kind Hilbert Spaces and Self-Adjointness made precise.
 
@@ -304,7 +307,7 @@ reality) is robust under singularity, while what it *cites* (completeness
 of a discrete eigenbasis) is precisely what needs the finite interval and
 the non-vanishing $p,w$ at the endpoints.
 
-## Physical Interpretation
+## Why Orthogonality Never Needed Rechecking
 
 Every "prove the eigenfunctions are orthogonal" step scattered across
 this platform's curriculum (the infinite well's $\sin$ functions, the
@@ -318,9 +321,9 @@ is. This is why an eigenvalue-problem-solving strategy that
 worked for the harmonic oscillator was always a safe bet to try again on
 hydrogen: not optimism, a theorem.
 
-## Worked Example
+## The Infinite Well, Read as Sturm-Liouville
 
-**Verify the infinite well's eigenfunctions are actually orthogonal,
+**Verify the infinite well's eigenfunctions are orthogonal,
 using this platform's own `infiniteSquareWellEigenstate` engine
 function, independent of the general proof above.**
 
@@ -337,7 +340,7 @@ $\int_{-a}^aw(x)\psi_m\psi_n\,dx=0$ for $m\ne n$ (here $w=1$), reached by
 summing over grid points rather than by the boundary-term algebra above.
 Two routes, no shared step, same answer.
 
-## Common Mistakes
+## Assuming Regularity on a Singular Interval
 
 <Callout type="warning">
 **Assuming the weight $w(x)$ is always $1$.** It's $1$ for every example
@@ -359,15 +362,182 @@ boundary conditions their respective domains force.
 ## Practice Questions
 
 1. Write out $p,q,w$ explicitly for the quantum harmonic oscillator's
-   equation $-y''+m^2\omega^2x^2y=2Ey$ (natural units), and identify
-   $\lambda$ in terms of $E$.
+   equation $-y''+m^2\omega^2x^2y=2mEy$ ($\hbar=1$, with the mass $m$
+   kept explicit), and identify $\lambda$ in terms of $E$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The canonical form is $(py')'-qy+\lambda wy=0$, with a $+$ in front of
+   $(py')'$, so the first move is to multiply through by $-1$:
+
+   $$
+   -y''+m^2\omega^2x^2y-2mEy=0
+   \quad\Longrightarrow\quad
+   (1\cdot y')'-\big(m^2\omega^2x^2\big)y+(2mE)(1)\,y=0 .
+   $$
+
+   Reading off: $p(x)=1$, $q(x)=m^2\omega^2x^2$, $w(x)=1$, and
+   $\lambda=2mE$.
+
+   Check it on the ground state rather than trusting the rearrangement.
+   With $\hbar=1$ the ground state is $y_0\propto e^{-m\omega x^2/2}$, so
+   $y_0''=\big(-m\omega+m^2\omega^2x^2\big)y_0$ and
+
+   $$
+   -y_0''+m^2\omega^2x^2y_0=m\omega\,y_0=2m\left(\frac{\omega}{2}\right)y_0=2mE_0\,y_0,
+   $$
+
+   using $E_0=\omega/2$. The mass survives on both sides. Numerically, at
+   $m=2,\omega=1,x=0.7$ the left side is $1.22525$ and $2mE_0y_0$ is
+   $1.22525$, while $2E_0y_0$ is $0.61263$, low by exactly the factor $m$.
+
+   The spectrum in these variables is
+   $\lambda_n=2mE_n=2m\omega\left(n+\tfrac12\right)=m\omega(2n+1)$:
+   increasing, evenly spaced, with no finite accumulation point, which is
+   what a discrete Sturm-Liouville spectrum is supposed to look like.
+
+   One honesty note about which theorem applies. This problem has
+   $p=w=1>0$, but it lives on all of $\mathbb R$, so the interval is
+   unbounded and the boxed *regular* theorem does not cover it. It is a
+   singular problem. Orthogonality and reality still carry over, because
+   those two proofs only need the boundary term to vanish and Gaussian
+   decay secures that at both ends. Discreteness and completeness do hold
+   here as well, but they hold as facts about this operator, not as
+   consequences of the regular theorem, exactly the distinction hydrogen
+   is used to make later in the lesson.
+
+   The wrong turn is reporting $\lambda=2E$, importing the convention
+   from the well and hydrogen. Both of those were stated with
+   $\hbar=m=1$, so their mass was already gone; here it was deliberately
+   kept, and $q=m^2\omega^2x^2$ is itself the signal that $m$ has not
+   been set to one. The second wrong turn is skipping the multiplication
+   by $-1$ and reading off $p=-1$ from $-y''$. The tell is immediate:
+   $p>0$ is a hypothesis of every theorem in this lesson, so any answer
+   with $p=-1$ has broken the framework before it starts. Multiplying
+   through also flips $q$, and a student who flips $p$ but not $q$ ends up
+   with $q=-m^2\omega^2x^2$, an inverted oscillator with no bound states
+   at all.
+
+   </details>
+
 2. Explain in one sentence why $p(a)=0$ at a singular endpoint (rather
    than a Dirichlet or Neumann condition) is enough to kill the boundary
-   term in Lagrange's identity, using the identity's exact form
-   $[p(y_2y_1'-y_1y_2')]_a^b$.
+   term in Lagrange's identity *provided $y$ stays bounded and
+   $py'\to0$ there*, using the identity's exact form
+   $[p(y_2y_1'-y_1y_2')]_a^b$, and give an example of what would go wrong
+   without that proviso.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   In one sentence: regroup the bracket as
+   $y_2\,(py_1')-y_1\,(py_2')$, and each product is a bounded factor
+   times a factor going to zero, so the whole term vanishes at that
+   endpoint.
+
+   The regrouping is the entire content, and it is worth saying why the
+   obvious alternative argument fails. One would like to say "$p(a)=0$
+   multiplied by something bounded is zero," but at a singular endpoint
+   $y'$ is typically *not* bounded; that is most of what makes the
+   endpoint singular. The quantity under control is the combination
+   $py'$, which is why the identity has to be read with $p$ distributed
+   onto the derivatives rather than left outside.
+
+   What goes wrong without the proviso is best seen in Legendre's
+   equation on $[-1,1]$, where $p(x)=1-x^2$ vanishes at both ends. Take
+   $y_1=P_0=1$, so $py_1'=0$, and for $y_2$ take the *second* solution
+   $Q_0(x)=\tfrac12\ln\frac{1+x}{1-x}$. Then $Q_0'=1/(1-x^2)$, so
+
+   $$
+   p\,Q_0'=(1-x^2)\cdot\frac{1}{1-x^2}=1
+   $$
+
+   identically. The boundary term is
+   $y_2(py_1')-y_1(py_2')=Q_0\cdot0-1\cdot1=-1$, and it is $-1$ at every
+   $x$, not merely in the limit: evaluated at $x=0.9$, $0.999$ and
+   $0.999999$ it returns exactly $-1$ each time. Orthogonality fails
+   outright. The repair is the boundary condition "bounded at $\pm1$,"
+   which excludes $Q_0$ because $Q_0$ diverges logarithmically there, and
+   that is precisely why the Legendre *polynomials* are the physically
+   admissible solutions.
+
+   Notice what that example proves about the proviso's two halves.
+   $pQ_0'$ is perfectly bounded, in fact constant, and the term still
+   does not vanish. Boundedness of $py'$ is not the hypothesis; its
+   *vanishing* is, and $Q_0$ fails the other half by being unbounded
+   itself. Both halves are load-bearing, and the seductive error is to
+   remember only the milder one.
+
+   There is a further case that connects straight back to Hilbert Spaces
+   and Self-Adjointness. Consider $(\sqrt x\,y')'+\lambda y=0$ on
+   $(0,1)$, where $p(0)=0$. Setting $v=\sqrt x\,y'$ gives
+   $v'=-\lambda y$, so $v$ tends to a finite limit $v_0$ and
+   $y\approx y(0)+2v_0\sqrt x$ near the origin: *both* local behaviours
+   are bounded, and $py'\to v_0$ need not be zero. Here "require $y$
+   bounded" fails to single out a domain at all, and a genuine boundary
+   condition has to be imposed by hand. That is the limit-circle case,
+   and it is the same deficiency-index question von Neumann's theorem
+   answered for the half-line momentum operator, arriving now through a
+   weight function instead of a wall.
+
+   </details>
+
 3. The reality-of-eigenvalues derivation used $w>0$. Where exactly would
    that derivation break down if $w$ could be negative somewhere on
    $(a,b)$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   At exactly one step: the division. The derivation ends at
+
+   $$
+   0=\Big[p(y^*y'-yy^{*\prime})\Big]_a^b=(\lambda^*-\lambda)\int_a^bw\,|y|^2dx,
+   $$
+
+   and concluding $\lambda^*=\lambda$ requires cancelling the integral,
+   which is legal only if $\int_a^bw|y|^2dx\ne0$. With $w>0$ throughout
+   and $y\not\equiv0$, the integrand is non-negative and strictly
+   positive on a set of positive measure, so the integral is strictly
+   positive and the cancellation is safe. Let $w$ change sign and
+   $w|y|^2$ takes both signs, its positive and negative parts can cancel
+   exactly, and for such a $y$ the identity reads $(\lambda^*-\lambda)
+   \cdot0=0$, which every complex $\lambda$ satisfies.
+
+   The failure mode is worth stating precisely, because it is not that
+   the derivation gives a wrong answer. It gives *no* answer. The
+   identity remains true and simply stops constraining $\lambda$. This is
+   not hypothetical either: indefinite-weight Sturm-Liouville problems
+   genuinely admit non-real eigenvalues, always in conjugate pairs, and
+   an eigenfunction attached to one of them must satisfy
+   $\int w|y|^2dx=0$, since $\lambda^*\ne\lambda$ leaves no alternative.
+   The vanishing integral is not a loophole in the proof, it is the
+   signature of the eigenfunctions the proof was silently excluding.
+
+   The wrong turn is answering that a negative $w$ makes the integral
+   negative and so breaks the cancellation. Dividing by a negative number
+   is perfectly legal; only $0$ is forbidden. If $w<0$ on *all* of
+   $(a,b)$ nothing breaks at all: substitute $\tilde w=-w>0$ and
+   $\tilde\lambda=-\lambda$ and you have an ordinary positive-weight
+   problem, so $\tilde\lambda$ is real and therefore so is $\lambda$. The
+   danger is an *indefinite* weight, one that changes sign inside the
+   interval, not a uniformly negative one. Reading the hypothesis as
+   "positive" when what it really controls is "of one sign" is the
+   specific slip to avoid.
+
+   A second wrong turn is assuming orthogonality is unaffected because
+   Lagrange's identity still holds. The identity does still give
+   $\int w\,y_1y_2\,dx=0$ for distinct real eigenvalues, but $w$ no
+   longer defines an inner product, only an indefinite bilinear form, so
+   the ambient space is a Krein space rather than a Hilbert space. A
+   nonzero eigenfunction can then be orthogonal to itself, which no
+   Hilbert space permits, and it cannot be normalized. Positivity of $w$
+   is doing two jobs, keeping this one denominator away from zero and
+   making $\int w\,\bar y z\,dx$ an inner product in the first place, and
+   only the first of them is visible in the line where the proof breaks.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -392,7 +562,7 @@ boundary conditions their respective domains force.
   completeness of a purely discrete basis belongs to the regular case
   only.
 
-## Further Exploration
+## Which Shortcuts Survive Being Made Precise
 
 <NextDiscovery>
   The [capstone](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/capstone-what-rigor-buys-you)

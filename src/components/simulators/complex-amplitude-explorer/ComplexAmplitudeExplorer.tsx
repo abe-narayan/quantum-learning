@@ -18,7 +18,7 @@ type Mode = "single" | "two-amplitude";
 /**
  * 0.5 + 0.5i, not 1 + 0i. A real number with zero imaginary part is the one
  * amplitude that looks like an ordinary number, so opening there hides the
- * whole point of the instrument — the phase readout sits at 0° and the arrow
+ * whole point of the instrument: the phase readout sits at 0° and the arrow
  * lies flat along the real axis. At 0.5 + 0.5i both parts are nonzero and the
  * phase reads 45° on mount, per the bench's "open mid-phenomenon" rule.
  * Deliberately *not* 0.6 + 0.8i: `complex-numbers-for-quantum-mechanics.mdx`
@@ -38,7 +38,7 @@ const COPY_CONFIRMATION_MS = 1500;
 // (re, im) for single mode, or (alphaMagnitude, alphaPhase, betaPhase) for
 // two-amplitude mode. `amp_aphase` is optional on read (defaulting to 0) so
 // links shared before the `"global-vs-relative"` variant's γ control existed
-// — the only control that ever moves alphaPhase away from 0 — still parse
+// (the only control that ever moves alphaPhase away from 0) still parse
 // exactly as before. Both slices are read and written together regardless of
 // which mode is active, so switching modes after loading a shared link
 // doesn't lose the other slice's restored value. Params are prefixed
@@ -61,7 +61,7 @@ function parseSingleAmplitude(params: { get(key: string): string | null }): { re
 
 /**
  * Reads and validates `?amp_mag=&amp_bphase=` (required) and `?amp_aphase=`
- * (optional, defaulting to 0 — see the shareable-state comment above). Null
+ * (optional, defaulting to 0; see the shareable-state comment above). Null
  * if either required param is absent or malformed.
  */
 function parseTwoAmplitude(params: {
@@ -86,7 +86,7 @@ function parseTwoAmplitude(params: {
 
 /**
  * A single amplitude's real/imaginary parts and its magnitude/phase are
- * one number, two representations — this component keeps `re`/`im` as
+ * one number, two representations: this component keeps `re`/`im` as
  * the single source of truth and derives magnitude/phase from it on every
  * render, so the two control pairs in `AmplitudeControls` can never drift
  * out of sync with each other.
@@ -96,7 +96,7 @@ export function ComplexAmplitudeExplorer({
 }: {
   /**
    * Which reading the "two amplitudes" mode's bottom comparison panel
-   * shows — see `TwoAmplitudeMode` for the physics. Defaults to the
+   * shows; see `TwoAmplitudeMode` for the physics. Defaults to the
    * unbounded double-slit `|α+β|²` reading the majority of lessons
    * embedding this explorer rely on; `superposition-interference-and-
    * phase.mdx` opts into `"basis-change"` instead, since it derives the
@@ -136,7 +136,7 @@ export function ComplexAmplitudeExplorer({
   }, []);
 
   // Keep the URL in sync with the settled state so the page is always shareable.
-  // Debounced so a slider drag doesn't spam `history.replaceState` — only the
+  // Debounced so a slider drag doesn't spam `history.replaceState`; only the
   // value it settles on after a short pause gets written. Skips the very first
   // run so mounting doesn't immediately rewrite the URL we just read from.
   useEffect(() => {
@@ -172,7 +172,7 @@ export function ComplexAmplitudeExplorer({
       if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
       copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
     } catch {
-      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+      // Clipboard access can be denied in some browser security contexts, so no crash and no link copied.
     }
   }, []);
 
@@ -185,17 +185,29 @@ export function ComplexAmplitudeExplorer({
   // This instrument had a state *panel* but no narrator: the numbers moved and
   // nothing said what the movement meant, and a screen-reader user got no
   // announcement at all. The single fact worth narrating here is the one the
-  // whole instrument exists to make obvious — phase moves, probability doesn't.
+  // whole instrument exists to make obvious: phase moves, probability doesn't.
   const magnitude = Math.hypot(re, im);
+  const magnitudeSquared = magnitude * magnitude;
   const phaseDegrees = (Math.atan2(im, re) * 180) / Math.PI;
+  // The real and imaginary sliders run to ±1.5 each, and the magnitude slider
+  // to 1.5, so |z|² is reachable up to 2.25: past 1, where it is no longer a
+  // probability at all. `StatePanel` already flags that in the numbers; this
+  // line is the live region a screen-reader user hears instead of reading the
+  // panel, so it has to make the same distinction rather than announce a
+  // "probability" of 2.250.
+  const arrowDescription = `The amplitude is ${magnitude.toFixed(2)} long, pointing ${Math.round(
+    phaseDegrees
+  )}° around.`;
   const singleModeNarration =
     magnitude < 1e-6
       ? "The amplitude is zero: no size, no direction, and no chance of ever measuring this outcome."
-      : `The amplitude is ${magnitude.toFixed(2)} long, pointing ${Math.round(
-          phaseDegrees
-        )}° around. Squaring the length gives ${(magnitude * magnitude).toFixed(
-          3
-        )} — that, and only that, is the probability. Rotating the arrow changes the direction and leaves the probability exactly where it is.`;
+      : magnitudeSquared > 1
+        ? `${arrowDescription} Squaring the length gives ${magnitudeSquared.toFixed(
+            3
+          )}, which is more than 1, so this arrow is too long to be a probability. A real state is normalised: its outcomes' squared lengths add up to exactly 1. Shorten it and the square becomes readable as a probability again.`
+        : `${arrowDescription} Squaring the length gives ${magnitudeSquared.toFixed(
+            3
+          )}: that, and only that, is the probability. Rotating the arrow changes the direction and leaves the probability exactly where it is.`;
 
   function reset() {
     if (mode === "single") {
@@ -214,9 +226,9 @@ export function ComplexAmplitudeExplorer({
 
   return (
     <SimulatorInstrument
-      label="Complex plane — amplitude"
-      footnote="An amplitude is a complex number, not a probability — only |z|² is ever a probability."
-      // `@container`: this simulator has no `controls` prop — the
+      label="Complex plane: amplitude"
+      footnote="An amplitude is a complex number, not a probability; only |z|² is ever a probability."
+      // `@container`: this simulator has no `controls` prop, so the
       // "single amplitude" mode below hand-rolls its own stage/controls
       // split (same 320px rail idea as SimulatorInstrument itself) rather
       // than using the shared one, so it needs the same container-query
@@ -245,7 +257,7 @@ export function ComplexAmplitudeExplorer({
         Quantum mechanics does not hand you probabilities directly. It hands you an{" "}
         <span className="font-medium text-foreground">amplitude</span>: an arrow with a length and a
         direction, drawn below. Square its length and you get the probability. The direction never shows
-        up in that answer at all — and yet it is the reason two possibilities can cancel each other out.
+        up in that answer at all, and yet it is the reason two possibilities can cancel each other out.
       </p>
 
       <div
@@ -259,7 +271,7 @@ export function ComplexAmplitudeExplorer({
 
       {mode === "single" ? (
         // `@min-[42rem]:` (container query on the stage above, not `lg:`
-        // viewport) — matches SimulatorInstrument's own split threshold, so
+        // viewport), matching SimulatorInstrument's own split threshold, so
         // this hand-rolled rail collapses on the same logic the shared one
         // does instead of opening inside a reading column too narrow for it.
         <div className="mt-6 grid gap-6 @min-[42rem]:grid-cols-[minmax(0,1fr)_320px]">
@@ -302,14 +314,14 @@ export function ComplexAmplitudeExplorer({
       <SimulatorFraming
         shows={
           <>
-            <span className="font-medium text-foreground">z</span> is the amplitude — a single complex number
+            <span className="font-medium text-foreground">z</span> is the amplitude: a single complex number
             with both a size and a direction. Only <span className="font-medium text-foreground">|z|²</span> is
             ever a probability; the amplitude itself carries strictly more information than that one number.
           </>
         }
         watchFor={
           <>
-            Drag the phase slider alone (magnitude fixed) and watch |z|² in the state panel — it never moves.
+            Drag the phase slider alone (magnitude fixed) and watch |z|² in the state panel. It never moves.
             Interference lives entirely in relative phase: flip β&rsquo;s phase by 180° and two amplitudes
             that used to add now cancel.
           </>
@@ -318,7 +330,7 @@ export function ComplexAmplitudeExplorer({
           <ul>
             <li>
               Switch to Two Amplitudes, set both magnitudes equal, then slide β&rsquo;s phase from 0° to
-              180° — watch total probability swing between constructive and destructive interference.
+              180°, and watch total probability swing between constructive and destructive interference.
             </li>
             <li>In single mode, drag only the phase slider and confirm |z|² in the panel never moves.</li>
           </ul>

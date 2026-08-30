@@ -8,7 +8,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "How to Read a Quantum Computing Paper",
   description:
-    "The final course of QuantumLearn opens not with new physics but with a practical skill: a reading strategy for turning everything this platform built into the ability to independently evaluate a real research claim.",
+    "The final course of StudyQuantum opens with a practical skill rather than new physics: a reading strategy for turning everything this platform built into the ability to evaluate a real research claim independently.",
   course: "research-methods-and-synthesis",
   module: "how-to-read-a-quantum-computing-paper",
   order: 1,
@@ -17,8 +17,8 @@ export const lessonMeta = {
   prerequisites: ["apex/algorithmic-frontiers/capstone-the-toolbox-that-ate-quantum-algorithms"],
   objectives: [
     "Identify the standard structural anatomy of a quantum-computing research paper (abstract's actual claim, the precise theorem/result statement, the assumptions/model section, numerical results vs. proven bounds, and the honest limitations/discussion section) and what to look for in each",
-    "Distinguish a paper's PRECISE technical claim from its abstract's more casually-worded framing, using a real, worked practice example",
-    "Identify common places where a paper's own abstract or introduction can (even unintentionally) oversell a result relative to its actual, precisely-stated theorem or numerical finding",
+    "Distinguish a paper's PRECISE technical claim from its abstract's more casually-worded framing, using a worked practice example",
+    "Spot the common places where a paper's own abstract or introduction can (even unintentionally) oversell a result relative to its actual, precisely-stated theorem or numerical finding",
   ],
   related: [
     {
@@ -31,47 +31,35 @@ export const lessonMeta = {
 <LessonHook eyebrow="No more graded answer keys">
   Every lesson on this platform ended with a right answer to check
   against. Your career won't. What comes next is a continuous stream of
-  papers, preprints, and press releases, each making a claim — and only
+  papers, preprints, and press releases, each making a claim, with only
   you to check it.
 </LessonHook>
 
-## Motivation
+## Reading Without an Answer Key
 
-Every earlier lesson on this platform ended with a right answer. A
-theorem was proved, a circuit was simulated, a bound was derived, and
-you could check your work against it. That is deliberate — it is how
-you built real machinery: the algebra of Hilbert spaces, the
+The answer key was the point. Checking a derived bound against a proved
+one is how you built the machinery: the algebra of Hilbert spaces, the
 circuit-level mechanics of real algorithms, the physics of noise and
-error correction, and, most recently, the complexity-theoretic
-vocabulary to say precisely what a "quantum speedup" does and doesn't
-mean. But that machinery has an intended destination, and this is the
-course that takes you there. Nobody is going to hand you graded
-problem sets for the rest of your career. What you will get instead is
-a continuous stream of new papers, preprints, press releases, and
-conference talks, each making a claim, and the only person who can
-check that claim against the standard you've spent this whole platform
-building is you.
+error correction, and, most recently, the complexity-theoretic vocabulary
+for saying precisely what a "quantum speedup" does and does not mean.
+That machinery has a destination, and this course is it.
 
-That is the entire subject of the **Research Methods and Synthesis**
-course, and this is its first lesson. Not a new law of physics, not a
-new algorithm — a reading strategy. The claim this lesson makes, and
-means literally, is that you already have everything you need to
-evaluate a real quantum-computing paper except the habit of reading it
-in the right order and asking the right question at each section. You
-have sat through the actual distinction between an oracle-model
-separation and an unconditional one (Quantum Complexity Theory). You
-have sat through lessons that were honest, in their own Discussion
-sections, about exactly which of their claims were proven theorems and
-which were illustrative numerics or open questions (nearly every
-Mastery and APEX capstone on this platform). You already know what it
-feels like when a precise statement is more restrictive than its
-one-sentence summary. The only thing left to practice is doing that
-deliberately, on a document you did not write, whose author is not in
-the room to clarify what they meant. That is what this lesson trains.
+So this lesson offers a reading strategy rather than a result. Its claim,
+meant literally, is that you already have everything needed to evaluate a
+real quantum-computing paper except the habit of reading it in the right
+order and asking the right question at each section. You have already met
+the distinction between an oracle-model separation and an unconditional
+one (Quantum Complexity Theory), and lessons that were explicit, in their
+own discussion sections, about which of their claims were proven theorems
+and which were illustrative numerics or open questions. You know what it
+feels like when a precise statement turns out to be more restrictive than
+its one-sentence summary. What is left is doing that deliberately, on a
+document you did not write, whose author is not in the room to clarify
+what they meant.
 
 ## The Anatomy of a Paper: A Reading Strategy, Not a Rulebook
 
-Real papers vary — a purely theoretical complexity-theory paper looks
+Real papers vary. A purely theoretical complexity-theory paper looks
 different from an experimental hardware-demonstration paper, and both
 look different from an algorithms paper with numerics attached. What
 follows is not a rigid template every paper obeys section-by-section;
@@ -84,7 +72,7 @@ regardless of how the author happened to organize their headings.
     { label: "Abstract", detail: "elevator pitch" },
     { label: "Introduction", detail: "motivation, prior work" },
     { label: "Model / assumptions", detail: "sets the real scope", highlight: true },
-    { label: "Precise claim", detail: "theorem or bound — checkable", highlight: true },
+    { label: "Precise claim", detail: "theorem or bound, checkable", highlight: true },
     { label: "Numerical results", detail: "small-scale evidence" },
     { label: "Discussion", detail: "limitations, caveats" },
   ]}
@@ -94,19 +82,19 @@ That is the reading order as a single pipeline; each of the six stops
 below unpacks what to actually look for at that stop, regardless of what
 the author happened to title their section headings.
 
-- **Abstract — the elevator pitch.** This is the most-read, least-precise
+- **Abstract: the elevator pitch.** This is the most-read, least-precise
   part of the paper, almost by design: it exists to be quoted in a
   talk, a tweet, a "related work" paragraph of someone else's paper,
   and a funding report, often by people who will never read past it.
-  Compression toward a punchy sentence is not dishonesty by itself —
-  but compression and precision trade off against each other, and an
+  Compression toward a punchy sentence is not dishonesty by itself, but
+  compression and precision trade off against each other, and an
   abstract sits at the compressed end of that trade. Read it first to
   orient yourself, then treat every strong word in it ("exponential,"
   "novel," "outperforms," "quantum advantage") as a placeholder that
   needs to be cashed out later in the paper, not as the paper's actual
   content.
 
-- **Introduction — motivation and honest positioning against prior
+- **Introduction: motivation and positioning against prior
   work.** This section earns its keep by telling you what problem is
   being solved and, critically, what is actually *new* here relative to
   what was already known. A well-written introduction differentiates
@@ -114,20 +102,20 @@ the author happened to title their section headings.
   which parts of the surrounding paragraph are this paper's contribution
   and which are background it's merely restating.
 
-- **The precise technical claim — the paper's actual, checkable
+- **The precise technical claim: the paper's actual, checkable
   content.** This is usually a formal theorem statement, an algorithm
   presented with a specifically stated complexity bound (e.g. "$O(\sqrt
   N)$ queries" rather than "a quadratic speedup"), or a specific
   numerical/experimental result reported with explicit error bars. This
   is not the abstract's job, and it is usually not the introduction's
-  job either — it typically lives in a dedicated results section, often
+  job either. It typically lives in a dedicated results section, often
   numbered ("Theorem 3.1," "Algorithm 1"), and it is the only part of
   the paper you can actually *check* the way you've been checking
   derivations on this platform for months.
 
-- **The model/assumptions section — the part most readers skim, and the
+- **The model/assumptions section: the part most readers skim, and the
   part that most changes what the result means.** What oracle model is
-  assumed? What noise model, if any? What is idealized away — perfect
+  assumed? What noise model, if any? What is idealized away: perfect
   gates, an infinite coherence time, an oracle that in practice would
   itself be expensive to build? This section is where a result's actual
   *scope* is defined, and Quantum Complexity Theory's whole running
@@ -137,26 +125,26 @@ the author happened to title their section headings.
   relative to a specific, possibly unrealistic, query model, and the
   only way to know which is to read the assumptions.
 
-- **Numerical results vs. proven bounds — two different kinds of
+- **Numerical results vs. proven bounds: two different kinds of
   evidence.** A single paper can, and very often does, contain *both* a
   proven asymptotic theorem *and* a separate numerical simulation
   demonstrating the algorithm on small, tractable instances. These are
   not the same kind of evidence, and treating them as interchangeable is
   one of the most common misreadings there is. A proven bound holds for
   all $n$ by construction of the proof. A numerical experiment at, say,
-  $n=20$ qubits demonstrates exactly that: behavior at $n=20$ qubits — it
+  $n=20$ qubits demonstrates exactly that: behavior at $n=20$ qubits. It
   is suggestive of the proven asymptotic trend, or it can be the *only*
   evidence offered when no proof exists yet, but by itself it proves
   nothing about what happens as $n$ grows large, the same caveat this
   platform's own numerically-illustrated capstones have flagged about
   their own bar charts and plots.
 
-- **Discussion/limitations — read this, it is not optional.** A
+- **Discussion/limitations, which is not optional reading.** A
   carefully written paper states its own caveats here explicitly: what
   the result does *not* show, what would have to be true for it to
   extend further, what remains open. Skipping this section because it
   looks like boilerplate throat-clearing is exactly how an oversold
-  abstract's gap from the real theorem goes unnoticed — the authors may
+  abstract's gap from the real theorem goes unnoticed. The authors may
   have already told you about it, in the one section most readers never
   reach.
 
@@ -165,13 +153,13 @@ the author happened to title their section headings.
 <Callout type="warning">
 The abstract and theorem below are **illustrative, not a quotation of
 any real paper.** They are built to be typical in *style* of how this
-kind of result is often written and, occasionally, oversold — not to
+kind of result is often written and, occasionally, oversold. They do not
 represent, paraphrase, or misattribute any specific published work.
 </Callout>
 
-Here is a plausible abstract, in a genuinely typical register, for a
-paper extending ideas from this platform's own Algorithmic Frontiers
-and Quantum Complexity Theory courses:
+Here is a plausible abstract, in a typical register, for a paper
+extending ideas from this platform's own Algorithmic Frontiers and
+Quantum Complexity Theory courses:
 
 <div className="not-prose my-6 rounded-panel border border-border bg-surface-muted/40 p-5 text-sm italic text-muted-foreground">
 "We present a quantum algorithm for verifying whether a given local
@@ -187,9 +175,9 @@ Read only this paragraph, and it sounds like a landmark result: local
 Hamiltonian problems are QMA-complete (Quantum Complexity Theory's own
 Local Hamiltonian lesson proved this), so an "exponential speedup" for
 verifying one, stated with no further qualification, would be an
-enormous, field-shaking claim — the kind that would immediately imply
-things about $\mathsf{QMA}$ versus classical verification that nobody
-currently knows how to prove. That should already be your first
+enormous claim, the kind that would immediately imply things about
+$\mathsf{QMA}$ versus classical verification that nobody currently knows
+how to prove. That should already be your first
 alarm bell: an extraordinary-sounding one-sentence claim is a cue to
 go find the precise statement, not to accept or reject the sentence
 itself.
@@ -201,13 +189,13 @@ clause the abstract had no room for. Which clause?
 <PredictBeforeReveal
   question="The abstract above claims an 'exponential speedup' for verifying a local Hamiltonian's ground-state energy. If the paper is correct and honestly written, which qualification is most likely sitting in the numbered theorem that the abstract left out?"
   options={[
-    { label: "The speedup holds only for a restricted family of Hamiltonians (say, 1D or commuting)", value: "family" },
-    { label: "The speedup is proven only relative to a query/oracle model, not against all classical algorithms", value: "oracle" },
-    { label: "The speedup is exponential in a parameter other than n, so it is smaller than it sounds", value: "param" },
-    { label: "The speedup holds only in the average case over random instances", value: "average" },
+    { label: "It holds only for a restricted family of Hamiltonians, say 1D or commuting", value: "family" },
+    { label: "It is proven only relative to a query model, not against all classical algorithms", value: "oracle" },
+    { label: "It is exponential in a parameter other than n, so it is smaller than it sounds", value: "param" },
+    { label: "It holds only on average over random instances, not on the worst case", value: "average" },
   ]}
   correctValue="oracle"
-  explanation="All four are real, common scope clauses worth knowing. But 'exponential speedup' stated with no model named is, in quantum algorithms specifically, most often an oracle separation: proven, rigorous, and true only against classical algorithms restricted to the same black-box access. The theorem below is exactly that case. The habit worth building is not guessing right — it is knowing that the sentence is incomplete until you have found which of these four (or which other) clause the theorem attaches, and refusing to repeat the claim before you do."
+  explanation="All four are common scope clauses worth knowing. But 'exponential speedup' stated with no model named is, in quantum algorithms specifically, most often an oracle separation: proven, rigorous, and true only against classical algorithms restricted to the same black-box access. The theorem below is exactly that case. The habit worth building is not guessing right; it is knowing that the sentence is incomplete until you have found which of these four (or which other) clause the theorem attaches, and refusing to repeat the claim before you do."
 />
 
 Now here is a plausible version of what the paper's actual numbered
@@ -215,7 +203,7 @@ result, buried in a results section, says:
 
 <div className="not-prose my-6 rounded-panel border-2 border-brand/40 bg-brand/5 p-5 text-sm">
 <p className="font-semibold text-brand">Theorem 4.2 (illustrative)</p>
-<p className="mt-2 text-muted-foreground">
+<div className="mt-2 text-muted-foreground">
 Let $O_H$ be a sparse-access oracle providing black-box query access to
 the entries of a $k$-local Hamiltonian $H$ on $n$ qubits, and suppose
 only this oracle access is available (no explicit description of $H$'s
@@ -224,7 +212,7 @@ problem using $O(\mathrm{poly}(n))$ queries to $O_H$, whereas any
 classical algorithm with only black-box query access to $O_H$ requires
 $\Omega(2^n)$ queries. Numerical experiments on explicit small
 instances ($n \le 20$) are consistent with this predicted separation.
-</p>
+</div>
 </div>
 
 Now do exactly what this lesson's anatomy asks of the model/assumptions
@@ -234,42 +222,41 @@ not as boilerplate. This is precisely the distinction Quantum
 Complexity Theory's own capstone spent an entire section on: an
 oracle-model separation is real and rigorously proven *within that
 model*, but it says nothing, by itself, about the setting where $H$ is
-given *explicitly* as a sum of named local terms — which is the
-realistic setting for an actual physical Hamiltonian, and the setting
-in which the problem's QMA-completeness lives. The abstract's
+given *explicitly* as a sum of named local terms, which is the realistic
+setting for an actual physical Hamiltonian and the setting in which the
+problem's QMA-completeness lives. The abstract's
 "exponential speedup," with no mention of the oracle model, reads as if
 it applies to Hamiltonians in general; Theorem 4.2's actual content is
 an exponential separation **between quantum and classical algorithms
-restricted to black-box query access** — a real, checkable, correctly
-proved fact, but a narrower one than the abstract's sentence suggests
-to a reader who stops at the abstract.
+restricted to black-box query access**. That is a correctly
+proved fact, and a narrower one than the abstract's sentence
+suggests to a reader who stops there.
 
 The numerical experiments compound the same gap in a second way: "up to
 $n=20$" instances consistent with a predicted separation is worthwhile
 supporting evidence, but it is evidence *for the oracle-model theorem
 already proven above it*, not independent evidence that the result
-extends to explicitly-given Hamiltonians — conflating "the numerics
+extends to explicitly-given Hamiltonians. Conflating "the numerics
 looked good" with "therefore the exponential speedup is broader than
 the theorem states" is exactly the numerical-vs-proven misreading
 flagged above, stacked on top of the abstract-vs-theorem misreading.
 
 <InsightBlock>
-  An abstract's job is compression, not precision — its strong words are
+  An abstract's job is compression, not precision. Its strong words are
   pointers to go verify against the numbered theorem, not the verified
   content itself.
 </InsightBlock>
 
-None of this means the paper is bad, wrong, or dishonest — Theorem 4.2,
-as stated, is a legitimate, well-scoped, provable result, and framing a
+None of this makes the paper bad, wrong, or dishonest. Theorem 4.2, as
+stated, is a legitimate, well-scoped, provable result, and framing a
 black-box separation in accessible language for an abstract is normal
-scientific writing, not misconduct. The skill this lesson is teaching
-is not "distrust every abstract" — it's "always find the numbered
-theorem before you decide what was actually shown."
+scientific writing. The habit to build is not distrust of abstracts. It
+is finding the numbered theorem before deciding what was shown.
 
 ## Paper Anatomy at a Glance
 
-<div className="not-prose my-8 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-  <div className="grid grid-cols-[minmax(180px,240px)_1fr] gap-x-5 gap-y-4 min-w-[560px]">
+<div className="not-prose my-8 rounded-panel border border-border bg-surface-muted/40 p-4">
+  <div className="grid gap-x-5 gap-y-4 sm:grid-cols-[minmax(180px,240px)_1fr]">
 
     <div className="rounded-(--radius-tight) border-l-4 border-foreground/30 bg-surface p-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Abstract</p>
@@ -279,7 +266,7 @@ theorem before you decide what was actually shown."
         <div className="h-2 w-2/3 rounded bg-foreground/10" />
       </div>
     </div>
-    <p className="self-center text-sm text-muted-foreground">The elevator pitch. Necessarily compressed. Note every strong word ("exponential," "novel," "advantage") as a claim still needing chapter and verse — don't treat this as the paper's content.</p>
+    <p className="self-center text-sm text-muted-foreground">The elevator pitch. Necessarily compressed. Note every strong word ("exponential," "novel," "advantage") as a claim still needing chapter and verse, not as the paper's content.</p>
 
     <div className="rounded-(--radius-tight) border-l-4 border-foreground/30 bg-surface p-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Introduction</p>
@@ -318,7 +305,7 @@ theorem before you decide what was actually shown."
         <div className="h-2 w-full rounded bg-accent/20" />
       </div>
     </div>
-    <p className="self-center text-sm text-muted-foreground">Small-scale simulation or hardware demonstration. Different kind of evidence than a proven bound — supportive, not a proof the asymptotic trend continues.</p>
+    <p className="self-center text-sm text-muted-foreground">Small-scale simulation or hardware demonstration. A different kind of evidence than a proven bound: supportive, but not a proof the asymptotic trend continues.</p>
 
     <div className="rounded-(--radius-tight) border-2 border-danger/50 bg-danger/5 p-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-danger">Discussion / limitations</p>
@@ -332,25 +319,24 @@ theorem before you decide what was actually shown."
   </div>
 </div>
 
-The color coding is deliberate, not decorative: neutral gray for the
-sections that orient you but aren't yet checkable content, amber for
-the section that is easy to skim past but changes the meaning of
-everything below it, the brand color for the one box that is actually
-this platform's whole standard of evidence — a stated, provable claim —
-and a second warm color marking numerics as real but categorically
-weaker support. Red marks the section most readers skip and most needs
-reading. A useful habit: when you open a new paper, locate these six
+The color coding carries information. Neutral gray marks the sections
+that orient you but are not yet checkable content; amber marks the
+section that is easy to skim past and changes the meaning of everything
+below it; the brand color marks the one box holding a stated, provable
+claim, which is this platform's whole standard of evidence; a second warm
+color marks numerics as real but categorically weaker support; red marks
+the section most readers skip and most need to read. A useful habit: when you open a new paper, locate these six
 things by name (even if the author's actual section headings differ)
 before forming an opinion about what the paper shows.
 
-## Common Mistakes
+## What You Can Safely Say You Read
 
 <Callout type="warning">
 **Quoting an abstract's phrasing as if it were the paper's theorem.**
 "They proved an exponential speedup" is only a safe thing to say once
 you've found the numbered statement and checked what model it's proven
-in. An abstract's job is compression, not precision — treat its strong
-claims as pointers to go verify, not as the verified content itself.
+in. An abstract's job is compression, not precision, so treat its strong
+claims as pointers to go verify rather than as verified content.
 </Callout>
 
 <Callout type="warning">
@@ -368,7 +354,7 @@ paper making a similarly-phrased claim.
 <Callout type="note">
 **Letting small-scale numerics "prove" an asymptotic claim.** A
 simulation at $n\le 20$ qubits consistent with a predicted scaling law
-is real, useful evidence — and it is not a proof that the scaling
+is useful evidence, and it is not a proof that the scaling
 continues at $n=200$ or $n=2000$. If the asymptotic claim is proven
 separately by theorem, the numerics are corroborating; if it is *not*
 proven separately, the numerics are the entire evidentiary basis for
@@ -379,16 +365,14 @@ yourself.
 <Callout type="note">
 **Skipping the discussion/limitations section because it "just" restates
 caveats.** It often contains the single clearest sentence in the whole
-paper about what was *not* shown — exactly the sentence that would have
-resolved an abstract-vs-theorem ambiguity in thirty seconds, if you'd
-read it.
+paper about what was *not* shown: exactly the sentence that would have
+resolved an abstract-vs-theorem ambiguity in thirty seconds.
 </Callout>
 
 ## Your First Real Read: Preskill's NISQ Paper
 
-The worked example above was built for teaching. Time to drop the
-training wheels. Here is a real, open-access paper, and it is one of the
-most cited in the field's history:
+The worked example above was built for teaching. Here is an actual
+paper, open-access and among the most cited in the field's history:
 
 <ResearchConnection
   title="Quantum Computing in the NISQ era and beyond"
@@ -424,12 +408,12 @@ instead a set of calibrated forecasts, and the right question becomes
 whether each forecast is tagged with the kind of evidence behind it.
 
 **Where is the model/assumptions section?** It is spread through the
-prose, and it is quantitative. The capability estimates assume two-qubit
-gate error rates near the percent level with no error correction, which
-is what caps a reliably executable circuit at something like a thousand
-gates. Change that assumption and every downstream forecast moves. That
-is the same load-bearing role the worked example's oracle-access clause
-played, wearing plainer clothes.
+prose, and it is quantitative. The capability estimates assume uncorrected
+two-qubit gates at the era's achieved error rates, which caps the total
+gate count of a reliably executable circuit at roughly the reciprocal of
+that error rate. Change that assumption and every downstream forecast
+moves. It is the same load-bearing role the worked example's
+oracle-access clause played, wearing plainer clothes.
 
 **Which claims are proven, and which are heuristic?** The paper sorts
 its own claims with unusual care. The classical-hardness argument for
@@ -445,8 +429,8 @@ quarantined in one section. Quantum machine learning proposals get a
 specific structural caveat (input and output bottlenecks: loading
 classical data in, and reading only a few classical bits out, can
 erase the claimed advantage). Fault tolerance gets a sobering resource
-estimate: thousands of protected logical qubits would need physical
-qubit counts in the millions. Each caveat is attached to the claim it
+estimate: running algorithms on thousands of protected logical qubits
+would call for physical qubit counts in the millions. Each caveat is attached to the claim it
 limits, at the moment the claim is made.
 
 **Did the strong claims survive?** Reading a 2018 forecast in the
@@ -465,7 +449,7 @@ well is a calibration standard worth keeping.
   scientific writing looks like, so you recognize its absence.
 </InsightBlock>
 
-<ChallengePrompt prompt="Open today's arXiv quant-ph listing, pick one abstract containing a superlative — 'exponential', 'first', 'outperforms', 'advantage' — and find the numbered statement that cashes it out.">
+<ChallengePrompt prompt="Open today's arXiv quant-ph listing, pick one abstract containing a superlative ('exponential', 'first', 'outperforms', 'advantage') and find the numbered statement that cashes it out.">
   Write two sentences: the abstract's claim, and the theorem's or the
   experiment's claim, each in your own words. Then name the specific gap
   between them: an oracle model, a restricted instance family, an assumed
@@ -482,8 +466,69 @@ well is a calibration standard worth keeping.
    but its body contained numerics on up to 50 qubits and **no** numbered
    theorem at all. Using the numerical-vs-proven distinction from this
    lesson's anatomy, what does that paper's numerics alone establish, and
-   what would you need to find elsewhere in the paper — if anything —
+   what, if anything, would you need to find elsewhere in the paper
    before repeating its "exponential speedup" language yourself?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The numerics establish the algorithm's behaviour at the sizes tested,
+   on the instances tested, against the baseline the authors actually
+   ran. Nothing beyond that, and in particular nothing about any $n$
+   larger than 50.
+
+   The first thing to notice is that 50 is not an improvement on 20 in
+   the way it looks. It is more data of the identical *kind*. "Exponential
+   speedup" is a statement about a limit, and no finite table of sizes
+   can reach a limit. Doubling the largest tested $n$ makes the evidence
+   more persuasive and does not move it into a different category, which
+   is exactly the distinction the anatomy draws.
+
+   That is not fussiness, and a single comparison shows why. Suppose the
+   truth is that the quantum cost is $n^3$ and the classical cost is
+   $2^{n/5}$: the classical algorithm is the asymptotically worse one, so
+   an exponential separation is genuinely there. At $n=50$ the numbers are
+   $125{,}000$ against $1{,}024$, so over the entire tested range the
+   "exponential" cost is *smaller* and a plot would show the quantum
+   method losing. The curves do not cross until around $n=100$. A range
+   of sizes that stops before the crossover cannot see the crossover, and
+   in quantum algorithms the crossovers are routinely well past what is
+   simulable.
+
+   **What to look for before repeating the word.** Four things, in
+   descending order of how much they would settle.
+
+   A proven asymptotic statement somewhere, or an explicit citation to
+   one in prior work that this paper is instantiating. Without a theorem,
+   no part of the paper licenses the word "exponential"; at most it
+   licenses "consistent with."
+
+   The identity of the classical baseline. An exponential speedup over
+   the authors' own naive implementation is not an exponential speedup,
+   and this is the single most common way the comparison is inflated.
+   Question 2 of the Evaluating Quantum Advantage lesson's checklist is
+   this question.
+
+   The fitting procedure, if the scaling claim rests on a fit. Which
+   functional forms were compared, over which range, and by how much did
+   the exponential win? A fit that was never given a polynomial to
+   compete against has not ruled one out.
+
+   The assumptions and discussion sections, which may already concede the
+   point. Papers frequently write "we conjecture" in section 6 and
+   "achieving" in the abstract, and the two sentences are describing the
+   same result.
+
+   **What you can honestly say if none of that is there.** "Numerical
+   evidence consistent with an exponential separation up to 50 qubits,
+   against a named classical baseline." That is a real and reportable
+   result, and it is worth stating in its own right rather than
+   downgrading with a shrug. Numerics without a theorem is how a great
+   deal of algorithms research legitimately proceeds. The defect, if
+   there is one, is in the abstract's verb, and separating the verb from
+   the evidence is the whole skill this lesson is teaching.
+
+   </details>
 2. Theorem 4.2 assumes "black-box query access" to $O_H$ with "no
    explicit description of $H$'s local terms given." Suppose you found a
    different paper whose theorem instead assumed *explicit* access to
@@ -493,14 +538,121 @@ well is a calibration standard worth keeping.
    same question as this lesson's illustrative abstract? Explain why or
    why not, referencing the oracle-model-versus-unconditional distinction
    the worked example draws on.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. It would answer a far stronger question, and that is the reason to
+   respond with suspicion rather than excitement.
+
+   Theorem 4.2's separation lives entirely inside a query model. It is
+   rigorous and it is complete on its own terms, and the classical side
+   of it is a lower bound against classical algorithms *restricted to the
+   same black-box access*. Hand a classical algorithm the explicit local
+   terms and the theorem says nothing at all, because the theorem's
+   hypothesis has been violated. It also relativizes, which by the
+   Baker-Gill-Solovay barrier means it cannot settle the unrelativized
+   question even in principle.
+
+   The second paper's model is the realistic one. A physical Hamiltonian
+   arrives as a list of named Pauli terms, not as an oracle, and that is
+   the setting in which the local Hamiltonian problem's QMA-completeness
+   lives. So an exponential separation there would be an unconditional
+   statement about classical computation with the full input in hand.
+
+   **Now trace what that would imply, because the implications are how
+   you calibrate whether to believe it.** A proven $2^{\Omega(n)}$
+   classical lower bound for an explicitly given problem that a
+   polynomial-time quantum algorithm solves would prove
+   $\mathsf{P}\neq\mathsf{BQP}$ outright. And since local Hamiltonian
+   threshold problems sit in $\mathsf{QMA}\subseteq\mathsf{PSPACE}$, a
+   proven exponential classical lower bound there would also separate
+   $\mathsf{P}$ from $\mathsf{PSPACE}$, a problem classical complexity
+   theory has been unable to touch for fifty years. Nobody has proven an
+   unconditional superpolynomial lower bound against general classical
+   computation for any problem at this level, and it is not close.
+
+   So the correct reading of such a paper is not "this is bigger than the
+   first one." It is: **find what the lower bound is actually against.**
+   In practice it will be one of four things. A restricted class of
+   classical algorithms, say a named family of tensor-network or Monte
+   Carlo methods, which is a real and useful result and not a complexity
+   separation. A conditional bound, resting on a hardness assumption. A
+   model with an oracle still hidden in it somewhere, commonly in state
+   preparation or in access to the ground state. Or a different problem
+   than the abstract's phrasing suggests.
+
+   **So the two papers do not answer the same question, and neither
+   answers the one the shared abstract implies.** The first is a proven,
+   narrow, model-relative fact. The second, read literally, would be a
+   sweeping unconditional fact, and is therefore almost certainly narrow
+   in some way its abstract has not said out loud. This is the reading
+   habit worth building: a claim's *size* is evidence about where its
+   hidden qualification is. Extraordinary scope means the qualification
+   is large and you have not found it yet.
+
+   </details>
+
 3. A paper's introduction states only "we improve significantly over
-   prior work," and its discussion section — the one section you were
-   tempted to skip — contains a single sentence: "our method's advantage
+   prior work," and its discussion section (the one section you were
+   tempted to skip) contains a single sentence: "our method's advantage
    assumes gate fidelities above 99.9%, not yet achieved on any public
    device." Using this lesson's six-part anatomy, explain specifically
    what that discussion sentence changes about how you would summarize
    the introduction's claim, and why skipping it would have left you with
    a false impression of the result.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It turns an unconditional performance claim into a conditional one
+   about hardware that does not exist yet, and it reverses the claim's
+   sign on every device available today.
+
+   **Before:** "This method improves significantly over prior work."
+   That reads as a comparison anyone could run this afternoon.
+
+   **After:** "On hardware with two-qubit fidelities above $99.9\%$,
+   better than any public device currently achieves, this method
+   outperforms prior work. On present hardware it does not." The second
+   sentence is not in the paper, but it is the direct logical
+   consequence: if the advantage *requires* a fidelity nobody has, then
+   at achievable fidelities the prior work is the better choice.
+
+   Run it against the anatomy and the structural problem is visible.
+   The **introduction** made a claim with no scope. The **precise
+   technical claim** is presumably a bound or a simulation computed under
+   an assumed noise level. The **model and assumptions** section is where
+   a fidelity threshold belongs, and the fact that it surfaced only in
+   discussion is itself the defect: a load-bearing hypothesis was filed
+   as a caveat. And the **numerical results**, whatever they show, were
+   produced at a noise level no experiment can currently supply, which
+   makes them a prediction rather than a demonstration.
+
+   **Why skipping the discussion is not a small loss.** It is the
+   difference between "better" and "would be better," and those differ in
+   tense, not in degree. A reader who stopped at the introduction would
+   summarize the paper for a colleague in a way that is false about every
+   machine either of them can access, while believing they had read the
+   paper carefully. The introduction gave them no signal that anything
+   was missing; that is what makes it a trap rather than an ambiguity.
+
+   **Two things worth saying in the paper's defence, since fairness is
+   part of reading well.** The authors disclosed it. One sentence in
+   discussion is thin, and it is disclosure, and a great deal of
+   published work is less forthcoming than that. And the caveat is a
+   near-term one rather than a fatal one: $99.9\%$ two-qubit fidelity is
+   at the edge of what leading platforms report, not a fantasy, so the
+   honest summary is "a method that becomes advantageous at the next
+   fidelity milestone." That is a genuinely useful result and deserves to
+   be described as neither a breakthrough nor a dud.
+
+   **The habit this argues for.** Read the discussion first. It is where
+   the scope lives, scope determines what the rest of the paper means,
+   and it costs a minute. A result whose limitations you already know is
+   a result you can read the introduction of safely.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -518,20 +670,20 @@ well is a calibration standard worth keeping.
   different kinds of evidence with different reliability; a paper can
   legitimately contain both, and conflating them is a common misreading.
 - The discussion/limitations section is where careful authors state
-  caveats explicitly — reading it is part of reading the paper, not an
+  caveats explicitly. Reading it is part of reading the paper, not an
   optional appendix.
 - This worked example's abstract-vs-theorem gap (an unqualified
   "exponential speedup" that turns out to be an oracle-model
   separation) is the same distinction Quantum Complexity Theory proved
   matters for Grover's optimality and for $\mathsf{NP}\not\subseteq
-  \mathsf{BQP}$ evidence — this course applies that same precision to
+  \mathsf{BQP}$ evidence. This course applies that same precision to
   papers you did not write yourself.
-- This is the practical payoff the entire APEX pillar has been building
+- This is the practical payoff the entire APEX track has been building
   toward: the technical vocabulary from every prior course, turned into
   the ability to read a new, real claim critically and independently,
   rather than relying on someone else's summary of it.
 
-## Further Exploration
+## Where the Reading Habit Goes Next
 
 <NextDiscovery>
   The next lesson in this course, [Distinguishing Theorem from

@@ -94,13 +94,13 @@ export const dataProcessingFrames = [
 ];
 
 <LessonHook eyebrow="You cannot gain information by processing data you already have">
-  Send a qubit through any physical channel — noisy, lossy, or into the
-  hands of an eavesdropper — and one inequality guarantees the same
+  Send a qubit through any physical channel (noisy, lossy, or into the
+  hands of an eavesdropper) and one inequality guarantees the same
   thing every time: whatever it shares with the rest of the world can
   only look *less* correlated afterward, never more.
 </LessonHook>
 
-## Motivation
+## Processing Cannot Create Information
 
 Quantum Entropy and Information Measures defined quantum mutual
 information $I(A:B)=S(A)+S(B)-S(AB)$ and computed $I(A:B)=2$ bits for a
@@ -110,22 +110,38 @@ down a noisy channel, or handed to an eavesdropper, or measured
 and forgotten? Intuition says it can only get worse: you cannot learn
 more about $A$ from a *processed* copy of $B$ than from $B$ itself. This
 lesson turns that intuition into an actual theorem, derives its most
-useful corollary in full, and checks it against a real, computed number.
+useful corollary in full, and checks it against a computed number.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c2/Claude_Shannon_c1930.png"
   alt="Portrait photograph of Claude Shannon as a young man"
-  caption="Claude Shannon, whose 1948 theory of information first made 'processing cannot create information, only destroy it' a precise, provable statement — the same intuition this lesson upgrades to a fully quantum theorem about relative entropy under CPTP maps."
+  caption="Claude Shannon, whose 1948 theory of information first made 'processing cannot create information, only destroy it' a precise, provable statement. This lesson upgrades that same intuition to a fully quantum theorem about relative entropy under CPTP maps."
   credit="University of Michigan Bentley Historical Library, via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Claude_Shannon_c1930.png"
   license="Public domain"
 />
 
-## Mathematical Development
+## Monotonicity, and What Follows From It
 
 ### The monotonicity theorem
 
 <TheoremBox title="Monotonicity of quantum relative entropy (data-processing for S(.||.))" provenance="cited">
+
+**Hypotheses.** $\rho$ and $\sigma$ are density matrices on the same
+finite-dimensional Hilbert space, and $\mathcal N$ is CPTP. Nothing is
+assumed about commutation or purity, and the supports need not nest: if
+$\text{supp}(\rho)\not\subseteq\text{supp}(\sigma)$ the right-hand side
+is $+\infty$ by the convention of the previous course and the inequality
+holds trivially. Where complete positivity is load-bearing is the
+corollary below rather than the bare inequality: the corollary applies
+$\text{id}_A\otimes\mathcal N$ to a bipartite state, and only complete
+positivity guarantees that map sends states to states at all.
+Transposition is the standard witness that mere positivity does not:
+Relative Entropy and Mixed-State Entanglement's Werner state at $p=0.7$
+has a partial transpose with eigenvalue $-0.275$, so
+$\text{id}_A\otimes T$ carries a legitimate density matrix to something
+that is not one, and the corollary's very first step would have nothing
+to work with.
 
 For any two density matrices $\rho,\sigma$ on a system, and any
 completely positive trace-preserving (CPTP) map $\mathcal N$ (any
@@ -134,7 +150,7 @@ sense: a unitary on a larger space followed by discarding an ancilla):
 
 <EquationReveal
   terms={[
-    { id: "N", symbol: "𝒩", gloss: "Any physical (CPTP) channel — a unitary on a larger space followed by discarding an ancilla." },
+    { id: "N", symbol: "𝒩", gloss: "Any physical (CPTP) channel, meaning a unitary on a larger space followed by discarding an ancilla." },
     { id: "lhs", symbol: "S(𝒩(ρ)‖𝒩(σ))", gloss: "Relative entropy between the two states after both have gone through the same channel." },
     { id: "rhs", symbol: "S(ρ‖σ)", gloss: "Relative entropy between the two original, unprocessed states." },
   ]}
@@ -151,6 +167,16 @@ the true state $\rho$, this says: **no physical operation can ever make
 two states easier to tell apart than they already were.** Processing
 can only destroy distinguishing information, never create it.
 
+**Equality condition.** The inequality is saturated precisely when the
+channel is *reversible on this particular pair*: there exists a CPTP map
+$\mathcal R$ with $\mathcal R(\mathcal N(\rho))=\rho$ and
+$\mathcal R(\mathcal N(\sigma))=\sigma$, and it can always be taken to be
+the **Petz recovery map** built from $\sigma$ and $\mathcal N$ (Petz,
+1986). Note what this does *not* say. It does not require $\mathcal N$
+to be invertible as a map, only that nothing separating these two states
+was destroyed. A channel can be badly lossy overall and still lose
+nothing that distinguishes $\rho$ from $\sigma$.
+
 </TheoremBox>
 
 <Callout type="note">
@@ -161,11 +187,12 @@ a *fixed* pair of states using two applications of Jensen's inequality
 on scalars. The monotonicity theorem above is a different, harder
 statement: it compares $S(\rho\|\sigma)$ *before and after* a channel,
 and its standard proofs (Lindblad, 1975; Uhlmann, 1977) go through
-either strong subadditivity of von Neumann entropy or the joint
-convexity of relative entropy, both of which rest on **operator
-convexity** of $x\mapsto x\log x$ (a statement about matrix-valued, not
-scalar, convexity), machinery this platform has not built. It is
-stated here as a real, precisely-quoted theorem, not derived. See
+either **strong subadditivity** of von Neumann entropy (Lieb and Ruskai,
+1973) or the joint convexity of relative entropy, both of which rest in
+turn on **Lieb's concavity theorem** and the **operator convexity** of
+$x\mapsto x\log x$ (a statement about matrix-valued, not scalar,
+convexity), machinery this platform has not built. It is
+stated here as a precisely-quoted theorem, not derived. See
 Nielsen & Chuang, *Quantum Computation and Quantum Information*, §11.3,
 or Wilde, *Quantum Information Theory*, Ch. 11, for the full proof.
 </Callout>
@@ -215,7 +242,7 @@ $A$. Claim: $I(A:B)\geq I(A:B')$.
   </DerivationStep>
   <DerivationStep annotation="Apply id_A ⊗ N to both sides. Tracing a trace-preserving map out again reproduces the original trace, so rho_AB'’s marginal on A is still exactly rho_A; its marginal on B' is N(rho_B) = rho_B' by definition. So Step 1's identity applies again to the primed state without modification.">
     On the left, $(\text{id}_A\otimes\mathcal N)(\rho_{AB})=\rho_{AB'}$,
-    the actual post-channel joint state. On the right,
+    the post-channel joint state. On the right,
     $(\text{id}_A\otimes\mathcal N)(\rho_A\otimes\rho_B)=\rho_A\otimes\mathcal N(\rho_B)=\rho_A\otimes\rho_{B'}$.
 
     $$
@@ -239,7 +266,7 @@ name: it required identifying the *specific* pair of states
 monotonicity statement collapses exactly onto the mutual-information
 identity.
 
-## Physical Interpretation: Why This Matters
+## What B Can Never Recover Alone
 
 - **LOCC cannot increase entanglement.** Any protocol built from local
   operations and classical communication is, from $B$'s side alone, a
@@ -300,7 +327,7 @@ $$
 
 The middle $2\times2$ block (the $\{|01\rangle,|10\rangle\}$ subspace)
 is identically zero, contributing two zero eigenvalues; the outer block
-$\begin{psmallmatrix}0.5 & 0.5(1-\lambda)\\ 0.5(1-\lambda) & 0.5\end{psmallmatrix}$
+$\left(\begin{smallmatrix}0.5 & 0.5(1-\lambda)\\ 0.5(1-\lambda) & 0.5\end{smallmatrix}\right)$
 has eigenvalues $1-\lambda/2$ and $\lambda/2$ by
 `eigenvaluesHermitian2x2`. So $S(AB')=-[(1-\tfrac\lambda2)\log_2(1-\tfrac\lambda2)+\tfrac\lambda2\log_2\tfrac\lambda2]$.
 Both reduced marginals stay maximally mixed for every
@@ -314,12 +341,12 @@ $$
 <PredictBeforeReveal
   question="Full dephasing (lambda=1) wipes out every off-diagonal, phase-coherent term on qubit B. Does the shared mutual information I(A:B') collapse all the way down to 0 bits, or does something survive?"
   options={[
-    { label: "It collapses to 0 — no coherence left, no correlation left", value: "zero" },
-    { label: "It settles at exactly 1 bit — the classical population correlation survives", value: "one" },
     { label: "It goes negative, the way S(A|B) can for the untouched Bell pair", value: "negative" },
+    { label: "It collapses to 0, since no coherence left means no correlation left", value: "zero" },
+    { label: "It settles at exactly 1 bit, since the classical population correlation survives", value: "one" },
   ]}
   correctValue="one"
-  explanation="I(A:B') -> 1 bit as lambda -> 1, not 0. Dephasing kills phase coherence but never touches populations, and the Bell pair's perfect classical (population) correlation — 'both 0 or both 1' — is carried entirely by populations. Half of the pair's original 2 bits is classical correlation that no amount of dephasing can remove; only the quantum half is vulnerable to this particular noise."
+  explanation="I(A:B') -> 1 bit as lambda -> 1, not 0. Dephasing kills phase coherence but never touches populations, and the Bell pair's perfect classical correlation ('both 0 or both 1') is carried entirely by populations. Half of the pair's original 2 bits is classical correlation that no amount of dephasing can remove; only the quantum half is vulnerable to this particular noise."
 />
 
 Computed values (`mutualInformationAfterDephasingB`, exact, no
@@ -344,15 +371,17 @@ even total decoherence on one side.
 
 <InteractiveSection
   title="Scan the noise parameter"
-  description="Every point on this curve is I(A:B') computed after dephasing qubit B with strength lambda. The dashed line marks the noiseless value I(A:B)=2, and the curve never crosses it.">
+  description="Every point on this curve is I(A:B') computed after dephasing qubit B with strength lambda. The dashed line marks the noiseless value I(A:B)=2; the data-processing inequality makes a claim about which side of that line the curve is allowed to sit on.">
   <ParametricCurve
     frames={dataProcessingFrames}
+    xAxisLabel="dephasing strength λ"
+    yAxisLabel="I(A:B′) (bits)"
     ariaLabel="Quantum mutual information I(A:B') between qubit A and dephased qubit B', plotted against the dephasing strength lambda from 0 to 1, staying at or below the noiseless value of 2 bits and decreasing monotonically toward 1 bit"
     referenceLines={[{ y: 2, label: "Noiseless I(A:B) = 2 bits" }]}
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Confusing Monotonicity With Entropy Increase
 
 <Callout type="warning">
 **Confusing "channels can't increase distinguishability" with "channels
@@ -382,16 +411,164 @@ monotonicity statement does.
 
 ## Practice Questions
 
-1. Confirm from the theorem's equality condition (inherited from
-   Klein's inequality) that a **unitary** channel leaves
+1. Confirm from the theorem's equality condition (the reversibility
+   condition stated in the theorem box above) that a **unitary** channel leaves
    $S(\rho\|\sigma)$ exactly unchanged, and explain why this makes
    sense given that a unitary is reversible.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The equality condition asks for a CPTP map $\mathcal R$ that undoes
+   $\mathcal N$ on both states, and for $\mathcal N(\cdot)=U\cdot U^\dagger$
+   there is an obvious candidate: $\mathcal R(\cdot)=U^\dagger\cdot U$,
+   which is itself a unitary channel, hence CPTP. It satisfies
+   $\mathcal R(\mathcal N(\rho))=U^\dagger U\rho U^\dagger U=\rho$ and the
+   same for $\sigma$. So the inequality is saturated and
+   $S(U\rho U^\dagger\|U\sigma U^\dagger)=S(\rho\|\sigma)$.
+
+   The same conclusion falls out of monotonicity alone, without invoking
+   the equality condition at all, which is worth seeing because it needs no
+   theory beyond the inequality itself. Apply the inequality once forwards,
+
+   $$
+   S(U\rho U^\dagger\|U\sigma U^\dagger)\leq S(\rho\|\sigma),
+   $$
+
+   and once with the channel $\mathcal R$ applied to the transformed pair,
+
+   $$
+   S(\rho\|\sigma)=S\big(U^\dagger(U\rho U^\dagger)U\,\big\|\,U^\dagger(U\sigma U^\dagger)U\big)\leq S(U\rho U^\dagger\|U\sigma U^\dagger).
+   $$
+
+   Two inequalities in opposite directions force equality. Any invertible
+   channel whose inverse is also a channel is pinned this way.
+
+   Direct computation agrees, and shows where the invariance lives.
+   Functional calculus gives $\log_2(UAU^\dagger)=U(\log_2 A)U^\dagger$,
+   because unitary conjugation carries the spectral decomposition of $A$ to
+   that of $UAU^\dagger$ without touching the eigenvalues. Then cyclicity
+   of the trace removes every $U$:
+
+   $$
+   \mathrm{Tr}\big(U\rho U^\dagger\log_2(U\sigma U^\dagger)\big)=\mathrm{Tr}\big(U\rho\log_2\sigma\,U^\dagger\big)=\mathrm{Tr}(\rho\log_2\sigma).
+   $$
+
+   The physical reading is the cleanest of the three. Distinguishability is
+   a statement about what measurements can reveal, and a unitary just
+   relabels the measurements: the statistics of measuring $U\rho U^\dagger$
+   with a POVM $\{E_i\}$ are identical to measuring $\rho$ with
+   $\{U^\dagger E_iU\}$, which is an equally valid POVM. No experiment can
+   tell the two situations apart, so no measure of distinguishability may
+   either.
+
+   One thing not to over-read. The equality condition says "reversible on
+   this pair", which is weaker than "unitary". A badly lossy channel can
+   still saturate the inequality for a particular $\rho,\sigma$, provided
+   nothing that separated *those two* states was discarded. Saturation is
+   evidence about a pair, not a certificate that the channel is invertible.
+
+   </details>
+
 2. Using the worked example's formula $I(A:B')=2-S(AB')(\lambda)$,
    compute $I(A:B')$ at $\lambda=0.6$ and confirm it lies strictly
    between the $\lambda=0.4$ and $\lambda=0.8$ table values.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $I(A:B')=1.118709$ bits, sitting between $1.278072$ at $\lambda=0.4$ and
+   $1.029049$ at $\lambda=0.8$, as required.
+
+   The outer block's eigenvalues are $1-\lambda/2$ and $\lambda/2$, so at
+   $\lambda=0.6$ they are $0.7$ and $0.3$:
+
+   $$
+   S(AB')=-0.7\log_20.7-0.3\log_20.3=0.360201+0.521090=0.881291,
+   $$
+
+   $$
+   I(A:B')=2-0.881291=1.118709\ \text{bits}.
+   $$
+
+   Betweenness is not luck here. $S(AB')=H(1-\lambda/2,\lambda/2)$ is a
+   binary entropy of an argument moving monotonically from $0$ toward
+   $1/2$ as $\lambda$ runs $0\to1$, and binary entropy increases
+   monotonically on $[0,1/2]$. So $S(AB')$ increases and $I(A:B')$
+   decreases, strictly, over the whole range. Data processing guarantees
+   only $I(A:B')\leq2$; the monotone decrease in $\lambda$ is an extra fact
+   about this particular family, coming from the entropy function's shape.
+
+   The shape is the part worth taking away. Binary entropy has infinite
+   slope at the endpoint, so the curve falls steeply at first and then
+   flattens: the first fifth of the noise ($\lambda=0$ to $0.2$) destroys
+   $0.469$ bits, while the last fifth ($0.8$ to $1.0$) destroys only
+   $0.029$. Sixteen times as much damage per unit of noise at the start.
+   Two practical readings follow. A nearly clean channel is fragile, so
+   small imperfections cost far more than a linear estimate suggests. And a
+   badly degraded channel is robust, so once the coherence is mostly gone,
+   further noise takes very little.
+
+   And the curve stops at $1$ bit rather than $0$, because the Bell pair's
+   population correlation is invisible to dephasing. Half the ebit's two
+   bits was classical all along and this channel cannot touch it.
+
+   </details>
+
 3. Explain, in your own words, why the Markov-chain structure
    $A\to B\to B'$ (not $A\to B'$ directly, and not a channel touching
    $A$ too) is exactly the condition the corollary's derivation needs.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the derivation feeds monotonicity a very specific pair of
+   states, "the joint state" and "the product of its own marginals", and it
+   needs that description to survive the channel. Only a map of the form
+   $\mathrm{id}_A\otimes\mathcal N$ preserves it.
+
+   Two separate things have to hold, and the Markov condition supplies both.
+
+   **$A$'s marginal must not change.** Step 1's identity
+   $S(\rho_{AB}\|\rho_A\otimes\rho_B)=I(A:B)$ is applied again to the
+   output, so the second argument must be the product of the *output*
+   state's marginals. On the $A$ side that means $\rho_A$ has to still be
+   $\rho_A$ afterwards. It is, because $\mathcal N$ acts only on $B$ and is
+   trace-preserving, so $\mathrm{Tr}_{B'}(\mathrm{id}\otimes\mathcal N)(\rho_{AB})=\mathrm{Tr}_B\rho_{AB}=\rho_A$.
+
+   **The product structure must be preserved.** Step 2 needs
+   $(\mathrm{id}_A\otimes\mathcal N)(\rho_A\otimes\rho_B)=\rho_A\otimes\rho_{B'}$,
+   which is true exactly because the map factors across the tensor product.
+   A jointly-acting $\mathcal N_{AB}$ sends a product state to something
+   correlated, and then the right-hand argument of the relative entropy is
+   no longer a product of anything, so it stops computing a mutual
+   information.
+
+   That is what "no further access to $A$" buys, and it is the direct
+   translation of the classical Markov condition $p(z|x,y)=p(z|y)$: $Z$ is
+   manufactured from $Y$ alone, so whatever it knows about $X$ it learned
+   through $Y$.
+
+   The failure without it is not subtle, and a single example settles it.
+   Take $\rho_A=|{+}\rangle\langle{+}|$ and $\rho_B=|0\rangle\langle0|$, a
+   product state with $I(A:B)=0$. Apply a CNOT across both qubits, which is
+   a perfectly legitimate CPTP map, and the output is $|\Phi^+\rangle$ with
+   $I(A:B')=2$ bits. Correlation created from nothing, from zero to the
+   two-qubit maximum, in one gate. Nothing about monotonicity was violated;
+   the corollary simply does not apply to a channel that touches both
+   halves.
+
+   The distinction worth carrying is that the *theorem* survives a joint
+   channel and the *corollary* does not. Monotonicity of relative entropy
+   holds for every CPTP map without exception. What the locality hypothesis
+   buys is the identification of both sides of that inequality with mutual
+   informations, which is what makes the abstract statement usable. This is
+   also why the LOCC and QKD applications insist so carefully that each
+   step is local: every one of them is an invocation of the corollary, and
+   a step that acted jointly would break the chain of reasoning rather than
+   merely weakening it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -415,7 +592,7 @@ monotonicity statement does.
   monotonicity, QKD eavesdropper-information bounds, and is the direct
   quantum lift of the classical Data Processing Inequality.
 
-## Further Exploration
+## Turning the Bound Into a Rate
 
 <NextDiscovery>
   [Entanglement Distillation and Typical Subspaces](/lessons/quantum-mastery/quantum-shannon-theory/entanglement-distillation-and-typical-subspaces)

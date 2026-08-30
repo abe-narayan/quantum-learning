@@ -90,13 +90,13 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="From inspection to a theorem">
-  Whether a transition can happen at all — no integral computed — turns
-  out to be a question symmetry alone can answer, once the recursion
+  Whether a transition can happen at all, with no integral computed,
+  turns out to be a question symmetry alone can answer, once the recursion
   behind Clebsch-Gordan coefficients is generalized into the
   Wigner-Eckart theorem.
 </LessonHook>
 
-## Motivation
+## Beyond Two Spin-Halves
 
 Addition of Angular Momentum combined two spin-$\tfrac12$ particles by
 direct inspection: four candidate states, checked by hand against $\vec
@@ -125,7 +125,7 @@ from symmetry alone.
   the operator-specific physics.
 </HistoricalMoment>
 
-## Mathematical Development
+## The Ladder Recursion, and What It Buys
 
 ### The general recursion
 
@@ -137,7 +137,7 @@ and the Angular Momentum Spectrum); the right side distributes over the
 product states, each factor lowering independently:
 
 <DerivationSteps>
-  <DerivationStep annotation="Apply J₋ = J₁₋ + J₂₋ to both sides of the coupling expansion. The left side reduces to the ordinary single-j ladder formula acting on the coupled state |j,m⟩ — the coefficient one step down in m.">
+  <DerivationStep annotation="Apply J₋ = J₁₋ + J₂₋ to both sides of the coupling expansion. The left side reduces to the ordinary single-j ladder formula acting on the coupled state |j,m⟩, giving the coefficient one step down in m.">
 
 $$
 \sqrt{j(j+1)-m(m-1)}\;C^{j,m-1}_{j_1m_1;j_2m_2}
@@ -151,7 +151,7 @@ $$
 $$
 
   </DerivationStep>
-  <DerivationStep annotation="J₂₋ lowers only the j2 factor — the second right-hand term, with j2's magnetic number one higher, obtained by matching the coefficient of |j1,m1⟩|j2,m2⟩ on both sides after the ladder action.">
+  <DerivationStep annotation="J₂₋ lowers only the j2 factor, producing the second right-hand term, with j2's magnetic number one higher, obtained by matching the coefficient of |j1,m1⟩|j2,m2⟩ on both sides after the ladder action.">
 
 $$
 {}+\sqrt{j_2(j_2+1)-m_2(m_2+1)}\;C^{j,m}_{j_1m_1;j_2,m_2+1}
@@ -236,7 +236,7 @@ $j_1,j_2$) confirms every coefficient, to floating-point precision:
 $3.75=\tfrac32\cdot\tfrac52$, $0.75=\tfrac12\cdot\tfrac32$: both
 $j(j+1)$, exactly, not approximately. These are the
 coefficients Degenerate Perturbation Theory used to build its coupled
-basis $U$, here actually derived rather than borrowed.
+basis $U$, derived here rather than borrowed.
 
 <PredictBeforeReveal
   question="Consider the stretched state |3/2,+3/2⟩ versus an interior state like |3/2,+1/2⟩. m₁+m₂ must equal mⱼ for any contributing product state. How many of the six uncoupled |mL,mS⟩ states can contribute to each?"
@@ -246,7 +246,7 @@ basis $U$, here actually derived rather than borrowed.
     { label: "Both have exactly two contributing product states", value: "both-two" },
   ]}
   correctValue="one-two"
-  explanation="mⱼ=+3/2 with m₁∈{1,0,−1} and m₂∈{+½,−½} has only one solution, m₁=1,m₂=+½, so |3/2,+3/2⟩ is forced to equal that single product state exactly (coefficient 1, no superposition). mⱼ=+1/2 has two solutions, (m₁,m₂)=(1,−½) and (0,+½), so |3/2,+1/2⟩ is a two-term superposition — exactly the √(2/3), √(1/3) split the recursion below derives."
+  explanation="mⱼ=+3/2 with m₁∈{1,0,−1} and m₂∈{+½,−½} has only one solution, m₁=1,m₂=+½, so |3/2,+3/2⟩ is forced to equal that single product state exactly (coefficient 1, no superposition). mⱼ=+1/2 has two solutions, (m₁,m₂)=(1,−½) and (0,+½), so |3/2,+1/2⟩ is a two-term superposition, exactly the √(2/3), √(1/3) split the recursion above derives."
 />
 
 <InteractiveSection
@@ -287,6 +287,18 @@ overall constant, independent of $m,m',q$:
 
 <TheoremBox title="Wigner–Eckart theorem" provenance="derived">
 
+**Hypotheses.** $T^k_q$ is a spherical tensor operator of rank $k$ in
+the sense just defined, and $|jm\rangle,|j'm'\rangle$ are eigenstates of
+one and the same total angular momentum $\vec J$. Any further quantum
+numbers (a radial label $n$, say) ride along inside the reduced matrix
+element and are suppressed in the notation below; they change
+$\langle j'\|T^k\|j\rangle$ and nothing else. The proportionality
+argument needs $j,j',k$ to satisfy the triangle rule, and when they do
+not, both sides are zero and the statement is vacuously true. One
+convention warning: many texts carry a $1/\sqrt{2j'+1}$ on the
+right-hand side, which rescales the reduced matrix element without
+changing any physical ratio. The form below omits it.
+
 $$
 \boxed{\;\langle j'm'|T^k_q|jm\rangle = \langle jm;kq|j'm'\rangle\,\langle j'\|T^k\|j\rangle\;}
 $$
@@ -311,7 +323,7 @@ above with no reference to any specific operator; by Wigner-Eckart, *any*
 rank-$k$ tensor operator's matrix element inherits both selection rules
 automatically, with zero additional calculation.
 
-## Physical Interpretation
+## Selection Rules Without an Integral
 
 <InsightBlock>
   Whether a transition is allowed is a symmetry question, answerable from
@@ -331,10 +343,9 @@ triangle rule above leaves exactly $\Delta l=\pm1$. This parity argument
 is a separate ingredient from Wigner-Eckart itself, worth stating honestly
 rather than folding silently into "the selection rule.") This is
 the electric-dipole selection rule underlying every atomic transition
-this platform's Hydrogen Atom course used, now derived from symmetry
-rather than asserted.
+this platform's Hydrogen Atom course used, now derived from symmetry.
 
-## Worked Example
+## Coupling l=1 to s=1/2, Coefficient by Coefficient
 
 **Confirm $\langle1,0;\tfrac12,-\tfrac12|\tfrac32,-\tfrac12\rangle=\sqrt{2/3}$
 directly from the $m$-conservation rule and the table above.**
@@ -342,13 +353,13 @@ directly from the $m$-conservation rule and the table above.**
 The table's $|3/2,-1/2\rangle$ row has nonzero coefficients only on
 $|0,-\tfrac12\rangle$ (coefficient $\sqrt{2/3}$) and
 $|{-1},\tfrac12\rangle$ (coefficient $\sqrt{1/3}$), the bar chart's
-fourth frame. Both satisfy $m_1+m_2=-\tfrac12$, as required. Reading off
+third frame. Both satisfy $m_1+m_2=-\tfrac12$, as required. Reading off
 the $|1,0\rangle|\tfrac12,-\tfrac12\rangle$ coefficient directly:
 $\langle1,0;\tfrac12,-\tfrac12|\tfrac32,-\tfrac12\rangle=\sqrt{2/3}\approx0.8165$,
 matching the recursion's prediction exactly (Practice Question 1 asks for
 the recursion derivation itself).
 
-## Common Mistakes
+## Reading Proportionality as Equality
 
 <Callout type="warning">
 **Assuming Wigner-Eckart says a matrix element equals the CG
@@ -372,14 +383,219 @@ parity argument above, not an extra CG vanishing condition.
    (derived in the worked example above) to derive
    $\left|\tfrac32,-\tfrac12\right\rangle$, and confirm your result
    matches the table.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Apply $J_-=L_-+S_-$ to both sides of
+
+   $$
+   \left|\tfrac32,\tfrac12\right\rangle=\sqrt{\tfrac23}\,|1,0\rangle\left|\tfrac12,\tfrac12\right\rangle+\sqrt{\tfrac13}\,|1,1\rangle\left|\tfrac12,-\tfrac12\right\rangle .
+   $$
+
+   Left side, by the single-$j$ ladder formula at $j=\tfrac32$, $m=\tfrac12$:
+
+   $$
+   \sqrt{j(j+1)-m(m-1)}=\sqrt{\tfrac{15}{4}+\tfrac14}=\sqrt4=2 ,
+   $$
+
+   so the left side is $2\left|\tfrac32,-\tfrac12\right\rangle$.
+
+   Right side, lowering each factor separately. On the first term,
+   $L_-|1,0\rangle=\sqrt2\,|1,-1\rangle$ and
+   $S_-\left|\tfrac12,\tfrac12\right\rangle=\left|\tfrac12,-\tfrac12\right\rangle$.
+   On the second term, $L_-|1,1\rangle=\sqrt2\,|1,0\rangle$ while
+   $S_-\left|\tfrac12,-\tfrac12\right\rangle=0$, since $-\tfrac12$ is
+   already the bottom rung. Collecting the two surviving product states:
+
+   $$
+   \sqrt{\tfrac23}\sqrt2\;\left|-1,\tfrac12\right\rangle+\left(\sqrt{\tfrac23}+\sqrt{\tfrac13}\sqrt2\right)\left|0,-\tfrac12\right\rangle
+   =\tfrac{2}{\sqrt3}\left|-1,\tfrac12\right\rangle+\tfrac{2\sqrt2}{\sqrt3}\left|0,-\tfrac12\right\rangle .
+   $$
+
+   Divide by $2$:
+
+   $$
+   \left|\tfrac32,-\tfrac12\right\rangle=\sqrt{\tfrac13}\,|1,-1\rangle\left|\tfrac12,\tfrac12\right\rangle+\sqrt{\tfrac23}\,|1,0\rangle\left|\tfrac12,-\tfrac12\right\rangle .
+   $$
+
+   An explicit rebuild of the lowering step returns
+   $0.577350$ and $0.816497$, which are $\sqrt{1/3}$ and $\sqrt{2/3}$, and
+   these are exactly the two entries the worked example reads off the
+   table for the $|3/2,-1/2\rangle$ row. The norm squared is
+   $\tfrac13+\tfrac23=1$ to twelve decimals.
+
+   Compare the result to $\left|\tfrac32,\tfrac12\right\rangle$ and a
+   symmetry is visible: both interior $j=\tfrac32$ states put the larger
+   coefficient $\sqrt{2/3}$ on the product state with $m_1=0$, and the
+   two are mirror images under $m\to-m$ with $m_S$ flipped. That is
+   forced, since the whole multiplet is generated by lowering from a
+   state symmetric under nothing in particular; the mirror symmetry comes
+   from the $m\to-m$ symmetry of the ladder coefficients themselves.
+
+   The wrong turn is dividing by the wrong ladder factor, most often
+   $\sqrt{j(j+1)-m(m+1)}=\sqrt3$, which is the *raising* normalization
+   read off by reflex. The coefficients then come out $0.666667$ and
+   $0.942809$, and the tell is immediate: their squares sum to
+   $\tfrac43$, not $1$. Checking normalization catches this every time,
+   which is why it is worth doing even when the algebra felt safe. A
+   second wrong turn is applying $J_-$ to only one factor of a product
+   state, or forgetting that $S_-$ annihilates
+   $\left|\tfrac12,-\tfrac12\right\rangle$ and manufacturing a third,
+   nonexistent term at $m_2=-\tfrac32$.
+
+   </details>
+
 2. Using $m$-conservation alone, explain why
    $\langle j'm'|T^1_1|jm\rangle$ must vanish unless $m'=m+1$, for *any*
    rank-1 tensor operator $T^1$, not just the dipole operator.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The defining property of a rank-$k$ spherical tensor supplies the
+   whole proof in two lines. For $k=1$, $q=1$ the definition reads
+   $[J_z,T^1_1]=1\cdot T^1_1$. Sandwich that commutator between the two
+   eigenstates and let $J_z$ act on whichever side it faces:
+
+   $$
+   \langle j'm'|[J_z,T^1_1]|jm\rangle=(m'-m)\,\langle j'm'|T^1_1|jm\rangle
+   =1\cdot\langle j'm'|T^1_1|jm\rangle ,
+   $$
+
+   so $(m'-m-1)\,\langle j'm'|T^1_1|jm\rangle=0$. Either $m'=m+1$, or the
+   matrix element is zero. There is no third option.
+
+   Nothing in that argument mentions the dipole, a radial integral, a
+   wavefunction, or even the value of $j$ and $j'$. The only input is the
+   commutator, which is what "rank-1 tensor operator" *means*. Physically,
+   $T^1_1$ is built to transform like $|1,+1\rangle$, so it carries one
+   unit of $J_z$ into the matrix element, and the bra has to absorb it.
+   This is angular-momentum conservation written at the level of
+   operators.
+
+   It is equally worth naming what the rule does not say. It gives a
+   condition for the element to be *allowed*, never a guarantee that it is
+   nonzero when the condition holds. Vanishing can still come from the
+   triangle rule on $j,j',k$, or from the reduced matrix element
+   $\langle j'\|T^1\|j\rangle$ being zero for that particular operator.
+   Selection rules exclude; they do not include.
+
+   The wrong turn is proving it for the dipole by writing the angular
+   integral $\int Y_{l'}^{m'*}Y_1^1Y_l^m\,d\Omega$ and observing that the
+   azimuthal part $\int_0^{2\pi}e^{i(m+1-m')\phi}d\phi$ vanishes unless
+   $m'=m+1$. That derivation is correct and it answers a narrower
+   question than the one asked. Worse, it does not generalize: the spin
+   operator components $S_{\pm},S_z$ form a perfectly good rank-1
+   spherical tensor and there is no spatial wavefunction to integrate
+   anywhere in sight, so no product of spherical harmonics exists to
+   write down. The commutator proof is not merely tidier, it is the only
+   one available in general.
+
+   </details>
 3. For $j_1=1,j_2=1$ (two $l=1$ systems combined, e.g. two p-electrons'
    orbital angular momenta), what range of total $j$ does the triangle
    rule permit? List every value.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The rule is $|j_1-j_2|\le j\le j_1+j_2$ in integer steps, so with
+   $j_1=j_2=1$:
+
+   $$
+   j\in\{0,\;1,\;2\} .
+   $$
+
+   All three, including the lower bound $|1-1|=0$, which is attained
+   rather than approached.
+
+   The check that makes this trustworthy rather than recalled is the
+   dimension count. The uncoupled space has
+   $(2j_1+1)(2j_2+1)=3\times3=9$ states, and the coupled multiplets
+   contribute $2j+1$ each:
+
+   $$
+   (2\cdot0+1)+(2\cdot1+1)+(2\cdot2+1)=1+3+5=9 .
+   $$
+
+   Coupling is a change of basis, so the totals must agree exactly. Drop
+   $j=0$ and you have $8$ states where there were $9$, which is the
+   fastest way to notice an omission.
+
+   In spectroscopic language these are the $S$, $P$ and $D$ terms of a
+   two-p-electron configuration. There is a further piece of structure
+   worth knowing, since the question names two p-electrons specifically:
+   for $j_1=j_2=j$ the coupled state has exchange symmetry
+   $(-1)^{2j-J}$, so here $J=2$ and $J=0$ are symmetric under swapping
+   the two electrons' orbital labels while $J=1$ is antisymmetric.
+   Combined with the Pauli principle, a symmetric orbital state must pair
+   with the antisymmetric spin singlet and vice versa, which selects
+   exactly $^1S_0$, $^3P$ and $^1D_2$ as the allowed terms of a $p^2$
+   configuration such as carbon's ground configuration. The triangle rule
+   supplies the candidates; antisymmetry prunes them.
+
+   The wrong turn is producing half-integer or non-integer values. Both
+   $j_1$ and $j_2$ are integers here, so $j_1+j_2$ is an integer and the
+   ladder steps by one, keeping every $j$ an integer; half-integers can
+   only appear when an odd number of half-integer angular momenta are
+   coupled. A second wrong turn is stopping at $\{1,2\}$ on the grounds
+   that $j=0$ means "no angular momentum" and therefore cannot arise from
+   two nonzero ones. It arises precisely when the two are antiparallel,
+   and the dimension count refuses to balance without it.
+
+   </details>
+
 4. Why does the top state $|j_1+j_2,j_1+j_2\rangle$ need no recursion at
    all, while every other state in every other multiplet does?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because at the very top there is only one product state to choose
+   from, so there is nothing left to determine.
+
+   Conservation of $J_z$ restricts the expansion to product states with
+   $m_1+m_2=m$. At $m=j_1+j_2$, the largest available values are
+   $m_1\le j_1$ and $m_2\le j_2$, so the sum can reach $j_1+j_2$ only by
+   saturating both at once: $m_1=j_1$ and $m_2=j_2$, and no other pair
+   works. That $m$-subspace is one-dimensional, and a one-dimensional
+   space has exactly one unit vector up to phase, so
+
+   $$
+   |j_1+j_2,\,j_1+j_2\rangle=|j_1,j_1\rangle|j_2,j_2\rangle
+   $$
+
+   with coefficient $1$. There is no superposition to solve for, hence no
+   recursion to run.
+
+   One step down the picture changes qualitatively. At $m=j_1+j_2-1$ two
+   product states share the value, $(j_1-1,j_2)$ and $(j_1,j_2-1)$, so the
+   $m$-subspace is two-dimensional and "which unit vector" becomes a real
+   question with a whole circle of candidate answers. The recursion is
+   what answers it, and the subspace dimension keeps growing as $m$
+   descends, up to $\min(2j_1,2j_2)+1$, so the question only gets harder.
+   This is the same counting the lesson's prediction exercise makes
+   concrete for $l=1\otimes s=\tfrac12$: one contributing product state at
+   $m_j=\tfrac32$, two at $m_j=\tfrac12$.
+
+   Two honest refinements, since the contrast is slightly sharper than
+   the question's phrasing suggests. First, the top state of each *lower*
+   multiplet is not produced by the recursion either; it is produced by
+   orthogonality to the states already built at that $m$, with the
+   Condon-Shortley convention fixing its phase. Recursion generates
+   states within a multiplet, orthogonalization starts new ones. Second,
+   the *bottom* state $|j_1+j_2,-(j_1+j_2)\rangle$ is forced by exactly
+   the same uniqueness argument as the top, $m_1=-j_1$ and $m_2=-j_2$
+   being the only option, even though in practice the ladder delivers it.
+
+   The wrong turn is explaining the top state's simplicity by saying it
+   is "the most aligned" or "the classical configuration," which sounds
+   physical but is not an argument. The reason is purely a counting fact
+   about how many pairs $(m_1,m_2)$ can sum to a given $m$, and it would
+   hold for any operator with the same additive quantum number.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -397,7 +613,7 @@ parity argument above, not an extra CG vanishing condition.
   the identical recursion CG coefficients do; selection rules ($\Delta
   m=q$, the triangle rule) follow immediately, with no integral evaluated.
 
-## Further Exploration
+## Symmetry as a Source of Phase
 
 <NextDiscovery>
   [The Adiabatic Theorem and Berry Phase](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/the-adiabatic-theorem-and-berry-phase)

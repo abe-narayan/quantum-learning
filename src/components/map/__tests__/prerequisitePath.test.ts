@@ -44,7 +44,7 @@ describe("getPrerequisitePath", () => {
     }
   });
 
-  it("is the transitive closure — nothing reachable is missing", () => {
+  it("is the transitive closure, nothing reachable is missing", () => {
     for (const node of CONCEPT_NODES) {
       const path = new Set(getPrerequisitePath(node.id).map((entry) => entry.id));
       // Independent BFS over the same edges, as a cross-check of the DFS.

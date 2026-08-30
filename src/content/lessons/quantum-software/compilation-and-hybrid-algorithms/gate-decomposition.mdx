@@ -10,7 +10,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Gate Decomposition",
   description:
-    "Real hardware only implements a small native gate set (typically RZ and one more axis of rotation). Every other gate this platform uses decomposes into that set, verified exactly: H=Ry(π/2)Rz(π), X=Rz(π)Ry(π), Z=Rz(π), S=Rz(π/2), T=Rz(π/4), all confirmed to machine precision up to global phase.",
+    "Real hardware only implements a small native gate set (typically RZ and one more axis of rotation). Every other gate this platform uses decomposes into that set, verified exactly: H=Ry(π/2)Rz(π), X=Rz(π)Ry(π), Z=Rz(π), S=Rz(π/2), T=Rz(π/4), each checked to machine precision against the engine's own matrices, using the equivalence that is physically correct for a gate rather than the one a linear-algebra library would reach for by default.",
   course: "compilation-and-hybrid-algorithms",
   module: "gate-decomposition",
   order: 1,
@@ -20,30 +20,44 @@ export const lessonMeta = {
   objectives: [
     "Explain why real hardware implements only a small native gate set, not every named gate directly",
     "Verify a specific gate decomposition (H, X, Z, S, T into RZ/RY) using this platform's engine",
-    "Explain what 'equal up to global phase' means for a decomposition, and why it's the correct equivalence to check",
+    "Justify what 'equal up to global phase' means for a decomposition, and why it's the correct equivalence to check",
   ],
   related: [
     {
       slug: "quantum-computing/qubits-and-quantum-states/single-qubit-rotations",
-      note: "The Rz/Ry rotation family used for every decomposition here is exactly that lesson's general axis-angle rotation formula, specialized to two fixed axes.",
+      note: "The Rz/Ry rotation family used for every decomposition here is that lesson's general axis-angle rotation formula, specialized to two fixed axes.",
     },
   ],
 };
 
 <LessonHook eyebrow="What a circuit diagram is hiding">
-Every circuit this platform has ever built — Bell states, Grover's algorithm, <Term id="vqe">VQE</Term> <Term id="ansatz">ansatzes</Term> — is, underneath the convenient H/X/CNOT notation, ultimately a sequence of native rotations on real hardware.
+Every circuit this platform has ever built (Bell states, Grover's algorithm, <Term id="vqe">VQE</Term> <Term id="ansatz">ansatzes</Term>) is, underneath the convenient H/X/CNOT notation, ultimately a sequence of native rotations on real hardware.
 </LessonHook>
 
-## Motivation
+## Which Gates the Device Actually Has
 
-Quantum Compilation & Transpilation covered WHICH qubits a gate can act
-on; this lesson covers WHAT gates a device can actually apply in the
-first place. Real hardware typically implements only a small **native
-gate set**, often just $R_z(\theta)$ (essentially free, since it can be
-absorbed into later pulse timing) and one genuine rotation axis like
+Quantum Compilation & Transpilation settled WHICH qubits a gate can act
+on. The prior question, the one that has to be answered before routing
+means anything, is WHAT gates a device can apply at all. Real hardware
+typically implements only a small **native
+gate set**, often just $R_z(\theta)$ (essentially free, since it is
+applied by shifting the phase of every later drive pulse rather than by
+firing a pulse of its own) and one physically-driven rotation axis like
 $R_y(\theta)$ or $R_x(\theta)$, and every other named gate this
 platform uses (H, X, Y, Z, S, T) must be expressed as a sequence of
 these native rotations before it can run.
+
+One simplification in that sentence is worth naming, since it is the
+first thing a real backend's specification will contradict. On a
+transmon the driven rotation is usually not available at an arbitrary
+angle: the calibrated primitive is a *fixed* $\pi/2$ pulse about one
+axis, and an arbitrary $R_y(\theta)$ is itself built from that primitive
+sandwiched between virtual $Z$ rotations. So a published basis gate set
+reads more like $\{R_z,\ \sqrt X,\ X,\ \text{CZ}\}$ than
+$\{R_z,\ R_y\}$. Nothing below changes: the decompositions this lesson
+verifies are into a two-axis rotation set, and lowering that set one
+step further onto fixed-angle pulses is the transpiler's next pass, not
+a different idea.
 
 So the letter "H" in a circuit diagram is a name for something the
 device never receives. What it receives is this:
@@ -62,7 +76,7 @@ The rest of this lesson works out that middle step for every named gate
 this platform uses, and checks each decomposition against the gate's own
 matrix rather than asserting it.
 
-## Engineering Development
+## Rebuilding H, X, and T From Two Rotations
 
 ### Verified decompositions into Rz and Ry
 
@@ -80,9 +94,8 @@ H = R_y(\pi/2)\,R_z(\pi), \qquad X = R_z(\pi)\,R_y(\pi)
 $$
 
 The first three are trivial (a single native rotation each); $H$ and
-$X$ need a composition of two native gates — non-obvious identities,
-each confirmed to machine precision ($\text{maxDiff}<10^{-15}$) rather
-than simply asserted. Drawn as an
+$X$ need a composition of two native gates, non-obvious identities
+each confirmed to machine precision ($\text{maxDiff}<10^{-15}$). Drawn as an
 actual circuit (application order, left to right, which reads opposite
 to the matrix product above, since the matrix product $H=R_y(\pi/2)R_z(\pi)$
 applies $R_z$ first, so it's drawn first here), the two-rotation
@@ -106,24 +119,12 @@ decompositions look like this:
   ]}
 />
 
-Stepping through all five verified gates one at a time, rather than
-reading two fixed diagrams, makes the "how many native rotations does
-THIS gate need" question concrete for every gate this platform uses,
-not just the two multi-rotation ones drawn above:
+Step through all five verified gates one at a time and the "how many
+native rotations does THIS gate need" question becomes concrete for
+every gate this platform uses, including the three the two fixed
+diagrams above leave out:
 
-<PredictBeforeReveal
-  question="How many native rotations does the Hadamard gate H need, compared to Z?"
-  options={[
-    { label: "The same as Z: just one", value: "same-one" },
-    { label: "Two, versus Z's one", value: "two-vs-one" },
-    { label: "Three, versus Z's one", value: "three-vs-one" },
-    { label: "Zero; H is already native", value: "zero" },
-  ]}
-  correctValue="two-vs-one"
-  explanation="Z=Rz(π) is already a single native rotation, but H=Ry(π/2)Rz(π) needs two — a non-obvious difference in compiled cost between two gates that look equally 'basic' in circuit notation. Step through the five gates below and watch Z, S, T stay a single RZ box while H and X expand to two."
-/>
-
-<InteractiveSection title="Step through all five decompositions" description="Slide across Z, S, T, H, and X. Notice the first three are a single Rz box (theta = pi, pi/2, pi/4 respectively); H and X are the two-rotation sequences drawn above. Every angle here is exactly the value this lesson already stated, just rendered as an actual circuit instead of a formula.">
+<InteractiveSection title="Step through all five decompositions" description="Slide across Z, S, T, H and X. The first three are a single Rz box (theta = pi, pi/2 and pi/4); only H and X need two. Read the box count rather than the angles: that count, not the rotation, is what a compiler is minimising, and it is why the fault-tolerant courses measure a circuit in T-count instead of gate count.">
   <CircuitDiagramExplorer
     sliderLabel="Gate"
     frames={[
@@ -169,14 +170,30 @@ not just the two multi-rotation ones drawn above:
 
 ### Why "up to global phase" is the right check
 
+Take the simplest decomposition in the list, $Z=R_z(\pi)$, and write
+both sides out as matrices. The Pauli $Z$ is $\text{diag}(1,-1)$.
+This platform's $R_z(\theta)=\text{diag}(e^{-i\theta/2},e^{i\theta/2})$,
+so $R_z(\pi)=\text{diag}(-i,\,i)$.
+
+<PredictBeforeReveal
+  question="diag(1, −1) against diag(−i, i): the decomposition claims these are the same gate, but the four entries plainly do not match. What is the relationship?"
+  options={[
+    { label: "They are numerically identical matrices", value: "identical" },
+    { label: "They differ by an unobservable overall phase", value: "phase" },
+    { label: "They are different gates with different outcomes", value: "different" },
+  ]}
+  correctValue="phase"
+  explanation="diag(−i, i) = −i · diag(1, −1). Every entry carries the same factor of −i, so the two matrices differ by one overall constant rather than entry by entry. That constant multiplies the whole state vector and no measurement can see it, which is why even this 'trivial' one-rotation decomposition fails an exact-equality test and passes the physically correct one."
+/>
+
 Mathematical Foundations already established that a global phase
 $e^{i\phi}$ multiplying an entire state vector is completely
 unobservable: no measurement can detect it. This means two gate
 matrices that differ only by an overall phase factor implement the
-*exact same physical gate*, even though they're different matrices
-numerically. `matricesEqualUpToGlobalPhase` checks precisely this
-weaker (and physically correct) equivalence, rather than requiring
-exact matrix equality. A decomposition that's correct "up to phase" is
+*same physical gate*, even though they're different matrices
+numerically. `matricesEqualUpToGlobalPhase` checks this
+weaker and physically correct equivalence; exact matrix equality would
+be the wrong test. A decomposition that's correct "up to phase" is
 a completely correct decomposition, not an approximation.
 
 ### General claim vs. specific verification
@@ -185,20 +202,20 @@ Any single-qubit <Term id="unitary-operator">unitary</Term> can, in principle, b
 native rotations (a standard result called Euler-angle decomposition,
 e.g. the $R_z$-$R_y$-$R_z$ form), stated here as a known mathematical
 fact this course doesn't derive in full generality. What this lesson DOES
-provide is genuine, checked verification for the five specific gates
-this platform actually uses throughout its Quantum Computing pillar,
+provide is checked verification for the five specific gates
+this platform actually uses throughout its Quantum Computing track,
 which is a stronger guarantee than an unverified general claim alone.
 
-## Physical Interpretation
+## What the Letter H Really Names
 
 Every circuit this platform has ever built (Bell states, Grover's
 algorithm, VQE ansatzes) is, underneath the convenient H/X/CNOT
 notation, ultimately a sequence of native rotations on real hardware.
 This lesson makes that translation explicit and checkable for the most
-commonly used gates, rather than leaving it as an assumed implementation
+commonly used gates, so it stops being an assumed implementation
 detail.
 
-## Worked Example
+## Checking a Decomposition to Machine Precision
 
 **Confirm $X=R_z(\pi)R_y(\pi)$ reproduces the correct action on
 $|0\rangle$: flipping it to $|1\rangle$.**
@@ -211,7 +228,7 @@ measurement PROBABILITIES at all. This platform's engine confirms
 returns `true`, and applying the composed matrix to $|0\rangle$
 gives population 1 in $|1\rangle$, exactly matching $X|0\rangle=|1\rangle$.
 
-## Common Mistakes
+## Demanding Equality Where Phase Is Free
 
 <Callout type="warning">
 **Requiring EXACT matrix equality (no phase tolerance) when checking a
@@ -232,16 +249,227 @@ requirement for every specific gate.
 
 1. Explain why `matricesEqualUpToGlobalPhase` is the physically correct
    equivalence check for verifying a gate decomposition, rather than
-   exact matrix equality.
+   exact matrix equality. Then name the one circumstance in which a
+   gate's global phase stops being free.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a phase multiplying an entire state vector is unobservable, so
+   two matrices differing by one overall factor implement the same
+   physical gate, and a test that rejected them would be rejecting
+   correct decompositions.
+
+   The simplest case in the lesson already shows exact equality failing.
+   Pauli $Z$ is $\text{diag}(1,-1)$. This platform's
+   $R_z(\theta)=\text{diag}(e^{-i\theta/2},e^{i\theta/2})$, so
+   $R_z(\pi)=\text{diag}(-i,i)$. The engine's own entries confirm it:
+   $Z_{00}=1$ while $R_z(\pi)_{00}=-i$ to machine precision. Not one
+   entry matches, and yet
+
+   $$
+   \text{diag}(-i,\,i) = -i\cdot\text{diag}(1,-1),
+   $$
+
+   the same constant on every entry. Under exact equality, $Z=R_z(\pi)$
+   would be reported false, and the single most trivial decomposition in
+   quantum computing would fail its own test.
+
+   The physics is the Born rule. An overall factor $e^{i\phi}$ on the
+   state contributes $|e^{i\phi}\alpha|^2=|\alpha|^2$ to every
+   probability, so no measurement sees it. And it stays global: a
+   constant commutes with every subsequent gate, so it cannot later
+   become a relative phase between two branches and show up in
+   interference.
+
+   Same story for the two-rotation cases. The engine gives
+   $R_z(\pi)R_y(\pi)=[[0,i],[i,0]]=i\,X$ and
+   $R_y(\pi/2)R_z(\pi)=-i\,H$. Both report `true`, both would fail exact
+   equality, both are correct decompositions rather than approximations
+   of correct ones. That distinction is worth insisting on: "correct up
+   to global phase" is not a weaker form of correct.
+
+   **The one circumstance where the phase stops being free: when the gate
+   is controlled.** Take $U=e^{i\phi}V$. As standalone gates these are
+   the same operation. Now build the controlled versions:
+
+   $$
+   C\text{-}U = |0\rangle\langle0|\otimes I + |1\rangle\langle1|\otimes e^{i\phi}V .
+   $$
+
+   The phase now sits on the $|1\rangle$ branch of the control and not on
+   the $|0\rangle$ branch. It has been promoted from global to
+   *relative*, and a relative phase is exactly the thing that is
+   observable. $C\text{-}U$ and $C\text{-}V$ are genuinely different
+   gates: they differ by a $Z$-rotation on the control qubit.
+
+   So a compiler cannot discard a global phase unconditionally. It can
+   for a gate that will be executed as written, and it must track it for
+   a subroutine that might later be controlled, which is why real
+   compilers carry the phase along rather than normalizing it away. The
+   right statement is not "global phase never matters," it is "global
+   phase never matters *for the gate as a whole state's evolution*," and
+   controlling a gate changes what the whole state is.
+
+   </details>
+
 2. $Z=R_z(\pi)$ needs only one native rotation, while $H=R_y(\pi/2)R_z(\pi)$
    needs two. What does this difference suggest about how "expensive"
    (in native-gate count) different logical gates are to compile?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   That the cost of a named gate is not a property of the gate but of its
+   relationship to the device's native axes, and that "expensive" is
+   relative to a cost model that changes completely between regimes.
+
+   **The immediate reading.** $Z$ rotates about the $z$ axis, which is
+   one of the axes the hardware can drive directly, so a single $R_z$
+   does the job. $H$ rotates by $\pi$ about the axis
+   $(\hat x+\hat z)/\sqrt2$, which no native rotation reaches, so the
+   compiler has to reposition first and then rotate: two boxes instead of
+   one. The general upper bound is three, from the Euler decomposition,
+   so the whole range for single-qubit gates is one to three. Small, and
+   gate-dependent.
+
+   **The first complication, and it cuts the wrong way for the naive
+   count.** On real superconducting hardware, $R_z$ is often not a
+   physical operation at all. It is implemented "virtually," by shifting
+   the phase of every subsequent drive pulse, which takes zero time and
+   introduces zero error. So $Z=R_z(\pi)$ costs literally nothing at run
+   time, while $H$ costs one genuine physical pulse. Counting boxes says
+   one against two; counting pulses says zero against one. The box count
+   overstates $Z$'s cost, and the interactive above is right to say that
+   the count rather than the angle is what a compiler minimizes, provided
+   you count the right things.
+
+   **The second complication inverts the entire list.** In a
+   fault-tolerant setting the accounting is not about pulses at all. The
+   Clifford gates, which include $H$, $S$, $X$, $Z$ and CNOT, become
+   comparatively cheap because a surface code implements them directly.
+   The $T$ gate does not: it requires magic-state distillation, an
+   expensive protocol consuming many physical qubits and many rounds. So
+   $T=R_z(\pi/4)$, which on this lesson's list looks like the cheapest
+   thing there is, one rotation with the smallest angle, becomes the
+   single most expensive gate in the circuit. That is why fault-tolerant
+   resource estimates are quoted as a **T-count** rather than a gate
+   count.
+
+   So the answer to "how expensive is this gate?" is three different
+   answers depending on the question: how many native rotations, how many
+   physical pulses, or how many magic states. The same five gates rank
+   differently under each.
+
+   The wrong turn is generalizing from $H$ to "every gate costs three
+   rotations, so a gate count is a good proxy for cost." The three is an
+   upper bound over all single-qubit unitaries, this lesson's own
+   examples show it is not tight, and the number that actually matters
+   depends on which machine and which era you are compiling for.
+
+   </details>
+
 3. Using the verified $X=R_z(\pi)R_y(\pi)$ identity, what would you
    expect $R_z(\pi)R_y(\pi)$ applied to $|1\rangle$ to give? (Hint: what
    does $X$ do to $|1\rangle$?)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $X|1\rangle=|0\rangle$, so the composed rotations must give
+   $|0\rangle$ too, up to a global phase. The engine returns amplitudes
+   $[\,i,\ 0\,]$, so the state is $i|0\rangle$: probability
+   $1$ on outcome 0 and $3.7\times10^{-33}$ on outcome 1, which is zero
+   as far as floating point can express it.
+
+   Working it by hand, since the phase is where the interest is.
+   $R_y(\pi)=[[0,-1],[1,0]]$, so
+
+   $$
+   R_y(\pi)|1\rangle = -|0\rangle .
+   $$
+
+   Then $R_z(\pi)=\text{diag}(-i,i)$ multiplies the $|0\rangle$ component
+   by $-i$:
+
+   $$
+   R_z(\pi)\left(-|0\rangle\right) = i\,|0\rangle .
+   $$
+
+   The factor of $i$ is exactly the global phase question 1 was about.
+   Indeed $R_z(\pi)R_y(\pi)=[[0,i],[i,0]]=i\,X$, so the composed operator
+   is $X$ times a constant, and applying it to $|0\rangle$ likewise gives
+   $i|1\rangle$, the same constant. One phase for the operator, not a
+   different one per input, which is what makes it global.
+
+   Two wrong turns.
+
+   The first is expecting the phase to leave a trace in the measurement.
+   It does not. $|i|^2=1$, so the probabilities are exactly those of
+   $X|1\rangle$, and no experiment on this state distinguishes $i|0\rangle$
+   from $|0\rangle$.
+
+   The second is more interesting and worth guarding against: assuming
+   that because $R_z$ only adds phases to $|0\rangle$ and $|1\rangle$
+   individually, it can never affect anything. It cannot change the
+   probabilities of a $Z$-basis measurement, which is all that was needed
+   here. On a general input it adds a *relative* phase between the two
+   components, which is a real, physical, measurable change, visible the
+   moment the state is measured in any other basis or passed through
+   another Hadamard. $R_z$ is free of consequence here only because the
+   state it acted on had a single nonzero component.
+
+   </details>
+
 4. Why does this lesson describe the general three-rotation Euler
    decomposition as a "known mathematical fact this course doesn't
    derive," rather than proving it from scratch?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because deriving it properly is a substantial detour that nothing on
+   this platform needs, and because the lesson is being careful to
+   distinguish what it *verified* from what it *cites*.
+
+   **On the derivation.** The claim is that every single-qubit unitary
+   factors as $R_z(\alpha)R_y(\beta)R_z(\gamma)$ up to phase, which is a
+   theorem about the structure of $SU(2)$. Proving it means developing
+   the correspondence between $SU(2)$ and rotations in three dimensions,
+   the double cover that also produces the half-angles this platform's
+   Bloch-sphere lessons already meet. That is a real piece of mathematics
+   and a real chapter, and no lesson here uses the general result. What
+   the lessons use is five specific decompositions.
+
+   **On the distinction, which is the more important half.** The lesson
+   verified those five against the engine's own matrices, to
+   $\text{maxDiff}<10^{-15}$. That is a stronger guarantee than an
+   unverified general assertion would be for these particular gates, and
+   it has a property a citation does not: it would catch a bug. If
+   `rotationZ` or `rotationY` were implemented with a sign error or a
+   wrong half-angle, the checks would fail, and the platform would find
+   out. A quoted theorem checks nothing about the code beneath it.
+
+   So the sentence is drawing a boundary between two epistemic
+   categories: this is checked, that is cited. The platform draws the
+   same boundary elsewhere, around the threshold theorem in the hardware
+   course and the entanglement area law in Tensor Network Methods, both
+   used and neither derived. Marking the line is what makes the rest of
+   the verification claims worth anything.
+
+   The wrong turn is reading "doesn't derive it" as hedging, as though
+   the result were uncertain or the lesson were unsure of it. Euler
+   decomposition is standard and settled. Presenting a citation as
+   though it were a derivation would be the actual failure of honesty,
+   and it is the one the phrasing avoids.
+
+   One thing the general result does *not* say, since the lesson's
+   Common Mistakes box flags it: three is an upper bound over all
+   single-qubit unitaries, not a fixed price. $Z$, $S$ and $T$ each need
+   one, and $H$ and $X$ need two. Reading the worst case as the cost of
+   every gate would misprice every circuit on the list.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -258,7 +486,7 @@ requirement for every specific gate.
   checking decompositions, since global phase is unobservable by
   construction.
 
-## Further Exploration
+## From One Gate to a Whole Loop
 
 <NextDiscovery>
 [Hybrid Quantum-Classical Workflows](/lessons/quantum-software/compilation-and-hybrid-algorithms/hybrid-workflows) shifts from

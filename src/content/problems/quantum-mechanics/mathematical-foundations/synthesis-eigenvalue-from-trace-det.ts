@@ -29,8 +29,9 @@ export const synthesisEigenvalueFromTraceDet: NumericProblem = {
     ],
   },
   hints: [
-    { text: "λ² - (trace)λ + (determinant) = 0." },
-    { text: "Substitute the given trace and determinant, then factor the quadratic. Its two roots add to the trace and multiply to the determinant; report the larger one." },
+    { text: "Trace and determinant are the two symmetric functions of a $2\\times2$ matrix's eigenvalues: one is their sum, the other their product." },
+    { text: "That gives two conditions on two unknown numbers, or equivalently a quadratic whose coefficients are the two values you were handed. Write it down." },
+    { text: "Look for a pair of numbers that add to the trace and multiply to the determinant before reaching for the quadratic formula, then report the larger of the two rather than their difference." },
   ],
   solution: {
     steps: [

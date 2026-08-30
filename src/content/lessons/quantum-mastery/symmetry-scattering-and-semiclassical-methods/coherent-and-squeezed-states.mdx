@@ -88,7 +88,7 @@ export const squeezeBars = [
 export const lessonMeta = {
   title: "Coherent and Squeezed States",
   description:
-    "The harmonic oscillator states that most resemble a classical trajectory: eigenstates of the annihilation operator, built directly on The Quantum Harmonic Oscillator's ladder operators, proved here to saturate the uncertainty bound with equal position and momentum spread. Squeezed states generalize this to unequal spread, still exactly minimal, and reveal what 'squeezing' really does to Δx and Δp.",
+    "The harmonic oscillator states that most resemble a classical trajectory: eigenstates of the annihilation operator, built directly on The Quantum Harmonic Oscillator's ladder operators, proved here to saturate the uncertainty bound with equal position and momentum spread. Squeezed states break that equality on purpose, and working out what the trade costs is what makes the name 'squeezing' literal.",
   course: "symmetry-scattering-and-semiclassical-methods",
   module: "coherent-and-squeezed-states",
   order: 1,
@@ -101,7 +101,7 @@ export const lessonMeta = {
   objectives: [
     "Derive coherent states as eigenstates of the annihilation operator, â|α⟩=α|α⟩, and expand them in the Fock basis",
     "Prove coherent states saturate the position-momentum uncertainty bound with equal Δx and Δp",
-    "Derive squeezed states as the general minimum-uncertainty family and compute how squeezing trades Δx against Δp while their product stays fixed",
+    "Generalize to squeezed states as the full minimum-uncertainty family and compute how squeezing trades Δx against Δp while their product stays fixed",
   ],
   related: [
     {
@@ -117,7 +117,7 @@ export const lessonMeta = {
   the opposite, and it is the family real laser light produces.
 </LessonHook>
 
-## Motivation
+## The Oscillator State That Behaves Classically
 
 The Quantum Harmonic Oscillator built energy eigenstates $|n\rangle$
 algebraically, states of definite energy, but *maximally* non-classical
@@ -138,7 +138,7 @@ directly from $a,a^\dagger$, no new postulate needed.
   license="CC BY 4.0"
 />
 
-## Mathematical Development
+## Eigenstates of a Non-Hermitian Operator
 
 ### Coherent states as eigenstates of â
 
@@ -171,7 +171,7 @@ basis The Quantum Harmonic Oscillator used):
 
 <InteractiveSection
   title="A real coherent state's Fock-basis distribution"
-  description="Bars are the actual computed |cₙ|² for α=1.5 (mean photon number |α|²=2.25), built from the closed-form coefficients above in a 30-level truncated basis. The distribution peaks near n=2, and its Poisson shape (not a bell curve centered exactly at the mean, slightly skewed) is a checkable feature of e^(-|α|²)|α|^(2n)/n!."
+  description="Bars are the computed |cₙ|² for α=1.5 (mean photon number |α|²=2.25), built from the closed-form coefficients above in a 30-level truncated basis. The distribution peaks near n=2, and its Poisson shape (not a bell curve centered exactly at the mean, slightly skewed) is a checkable feature of e^(-|α|²)|α|^(2n)/n!."
 >
   <BarChart
     bars={fockBars}
@@ -209,9 +209,25 @@ feature: it's a *displaced* vacuum, same shape, shifted mean position and
 momentum, which is why it tracks a classical trajectory (the
 "blob" doesn't spread or distort as $\langle x\rangle,\langle p\rangle$
 oscillate). Checked directly against the real engine's coherent-state
-amplitudes at $\alpha=1.5$: $\Delta x=\Delta p\approx0.7071$ (machine
-precision, in the 30-level truncated basis, far above the state's own
-$\langle N\rangle=2.25$).
+amplitudes at $\alpha=1.5$: $\Delta x=\Delta p=0.70710678$ and
+$\Delta x\,\Delta p=0.50000000$, both to eight digits.
+
+That agreement is worth one paragraph of scepticism, because every
+operator in the computation is a $30\times30$ truncation of an
+operator that lives on an infinite-dimensional space, and
+truncation is not innocent. On a finite Fock space the canonical
+commutator *fails*: computing $[a,a^\dagger]$ in this platform's own
+$30$-level matrices gives $1$ on the first $29$ diagonal entries and
+$1-30=-29$ on the last. It has to, since a finite matrix commutator is
+traceless and $\mathbb 1$ is not, so no finite matrices satisfy
+$[a,a^\dagger]=\mathbb 1$ at all. Every derivation above used that
+commutator. The numbers come out right anyway for one checkable reason:
+the coherent state at $\alpha=1.5$ carries weight $2\times10^{-22}$ at
+$n=29$, so the one corrupted entry is never touched. Push $\alpha$ up
+toward $\sqrt{30}$ and the same code would start returning nonsense with
+no warning. The infinite-dimensional statement is the true one; the
+matrix is a well-chosen approximation to it, valid here because the state
+is confined far below the ceiling.
 
 ### Squeezed states: unequal spread, still minimal
 
@@ -228,9 +244,9 @@ to $b,|\beta\rangle$ unchanged, just relabeled.
 <PredictBeforeReveal
   question="Squeezing shrinks Δx below the coherent-state value 1/√2. What happens to the product Δx·Δp as a result?"
   options={[
-    { label: "It drops below 1/2 — squeezing beats the uncertainty bound", value: "below" },
-    { label: "It stays exactly 1/2 — Δp grows to compensate", value: "same" },
-    { label: "It rises above 1/2 — squeezing costs you some minimality", value: "above" },
+    { label: "It drops below 1/2, since squeezing beats the uncertainty bound", value: "below" },
+    { label: "It stays exactly 1/2, since Δp grows to compensate", value: "same" },
+    { label: "It rises above 1/2, since squeezing costs you some minimality", value: "above" },
   ]}
   correctValue="same"
   explanation="b obeys the identical commutator [b,b†]=1 that a does, so |β⟩ saturates the uncertainty bound the same way |α⟩ does; it is minimum-uncertainty by construction, not by accident. The derivation below shows Δx and Δp individually as e^(∓r)/√2, and the exponentials cancel in the product no matter how large r gets."
@@ -239,8 +255,16 @@ to $b,|\beta\rangle$ unchanged, just relabeled.
 Inverting the Bogoliubov transform, $a=b\cosh r-b^\dagger\sinh r$
 (direct algebra: $b\cosh r-b^\dagger\sinh r=(a\cosh r+a^\dagger\sinh
 r)\cosh r-(a^\dagger\cosh r+a\sinh r)\sinh r=a(\cosh^2r-\sinh^2r)=a$),
-checked here as an exact matrix identity (holds at *any* truncation,
-since it's pure linear-operator algebra, not an eigenvalue statement):
+checked here as an exact matrix identity. This one really does hold at
+*any* truncation, and it is worth seeing why it escapes the problem just
+raised: $b\cosh r-b^\dagger\sinh r=a(\cosh^2r-\sinh^2r)$ is a linear
+identity among the matrices themselves, using no commutator anywhere, so
+the corrupted last row of $[a,a^\dagger]$ never enters. The panels below
+agree to $4\times10^{-16}$ in a $6$-level basis, which is far too small
+to hold a coherent state and still exact for this identity. The
+$[b,b^\dagger]=1$ claim above is the opposite case: it *does* rest on the
+commutator, and so it is an infinite-dimensional statement that no
+truncation reproduces exactly.
 
 <MatrixGridExplorer
   presets={squeezeCheckPresets}
@@ -276,7 +300,7 @@ the Heisenberg bound.
   maxValue={1.3}
 />
 
-## Physical Interpretation
+## What Squeezing Trades Away
 
 "Squeezing" is what the name suggests: at $r=0.5$, position spread
 shrinks to about $61\%$ of the coherent-state value while momentum spread
@@ -297,11 +321,11 @@ quadrature, at the unavoidable cost of extra noise on the other one).
     frames={ellipseFrames}
     center={ellipseCenter}
     sliderLabel="Squeeze parameter r"
-    ariaLabel="Phase-space uncertainty ellipse for a squeezed state, centered at a fixed point, morphing from a circle at r=0 into an increasingly stretched ellipse — narrower in x, taller in p — as the squeeze parameter r increases from 0 to 1.5, with the product Delta x times Delta p staying exactly one half throughout"
+    ariaLabel="Phase-space uncertainty ellipse for a squeezed state, centered at a fixed point, morphing from a circle at r=0 into an increasingly stretched ellipse (narrower in x, taller in p) as the squeeze parameter r increases from 0 to 1.5, with the product Delta x times Delta p staying exactly one half throughout"
   />
 </InteractiveSection>
 
-## Worked Example
+## The Uncertainty Product, Still Exactly One Half
 
 **Compute $\Delta x$ and $\Delta p$ for $r=0.5$ directly from the boxed
 formulas, and confirm the product is still exactly $\tfrac12$.**
@@ -313,7 +337,7 @@ decimal places, a direct numeric confirmation (not just the general
 algebraic argument) that squeezing preserves the minimum-
 uncertainty product while redistributing it unevenly.
 
-## Common Mistakes
+## Assuming Minimal Uncertainty Means Equal Spread
 
 <Callout type="warning">
 **Assuming any state with small $\Delta x$ is "squeezed."** Squeezed
@@ -337,15 +361,221 @@ contradictions.
 1. For $\alpha=2$, what is the coherent state's mean photon number
    $\langle N\rangle$, and what specific probability distribution
    describes $P(n)$ around it?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\langle N\rangle=|\alpha|^2=4$, and $P(n)$ is the Poisson distribution
+   with mean $4$:
+
+   $$
+   P(n)=|c_n|^2=e^{-|\alpha|^2}\frac{|\alpha|^{2n}}{n!}=e^{-4}\frac{4^n}{n!}.
+   $$
+
+   That comes straight off the boxed Fock expansion, with no extra
+   physics: $c_n=e^{-|\alpha|^2/2}\alpha^n/\sqrt{n!}$, so
+   $|c_n|^2=e^{-|\alpha|^2}|\alpha|^{2n}/n!$, which is the Poisson mass
+   function with $\lambda=|\alpha|^2$ written out. Reading $\langle
+   N\rangle=|\alpha|^2$ off it is then just the standard fact that a
+   Poisson distribution's mean is its parameter.
+
+   The distribution's shape at $\lambda=4$ has one feature worth noticing,
+   because it is the giveaway that this is Poisson and not a Gaussian
+   dressed up. It is *doubly* peaked at $n=3$ and $n=4$, with
+   $P(3)=P(4)=0.1954$, and asymmetric about the mean: $P(2)=0.1465$ but
+   $P(6)=0.1042$, and the right tail runs much further than the left. The
+   tie is exact whenever $\lambda$ is a whole number, since
+   $P(\lambda)/P(\lambda-1)=\lambda/\lambda=1$.
+
+   The physically loaded consequence is the variance. For a Poisson
+   distribution $\mathrm{Var}(N)=\lambda$, so
+
+   $$
+   \Delta N=\sqrt{\langle N\rangle}=|\alpha|=2,\qquad
+   \frac{\Delta N}{\langle N\rangle}=\frac{1}{|\alpha|}=\frac12.
+   $$
+
+   This is shot noise, and it is the reason "the laser is stable" and "the
+   photon number is definite" are different claims. A coherent state is
+   not an eigenstate of $N$ and its photon number fluctuates by $\sqrt{\langle
+   N\rangle}$ every time you count, no matter how quiet the laser is. The
+   Fano factor $\mathrm{Var}(N)/\langle N\rangle$ equals exactly $1$, which
+   is the standard dividing line: light with Fano factor above $1$ is
+   super-Poissonian (thermal light, where the distribution is
+   Bose-Einstein and much broader), below $1$ is sub-Poissonian and has no
+   classical description at all (a Fock state $|n\rangle$ sits at the
+   extreme, Fano factor $0$).
+
+   One hypothesis is doing real work here: this is the distribution for an
+   ideal single-mode coherent state. Calling a real laser beam Poissonian
+   is a very good approximation well above threshold and a poor one near
+   it, and any loss the beam suffers keeps it Poissonian while shrinking
+   $|\alpha|$, which is a special property of coherent states rather than
+   a general fact about attenuated light.
+
+   </details>
+
 2. Compute $\Delta x$ and $\Delta p$ for a squeezed state with $r=1$, and
    confirm the product is still $\tfrac12$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \Delta x=\frac{e^{-1}}{\sqrt2}=\frac{0.3678794}{1.4142136}=0.26013005,
+   \qquad
+   \Delta p=\frac{e^{1}}{\sqrt2}=\frac{2.7182818}{1.4142136}=1.92211551.
+   $$
+
+   $$
+   \Delta x\,\Delta p=\frac{e^{-1}}{\sqrt2}\cdot\frac{e^{1}}{\sqrt2}=\frac{e^{-1}e^{1}}{2}=\frac12.
+   $$
+
+   Numerically $0.26013005\times1.92211551=0.500000000000$, and it is worth
+   being clear that this is not a coincidence surviving to twelve digits.
+   The product is $\tfrac12$ as an algebraic identity, because $e^{-r}$ and
+   $e^{r}$ multiply to $1$ for every real $r$; the numeric evaluation only
+   confirms the arithmetic was done correctly, and would agree to whatever
+   precision it was carried out in.
+
+   Compared with $r=0.5$ in the worked example above, the trade has become
+   much more lopsided. At $r=1$, position spread is $e^{-1}=36.8\%$ of the
+   coherent-state value and momentum spread is $e^{1}=271.8\%$ of it, where
+   at $r=0.5$ the figures were $61\%$ and $165\%$. The trade is
+   exponential in $r$, so each additional unit of $r$ costs a factor $e$ on
+   one quadrature to buy a factor $e$ on the other, and the experimental
+   difficulty grows accordingly. Optics quotes this in decibels of noise
+   power, $10\log_{10}(e^{2r})=20r/\ln10$, so $r=1$ is $8.69$ dB of
+   squeezing, which is a substantial figure for a real apparatus.
+
+   The wrong turn worth naming: reading a small $\Delta x$ as "more
+   information about $x$, for free". Nothing is free here. The squeezed
+   state is useful precisely when the experiment reads out one quadrature
+   and can afford to be blind on the conjugate one, which is why
+   interferometers use it and why a measurement sensitive to both
+   quadratures gains nothing at all from squeezing.
+
+   </details>
+
 3. Explain why $[b,b^\dagger]=1$ (shown above from
    $[b,b^\dagger]=\cosh^2r[a,a^\dagger]+\sinh^2r[a^\dagger,a]$) is exactly
    what's needed for $b$'s eigenstates to exist as a normalizable family,
    the same way $[a,a^\dagger]=1$ was needed for $|\alpha\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the entire construction of $|\alpha\rangle$ used *only* the
+   commutator, never anything else about $a$. Go back through it and check:
+
+   The Fock ladder came from $[a,a^\dagger]=1$. That single relation gives
+   $[N,a]=-a$ and $[N,a^\dagger]=a^\dagger$ for $N=a^\dagger a$, hence a
+   spectrum of $N$ that is bounded below (since $\langle N\rangle=\|a\psi\|^2\geq0$)
+   and spaced by exactly $1$, hence an orthonormal basis $|n\rangle$ with
+   $a|n\rangle=\sqrt n|n-1\rangle$ and $a^\dagger|n\rangle=\sqrt{n+1}|n+1\rangle$.
+
+   The recursion came from that ladder. Writing $|\alpha\rangle=\sum_nc_n|n\rangle$
+   and imposing $a|\alpha\rangle=\alpha|\alpha\rangle$ gave
+   $c_{n+1}=\alpha c_n/\sqrt{n+1}$, so $c_n=\alpha^nc_0/\sqrt{n!}$.
+
+   Normalizability came from the resulting series. $\sum_n|\alpha|^{2n}/n!=e^{|\alpha|^2}$
+   converges for *every* complex $\alpha$, which is why the eigenstates
+   form a family indexed by the whole plane rather than a discrete set.
+
+   Not one of those three steps mentioned $x$, $p$, or the oscillator
+   Hamiltonian. So any operator satisfying the same commutator inherits the
+   same conclusions verbatim: $[b,b^\dagger]=1$ gives a $b$-Fock basis
+   $|n\rangle_b$, the same recursion in that basis, the same $e^{|\beta|^2}$,
+   and therefore a normalizable $|\beta\rangle$ for every complex $\beta$.
+   That is the whole content of the Bogoliubov transformation being
+   **canonical**, and $\cosh^2r-\sinh^2r=1$ is the one line where it is
+   checked.
+
+   The argument is much sharper if you ask what goes wrong otherwise.
+   Take the general linear combination $b=ua+va^\dagger$ with real $u,v$,
+   so $[b,b^\dagger]=u^2-v^2=\kappa$, and consider the three cases.
+
+   If $\kappa>0$, rescale $b\to b/\sqrt\kappa$ and the canonical case is
+   recovered unchanged; only the labelling of $\beta$ shifts. Nothing new.
+
+   If $\kappa<0$, then $b^\dagger/\sqrt{|\kappa|}$ is the annihilation
+   operator and $b$ is proportional to a *creation* operator. A creation
+   operator has no eigenvectors whatsoever. Impose
+   $a^\dagger|\psi\rangle=\beta|\psi\rangle$ on $|\psi\rangle=\sum_nc_n|n\rangle$:
+   the coefficient of $|0\rangle$ on the left is zero, forcing $\beta
+   c_0=0$, and the coefficient of $|n+1\rangle$ gives
+   $c_{n+1}=c_n\sqrt{n+1}/\beta$. So for $\beta\neq0$ we get $c_0=0$ and
+   the recursion propagates that zero to every $c_n$; for $\beta=0$ the
+   recursion runs the same way with the same conclusion. The point spectrum
+   is empty, not merely awkward. This is the case $b=a\cos\vartheta+a^\dagger\sin\vartheta$
+   with $\vartheta>45°$ falls into, which is why the hyperbolic functions
+   and not the trigonometric ones are the right parametrization.
+
+   If $\kappa=0$, then $u=v$ and $b=u(a+a^\dagger)=u\sqrt2\,x$ is
+   proportional to the position operator: Hermitian, with purely
+   continuous spectrum. Its "eigenvectors" are the position kets, which
+   are not vectors in the Hilbert space at all, only elements of the
+   larger distribution space that Continuous Spectra and Rigged Hilbert
+   Space sets up. The eigenvalue equation still has solutions in that
+   weaker sense, but there is no normalizable family, and the whole
+   coherent-state analogy collapses.
+
+   One further hypothesis is not algebraic and deserves naming, because
+   the commutator alone does not supply it: the $b$-vacuum has to be a
+   genuine vector in the *original* oscillator's Hilbert space, not just an
+   abstract Fock-space object. It is, for every finite $r$, because
+   $b=S(r)\,a\,S^\dagger(r)$ with $S(r)=\exp[\tfrac r2(a^2-(a^\dagger)^2)]$
+   unitary, so the $b$-Fock basis is the image of the ordinary one under a
+   unitary map and the squeezed vacuum's Fock coefficients (which go like
+   $\tanh^n r$) are square-summable whenever $|\tanh r|<1$. Take $r$ to
+   infinity and that fails, which is the finite-dimensional shadow of a
+   real phenomenon: in quantum field theory, Bogoliubov transformations
+   that are not unitarily implementable produce genuinely inequivalent
+   vacua.
+
+   </details>
+
 4. As $r\to0$, what do the squeezed-state formulas for $\Delta x,\Delta p$
    reduce to, and why does that make physical sense given how $b$ was
    defined?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Both collapse to the coherent-state value:
+   $\Delta x=e^{0}/\sqrt2=1/\sqrt2$ and $\Delta p=e^{0}/\sqrt2=1/\sqrt2$,
+   with the product still $\tfrac12$.
+
+   That is forced by the definition rather than being a limit that happens
+   to work out. At $r=0$, $\cosh r=1$ and $\sinh r=0$, so
+   $b=a\cosh r+a^\dagger\sinh r$ is literally $a$, its eigenvalue equation
+   $b|\beta\rangle=\beta|\beta\rangle$ is literally $a|\alpha\rangle=\alpha|\alpha\rangle$,
+   and $|\beta\rangle$ *is* the coherent state $|\alpha=\beta\rangle$. There
+   is no separate calculation to do. The squeezed states are a
+   one-parameter deformation of the coherent states that contains them as
+   its $r=0$ member, and the deformation is smooth because $\cosh$ and
+   $\sinh$ are.
+
+   The first-order behaviour is the part worth extracting, because it shows
+   what the exponentials are protecting. Expanding,
+   $\Delta x\approx(1-r)/\sqrt2$ and $\Delta p\approx(1+r)/\sqrt2$: to
+   leading order the squeeze shrinks one spread and grows the other by the
+   same additive amount. But the linearized product is
+   $(1-r)(1+r)/2=(1-r^2)/2$, which sits *below* the Heisenberg bound.
+   Nothing physical is violated, since the linearization is not a state;
+   what it shows is that keeping $\Delta x\Delta p$ pinned at exactly
+   $\tfrac12$ requires the multiplicative pair $e^{-r},e^{+r}$ and not
+   merely a symmetric-looking additive trade. That is why the Bogoliubov
+   parametrization uses hyperbolic functions: they are the ones whose
+   defining identity $\cosh^2r-\sinh^2r=1$ makes the trade exactly
+   reciprocal at every order in $r$, not just the first.
+
+   Worth reading the limit in reverse as well. Since $r=0$ is an interior
+   point of the family and $\Delta x\Delta p$ is constant across it, no
+   amount of squeezing ever escapes the bound the coherent state already
+   saturates. Squeezing redistributes uncertainty; it never removes any.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -363,7 +593,7 @@ contradictions.
   $\Delta x=e^{-r}/\sqrt2$, $\Delta p=e^r/\sqrt2$, still exactly saturating
   the same bound for any $r$.
 
-## Further Exploration
+## Coherent States as Scattering Wave Packets
 
 <NextDiscovery>
   [Three-Dimensional Scattering and the S-Matrix](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/three-dimensional-scattering-and-the-s-matrix)

@@ -2,7 +2,6 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { BarChartExplorer } from "@/components/visualizations/BarChartExplorer";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
-import { Question } from "@/components/narrative/Question";
 import { GraphDiagram } from "@/components/visualizations/GraphDiagram";
 import { HardwarePlatformSchematic } from "@/components/visualizations/HardwarePlatformSchematic";
 
@@ -50,7 +49,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Capstone: Comparing Qubit Platforms",
   description:
-    "No single platform wins on every axis: putting superconducting circuits, trapped ions, neutral atoms, photons, and spin qubits side by side on coherence time, gate speed, two-qubit gate fidelity, connectivity, and scalability makes the actual engineering tradeoff space visible at once.",
+    "No single platform wins on every axis: putting superconducting circuits, trapped ions, neutral atoms, photons, and spin qubits side by side on coherence time, gate speed, two-qubit gate fidelity, connectivity, and scalability makes the engineering tradeoff space visible at once.",
   course: "physical-qubit-platforms",
   module: "capstone-comparing-qubit-platforms",
   order: 1,
@@ -64,23 +63,29 @@ export const lessonMeta = {
   ],
 };
 
-<Question>
-Five separate lessons each made one platform's physics feel like the obvious choice, in isolation. Read side by side, does any of them actually dominate?
-</Question>
+<LessonHook eyebrow="Nothing here wins outright">
+Five platforms, five sets of physics, and no row in the table below that beats the others on every column. What is left is an engineering decision, and this is where it gets made.
+</LessonHook>
 
-## Motivation
+## Five Platforms, One Decision
 
-Five separate lessons each made one platform's physics feel like the
-obvious choice, in isolation. Read side by side, none of them do:
-superconducting circuits, trapped ions, <Term id="neutral-atoms">neutral atoms</Term>, photons, and <Term id="spin-qubits">spin
-qubits</Term> each trade something real for something else. This capstone adds
-no new physics. It puts all five in the same room, which is where the
-engineering decision actually gets made.
+Superconducting circuits, trapped ions, <Term id="neutral-atoms">neutral atoms</Term>, photons and <Term id="spin-qubits">spin
+qubits</Term> each looked like the obvious answer inside their own lesson.
+That is what reading one platform at a time does to you. Set against
+each other on the same five axes, coherence time, gate speed, two-qubit
+gate fidelity, connectivity, and scaling path, they stop being five
+candidate answers and become one tradeoff surface.
+
+This capstone adds no new physics. The thing to watch as the table and
+the two charts below fill in is not which row comes out on top: it is
+which pair of columns keeps moving in opposite directions, because that
+pattern turns out to have a physical cause, and naming it is what lets
+you predict where a platform you have never met will sit.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/5e/QuEra_Aquila_Optical_Layout.jpg"
   alt="The optical table and beam layout of QuEra's first-generation Aquila neutral-atom quantum computer"
-  caption="What five chapters of qubit physics have left out until now: the machine built around the qubits. This is the optical bench of a neutral-atom system — no cryostat anywhere in it, because a tweezer array needs vacuum and stabilized lasers instead. Every row of the table below carries its own version of this bill, and Control & Readout is where it comes due."
+  caption="What five chapters of qubit physics have left out until now: the machine built around the qubits. This is the optical bench of a neutral-atom system, with no cryostat anywhere in it, because a tweezer array needs vacuum and stabilized lasers instead. Every row of the table below carries its own version of this bill, and Control & Readout is where it comes due."
   credit="QuEra Computing, Inc., via Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:QuEra_Aquila_Optical_Layout.jpg"
   license="CC BY 4.0"
@@ -95,9 +100,9 @@ between them rests on.
 |---|---|---|---|---|---|
 | Superconducting | ~microseconds | ~nanoseconds (fast) | ~99.5-99.9% | mostly nearest-neighbor | lithographic fabrication, many labs/companies actively scaling |
 | Trapped ions | ~seconds (long) | ~microseconds (slow) | ~99.9% (best published at or above 99.9%) | all-to-all within a trap | chain length limited; modular/networked traps an active research direction |
-| Neutral atoms | ~seconds (long) | ~microseconds | ~99.5% | flexible, reconfigurable geometry | hundreds of qubits already demonstrated; among the largest current counts |
+| Neutral atoms | ~seconds (long) | ~microseconds | ~99.5% | flexible, reconfigurable geometry | thousands of atoms already trapped (6,100 in one 2025 array); the largest current counts, though trapped-atom count is not yet gate-ready qubit count |
 | Photonic | effectively no decoherence in flight; loss-limited instead | very fast per operation | probabilistic fusion gates: succeed or fail heralded, a different regime from a fidelity spec | naturally networked (light travels) | strong for communication/networking; two-qubit gates remain the hard problem |
-| Spin qubits | intermediate–long | ~nanoseconds | ~99% | nearest-neighbor (dot-to-dot) | leverages existing semiconductor fabrication tooling |
+| Spin qubits | intermediate to long (purified silicon) | ~10-100 ns | ~99%, best published above 99.5% | nearest-neighbor (dot-to-dot) | leverages existing semiconductor fabrication tooling; registers still around ten qubits |
 
 (These are representative orders of magnitude for illustrating the
 tradeoff space, drawn from published results through the mid-2020s, not
@@ -116,7 +121,7 @@ The table's five rows are five physically distinct structures, not just
 five sets of numbers; each platform lesson's own schematic,
 side by side, makes that concrete:
 
-<div className="not-prose grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+<div className="not-prose grid grid-cols-1 gap-4 [&>div]:min-w-0 sm:grid-cols-2 lg:grid-cols-3">
 
 <div>
 <HardwarePlatformSchematic variant="superconducting" ariaLabel="Superconducting transmon qubit: an LC circuit with a Josephson junction replacing the inductor" />
@@ -162,7 +167,19 @@ size of that gap honest instead of ordinal:
 <BarChart
   ariaLabel="Coherence time in seconds, log scale, across four platforms: superconducting around 10 microseconds, spin qubits around 1 millisecond, trapped ions around 1 second, neutral atoms around 13 seconds"
   bars={coherenceTimeBars}
+  maxValue={8}
 />
+
+Read the top two bars as the same order of magnitude, not as a ranking.
+Their provenance is not matched. The neutral-atom figure is one specific
+published result, the 12.6 s hyperfine coherence of the 2025 Caltech
+tweezer array; the trapped-ion figure is the conservative round number
+this track's worked comparisons use, and single trapped ions have been
+held coherent for far longer than a second in dedicated experiments. The
+chart is honest about the six-order-of-magnitude gap between the
+solid-state platforms and the atomic ones, which is the point it exists
+to make. It is not evidence about which of the two atomic platforms
+holds a record.
 
 <Term id="photonic-qubits">Photonic qubits</Term> aren't on this chart at all, deliberately. $T_1$/$T_2$
 decay is a *rate*, something that happens gradually and can be assigned a
@@ -183,14 +200,15 @@ on the coherence chart tend to be short here, and vice versa:
 <BarChart
   ariaLabel="Gate speed across four platforms, log scale with taller meaning faster: single-qubit gate times for superconducting around 10 nanoseconds, spin qubits around 100 nanoseconds, and neutral atoms around 1 microsecond, plus the two-qubit entangling gate time for trapped ions around 10 microseconds"
   bars={gateTimeBars}
+  maxValue={8}
 />
 
 One caution about reading this chart: the bars don't all measure the
 same kind of gate, and the captions say which is which. The
 superconducting, spin-qubit, and neutral-atom bars are *single-qubit*
 gate times; the trapped-ion bar is the platform's *two-qubit* entangling
-gate, because that shared-motion step is the operation that actually
-sets the platform's pace (the Trapped Ions lesson noted a single-qubit
+gate, because that shared-motion step is the operation that sets the
+platform's pace (the Trapped Ions lesson noted a single-qubit
 ion gate, a direct laser drive with no shared motion involved, runs
 considerably faster). Plotting the ion's defining bottleneck rather than
 its best case is the honest comparison, but only with the mismatch
@@ -198,7 +216,7 @@ labeled.
 
 Photonic is excluded here too, for a related but different reason: a
 passive polarization rotation has essentially no drive time at all, while
-the platform's actual bottleneck, the probabilistic two-photon gate, isn't
+the platform's real bottleneck, the probabilistic two-photon gate, isn't
 clocked the way a Rabi-driven pulse is. There's no single "gate time"
 number to plot for a gate that sometimes doesn't happen.
 
@@ -218,7 +236,7 @@ wires; neutral atoms get something in between, not an intrinsically
 richer graph, but a graph that can be *redrawn* between shots because
 each atom sits in its own independently-steerable tweezer:
 
-<div className="not-prose grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+<div className="not-prose grid grid-cols-1 gap-4 [&>div]:min-w-0 sm:grid-cols-2 lg:grid-cols-3">
 
 <div>
 <GraphDiagram
@@ -302,9 +320,9 @@ fabrication time the way the other two are.
 <PredictBeforeReveal
   question="Every lesson in this course isolated its qubit from the environment as strongly as possible to protect coherence. Based on the coherence and gate-speed charts above, what would you predict about a platform's gate speed if you pushed its environmental isolation even further?"
   options={[
-    { label: "Gate speed would improve too — isolation helps everything", value: "improve" },
-    { label: "Gate speed would tend to get worse — the same isolation that blocks noise also blocks the coupling gates need", value: "worse" },
-    { label: "Gate speed is unrelated to isolation on every platform", value: "unrelated" },
+    { label: "It improves too: cleaner qubits take control better", value: "improve" },
+    { label: "It stays put: isolation and coupling are separate knobs", value: "unrelated" },
+    { label: "It gets worse: the wall blocking noise blocks control", value: "worse" },
   ]}
   correctValue="worse"
   explanation="This is the pattern underneath every row of the table above: trapped ions and neutral atoms isolate their qubits extremely well (seconds-long coherence) and pay for it with microsecond gates driven through comparatively weak mechanical or Rydberg coupling; superconducting and spin qubits accept noisier, shorter-lived qubits in exchange for the strong, fast coupling a solid-state circuit or gate voltage can provide directly. The same physical mechanism that keeps the environment out also keeps the control fields' coupling weak."
@@ -317,11 +335,11 @@ flexible geometry; photons trade an entirely different error model
 (loss, not decoherence) for a much harder gate mechanism; spin qubits
 trade smaller, more standard fabrication for intermediate performance on
 every other axis. This isn't a temporary state of immaturity to be
-"solved." It reflects genuine underlying physics tradeoffs: strong
-environmental isolation, which improves coherence, tends to also
-weaken the coupling needed for fast gates.
+"solved." It reflects a physics tradeoff: strong environmental
+isolation, which improves coherence, tends to also weaken the coupling
+needed for fast gates.
 
-## Worked Example
+## Choosing for a Specific Workload
 
 **A research group needs to run a long calculation requiring many
 sequential gates, but connectivity between arbitrary qubits matters less
@@ -334,7 +352,7 @@ $\sim10^3$ for a representative superconducting device), favoring
 platforms where coherence time, not raw gate speed, is the limiting
 resource for this specific priority.
 
-<InteractiveSection title="Toggle between the two gate budgets" description="Slide between the exact two data points computed above: a representative superconducting device's ~10 ns gate and ~10 μs coherence time give a gate budget of ~10³ operations, while a trapped ion's much slower ~10 μs gate paired with its ~1 s coherence time gives ~10⁵, a factor of 100 more room despite each individual gate being roughly 1000 times slower. The bar height is the base-10 exponent (3 or 5), not the raw count, so both fit on one readable scale.">
+<InteractiveSection title="Toggle between the two gate budgets" description="Slide between the two data points computed above: a representative superconducting device's ~10 ns gate and ~10 μs coherence time give a gate budget of ~10³ operations, while a trapped ion's much slower ~10 μs gate paired with its ~1 s coherence time gives ~10⁵, a factor of 100 more room despite each individual gate being roughly 1000 times slower. The bar height is the base-10 exponent (3 or 5), not the raw count, so both fit on one readable scale.">
   <BarChartExplorer
     frames={gateBudgetFrames}
     sliderLabel="Platform"
@@ -343,12 +361,12 @@ resource for this specific priority.
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Looking for the Row That Wins Everything
 
 <Callout type="note">
 **Looking for a single "best" platform.** This lesson's comparison table
 has no row that wins on every column. The right platform depends on
-which axis a specific application actually needs most.
+which axis a specific application needs most.
 </Callout>
 
 <Callout type="note">
@@ -360,19 +378,227 @@ qualitative tradeoffs, not a snapshot to memorize as timeless fact.
 
 ## Practice Questions
 
-1. Using this lesson's table, which platform would you recommend for an
-   application prioritizing photon-based communication between two
-   separate quantum processors?
+1. An application has to distribute entanglement between two
+   superconducting processors sitting in different buildings. Using this
+   lesson's table, which platform's entry suits the link itself, and what
+   has to be added at each end before that link can attach to a
+   superconducting processor at all?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **The link is photonic.** The table's photonic row is the only one
+   whose connectivity entry says "naturally networked (light travels),"
+   and that is the property the job actually needs. Every other row
+   encodes its qubit in something bolted to a chip, a trap or a
+   refrigerator. A photon is in motion by its nature, its dominant error
+   grows with distance flown rather than with time elapsed, and the
+   installed telecom fibre between two buildings was built around the
+   wavelength where that loss is smallest.
+
+   It is worth being explicit about why the other rows' real strengths do
+   not help. A trapped ion's seconds-long coherence is a superb property
+   of a stationary qubit, and coherence does not transport a state
+   anywhere.
+   Superconducting qubits' nanosecond gates shorten the local circuits at
+   each end and leave the distance untouched. Spin qubits' density is a
+   fabrication property of an endpoint. All three are answers to a
+   different question.
+
+   **What has to be added: a transducer at each end.** This is the part
+   the table hides, and it is the hard part. A superconducting qubit's
+   excitation is a microwave photon at a few gigahertz, living inside a
+   10 mK refrigerator. The link carries an optical photon at a few
+   hundred terahertz, at room temperature, in a fibre. Nothing connects
+   those two by default, so each processor needs a microwave-to-optical
+   converter, and the return path needs the reverse.
+
+   Microwave-to-optical transduction is an active research problem
+   precisely because current converters are lossy and add noise, and the
+   architecture's entanglement-distribution rate is set by that step
+   rather than by the fibre. The fibre is the easy, solved part of this
+   design. Note also that the conversion has to happen at the cold end
+   and its own dissipation lands in the refrigerator's budget, which is
+   the wiring-and-cooling problem the Control & Readout course takes up.
+
+   One structural point in the link's favour, since it changes the
+   protocol available. Photon loss is heralded: a detector that does not
+   fire tells you the attempt failed. So entanglement distribution runs
+   as repeat-until-success, and a lossy link costs rate rather than
+   correctness. That is a much better failure mode than an error you
+   cannot see, and it is why a link with single-digit percent
+   transmission is still usable.
+
+   </details>
+
 2. Explain why "strong environmental isolation" (good for coherence)
    tends to work against "fast, strong coupling" (good for gate speed),
    using at least one specific platform's physical mechanism as an
-   example.
+   example. Then say why better shielding does not let a platform escape
+   the tradeoff.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because isolation and controllability are the same quantity read
+   twice. A qubit's coherence is protected by having only weak couplings
+   to degrees of freedom outside itself, and your control field is a
+   degree of freedom outside itself. There is no filter that admits the
+   drive you want and rejects the bath you do not, because at the level
+   of the interaction they are the same kind of term.
+
+   **Trapped ions, worked through.** The qubit lives in two internal
+   levels of a single atom, floating in ultra-high vacuum, physically
+   touching nothing. Nothing in its surroundings couples to it, which is
+   exactly why coherence reaches seconds. Now try to entangle it with
+   another ion. There is no wire to run between them and no direct
+   interaction between two sets of internal atomic levels micrometres
+   apart. The only channel available is indirect: the chain's collective
+   mechanical motion, reached through laser sidebands. Excite it
+   conditionally on one ion, sense it with the other. It works, and it
+   takes microseconds, because you are steering a qubit through its
+   own mechanical vibration rather than driving it directly.
+
+   **Superconducting circuits, the other end.** Two transmons can be
+   coupled by putting a capacitor between them, which is about as direct
+   as coupling gets, and the gates take tens of nanoseconds. The same
+   circuit is embedded in a real solid: amorphous oxide near the
+   junction, dielectric loss in the substrate, and control lines running
+   out to room-temperature electronics. Every one of those is a channel
+   too, and $T_1$ comes out in microseconds, drifting between
+   calibrations as two-level-system defects move around. The strong
+   coupling that makes the gate fast is not accidentally accompanied by
+   the loss; it is the same accessibility.
+
+   **Neutral atoms make the tradeoff explicit rather than implicit.**
+   Their gate mechanism is to promote an atom to a Rydberg state, whose
+   enormous orbit interacts strongly with a neighbour. That is
+   deliberately making the qubit far less isolated, for the duration of
+   the gate and no longer. The Rydberg state's radiative lifetime and its
+   sensitivity to stray fields are the bill, and it arrives exactly when
+   the coupling is used. Nowhere is the tradeoff clearer: the platform
+   buys coupling by temporarily giving up isolation, and pays in fidelity
+   for the window it is given up.
+
+   The wrong turn is imagining that better shielding would let you have
+   both, that with enough engineering you could block the noise and leave
+   the control channel open. Shielding does help, and it is why filtered,
+   attenuated coaxial lines and magnetic shields exist. But it addresses
+   noise arriving *through a specific channel you already knew about*.
+   The tradeoff described here is about the qubit's intrinsic coupling
+   strength to the outside world, and that number appears in both the
+   decoherence rate and the gate rate.
+
+   </details>
+
 3. If a new fabrication breakthrough dramatically improved superconducting
    qubits' coherence time without changing anything else, would this
    table's fundamental "no free lunch" pattern disappear? Why or why not?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No, and the reason is worth separating into two claims that get
+   confused with each other.
+
+   **The numbers would change, and that matters.** A superconducting
+   device with, say, a millisecond of coherence at 10 ns gates would have
+   a $10^5$ gate budget, matching trapped ions while keeping gates a
+   thousand times faster. For a great many workloads that would settle
+   the platform question outright. Nothing in this lesson says such an
+   improvement is impossible; the lesson says the opposite, that every
+   platform's numbers have improved substantially and continue to, and
+   warns against reading the table as a permanent specification.
+
+   **The pattern would not disappear, because the table has five columns
+   and the pattern is about the whole surface.** Improving one cell in
+   one row does not produce a row that wins everywhere. Superconducting
+   connectivity would still be nearest-neighbour, fixed at fabrication
+   time, so an algorithm needing arbitrary pairs would still pay SWAP
+   routing that a trapped-ion chain does not. Neutral atoms would still
+   be the only row whose geometry can be redrawn between shots. Photons
+   would still be the only carrier that travels, so the networking
+   argument of question 1 would be untouched. "No free lunch" is the
+   claim that no row dominates every column, and one improved cell leaves
+   that claim standing.
+
+   **Now the part that requires care, because the hypothesis is doing
+   real work.** The question says the improvement changes *nothing else*,
+   and the underlying claim of this lesson is a mechanism, not a
+   coincidence: strong isolation improves coherence and weakens the
+   coupling that fast gates need. A device that genuinely reached
+   seconds of coherence *while keeping* nanosecond gates would be
+   evidence against that mechanism, or at least evidence that it does not
+   bind as tightly as the current data suggests. So the honest answer is
+   conditional. The mechanism has not been repealed by an improvement
+   that leaves the coupling strength alone, but a platform that broke the
+   isolation-versus-coupling link in a demonstrated way would be a real
+   counterexample and should be treated as one.
+
+   The wrong turn is to treat "no free lunch" as a conservation law: some
+   metaphysical rule that every gain must be paid for, so improvement is
+   futile. That is not a physical statement and it is not what the lesson
+   argues. The argument is specific and falsifiable, about isolation and
+   coupling strength being two readings of one number, and the right
+   response to a breakthrough is to ask which number moved rather than to
+   assume something must have gotten worse.
+
+   </details>
+
 4. Which platform's connectivity advantage comes from a shared physical
    mode, and which platform's comes from reconfigurable geometry?
    Explain the difference between these two mechanisms.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Shared physical mode: **trapped ions**. Reconfigurable geometry:
+   **neutral atoms**.
+
+   **Trapped ions** get all-to-all coupling from one collective
+   vibrational mode of the whole chain. Any ion can excite it and any
+   other ion can sense it, so on five ions all ten pairs are available,
+   and they are available *within a single shot*, with no dependence on
+   how far apart along the chain the two ions sit.
+
+   **Neutral atoms** have no shared bus at all. Rydberg blockade only
+   reaches inside the blockade radius, so at any instant the coupling
+   graph is whatever the current arrangement of the tweezers makes it,
+   which is sparse. What the platform buys instead is the ability to
+   *choose that sparse graph* and to change it between runs, because
+   every atom sits at its own separately steerable focus.
+
+   **The difference, stated sharply.** Ions have a fixed graph that
+   happens to be complete. Atoms have a sparse graph that happens to be
+   redrawable. Those are not the same advantage and they do not have the
+   same cost.
+
+   The ion's version is free within a shot and degrades with size: more
+   ions in one trap means more motional modes, crowded closer together,
+   more spectator modes for the drive to touch by accident, and more
+   heating, so fidelity and speed both fall as the chain grows.
+
+   The atom's version costs time rather than fidelity. Rearranging the
+   array happens between shots, and it is slow compared with the gates,
+   so a large neutral-atom machine can return fewer shots per second than
+   a small superconducting chip. Nothing degrades inside the shot; you
+   simply wait between them.
+
+   The consequence for a compiler is the practical version of this.
+   Against ions there is no routing problem: every logical pair maps to a
+   physical pair. Against atoms there is a routing problem, but the
+   compiler has a primitive no chip-based platform offers, which is to
+   physically move a qubit instead of SWAPping its state along a chain.
+
+   The wrong turn is reading "reconfigurable" as a synonym for
+   "all-to-all," which quietly upgrades the atom row into the ion row.
+   Redrawable is strictly weaker inside any one circuit. It is also worth
+   not crediting superconducting qubits with either mechanism: their
+   graph is drawn in lithography, so it is neither complete nor
+   changeable afterwards, which is exactly why the routing overhead the
+   Quantum Software track develops falls hardest on that platform.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -382,19 +608,19 @@ qualitative tradeoffs, not a snapshot to memorize as timeless fact.
   connectivity, and scalability side by side shows every platform
   trading strength on one axis for weakness on another; no platform
   dominates across the board.
-- This reflects genuine physical tradeoffs (isolation vs. coupling
-  strength), not simply immature engineering that will resolve itself.
+- This reflects a physical tradeoff (isolation vs. coupling strength),
+  not immature engineering that will resolve itself.
 - Application priorities (raw gate count vs. fast iteration vs.
   networking) should drive platform choice, not a single "best" ranking.
 
-## Further Exploration
+## Platforms as Moving Targets
 
 <NextDiscovery>
 None of these five platforms has appeared, in this course, as anything
 more than the physics inside a vacuum chamber or a cryostat. **Control &
 Readout** is where that changes: cryogenics, control electronics, and
-calibration, the classical engineering that actually drives and reads
-out the qubits described here, one layer deeper into whichever platform
+calibration, the classical engineering that drives and reads out the
+qubits described here, one layer deeper into whichever platform
 a reader is most drawn to. **Physical Qubit Platforms** closes on that
 note.
 </NextDiscovery>

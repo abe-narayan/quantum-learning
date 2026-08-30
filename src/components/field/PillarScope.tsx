@@ -29,7 +29,7 @@ import { FieldRegimeSetter } from "./FieldRegimeSetter";
  *
  * This is a Server Component. That matters: `data-pillar` is present in the
  * server-rendered HTML, so there is no flash of default-pillar color on any
- * page — which is exactly why the pillar is *not* set from JavaScript.
+ * page, which is exactly why the pillar is *not* set from JavaScript.
  */
 export function PillarScope({
   pillar,
@@ -41,8 +41,8 @@ export function PillarScope({
    *  problems catalog, about). */
   pillar?: Pillar;
   /**
-   * Defaults to the pillar's own environment, or — for a bare `<PillarScope>`
-   * with no `pillar` — the neutral `atlas` regime (see regimes.ts). `journey`
+   * Defaults to the pillar's own environment, or, for a bare `<PillarScope>`
+   * with no `pillar`, the neutral `atlas` regime (see regimes.ts). `journey`
    * (the homepage's curriculum-order crossfade) is never inferred; it means
    * something only for a page whose scroll position tracks a descent through
    * the curriculum, so the one page that wants it (`src/app/page.tsx`)

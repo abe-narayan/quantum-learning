@@ -23,10 +23,10 @@ export const verifyXDecomposition: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "Does the composed matrix Rz(π)·Ry(π) equal the X gate, up to global phase?",
     options: [
-      { id: "a", text: "Yes: the composed matrix is X times a global phase" },
-      { id: "b", text: "No: Ry(π) already flips the basis states, so composing with Rz(π) overshoots and lands on Z instead" },
-      { id: "c", text: "Yes on the poles of the Bloch sphere, but not as a general matrix identity" },
-      { id: "d", text: "No, because the order is backwards: only Ry(π)·Rz(π) gives X, and matrix products do not commute" },
+      { id: "a", text: "Yes: the product is X up to an overall phase, so the two act identically on every input state" },
+      { id: "b", text: "No: Ry(π) already flips the basis states, so composing with Rz(π) overshoots and lands on Z" },
+      { id: "c", text: "Yes at the poles of the Bloch sphere, but not as a general matrix identity for every state" },
+      { id: "d", text: "No, the order is backwards: only Ry(π)·Rz(π) gives X, and matrix products do not commute" },
     ],
   },
   answer: {

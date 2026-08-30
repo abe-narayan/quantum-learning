@@ -47,6 +47,6 @@ export const purityFromConcurrence: NumericProblem = {
   explanation: {
     correctIdea: "Higher concurrence corresponds directly to lower reduced purity, via the exact identity derived in this course.",
     whyCorrect: "0.82 sits between 1 (product state, C=0) and 0.5 (Bell state, C=1), consistent with C=0.6 being partial entanglement.",
-    whyWrong: ["Computing 1-C (without squaring) uses the wrong identity — the relationship is quadratic in C, not linear."],
+    whyWrong: ["Computing 1-C (without squaring) uses the wrong identity: the relationship is quadratic in C, not linear."],
   },
 };

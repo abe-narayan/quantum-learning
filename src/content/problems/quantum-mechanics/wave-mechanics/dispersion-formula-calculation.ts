@@ -15,7 +15,7 @@ export const dispersionFormulaCalculation: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "A free-particle Gaussian packet starts with width sigma_0 = 1 (natural units, hbar = m = 1). Find its width sigma(t) at t = 4.",
-    inputHint: "a decimal",
+    inputHint: "a decimal, to 3 decimal places",
   },
   answer: {
     type: "numeric",
@@ -29,8 +29,9 @@ export const dispersionFormulaCalculation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "sigma(t)^2 = sigma_0^2 + (t/(2*sigma_0))^2 in natural units." },
-    { text: "Substitute sigma_0=1, t=4: sigma(4)^2 = 1 + (4/2)^2 = 1+4 = 5." },
+    { text: "A free packet spreads because its momentum components travel at different speeds, so the width grows with time rather than holding still." },
+    { text: "The spreading law adds in quadrature: the initial width squared, plus a term that grows with t and is inversely scaled by that same initial width. Write it down before substituting." },
+    { text: "What that gives you is the width squared, not the width. If your answer came out as 5, the final step has not been taken." },
   ],
   solution: {
     steps: [

@@ -21,19 +21,31 @@ export const whyOutcomeIndependentDisturbance: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["both", "either eigenstate", "|+> and |->"],
+      {
+        phrases: ["both x eigenstates", "both eigenstates", "both outcomes", "both branches", "both post-measurement states", "both cases", "either eigenstate", "either outcome", "whichever outcome", "plus and minus", "either x eigenstate"],
+        missingFeedback:
+          "The X measurement leaves the qubit in one of two states. Say which two, because the answer turns on both of them sharing a feature.",
+      },
       {
         phrases: ["equal superposition", "50/50 in the Z basis", "same magnitude", "same magnitudes", "equal magnitude", "only a sign", "only the sign", "sign differs", "squaring"],
         missingFeedback:
-          "You have said both X outcomes have to be considered. Add why they agree: |+⟩ and |−⟩ carry the same magnitudes on |0⟩ and |1⟩ and differ only by a relative sign, which the Born rule's squaring erases.",
+          "You have said each X result must be checked. Now compare the two coefficient lists you get: what is identical between them, what is different, and which of those two features survives the Born rule's modulus?",
       },
     ],
-    incorrectFeedback: "Name both pieces: that both X-eigenstates (|+> and |->) are being considered, and that both happen to be equal-magnitude superpositions of |0> and |1>, giving the same Z-probabilities either way.",
+    incorrectFeedback: "You answered that measuring X 'destroys the information', which explains why the result is 0.5 in one case but not why the two cases agree. Write each of the two possible post-X states in the Z basis and put their coefficients side by side.",
+    modelAnswers: [
+      "Both X eigenstates have Z-basis coefficients of the same magnitude, differing only by a sign. Squaring removes the sign, so P(Z=0)=0.5 whichever outcome the X measurement gave.",
+      "Whichever outcome you got, the state left behind is an equal superposition in the Z basis. The two cases differ only in the sign of one coefficient, and that disappears on squaring.",
+    ],
   },
-  hints: [{ text: "Write out both |+> and |-> in the Z basis and compare their |0>-coefficients' magnitudes." }],
+  hints: [
+    { text: "There are two possible states after the X measurement. Write each of them out in terms of |0> and |1>." },
+    { text: "Line the two expansions up and compare coefficient by coefficient. What is identical, and what differs?" },
+    { text: "The Born rule does not use the coefficient itself. Apply what it does use to each expansion, and see whether the difference you spotted still shows up in the answer." },
+  ],
   solution: {
     steps: [
-      { description: "$|+\\rangle=\\tfrac1{\\sqrt2}(|0\\rangle+|1\\rangle)$ and $|-\\rangle=\\tfrac1{\\sqrt2}(|0\\rangle-|1\\rangle)$ have the *same* magnitude coefficients on $|0\\rangle$ and $|1\\rangle$ — only a relative sign differs." },
+      { description: "$|+\\rangle=\\tfrac1{\\sqrt2}(|0\\rangle+|1\\rangle)$ and $|-\\rangle=\\tfrac1{\\sqrt2}(|0\\rangle-|1\\rangle)$ have the *same* magnitude coefficients on $|0\\rangle$ and $|1\\rangle$; only a relative sign differs." },
       { description: "Since probabilities depend on squared magnitudes, that sign difference is invisible to $P(Z{=}0)$, giving $0.5$ in both cases." },
     ],
     finalAnswer: "Both X-eigenstates have equal-magnitude Z-basis coefficients (differing only by a sign that vanishes upon squaring), so P(Z=0)=0.5 regardless of which X outcome occurred.",

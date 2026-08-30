@@ -32,8 +32,9 @@ export const shorCodeQubitCount: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Picture the structure the prompt describes: an outer phase-flip code whose qubits have each been replaced by a complete inner bit-flip code. Does that arrangement add the two counts or combine them some other way?" },
-    { text: "Concatenation multiplies. Total physical qubits = (number of outer groups) × (qubits in each group)." },
+    { text: "Picture the structure the prompt describes: an outer phase-flip code whose qubits have each been replaced by a complete inner bit-flip code." },
+    { text: "Because every outer qubit is itself expanded into a full inner block, the two counts compose rather than accumulate side by side. Decide which arithmetic operation that corresponds to." },
+    { text: "If your answer is 6, the two counts were added, which would describe two codes sitting next to each other rather than one nested inside the other." },
   ],
   solution: {
     steps: [{ description: "3 groups × 3 qubits/group = 9 physical qubits." }],

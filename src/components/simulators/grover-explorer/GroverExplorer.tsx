@@ -19,17 +19,45 @@ const DEFAULT_MARKED_INDEX = 5;
  * i.e. a literally flat chart that shows nothing the algorithm does. Opening
  * one iteration in means the marked bar is already visibly taller than the
  * rest the moment the instrument mounts, per the bench's "open
- * mid-phenomenon" rule. Reset still returns to 0 — that really is the start
+ * mid-phenomenon" rule. Reset still returns to 0; that really is the start
  * of the algorithm, and the framing tells the reader to step from there.
  */
 const DEFAULT_ITERATION = 1;
 const MIN_QUBITS = 2;
 const MAX_QUBITS = 4;
+/**
+ * The ceiling on the round counter, for BOTH ways of raising it: the `?grover_i=`
+ * parser below and the Step button's `handleStep`.
+ *
+ * It used to bind only the parser, so a shared link could never open past round
+ * 200 while clicking Step could walk past it forever. That asymmetry was
+ * harmless to the physics and not harmless to the render: `probabilityHistory`
+ * and `state` both replay the whole run from the uniform superposition on every
+ * render, so the cost of a render is O(iteration) and the cost of getting there
+ * is O(iteration²). Enter auto-repeats `click` while held (Space does not), so
+ * holding Enter on a focused Step button is enough to climb into the thousands
+ * without anyone meaning to.
+ *
+ * Capping the button rather than raising the parser, because nothing is
+ * learnable up there. The lesson this instrument teaches past the optimum is
+ * that the state *over-rotates* and the probability falls back down, and that
+ * happens inside the first handful of rounds: the full Grover rotation has
+ * period pi/theta, which is ~12 rounds at N=8 and ~17 at N=16, so 200 rounds is
+ * already a dozen complete over-rotation cycles of the same curve. The reader
+ * who wants to see the fall sees it at round 3.
+ *
+ * Clamping silently (rather than disabling the button at the ceiling) is
+ * deliberate: `GroverControls` takes one `disabled` flag for every control it
+ * renders, so disabling Step there would also freeze Reset and the qubit
+ * toggle, i.e. strand the reader at the ceiling with no way back. 200
+ * deliberate clicks to reach a counter that stops moving, with Reset still
+ * live, is the milder failure.
+ */
 const MAX_ITERATION = 200;
 const URL_SYNC_DEBOUNCE_MS = 400;
 const COPY_CONFIRMATION_MS = 1500;
 
-// Minimal shareable state is qubit count + marked index + iteration count —
+// Minimal shareable state is qubit count + marked index + iteration count;
 // together they fully determine the amplitude vector shown (it's a pure
 // function of these three via `groverIteration`). Params are prefixed
 // (`grover_`) because this simulator shares `/simulators` with other
@@ -112,12 +140,12 @@ export function GroverExplorer() {
       if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
       copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
     } catch {
-      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+      // Clipboard access can be denied in some browser security contexts, so no crash and no link copied.
     }
   }, []);
 
   // A running history of P(marked) at every iteration count from 0 up to the
-  // current one — the same `groverIteration` sequence `state` below already
+  // current one; the same `groverIteration` sequence `state` below already
   // walks, just retained at each step instead of only the last. This is what
   // lets the over-rotation Predict question (below) compare "probability the
   // moment you reached the optimum" against "probability now" without
@@ -153,14 +181,14 @@ export function GroverExplorer() {
     setIteration(0);
   };
 
-  const handleStep = () => setIteration((i) => i + 1);
+  const handleStep = () => setIteration((i) => Math.min(i + 1, MAX_ITERATION));
   const handleReset = () => setIteration(0);
 
   return (
     <SimulatorInstrument
-      label="Grover&rsquo;s algorithm — amplitude amplification"
+      label="Grover&rsquo;s algorithm: amplitude amplification"
       readout={<Readout label="P(marked)" value={(successProbability * 100).toFixed(1)} unit="%" />}
-      footnote="Next: see how the same-size search space collapses instantly in the Two-Qubit Explorer&rsquo;s measurement panel — no amplification needed classically."
+      footnote="Next: see how the same-size search space collapses instantly in the Two-Qubit Explorer&rsquo;s measurement panel; no amplification needed classically."
       stageClassName="space-y-6"
       stage={
         <>
@@ -178,14 +206,14 @@ export function GroverExplorer() {
           >
             {iteration === 0 ? (
               <>
-                Iteration 0 — the uniform superposition every run starts from: all {2 ** numQubits} items
+                Iteration 0 is the uniform superposition every run starts from: all {2 ** numQubits} items
                 equally likely, so measuring now would be a pure guess at {(100 / 2 ** numQubits).toFixed(1)}%.
                 Press Step to run one round.
               </>
             ) : (
               <>
                 After {iteration} round{iteration === 1 ? "" : "s"}, the marked item is at{" "}
-                {(successProbability * 100).toFixed(1)}% — up from a{" "}
+                {(successProbability * 100).toFixed(1)}%, up from a{" "}
                 {(100 / 2 ** numQubits).toFixed(1)}% blind guess.{" "}
                 {iteration === optimal
                   ? "This is the theoretical optimum for this search space. Stepping further will start to overshoot."
@@ -201,7 +229,7 @@ export function GroverExplorer() {
           {/* No `overflow-x-auto` here: the only child is a block-level
               `.katex-display`, which fills this content box and carries its own
               horizontal scroll (globals.css §6), so this box never had anything to
-              scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+              scroll, and `overflow-x: auto` with `overflow-y: visible` computes the
               y axis to `auto` too, which would silently clip a tall equation. The tab
               stop the slab needs now lives on `.katex-display` itself; see
               `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
@@ -215,7 +243,7 @@ export function GroverExplorer() {
           {iteration >= optimal && optimal > 0 ? (
             <Predict
               key={`${numQubits}-${markedIndex}`}
-              question={`You've just reached the theoretical optimum (${optimal} iteration${optimal === 1 ? "" : "s"}). Step once more — does P(marked) keep climbing, or start falling?`}
+              question={`You've just reached the theoretical optimum (${optimal} iteration${optimal === 1 ? "" : "s"}). Step once more. Does P(marked) keep climbing, or start falling?`}
               options={[
                 { id: "climb", label: "Keeps climbing" },
                 { id: "fall", label: "Starts falling" },
@@ -231,13 +259,13 @@ export function GroverExplorer() {
           ) : null}
 
           <SimulatorFraming
-            shows="Grover's algorithm concentrates probability onto a marked item faster than any classical search — but only up to a point."
-            watchFor="Success probability doesn't climb forever — past the optimal iteration count it overshoots and starts falling back down."
+            shows="Grover's algorithm concentrates probability onto a marked item faster than any classical search, but only up to a point."
+            watchFor="Success probability doesn't climb forever; past the optimal iteration count it overshoots and starts falling back down."
             tryThis={
               <ul>
                 <li>
-                  Set 3 qubits, mark index 5, and step past the optimal iteration count shown in the controls
-                  — watch P(marked) fall back down instead of climbing forever.
+                  Set 3 qubits, mark index 5, and step past the optimal iteration count shown in the controls,
+                  and watch P(marked) fall back down instead of climbing forever.
                 </li>
                 <li>Try 4 qubits (16 items) and compare how many iterations it takes versus 3 qubits (8 items).</li>
               </ul>

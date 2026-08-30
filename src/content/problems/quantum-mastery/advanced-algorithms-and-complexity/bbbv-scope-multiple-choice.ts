@@ -16,10 +16,10 @@ export const bbbvScopeMultipleChoice: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "Which statement correctly describes what the BBBV Ω(√N) lower bound establishes about Grover's algorithm and NP-complete problems?",
     options: [
-      { id: "a", text: "It proves no quantum algorithm can search an unstructured N-item black box faster than Θ(√N); it says nothing about whether structured NP-complete problems admit a faster quantum algorithm" },
-      { id: "b", text: "It proves NP ⊄ BQP unconditionally, since any NP-complete problem can be phrased as an unstructured search" },
-      { id: "c", text: "It proves Grover's algorithm is merely the best known approach, not a proven optimum" },
-      { id: "d", text: "It applies only to Grover's specific circuit, not to any other possible quantum search algorithm" },
+      { id: "a", text: "It proves Θ(√N) is optimal for unstructured black-box search, and leaves the structured NP-complete case an open question" },
+      { id: "b", text: "It proves NP ⊄ BQP unconditionally, since any NP-complete problem can be phrased as an unstructured search over its solution space" },
+      { id: "c", text: "It bounds every algorithm that queries the oracle, so it also bounds one that first builds an oracle from a 3-SAT formula" },
+      { id: "d", text: "It applies to Grover's circuit rather than to every possible quantum search algorithm, so another circuit could still beat it" },
     ],
   },
   answer: {
@@ -27,14 +27,14 @@ export const bbbvScopeMultipleChoice: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "This overreaches: BBBV's bound is specific to the black-box query model. Concrete NP-complete instances are structured, not black boxes, so the bound doesn't transfer; NP ⊆ BQP remains open, just as widely disbelieved as P=NP.",
-      c: "BBBV's bound is a genuine matching lower bound (not just 'best known so far'), proving Grover's algorithm is exactly query-optimal for unstructured search.",
-      d: "BBBV's hybrid-method proof bounds every possible quantum algorithm's query count, not just Grover's specific circuit — that's what makes it a lower bound rather than a property of one implementation.",
+      c: "Building an oracle out of a formula and then querying it is one strategy, and the bound does constrain that strategy. It says nothing about an algorithm that reads the clauses directly instead of hiding them behind a query interface, which is what makes the structured case open.",
+      d: "BBBV's hybrid-method proof bounds the query count of every quantum algorithm, not of one circuit. That is what makes it a lower bound rather than a property of a particular implementation.",
     },
     defaultIncorrectFeedback: "Recall the lesson's precise distinction between the black-box query model (where BBBV applies) and structured, explicitly-given problems (where it doesn't).",
   },
   hints: [
     { text: "BBBV's proof technique (the hybrid method) only ever assumes black-box oracle access to the marking function." },
-    { text: "A concrete NP-complete instance, like a specific 3-SAT formula, is never actually a black box — its clauses are explicit and inspectable." },
+    { text: "A concrete NP-complete instance, like a specific 3-SAT formula, is never a black box: its clauses are explicit and inspectable." },
     { text: "The bound rules out a specific kind of generic speedup, not every conceivable structure-exploiting algorithm." },
   ],
   solution: {
@@ -47,11 +47,11 @@ export const bbbvScopeMultipleChoice: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "BBBV is a rigorous, but scope-limited, theorem: optimal for black-box search, silent on structured problems.",
-    whyCorrect: "This is exactly the distinction the lesson derives and explicitly contrasts with Shor's algorithm, which succeeds precisely because it exploits structure the oracle model hides by construction.",
+    whyCorrect: "BBBV bounds what an algorithm can do when querying is all it may do. Shor's algorithm sits outside that setting entirely, since it exploits structure the oracle model hides by construction, so no tension arises between the two results.",
     whyWrong: [
       { optionId: "b", text: "Overreaches the bound's scope. Concrete NP-complete instances are structured, not black boxes, so the bound doesn't transfer and NP ⊆ BQP stays open." },
-      { optionId: "c", text: "Understates the bound's rigor. This is a matching lower bound, not a 'best known so far' observation." },
-      { optionId: "d", text: "Narrows the bound to one circuit. The hybrid-method proof bounds every possible quantum algorithm's query count." },
+      { optionId: "c", text: "Assumes the only route to a 3-SAT instance is through an oracle. An algorithm that inspects the clauses is outside the model the bound constrains." },
+      { optionId: "d", text: "Narrows the bound to one circuit. The hybrid-method proof constrains every possible quantum algorithm's query count." },
     ],
   },
 };

@@ -11,10 +11,10 @@ export function vectorToExchangeGrid(vector: readonly Complex[], dim: number): M
 export type ExchangeVerdict = "symmetric" | "antisymmetric" | "not-an-eigenstate" | "undefined-zero-vector";
 
 const VERDICT_LABEL: Record<ExchangeVerdict, string> = {
-  symmetric: "+1 eigenstate (symmetric — bosons)",
-  antisymmetric: "−1 eigenstate (antisymmetric — fermions)",
+  symmetric: "+1 eigenstate (symmetric, bosons)",
+  antisymmetric: "−1 eigenstate (antisymmetric, fermions)",
   "not-an-eigenstate": "Not an exchange eigenstate",
-  "undefined-zero-vector": "Zero vector — this state does not exist (Pauli exclusion)",
+  "undefined-zero-vector": "Zero vector: this state does not exist (Pauli exclusion)",
 };
 
 const VERDICT_TONE: Record<ExchangeVerdict, string> = {
@@ -58,7 +58,7 @@ export function ExchangeDiagramContent({
           <span aria-hidden="true" className="text-xl">
             ⇄
           </span>
-          <span className="text-[10px] font-medium uppercase tracking-wide">exchange</span>
+          <span className="text-micro font-medium uppercase tracking-wide">exchange</span>
         </div>
         <div className="space-y-2">
           <p className="tech-label">{afterLabel}</p>
@@ -109,7 +109,7 @@ export function ExchangeDiagram({
     // `beforeLabel`/`afterLabel` captions naming ψ and P₁₂ψ, the "Rows/columns:
     // particle 1 / particle 2 in state …" basis legend, and — the one that
     // matters most — the verdict badge, which is the figure's whole punchline
-    // ("−1 eigenstate (antisymmetric — fermions)", "Zero vector — this state
+    // ("−1 eigenstate (antisymmetric, fermions)", "Zero vector — this state
     // does not exist (Pauli exclusion)"). The caller's `ariaLabel` is a fixed
     // sentence written once in the MDX body; it cannot carry the amplitudes
     // and it does not restate the verdict, so `img` was handing a screen

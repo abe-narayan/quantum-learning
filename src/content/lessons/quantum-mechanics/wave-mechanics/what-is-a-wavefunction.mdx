@@ -25,13 +25,14 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="When a finite list runs out">
 Ask where an electron in a hydrogen atom is, and quantum mechanics will not hand you a point. It hands you a function.
 </LessonHook>
 
-## Motivation
+## Why a list of amplitudes stops working
 
-The function quantum mechanics hands you is $\psi(x)$, the wavefunction,
+The function quantum mechanics hands you is $\psi(x)$, the
+<Term id="wavefunction">wavefunction</Term>,
 and this lesson is about where it comes from
 and what it means. A finite list of amplitudes is enough to describe a
 qubit, or three qubits, or any number of qubits: $\mathbb{C}^2$,
@@ -53,7 +54,7 @@ whole job.
   license="CC BY 4.0"
 />
 
-## Intuition
+## Chop space into a grid first
 
 Don't start from continuous $x$ directly. Start from what you already
 know. Chop space into a fine grid of positions $x_1, x_2, \ldots, x_N$
@@ -63,7 +64,7 @@ finite-dimensional <Term id="quantum-state">state vector</Term>, $|\psi\rangle =
 with $\sum_i |c_i|^2 = 1$ by the <Term id="born-rule">Born rule</Term> you already know. Then ask what
 happens to this description as $\Delta x \to 0$.
 
-## Mathematical Development
+## Taking the grid spacing to zero
 
 ### The continuum limit
 
@@ -99,9 +100,32 @@ $$
 |\psi\rangle = \int \psi(x)\,|x\rangle\,dx
 $$
 
-with $\langle x|x'\rangle = \delta(x-x')$ (a Dirac delta) replacing the
-discrete $\langle x_i|x_j\rangle = \delta_{ij}$, the continuum's version
-of an <Term id="orthonormal-basis">orthonormal basis</Term>. **This platform's numerical simulator is this
+with $\langle x|x'\rangle = \delta(x-x')$ replacing the discrete
+$\langle x_i|x_j\rangle = \delta_{ij}$, the continuum's version of an
+<Term id="orthonormal-basis">orthonormal basis</Term>.
+
+Both $\delta$s are worth stopping on, because later lessons use them
+without ceremony. The **Kronecker delta** $\delta_{ij}$ is just a compact
+way of writing "orthonormal": it is $1$ when $i=j$ and $0$ otherwise, so
+$\langle x_i|x_j\rangle=\delta_{ij}$ says each grid state has norm one and
+is orthogonal to every other. The **Dirac delta** $\delta(x-x')$ is its
+continuum counterpart, and it is not an ordinary function: no ordinary
+function is zero everywhere except at one point and still integrates to
+$1$. Define it instead by the only property anything ever uses it for,
+namely what it does inside an integral:
+
+$$
+\int f(x')\,\delta(x-x')\,dx' = f(x)
+$$
+
+It sifts out the value of $f$ at the single point where its argument
+vanishes, collapsing an integral to one number, the same way $\delta_{ij}$
+collapses a sum $\sum_j c_j\delta_{ij}$ to the single term $c_i$. That
+sifting is the whole of it, and it is the step that turns a double
+integral into a single one in every position-space calculation from here
+on.
+
+**This platform's numerical simulator is this
 same construction, deliberately left at finite $\Delta x$**: `Grid1D`
 *is* $\{x_1,\ldots,x_N\}$, and a `Wavefunction1D`'s `amplitudes` array
 *is* $\{\psi(x_1),\ldots,\psi(x_N)\}$. The discretization this lesson
@@ -110,7 +134,7 @@ an unrelated approximation.
 
 <InteractiveSection
   title="Watch the discrete bars become the continuous curve"
-  description="Each bar's height is |psi(x_i)|^2 and its width is Delta x, so the bar's AREA is |c_i|^2, the quantity the Born rule needs to sum to 1. Drag the slider to refine the grid: the blocky bars at low N thin and fuse into the smooth |psi(x)|^2 curve, while the running sum beneath the plot stays pinned near 1 the entire time."
+  description="Each bar's height is |psi(x_i)|^2 and its width is Delta x, so the bar's AREA is |c_i|^2, the quantity the Born rule needs to sum to 1. Drag the slider to refine the grid: the blocky bars at low N thin and fuse into the smooth |psi(x)|^2 curve. Keep the running sum beneath the plot in view while they do, since that is the quantity the Born rule actually constrains."
 >
   <DiscretizationLimit ariaLabel="Histogram of discrete cell probabilities over a Gaussian, converging to the continuous probability density as the number of grid cells N increases via a slider" />
 </InteractiveSection>
@@ -155,7 +179,7 @@ Revisit the four postulates from the last course:
 Nothing here is new physics. It's the same postulates, in a basis with a
 continuum of labels instead of finitely many.
 
-## Physical Interpretation
+## A function's worth of amplitude
 
 A finite-dimensional qubit's amplitudes told you how much of $|0\rangle$,
 how much of $|1\rangle$. $\psi(x)$ tells you the analogous thing for
@@ -164,7 +188,7 @@ information rather than a list's. That is the reason continuous quantum
 mechanics needs calculus where finite-dimensional quantum computing needed
 only linear algebra.
 
-## Worked Example
+## Normalizing a top-hat
 
 **A particle's wavefunction is $\psi(x) = A$ for $x \in [0, L]$ and $0$
 elsewhere. Find $A$.**
@@ -174,7 +198,7 @@ $A = 1/\sqrt{L}$ (taking $A$ real and positive, a free choice: see the
 Superposition, Interference, and Phase lesson on why an overall phase
 never matters).
 
-## Common Mistakes
+## Two ways to misread psi(x)
 
 <Callout type="mistake">
 **Treating $\psi(x)$ itself as a probability.** It isn't. It can be
@@ -199,9 +223,147 @@ interval width, compares two different kinds of quantities.
 
 1. Why must $c_i$ scale as $\sqrt{\Delta x}$, specifically, rather than as
    $\Delta x$ or as a constant, for the continuum limit to work?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the Born rule constrains $\sum_i|c_i|^2$, which squares the
+   scaling, and only a square root survives that squaring as a single
+   factor of $\Delta x$: exactly what a Riemann sum needs.
+
+   Track the sum under each candidate.
+
+   With $c_i = \psi(x_i)\sqrt{\Delta x}$, the normalization sum is
+
+   $$
+   \sum_i |c_i|^2 = \sum_i |\psi(x_i)|^2\,\Delta x \;\xrightarrow{\Delta x\to0}\; \int|\psi(x)|^2\,dx
+   $$
+
+   a textbook Riemann sum with the width $\Delta x$ sitting where a
+   Riemann sum requires it. The limit is finite and independent of how
+   finely you chopped, which is the whole requirement.
+
+   With $c_i$ a constant $c$ instead, $\sum_i|c_i|^2 = N|c|^2$, and $N$
+   grows without bound as the grid refines. Normalization would force
+   $|c|^2 = 1/N$, so $c$ is not a fixed number at all and there is no
+   function left in the limit; refining the grid changes the answer, and a
+   description that depends on your bookkeeping is not a description of
+   the particle.
+
+   With $c_i = \psi(x_i)\Delta x$, the sum is
+   $\sum_i|\psi(x_i)|^2\Delta x^2 = \Delta x\sum_i|\psi(x_i)|^2\Delta x
+   \to 0\cdot\int|\psi|^2dx = 0$. Total probability collapses to zero, and
+   normalization becomes impossible.
+
+   Stated as a rule, the exponent is forced by counting: the sum has
+   $N \propto 1/\Delta x$ terms, so each term must scale as $\Delta x^1$ to
+   keep the total finite, and since each term is a *squared* coefficient,
+   the coefficient itself scales as $\Delta x^{1/2}$. Any other power
+   diverges or vanishes.
+
+   The wrong turn is to look for a physical reason for the square root, as
+   though nature had chosen it. It is bookkeeping, forced by the fact that
+   probabilities come from squared amplitudes, and it is precisely what
+   makes $\psi$ an amplitude *density* rather than an amplitude. The
+   $\sqrt{\Delta x}$ carries the units, and once it is stripped out, what
+   is left over has units of (probability)$^{1/2}$ per unit length.
+
+   </details>
+
 2. For the top-hat wavefunction above with $L=4$, what is $A$?
-3. Which of the four postulates literally does not need to be restated at
-   all when moving from qubits to continuous position?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $A = \tfrac12$.
+
+   The wavefunction is constant on an interval of length $4$, so
+
+   $$
+   \int_0^4|A|^2\,dx = |A|^2\cdot 4 = 1 \quad\Longrightarrow\quad |A| = \frac{1}{\sqrt4} = \frac12
+   $$
+
+   taking $A$ real and positive, which costs nothing: an overall phase on
+   the whole wavefunction is unobservable, as the last course established.
+
+   Two checks are worth doing every time, because they catch most errors
+   for free.
+
+   Units. $A$ has units of (length)$^{-1/2}$, matching $\psi$'s status as
+   an amplitude density. If your answer came out dimensionless, you
+   normalized $\psi$ rather than $|\psi|^2$.
+
+   Direction. Widening the region must *lower* $A$, since the same total
+   probability is being spread thinner. $A=1/\sqrt L$ does that. A common
+   slip produces $A=\sqrt L$, which rises with $L$ and predicts a state
+   that becomes more concentrated the wider its support, which is
+   backwards.
+
+   Note that $|\psi|^2 = \tfrac14$ here, comfortably under $1$, but that is
+   an accident of $L=4$. Shrink the support to $L = 0.01$ and $A = 10$,
+   with $|\psi|^2 = 100$: a probability *density* of $100$ per unit length,
+   which is not a probability and is not capped at $1$. The probability of
+   finding the particle anywhere in that support is still exactly $1$,
+   because $100\times0.01 = 1$.
+
+   </details>
+
+3. Exactly one of the four postulates needs its *statement* changed, not
+   merely its representation, when moving from qubits to continuous
+   position. Which one is it, what changes, and why do the other three
+   survive word for word?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Postulate 3, the Born rule, is the one. Its sum becomes an integral and
+   its probability becomes a probability *density*.
+
+   As written for qubits, Postulate 3 says: measuring $A$ with spectral
+   decomposition $A=\sum_i\lambda_i|e_i\rangle\langle e_i|$ gives outcome
+   $\lambda_i$ with probability $P(\lambda_i)=|\langle e_i|\psi\rangle|^2$.
+   Every clause of that sentence assumes one eigenvector per outcome and a
+   countable list of them. Position has neither. The outcomes form a
+   continuum, so the sum over $i$ becomes an integral over $x$; and the
+   probability of any single exact value is zero, so
+   $P(\lambda_i)$ has to be replaced by $|\psi(x)|^2$, a density, with
+   $|\psi(x)|^2\,dx$ carrying the probability. The deeper reason is that
+   $\hat x$ has no normalizable eigenvector at all: $|x\rangle$ satisfies
+   $\langle x|x'\rangle=\delta(x-x')$ rather than $\langle x|x\rangle=1$,
+   so the postulate's $|e_i\rangle$ does not exist to be substituted in.
+
+   The other three survive because each is stated in terms that never
+   mentioned dimension.
+
+   Postulate 1 says the state is a normalized vector in a complex Hilbert
+   space. $L^2(\mathbb{R})$, the square-integrable functions, is a complex
+   Hilbert space. The sentence is unchanged; only which space it names has
+   changed, and "normalized" now reads $\int|\psi|^2dx=1$ rather than
+   $\sum_i|c_i|^2=1$, which is the same condition in the new basis.
+
+   Postulate 2 says an observable is a Hermitian operator whose eigenvalues
+   are the possible outcomes. $\hat x$ and $\hat p$ are Hermitian
+   operators, and the sentence stands. In fairness, infinite dimensions do
+   introduce genuine technical care here that finite dimensions never
+   needed: these operators are unbounded, so they are defined only on a
+   dense subspace rather than everywhere, and the property that actually
+   matters becomes self-adjointness rather than plain symmetry. That is a
+   refinement of what "Hermitian operator" means, not a change to what the
+   postulate asserts.
+
+   Postulate 4 says evolution is unitary, equivalently
+   $i\hbar\,d|\psi\rangle/dt=H|\psi\rangle$. That equation is reproduced
+   character for character in position space; all that changes is that $H$
+   is a differential operator instead of a matrix.
+
+   The wrong answer to guard against is nominating Postulate 1, on the
+   grounds that "the state is now a function, not a vector." A function
+   *is* a vector, in exactly the sense the Vector Spaces lesson defined:
+   you can add two wavefunctions and scale one by a complex number. That
+   lesson built the abstraction precisely so this step would need no new
+   postulate, and it does not.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -217,7 +379,7 @@ interval width, compares two different kinds of quantities.
 - This platform's numerical `Grid1D`/`Wavefunction1D` types are this
   lesson's discrete construction, deliberately left un-taken-to-the-limit.
 
-## Further Exploration
+## Making the Born rule precise
 
 <NextDiscovery>
 The Born-rule reinterpretation above is stated informally;

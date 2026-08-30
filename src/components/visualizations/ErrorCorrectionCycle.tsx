@@ -86,13 +86,13 @@ export function ErrorCorrectionCycle({ ariaLabel }: { ariaLabel: string }) {
   const stageDescription = [
     `The logical qubit α|0⟩+β|1⟩ (α=β=1/√2) is encoded into the 3-qubit ${isPhaseFlip ? "phase-flip" : "bit-flip"} code.`,
     errorQubit === null
-      ? "No error is injected — the codeword is untouched."
+      ? "No error is injected: the codeword is untouched."
       : `A real ${errorTypeName} error is applied to physical qubit q${errorQubit}.`,
     `Two ancillas measure the syndrome via real partial measurement: (s1,s2) = (${result.syndrome[0]},${result.syndrome[1]}). ${
-      result.correctedQubit === null ? "No correction indicated — the syndrome is (0,0)." : `Diagnosed error on q${result.correctedQubit}; the matching correction gate is applied.`
+      result.correctedQubit === null ? "No correction indicated: the syndrome is (0,0)." : `Diagnosed error on q${result.correctedQubit}; the matching correction gate is applied.`
     }`,
     `Fidelity of the corrected codeword against the original encoded state: ${fidelity.toFixed(4)}${
-      fidelity > 0.999 ? " — fully recovered." : " — NOT fully recovered (this happens only when the diagnosed correction doesn't match reality, e.g. two simultaneous errors, which this distance-3 code cannot handle)."
+      fidelity > 0.999 ? ". Fully recovered." : ". NOT fully recovered (this happens only when the diagnosed correction doesn't match reality, e.g. two simultaneous errors, which this distance-3 code cannot handle)."
     }`,
   ];
 
@@ -150,8 +150,8 @@ export function ErrorCorrectionCycle({ ariaLabel }: { ariaLabel: string }) {
             <span
               className={
                 i <= stage
-                  ? "flex h-6 w-6 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-brand-foreground"
-                  : "flex h-6 w-6 items-center justify-center rounded-full border border-border text-[11px] text-muted-foreground"
+                  ? "flex h-6 w-6 items-center justify-center rounded-full bg-brand text-meta font-semibold text-brand-foreground"
+                  : "flex h-6 w-6 items-center justify-center rounded-full border border-border text-meta text-muted-foreground"
               }
             >
               {i + 1}
@@ -205,7 +205,7 @@ export function ErrorCorrectionCycle({ ariaLabel }: { ariaLabel: string }) {
         </button>
       </div>
 
-      <div aria-live="polite" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
+      <div aria-live="polite" aria-atomic="true" className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {stageDescription[stage]}
       </div>
 

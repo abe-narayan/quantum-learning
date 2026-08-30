@@ -6,7 +6,7 @@ import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
 
 /** Default duration for ordinary unitary (gate / rotation / preset) transitions. */
 export const GATE_ROTATION_MS = 550;
-/** Measurement collapse is a discontinuous physical event, not a rotation — animate it much faster
+/** Measurement collapse is a discontinuous physical event, not a rotation, so animate it much faster
  * so it reads as a snap rather than a graceful sweep. */
 export const COLLAPSE_MS = 150;
 
@@ -15,7 +15,7 @@ export function easeInOutCubic(t: number): number {
 }
 
 /** An arbitrary unit vector perpendicular to `v` (there's a whole circle of choices when `v`
- * is a pole of that choice — any one works, since the caller only needs *some* meridian). */
+ * is a pole of that choice; any one works, since the caller only needs *some* meridian). */
 function arbitraryPerpendicular(v: BlochVector): BlochVector {
   const reference = Math.abs(v.z) < 0.9 ? { x: 0, y: 0, z: 1 } : { x: 1, y: 0, z: 0 };
   const cx = v.y * reference.z - v.z * reference.y;
@@ -26,8 +26,8 @@ function arbitraryPerpendicular(v: BlochVector): BlochVector {
 }
 
 /** The rotation axis for the degenerate (near-π) slerp branch below. Prefers `cross(a, b)`
- * — the true meridian axis, which stays numerically meaningful far below the `sinTheta < 1e-6`
- * cutoff that gates this branch — and only falls back to the direction-agnostic
+ * (the true meridian axis, which stays numerically meaningful far below the `sinTheta < 1e-6`
+ * cutoff that gates this branch) and only falls back to the direction-agnostic
  * `arbitraryPerpendicular(a)` once that cross product has itself collapsed to noise (`a` and
  * `b` are bit-for-bit antipodal, or close enough that no meridian is distinguishable). Without
  * this, a vector approaching antipodal along a fixed azimuth would track that azimuth right up
@@ -52,8 +52,57 @@ function rotateAboutPerpendicularAxis(v: BlochVector, axis: BlochVector, angle: 
   return { x: v.x * cos + crossX * sin, y: v.y * cos + crossY * sin, z: v.z * cos + crossZ * sin };
 }
 
-/** Spherical-linear interpolation between two Bloch vectors along the great-circle arc. */
+/** Below this length a Bloch vector has no meaningful direction left to interpolate. */
+const NEGLIGIBLE_RADIUS = 1e-9;
+
+/** `v` rescaled from its current `length` (already computed by the caller) to `radius`. */
+function withRadius(v: BlochVector, length: number, radius: number): BlochVector {
+  const k = radius / length;
+  return { x: v.x * k, y: v.y * k, z: v.z * k };
+}
+
+/**
+ * Spherical-linear interpolation between two Bloch vectors: the *direction*
+ * sweeps along the great-circle arc, and the *length* interpolates linearly
+ * between the two endpoints' lengths.
+ *
+ * Splitting the two is not decoration. A Bloch vector is a unit vector only
+ * for a pure state; the Noise Explorer and the Density Matrix Explorer both
+ * animate a genuinely mixed state, whose length |r| < 1 is the entire
+ * reading (how far in from the surface the state has sunk is how much of it
+ * has been lost). `slerpUnitDirection` below reads a·b as cos of the angle
+ * between them, which is only true for unit vectors; fed short vectors it
+ * over-reports that angle, and its weights sin((1-t)θ)/sinθ and sin(tθ)/sinθ
+ * then sum to more than 1. Measured on the Noise Explorer's own opening
+ * configuration (|+⟩, dephasing, λ = 0.15), stepping from |r| = 0.377 to
+ * |r| = 0.321 swept the drawn arrow out to |r| = 0.468 mid-tween: 24% longer
+ * than where it started, in the one instrument whose whole subject is that
+ * arrow getting shorter. `lib/quantum/__tests__/physicalInvariants.test.ts`
+ * already forbids a noise channel from lengthening the Bloch vector, so the
+ * animation was drawing something the engine is not allowed to compute.
+ *
+ * For unit inputs (every caller in BlochSphereExplorer, where the state is
+ * always pure) the radius is 1 at both ends and this is exactly the previous
+ * behaviour.
+ */
 export function slerpBlochVector(a: BlochVector, b: BlochVector, t: number): BlochVector {
+  const lengthA = Math.hypot(a.x, a.y, a.z);
+  const lengthB = Math.hypot(b.x, b.y, b.z);
+  const radius = lengthA + (lengthB - lengthA) * t;
+
+  // A vector at the sphere's centre has no direction, so follow whichever
+  // endpoint still has one; if neither does, the whole path is the centre.
+  if (lengthA < NEGLIGIBLE_RADIUS) {
+    return lengthB < NEGLIGIBLE_RADIUS ? { x: 0, y: 0, z: 0 } : withRadius(b, lengthB, radius);
+  }
+  if (lengthB < NEGLIGIBLE_RADIUS) return withRadius(a, lengthA, radius);
+
+  const direction = slerpUnitDirection(withRadius(a, lengthA, 1), withRadius(b, lengthB, 1), t);
+  return withRadius(direction, 1, radius);
+}
+
+/** The great-circle sweep itself, for two UNIT vectors; see `slerpBlochVector` for why the length is handled separately. */
+function slerpUnitDirection(a: BlochVector, b: BlochVector, t: number): BlochVector {
   const dot = Math.min(1, Math.max(-1, a.x * b.x + a.y * b.y + a.z * b.z));
   const theta = Math.acos(dot);
   const sinTheta = Math.sin(theta);
@@ -62,7 +111,7 @@ export function slerpBlochVector(a: BlochVector, b: BlochVector, t: number): Blo
     if (dot < 0) {
       // Antipodal (e.g. |0⟩ <-> |1⟩ via Reset or a preset click): the great-circle direction
       // is undefined, and the naive lerp-then-normalize below divides by a norm that passes
-      // through exactly zero at t=0.5 — the vector visibly collapses to the sphere's center
+      // through exactly zero at t=0.5, so the vector visibly collapses to the sphere's center
       // (a maximally-mixed point that's never physically true for a pure state) instead of
       // sweeping along a meridian. Rotate about the (near-)meridian axis instead, which
       // stays at unit radius the whole way and still lands exactly on `b` at t=1.

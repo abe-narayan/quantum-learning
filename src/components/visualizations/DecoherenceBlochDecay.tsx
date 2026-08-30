@@ -93,7 +93,7 @@ function BlochCirclePanel({
         <circle cx={px} cy={py} r={5} className={fillClass} />
       </svg>
       <p className="mt-1 text-xs font-semibold text-foreground">{title}</p>
-      <p className="font-mono text-[11px] text-muted-foreground">|r| = {length.toFixed(3)}</p>
+      <p className="font-mono text-meta text-muted-foreground">|r| = {length.toFixed(3)}</p>
     </div>
   );
 }
@@ -296,7 +296,7 @@ export function DecoherenceBlochDecay({
       <div className="rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground">
         {narration}
       </div>
-      <div aria-live="polite" className="sr-only">
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
         {playing ? "" : narration}
       </div>
     </div>

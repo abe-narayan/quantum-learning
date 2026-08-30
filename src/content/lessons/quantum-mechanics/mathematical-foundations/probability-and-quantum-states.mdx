@@ -37,13 +37,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Where the algebra starts predicting">
   Everything so far has been linear algebra: true, but not yet about
   anything. Four postulates turn it into predictions a laboratory can
   check.
 </LessonHook>
 
-## Motivation
+## Nine lessons of mathematics, now aimed at something
 
 Nine lessons of linear algebra have built unit vectors, inner products,
 Hermitian and unitary operators, eigenvalues, and tensor products. None of
@@ -61,7 +61,7 @@ about what an experiment will show.
   license="Public domain"
 />
 
-## Intuition
+## Where every earlier lesson was heading
 
 Every earlier lesson in this course quietly built toward one destination:
 a state is a unit vector; an <Term id="observable">observable</Term> is a Hermitian operator; a
@@ -70,7 +70,7 @@ measurement outcome is one of that operator's eigenvalues; and the
 state "overlaps" with the corresponding eigenvector. Every piece of that
 sentence is a lesson you've already done the work for.
 
-## Mathematical Development
+## The four postulates, stated and connected
 
 ### Postulate 1: states are unit vectors
 
@@ -179,6 +179,16 @@ re-measurement of the same observable then gives $\lambda_i$ again with
 certainty ($P(\lambda_i)=|\langle e_i|e_i\rangle|^2=1$), matching the
 operational meaning of "the system now definitely has that value."
 
+One assumption is buried in that sentence, and it is worth naming now so
+it does not have to be unlearned later: it presumes each eigenvalue
+$\lambda_i$ has exactly one eigenvector, so that naming the outcome names
+the post-measurement state uniquely. When two or more independent
+eigenvectors share an eigenvalue (a **degenerate** eigenvalue), the
+outcome no longer picks out a single vector, and the collapse rule has to
+be restated in terms of projectors onto whole eigenspaces. Everything in
+this lesson is the non-degenerate case; the Operators, Observables &
+Measurement course does the general one.
+
 ### Composite systems
 
 For two systems combined via the <Term id="tensor-product">tensor product</Term> (last lesson), a joint
@@ -187,7 +197,7 @@ systems, and non-factorizable (entangled) states describe systems whose
 measurement outcomes are correlated in a way no product state can
 reproduce.
 
-## Physical Interpretation
+## Each postulate traced back to its lesson
 
 Collect the four postulates together, each now tied to a specific earlier
 lesson: **state** equals unit vector (Vector Spaces, Inner Products);
@@ -200,7 +210,7 @@ state evolves *between* measurements. This short list is the mathematical
 skeleton of every calculation the rest of quantum mechanics will ask you
 to do.
 
-## Worked Example
+## Probabilities and an expectation from two overlaps
 
 **A Hermitian observable has eigenvalues $+1,-1$ with eigenvectors
 $|e_+\rangle,|e_-\rangle$. A system is in state $|\psi\rangle$ with
@@ -211,9 +221,9 @@ ways of computing $\langle A\rangle$ agree.**
 <PredictBeforeReveal
   question="With ⟨e₊|ψ⟩ = 0.6 and ⟨e₋|ψ⟩ = 0.8, which outcome is more likely?"
   options={[
-    { label: "+1 is more likely", value: "plus" },
     { label: "-1 is more likely", value: "minus" },
     { label: "Equally likely", value: "equal" },
+    { label: "+1 is more likely", value: "plus" },
   ]}
   correctValue="minus"
   explanation="P(-1) = 0.8² = 0.64 beats P(+1) = 0.6² = 0.36. Squaring the amplitudes widens the gap: the overlaps differ by a factor of 1.33, the probabilities by 1.78. Eyeballing the raw overlaps gets the ranking right here, but never the probabilities themselves."
@@ -231,12 +241,13 @@ the two outcomes side by side and the gap between them is easy to see:
     { label: "P(+1)", value: workedExamplePPlus, caption: `${(workedExamplePPlus * 100).toFixed(0)}%` },
     { label: "P(-1)", value: workedExamplePMinus, caption: `${(workedExamplePMinus * 100).toFixed(0)}%` },
   ]}
-  ariaLabel="Bar chart of P(+1) and P(-1) for the worked example"
+  maxValue={1}
+  ariaLabel="Two bars on a scale running to 1: P(+1) at 0.36, just over a third of full height, and P(-1) at 0.64, just under two thirds. The second is close to twice the first, and together they fill the scale exactly."
 />
 
 The two bars sum to exactly 1, as normalization demands.
 
-<InteractiveSection title="Slide c₊, watch normalization hold" description="Drag c₊ from 0 to 1. c₋ is set automatically to keep the state normalized (c₊² + c₋² = 1), and the two bars always sum to exactly 1 no matter where you leave the slider. Normalization is not a special property of the 0.6/0.8 example above; it holds everywhere along this family of states.">
+<InteractiveSection title="Slide c₊, and add the two bars" description="Drag c₊ from 0 to 1. c₋ is set automatically to keep the state normalized (c₊² + c₋² = 1). Add the two bars at three or four places along the slider, including both ends, and decide from that whether the 0.6/0.8 example above was a special case or a typical one.">
   <BarChartExplorer
     frames={Array.from({ length: 21 }, (_, i) => bornRuleFrame(i * 5))}
     sliderLabel="c₊ (as a percentage of its max value)"
@@ -260,7 +271,7 @@ $$
 
 Both routes agree, as the general derivation above guarantees they must.
 
-## Common Mistakes
+## Amplitude against squared modulus, one last time
 
 <Callout type="warning">
 **Using the amplitude directly instead of its squared modulus.**
@@ -281,16 +292,150 @@ superposition, not an overall phase on the whole state, is observable.
 
 1. Using the worked example's setup, verify $P(+1)+P(-1)=1$ directly
    (already shown above, restate the calculation in your own words).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The worked example has overlaps $\langle e_+|\psi\rangle = 0.6$ and
+   $\langle e_-|\psi\rangle = 0.8$, so the Born rule gives
+
+   $$
+   P(+1) = |0.6|^2 = 0.36, \qquad P(-1) = |0.8|^2 = 0.64, \qquad 0.36+0.64 = 1 \checkmark
+   $$
+
+   Why it had to come out that way, rather than by arithmetic luck: the
+   eigenvectors form an orthonormal basis, so expanding
+   $|\psi\rangle = \sum_i c_i|e_i\rangle$ and computing
+   $\langle\psi|\psi\rangle$ kills every cross term and leaves
+   $\sum_i |c_i|^2$. Since $|\psi\rangle$ is normalized, that sum is 1, and
+   the $|c_i|^2$ are exactly the Born probabilities. Normalization of the state
+   *is* normalization of the probability distribution; they are one equation
+   read two ways.
+
+   Two structural points that the arithmetic hides. The check works basis by
+   basis, so a *different* observable on the same state gives a different set of
+   probabilities that also sums to 1, using the same normalization once again.
+   And $0.6+0.8 = 1.4$, not 1, which is the reminder that it is the squares and
+   never the amplitudes that are required to sum to one.
+
+   </details>
+
 2. A state has $\langle e_1|\psi\rangle = \frac{1}{\sqrt3}$ and two other
    eigenvectors with equal overlap. If probabilities must sum to $1$ and
    are all equal, what is $|\langle e_2|\psi\rangle|^2$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   |\langle e_2|\psi\rangle|^2 = \frac13.
+   $$
+
+   Two routes reach it, and they agree, which is the check.
+
+   From the given overlap: $|\langle e_1|\psi\rangle|^2 = \left|\tfrac{1}{\sqrt3}\right|^2 = \tfrac13$.
+   Since all three probabilities are equal, every one of them is $\tfrac13$.
+
+   From the sum rule: three equal probabilities summing to 1 must each be
+   $\tfrac13$, without needing the first overlap at all.
+
+   The question is deliberately over-determined, and noticing that is part of
+   the answer. Being told the first overlap *and* that all three are equal *and*
+   that they sum to 1 is one fact more than the problem needs, and the redundancy
+   is what lets you verify rather than merely compute. If the stated overlap had
+   been, say, $\tfrac{1}{\sqrt2}$, the three conditions would have been mutually
+   inconsistent and the state described would not exist.
+
+   The error to avoid is answering $\tfrac{1}{\sqrt3}$, which is the
+   *amplitude*, not the probability. The question asks for
+   $|\langle e_2|\psi\rangle|^2$, and the square is already written into the
+   symbol.
+
+   </details>
+
 3. Explain, using the derivation above, why multiplying $|\psi\rangle$ by
    $-1$ (a special case of a global phase, $\alpha=\pi$) changes no
-   prediction at all.
+   prediction at all, for probabilities and for expectation values alike.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because every prediction is quadratic in the state, so the phase appears once
+   with a conjugate and once without, and the two cancel.
+
+   For probabilities, with $|\psi'\rangle = -|\psi\rangle$:
+
+   $$
+   P'(\lambda_i) = |\langle e_i|\psi'\rangle|^2 = |-1|^2\,|\langle e_i|\psi\rangle|^2 = |\langle e_i|\psi\rangle|^2 = P(\lambda_i).
+   $$
+
+   Every outcome probability, in every basis, is untouched. Since the
+   probabilities are all the observable content of the state, nothing further
+   could survive.
+
+   For expectation values the cancellation is even more explicit, because the
+   state appears on both sides of the operator:
+
+   $$
+   \langle\psi'|A|\psi'\rangle = (-1)^*(-1)\langle\psi|A|\psi\rangle = \langle\psi|A|\psi\rangle.
+   $$
+
+   The general case runs identically with $e^{i\alpha}$ in place of $-1$:
+   $|e^{i\alpha}|^2 = 1$ for the probabilities, and
+   $(e^{i\alpha})^*(e^{i\alpha}) = 1$ for the expectation values. The specific
+   value $\alpha = \pi$ has no special status.
+
+   The essential qualifier, and the one that stops this from being a licence to
+   discard every phase: the factor must multiply the *entire* state. A phase on
+   one term of a superposition, $\alpha|e_1\rangle - \beta|e_2\rangle$ against
+   $\alpha|e_1\rangle + \beta|e_2\rangle$, does not factor out and does not
+   cancel. It changes the probabilities in any basis that is not $\{|e_i\rangle\}$,
+   and interference is exactly that difference. Global phase is unphysical;
+   relative phase is the physics.
+
+   </details>
+
 4. For the observable $A=$ Pauli-$Z$ and state $|\psi\rangle=|+\rangle$
    (eigenvector of Pauli-$X$, not $Z$), use $Z$'s eigenvectors
    $|0\rangle,|1\rangle$ to find $P(+1)$ and $P(-1)$ for a $Z$
    measurement, and $\langle Z\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $Z$'s eigenvectors are $|0\rangle$ with eigenvalue $+1$ and $|1\rangle$ with
+   eigenvalue $-1$. Overlap $|+\rangle = \tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$
+   with each:
+
+   $$
+   \langle0|+\rangle = \tfrac{1}{\sqrt2}, \qquad \langle1|+\rangle = \tfrac{1}{\sqrt2},
+   $$
+
+   so
+
+   $$
+   P(+1) = P(-1) = \left|\tfrac{1}{\sqrt2}\right|^2 = \tfrac12, \qquad \langle Z\rangle = (+1)\tfrac12 + (-1)\tfrac12 = 0.
+   $$
+
+   Confirming by the sandwich:
+   $Z|+\rangle = \tfrac{1}{\sqrt2}(|0\rangle - |1\rangle) = |-\rangle$, and
+   $\langle+|-\rangle = 0$, so $\langle+|Z|+\rangle = 0$ $\checkmark$. Two
+   different calculations, one answer, which is the spectral decomposition and
+   the matrix sandwich agreeing as they must.
+
+   The parenthetical in the question is the trap being set. $|+\rangle$ *is* an
+   eigenvector, of $X$, with eigenvalue $+1$, and it is tempting to carry that
+   over and answer $\langle Z\rangle = 1$ with certainty. Being an eigenstate is
+   a relationship between a state and one particular observable, not a property
+   of the state alone. With respect to $Z$, $|+\rangle$ is maximally
+   non-committal.
+
+   $\langle Z\rangle = 0$ also illustrates the point from the Hermitian
+   Operators lesson: 0 is not one of $Z$'s eigenvalues, and no individual
+   measurement ever returns it. It is the average of a stream of $+1$s and
+   $-1$s arriving in equal proportion.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -308,7 +453,7 @@ superposition, not an overall phase on the whole state, is observable.
 - Composite systems combine via the tensor product; entangled states
   describe correlations no product state can reproduce.
 
-## Further Exploration
+## The same state, a different observable
 
 <ChallengePrompt prompt="The worked example's observable A had eigenvalues ±1 and gave ⟨A⟩=-0.28. A different observable B has the same eigenvectors but eigenvalues ±2. What is ⟨B⟩ for the same state?">
   Recompute directly from $\langle B\rangle=\sum_i\lambda_iP(\lambda_i)$
@@ -319,7 +464,7 @@ superposition, not an overall phase on the whole state, is observable.
 <NextDiscovery>
   This closes the course's core development. [Mathematical
   Foundations Challenge](/lessons/quantum-mechanics/mathematical-foundations/mathematical-foundations-challenge) is a synthesis lesson connecting every tool built
-  here across multiple lessons at once, before the Quantum Mechanics pillar
+  here across multiple lessons at once, before the Quantum Mechanics track
   continues into **From Classical to Quantum**, which turns this
   mathematics into the actual postulates, dynamics, and physical
   predictions of quantum mechanics.

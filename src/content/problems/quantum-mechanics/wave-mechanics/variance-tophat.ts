@@ -21,7 +21,7 @@ export const varianceTophat: NumericProblem = {
     type: "numeric",
     value: 1.7320508,
     tolerance: 0.01,
-    incorrectFeedback: "For a uniform distribution of width L, the variance is L^2/12 — a standard result you can derive directly from the two expectation-value integrals.",
+    incorrectFeedback: "For a uniform distribution of width L, the variance is L^2/12, a standard result you can derive from the two expectation-value integrals.",
     nearMisses: [
       { value: Math.sqrt(12), tolerance: 0.02, feedback: "That is √(L²/3), from ⟨x²⟩ alone. Subtracting ⟨x⟩² first is what turns the second moment into a variance." },
       { value: 3, feedback: "3 is L²/12 for L=6, that is the variance itself. Take its square root to get the uncertainty." },
@@ -29,8 +29,9 @@ export const varianceTophat: NumericProblem = {
     ],
   },
   hints: [
-    { text: "Place the interval as [0, L] without loss of generality — variance doesn't depend on where the interval is centered." },
-    { text: "Compute <x> = L/2 and <x^2> = L^2/3, then subtract the square." },
+    { text: "Variance measures spread about the mean, so it cannot depend on where the interval sits. Put it wherever the integrals are easiest." },
+    { text: "Compute the mean and the mean of the square from the uniform density, then subtract the square of the mean from the mean of the square." },
+    { text: "The two moments differ by a fraction of L squared. Take the square root at the end: the question asks for Delta x, not its square." },
   ],
   solution: {
     steps: [

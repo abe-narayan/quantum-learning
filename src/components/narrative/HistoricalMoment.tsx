@@ -38,7 +38,11 @@ export function HistoricalMoment({
         <span className="font-display text-2xl font-semibold text-foreground sm:text-3xl">{date}</span>
         {place ? <TechLabel>{place}</TechLabel> : null}
       </figcaption>
-      <div className="mt-2 space-y-2 text-sm leading-relaxed text-muted-foreground">{children}</div>
+      {/* `text-base`: `not-prose` above excludes this subtree from the
+          typography plugin's selectors but does not reset the inherited
+          `font-size`, so an absolute size here is measured against `.prose`'s
+          18px body. This is the narrative itself, not a caption. */}
+      <div className="mt-2 space-y-2 text-base leading-relaxed text-muted-foreground">{children}</div>
     </figure>
   );
 }

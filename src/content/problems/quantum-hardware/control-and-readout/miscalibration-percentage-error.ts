@@ -45,7 +45,7 @@ export const miscalibrationPercentageError: NumericProblem = {
   },
   explanation: {
     correctIdea: "This reproduces the lesson's own worked example number, confirming the actual Ω is substantially lower (about 69% of the assumed 18 MHz) than what an uncalibrated assumption would use.",
-    whyCorrect: "Matches the lesson's explicit Worked Example calculation.",
+    whyCorrect: "The peak arrives when Ωt reaches π/2, so peak time and drive strength are reciprocal. Seeing the peak at 20 ns instead of the assumed 13.89 ns means Ω is smaller than assumed by exactly that ratio: 18 × 13.89/20 ≈ 12.5 MHz.",
     whyWrong: ["Using the assumed t_π (13.89ns) instead of the observed one (20ns) would just reproduce the wrong, already-assumed 18 MHz value, missing the point of the calibration check."],
   },
 };

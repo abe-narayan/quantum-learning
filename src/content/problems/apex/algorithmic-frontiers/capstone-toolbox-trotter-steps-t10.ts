@@ -22,7 +22,7 @@ export const capstoneToolboxTrotterStepsT10: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "Using this capstone's formula for first-order Trotter step count, n = ceil(t²‖[A,B]‖/(2ε)), with the same 2-qubit Hamiltonian's exact commutator norm ‖[A,B]‖=4√2≈5.656854, t=10, and target error ε=0.001, what is the smallest integer number of Trotter steps n needed?",
+      "Using this capstone's formula for first-order Trotter step count, n = ceil(t²‖[A,B]‖/(2ε)), with the same 2-qubit Hamiltonian and the same norm the capstone uses throughout (the Frobenius norm, ‖[A,B]‖ = 4√2 ≈ 5.656854, which is never smaller than the spectral norm), t=10, and target error ε=0.001, what is the smallest integer number of Trotter steps n needed?",
     inputHint: "an integer; anything within 1% of the exact count is accepted",
   },
   answer: {

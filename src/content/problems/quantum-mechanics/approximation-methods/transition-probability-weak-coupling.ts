@@ -18,7 +18,7 @@ export const transitionProbabilityWeakCoupling: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "Using P(t)=4|V|²sin²(ωt/2)/ω² with V=0.01, ω=1, t=3, what is the first-order transition probability?",
-    inputHint: "as a decimal",
+    inputHint: "as a small decimal, to 6 decimal places",
   },
   answer: {
     type: "numeric",

@@ -56,27 +56,37 @@ export function HintPanel({
 }) {
   const allRevealed = revealedCount >= hints.length;
 
-  // Revealing an *earlier* hint keeps the button mounted (only its label
-  // changes), so focus stays put. Revealing the LAST hint replaces the
-  // button with the static "All hints revealed" span, which would drop
-  // keyboard focus to <body>. Move it onto the hint that was just revealed
-  // instead (`tabIndex={-1}` + `.focus()`, the ProblemsCatalog results-header
-  // move).
+  // Focus lands on the hint that was just revealed, on EVERY reveal.
   //
-  // Gated on the caller's *click*, not on `allRevealed`'s previous value —
-  // the same failure `SolutionPanel`'s effect documents at length.
-  // `revealedCount` comes from `useProblemProgress`, whose `getServerSnapshot`
-  // is `EMPTY_PROGRESS`, so a reader returning to a problem whose ladder they
-  // already exhausted renders `allRevealed === false` on the hydration pass
-  // and `true` only on the post-hydration catch-up. A `useRef(allRevealed)`
-  // guard is seeded from the first of those, read the second as a fresh
-  // reveal, and scrolled the page down to the last hint on load.
+  // This used to fire only on the last one, on the reasoning that an earlier
+  // reveal keeps the button mounted (only its label changes) so focus is not
+  // destroyed. True, and not the point: the reader pressed a control whose
+  // entire purpose is to produce a sentence they have not read yet, and
+  // nothing announced that sentence. A screen-reader user heard the button
+  // rename itself from "Reveal hint 1 of 4" to "Reveal hint 2 of 4" and never
+  // heard hint 1 at all. It is worse from the *other* reveal control: the
+  // "Next step" block in `ProblemViewClient` sits beside the feedback box, a
+  // panel away from where the hint appears, so the new text landed entirely
+  // off-screen and unspoken. Moving focus reads it, puts the caret where the
+  // reader asked to be, and matches what `SolutionPanel` already does one
+  // panel below. Getting back to the ladder is one Shift+Tab: the button is
+  // in the header strip, immediately before this list in DOM order.
+  //
+  // Gated on the caller's *click*, not on a previous-value guard — the same
+  // failure `SolutionPanel`'s effect documents at length. `revealedCount`
+  // comes from `useProblemProgress`, whose `getServerSnapshot` is
+  // `EMPTY_PROGRESS`, so a reader returning to a problem whose ladder they
+  // already worked through renders 0 on the hydration pass and the real count
+  // only on the post-hydration catch-up. A value guard would read that
+  // catch-up as a fresh reveal and scroll the page down to the last hint on
+  // load. A click cannot happen before hydration, so intent is the exact
+  // predicate that separates the two.
   const lastHintRef = useRef<HTMLLIElement>(null);
   useEffect(() => {
-    if (!allRevealed || !revealIntentRef?.current) return;
+    if (revealedCount === 0 || !revealIntentRef?.current) return;
     revealIntentRef.current = false;
     lastHintRef.current?.focus();
-  }, [allRevealed, revealIntentRef]);
+  }, [revealedCount, revealIntentRef]);
 
   if (hints.length === 0) return null;
 
@@ -120,8 +130,13 @@ export function HintPanel({
           ))}
         </ol>
       ) : (
+        /* The count is stated in words, not left to the tick ladder above: the
+           ladder is `aria-hidden` decoration, so before this line a reader who
+           could not see it learned how long the ladder was only from the
+           button's "of N". */
         <p className="text-sm text-muted-foreground">
-          Stuck? Each hint narrows things down one step at a time — take only as many as you need.
+          Stuck? There {hints.length === 1 ? "is one hint" : `are ${hints.length} hints`}, revealed one
+          at a time, each narrowing the problem a step further. Take only as many as you need.
         </p>
       )}
     </Instrument>

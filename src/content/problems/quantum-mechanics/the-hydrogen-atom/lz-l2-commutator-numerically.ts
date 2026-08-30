@@ -33,6 +33,11 @@ export const lzL2CommutatorNumerically: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.001,
+    nearMisses: [
+      { value: 1, tolerance: 0.01, feedback: "1 is the largest entry of L_z itself in the j=1 representation. The commutator is a different matrix, built from two products of L_z with L²." },
+      { value: 2, tolerance: 0.01, feedback: "2 is j(j+1) at j=1, the eigenvalue L² carries on this multiplet. It is a property of L², not an entry of the commutator." },
+      { value: 1.4142135623730951, tolerance: 0.01, feedback: "√2 is the size of the off-diagonal entries in L_x and L_y. Neither of those appears anywhere in [L_z, L²]." },
+    ],
     incorrectFeedback: "The title already tells you what to expect here. If you found something else, check that you formed the commutator as Lz L² minus L² Lz in that order, and that both matrices are the j=1 representations. Any surviving entry traces to an arithmetic slip, not to the physics.",
   },
   hints: [

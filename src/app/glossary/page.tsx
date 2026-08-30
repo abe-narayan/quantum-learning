@@ -27,7 +27,7 @@ export default async function GlossaryPage() {
   const foundationalCount = GLOSSARY_TERMS.filter((term) => term.level === "foundational").length;
 
   return (
-    // No single pillar — the glossary spans all six, alphabetically — so a
+    // No single pillar, the glossary spans all six, alphabetically, so a
     // reader scrolling A to Z gets the calm `atlas` reference environment
     // rather than the homepage's curriculum-order crossfade behind content
     // that has nothing to do with it. See docs/UX_REVIEW.md P1-2.
@@ -44,7 +44,7 @@ export default async function GlossaryPage() {
         <Lede className="mt-4">
           {GLOSSARY_TERMS.length} quantum physics and quantum computing terms, each with a precise
           definition and a link to the real lesson that covers it in depth. {foundationalCount} of
-          them assume no prior background — start with the {startHereTerms.length} below, then use
+          them assume no prior background. Start with the {startHereTerms.length} below, then use
           the A–Z or the filter for anything you meet along the way.
         </Lede>
 

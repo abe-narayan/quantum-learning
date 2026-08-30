@@ -82,9 +82,24 @@ function observe(element: Element, handler: ObserverEntryHandler) {
     observer.unobserve(element);
     handlers.delete(element);
     observedCount -= 1;
-    if (observedCount === 0) {
+    // `observer` is the instance this element was registered on, captured at
+    // observe time. `sharedObserver` is whatever is current. They are the same
+    // on every path today, because `released` in `Reveal` below guarantees one
+    // decrement per increment, so `observedCount` cannot reach 0 while any
+    // element is still observed, and therefore cannot reach 0 on a generation
+    // that is not the current one. The identity check keeps that an assertion
+    // rather than an assumption: if the counter is ever unbalanced again — the
+    // double-release bug documented below did exactly that, and any future
+    // caller of `observe` could — a decrement arriving from a *retired*
+    // observer would otherwise null out the *live* one while it still has
+    // observations, orphaning it. Disconnecting the captured observer is
+    // unconditional and always right: a retired one is already dead, and
+    // disconnect is idempotent. Clamping guards the same imbalance from the
+    // other side, where a negative count means teardown never fires again.
+    if (observedCount <= 0) {
+      observedCount = 0;
       observer.disconnect();
-      sharedObserver = null;
+      if (sharedObserver === observer) sharedObserver = null;
     }
   };
 }

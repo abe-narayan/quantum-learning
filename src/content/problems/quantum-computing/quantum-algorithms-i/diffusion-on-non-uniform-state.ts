@@ -27,7 +27,7 @@ export const diffusionOnNonUniformState: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "Diffusion only fixes |s⟩ exactly — |00⟩ is a different state, so there's no guarantee it's left unchanged.",
+    incorrectFeedback: "Diffusion fixes |s⟩ alone. |00⟩ is a different state, so nothing guarantees it comes back unchanged.",
     nearMisses: [
       { value: 1, feedback: "Probability 1 would mean diffusion is the identity. It fixes |s⟩ alone; on |00⟩ it returns |s⟩ − |00⟩, whose |00⟩ amplitude is −1/2." },
       { value: 0, feedback: "The |00⟩ amplitude does not vanish: 2|s⟩⟨s| − I sends |00⟩ to |s⟩ − |00⟩, leaving −1/2 on |00⟩. Square that magnitude." },
@@ -42,13 +42,14 @@ export const diffusionOnNonUniformState: NumericProblem = {
   solution: {
     steps: [
       { description: "H^⊗2|00⟩ = |s⟩ (the uniform superposition itself)." },
-      { description: "Reflecting |s⟩ about |0⟩ gives a new state; applying H^⊗2 again does not return to |00⟩." },
+      { description: "Written as 2|s⟩⟨s|−I, diffusion sends |00⟩ to 2⟨s|00⟩|s⟩ − |00⟩. With N=4, ⟨s|00⟩ = 1/2, so this is |s⟩ − |00⟩." },
+      { description: "|s⟩ carries amplitude 1/2 on |00⟩, so the surviving |00⟩ amplitude is 1/2 − 1 = −1/2, and P = (−1/2)² = 0.25." },
     ],
-    finalAnswer: "P(|00⟩) after diffusion applied to |00⟩ = 0.25 (not 1) — diffusion doesn't fix an arbitrary input the way it fixes |s⟩.",
+    finalAnswer: "P(|00⟩) after diffusion applied to |00⟩ = 0.25, not 1. Diffusion does not fix an arbitrary input the way it fixes |s⟩.",
   },
   explanation: {
-    correctIdea: "The '2|s⟩⟨s|−I fixes |s⟩' identity is specific to |s⟩ — it doesn't mean diffusion is the identity operator on every state.",
-    whyCorrect: "Directly computed from the engine: only 0.25 probability remains on |00⟩, confirming diffusion genuinely moves this state.",
-    whyWrong: ["Assuming diffusion always returns 1.0 confuses 'fixes the specific state |s⟩' with 'is the identity on every state' — very different claims."],
+    correctIdea: "The '2|s⟩⟨s|−I fixes |s⟩' identity is specific to |s⟩. It does not make diffusion the identity operator on every state.",
+    whyCorrect: "Directly computed from the engine: only 0.25 probability remains on |00⟩, confirming that diffusion moves this state.",
+    whyWrong: ["Assuming diffusion always returns 1.0 confuses 'fixes the state |s⟩' with 'is the identity on every state'. Those are different claims."],
   },
 };

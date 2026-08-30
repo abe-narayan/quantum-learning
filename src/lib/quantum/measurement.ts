@@ -97,7 +97,7 @@ export function measureQubit(
   const outcome: 0 | 1 = random < p0 ? 0 : 1;
   const probability = outcome === 0 ? p0 : p1;
   if (probability === 0) {
-    throw new Error(`Measured an outcome (${outcome}) with zero probability — this should never happen.`);
+    throw new Error(`Measured an outcome (${outcome}) with zero probability. This should never happen.`);
   }
 
   const norm = Math.sqrt(probability);

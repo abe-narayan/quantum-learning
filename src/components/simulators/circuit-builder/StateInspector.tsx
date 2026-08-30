@@ -25,7 +25,7 @@ export function StateInspector({ state }: { state: StateVector }) {
       {/* No `overflow-x-auto` here: the only child is a block-level
           `.katex-display`, which fills this content box and carries its own
           horizontal scroll (globals.css §6), so this box never had anything to
-          scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+          scroll, and `overflow-x: auto` with `overflow-y: visible` computes the
           y axis to `auto` too, which would silently clip a tall equation. The tab
           stop the slab needs now lives on `.katex-display` itself; see
           `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
@@ -35,9 +35,9 @@ export function StateInspector({ state }: { state: StateVector }) {
 
       {/* `tabIndex={0}` + `role="group"`, matching `BB84RoundTable` and
           `mdx-components.tsx`'s `Table` wrapper. `w-full` does not mean "fits":
-          the three columns floor near 300px on their min-content widths — the
+          the three columns floor near 300px on their min-content widths (the
           ket, a formatted complex amplitude, and a probability cell holding a
-          `w-16` meter beside a `w-10` percentage — against a ~256px content
+          `w-16` meter beside a `w-10` percentage) against a ~256px content
           box on a 320px phone, and the ket column grows with qubit count
           (`|1011⟩` at four qubits). An `overflow-x-auto` div is focusable by
           default in no browser but Firefox, so a keyboard-only reader could

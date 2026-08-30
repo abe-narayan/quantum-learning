@@ -33,11 +33,11 @@ export const lessonMeta = {
 Qiskit, Cirq, and PennyLane look different on the surface, but strip away the syntax and they share the same core structure: build a circuit as data, target a backend, read results back.
 </LessonHook>
 
-## Motivation
+## Three Ecosystems, One Structure
 
 Circuit Representation in Code built one small, platform-specific
 circuit abstraction. Real-world quantum programming happens through a
-handful of established SDKs — Qiskit, Cirq, PennyLane, and others. This
+handful of established SDKs: Qiskit, Cirq, PennyLane, and others. This
 lesson surveys them at a conceptual level. The goal is recognizing the
 shared structure underneath all of them (the same structure this
 platform's own `QuantumCircuit` already demonstrates in miniature),
@@ -46,13 +46,13 @@ not memorizing any one's specific syntax.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/c/c0/IQM_Quantum_Computers_Design.jpg"
   alt="An IQM superconducting quantum computer, one vendor's system among several an SDK can target"
-  caption="An IQM system — a vendor neither Qiskit nor Cirq was originally written for. That is the point of the shared structure this lesson surveys: an SDK's job is to be aimable at whichever backend you have access to, so a circuit is not rewritten every time the machine underneath it changes."
+  caption="An IQM system, from a vendor neither Qiskit nor Cirq was originally written for. That is the point of the shared structure this lesson surveys: an SDK's job is to be aimable at whichever backend you have access to, so a circuit is not rewritten every time the machine underneath it changes."
   credit="Ragsxl / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:IQM_Quantum_Computers_Design.jpg"
   license="CC BY-SA 4.0"
 />
 
-## Engineering Development
+## The Same Circuit in Qiskit, Cirq, and PennyLane
 
 ### The major SDKs, briefly
 
@@ -81,10 +81,9 @@ hardware, to execute it, and (3) **read back results**, typically as
 measurement counts over <Term id="shot-noise-standard-error">many shots</Term> (Qubit Readout Techniques), not a
 single exact answer. Framework differences are mostly about ergonomics,
 target audience (research vs. production), and which hardware
-ecosystem each is most tightly integrated with, not about
-fundamentally different computational capability. Laid out as a
-pipeline, Qiskit, Cirq, and PennyLane are three different skins over
-the exact same three boxes:
+ecosystem each is most tightly integrated with. None of them differ in
+computational capability. Laid out as a pipeline, Qiskit, Cirq, and
+PennyLane are three different skins over the same three boxes:
 
 <PipelineDiagram
   ariaLabel="Shared quantum SDK structure: build, backend, results"
@@ -99,14 +98,14 @@ the exact same three boxes:
 
 This platform's `QuantumCircuit` is deliberately minimal, so it's worth
 seeing what the SAME Bell-state circuit built above (`h(0).cnot(0,1)`)
-actually looks like in each of the three SDKs this lesson surveys.
+looks like in each of the three SDKs this lesson surveys.
 First, Qiskit, IBM's SDK, using only the small, stable core of its API
 (circuit construction and gates, not a specific execution/backend
 call, which has changed across Qiskit versions):
 
 ```python
-# This is real Qiskit syntax, shown here as a static comparison only —
-# it is not run by this platform's own simulator above.
+# Real Qiskit syntax, shown here as a static comparison only.
+# It is not run by this platform's own simulator above.
 from qiskit import QuantumCircuit
 
 qc = QuantumCircuit(2)   # 2-qubit circuit, same as new QuantumCircuit(2)
@@ -115,13 +114,13 @@ qc.cx(0, 1)               # CNOT with control 0, target 1, same as .cnot(0, 1)
 qc.measure_all()          # measure both qubits
 ```
 
-Structurally, this is the exact same three-line build this lesson's
+Structurally, this is the same three-line build this lesson's
 `sdkSampleCircuit` performs: a Hadamard to create superposition, then a
 controlled-NOT to entangle it into a Bell state. `.h()` and `.cx()` are
 long-stable, core parts of Qiskit's `QuantumCircuit` API; only the
 "backend" step (choosing a simulator or real device, and what to call
-to execute it) changes meaningfully across SDK versions, which is
-exactly the abstraction the next section names.
+to execute it) changes meaningfully across SDK versions, which is the
+abstraction the next section names.
 
 ### The same circuit in Cirq
 
@@ -161,7 +160,7 @@ dev = qml.device("default.qubit", wires=2)
 # BUILD: the circuit is a decorated function bound to that device.
 @qml.qnode(dev)
 def bell():
-    qml.Hadamard(0)
+    qml.Hadamard(wires=0)
     qml.CNOT(wires=[0, 1])
     # RESULTS: the return statement declares what to read back.
     return qml.probs(wires=[0, 1])
@@ -180,17 +179,17 @@ capabilities.
 
 ### What a backend abstracts over
 
-A "backend" is exactly the abstraction that lets identical circuit code
+A "backend" is the abstraction that lets identical circuit code
 run against wildly different execution engines: an ideal noiseless
 simulator (giving exact <Term id="amplitude">amplitudes</Term>), a noisy simulator (Simulating
 Quantum Systems' noise-simulation lesson), or real hardware
 (Physical Qubit Platforms' actual devices, with all of Noise, Decoherence
 & Scaling's real error sources). The circuit itself doesn't need to know
-or care which backend it's targeting — that separation of concerns is
+or care which backend it's targeting: that separation of concerns is
 the whole point.
 
 The SAME Bell circuit (`h(0).cnot(0,1)`), run against two different
-backends this platform's own engine actually implements, makes this
+backends this platform's own engine implements, makes this
 concrete: an exact backend returns the ideal amplitudes directly; a
 shot-sampled backend, standing in for what any real or noisy backend
 must ultimately report, hands back finite-shot counts instead.
@@ -198,11 +197,12 @@ must ultimately report, hands back finite-shot counts instead.
 <PredictBeforeReveal
   question="Same circuit, same code, two backends. Will the exact-simulator backend and the 1000-shot sampled backend report identical 00/11 numbers?"
   options={[
-    { label: "Yes — the circuit is identical, so the numbers must match exactly", value: "same" },
-    { label: "No — the sampled backend will land close to 500/500 but not exactly", value: "different" },
+    { label: "No; the sampled counts jitter from run to run", value: "different" },
+    { label: "Yes; same circuit and code, so identical numbers", value: "same" },
+    { label: "No; the two backends run different circuits", value: "different-circuit" },
   ]}
   correctValue="different"
-  explanation="The circuit never changes between the two runs below — only the backend does. The exact backend reports the ideal 0.5/0.5 amplitudes directly. The sampled backend reports actual counts out of 1000 shots, which land near 500/500 but jitter from run to run — the same statistical shot noise Writing Your First Circuit covers in full."
+  explanation="The circuit never changes between the two runs below: only the backend does. The exact backend reports the ideal 0.5/0.5 amplitudes directly. The sampled backend reports counts out of 1000 shots, which land near 500/500 but jitter from run to run, the same statistical shot noise Writing Your First Circuit covers in full."
 />
 
 <InteractiveSection title="Same circuit, two backends" description="Backend 1 is the exact simulator: runCircuit gives the Bell state's ideal 50/50 amplitudes directly. Backend 2 is a shot-sampled backend: this page's own live sampleMeasurements call, 1000 shots against that exact same circuit object. Slide between them and notice the circuit never changed, only which backend executed it.">
@@ -229,7 +229,7 @@ must ultimately report, hands back finite-shot counts instead.
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## Where the Real Differences Are
 
 This lesson is intentionally light on new technical content. Its value
 is recognizing that the specific tool (Qiskit vs. Cirq vs. PennyLane)
@@ -237,7 +237,7 @@ matters far less than understanding the shared conceptual pattern this
 entire course has been building toward, which transfers directly to
 whichever specific SDK a reader eventually uses in practice.
 
-## Worked Example
+## Picking an SDK for a Gradient-Heavy Job
 
 **Why would a research team building VQE-based algorithms specifically
 favor PennyLane over a general-purpose SDK?**
@@ -247,15 +247,14 @@ parametrized circuit's output with respect to its parameters, for
 classical optimization. PennyLane's differentiable-programming design
 is specifically built around making this gradient computation efficient
 and ergonomic, whereas a general-purpose SDK might require the
-researcher to implement this gradient machinery manually. This is
-exactly the kind of ergonomics-driven, not capability-driven,
-distinction this lesson emphasizes.
+researcher to implement this gradient machinery manually. That is an
+ergonomics-driven distinction, not a capability-driven one, which is
+the distinction this lesson turns on.
 
-## Common Mistakes
+## Believing the SDKs Compute Different Physics
 
 <Callout type="note">
-**Thinking one SDK can do something fundamentally impossible in
-another.** All three (and others) can, in principle, express the same
+**Thinking one SDK can do something impossible in another.** All three (and others) can, in principle, express the same
 circuits and run on the same range of backends. Differences are about
 convenience and ecosystem fit, not raw computational capability.
 </Callout>
@@ -264,20 +263,205 @@ convenience and ecosystem fit, not raw computational capability.
 **Assuming this platform's QuantumCircuit is "a real SDK."** It's a
 deliberately minimal illustration of the shared PATTERN real SDKs use.
 Useful for seeing the structure clearly, but far short of any
-production SDK's actual feature set (error mitigation, hardware-specific
+production SDK's feature set (error mitigation, hardware-specific
 compilation, and much more).
 </Callout>
 
 ## Practice Questions
 
-1. Name the three SDKs this lesson covers, and one distinguishing
-   characteristic of each.
+1. Name the three SDKs above, and one distinguishing characteristic of
+   each.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Qiskit** (IBM): the most widely used of the three, tightly
+   integrated with IBM's own hardware access, and carrying a large
+   ecosystem of add-on libraries for particular algorithm families.
+
+   **Cirq** (Google): designed with unusual attention to near-term
+   hardware's physical constraints, giving fine-grained control over
+   circuit scheduling and device-specific details.
+
+   **PennyLane** (Xanadu): built around hybrid quantum-classical
+   differentiable programming, with first-class support for the
+   gradient-based optimization that VQE and QAOA need.
+
+   The lesson's three code snippets show a second, purely surface-level
+   distinction that is easy to mistake for a deeper one. Qiskit and Cirq
+   build a circuit object first and hand it to a backend afterwards, and
+   the difference between them is mostly whether gates arrive by method
+   chaining or as a list of operations on explicit qubit objects.
+   PennyLane rearranges more: the device is named *before* the circuit
+   exists, and the circuit is an ordinary function wearing a decorator.
+
+   The wrong turn is upgrading any of these into a capability claim.
+   All three express the same circuits, compile to the same gate model,
+   can emit and consume OpenQASM, and target multiple hardware providers.
+   There is no circuit one of them can run that another cannot express.
+   The differences are ergonomics, ecosystem fit, and which vendor's
+   hardware access is smoothest, which is why the lesson is deliberately
+   light on syntax: the transferable thing is the shared pattern, and
+   whichever SDK you eventually use will be learned from its own
+   documentation in an afternoon.
+
+   </details>
+
 2. What are the three shared structural steps every one of these SDKs
    follows?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Build, backend, results.**
+
+   **Build** a circuit as a data structure, by appending gate
+   instructions rather than applying matrices.
+
+   **Target a backend**, choosing which execution engine runs it: an
+   exact simulator, a noisy simulator, or a specific piece of hardware.
+
+   **Read results back**, typically as measurement counts over many
+   shots, not a single exact answer.
+
+   This platform's own `QuantumCircuit`, `runCircuit` and
+   `sampleMeasurements` are those three steps in miniature, which is why
+   the lesson can claim the pattern is shared rather than merely common.
+
+   The part worth understanding is that this is not a stylistic
+   convention the three SDKs happened to converge on. Each step is
+   forced by something real.
+
+   **The circuit has to be data** because no device natively runs "H on
+   qubit 0." Every machine has its own native gate set and connectivity
+   graph, and something has to translate. A translator needs a
+   representation of the program to translate, which is precisely an
+   instruction list.
+
+   **The backend has to be a separate choice** because the same circuit
+   must be runnable against a simulator during development and against
+   hardware afterwards. Welding the target into the circuit would mean
+   rewriting the circuit to change machines.
+
+   **Results have to be counts** because measurement is probabilistic and
+   real hardware cannot hand back amplitudes. There is no operation that
+   extracts a state vector from a physical device; there is only running
+   the circuit again and recording another outcome.
+
+   So the answer to "why do they all look like this?" is that any tool
+   doing this job would end up looking like this. That is the reason the
+   pattern transfers to whichever SDK you meet next, including ones that
+   have not been written yet.
+
+   </details>
+
 3. Explain what a "backend" abstracts over, and why this separation of
    concerns is valuable.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   A backend abstracts over **which execution engine runs the circuit**,
+   and therefore over everything that engine implies.
+
+   The circuit code does not have to know, or contain anything that
+   depends on: the native gate set it will be compiled into; the
+   connectivity graph and hence how much SWAP routing is needed; the
+   device's current calibration data; whether there is noise and what
+   kind; how a job is queued, submitted and retrieved; or how a gate
+   becomes a shaped microwave pulse at the far end. Every one of those is
+   the backend's business.
+
+   **Why that is valuable** comes down to one circuit reaching many
+   targets, and the ladder that makes possible. Develop against an exact
+   simulator, where the answer is unambiguous and a wrong result means a
+   wrong circuit. Move to a noisy simulator to see how the same circuit
+   behaves under a realistic error model. Then submit it to hardware. At
+   no point is the circuit rewritten, so a disagreement between two rungs
+   is attributable: the circuit was the constant, the backend was the
+   variable.
+
+   The lesson's own demonstration is exactly this experiment. The same
+   Bell circuit object, `h(0).cnot(0,1)`, is run twice. The exact backend
+   reports the ideal $0.5/0.5$. The 1000-shot backend reports counts
+   landing near 500 and 500, jittering from run to run by a standard
+   deviation of $\sqrt{1000\times0.5\times0.5}\approx15.8$ counts. Two
+   quite different-looking outputs, and the circuit never changed between
+   them.
+
+   Two further payoffs are worth naming.
+
+   The compiler's job becomes well-defined. "Optimize this circuit" is
+   not a question with an answer; "compile this circuit for a backend
+   with *this* gate set and *this* connectivity" is.
+
+   And portability survives hardware turnover. The Intel wafer photograph
+   earlier in this course makes the point: no two chips on it have the
+   same frequencies, connectivity, or calibration, and none of them will
+   be the machine anyone uses in five years. Circuits written against a
+   backend abstraction outlive the devices they were first aimed at.
+
+   The wrong turn is treating the backend as merely a configuration
+   setting, a switch that picks how fast the same computation runs.
+   It changes what kind of answer comes back. Exact amplitudes and
+   sampled counts are different objects with different error behaviour,
+   and code that consumes results has to know which it is holding.
+
+   </details>
+
 4. Why might a team favor PennyLane specifically for gradient-based
    variational algorithms, per this lesson's worked example?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because VQE and QAOA need the derivative of a circuit's output with
+   respect to its parameters, and PennyLane's differentiable-programming
+   design makes that derivative fall out of the framework's evaluation
+   machinery rather than being something the researcher assembles.
+
+   That is the whole claim, and it is an **ergonomics** claim. It is
+   worth being careful about, because there are three tempting
+   overstatements sitting next to it, and each is false.
+
+   **Not "only PennyLane can differentiate a circuit."** The parameter-
+   shift rule is a general result and every major SDK implements it. What
+   differs is how much you write yourself.
+
+   **Not "PennyLane's gradients are exact and the others' are finite
+   differences."** The parameter-shift rule is exact everywhere it
+   applies. For a gate $e^{-i\theta G/2}$ whose generator has eigenvalues
+   $\pm1$, the derivative of an expectation value $f(\theta)$ is
+
+   $$
+   \frac{\partial f}{\partial \theta} = \frac{f(\theta+\pi/2)-f(\theta-\pi/2)}{2},
+   $$
+
+   an identity, not an approximation, and unlike a finite difference it
+   carries no step-size tradeoff between truncation and noise. It is
+   evaluated by running the circuit twice more, at shifted parameter
+   values, which is why the framework's contribution here is bookkeeping
+   rather than new mathematics.
+
+   **Not "the optimization loop runs on the device."** The optimizer
+   stays classical, and the round trip between the classical machine and
+   the quantum one persists on every iteration. That round trip is a
+   large part of what makes variational algorithms slow, and no SDK
+   removes it.
+
+   What PennyLane does provide is that a circuit is an ordinary
+   differentiable function inside a familiar autodiff framework, so
+   composing quantum and classical layers, and getting gradients through
+   the whole thing, is the framework's default rather than a project.
+   For a team whose work *is* the optimization loop, that removes a
+   standing source of tedium and of bugs.
+
+   The final caution, which the lesson makes in its own Common Mistakes
+   box: this is a reason to reach for a tool, not a reason to believe it
+   computes different physics. A VQE run built carefully in Qiskit or
+   Cirq converges to the same ground-state energy.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -292,7 +476,7 @@ compilation, and much more).
   hardware) runs a circuit, letting the same circuit code target very
   different systems.
 
-## Further Exploration
+## Writing One End to End
 
 <NextDiscovery>
 [Writing Your First Circuit](/lessons/quantum-software/programming-quantum-computers/writing-your-first-circuit) is a hands-on walkthrough building and

@@ -27,10 +27,15 @@ export const compositionLawRelativeError: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 2,
-    incorrectFeedback: "This lesson's worked example reports a relative error around 10⁻¹⁵ (machine precision) — expect a similarly extreme (large-magnitude negative) exponent here.",
+    nearMisses: [
+      { value: 15, tolerance: 1, feedback: "The sign is inverted. A relative error far below 1 has a negative exponent; a positive one would mean the two answers disagree by a factor of a quadrillion." },
+      { value: -3, tolerance: 1, feedback: "An error around 10⁻³ would be a discretization error, the kind a coarse grid leaves behind. On a well-resolved grid the two-slice sum reproduces the exact propagator down to the last bits the double can hold." },
+      { value: -8, tolerance: 1, feedback: "10⁻⁸ is roughly single-precision territory. This computation runs in double precision, and the composition law is exact rather than approximate, so the residual sits far lower." },
+    ],
+    incorrectFeedback: "This lesson's worked example reports a relative error around 10⁻¹⁵ (machine precision), so expect a similarly large-magnitude negative exponent here.",
   },
   hints: [
-    { text: "The discretized sum reproduces the exact Gaussian convolution essentially exactly on a fine enough grid." },
+    { text: "On a fine enough grid, the discretized sum reproduces the exact Gaussian convolution to floating-point precision." },
     { text: "This lesson's worked example found ~1.3×10⁻¹⁵ for a different (xf,xi,τ)." },
     { text: "Expect a similarly tiny (near machine-precision) relative error here." },
   ],
@@ -39,8 +44,8 @@ export const compositionLawRelativeError: NumericProblem = {
     finalAnswer: "k ≈ -15 (machine precision)",
   },
   explanation: {
-    correctIdea: "This reinforces that the near-exact numerical agreement isn't a fluke of one specific (xf,xi,τ) choice — it holds essentially everywhere, since it reflects an exact mathematical identity, not an approximation.",
+    correctIdea: "This reinforces that the near-exact numerical agreement is not a fluke of one particular (xf,xi,τ) choice. It holds everywhere, because it reflects an exact mathematical identity rather than an approximation.",
     whyCorrect: "Matches the engine's own discretizedTwoSlicePropagator output compared to euclideanFreePropagator for this (xf,xi,τ).",
-    whyWrong: ["A relative error anywhere near 0.01 or larger would suggest either too coarse a grid or too narrow an xRange — not what this platform's default parameters produce."],
+    whyWrong: ["A relative error anywhere near 0.01 or larger would point to too coarse a grid or too narrow an xRange, neither of which this platform's default parameters produce."],
   },
 };

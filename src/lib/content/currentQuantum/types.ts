@@ -3,7 +3,7 @@ import type { Difficulty } from "../types";
 /**
  * Broad buckets for "Current Quantum" entries. Deliberately a small, flat
  * union (not a nested taxonomy) so a new entry only ever has to pick one
- * existing label — see AGENTS.md-style guidance in `data.ts` for why this
+ * existing label. See AGENTS.md-style guidance in `data.ts` for why this
  * collection favors "easy for a human to hand-edit" over structural cleverness.
  */
 export type CurrentQuantumCategory =
@@ -15,7 +15,7 @@ export type CurrentQuantumCategory =
   | "historical experiment"
   | "cryptography";
 
-/** Where a fact in an entry came from — always a real, checkable source. */
+/** Where a fact in an entry came from. Always a real, checkable source. */
 export type CurrentQuantumSource = {
   /** Publisher/outlet name, e.g. "Nature", "Google Quantum AI", "NIST". */
   name: string;
@@ -31,7 +31,7 @@ export type CurrentQuantumSource = {
  * WHY THIS IS ITS OWN TYPE: this is the only half that may cross into a
  * client bundle. `ConceptDetailPanel` is a `"use client"` component that
  * reverse-looks-up entries by lesson slug and renders date/category/title as
- * a mini-card link — it needs exactly these five fields, and used to reach
+ * a mini-card link. It needs exactly these five fields, and used to reach
  * the whole corpus (prose, citations, image metadata and all) to get them.
  * See `metaRegistry.ts` for the full reasoning and the rule that keeps it
  * that way.
@@ -53,7 +53,7 @@ export type CurrentQuantumEntryMeta = {
 /**
  * The half of an entry that only a full card render needs: the prose, the
  * citation, the difficulty readout and the optional figure. Server-only by
- * construction — it lives in `data.ts`, keyed by slug, alongside the
+ * construction: it lives in `data.ts`, keyed by slug, alongside the
  * editorial provenance comments for each entry.
  *
  * Every field here is rendered by `CurrentQuantumCard`, which is only ever
@@ -67,13 +67,13 @@ export type CurrentQuantumEntryBody = {
   source: CurrentQuantumSource;
   /** One sentence connecting this real-world development to that lesson's actual content. */
   whyThisMatters: string;
-  /** Optional — how advanced the underlying physics/CS is, matching `Difficulty` elsewhere. */
+  /** Optional. How advanced the underlying physics/CS is, matching `Difficulty` elsewhere. */
   difficulty?: Difficulty;
-  /** Optional — a genuinely reusable real image, rendered via `ExternalFigure`. */
+  /** Optional. A genuinely reusable real image, rendered via `ExternalFigure`. */
   imageUrl?: string;
   /**
    * Alt text describing what the image itself actually shows (a person,
-   * apparatus, chip, etc.) — required alongside `imageUrl`. Deliberately a
+   * apparatus, chip, etc.), required alongside `imageUrl`. Deliberately a
    * separate field from `title`: the card used to pass `entry.title` as the
    * `<img alt>`, which describes the news event, not the picture, and is
    * wrong for a screen reader announcing the image itself.
@@ -81,7 +81,7 @@ export type CurrentQuantumEntryBody = {
   imageAlt?: string;
   /**
    * One sentence, rendered as the figure caption, saying what the image
-   * actually depicts and how (or whether) it relates to this entry — e.g.
+   * actually depicts and how (or whether) it relates to this entry: e.g.
    * naming the real device/person shown and being explicit when it's a
    * general/illustrative match rather than a photo of the specific
    * experiment. Never a restatement of `title`.
@@ -96,7 +96,7 @@ export type CurrentQuantumEntryBody = {
 
 /**
  * One real quantum-computing/physics development, connected back to a real
- * QuantumLearn lesson — meta and body rejoined.
+ * StudyQuantum lesson, meta and body rejoined.
  *
  * This is still the shape every renderer sees; the split above is a payload
  * boundary, not a modelling change. `registry.ts` is the one place that

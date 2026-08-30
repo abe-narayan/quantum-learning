@@ -16,10 +16,10 @@ export const notEveryGateNeedsThreeRotations: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "Per this lesson's verified decompositions, how many native rotations does the Z gate need?",
     options: [
-      { id: "a", text: "One: Z is Rz(π) on its own" },
+      { id: "a", text: "One: Z is Rz(π), because Z's rotation axis is already one of the native axes" },
       { id: "b", text: "Two, as H needs, since Z also has to move the axis before rotating about it" },
       { id: "c", text: "Three, the general Euler upper bound, which every single-qubit gate has to pay" },
-      { id: "d", text: "Zero: Z only relabels basis states, so a compiler can absorb it into later gates for free" },
+      { id: "d", text: "Zero: Z only relabels basis states, so a compiler absorbs it into later gates for free" },
     ],
   },
   answer: {
@@ -43,7 +43,7 @@ export const notEveryGateNeedsThreeRotations: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "The three-rotation Euler form is a worst case for an arbitrary unitary. A gate whose axis is already native, such as Z, S or T, costs a single rotation.",
-    whyCorrect: "Matches the lesson's verified decomposition list.",
+    whyCorrect: "Three rotations is an upper bound for an arbitrary single-qubit unitary, not a toll every gate pays. Z already turns about a native axis, so it needs one Rz(π) and nothing else; the Euler count only bites when the target axis is not one the hardware offers.",
     whyWrong: [
       { optionId: "b", text: "Borrows H's cost. H pays for a rotation axis that no native rotation reaches; Z does not." },
       { optionId: "c", text: "Reads a worst-case bound as a fixed price. It is an upper bound over all unitaries." },

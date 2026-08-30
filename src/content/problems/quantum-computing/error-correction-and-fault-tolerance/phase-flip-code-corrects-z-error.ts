@@ -26,7 +26,7 @@ export const phaseFlipCodeCorrectsZError: MultipleChoiceProblem = {
     options: [
       { id: "a", text: "Matches exactly, to floating-point precision" },
       { id: "b", text: "Matches only approximately, with a small residual error" },
-      { id: "c", text: "Doesn't match at all — this code can't correct Z errors" },
+      { id: "c", text: "Does not match at all, since this code cannot correct Z errors" },
       { id: "d", text: "Matches only if the error was on qubit 0 or 1, not qubit 2" },
     ],
   },
@@ -34,11 +34,11 @@ export const phaseFlipCodeCorrectsZError: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "The correction is exact, not approximate — the conjugation by H is itself exact, and so is the underlying bit-flip code's correction.",
-      c: "This is exactly backward — the phase-flip code is specifically built to correct Z errors (the bit-flip code, not this one, is blind to them).",
-      d: "The code corrects a Z error on any of the three qubits equally, qubit 2 included — verified directly by this problem's own computation.",
+      b: "The correction is exact, not approximate: conjugation by H is exact, and so is the underlying bit-flip code's correction.",
+      c: "This has the two codes backward. The phase-flip code is built to correct Z errors; the bit-flip code is the one blind to them.",
+      d: "The code corrects a Z error on any of the three qubits equally, qubit 2 included, as this problem's own computation confirms.",
     },
-    defaultIncorrectFeedback: "Recall this is exactly the dual construction the phase-flip code lesson verified for all three qubit positions.",
+    defaultIncorrectFeedback: "This is the dual construction the phase-flip code lesson verified for all three qubit positions.",
   },
   hints: [
     { text: "The phase-flip code is the bit-flip code conjugated by H^⊗3." },
@@ -51,7 +51,7 @@ export const phaseFlipCodeCorrectsZError: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "The H-conjugation is exact, so the phase-flip code inherits the bit-flip code's exact correction guarantee for its own error type.",
-    whyCorrect: `Confirmed directly: the maximum amplitude difference is ${maxDiff.toExponential(2)}, essentially floating-point noise.`,
+    whyCorrect: `Confirmed directly: the maximum amplitude difference is ${maxDiff.toExponential(2)}, no larger than floating-point rounding.`,
     whyWrong: [
       { optionId: "b", text: "Understates the precision. The H-conjugation and the underlying bit-flip correction are both exact, so no residual error is left behind." },
       { optionId: "c", text: "Backwards on error type. The phase-flip code is built to correct Z errors; the bit-flip code is the one blind to them." },

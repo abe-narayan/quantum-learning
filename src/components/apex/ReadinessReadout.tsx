@@ -11,7 +11,7 @@ import type { ReadinessCourse } from "./readiness";
  * The two-audience bridge
  * ============================================================
  * `/apex` and `/mastery` are the two pages where an advanced reader decides
- * whether this site is serious — and they are also, inevitably, pages a
+ * whether this site is serious, and they are also, inevitably, pages a
  * reader arrives at far too early, from search or from the pillar nav. The
  * honest signposting those pages already carry ("for readers who've finished
  * the core curriculum") tells that second reader they're early but not what
@@ -20,18 +20,18 @@ import type { ReadinessCourse } from "./readiness";
  * So this answers the follow-up precisely rather than generically: which of
  * the assumed prerequisite courses are already done, how many courses the
  * prerequisite graph actually puts between a standing start and this pillar,
- * and the *name* of the specific first course that isn't finished — resolved
+ * and the *name* of the specific first course that isn't finished, resolved
  * from `prerequisiteChain`'s topological walk of the real `prerequisites`
  * data, never a hand-typed "start with the basics".
  *
  * Register discipline: this is a status readout in the same technical voice
  * as everything else on these two pages, not an encouragement. No "don't
- * worry", no "you've got this", no gate. Nothing on either page is locked —
- * the copy says so — because an advanced reader who genuinely does have the
+ * worry", no "you've got this", no gate. Nothing on either page is locked,
+ * the copy says so, because an advanced reader who genuinely does have the
  * background from elsewhere must not be told to go take a course.
  *
  * A thin client leaf per docs/DESIGN_SYSTEM.md §10: the only cross-boundary
- * import is `lib/content/progress` (explicitly allowed — client-side storage
+ * import is `lib/content/progress` (explicitly allowed, client-side storage
  * by design) plus a type-only import from `./readiness`, which is erased at
  * compile time and so never pulls the curriculum registry into the bundle.
  * The caller does the whole graph walk server-side and passes flat arrays.
@@ -76,7 +76,7 @@ export function ReadinessReadout({
     return "partial";
   }
 
-  // Courses with no authored lessons yet are excluded from every count —
+  // Courses with no authored lessons yet are excluded from every count,
   // reporting one as permanently unfinished would be a fact about the
   // curriculum's authoring state, not about the reader.
   const graded = direct.filter((course) => course.lessonSlugs.length > 0);
@@ -128,12 +128,12 @@ export function ReadinessReadout({
                 <span className="tech-label shrink-0 text-subtle-foreground">{course.pillarLabel}</span>
                 <span className="sr-only">
                   {status === "done"
-                    ? " — completed"
+                    ? " (completed)"
                     : status === "partial"
-                      ? " — partly completed"
+                      ? " (partly completed)"
                       : status === "unwritten"
-                        ? " — no lessons authored yet"
-                        : " — not started"}
+                        ? " (no lessons authored yet)"
+                        : " (not started)"}
                 </span>
               </Link>
             </li>
@@ -141,11 +141,11 @@ export function ReadinessReadout({
         })}
       </ul>
 
-      <p className="mt-3 max-w-[46rem] text-sm leading-relaxed text-muted-foreground">
+      <p className="mt-3 max-w-reading text-sm leading-relaxed text-muted-foreground">
         {allDone ? (
           <>
             Every course {pillarLabel} assumes is complete. Nothing on this page was
-            gated in the first place — now the index below is also the right place to
+            gated in the first place; now the index below is also the right place to
             start.
           </>
         ) : startHere ? (
@@ -169,7 +169,7 @@ export function ReadinessReadout({
               {startHere.title}
             </Link>
             , in <span className="tech-label text-subtle-foreground">{startHere.pillarLabel}</span>.
-            Read on regardless if you have this background from elsewhere — none of it is locked.
+            Read on regardless if you have this background from elsewhere. None of it is locked.
           </>
         ) : null}
       </p>
@@ -178,7 +178,7 @@ export function ReadinessReadout({
 }
 
 /**
- * Three states, three shapes — legible in grayscale, in forced-colors mode,
+ * Three states, three shapes, legible in grayscale, in forced-colors mode,
  * and to a reader who can't distinguish the pillar hue from the border hue:
  * filled disc + check (done), ring + solid core (partly done), hollow ring
  * (not started or nothing to start yet).

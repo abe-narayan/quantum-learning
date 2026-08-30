@@ -21,7 +21,7 @@ export const harmonicOscillatorEnergyLevel: NumericProblem = {
     type: "numeric",
     value: 10.5,
     tolerance: 0.01,
-    incorrectFeedback: "Don't forget the +1/2 — E_n = ħω(n + 1/2), not ħω·n.",
+    incorrectFeedback: "E_n = ħω(n + 1/2), not ħω·n. The +1/2 is the term most often dropped.",
     nearMisses: [
       { value: 9, feedback: "9 is ħω·n, dropping the zero-point offset. Every level sits half a quantum above that, including the ground state." },
       { value: 3.5, feedback: "3.5 is (n + 1/2) on its own. It still has to be multiplied by ħω = 3." },
@@ -29,7 +29,9 @@ export const harmonicOscillatorEnergyLevel: NumericProblem = {
     ],
   },
   hints: [
-    { text: "E_3 = 3 × (3 + 0.5)." },
+    { text: "The oscillator's levels are evenly spaced, but the ladder does not start at zero: the whole ladder sits half a quantum above the potential minimum." },
+    { text: "Write $E_n$ with that offset in place, then substitute $n=3$ and $\\hbar\\omega=3$. Evaluate the bracket before multiplying." },
+    { text: "The bracket is not a whole number. If yours came out as 3, the zero-point term went missing on the way in." },
   ],
   solution: {
     steps: [

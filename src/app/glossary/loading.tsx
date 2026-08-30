@@ -10,7 +10,7 @@ import { Section } from "@/components/ui/Section";
 // term rows.
 //
 // The "Start here" panel is the load-bearing part. It renders whenever the
-// filter is empty — which is always, on arrival — and it is a ~550px block:
+// filter is empty, which is always, on arrival, and it is a ~550px block:
 // a heading, a paragraph, and fifteen linked cards in a two-to-three column
 // grid. The skeleton omitted it entirely and drew the A-Z immediately under
 // the lede, so the letter rail and every term row slid half a screen down the
@@ -42,7 +42,7 @@ export default function GlossaryLoading() {
           </div>
           <div className="h-2.5 w-40 rounded bg-surface-muted" />
         </div>
-        <div className="mt-3 h-4 w-full max-w-[46rem] rounded bg-surface-muted" />
+        <div className="mt-3 h-4 w-full max-w-reading rounded bg-surface-muted" />
         <div className="mt-2 h-4 w-3/4 max-w-xl rounded bg-surface-muted" />
         <div className="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 15 }).map((_, i) => (

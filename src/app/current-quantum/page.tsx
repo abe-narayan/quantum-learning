@@ -12,7 +12,7 @@ import { buildBreadcrumbSchema } from "@/lib/structuredData";
 export const metadata: Metadata = buildPageMetadata({
   title: "Current Quantum",
   description:
-    "Real quantum computing and physics developments, from the foundational experiments to this decade's hardware — each linked back to the QuantumLearn lesson that explains the concept behind it.",
+    "Real quantum computing and physics developments, from the foundational experiments to this decade's hardware, each linked back to the StudyQuantum lesson that explains the concept behind it.",
   path: "/current-quantum",
 });
 
@@ -28,7 +28,7 @@ export default async function CurrentQuantumPage() {
   ]);
   const lessonTitles = Object.fromEntries(lessons.map((lesson) => [lesson.slug, lesson.title]));
 
-  // Real ItemList structured data for the entries themselves — every url
+  // Real ItemList structured data for the entries themselves, every url
   // below is a real lesson route this page already verified resolves (see
   // `lessonTitles`), not a fabricated per-entry page.
   const itemListSchema = {
@@ -52,16 +52,16 @@ export default async function CurrentQuantumPage() {
     // homepage's `journey` crossfade (see docs/UX_REVIEW.md P1-2, which
     // names this exact line as the pattern six other cross-cutting pages
     // are missing) and restores the atmosphere layer every other page gets.
-    // docs/UX_REVIEW.md P1-12 separately flags that Simulators and Problems
-    // — the other two catalog-style pages — don't wrap in PillarScope at
-    // all, so a reader moving between the three sees one of them get an
-    // atmosphere/regime and two don't, and asks whether Current Quantum
-    // should drop it for consistency. Per P1-2 this is the convention the
-    // *other* two pages are missing, not an extra this one should shed —
-    // dropping it would trade one inconsistency (three templates) for a
-    // worse one (this page silently reinheriting `journey`, P1-2's bug).
-    // Kept as-is; Simulators and Problems (owned by other agents) should
-    // each adopt a bare <PillarScope> the same way.
+    // docs/UX_REVIEW.md P1-12 used to flag that Simulators and Problems,
+    // the other two catalog-style pages, did not wrap in PillarScope at all,
+    // so a reader moving between the three saw one of them get an
+    // atmosphere/regime and two not. Per P1-2 that was the convention the
+    // *other* two pages were missing, not an extra this one should shed:
+    // dropping it here would have traded one inconsistency (three templates)
+    // for a worse one (this page silently reinheriting `journey`, P1-2's
+    // bug). Both have since adopted `<PillarScope regime="atlas">`, so all
+    // three catalog pages now declare the same neutral reference
+    // environment.
     <PillarScope regime="atlas">
       <script
         type="application/ld+json"
@@ -77,24 +77,24 @@ export default async function CurrentQuantumPage() {
         <SectionTitle level={1} size="xl" className="mt-4 max-w-3xl">
           The real research behind the curriculum
         </SectionTitle>
-        <Lede className="mt-5 max-w-[46rem]">
+        <Lede width="reading" className="mt-5">
           {entries.length} real, verified results in quantum computing and physics, from Bell&rsquo;s 1964
           inequality to this decade&rsquo;s hardware, listed reverse-chronological and each linked back to the
-          QuantumLearn lesson that explains the concept behind it.
+          StudyQuantum lesson that explains the concept behind it.
         </Lede>
 
         {mostRecent && oldest ? (
-          // No "N weeks/months ago" readout here — see docs/UX_REVIEW.md
+          // No "N weeks/months ago" readout here, see docs/UX_REVIEW.md
           // P0-2. This page is statically generated with no `export const
           // revalidate`, so `new Date()` would be evaluated once at build
           // time and any "that was N ago" string baked from it would drift
           // further from true every day the build stays live, with nothing
-          // to notice it — the opposite of what a currency-focused page
+          // to notice it, the opposite of what a currency-focused page
           // should claim. `formatEntryDate` below is an absolute date, not
           // computed against "now", so it stays true indefinitely with no
-          // rebuild or revalidation schedule required. (The alternative —
+          // rebuild or revalidation schedule required. (The alternative,
           // `export const revalidate = 86400` plus keeping the relative
-          // string — was considered and rejected: it only refreshes on the
+          // string, was considered and rejected: it only refreshes on the
           // next request after the window elapses, so correctness would
           // depend on traffic and on the host actually running background
           // ISR regeneration, which isn't guaranteed for every deployment

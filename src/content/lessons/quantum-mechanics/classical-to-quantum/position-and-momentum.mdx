@@ -54,13 +54,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Narrow the slit, and the beam fans out">
   Squeeze a laser through a narrower slit and the light fans out wider,
   not narrower. One substitution into a theorem this course already
   proved turns that observation into $\Delta x\,\Delta p \ge \hbar/2$.
 </LessonHook>
 
-## Motivation
+## Past a certain width, the beam stops obeying
 
 Narrow the slit and, past a certain width, the beam stops obeying you.
 Instead of a tighter line, it fans out into the pattern below, wider than
@@ -90,7 +90,7 @@ turns out to be less than expected: the full continuous machinery belongs
 to the Wave Mechanics course, and none of it is needed for the result
 below.
 
-## Intuition
+## Four postulates, no amendments needed
 
 None of the four postulates needs amending for a continuous observable.
 States are still vectors, position and momentum are still Hermitian
@@ -103,7 +103,7 @@ Because the postulates survive intact, so does every theorem proved from
 them. Heisenberg's <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term> is about to arrive as one line
 of substitution rather than as a new physical idea.
 
-## Mathematical Development
+## One substitution into a theorem already proved
 
 ### Position and momentum as operators
 
@@ -189,7 +189,7 @@ never an oscillator-specific trick; it was the canonical commutation
 relation in a change of coordinates, which is why ladder operators keep
 reappearing in systems that are not oscillators at all.
 
-## Physical Interpretation
+## Momentum's second job: generating translations
 
 Momentum has a second job beyond being an observable. Compare the
 Time Evolution lesson's $U(t)=e^{-i\hat Ht/\hbar}$, which shifts a state
@@ -212,7 +212,7 @@ looked nothing alike, and were only afterwards shown to be one theory.
 This course reached both from the same four postulates, which is why the
 equivalence needed no argument here.
 
-## Worked Example
+## The minimum momentum spread inside an atom
 
 **Using $\Delta x\,\Delta p\ge\hbar/2$, if a particle's position is known
 to $\Delta x = 10^{-10}$ m (roughly an atomic radius), what is the
@@ -229,22 +229,22 @@ of the speed of light, for an electron merely known to sit inside an
 atom.
 
 Run the same numbers for a $1$ gram bead localized to a micron and the
-velocity uncertainty lands near $10^{-25}$ m/s, which no experiment will
-ever resolve. The bound applies to both; only the mass in the denominator
+velocity uncertainty lands near $5\times10^{-26}$ m/s, which no experiment
+will ever resolve. The bound applies to both; only the mass in the denominator
 decides whether anyone notices.
 
 <PredictBeforeReveal
   question="If Δx is doubled (the position is known only half as precisely), what happens to the minimum Δp?"
   options={[
-    { label: "It doubles too", value: "doubles" },
     { label: "It's cut in half", value: "halves" },
     { label: "It's unaffected", value: "same" },
+    { label: "It doubles too", value: "doubles" },
   ]}
   correctValue="halves"
   explanation="Δp_min = ħ/(2Δx) is inversely proportional to Δx, so doubling Δx halves the minimum momentum uncertainty. The product Δx·Δp_min holds at ħ/2 wherever the slider sits, which is the entire content of the bound: it constrains the product and says nothing about either factor alone."
 />
 
-<InteractiveSection title="Slide Δx, watch the trade-off" description="Δp_min = ℏ/(2Δx) is recomputed live as Δx varies around an atomic radius; Δx = 1.0×10⁻¹⁰ m is marked, reproducing the worked example's Δp_min ≈ 5.3×10⁻²⁵ kg·m/s exactly. The second bar converts that same Δp_min to a minimum velocity uncertainty for an electron, the same conversion the worked example makes.">
+<InteractiveSection title="Slide Δx, watch the trade-off" description="Δp_min = ℏ/(2Δx) is recomputed live as Δx varies around an atomic radius; Δx = 1.0×10⁻¹⁰ m is marked; read Δp_min there and check it against the worked example's number. The second bar converts that same Δp_min to a minimum velocity uncertainty for an electron, the same conversion the worked example makes.">
   <BarChartExplorer
     frames={positionMomentumFrames}
     sliderLabel="Δx (×10⁻¹⁰ m)"
@@ -253,7 +253,7 @@ decides whether anyone notices.
   />
 </InteractiveSection>
 
-<InteractiveSection title="The uncertainty box: squeeze one side, the other stretches" description="A box of width Δx and height Δp = ħ/(2Δx), centered at the origin of the (x, p) plane. Drag the same Δx as above: the box narrows horizontally and stretches vertically, and its area holds still, because the area is Δx·Δp = ħ/2 by construction. Since Δx is in units of ×10⁻¹⁰ m and Δp in ×10⁻²⁵ kg·m/s, the readout's raw product (≈5.3) carries an implied ×10⁻³⁵ kg·m²/s; restoring it recovers ħ/2 ≈ 5.3×10⁻³⁵ kg·m²/s.">
+<InteractiveSection title="The uncertainty box: squeeze one side, the other stretches" description="A box of width Δx and height Δp = ħ/(2Δx), centered at the origin of the (x, p) plane. Drag the same Δx as above and watch the box narrow horizontally while it stretches vertically, keeping the area readout in view the whole time. Since Δx is in units of ×10⁻¹⁰ m and Δp in ×10⁻²⁵ kg·m/s, that raw product carries an implied ×10⁻³⁵ kg·m²/s; restoring it is what makes the number directly comparable to ħ/2 ≈ 5.3×10⁻³⁵ kg·m²/s.">
   <PhaseSpacePanel
     mode="box"
     frames={uncertaintyBoxFrames}
@@ -263,7 +263,7 @@ decides whether anyone notices.
   />
 </InteractiveSection>
 
-## Common Mistakes
+## p-hat is an operator, not a number
 
 <Callout type="warning">
 **Treating $\hat p$ as an ordinary number rather than an operator.** Every
@@ -282,15 +282,202 @@ no need for a separate argument specific to position and momentum.
 ## Practice Questions
 
 1. What is $[\hat p,\hat x]$ (note the reversed order), given
-   $[\hat x,\hat p]=i\hbar$?
+   $[\hat x,\hat p]=i\hbar$? Then show the uncertainty bound derived above
+   is completely unchanged by that reversal, and name the feature of the
+   bound's statement that makes it so.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $[\hat p,\hat x] = -i\hbar$, and the bound is untouched: still
+   $\hbar/2$.
+
+   The first part is antisymmetry, which is not a rule to remember but a
+   one-line consequence of the definition:
+
+   $$
+   [\hat p,\hat x] = \hat p\hat x - \hat x\hat p = -\left(\hat x\hat p - \hat p\hat x\right) = -[\hat x,\hat p] = -i\hbar
+   $$
+
+   Now substitute the reversed pair into the general relation with
+   $A=\hat p$, $B=\hat x$:
+
+   $$
+   \Delta p\,\Delta x \ge \tfrac12\left|\langle[\hat p,\hat x]\rangle\right| = \tfrac12\left|-i\hbar\right| = \tfrac12\hbar = \frac{\hbar}{2}
+   $$
+
+   Identical to before. Two features of the statement are doing that work
+   together. The right-hand side carries an **absolute value**, which
+   discards the sign the reversal introduced, since $|-i\hbar| =
+   |i\hbar| = \hbar$. And the left-hand side is a **product of two real
+   non-negative numbers**, so $\Delta p\,\Delta x$ and $\Delta x\,\Delta
+   p$ are the same number. Neither side can tell which operator was named
+   first.
+
+   That insensitivity is not a triviality; it is a consistency check the
+   derivation had to pass. Nothing physical distinguishes "the uncertainty
+   relation between position and momentum" from "the uncertainty relation
+   between momentum and position," so a bound that changed under the
+   swap would have been evidence of an error upstream. Trace where the
+   absolute value came from and the reason appears: the derivation bounded
+   $|\langle f|g\rangle|^2$, a squared magnitude, which was already
+   sign-blind before the commutator was ever named.
+
+   The slip worth flagging is dropping the minus sign and writing
+   $[\hat p,\hat x] = i\hbar$ on the grounds that "the bound comes out the
+   same anyway." The bound does, and the commutator does not. The sign is
+   physical elsewhere: it fixes the *direction* the Bloch vector turns in
+   the two-level analogue, and it is why $e^{-i\hat pa/\hbar}$ translates
+   a state by $+a$ rather than $-a$ in the translation formula above.
+
+   </details>
+
 2. Using the general uncertainty relation, what is the minimum value of
    $\Delta x\,\Delta(2p)$, in terms of $\hbar$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\hbar$. Twice the familiar bound.
+
+   Two routes reach it, and agreeing is the point.
+
+   Through the commutator: $2\hat p$ is a Hermitian operator in its own
+   right, and the commutator is linear in each slot, so
+   $[\hat x, 2\hat p] = 2[\hat x,\hat p] = 2i\hbar$. Substituting into the
+   general relation,
+
+   $$
+   \Delta x\,\Delta(2p) \ge \tfrac12\left|2i\hbar\right| = \hbar
+   $$
+
+   Through the standard deviation: scaling an observable by a constant
+   $c$ scales its spread by $|c|$, since
+   $\operatorname{Var}(cA) = c^2\operatorname{Var}(A)$. So
+   $\Delta(2p) = 2\Delta p$, and
+
+   $$
+   \Delta x\,\Delta(2p) = 2\,\Delta x\,\Delta p \ge 2\cdot\frac{\hbar}{2} = \hbar
+   $$
+
+   Same answer, and the second route shows why it had to be: both sides of
+   the inequality picked up the same factor of $2$, so the inequality
+   itself did not move.
+
+   That is the trap in this question. It looks as though rescaling
+   momentum has made the trade-off twice as severe, and it has not. What
+   changed is the unit in which the momentum spread is reported. Measure
+   momentum in half-units and every momentum uncertainty doubles as a
+   number while nothing about the state changes, so the bound doubles to
+   keep pace. The physically meaningful statement is the one that survives
+   rescaling: the *product* is bounded below, and the bound scales exactly
+   as the observables do.
+
+   A useful way to see that nothing was gained is to ask whether the
+   minimum is still reachable. It is, and by the same states: any state
+   saturating $\Delta x\,\Delta p = \hbar/2$ saturates $\Delta
+   x\,\Delta(2p)=\hbar$. No state was made better or worse off.
+
+   </details>
+
 3. If a particle's momentum were known exactly ($\Delta p=0$), what does
    the uncertainty relation say about $\Delta x$? Is this physically
    achievable, even in principle?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The relation says $\Delta x$ would have to be unbounded, and no, it is
+   not achievable, not even in principle.
+
+   Put $\Delta p = 0$ into $\Delta x\,\Delta p \ge \hbar/2$ and the left
+   side is $0$ for any finite $\Delta x$, so the inequality would read
+   $0 \ge \hbar/2$, which is false. The bound is therefore violated by
+   *every* finite position spread. Unlike the two-level examples earlier
+   in this course, there is no escape by way of the right-hand side
+   shrinking: $[\hat x,\hat p]=i\hbar$ is a number times the identity, so
+   $\tfrac12|\langle[\hat x,\hat p]\rangle| = \hbar/2$ in every state,
+   with nothing to soften it.
+
+   So no state of the theory has $\Delta p=0$. That is worth stating as a
+   fact about the operator rather than about apparatus: a state with
+   $\Delta p = 0$ would be an eigenvector of $\hat p$ living in the
+   Hilbert space, and $\hat p$ on the line has no such eigenvector. The
+   would-be candidate is the plane wave $e^{ipx/\hbar}$, which has
+   constant magnitude everywhere and so cannot be normalized, meaning it
+   is not a state at all. It remains an indispensable *idealization*,
+   used the way a point mass is used, and the Wave Mechanics course builds
+   the wave-packet machinery that makes it rigorous.
+
+   The wrong turn to name explicitly is arguing that $\Delta p=0$ is fine
+   provided $\Delta x=\infty$, on the grounds that $0\times\infty$ can be
+   anything. That is not an argument, it is a refusal to evaluate.
+   $\Delta x$ is defined as the square root of
+   $\langle x^2\rangle-\langle x\rangle^2$ computed on a normalized
+   wavefunction, and $\infty$ is not a value it takes for any such
+   wavefunction with $\Delta p = 0$, because there is no such wavefunction
+   to begin with. The right conclusion is not that the product is
+   indeterminate; it is that the premise has no state satisfying it.
+
+   The physically honest version of the idea does survive. Momentum can be
+   made as sharp as you like, at the cost of a position spread growing
+   like $\hbar/(2\Delta p)$, without limit and without ever reaching the
+   endpoint. Approaching an idealization arbitrarily closely is a
+   different thing from occupying it.
+
+   </details>
+
 4. Verify, by substituting the ladder-operator definitions of $\hat x$
    directly, that $\hat x$ is Hermitian (recall $a^\dagger$ is the
    adjoint of $a$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\hat x^\dagger = \hat x$, and the check is three steps.
+
+   Start from the definition given above, and take the adjoint. The
+   adjoint is conjugate-linear on scalars and reverses products, and here
+   the prefactor $\sqrt{\hbar/2m\omega}$ is a real positive number, so it
+   passes through unchanged:
+
+   $$
+   \hat x^\dagger = \sqrt{\frac{\hbar}{2m\omega}}\left(a+a^\dagger\right)^\dagger = \sqrt{\frac{\hbar}{2m\omega}}\left(a^\dagger + a^{\dagger\dagger}\right) = \sqrt{\frac{\hbar}{2m\omega}}\left(a^\dagger + a\right) = \hat x
+   $$
+
+   using $(A+B)^\dagger = A^\dagger+B^\dagger$ and $a^{\dagger\dagger}=a$,
+   the fact that taking the adjoint twice returns the original operator.
+   Addition commutes, so $a^\dagger + a$ is the same operator as
+   $a+a^\dagger$, and the check closes.
+
+   The structural point is that $a$ and $a^\dagger$ are individually *not*
+   Hermitian, which is exactly why they can raise and lower: a Hermitian
+   operator's eigenvalues are real and it cannot shift the spectrum of $N$
+   the way these do. Hermiticity is recovered by pairing each with its own
+   adjoint. The sum $a+a^\dagger$ is Hermitian, and so is
+   $i(a^\dagger-a)$, and those two combinations are the physically
+   meaningful ones.
+
+   That second combination is where the instructive error lives. Run the
+   same computation on the *difference* without the $i$:
+
+   $$
+   \left(a^\dagger - a\right)^\dagger = a - a^\dagger = -\left(a^\dagger - a\right)
+   $$
+
+   which is anti-Hermitian, not Hermitian. Multiplying by $i$ fixes it,
+   because the adjoint conjugates the scalar and the two sign flips cancel:
+
+   $$
+   \left[i\left(a^\dagger-a\right)\right]^\dagger = -i\left(a-a^\dagger\right) = i\left(a^\dagger-a\right)
+   $$
+
+   So the $i$ sitting in front of $\hat p$ in the definition above is not
+   a convention or a leftover from the algebra. It is what makes momentum
+   an observable at all, and dropping it produces an operator whose
+   eigenvalues are imaginary and which Postulate 2 refuses.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -306,7 +493,7 @@ no need for a separate argument specific to position and momentum.
   $\hat x,\hat p$ are written in terms of the harmonic oscillator's ladder
   operators: one algebra, two familiar faces.
 
-## Further Exploration
+## The same estimate at nuclear scale
 
 <ChallengePrompt prompt="Confine a particle to a proton-sized region, Δx ≈ 10⁻¹⁵ m, five orders of magnitude tighter than the worked example's atomic 10⁻¹⁰ m. What is the minimum Δp, and how many orders of magnitude larger is it than the worked example's answer?">
   Same formula, $\Delta p_{\min}=\hbar/(2\Delta x)$, with a different

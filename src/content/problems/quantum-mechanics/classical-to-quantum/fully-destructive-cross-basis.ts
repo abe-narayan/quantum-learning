@@ -29,8 +29,9 @@ export const fullyDestructiveCrossBasis: NumericProblem = {
     ],
   },
   hints: [
-    { text: "cos(π) = -1." },
-    { text: "P(+) = (1 + (-1)) / 2." },
+    { text: "At $\\varphi=\\pi$ the phase factor is nothing but a sign flip, so first ask what $\\tfrac{1}{\\sqrt2}(|0\\rangle-|1\\rangle)$ is already called in the $X$ basis." },
+    { text: "Write $\\langle+|$ in the computational basis and take its overlap with that state term by term." },
+    { text: "The two terms of the overlap come out equal in size and opposite in sign. Settle what that does to their sum before you square anything." },
   ],
   solution: {
     steps: [
@@ -39,7 +40,7 @@ export const fullyDestructiveCrossBasis: NumericProblem = {
     finalAnswer: "$P(+) = 0$",
   },
   explanation: {
-    correctIdea: "At φ=π, the interference is fully destructive in the |+⟩ direction — the state is exactly |−⟩.",
+    correctIdea: "At φ=π, the interference is fully destructive in the |+⟩ direction: the state is |−⟩.",
     whyCorrect: "1/√2(|0⟩ - |1⟩) is exactly |−⟩, which has zero overlap with |+⟩ by orthogonality.",
     whyWrong: ["Answering 0.5 would be the 'no interference' case (φ=π/2), not the fully destructive case."],
   },

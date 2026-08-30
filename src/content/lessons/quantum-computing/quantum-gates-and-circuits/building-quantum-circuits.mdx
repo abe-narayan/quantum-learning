@@ -69,11 +69,11 @@ export const ghzCircuitFrames = [
   },
 ];
 
-<LessonHook eyebrow="Why this matters">
-Nine lessons' worth of tools (tensor products, entanglement, CNOT, partial measurement, no-cloning, teleportation, interference) all get used at once here, on a three-qubit circuit you have not seen.
+<LessonHook eyebrow="What a third qubit adds">
+Two entangled qubits either agree or they don't; the whole of this course so far fits in that sentence. Three qubits can be correlated in a way that has no two-party version at all, and it takes one extra CNOT to build.
 </LessonHook>
 
-## Motivation
+## No new mathematics, one more qubit
 
 Nine lessons have built a toolkit: tensor products, <Term id="entanglement">entanglement</Term>, CNOT,
 partial measurement, no-cloning, teleportation, interference. This lesson
@@ -91,7 +91,7 @@ standard example.
   caption="A six-ion 'cat' state entangled in a NIST ion-trap apparatus: the same family of multi-qubit entangled state as the GHZ state built below, scaled up by three qubits and verified on physical hardware."
   credit="NIST (photograph by Bill Pietsch, Astronaut 3 Media Group)"
   creditUrl="https://commons.wikimedia.org/wiki/File:NIST_Physicists_Coax_Six_Atoms_into_Quantum_%27Cat%27_State_(5884514942).jpg"
-  license="Public Domain (U.S. Government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
 ## A circuit identity, revisited
@@ -167,7 +167,7 @@ three tells you with certainty what the other two are. Three-party
 correlation, from the same H-plus-CNOTs pattern that built a two-party one,
 plus a single extra CNOT.
 
-## Common Mistakes, Revisited
+## Order, and the cloning objection
 
 <Callout type="warning">
 **Operator order.** Still the most common error across this entire
@@ -179,12 +179,17 @@ getting this right.
 <Callout type="warning">
 **Confusing "many CNOTs from one qubit" with cloning.** The GHZ circuit
 uses qubit 0 as the control for two separate CNOTs. This spreads
-*correlation*, not the qubit's unknown amplitude information. If qubit 0
-had started in an arbitrary unknown state instead of $|0\rangle$, the
-same circuit would still work as derived (try it: replace
-$|000\rangle$ with $|\psi\rangle\otimes|00\rangle$ and redo the algebra),
-and it still wouldn't violate no-cloning, because the result is one
-*entangled* 3-qubit state, not three independent copies of $|\psi\rangle$.
+*correlation*, not the qubit's unknown amplitude information. Start qubit 0
+in an arbitrary unknown $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$
+instead of $|0\rangle$ and redo the algebra: the circuit returns
+$\alpha'|000\rangle+\beta'|111\rangle$ with
+$(\alpha',\beta')=H(\alpha,\beta)$. That is a different state from the GHZ
+one derived above, so "works as derived" is too strong a claim, and it is
+entangled for every $|\psi\rangle$ except the two that $H$ sends to a
+basis state: feed in $|+\rangle$ or $|-\rangle$ and the output is the
+plain product state $|000\rangle$ or $|111\rangle$. The no-cloning point survives the change intact. What
+comes out is one *entangled* 3-qubit state, a long way from three
+independent copies of $|\psi\rangle$.
 </Callout>
 
 ## Practice: The Course Challenge
@@ -199,12 +204,141 @@ that prepares $|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$.
 single-qubit gate(s), applied before or after, produce the extra minus
 sign and the swapped basis labels.)
 
+<details className="answer-reveal">
+<summary>A defensible answer</summary>
+
+Many circuits work, so this is marked on whether the design is justified
+and verified rather than on matching one answer. Here is one worked in
+full, then two others that are just as good, then what a bad answer looks
+like.
+
+A worked version, four gates in this order: $X$ on qubit 1, then $H$ on
+qubit 0, then $\text{CNOT}(0,1)$, then $Z$ on qubit 0.
+
+Trace it. $X$ on qubit 1 turns $|00\rangle$ into $|01\rangle$. The
+H-then-CNOT recipe run from $|01\rangle$ gives
+$\tfrac{1}{\sqrt2}(|01\rangle+|10\rangle) = |\Psi^+\rangle$, which is the
+right pair of basis labels and the wrong sign. Finally $Z$ on qubit 0
+leaves the $|01\rangle$ term alone (its qubit 0 is $0$) and negates the
+$|10\rangle$ term (its qubit 0 is $1$), giving
+$\tfrac{1}{\sqrt2}(|01\rangle-|10\rangle) = |\Psi^-\rangle$. The engine
+returns amplitudes $0.7071$ on $|01\rangle$ and $-0.7071$ on $|10\rangle$,
+and reports the result entangled.
+
+The design logic is worth separating from the trace, because it
+generalizes. The recipe's *input* controls which of the four Bell states
+comes out: qubit 1's starting value decides whether the output labels
+agree ($\Phi$) or disagree ($\Psi$), and qubit 0's starting value decides
+the sign, because $H|1\rangle = |-\rangle$ carries a minus into the second
+branch. So you can steer with either the input or with corrections
+afterwards.
+
+Equally defensible. Steering purely by input: $X$ on qubit 0 and $X$ on
+qubit 1, then $H$ on qubit 0, then $\text{CNOT}(0,1)$, which is the recipe
+run from $|11\rangle$. The engine gives the identical final state, and
+this version needs no correction gate at all. Or steer purely by output:
+build $|\Phi^+\rangle$ the usual way, then apply $Z$ on qubit 0 and $X$ on
+qubit 1, which the engine confirms lands on $|\Psi^-\rangle$ exactly. The
+$X$ swaps the labels within each branch and the $Z$ supplies the sign, and
+because they act on different wires their order does not matter. Any of
+these earns full credit provided the trace is shown and the final
+amplitudes are checked.
+
+What a bad answer looks like: a circuit that produces
+$\tfrac{1}{\sqrt2}(|01\rangle+|10\rangle)$ and a claim that the minus sign
+is "just a phase". It is not a global phase. $|\Psi^+\rangle$ and
+$|\Psi^-\rangle$ are orthogonal states, distinguishable with certainty by
+Bob's superdense decode circuit, and they behave differently under
+$H\otimes H$. Global phase means an overall factor multiplying the
+*entire* state; a sign on one of two branches is a relative phase, and
+relative phases are physical. Also insufficient: any answer that stops at
+"apply $Z$ somewhere" without saying which qubit. $Z$ on qubit 1 negates
+the $|01\rangle$ term instead, giving $-|\Psi^-\rangle$ from
+$|\Psi^+\rangle$, which happens to be the same physical state here but for
+a different reason, and the reasoning is what is being tested.
+
+</details>
+
 **2.** Prove your circuit's output is entangled, using the
 coefficient-matching contradiction method from the Bell-states lesson.
+
+<details className="answer-reveal">
+<summary>Answer</summary>
+
+Suppose $|\Psi^-\rangle = |a\rangle\otimes|b\rangle$. Matching against
+$0|00\rangle + \tfrac{1}{\sqrt2}|01\rangle - \tfrac{1}{\sqrt2}|10\rangle + 0|11\rangle$:
+
+$$
+a_0b_0=0, \qquad a_0b_1=\frac{1}{\sqrt2}, \qquad a_1b_0=-\frac{1}{\sqrt2}, \qquad a_1b_1=0
+$$
+
+From $a_0b_0 = 0$, either $a_0 = 0$ or $b_0 = 0$. If $a_0 = 0$ then
+$a_0b_1 = 0 \neq \tfrac{1}{\sqrt2}$. If $b_0 = 0$ then
+$a_1b_0 = 0 \neq -\tfrac{1}{\sqrt2}$. Both branches contradict, so no
+product state equals $|\Psi^-\rangle$.
+
+The determinant shortcut confirms it in one line:
+$c_{00}c_{11} - c_{01}c_{10} = 0 - \left(\tfrac{1}{\sqrt2}\right)\left(-\tfrac{1}{\sqrt2}\right) = \tfrac12$,
+nonzero, so the amplitude array does not factor as a row times a column.
+The platform's separability check returns determinant magnitude
+$\tfrac12$ with `separable: false`, and the entanglement entropy is $1$
+bit, the two-qubit maximum.
+
+Notice that the minus sign never appears in the argument. What kills
+factorability is the pattern of *zeros*: two vanishing amplitudes on one
+diagonal and two nonvanishing ones on the other. All four Bell states have
+that pattern, on one diagonal or the other, which is why all four are
+maximally entangled and why the sign that distinguishes $|\Psi^+\rangle$
+from $|\Psi^-\rangle$ has no bearing on this question.
+
+The wrong turn is a proof that reports having tried several candidate
+factorizations without success. Not finding one is not the same as there
+being none. The contradiction structure is what turns a search into a
+theorem: it grants the factorization exists and derives something false,
+ruling out every candidate at once.
+
+</details>
 
 **3.** Compute the measurement statistics: if you measure qubit 0 of your
 prepared state, what are $P(0)$ and $P(1)$, and what does qubit 1 become
 in each case?
+
+<details className="answer-reveal">
+<summary>Answer</summary>
+
+$P(0) = P(1) = \tfrac12$. Only the $|01\rangle$ term has qubit 0 equal to
+$0$, contributing $\left|\tfrac{1}{\sqrt2}\right|^2 = \tfrac12$, and only
+the $|10\rangle$ term has qubit 0 equal to $1$, contributing
+$\left|-\tfrac{1}{\sqrt2}\right|^2 = \tfrac12$. Squaring the magnitude
+discards the sign, which is why the two branches are equally likely
+despite the asymmetric-looking amplitudes.
+
+Outcome $0$: zero out everything inconsistent and renormalize, leaving
+$|01\rangle$, so qubit 1 is $|1\rangle$ with certainty.
+
+Outcome $1$: the same procedure leaves $-|10\rangle$, so qubit 1 is
+$|0\rangle$ with certainty. The surviving minus sign is now the only
+nonzero amplitude in the state, which makes it a global phase and
+therefore unobservable. $-|10\rangle$ and $|10\rangle$ are the same
+physical state.
+
+Perfect anticorrelation, then: qubit 1 always comes out the opposite of
+qubit 0. That is the pattern to compare against $|\Phi^\pm\rangle$, where
+the two always agree. All four Bell states give $\tfrac12$ each on the
+individual measurement, and differ entirely in the joint behaviour, which
+is the same lesson as the Bell-states practice: marginals are blind to
+correlation.
+
+Two slips are worth naming. The first is expecting $P(1)$ to be smaller
+because its amplitude is negative. Probability is $|c|^2$, so
+$\left|-\tfrac{1}{\sqrt2}\right|^2 = \tfrac12$ exactly as for the positive
+branch; a negative *probability* would be meaningless. The second is
+carrying the minus sign forward as though it still mattered. It was a
+relative phase while two branches existed and it became global the moment
+one of them was discarded. Compare with question 2, where the same sign
+was equally irrelevant to entanglement but for a different reason.
+
+</details>
 
 **4.** Extend your circuit by one qubit, using the same
 "one more CNOT from the same control" pattern as the GHZ derivation
@@ -212,10 +346,102 @@ above, to build a 3-qubit state with the same "flavor" of correlation as
 $|\Psi^-\rangle$. Predict what measuring any one qubit tells you about
 the other two.
 
+<details className="answer-reveal">
+<summary>Answer</summary>
+
+Add a third qubit in $|0\rangle$ and apply $\text{CNOT}(0,2)$, keeping
+qubit 0 as the control exactly as the GHZ circuit does.
+
+Start from $|\Psi^-\rangle\otimes|0\rangle = \tfrac{1}{\sqrt2}(|010\rangle - |100\rangle)$.
+The $|010\rangle$ term has qubit 0 equal to $0$, so the new CNOT leaves it
+alone; the $|100\rangle$ term has qubit 0 equal to $1$, so its target,
+qubit 2, flips:
+
+$$
+\frac{|010\rangle - |101\rangle}{\sqrt2}
+$$
+
+The engine confirms both the input and the output amplitudes.
+
+Measuring any single qubit determines the other two with certainty,
+because the state has only two branches and the three qubits take
+different values in each. Outcome $0$ on qubit 0 leaves $|010\rangle$, so
+qubits 1 and 2 are $1$ and $0$. Outcome $1$ on qubit 0 leaves
+$-|101\rangle$, so they are $0$ and $1$. Measuring qubit 1 or qubit 2
+instead works the same way, since each of them also takes a different
+value in the two branches. This is the same all-or-nothing structure as
+GHZ, with a different labelling: where GHZ correlates all three to agree,
+this state correlates them to a fixed pattern that flips wholesale.
+
+The honest caveat on the phrase "same flavor" is that this is a relabelled
+GHZ state rather than a genuinely new kind of correlation. Applying $X$ to
+qubit 1 turns $|010\rangle - |101\rangle$ into $|000\rangle - |111\rangle$,
+and one more $Z$ on qubit 0 removes the sign, so the state is
+$\tfrac{1}{\sqrt2}(|000\rangle+|111\rangle)$ dressed in local gates.
+Single-qubit gates cannot change how entangled a state is, so these are
+the same entanglement wearing different clothes. Genuinely inequivalent
+three-qubit entanglement does exist, and the standard example is the W
+state $\tfrac{1}{\sqrt3}(|001\rangle+|010\rangle+|100\rangle)$, which no
+sequence of single-qubit gates can turn into a GHZ state.
+
+The wrong turn is to use qubit 1 as the second CNOT's control, on the
+reasoning that you are chaining the correlation along. That builds
+$\tfrac{1}{\sqrt2}(|011\rangle - |100\rangle)$, which is still a fine
+entangled state but is a different one, and the pattern the question asks
+for is the GHZ pattern, a single control feeding every other wire.
+
+</details>
+
 **5.** Explain, in your own words, why none of the circuits you just
 built could be used to send a message faster than light, even though
 measuring one qubit instantly tells you something about qubits that
 might be far away.
+
+<details className="answer-reveal">
+<summary>A defensible answer</summary>
+
+Marked on the argument rather than the wording. One version in full, then
+the alternatives, then the failure modes.
+
+A worked version: signalling requires that something the sender chooses
+changes something the receiver can observe. Alice holds qubit 0 and Bob
+holds qubit 1 of $|\Psi^-\rangle$. Whatever Alice does to her half, and
+whether she measures at all, Bob's own statistics are unchanged: his
+outcome is $50/50$ before and after, in the computational basis and in
+every other basis, because his reduced description is the maximally mixed
+$\tfrac12 I$ regardless. The correlation is real, but it only becomes
+visible when the two records are brought together and compared, and
+carrying a record from one place to another is ordinary classical
+communication at ordinary speed. Alice learning something about Bob's
+qubit is not the same as Alice telling Bob something.
+
+Equally defensible routes. You can argue from order-independence: the
+joint statistics are identical whichever of them measures first, so there
+is no fact about who influenced whom, and a mechanism that cannot even be
+assigned a direction cannot carry a directed message. You can argue by
+analogy, carefully: a pair of gloves split between two boxes gives perfect
+anticorrelation with no signalling either, and then note where the analogy
+breaks, since the quantum case also correlates in bases the glove model
+has no answers for, which is what Bell's theorem is about. You can argue
+from the protocols: teleportation needs two classical bits and superdense
+coding needs a qubit to physically travel, and both are cases where the
+theory forced exactly the classical communication that a
+faster-than-light shortcut would have to avoid.
+
+What a bad answer looks like: "the collapse is instantaneous but the
+information travels at light speed", offered on its own. It states the
+conclusion in the vocabulary of the puzzle without saying what stops Alice
+from modulating Bob's outcomes, and the missing piece is the whole answer.
+Also wrong is "you cannot control what outcome you get, so you cannot
+encode a message". True but incomplete, because a sender could try to
+signal by *choosing whether to measure at all*, or by choosing a basis,
+neither of which requires controlling the outcome. Closing that gap needs
+the stronger claim: Bob's marginal statistics are identical under every
+choice Alice can make. And any answer resting on "the qubits are too far
+apart for a signal to arrive in time" has the physics backwards; distance
+is what makes the puzzle sharp, not what resolves it.
+
+</details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -231,13 +457,13 @@ might be far away.
 - Analyzing any circuit, whether it is entangled and what measurement does
   to it, reuses the same techniques regardless of circuit size.
 
-## Further Exploration
+## The complete multi-qubit toolkit
 
 <NextDiscovery>
 This completes **Quantum Gates & Circuits**. You now have the complete
 toolkit for multi-qubit systems: tensor products, circuit notation,
 controlled gates, entanglement, multi-qubit measurement, no-cloning,
-teleportation, and interference. The next course in this pillar,
+teleportation, and interference. The next course in this track,
 **Entanglement, Mixed States & Bell Tests**, pushes entanglement further,
 beyond pairs to arbitrary multipartite states, and beyond pure states
 to the mixed-state formalism needed once a qubit is entangled with

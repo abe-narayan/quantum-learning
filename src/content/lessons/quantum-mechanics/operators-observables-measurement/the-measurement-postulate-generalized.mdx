@@ -84,11 +84,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The old formula does not typecheck">
 The earlier measurement postulate, P(aᵢ)=|cᵢ|², is exactly right when aᵢ is nondegenerate. When several eigenvectors share an eigenvalue, it does not even typecheck.
 </LessonHook>
 
-## Motivation
+## No single eigenvector to take a coefficient of
 
 From Classical to Quantum's measurement postulate defined
 $c_i=\langle a_i|\psi\rangle$ for a *single* eigenvector $|a_i\rangle$.
@@ -98,14 +98,14 @@ compute. This lesson repairs it using last lesson's projectors, arriving
 at the form von Neumann gave in 1932: project onto the eigenspace, then
 renormalize.
 
-## Intuition
+## Ask about the eigenspace, not the eigenvector
 
 Instead of asking "how much of this *one* eigenvector is in my state," the
 generalized rule asks "how much of my state lies in this *whole
 eigenspace*," a question that makes sense whether the eigenspace is one
 dimension or several, answered by the projector onto that eigenspace.
 
-## Mathematical Development
+## The projector form, and what it reduces to
 
 ### The generalized Born rule
 
@@ -156,7 +156,7 @@ every eigenvector *sharing* that eigenvalue. This is the ordinary rule
 from probability theory: "probability the outcome is $a_i$" is the sum
 over every way the system could produce that outcome.
 
-## Physical Interpretation
+## Why collapse keeps the superposition inside the subspace
 
 Collapse to $P_i|\psi\rangle/\|P_i|\psi\rangle\|$ (rather than, say,
 picking one specific eigenvector out of the degenerate subspace) is the
@@ -166,7 +166,7 @@ state was, and it must not destroy the information that was there.
 Projecting keeps the part of $|\psi\rangle$ consistent with the observed
 outcome, and discards only the part the outcome ruled out.
 
-## Worked Example
+## A degenerate outcome and the state it leaves behind
 
 **For $N=\mathrm{diag}(1,1,2)$ and $|\psi\rangle=\tfrac{1}{\sqrt3}
 (|0\rangle+|1\rangle+|2\rangle)$, find $P(N=1)$ and the post-measurement
@@ -177,7 +177,7 @@ state.**
   options={[
     { label: "1/3, one outcome out of three equally weighted states", value: "third" },
     { label: "1/2, two outcomes are possible so they split evenly", value: "half" },
-    { label: "2/3, the eigenspace collects the weight of both |0⟩ and |1⟩", value: "twothirds" },
+    { label: "2/3, the eigenspace holds two of the three", value: "twothirds" },
   ]}
   correctValue="twothirds"
   explanation="The projector P₁ = |0⟩⟨0| + |1⟩⟨1| collects every amplitude in the eigenspace, so P(N=1) = |1/√3|² + |1/√3|² = 2/3. A degenerate outcome is not one branch among equals: it owns as much probability as its eigenspace holds. The calculation below confirms it, and P(N=2) = 1/3 makes the total come out to 1."
@@ -255,16 +255,16 @@ is the thing the next Common Mistake warns against flattening away. What
 it buys in exchange is that the project-then-renormalize mechanism becomes
 two visible moves rather than one algebraic formula.
 
-<InteractiveSection title="Sweep the state, watch both probabilities move" description="A one-parameter family of normalized states, parameterized by φ, sweeping continuously between an eigenstate of N=1 and an eigenstate of N=2. The two bars always sum to exactly 1. Find the φ that reproduces the worked example's 2/3, 1/3 split.">
+<InteractiveSection title="Sweep the state, watch both probabilities move" description="A one-parameter family of normalized states, parameterized by φ in 5° steps, sweeping between an eigenstate of N=1 and an eigenstate of N=2. Add the two bars at a few points along the sweep. Then hunt for the frame nearest the worked example's 2/3, 1/3 split: the exact value needs φ=35.26°, and since the slider moves in 5° steps the nearest frame lands a quarter of a degree short of it. Find that frame and read both bars.">
   <BarChartExplorer
     frames={Array.from({ length: 19 }, (_, i) => degenerateBornFrame(i * 5))}
     sliderLabel="φ"
-    ariaLabel="P of N equals 1 and P of N equals 2 recomputed live as phi sweeps the state between the two eigenspaces, with the two probabilities always summing to 1"
+    ariaLabel="Two bars, P(N=1) = cos²φ and P(N=2) = sin²φ, as φ steps from 0° to 90° in 5° increments. At φ=0° the first bar is at full height 1 and the second is flat at 0. They cross at φ=45°, both at 0.5, and the situation is reversed at φ=90°. At φ=35° they read 0.67 and 0.33, the worked example's split. The two always sum to 1."
     maxValue={1}
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Picking one eigenvector out is the wrong move
 
 <Callout type="warning">
 **Collapsing to an arbitrarily chosen single eigenvector.** The correct
@@ -284,12 +284,131 @@ outcomes). Dividing by $\|P_i|\psi\rangle\|$ is not optional.
 
 1. For the worked example's $|\psi\rangle$, verify $P(N{=}2)=\tfrac13$
    directly using the projector $P_2=|2\rangle\langle2|$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   P_2|\psi\rangle = |2\rangle\langle2|\psi\rangle = \frac{1}{\sqrt3}|2\rangle, \qquad P(N{=}2) = \langle\psi|P_2|\psi\rangle = \left|\frac{1}{\sqrt3}\right|^2 = \frac13
+   $$
+
+   Computing it the other way round confirms the same number:
+   $\|P_2|\psi\rangle\|^2 = (1/\sqrt3)^2 = 1/3$. The two routes agree
+   because $P_2$ is both idempotent and Hermitian, so
+   $\langle\psi|P_2|\psi\rangle = \langle\psi|P_2^\dagger P_2|\psi\rangle =
+   \|P_2|\psi\rangle\|^2$. That identity is why the rule can be stated
+   either as a sandwich or as a squared length, and it is worth knowing
+   both forms: the sandwich generalizes to density matrices, and the
+   squared length is what a numerical implementation actually computes.
+
+   Since $a=2$ is nondegenerate, the general rule collapses back to the
+   familiar $|c_i|^2$ here, with $c_2=\langle2|\psi\rangle=1/\sqrt3$. That
+   is the reduction the lesson proves in general, seen in a single case.
+
+   Together with $P(N{=}1)=\tfrac23$, the probabilities sum to $1$, which
+   question 3 shows was guaranteed in advance by completeness rather than
+   confirmed by luck.
+
+   The instructive contrast is what the two outcomes do to the state.
+   Outcome $2$ collapses $|\psi\rangle$ to $|2\rangle$, a single basis
+   vector with nothing left inside it, because its eigenspace is
+   one-dimensional. Outcome $1$ collapses it to
+   $(|0\rangle+|1\rangle)/\sqrt2$, still a superposition, because its
+   eigenspace has room for one. Same observable, same measurement, and
+   whether the result is a definite basis state or a surviving
+   superposition depends entirely on the rank of the projector that
+   fired.
+
+   </details>
+
 2. If $|\psi\rangle$ had been exactly $|0\rangle$ to begin with, what
    would $P(N{=}1)$ and the post-measurement state be? (No calculation
    needed if you reason about it correctly.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $P(N{=}1)=1$, and the state is left as $|0\rangle$, unchanged.
+
+   The reasoning that avoids the arithmetic: $|0\rangle$ already lies
+   entirely inside the eigenvalue-$1$ eigenspace
+   $\mathrm{span}\{|0\rangle,|1\rangle\}$. A projector acts as the identity
+   on vectors already in its subspace, so $P_1|0\rangle=|0\rangle$, giving
+   probability $\||0\rangle\|^2=1$ and, after a renormalization that
+   divides by $1$, the same state back. Nothing was discarded because
+   nothing lay outside.
+
+   That is idempotence read as physics: projecting a state that is already
+   projected changes nothing, which is the same fact that makes an
+   immediately repeated measurement certain to reproduce its own outcome.
+
+   The trap this question is built around is the assumption that a
+   degenerate outcome must leave the state "spread out" across its
+   eigenspace. It does not. The post-measurement state is whatever the
+   pre-measurement state's component in that eigenspace was, renormalized,
+   and if that component happened to be a single basis vector, a single
+   basis vector is what you get. The Common Mistakes note above puts the
+   same point the other way round: only if the state was already an
+   eigenvector does collapse leave it looking simple.
+
+   Two contrasts sharpen it. Had the state been $|2\rangle$ instead, the
+   answer would be $P(N{=}1)=0$: $P_1|2\rangle$ is the zero vector, and the
+   renormalization step is undefined, correctly, since an outcome of
+   probability zero never occurs and there is no post-measurement state to
+   compute. And had the state been the worked example's equal
+   superposition, $P(N{=}1)=\tfrac23$ with a genuine superposition
+   surviving. The rule handles all three without a special case, which is
+   the whole point of writing it with projectors.
+
+   </details>
+
 3. Explain briefly why $\sum_iP(a_i)=1$ is guaranteed for *any* normalized
    $|\psi\rangle$, using completeness ($\sum_iP_i=I$) from the first
    lesson of this course.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the sum of the probabilities is the sum of the projectors,
+   sandwiched, and completeness turns that sum into the identity:
+
+   $$
+   \sum_i P(a_i) = \sum_i \langle\psi|P_i|\psi\rangle = \left\langle\psi\left|\left(\sum_iP_i\right)\right|\psi\right\rangle = \langle\psi|I|\psi\rangle = \langle\psi|\psi\rangle = 1
+   $$
+
+   Only two facts were used: linearity, which lets the sum move inside the
+   bracket, and $\sum_iP_i=I$. Normalization supplies the final step.
+
+   What makes this a real guarantee rather than a restatement is that
+   completeness is itself a theorem, not an assumption. The spectral
+   theorem says a Hermitian operator's eigenvectors form a full orthonormal
+   basis of the space, and $\sum_iP_i$ is exactly the projector onto the
+   span of all of them, which is everything. So the probabilities sum to
+   one because the observable's outcomes exhaust the possibilities, which
+   is what "the eigenvectors span the space" means physically.
+
+   Note how little the argument needed. It never mentioned which
+   observable, whether any eigenvalue is degenerate, what the ranks of the
+   projectors are, or which state was measured. That universality is the
+   payoff of writing the Born rule with projectors: the nondegenerate proof
+   in the earlier course had to count coefficients one eigenvector at a
+   time, and this one does not count anything.
+
+   Two places the argument would break, both worth recognizing.
+
+   If the $P_i$ were not mutually orthogonal, the sum could overcount and
+   exceed $1$. Orthogonality comes free for a Hermitian operator's distinct
+   eigenvalues, proven in Mathematical Foundations, which is why the
+   generalized rule requires a Hermitian observable and not merely any
+   operator with real eigenvalues.
+
+   And if some eigenvalues were left out of the sum, completeness fails and
+   the total falls below $1$. That is not a hypothetical: it is exactly
+   what a *selective* measurement looks like, where an apparatus registers
+   only some outcomes, and the missing probability is the chance the
+   apparatus stayed silent.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -304,7 +423,7 @@ outcomes). Dividing by $\|P_i|\psi\rangle\|$ is not optional.
   every eigenvector sharing that eigenvalue, and the post-measurement
   state can remain a superposition within the degenerate subspace.
 
-## Further Exploration
+## Making disturbance concrete and numeric
 
 <NextDiscovery>
 [Sequential Measurements and Incompatibility](/lessons/quantum-mechanics/operators-observables-measurement/sequential-measurements-and-incompatibility) makes

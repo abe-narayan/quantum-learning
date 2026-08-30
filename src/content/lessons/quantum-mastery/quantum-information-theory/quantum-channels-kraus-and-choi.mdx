@@ -173,12 +173,12 @@ export const choiSpectrumFrames = [
 ];
 
 <LessonHook eyebrow="Turning a map into a matrix">
-  An entire physical process — every possible input, every possible
-  output — can be checked for validity the same way you'd check a
+  An entire physical process (every possible input, every possible
+  output) can be checked for validity the same way you'd check a
   single matrix: is it positive semi-definite?
 </LessonHook>
 
-## Motivation
+## Complete Positivity, Finally Defined
 
 Open Quantum Systems & Kraus Operators stated the
 <Term id="kraus-operators-cptp-maps">Kraus sum representation</Term>
@@ -197,8 +197,8 @@ and pushes every point through `amplitudeDampingChannel` at three
 strengths, using this platform's own `applyKrausChannel` and
 `densityMatrixToBlochVector` to place each point.
 
-<div className="not-prose my-8 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-  <svg width={236} height={236} viewBox="0 0 236 236" className="mx-auto max-w-full" role="img" aria-label="The x-z cross-section of the Bloch ball under amplitude damping. The outer grey circle is the set of pure states at gamma equals zero. Inside it sit three progressively smaller ellipses, for gamma equals 0.3, 0.6 and 0.9, each one both narrower and shorter than the last and each shifted upward toward the north pole, which is the state ket zero. At gamma equals 0.9 the ellipse has nearly collapsed onto that north pole. No ellipse touches or crosses the outer circle, and none is centred on the origin: the channel contracts the ball and simultaneously drags it toward one fixed point.">
+<div className="not-prose my-8 rounded-panel border border-border bg-surface-muted/40 p-4">
+  <svg width={236} height={236} viewBox="0 0 236 236" className="mx-auto max-w-full" role="img" aria-label="The x-z cross-section of the Bloch ball under amplitude damping. The outer grey circle is the set of pure states at gamma equals zero. Inside it sit three progressively smaller ellipses, for gamma equals 0.3, 0.6 and 0.9, each one both narrower and shorter than the last and each shifted upward toward the north pole, which is the state ket zero. At gamma equals 0.9 the ellipse has nearly collapsed onto that north pole. Every ellipse meets the outer circle at exactly one point, the north pole itself, which is the channel's fixed point ket zero, and lies strictly inside the circle everywhere else. None is centred on the origin: the channel contracts the ball and simultaneously drags it toward that one fixed point.">
     <line x1={118} y1={18} x2={118} y2={218} className="stroke-border" strokeWidth={1} />
     <line x1={18} y1={118} x2={218} y2={118} className="stroke-border" strokeWidth={1} />
     <path d={blochPurePath} className="fill-none stroke-muted-foreground" strokeWidth={1.75} strokeDasharray="5 4" />
@@ -218,18 +218,19 @@ $\sqrt{1-\gamma}$ and half-height $1-\gamma$, centred at $z=\gamma$
 rather than at the origin.
 
 Two features of that picture carry the lesson. The ellipses stay
-*inside* the circle: the channel never produces a state outside the ball,
-which is what a positive, trace-preserving map has to do. And no ellipse
-is centred on the origin. Amplitude damping is **non-unital**: it moves
-$I/2$, dragging everything toward $|0\rangle$. At $\gamma={contractionGammas[1]}$
+*inside* the circle, touching it only at the north pole $|0\rangle$,
+which damping leaves exactly where it is: the channel never produces a
+state outside the ball, which is what a positive, trace-preserving map
+has to do. And no ellipse is centred on the origin. Amplitude damping is **non-unital**: it moves
+$I/2$, dragging everything toward $|0\rangle$. At $\gamma=$ {contractionGammas[1]}
 the equator has contracted to half-width {contractionWidth[1].toFixed(4)}
-and lifted to $z={contractionCentreShift[1].toFixed(4)}$, both read off
+and lifted to $z=$ {contractionCentreShift[1].toFixed(4)}, both read off
 the real channel rather than the formula. Complete positivity is the
 statement that this containment survives even when the qubit being
 squeezed is entangled with a spectator the channel never touches, and
 that extra clause is what the Choi matrix is built to test.
 
-## Mathematical Development
+## The Choi Matrix as a Positivity Test
 
 ### Complete positivity, precisely
 
@@ -254,7 +255,7 @@ platform's `partialTrace`-based reduced states are built to describe.
 
 <EquationReveal
   terms={[
-    { id: "J", symbol: "J(ℰ)", gloss: "The Choi matrix — a single d²×d² matrix that encodes the entire channel ℰ." },
+    { id: "J", symbol: "J(ℰ)", gloss: "The Choi matrix, a single d²×d² matrix that encodes the entire channel ℰ." },
     { id: "ij", symbol: "|i⟩⟨j|", gloss: "Every basis matrix, including non-positive-semi-definite ones (i≠j); ℰ is still a well-defined linear map on them." },
     { id: "Eij", symbol: "ℰ(|i⟩⟨j|)", gloss: "The channel's output when fed that basis matrix." },
   ]}
@@ -316,7 +317,7 @@ is the image of the positive operator $|\Omega^+\rangle\langle\Omega^+|$
 under the now-established-positive map $\mathbb1\otimes\mathcal E$,
 hence $J(\mathcal E)\geq0$.
 
-**Hard direction, the actual content of the theorem.** Suppose
+**Hard direction, and the substance of the theorem.** Suppose
 $J(\mathcal E)\geq0$.
 
 <DerivationSteps>
@@ -325,7 +326,7 @@ $J(\mathcal E)\geq0$.
     each $|v_k\rangle=\sum_{i,\ell}(v_k)_{i\ell}|i\rangle|\ell\rangle$ an
     eigenvector of the $d^2$-dimensional Choi matrix.
   </DerivationStep>
-  <DerivationStep annotation="Output index ℓ becomes the matrix row, input index i the column — the same index that labelled which |i⟩⟨j| was fed into E when J was built. This reshaping directly inverts the 'vectorize K_k' map used in the easy direction.">
+  <DerivationStep annotation="Output index ℓ becomes the matrix row, input index i the column, which is the same index that labelled which |i⟩⟨j| was fed into E when J was built. This reshaping directly inverts the 'vectorize K_k' map used in the easy direction.">
     Define, for each $k$, the $d\times d$ matrix $K_k$ by
     **reshaping** $|v_k\rangle$:
 
@@ -334,7 +335,9 @@ $J(\mathcal E)\geq0$.
     $$
   </DerivationStep>
   <DerivationStep annotation="Checked term by term (the worked example below verifies this identity numerically rather than leaving it purely symbolic).">
-    $\sum_ij|i\rangle\langle j|\otimes K_k|i\rangle\langle j|K_k^\dagger=|v_k\rangle\langle v_k|\cdot\mu_k/\mu_k=\mu_k|v_k\rangle\langle v_k|$
+    $\sum_{ij}|i\rangle\langle j|\otimes K_k|i\rangle\langle j|K_k^\dagger=\big(\sqrt{\mu_k}\big)^2|v_k\rangle\langle v_k|=\mu_k|v_k\rangle\langle v_k|$
+    (the two factors of $\sqrt{\mu_k}$ in the reshaping definition, one
+    from $K_k$ and one from $K_k^\dagger$, multiply to $\mu_k$)
     reproduces exactly the $k$-th term of the eigendecomposition.
   </DerivationStep>
   <DerivationStep annotation="Matching term-by-term against the definition J(E) = Σ_ij |i⟩⟨j| ⊗ E(|i⟩⟨j|) forces E(|i⟩⟨j|) = Σ_k K_k|i⟩⟨j|K_k† for every basis matrix. Since these span the full space of matrices, this extends to every ρ by linearity.">
@@ -348,6 +351,11 @@ $J(\mathcal E)\geq0$.
 ### Trace-preservation, restated on the Choi matrix
 
 <TheoremBox title="Trace-preservation on the Choi matrix" provenance="derived">
+
+**Hypotheses.** The same as Choi's theorem: $\mathcal E$ linear on the
+$d\times d$ matrices, $d$ finite. Positivity is *not* assumed, and this
+is a separate condition, not a restatement: the two boxes constrain different
+things about $J(\mathcal E)$ and neither implies the other.
 
 $\mathcal E$ is trace-preserving if and only if
 $\text{Tr}_{\text{out}}\big(J(\mathcal E)\big)=I$ (tracing out the
@@ -363,7 +371,7 @@ $|i\rangle\langle j|$ forces $\text{Tr}(\mathcal E(|i\rangle\langle j|))=\delta_
 on the whole spanning set, hence on every $\rho$ by linearity.
 $\blacksquare$
 
-## Worked Example
+## Amplitude Damping, Reconstructed From Its Choi Matrix
 
 **Build the Choi matrices for this platform's own
 <Term id="amplitude-damping">amplitude-damping</Term> ($\gamma=0.3$) and
@@ -386,8 +394,8 @@ throughout this course, applied directly to each $2\times2$ block gives:
 
 | Channel | Block eigenvalues | Isolated diagonal entries | Full Choi spectrum |
 |---|---|---|---|
-| Amplitude damping, $\gamma={gamma}$ | {muAD1.toFixed(4)}, {muAD2.toFixed(4)} | {isolatedAD.toFixed(4)}, 0 | {[muAD1, isolatedAD, muAD2, 0].map((v) => v.toFixed(4)).join(", ")} |
-| Dephasing, $\lambda={lambda}$ | {muDP1.toFixed(4)}, {muDP2.toFixed(4)} | {isolatedDP1.toFixed(4)}, {isolatedDP2.toFixed(4)} | {[muDP1, muDP2, isolatedDP1, isolatedDP2].map((v) => v.toFixed(4)).join(", ")} |
+| Amplitude damping, $\gamma=$ {gamma} | {muAD1.toFixed(4)}, {muAD2.toFixed(4)} | {isolatedAD.toFixed(4)}, 0 | {[muAD1, isolatedAD, muAD2, 0].map((v) => v.toFixed(4)).join(", ")} |
+| Dephasing, $\lambda=$ {lambda} | {muDP1.toFixed(4)}, {muDP2.toFixed(4)} | {isolatedDP1.toFixed(4)}, {isolatedDP2.toFixed(4)} | {[muDP1, muDP2, isolatedDP1, isolatedDP2].map((v) => v.toFixed(4)).join(", ")} |
 
 Every entry above comes from `eigenvaluesHermitian2x2` applied to the
 Choi matrices built just above, not from a formula typed out by hand.
@@ -404,8 +412,8 @@ $J_{DP}$ returns exactly $I$).
 <PredictBeforeReveal
   question="At gamma=1, amplitude damping is total: every qubit decays to |0⟩, the same trivial, fully-known outcome regardless of input. Does the channel's Kraus rank drop back down to 1 there, the way it's exactly 1 at gamma=0?"
   options={[
-    { label: "Yes — total decay is just as trivial as no decay at all, so rank 1 again", value: "rank1" },
-    { label: "No — it stays at rank 2, the same as every other gamma strictly between 0 and 1", value: "rank2" },
+    { label: "Yes, because total decay is as trivial as no decay at all, so rank 1 again", value: "rank1" },
+    { label: "No, it stays at rank 2, the same as every other gamma strictly between 0 and 1", value: "rank2" },
   ]}
   correctValue="rank2"
   explanation="Rank 2 the whole way through, including gamma=1. 'Trivial outcome' and 'trivial channel' aren't the same thing: at gamma=1 the channel still needs two Kraus operators (K0 kills all population in |1⟩, K1 carries every |1⟩ amplitude over to |0⟩) to correctly zero out coherences along with populations. Only gamma=0, literally no evolution at all, collapses back to a single K0=I."
@@ -414,9 +422,9 @@ $J_{DP}$ returns exactly $I$).
 The presets above freeze $\gamma=\lambda=0.3$, which hides a fact the
 same `choiMatrix` construction reveals once it's swept over every
 strength $s\in[0,1]$: amplitude damping's *bottom* block eigenvalue
-$\mu_2$ isn't small because $\gamma=0.3$ happens to be small — it's
+$\mu_2$ isn't small because $\gamma=0.3$ happens to be small. It is
 $\equiv0$ for **every** $\gamma$, while the top one is the exact line
-$\mu_1(\gamma)=2-\gamma$. What actually carries $\gamma$-dependence is
+$\mu_1(\gamma)=2-\gamma$. What carries $\gamma$-dependence is
 the *isolated* diagonal entry $J(2,2)=\gamma$, climbing linearly from
 $0$ to $1$. Since amplitude damping's minimal Kraus rank is the count
 of nonzero values among $\{\mu_1,\mu_2,J(2,2),J(1,1){=}0\}$, that makes
@@ -433,10 +441,12 @@ component to track, unlike amplitude damping.
 
 <ParametricCurve
   frames={choiSpectrumFrames}
+  xAxisLabel="channel strength"
+  yAxisLabel="Choi eigenvalue / entry"
   ariaLabel="Amplitude damping's two Choi block eigenvalues and isolated diagonal entry, plotted against channel strength from 0 to 1, alongside dephasing's isolated entries which stay at zero throughout"
 />
 
-Now the hard direction's actual content: reshape the amplitude-damping
+Now the hard direction's content: reshape the amplitude-damping
 block's top eigenvector (eigenvalue $\mu_1=1.7$, eigenvector
 $\approx(0.7670,0.6417)$ in the $\{(0,0),(1,1)\}$ block basis) via
 $(K_1)_{\ell i}=\sqrt{\mu_1}\,(v_1)_{i\ell}$:
@@ -460,7 +470,7 @@ Trace Distance and Fidelity's $\rho_{AD}=\begin{pmatrix}0.65&0.4183\\0.4183&0.35
 to full numerical precision, the concrete, verified instance of the
 term-by-term identity claimed in the proof above.
 
-## Physical Interpretation
+## A Quantifier Over Every Spectator System
 
 <InsightBlock>
   Complete positivity is defined by a quantifier over every spectator
@@ -486,7 +496,7 @@ that two-qubit object is a legal state, and the reason the one-qubit
 picture is not enough is the same reason the transpose map passes
 the ball test and fails the Choi test.
 
-## Common Mistakes
+## Positivity Mistaken for Complete Positivity
 
 <Callout type="mistake">
 **Checking only that $\mathcal E$ is positive, not completely positive.**
@@ -511,20 +521,222 @@ $\mathcal E$ to be a physically valid channel.
    both the amplitude-damping and dephasing Choi matrices above, and
    explain why this number must always equal $d$ for any single-qubit
    trace-preserving channel.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Write both matrices out in the ordered basis
+   $\{|00\rangle,|01\rangle,|10\rangle,|11\rangle\}$, where the first
+   index is the input label $i$ and the second the output label. For
+   amplitude damping at $\gamma=0.3$, the four blocks are
+   $\mathcal E(|0\rangle\langle0|)=|0\rangle\langle0|$,
+   $\mathcal E(|1\rangle\langle1|)=\mathrm{diag}(\gamma,1-\gamma)$, and
+   $\mathcal E(|0\rangle\langle1|)=\sqrt{1-\gamma}\,|0\rangle\langle1|$,
+   giving
+
+   $$
+   J_{AD}=\begin{pmatrix}1&0&0&0.83666\\0&0&0&0\\0&0&0.3&0\\0.83666&0&0&0.7\end{pmatrix},
+   \qquad
+   J_{DP}=\begin{pmatrix}1&0&0&0.7\\0&0&0&0\\0&0&0&0\\0.7&0&0&1\end{pmatrix}.
+   $$
+
+   The diagonals sum to $1+0+0.3+0.7=2$ and $1+0+0+1=2$. Both are $d=2$,
+   and both agree with the spectra in the table, since
+   $1.7+0.3+0+0=2$ in each row.
+
+   The reason it must equal $d$ is a two-line consequence of the
+   definition, using $\mathrm{Tr}(A\otimes B)=\mathrm{Tr}A\,\mathrm{Tr}B$:
+
+   $$
+   \mathrm{Tr}\,J(\mathcal E)=\sum_{i,j}\mathrm{Tr}\big(|i\rangle\langle j|\big)\,\mathrm{Tr}\big(\mathcal E(|i\rangle\langle j|)\big)
+   =\sum_{i,j}\delta_{ij}\,\delta_{ij}=\sum_i1=d,
+   $$
+
+   where the second $\delta_{ij}$ is exactly where trace preservation
+   enters: $\mathrm{Tr}\,\mathcal E(|i\rangle\langle j|)=\mathrm{Tr}|i\rangle\langle j|=\delta_{ij}$.
+   Equivalently, and more memorably, $J/d$ is the state you get by sending
+   half of a maximally entangled pair through the channel, so it is a
+   density matrix and its trace is $1$.
+
+   The trap here is treating $\mathrm{Tr}\,J=d$ as a *test* for trace
+   preservation. It is one scalar equation; trace preservation is the
+   $d^2$ equations $\mathrm{Tr}_{\rm out}J=I$. A CP map with a single Kraus
+   operator $A=\mathrm{diag}(\sqrt2,0)$ has
+   $\mathrm{Tr}\,J=\mathrm{Tr}(A^\dagger A)=2=d$ but
+   $\mathrm{Tr}_{\rm out}J=\mathrm{diag}(2,0)\neq I$, and it maps
+   $|1\rangle\langle1|$ to $0$ while doubling the trace of
+   $|0\rangle\langle0|$. Passing the trace check means only that the map
+   preserves trace *on average over the maximally mixed input*.
+
+   </details>
+
 2. The dephasing channel's Choi block has eigenvalues $\{1.7,0.3\}$,
    *both* nonzero (unlike amplitude damping's $\{1.7,0\}$). What does
    this say about dephasing's minimal Kraus rank compared to amplitude
    damping's?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Nothing, and that is the point of the question. Both channels have
+   minimal Kraus rank exactly $2$.
+
+   The minimal Kraus rank is the rank of the *whole* Choi matrix, not of
+   one block of it. Reading the full spectra from the table:
+
+   Amplitude damping at $\gamma=0.3$: $\{1.7,\;0.3,\;0,\;0\}$, where the
+   $1.7$ comes from the block and the $0.3$ is the isolated entry
+   $J(2,2)=\gamma$. Two nonzero eigenvalues, rank $2$.
+
+   Dephasing at $\lambda=0.3$: $\{1.7,\;0.3,\;0,\;0\}$, where both nonzero
+   values come from the block and both isolated entries are $0$. Two
+   nonzero eigenvalues, rank $2$.
+
+   Identical rank, identical spectrum in fact, arranged differently inside
+   the matrix. What the block structure tells you is *where* each Kraus
+   operator's support sits, not how many there are. Amplitude damping's
+   two Kraus operators are $K_0=\mathrm{diag}(1,\sqrt{1-\gamma})$, which is
+   diagonal and therefore lives in the $\{|00\rangle,|11\rangle\}$ block,
+   and $K_1=\sqrt\gamma\,|0\rangle\langle1|$, which is purely off-diagonal
+   and shows up as the isolated entry. Dephasing's are
+   $\sqrt{1-\lambda/2}\,I$ and $\sqrt{\lambda/2}\,Z$, both diagonal, so both
+   land in the same block.
+
+   Reading the question the tempting way, "dephasing has two nonzero block
+   eigenvalues and damping has one, so dephasing needs more Kraus
+   operators", gets the right count for dephasing and the wrong one for
+   damping by ignoring the isolated entry. The lesson's own reconstruction
+   makes the correction concrete: it builds $K_0$ from the block
+   eigenvector and $K_1$ from the isolated entry, and needs both.
+
+   Worth adding the endpoints, since they are where rank actually varies.
+   The full amplitude-damping spectrum is $\{2-\gamma,\,0,\,\gamma,\,0\}$
+   and the full dephasing spectrum is $\{2-\lambda,\,\lambda,\,0,\,0\}$.
+   Each has rank $1$ only at strength $0$, where the channel is the
+   identity, and rank $2$ for every strength in $(0,1]$. Neither ever
+   reaches the theoretical maximum $d^2=4$, which means both admit a
+   Stinespring dilation with a single environment qubit rather than the
+   two qubits a generic channel would need.
+
+   </details>
+
 3. A single unitary channel $\mathcal E(\rho)=U\rho U^\dagger$ has Choi
    matrix $J(\mathcal E)=|v\rangle\langle v|$ for
    $|v\rangle=\sum_i|i\rangle\otimes U|i\rangle$, rank exactly $1$.
    Explain why this matches the fact that a unitary channel needs only
    one Kraus operator.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the reconstruction in Choi's theorem produces exactly one Kraus
+   operator per nonzero eigenvalue, and a rank-1 matrix has exactly one.
+   The correspondence is not an analogy; the count is the same count.
+
+   Run the machine and watch it hand back $U$. First,
+   $\langle v|v\rangle=\sum_{i,j}\langle i|j\rangle\langle Ui|Uj\rangle=\sum_i1=d$,
+   so $|v\rangle$ is not normalized and $J=|v\rangle\langle v|$ has the
+   single nonzero eigenvalue $\mu=d$ with normalized eigenvector
+   $|\hat v\rangle=|v\rangle/\sqrt d$, whose components are
+   $(\hat v)_{i\ell}=U_{\ell i}/\sqrt d$. Reshaping as the theorem
+   prescribes,
+
+   $$
+   (K)_{\ell i}=\sqrt\mu\,(\hat v)_{i\ell}=\sqrt d\cdot\frac{U_{\ell i}}{\sqrt d}=U_{\ell i},
+   $$
+
+   so $K=U$ exactly, and $\mathcal E(\rho)=U\rho U^\dagger$ is recovered.
+   The $\sqrt{\mu}$ in the reshaping is what restores the normalization the
+   eigenvector convention removed.
+
+   The converse is the sharper statement and is worth having. Kraus rank
+   $1$ means $\mathcal E(\rho)=K\rho K^\dagger$ for a single $K$; adding
+   trace preservation, $\mathrm{Tr}_{\rm out}J=I$ becomes $K^\dagger K=I$,
+   which for a square $K$ makes it unitary. So
+
+   $$
+   \text{Kraus rank }1 \text{ and trace preserving} \iff \text{the channel is unitary},
+   $$
+
+   and neither half can be dropped: rank $1$ without trace preservation
+   allows any $K$ at all, and trace preservation without rank $1$ is every
+   noisy channel in this lesson.
+
+   The physical reading ties it to the isomorphism. $J/d$ is the state of
+   the maximally entangled pair after one half passes through the channel,
+   and rank $1$ means that state is *pure*. A pure output means the
+   channel deposited no information anywhere else: nothing became
+   entangled with an environment, nothing was lost, and the map is
+   reversible. Every eigenvalue of $J$ beyond the first is a measure of how
+   much the channel has mixed the reference pair, which is why Kraus rank
+   is a reasonable first count of "how many ways this channel can go
+   wrong."
+
+   </details>
+
 4. Using the trace-preservation identity, explain why a channel with
    $J(\mathcal E)\geq0$ but $\text{Tr}_{\text{out}}(J(\mathcal E))\neq I$
    could still be a valid *sub-normalized* quantum operation (used to
    describe one branch of a measurement) even though it isn't a complete
    channel.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a measurement branch is not supposed to preserve trace. The
+   trace it produces is the probability that the branch happened, and a
+   probability below $1$ is exactly what "this outcome did not always
+   occur" looks like.
+
+   Make it quantitative. $J\geq0$ gives a Kraus form
+   $\mathcal E(\rho)=\sum_kK_k\rho K_k^\dagger$, and
+
+   $$
+   \mathrm{Tr}\,\mathcal E(\rho)=\mathrm{Tr}\Big(\rho\sum_kK_k^\dagger K_k\Big)=\mathrm{Tr}(\rho\,Q),\qquad Q\equiv\sum_kK_k^\dagger K_k,
+   $$
+
+   while $\mathrm{Tr}_{\rm out}J$ is $Q$ up to a transpose, which leaves
+   its spectrum alone. So $\mathrm{Tr}_{\rm out}J=I$ says $Q=I$ and every
+   input keeps its trace, and $\mathrm{Tr}_{\rm out}J\neq I$ says some
+   input does not.
+
+   The condition that makes the map physically meaningful anyway is
+   sharper than "not equal to $I$", and this is the part the question's
+   phrasing invites you to skip:
+
+   $$
+   0\leq \mathrm{Tr}_{\rm out}J(\mathcal E)\leq I.
+   $$
+
+   That is **trace non-increasing**, and it is exactly the requirement that
+   $\mathrm{Tr}(\rho Q)\in[0,1]$ for every state $\rho$, since the extreme
+   values of $\mathrm{Tr}(\rho Q)$ over states are $Q$'s smallest and
+   largest eigenvalues. A CP map whose $Q$ has an eigenvalue above $1$ is
+   not a sub-normalized operation at all; fed the corresponding
+   eigenstate it reports an outcome probability greater than one, which is
+   not a description of anything. The earlier $A=\mathrm{diag}(\sqrt2,0)$
+   example is precisely such a map, so having the right trace is no defence.
+
+   Given trace non-increase, the standard measurement dictionary reads:
+   $\mathrm{Tr}\,\mathcal E_m(\rho)=\mathrm{Tr}(\rho\,Q_m)$ is the
+   probability of outcome $m$, and the post-measurement state is the
+   renormalized $\mathcal E_m(\rho)/\mathrm{Tr}\,\mathcal E_m(\rho)$,
+   defined whenever that probability is nonzero. The individual branches
+   are sub-normalized; the collection is not. Summing over outcomes,
+   $\sum_mQ_m=I$ is the completeness relation, so
+   $\sum_m\mathrm{Tr}_{\rm out}J(\mathcal E_m)=I$ and the total map
+   $\sum_m\mathcal E_m$ is a genuine channel: exactly the channel you get
+   by performing the measurement and then throwing the outcome away.
+
+   Those $Q_m$ are POVM elements, which is where this thread is picked up
+   in POVMs and Generalized Measurement. The structure to carry forward is
+   that the two Choi conditions are genuinely independent: positivity of
+   $J$ is what makes a map physical at all, and the constraint on
+   $\mathrm{Tr}_{\rm out}J$ is a separate dial running from "deterministic
+   channel" at $=I$ through "one branch of a measurement" at $\leq I$ to
+   "not a description of anything" past it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -543,11 +755,11 @@ $\mathcal E$ to be a physically valid channel.
   Trace Distance and Fidelity's exact numerical output, is this lesson's
   concrete proof that the theorem isn't just symbolic bookkeeping.
 
-## Further Exploration
+## From Discrete Channels to Continuous Drift
 
 <NextDiscovery>
   [The Lindblad Master Equation](/lessons/quantum-mastery/quantum-information-theory/the-lindblad-master-equation)
   turns to a different question about these same channels: given
   that a map is physically valid at a single instant, what
-  continuous-time generator would actually produce it as time unfolds?
+  continuous-time generator would produce it as time unfolds?
 </NextDiscovery>

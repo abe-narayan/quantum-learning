@@ -24,13 +24,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="A valid state that cannot exist">
   A momentum eigenstate is a perfectly valid piece of mathematics and a
   physically impossible state: it can never be <Term id="normalization">normalized</Term>. A real
   particle needs a superposition of many of them.
 </LessonHook>
 
-## Motivation
+## The integral that refuses to converge
 
 The plane wave $e^{ipx/\hbar}$ from two lessons ago is the momentum
 operator's eigenfunction, but $\int|e^{ipx/\hbar}|^2dx = \int 1\,dx$
@@ -39,7 +39,7 @@ state at all, only a useful mathematical building block. A real free
 particle is instead built as a *superposition* of plane waves, and that
 superposition is what a wave packet is.
 
-## Intuition
+## Add plane waves until they cancel everywhere else
 
 Superposition, interference, and phase (the last course's own lesson)
 already established that combining amplitudes with the right relative
@@ -58,7 +58,7 @@ arranged so they interfere *constructively* in one localized region and
   license="CC BY 4.0 (public domain in France and the US)"
 />
 
-## Mathematical Development
+## Building the packet, then clocking its speed
 
 ### Building the packet
 
@@ -85,7 +85,7 @@ momentum})` implements, generalized to an arbitrary center.
 ### Group velocity
 
 <PredictBeforeReveal
-  question="A wave packet is built from plane waves e^{ikx}, each with its own phase velocity ω/k. Does the packet's visible envelope move at that same phase velocity?"
+  question="A wave packet is built from plane waves e^(ikx), each with its own phase velocity ω/k. Does the packet's visible envelope move at that same phase velocity?"
   options={[
     { label: "Yes, the envelope moves at the phase velocity", value: "phase" },
     { label: "No, the envelope moves at a different speed, the group velocity", value: "group" },
@@ -111,7 +111,7 @@ calculation deferred to the Wave Packet Dynamics lesson but numerically
 verified here already), so the packet's average position advances the way
 a free classical particle would.
 
-## Physical Interpretation
+## The closest quantum mechanics comes to a particle
 
 A wave packet is the quantum object closest to "a particle with a
 definite position and momentum." It has *some* spread in both (bounded
@@ -128,7 +128,7 @@ classical mechanics ever looked like the whole story.
 Newton's laws, and for a grain of sand the average is all anyone can
 measure.
 
-<InteractiveSection title="Group velocity, live" description="The Wavefunction Explorer's Free Gaussian Packet preset builds the state derived above. Set momentum to a nonzero value and watch ⟨x⟩ in the state panel advance at a constant rate. Measure it against the formula v_g=p₀/m (natural units, m=1, so v_g=p₀ directly) by comparing the displayed ⟨p⟩ to the rate ⟨x⟩ changes at.">
+<InteractiveSection title="Group velocity, live" description="The Wavefunction Explorer's Free Gaussian Packet preset builds the state derived above. Set momentum to a nonzero value and time how fast ⟨x⟩ moves in the state panel, and whether that rate itself holds steady. Measure it against the formula v_g=p₀/m (natural units, m=1, so v_g=p₀ directly) by comparing the displayed ⟨p⟩ to the rate ⟨x⟩ changes at.">
   <LazyWavefunctionExplorer />
 </InteractiveSection>
 
@@ -151,7 +151,7 @@ measure.
   ]}
 />
 
-## Worked Example
+## How far the centre has moved after three time units
 
 **A packet has $p_0=2$ (natural units, $m=1$). After $\Delta t=3$, by how
 much should $\langle x\rangle$ have advanced, if the packet started at
@@ -166,7 +166,7 @@ readout after playing that preset forward to $t=3$. The same check runs as
 one of `timeEvolution.test.ts`'s engine tests, which asserts the numerical
 result against this formula.
 
-## Common Mistakes
+## Phase velocity is the other one
 
 <Callout type="warning">
 **Trying to normalize a bare plane wave.** It cannot be done. $\int
@@ -187,11 +187,136 @@ the classical particle velocity.
 1. Why is $\Delta k$ (momentum-space width) inversely related to $\sigma$
    (position-space width) for a Gaussian packet? Connect this to the
    <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term> from two lessons ago.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $\psi(x)$ and $\phi(k)$ are one state written in two bases
+   related by a Fourier transform, and the Fourier transform trades width
+   in one domain for narrowness in the other. For the Gaussian the trade is
+   exact: $\sigma = 1/(2\Delta k)$, so the product is fixed.
+
+   The construction in this lesson shows it in one step. Starting from
+   $\phi(k)\propto e^{-(k-k_0)^2/(4\Delta k^2)}$ and transforming gives
+   $\psi(x,0)\propto e^{-x^2/(4\sigma^2)}e^{ik_0x}$ with
+   $\sigma=1/(2\Delta k)$. The transform sends the exponent's
+   coefficient to its reciprocal, so the two widths cannot both shrink: a
+   narrower band of $k$ is a broader envelope in $x$, and conversely.
+
+   The mechanism, in words rather than integrals, is interference. The
+   packet is localized because the plane waves in the superposition
+   reinforce near one point and cancel elsewhere. Cancelling over a wide
+   region requires many components spread across a wide range of $k$, so
+   they can get out of step quickly as you move away from the centre. A
+   narrow band of $k$ contains waves that stay nearly in step over a long
+   distance, so they cannot cancel until far away, and the envelope is
+   correspondingly broad.
+
+   The connection to the uncertainty principle is that these are the same
+   fact, not two facts that agree. With $\hbar=1$, $\Delta p = \Delta k$,
+   so $\sigma\Delta k = \tfrac12$ reads $\Delta x\,\Delta p = \hbar/2$:
+   the Gaussian saturates the bound. The general theorem
+   $\Delta x\,\Delta p\ge\hbar/2$ was proved from the commutator, with no
+   mention of Fourier transforms; the Fourier statement is what that
+   theorem looks like once the operators are written in position space.
+   Two routes, one result, which is the pattern this whole course runs on.
+
+   The wrong turn is to describe this as a measurement limitation, as
+   though a cleverer apparatus could beat it. Nothing was measured here. A
+   Gaussian in $k$ simply *is* a Gaussian in $x$ of reciprocal width, the
+   way a short pulse in time simply is a broad band in frequency. The
+   constraint is a property of the state, present before any instrument is
+   pointed at it.
+
+   </details>
+
 2. For $p_0=-3$ and $m=1$, what is the group velocity, and which
    direction does the packet move?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $v_g = p_0/m = -3$, so the packet moves in the $-x$ direction, at speed
+   $3$.
+
+   The formula derived above carries the sign through untouched:
+   $v_g = dE/dp = p_0/m$, and a negative $p_0$ gives a negative velocity. A
+   packet built with $k_0<0$ is a superposition of leftward-travelling
+   plane waves, and its envelope goes left.
+
+   Checking against the mean-position formula makes it concrete. Starting
+   at $x_0$, $\langle x(t)\rangle = x_0 - 3t$, so after $t=3$ the centre
+   has moved $9$ units to the left of where it began. The worked example's
+   packet, with $p_0=+2$, moved $6$ units to the right over the same
+   interval.
+
+   Two distinctions to keep clean.
+
+   Velocity has a sign; speed does not. "Group velocity $-3$" and "speed
+   $3$, leftward" are the same statement, and reporting $|v_g|=3$ without
+   the direction throws away half the answer to this question.
+
+   The *width* does not care about the sign. $\sigma(t)$ depends on
+   $\sigma_0$ and $|t|$, not on $p_0$, so the leftward packet spreads at
+   exactly the rate the rightward one does. Momentum sets where the packet
+   goes; the momentum *spread* sets how fast it smears, and those are
+   independent knobs. The next lesson makes that separation exact.
+
+   Finally, note what a negative $p_0$ does not change: the energy. Since
+   $E = p_0^2/2m$ is even in $p_0$, packets with $p_0 = +3$ and $p_0 = -3$
+   have identical energy, $4.5$ in these units. Energy fixes the speed and
+   leaves the direction undetermined, which is why $\sin(kx)$, an equal
+   mix of both signs, has a sharp energy and zero mean momentum.
+
+   </details>
+
 3. Explain in one or two sentences why Ehrenfest's theorem (packet
    averages obey classical mechanics) is *consistent* with, not a
    violation of, the underlying quantum uncertainty.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because Ehrenfest's theorem is a statement about *averages*, and an
+   average obeying a classical equation says nothing about the spread
+   around it. Uncertainty constrains the spread, and the two claims never
+   compete for the same quantity.
+
+   Spelled out: $d\langle x\rangle/dt = \langle p\rangle/m$ constrains one
+   number, the mean position, and ties it to another number, the mean
+   momentum. The uncertainty relation constrains $\Delta x$ and $\Delta p$,
+   which are second moments about those means. A distribution can have a
+   mean that marches along a perfect straight line while being as broad as
+   you like around it, and a free wave packet is exactly that: its centre
+   advances at $p_0/m$ forever while its width grows without bound.
+
+   The concrete picture is the grain of sand above. Its $\langle x\rangle$
+   follows Newton's laws to any precision anyone can measure, and it also
+   carries $\Delta x\Delta p\ge\hbar/2$ the whole time; both are true
+   because the spread is around $10^{-26}$ m/s in velocity, far below what
+   the classical description was ever resolving.
+
+   The seductive wrong reading is that Ehrenfest's theorem shows quantum
+   mechanics "reduces to" classical mechanics, so the uncertainty must
+   somehow be washing out. It does not, and there are two separate reasons
+   to resist it.
+
+   First, the theorem in its exact form is $d\langle p\rangle/dt =
+   -\langle V'(x)\rangle$, the average of the force over the packet, and
+   Newton's law would require $-V'(\langle x\rangle)$, the force at the
+   average position. These agree only when $V'$ is linear in $x$, which
+   means $V$ at most quadratic: free, uniform force, harmonic. For any
+   other potential the classical trajectory and the quantum mean genuinely
+   part company once the packet is wide enough to sample different forces,
+   and the next lesson's derivation is where that shows up.
+
+   Second, even where the means do follow classical equations exactly, the
+   *predictions* are not classical. A single measurement returns a value
+   scattered around the mean by $\Delta x$, not the mean itself. Classical
+   mechanics is recovered as a statement about averages, not as a statement
+   about outcomes.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -205,7 +330,7 @@ the classical particle velocity.
 - That construction is what `gaussianPacket` builds and what the
   Wavefunction Explorer's Free Gaussian Packet preset animates.
 
-## Further Exploration
+## Where confinement enters
 
 <ChallengePrompt prompt="For p0=4, m=2 (ħ=1), find both the group velocity and the phase velocity of the underlying plane wave, and confirm they differ by exactly the factor of 2 the Common Mistakes note states.">
   $v_g=p_0/m$ as derived above, and $v_{\rm phase}=\hbar k_0/(2m)=v_g/2$

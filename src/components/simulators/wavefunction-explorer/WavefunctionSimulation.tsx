@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { SplitOperatorEvolver } from "@/lib/quantum/timeEvolution";
+import { SplitOperatorEvolver, probabilityNearGridEdges } from "@/lib/quantum/timeEvolution";
 import type { Wavefunction1D } from "@/lib/quantum/wavefunction";
 import type { PresetSetup } from "./presets";
-import { WavefunctionCanvas, type CanvasMode } from "./WavefunctionCanvas";
+import { momentumDisplayRange, WavefunctionCanvas, type CanvasMode } from "./WavefunctionCanvas";
 import { StatePanel } from "./StatePanel";
 import { PlaybackControls } from "./PlaybackControls";
 import { ComparisonPanel } from "./ComparisonPanel";
 
 /**
  * How many animation frames the first-contact autoplay pass advances before
- * pausing itself — the same bounded-pass convention (and the same budget)
+ * pausing itself, the same bounded-pass convention (and the same budget)
  * as WavefunctionHeroExplorer's AUTOPLAY_FRAME_LIMIT: long enough to show
  * the physics actually develop, short enough to read as a proof-of-concept
  * rather than a looping background animation.
@@ -22,12 +22,12 @@ const AUTOPLAY_FRAME_LIMIT = 260;
  * Owns everything that evolves over time for one fixed configuration: the
  * current wavefunction, elapsed time, and the animation loop. Deliberately
  * mounted fresh (via a `key` on the config, in WavefunctionExplorer) every
- * time the preset or a parameter changes, rather than reset via an effect
- * — an effect-based reset still renders once with the *old* `psi` next to
+ * time the preset or a parameter changes, rather than reset via an effect.
+ * An effect-based reset still renders once with the *old* `psi` next to
  * the *new* `setup` (different grids) before it runs, and anything reading
  * both together in that render (like ComparisonPanel's overlap fidelity)
  * throws. Remounting via `key` means `psi`'s initial state is *always*
- * `setup.psi0` for the exact `setup` this instance was built with — the
+ * `setup.psi0` for the exact `setup` this instance was built with. The
  * mismatch is structurally impossible rather than patched over.
  */
 export function WavefunctionSimulation({
@@ -43,7 +43,7 @@ export function WavefunctionSimulation({
   speed: number;
   onSpeedChange: (speed: number) => void;
   prefersReducedMotion: boolean;
-  /** Forwarded to WavefunctionCanvas — see its doc comment. */
+  /** Forwarded to WavefunctionCanvas; see its doc comment. */
   showMeanSpreadOverlay?: boolean;
 }) {
   const evolver = useMemo(
@@ -59,7 +59,7 @@ export function WavefunctionSimulation({
 
   // A lesson can carry several of these embeds; nothing stops a reader from
   // hitting Play, scrolling on, and leaving the stepper running indefinitely
-  // off-screen. This tracks visibility only — it doesn't touch `isPlaying`
+  // off-screen. This tracks visibility only; it doesn't touch `isPlaying`
   // (the Play/Pause button keeps showing the reader's actual intent) so the
   // loop silently resumes on scroll-back rather than needing a second click.
   // Defaults `true` so an already-visible, already-playing instance never
@@ -83,7 +83,7 @@ export function WavefunctionSimulation({
     return () => observer.disconnect();
   }, []);
 
-  // One bounded autoplay pass on first contact — the bench's "open
+  // One bounded autoplay pass on first contact, the bench's "open
   // mid-phenomenon" rule for an instrument whose whole point is time
   // evolution. Runs once per mount (a preset/parameter change remounts via
   // `key`, exactly like the homepage hero), is capped at
@@ -134,12 +134,38 @@ export function WavefunctionSimulation({
     setIsPlaying((v) => !v);
   }
 
+  /**
+   * One Step advances exactly what one frame of Play advances at 1x speed:
+   * `setup.stepsPerFrame` integrator steps, not one.
+   *
+   * It used to advance a single `dt`, which made Step and Play different units
+   * on the same instrument, and on three of the eight presets it made Step
+   * useless. `stepsPerFrame` is 4 on the free Gaussian but 100 on the two
+   * infinite-well presets and 150 on `superposition`, so a click moved the
+   * simulation 1/150th of a frame: t advanced by 0.0002 where a frame of Play
+   * advances 0.03, and the 260-frame autoplay pass covers t = 7.8. A reader
+   * pressing Step saw nothing change, because nothing had.
+   *
+   * That is a reduced-motion bug, not a nicety. Under
+   * `prefers-reduced-motion` this is the *only* thing left driving the
+   * simulation: `PlaybackControls` replaces Play with a "continuous play
+   * disabled" badge and a Step button, and the rAF loop above returns
+   * immediately. So the reduced-motion path was present, wired, correct in
+   * outline and, on the presets whose whole subject is a state that beats or
+   * sloshes, incapable of reaching the phenomenon: ~39,000 clicks to cover
+   * what the motion path plays automatically in 260 frames.
+   *
+   * One frame's work is one frame's cost, ~37ms on the heaviest preset
+   * (measured against the real evolver, 512-point grid, 100 steps), which is
+   * fine for a discrete button press and is exactly what the animation loop
+   * already spends per frame.
+   */
   function handleStep() {
     autoplayRef.current = false;
-    const next = evolver.step(psiRef.current);
+    const next = evolver.stepMultiple(psiRef.current, setup.stepsPerFrame);
     psiRef.current = next;
     setPsi(next);
-    setT((prev) => prev + setup.dt);
+    setT((prev) => prev + setup.dt * setup.stepsPerFrame);
   }
 
   function handleReset() {
@@ -150,27 +176,66 @@ export function WavefunctionSimulation({
     setT(0);
   }
 
-  // Computed once per render, not once per displaying component — see
+  // Computed once per render, not once per displaying component; see
   // Wavefunction1D.momentumStatistics's doc comment.
   const { meanMomentum, kineticEnergy } = useMemo(() => psi.momentumStatistics(1), [psi]);
 
   // Live narration, matching the aria-live line every other instrument on the
   // bench carries: this one had a numeric StatePanel but nothing that said in
   // words what the numbers meant, and nothing announced to a screen reader as
-  // the simulation ran. Both quantities are read off the real evolved state —
+  // the simulation ran. Both quantities are read off the real evolved state,
   // no separate model.
   const initialSpread = useMemo(() => Math.sqrt(setup.psi0.variancePosition()), [setup.psi0]);
   const spread = Math.sqrt(psi.variancePosition());
   const spreadRatio = initialSpread > 0 ? spread / initialSpread : 1;
+
+  /**
+   * Whether the packet has run into the end of the simulation box.
+   *
+   * The box is periodic (see `probabilityNearGridEdges`), so it does not
+   * leave: it comes back in the far side, and from that moment ⟨x⟩ and the
+   * width below stop describing one packet. At the ends of the free-particle
+   * preset's own sliders this happens partway through the automatic first
+   * playback, and the sentence the reader used to get there ("Spreading like
+   * this is not the simulation losing accuracy") was the one thing on screen
+   * insisting a numerical artifact was physics. Norm is still exactly 1, so
+   * the Norm readout gives no warning either.
+   */
+  /**
+   * The k window the momentum view is drawn in, fixed for this run.
+   *
+   * Derived from `setup.psi0` and not from the live `psi` on purpose: sizing
+   * the axis from the frame being drawn was measured hopping between rungs 38
+   * times over 400 frames on `infinite-well-excited`, because an eigenstate's
+   * slow tail wobbles across a rung boundary under the finite-wall Trotter
+   * error. See THE MOMENTUM AXIS in `WavefunctionCanvas`. This component is
+   * remounted (via `key`) on every preset or parameter change, so "once per
+   * mount" is exactly "once per configuration".
+   */
+  const momentumRange = useMemo(() => momentumDisplayRange(setup.psi0), [setup.psi0]);
+
+  const edgeProbability = useMemo(() => probabilityNearGridEdges(psi), [psi]);
+  const hasWrappedAround = edgeProbability > 1e-3;
+
   const narration = setup.isStationary
-    ? `t = ${t.toFixed(2)}. This is an energy eigenstate: its shape has not changed and never will, no matter how long you run it. Switch to the Re / Im view and you'll see what is still moving — the phase turns while the probability sits perfectly still.`
-    : `t = ${t.toFixed(2)}. The packet is centred at x = ${psi
-        .expectationPosition()
-        .toFixed(1)} and is now ${spreadRatio.toFixed(2)}× as wide as it started. ${
-        spreadRatio > 1.05
-          ? "Spreading like this is not the simulation losing accuracy — an unconfined quantum particle genuinely becomes less and less localized over time."
-          : "Watch that width: it does not stay put."
-      }`;
+    ? `t = ${t.toFixed(2)}. This is an energy eigenstate: its shape has not changed and never will, no matter how long you run it. Switch to the Re / Im view and you'll see what is still moving: the phase turns while the probability sits perfectly still.`
+    : hasWrappedAround
+      ? `t = ${t.toFixed(2)}. The packet has reached the end of the simulation box, which wraps around, so part of it is now re-entering from the far side. The position and width figures below stop describing a single packet from here on; press Reset to run it again.`
+      : `t = ${t.toFixed(2)}. The packet is centred at x = ${psi
+          .expectationPosition()
+          .toFixed(1)} and is now ${spreadRatio.toFixed(2)}× as wide as it started. ${
+          spreadRatio > 1.05
+            ? "Spreading like this is not the simulation losing accuracy; an unconfined quantum particle genuinely becomes less and less localized over time."
+            : // "Watch that width" is an instruction to watch something move,
+              // and under reduced motion nothing is going to: the rAF loop
+              // above returns immediately and the autoplay pass never starts,
+              // so this reader is sitting on a still frame with Step forward as
+              // their only way on. Telling them what to press is the same
+              // sentence doing the same job through the control they have.
+              prefersReducedMotion
+              ? "Press Step forward to advance the evolution one frame at a time and watch that width change."
+              : "Watch that width: it does not stay put."
+        }`;
 
   return (
     <div ref={containerRef} className="space-y-3">
@@ -180,6 +245,7 @@ export function WavefunctionSimulation({
         potential={setup.potential}
         mode={mode}
         showMeanSpreadOverlay={showMeanSpreadOverlay}
+        momentumRange={momentumRange}
       />
 
       <PlaybackControls
@@ -194,8 +260,8 @@ export function WavefunctionSimulation({
 
       {/*
         The visible narration is deliberately not the live region. This
-        instrument steps on every animation frame — and it autoplays a bounded
-        260-frame pass on first contact without anyone pressing anything — so a
+        instrument steps on every animation frame, and it autoplays a bounded
+        260-frame pass on first contact without anyone pressing anything, so a
         `polite` region attached here rewrote itself ~60 times a second and a
         screen reader spent the whole run being cut off mid-sentence, never
         completing one. Same split as RabiExplorer: the eye reads the live

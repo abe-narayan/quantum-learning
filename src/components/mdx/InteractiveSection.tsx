@@ -117,6 +117,61 @@ function ModeIcon({ mode }: { mode?: Mode }) {
  * leaving only the pedagogical header — mode badge, title, description —
  * above the simulator's own single frame. Every other embed keeps the full
  * panel exactly as before.
+ *
+ * **What the de-framed wrapper still costs, and the box a figure inside it
+ * actually gets.** Switching the chrome off does not switch the *box* off.
+ * Colour, wash and shadow are the only things those four utilities touch;
+ * the 1px border and the body's `p-4 sm:p-5` are geometry and survive
+ * untouched. Measured against the dev server's served markup on
+ * `/lessons/quantum-hardware/noise-decoherence-and-scaling/sources-of-noise`,
+ * `/lessons/quantum-computing/qubits-and-quantum-states/the-bloch-sphere` and
+ * `/lessons/quantum-computing/quantum-gates-and-circuits/building-quantum-circuits`,
+ * a lesson simulator embed nests exactly like this:
+ *
+ *     div.instrument.overflow-hidden.has-[…]      <- this wrapper, 1px border
+ *       div.p-4.sm:p-5                            <- this wrapper's body
+ *         div[data-mdx-slot=embed].mt-4
+ *           div.not-prose.instrument.overflow-hidden  <- SimulatorInstrument
+ *             div.p-4.sm:p-5                          <- the simulator's body
+ *
+ * so at a 320px viewport the arithmetic used to run 320 − 32 (`Container
+ * px-4`) − 34 (this wrapper) − 34 (the simulator's own frame) = **220px**,
+ * against the 254px every other figure in this tree is sized for. 34px is 13%
+ * of the column, and it was buying nothing a reader could see, because the
+ * frame it padded is invisible. It is why four simulator canvases were
+ * painting 8.0-8.8px type in lessons while clearing the floor on the
+ * `/simulators` bench, where the same component gets the full 254px.
+ *
+ * So below `sm` the de-framed wrapper now gives the 34px back: `border-0`
+ * drops the transparent border box, and the embed slot's `-mx-4` cancels the
+ * body padding for the embed only. The embed lands flush on the wrapper's
+ * padding box, and a lesson simulator gets **254px at 320px**, the same box
+ * it gets on the bench. The header, title and description keep their inset
+ * (17px before, 16px now that the border they were sitting behind is gone),
+ * so the pedagogical prose stays where it was and only the instrument frame
+ * goes full bleed, which is the ordinary "figure breaks the column" treatment
+ * rather than a new one.
+ *
+ * **Why below `sm` only, and not everywhere.** `SimulatorInstrument`'s
+ * stage/rail split is an `@min-[42rem]` (672px) container query on the
+ * simulator's *own body*. The lesson reading column is `--container-reading`,
+ * 46rem = 736px, so that body measures 736 − 42 (this wrapper at `sm:p-5`) −
+ * 42 (its own) = 652px and correctly stays stacked. Reclaiming the 42px at
+ * desktop takes it to 694px, which fires the split and opens the fixed 320px
+ * controls rail inside the reading column, leaving a 342px stage. That is the
+ * exact failure `SimulatorInstrument`'s doc comment says the container query
+ * exists to prevent, so desktop keeps its padding and the gate keeps its
+ * headroom. Below `sm` the same body reaches at most 573px, so the 672px gate
+ * is unreachable in either state; every gate that does move (`@sm` 384px on
+ * the control grids, `@min-[340px]` in `WavefunctionCanvas`, `@min-[32rem]` in
+ * `CompareStatesExplorer`) fires 34px of viewport earlier, at a container
+ * width that genuinely satisfies it, which is what a container query is for.
+ *
+ * One cosmetic consequence, accepted: `.instrument`'s `overflow-hidden` stays
+ * on, so below `sm` the simulator's own drop shadow is clipped at the left and
+ * right edges it now sits flush against. Removing the clip instead would let a
+ * wide simulator bleed past the column and scroll the page sideways, which is
+ * the worse of the two.
  */
 export function InteractiveSection({
   title = "Try it yourself",
@@ -149,12 +204,21 @@ export function InteractiveSection({
           "has-[[data-mdx-slot=embed]_.instrument]:border-transparent",
           "has-[[data-mdx-slot=embed]_.instrument]:bg-transparent",
           "has-[[data-mdx-slot=embed]_.instrument]:shadow-none",
-          "has-[[data-mdx-slot=embed]_.instrument]:after:content-none"
+          "has-[[data-mdx-slot=embed]_.instrument]:after:content-none",
+          // …and below `sm`, stop charging for the box as well as the paint:
+          // a transparent 1px border is still 2px of column. See "What the
+          // de-framed wrapper still costs" above for the measurement.
+          "max-sm:has-[[data-mdx-slot=embed]_.instrument]:border-0"
         )}
       >
         <p className="font-display text-base font-semibold text-foreground sm:text-lg">{title}</p>
         <p className="mt-1.5 text-sm text-muted-foreground">{description}</p>
-        <div data-mdx-slot="embed" className="mt-4">
+        {/* `-mx-4` cancels the body's `p-4` for the embed alone, so the
+            simulator's frame lands on the wrapper's padding box (254px at
+            320px) while the header and prose above keep their inset. Paired
+            with the `border-0` above and gated on the same `max-sm` and the
+            same `.instrument` test, so the two move as one. */}
+        <div data-mdx-slot="embed" className="mt-4 max-sm:has-[.instrument]:-mx-4">
           {children}
         </div>
       </Instrument>

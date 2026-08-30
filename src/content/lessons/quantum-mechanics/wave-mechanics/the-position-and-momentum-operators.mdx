@@ -20,15 +20,16 @@ export const lessonMeta = {
   objectives: [
     "State the position operator's action in position space and explain why it's just multiplication",
     "Derive the momentum operator p-hat = -i*hbar*d/dx from requiring plane waves to be its eigenfunctions with eigenvalue p",
+    "Show by integration by parts that the factor of i is exactly what makes p-hat Hermitian",
     "Compute [x,p]psi(x) directly by calculus and reproduce [x,p]=i*hbar exactly",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Derived, not decreed">
 The earlier Position and Momentum lesson stated [x̂,p̂]=iħ and moved on, promising the derivation once continuous position existed. This lesson is that promise kept: p̂ isn't asserted here, it's derived from a single physical requirement.
 </LessonHook>
 
-## Motivation
+## The preview that owed you a derivation
 
 The "From Classical to Quantum" course's Position and Momentum lesson was
 explicit that it was only a *preview*. It wrote down
@@ -57,7 +58,7 @@ from the commutator with no further physics.
   license="CC BY-SA 3.0 DE"
 />
 
-## Intuition
+## Start from the plane wave and work backwards
 
 A free particle with definite momentum $p$ is described (from ordinary
 wave physics, de Broglie's relation $p=\hbar k$) by a plane wave $e^{ikx}
@@ -65,7 +66,7 @@ wave physics, de Broglie's relation $p=\hbar k$) by a plane wave $e^{ikx}
 have this plane wave as an eigenfunction with <Term id="eigenvalue-eigenvector">eigenvalue</Term> $p$. That single
 requirement pins down the operator's form completely.
 
-## Mathematical Development
+## One requirement, and p-hat has no choice
 
 ### The position operator
 
@@ -170,7 +171,7 @@ never needed $\hat p$'s explicit form, only the value of the commutator.
   explanation="[p-hat, x-hat] = -[x-hat, p-hat] = -i*hbar, since swapping the order of a commutator flips its sign by definition ([A,B] = -[B,A]). Redoing the product-rule calculation with the operators reversed confirms it directly, and that is Practice Question 2 below."
 />
 
-## Physical Interpretation
+## Why multiplying and differentiating refuse to commute
 
 $\hat x$ and $\hat p$ don't commute because "multiply by $x$" and "take a
 derivative" interfere with each other: differentiating a product picks up
@@ -187,7 +188,7 @@ electron to an atom is what makes it fast. There is no way to have a
 narrow spike and a slowly varying derivative at once, and the uncertainty
 principle is that statement about calculus, read as physics.
 
-## Worked Example
+## Checking the eigenvalue equation in one line
 
 **Verify $\hat p\phi_p(x)=p\,\phi_p(x)$ directly for $\phi_p(x)=e^{ipx/\hbar}$.**
 
@@ -204,13 +205,13 @@ this platform's simulator computes its momentum expectation value by
 running the Fourier transform, not by reading back a label you set:
 
 <InteractiveSection
-  title="Set the momentum, watch ⟨p⟩ track it"
-  description="Try the Free Gaussian Packet preset and change its Momentum parameter. Watch the ⟨p⟩ readout track the value you set: the eigenvalue relation derived above, checked against a computed expectation value rather than an assumption."
+  title="Set the momentum, then read ⟨p⟩"
+  description="Try the Free Gaussian Packet preset and change its Momentum parameter. Set it to a few different values and read ⟨p⟩ each time. The eigenvalue relation derived above commits to a specific relationship between the number you set and the number you read, and this is where it gets checked against a computed expectation value rather than assumed."
 >
   <LazyWavefunctionExplorer />
 </InteractiveSection>
 
-## Common Mistakes
+## The factor of i is load-bearing
 
 <Callout type="warning">
 **Dropping the factor of $i$.** $\hat p = -\hbar\,d/dx$ (missing the $i$)
@@ -230,12 +231,156 @@ $x$ times $\hat p\psi$.
 1. Show that $\hat x$ is trivially Hermitian (i.e. that "multiply by the
    real number $x$" satisfies the Hermiticity condition without needing
    integration by parts).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Hermiticity asks that $\langle\phi|\hat x\psi\rangle =
+   \langle\hat x\phi|\psi\rangle$. Write both sides out:
+
+   $$
+   \langle\phi|\hat x\psi\rangle = \int \phi(x)^*\,x\,\psi(x)\,dx, \qquad \langle\hat x\phi|\psi\rangle = \int \left(x\,\phi(x)\right)^*\psi(x)\,dx = \int x^*\,\phi(x)^*\,\psi(x)\,dx
+   $$
+
+   Since $x$ is a real number, $x^* = x$, and the two integrands are
+   identical term for term. The two sides are equal, and nothing was moved
+   from one factor to the other, so no integration by parts and no boundary
+   terms were needed.
+
+   The contrast with $\hat p$ is the point of the exercise. Multiplication
+   is a *pointwise* operation: at each $x$ it scales the value of $\psi$
+   there by a number, and the only way that can fail Hermiticity is if the
+   number is not real. Differentiation is not pointwise. It compares
+   neighbouring values, so moving it across the inner product means
+   integrating by parts, which flips a sign and produces boundary terms.
+   That flip is why $d/dx$ alone is anti-Hermitian and why the $i$ in
+   $\hat p = -i\hbar\,d/dx$ is required.
+
+   The same one-line argument covers more than $\hat x$. Any operator that
+   acts as multiplication by a real-valued function $V(x)$ is Hermitian by
+   this identical calculation, which is why the potential term of the
+   Hamiltonian never needs a separate check. The rule to carry forward is
+   that a multiplication operator is Hermitian exactly when the function it
+   multiplies by is real; a complex potential, the tool for modelling
+   absorption, is non-Hermitian for precisely this reason and loses norm on
+   purpose.
+
+   </details>
+
 2. Compute $[\hat p,\hat x]$ directly (not by just negating the result
    above, redo the calculation with the operators in the other order) and
    confirm it equals $-i\hbar$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $[\hat p,\hat x] = -i\hbar$.
+
+   Apply $[\hat p,\hat x] = \hat p\hat x - \hat x\hat p$ to an arbitrary
+   $\psi(x)$, keeping careful track of which term needs the product rule.
+   The first term differentiates the product $x\psi$:
+
+   $$
+   \hat p\hat x\,\psi = -i\hbar\frac{d}{dx}\left(x\,\psi\right) = -i\hbar\left(\psi + x\psi'\right)
+   $$
+
+   The second differentiates $\psi$ alone and then multiplies by $x$, so
+   no product rule appears:
+
+   $$
+   \hat x\hat p\,\psi = x\left(-i\hbar\,\psi'\right) = -i\hbar\,x\psi'
+   $$
+
+   Subtracting, the $x\psi'$ terms cancel and the leftover is the term the
+   product rule generated:
+
+   $$
+   [\hat p,\hat x]\psi = -i\hbar\psi - i\hbar x\psi' - \left(-i\hbar x\psi'\right) = -i\hbar\,\psi
+   $$
+
+   Since this holds for every $\psi$, the operator identity is
+   $[\hat p,\hat x] = -i\hbar\,\hat I$, which is $-[\hat x,\hat p]$ as
+   antisymmetry requires. Redoing the calculation rather than negating is
+   the check: an independent route landing on the same answer means the
+   product rule was applied to the right factor both times.
+
+   The mistake this question is designed to expose is applying the product
+   rule in the wrong place, or in both places. It is easy to write
+   $\hat x\hat p\,\psi = -i\hbar\,(x\psi)'$ by reflex, which would make the
+   two terms identical and give a commutator of zero, that is, position and
+   momentum commuting and no uncertainty principle at all. The operators
+   are read right to left: in $\hat x\hat p$, $\hat p$ acts first on $\psi$
+   and $\hat x$ multiplies the result afterwards, so the derivative never
+   sees the $x$.
+
+   The whole of the canonical commutator therefore comes from one term in
+   one product rule. That is a small piece of calculus carrying the entire
+   position-momentum uncertainty relation, since the bound
+   $\Delta x\,\Delta p\ge\tfrac12|\langle[\hat x,\hat p]\rangle|$ collapses
+   to zero the moment that term is dropped.
+
+   </details>
+
 3. Using $\hat p = -i\hbar\,d/dx$, compute $\hat p^2\psi$ for
    $\psi(x)=\sin(kx)$, and identify what physical quantity
    $\langle\psi|\hat p^2|\psi\rangle/(2m)$ represents.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\hat p^2\psi = \hbar^2k^2\sin(kx) = \hbar^2k^2\,\psi$, and
+   $\langle\hat p^2\rangle/(2m)$ is the expectation value of the
+   **kinetic energy**.
+
+   Apply the operator twice, one derivative at a time:
+
+   $$
+   \hat p\,\psi = -i\hbar\,\frac{d}{dx}\sin(kx) = -i\hbar k\cos(kx)
+   $$
+
+   $$
+   \hat p^2\psi = -i\hbar\frac{d}{dx}\left(-i\hbar k\cos(kx)\right) = (-i\hbar)^2 k\,\frac{d}{dx}\cos(kx) = \left(-\hbar^2\right)\left(-k^2\sin(kx)\right) = \hbar^2k^2\,\psi
+   $$
+
+   using $(-i\hbar)^2 = -\hbar^2$ and $\tfrac{d}{dx}\cos(kx) =
+   -k\sin(kx)$. So $\sin(kx)$ is an eigenfunction of $\hat p^2$ with
+   eigenvalue $\hbar^2k^2$.
+
+   The identification of $\langle\hat p^2\rangle/(2m)$ follows from
+   promoting the classical kinetic energy $p^2/2m$ to an operator, exactly
+   as the Hamiltonian's kinetic term is built in the next lesson: for this
+   state it equals $\hbar^2k^2/(2m)$, a definite number.
+
+   The subtlety worth the effort here is that $\sin(kx)$ is an
+   eigenfunction of $\hat p^2$ while emphatically *not* being an
+   eigenfunction of $\hat p$. Check it: $\hat p\psi = -i\hbar k\cos(kx)$,
+   and $\cos$ is not a multiple of $\sin$. Written as a superposition,
+
+   $$
+   \sin(kx) = \frac{1}{2i}\left(e^{ikx} - e^{-ikx}\right)
+   $$
+
+   the state is an equal mix of momentum $+\hbar k$ and momentum
+   $-\hbar k$. So $\langle p\rangle = 0$ while $\langle p^2\rangle =
+   \hbar^2k^2$, giving $\Delta p = \hbar k$. The particle has a perfectly
+   definite kinetic energy and a completely undetermined direction of
+   travel, which is exactly what a standing wave is.
+
+   The wrong turn is to reason that a definite $\hat p^2$ means a definite
+   $\hat p$, and to report $\langle p\rangle = \hbar k$. Squaring destroys
+   the sign, so $\hat p^2$ cannot distinguish the two directions and has a
+   larger set of eigenfunctions than $\hat p$ does. This is why an infinite
+   well's eigenstates, which are exactly these sines, have sharp energies
+   and zero average momentum: the particle is not sitting still, it is
+   going both ways at once.
+
+   One caveat on rigour. $\sin(kx)$ is not normalizable on the whole line,
+   so $\langle\psi|\hat p^2|\psi\rangle$ is not literally defined there;
+   the calculation above is an operator identity, and it becomes a genuine
+   expectation value on a finite interval, which is precisely the infinite
+   square well two lessons ahead, with $k = n\pi/L$.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -251,7 +396,7 @@ $x$ times $\hat p\psi$.
 - The uncertainty principle's proof from the last course applies
   unchanged, since it only used the commutator's value.
 
-## Further Exploration
+## Where the plane waves lead next
 
 <NextDiscovery>
 Up next is [Momentum Space and the Fourier Transform](/lessons/quantum-mechanics/wave-mechanics/momentum-space-and-the-fourier-transform), the momentum-space

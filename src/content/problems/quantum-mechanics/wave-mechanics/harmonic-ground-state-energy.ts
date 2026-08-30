@@ -27,7 +27,11 @@ export const harmonicGroundStateEnergy: NumericProblem = {
       { value: 0, feedback: "0 would mean the oscillator can be at rest at the bottom of the well. The uncertainty principle forbids that, leaving ħω/2." },
     ],
   },
-  hints: [{ text: "Use E_0 = omega/2 directly (hbar=1)." }],
+  hints: [
+    { text: "The oscillator's lowest state does not sit at the bottom of the well. Localizing the particle there would pin both position and momentum at once." },
+    { text: "Write the oscillator's level formula $E_n$ and set $n=0$. With $\\hbar=1$ the only symbol left standing is $\\omega$." },
+    { text: "What survives at $n=0$ is a fraction of $\\hbar\\omega$, not the whole of it. Read that fraction off the level formula before substituting $\\omega=3$." },
+  ],
   solution: {
     steps: [{ description: "$E_0 = \\dfrac{\\omega}{2} = \\dfrac{3}{2} = 1.5$." }],
     finalAnswer: "$E_0 = 1.5$",
@@ -35,6 +39,6 @@ export const harmonicGroundStateEnergy: NumericProblem = {
   explanation: {
     correctIdea: "The harmonic oscillator's ground state has nonzero zero-point energy, hbar*omega/2.",
     whyCorrect: "This matches the direct-substitution derivation from the Gaussian ansatz, and the ladder-operator result from the last course.",
-    whyWrong: ["Reporting E_0=0 forgets the zero-point energy — the ground state is never exactly at rest quantum mechanically."],
+    whyWrong: ["Reporting E_0=0 forgets the zero-point energy. The ground state is never at rest quantum mechanically."],
   },
 };

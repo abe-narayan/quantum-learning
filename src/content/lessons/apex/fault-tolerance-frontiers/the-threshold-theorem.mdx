@@ -41,6 +41,16 @@ export const REQUIRED_LEVELS = Math.ceil(REQUIRED_LEVELS_CONTINUOUS);
 
 export const TOTAL_PHYSICAL_QUBITS_PER_LOGICAL_QUBIT = STEANE_QUBITS_PER_LEVEL ** REQUIRED_LEVELS;
 
+export const DEEPER_TARGET_LOGICAL_ERROR_RATE = 1e-36;
+
+export const DEEPER_REQUIRED_LEVELS_CONTINUOUS = requiredLevelsContinuous(DEEPER_TARGET_LOGICAL_ERROR_RATE, BELOW_THRESHOLD_RATIO, THRESHOLD_C);
+
+export const DEEPER_REQUIRED_LEVELS = Math.ceil(DEEPER_REQUIRED_LEVELS_CONTINUOUS);
+
+export const DEEPER_TOTAL_PHYSICAL_QUBITS = STEANE_QUBITS_PER_LEVEL ** DEEPER_REQUIRED_LEVELS;
+
+export const DEEPER_QUBIT_COST_FACTOR = DEEPER_TOTAL_PHYSICAL_QUBITS / TOTAL_PHYSICAL_QUBITS_PER_LOGICAL_QUBIT;
+
 export const crossoverRatios = Array.from({ length: 41 }, (_, i) => 0.5 + i * 0.025);
 
 export const crossoverLevels = [1, 2, 3, 4, 5];
@@ -107,14 +117,14 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The same machinery on both sides of one number">
   Below one fixed physical error rate, a quantum computer can run an
   arbitrarily long computation with arbitrarily small failure
   probability, at only polylogarithmic cost. Above it, the identical machinery makes
   things worse instead of better.
 </LessonHook>
 
-## Motivation
+## The Objection That Nearly Ended the Field
 
 By the mid-1990s, Peter Shor's factoring algorithm had already shown that
 a quantum computer could, in principle, outrun every known classical
@@ -164,7 +174,7 @@ below threshold, and error correction provably does the rest."
   down before the recursion means anything.
 </ResearchConnection>
 
-## Mathematical Development
+## The Recursion, Unrolled
 
 ### One level: why a logical error needs two physical faults
 
@@ -254,10 +264,12 @@ watching one fixed $p_0$ across levels:
 
 <InteractiveSection
   title="The crossing, swept"
-  description="Logical error rate after L levels of concatenation, as the physical error rate is varied across the threshold. Drag the slider to add levels. Every curve passes through the same point — p_0 = p_th, where p_L = p_th exactly — and pivots about it, falling away steeply on the left and climbing steeply on the right. The pivot point does not move with L; only the steepness does."
+  description="Logical error rate after L levels of concatenation, as the physical error rate is varied across the threshold. Drag the slider to add levels. Every curve passes through the same point, p_0 = p_th, where p_L = p_th exactly, and pivots about it, falling away steeply on the left and climbing steeply on the right. The pivot point does not move with L; only the steepness does. On the right branch at larger L the plotted value climbs past 1, which is the recursion's formal output, not a probability: above threshold the gadget has already left the small-error regime the p² step assumes."
 >
   <ParametricCurve
     frames={crossoverFrames}
+    xAxisLabel="p / p_th"
+    yAxisLabel="log₁₀(p_L)"
     referenceLines={crossoverReferenceLines}
     sliderLabel="Concatenation levels L"
     ariaLabel="Log base 10 of the logical error rate after L levels of concatenation, plotted against the ratio of physical error rate to threshold, swept from 0.5 to 1.5. At every value of L the curve passes through the same fixed point where the ratio equals 1 and the logical error rate equals the threshold. To the left of that point the curve drops, steeply and more steeply as L grows; to the right it rises, and rises faster as L grows."
@@ -366,7 +378,7 @@ reporting a per-gate error rate below the quoted threshold:
   the honest price of a proof that does not assume independent errors.
 </ResearchConnection>
 
-## Physical Interpretation: Why This Matters
+## Noise as a Fixed Point
 
 <InsightBlock>
   Concatenation turns noise into a fixed point: below threshold, each
@@ -375,24 +387,24 @@ reporting a per-gate error rate below the quoted threshold:
   reliability at only polylogarithmic qubit cost.
 </InsightBlock>
 
-The Quantum Hardware pillar's noise-and-scaling course asked a question
+The Quantum Hardware track's noise-and-scaling course asked a question
 it could not yet answer: as you scale up a device, do physical error
 rates compound catastrophically, killing any hope of a long computation,
 or can they be tamed? The threshold theorem is the mathematical fact
 that answers it. Below $p_{\text{th}}$, errors do **not** compound
-without bound — concatenation (or, as the next section discusses, a
+without bound. Concatenation (or, as the next section discusses, a
 large-enough surface code) provably suppresses them arbitrarily far, at
 a cost that grows only polylogarithmically in how reliable you need to
-be. This is precisely what makes "build colder, more precisely
+be. That is what makes "build colder, more precisely
 controlled, lower-error qubits until you cross threshold, then let error
 correction handle the rest" a coherent long-term engineering roadmap
 rather than false hope. Every real hardware effort's obsession with
-gate fidelity exists because of exactly this theorem: crossing
-$p_{\text{th}}$ is not one improvement among many, it is the qualitative
+gate fidelity traces back to this theorem: crossing
+$p_{\text{th}}$ is not one improvement among many; it is the qualitative
 threshold between "no amount of encoding saves you" and "arbitrarily
 long, arbitrarily reliable computation is achievable."
 
-## Worked Example
+## Both Sides of the Threshold, Numerically
 
 Take $c = 10^4$, i.e. a (illustrative, not literature-fitted) threshold
 of $p_{\text{th}} = 1/c = 10^{-4}$. Compare a physical error rate at half
@@ -401,11 +413,11 @@ one-and-a-half times threshold, $p_0 = 1.5\,p_{\text{th}} = 1.5\times10^{-4}$,
 applying $p_{k+1} = c\,p_k^2$ directly:
 
 <PredictBeforeReveal
-  question="Both starting points sit close to p_th — one at 0.5×p_th, the other at 1.5×p_th, just a factor of 3 apart. After 4 levels of the same recursion p_(k+1) = c·p_k², how far apart do you expect the two final logical error rates to be?"
+  question="Both starting points sit close to p_th, one at 0.5×p_th and the other at 1.5×p_th, a factor of 3 apart. After 4 levels of the same recursion p_(k+1) = c·p_k², how far apart do you expect the two final logical error rates to be?"
   options={[
     { label: "Still within about the same factor of 3", value: "same" },
     { label: "A couple of orders of magnitude apart", value: "few" },
-    { label: "Many orders of magnitude apart — the doubling exponent compounds", value: "many" },
+    { label: "Many orders of magnitude apart, since the doubling exponent compounds", value: "many" },
   ]}
   correctValue="many"
   explanation="The table below shows it exactly: the below-threshold case collapses to about 1.5×10⁻⁹ while the above-threshold case climbs to about 6.5×10⁻², a gap of roughly seven orders of magnitude from a factor-of-3 head start. Each level squares the previous ratio to p_th, so a small initial gap on either side of threshold gets amplified explosively in opposite directions."
@@ -432,23 +444,45 @@ gadget doesn't stay in the small-error regime it was designed for).
 Pushing the below-threshold case further: reaching a target logical
 error rate of $\varepsilon = 10^{-18}$ (a plausible target for a
 cryptographically long algorithm) needs
-$L \approx \log_2\!\big(\ln(1/(c\varepsilon))/\ln(1/0.5)\big) \approx 5.54$,
-so $L=6$ integer levels — confirmed directly: continuing the recursion
-gives $p_5 \approx 2.33\times10^{-14}$ (not yet below target) and
+$L \approx \log_2\!\big(\ln(1/(c\varepsilon))/\ln(1/0.5)\big)$, which
+`REQUIRED_LEVELS_CONTINUOUS` evaluates to
+{REQUIRED_LEVELS_CONTINUOUS.toFixed(2)}, so `REQUIRED_LEVELS` =
+{REQUIRED_LEVELS} integer levels. Continuing the recursion confirms it:
+$p_5 \approx 2.33\times10^{-14}$ (not yet below target) and
 $p_6 \approx 5.42\times10^{-24}$ (comfortably below it). Six levels of a
-7-qubit code cost $7^6 = 117{,}649$ physical qubits per logical qubit,
-a large number, but a **polylogarithmic**, not exponential, function of
-$1/\varepsilon$: reaching $\varepsilon = 10^{-36}$ instead would only
-add a couple more levels, not double the qubit count.
+7-qubit code cost $7^6$ physical qubits per logical qubit, which
+`TOTAL_PHYSICAL_QUBITS_PER_LOGICAL_QUBIT` puts at
+{TOTAL_PHYSICAL_QUBITS_PER_LOGICAL_QUBIT.toLocaleString("en-US")}: a large number, but a
+**polylogarithmic**, not exponential, function of $1/\varepsilon$.
+Reaching $\varepsilon = 10^{-36}$ instead, i.e. *squaring* the accuracy
+demand, moves the same formula to
+{DEEPER_REQUIRED_LEVELS_CONTINUOUS.toFixed(2)} continuous levels, so
+`DEEPER_REQUIRED_LEVELS` = {DEEPER_REQUIRED_LEVELS}: exactly **one**
+more level, not a couple. But one more level is one more full factor of
+the branching number, from
+{TOTAL_PHYSICAL_QUBITS_PER_LOGICAL_QUBIT.toLocaleString("en-US")} to
+{DEEPER_TOTAL_PHYSICAL_QUBITS.toLocaleString("en-US")} physical qubits
+per logical qubit, a factor of
+{DEEPER_QUBIT_COST_FACTOR.toFixed(0)}: considerably more than double.
+That is what the $N_L=\big(\ln(1/(c\varepsilon))/\ln(1/r)\big)^{\log_2 7}$
+formula above says too, whose continuous form gives a ratio of about
+$10$ that rounding to whole levels brings down to
+{DEEPER_QUBIT_COST_FACTOR.toFixed(0)}. The reassuring part is not that the cost barely
+moves; it is *what* the cost is a function of. $N_L$ is a fixed power of
+a **logarithm** of $1/\varepsilon$, so squaring the accuracy demand
+multiplies the machine by a constant, where an exponential dependence on
+$1/\varepsilon$ would have squared it.
 
-<InteractiveSection title="The double exponential, plotted" description="log10 of the logical error rate p_L versus concatenation level L, for the two worked cases above. The below-threshold curve (brand color) collapses toward the bottom of the chart; the above-threshold curve (warning color), started from a physical error rate only three times further from p_th, climbs instead — same recursion, opposite direction, exactly as derived above.">
+<InteractiveSection title="The double exponential, plotted" description="log10 of the logical error rate p_L versus concatenation level L, for the two worked cases above. The below-threshold curve (brand color) collapses toward the bottom of the chart; the above-threshold curve (warning color), started from a physical error rate only three times further from p_th, climbs instead. Same recursion, opposite direction, exactly as derived above.">
   <ParametricCurve
     frames={thresholdComparisonFrames}
+    xAxisLabel="concatenation level L"
+    yAxisLabel="log₁₀(p_L)"
     ariaLabel="Log base 10 of the logical error rate p_L plotted against concatenation level L from 0 to 4, for two cases sharing the same recursion p_(k+1) = c times p_k squared with c = 10^4: p0 = 0.5 times p_th falls from about -4.3 to -8.8, a rapid downward collapse, while p0 = 1.5 times p_th rises from about -3.8 to -1.2, climbing instead"
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Two Thresholds, Routinely Confused
 
 <Callout type="warning">
 **Treating different threshold theorems' numerical threshold values as
@@ -463,7 +497,7 @@ simulation-based* results for a specific noise model and a specific
 decoder, and tend to land at far more hardware-friendly, roughly
 percent-level physical error rates. Neither number is "the" threshold:
 comparing threshold values across code families, proof techniques, and
-noise-model assumptions is genuinely subtle, and a different quoted
+noise-model assumptions is subtle, and a different quoted
 number reflects different assumptions, not different underlying physics.
 </Callout>
 
@@ -486,11 +520,122 @@ the same machinery drives the logical error rate *up*, not down.
    and $p_3$, and compare how much more slowly this sequence collapses
    than the lesson's own $p_0 = 0.5\,p_{\text{th}}$ column in the
    worked-example table.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $p_1=5.625\times10^{-5}$, $p_2=3.164\times10^{-5}$,
+   $p_3=1.001\times10^{-5}$. Three levels of concatenation have bought a
+   factor of $7.5$, where the same three levels at
+   $p_0=0.5\,p_{\text{th}}$ bought a factor of $128$.
+
+   Turning the crank:
+
+   $$
+   p_1 = 10^4(7.5\times10^{-5})^2 = 5.625\times10^{-5},
+   $$
+
+   $$
+   p_2 = 10^4(5.625\times10^{-5})^2 = 3.164\times10^{-5},
+   $$
+
+   $$
+   p_3 = 10^4(3.164\times10^{-5})^2 = 1.001\times10^{-5}.
+   $$
+
+   The closed form makes the comparison exact rather than impressionistic.
+   With $r=cp_0$,
+
+   $$
+   \frac{p_L}{p_0} = r^{\,2^L-1},
+   $$
+
+   so three levels multiply the error rate by $r^7$. At $r=0.5$ that is
+   $1/128$; at $r=0.75$ it is $0.1335$, a factor of $7.5$. A physical
+   error rate only $1.5$ times worse produces a suppression $17$ times
+   weaker, and both cost the identical $7^3=343$ physical qubits per
+   logical qubit.
+
+   The honest way to price that is to ask what $r=0.75$ must spend to
+   match what $r=0.5$ achieves at three levels, namely
+   $3.91\times10^{-7}$. Four levels gives $10^{-4}\times0.75^{16} =
+   1.00\times10^{-6}$, still worse. Five levels gives
+   $10^{-4}\times0.75^{32} = 1.00\times10^{-8}$, finally better. So
+   $L=5$, at $7^5=16{,}807$ physical qubits per logical qubit against the
+   other device's $343$. **A factor of $1.5$ in gate fidelity is worth a
+   factor of $49$ in hardware**, and that ratio is the entire argument
+   for why fabrication and control teams chase fidelity long after they
+   are already below threshold.
+
+   **The wrong turn** is reading "below threshold" as a binary that has
+   been passed. Both devices are below threshold and both improve
+   without limit, so the theorem's guarantee is satisfied in both cases.
+   What differs is the base $r$ that gets raised to $2^L$, and since $L$
+   enters only through an exponent while $r$ sets what is being
+   exponentiated, no amount of concatenation compensates for a worse $r$
+   in a fixed qubit budget. Being under the threshold is the entry
+   requirement; the distance under it is the whole of the economics.
+
+   </details>
+
 2. Suppose a device instead operates at $p_0 = 1.2\,p_{\text{th}} =
-   1.2\times10^{-4}$ — above threshold, but closer to it than the
+   1.2\times10^{-4}$, above threshold but closer to it than the
    lesson's $p_0 = 1.5\,p_{\text{th}}$ case. Compute $p_1$ through $p_4$
    with the same recursion, and state whether four levels of
    concatenation help or hurt here, and by roughly what factor.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   They hurt, by a factor of about $15$.
+
+   $$
+   p_1 = 1.440\times10^{-4},\quad
+   p_2 = 2.074\times10^{-4},\quad
+   p_3 = 4.300\times10^{-4},\quad
+   p_4 = 1.849\times10^{-3}.
+   $$
+
+   Each of those is $10^{-4}\times1.2^{2^k}$, and the same ratio formula
+   as question 1 gives $p_4/p_0 = 1.2^{15} = 15.4$ directly. So $7^4 =
+   2{,}401$ physical qubits have been spent per logical qubit to make
+   that logical qubit fifteen times *less* reliable than one bare
+   physical qubit. There is no reading of that trade under which it is
+   worth making.
+
+   The comparison with the lesson's $1.5\,p_{\text{th}}$ column is the
+   interesting part. There the same four levels degrade the error rate by
+   $1.5^{15}=438$, nearly thirty times worse than here. So being closer
+   to threshold from above genuinely is less catastrophic, and that fact
+   is a trap: a device at $1.2\,p_{\text{th}}$ can run a level-1 or
+   level-2 experiment, see a logical error rate in the same order of
+   magnitude as its physical one, and read that as "roughly break even,
+   we are nearly there." The recursion is not nearly there. It is on the
+   wrong side of a fixed point, and the only thing distinguishing $1.2$
+   from $1.5$ is how fast the damage compounds.
+
+   **The one diagnostic that works** is the sign of the change from level
+   to level, not its magnitude. $p_1>p_0$ already, at the very first
+   level, and that single comparison settles which side of threshold the
+   device is on. It costs one level of encoding to measure and needs no
+   knowledge of $c$ or $p_{\text{th}}$ at all. This is exactly the test
+   the Willow result reports in the surface-code language: logical error
+   rate falling as distance grows is the below-threshold signature, and
+   the factor by which it falls is a secondary number.
+
+   **A caveat the lesson flags and this case makes concrete.** Above
+   threshold the recursion eventually returns values above $1$, which are
+   not probabilities. Here that does not happen until $L=6$
+   ($p_6\approx11.7$), so the four numbers above are at least
+   self-consistent as probabilities. They are still not trustworthy in
+   detail, because $p_{k+1}\approx cp_k^2$ counts only the leading
+   two-fault term and that approximation degrades as $p_k$ grows. The
+   qualitative conclusion, that concatenation makes things worse and
+   worse the more of it you do, survives all of that; the specific $15.4$
+   should be read as an order of magnitude.
+
+   </details>
+
 3. The lesson shows that reaching $\varepsilon = 10^{-18}$ from
    $p_0 = 0.5\,p_{\text{th}}$ needs $L = 6$ levels of the Steane code,
    costing $7^6 = 117{,}649$ physical qubits per logical qubit. Using
@@ -498,6 +643,61 @@ the same machinery drives the logical error rate *up*, not down.
    $r = cp_0 = 0.5$, find the smallest integer $L$ needed to reach a
    far less demanding target of $\varepsilon = 10^{-9}$, and the
    corresponding physical-qubit cost per logical qubit.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $L=5$, costing $7^5 = 16{,}807$ physical qubits per logical qubit.
+
+   Substituting $c\varepsilon = 10^4\times10^{-9} = 10^{-5}$ and
+   $\ln(1/r)=\ln2$:
+
+   $$
+   L = \log_2\!\left(\frac{\ln(10^{5})}{\ln 2}\right)
+     = \log_2\!\left(\frac{11.513}{0.6931}\right)
+     = \log_2(16.61) = 4.05 ,
+   $$
+
+   and since only whole levels exist, round **up** to $L=5$.
+
+   Confirm against the recursion rather than trusting the rounding, because
+   $4.05$ is uncomfortably close to $4$. Four levels give
+   $p_4 = 10^{-4}\times0.5^{16} = 1.53\times10^{-9}$, which misses the
+   $10^{-9}$ target, narrowly but genuinely. Five levels give
+   $p_5 = 10^{-4}\times0.5^{32} = 2.33\times10^{-14}$, five orders of
+   magnitude past it.
+
+   **That overshoot is the real lesson here.** There is no configuration
+   between $1.5\times10^{-9}$ and $2.3\times10^{-14}$. Concatenation
+   squares the suppression at each step, so the available operating
+   points are sparse, and a design that needs $10^{-9}$ ends up buying
+   $10^{-14}$ and paying $7\times$ the qubits for the accuracy it did not
+   ask for. The same granularity shows up in the surface code as the
+   jump from distance $d$ to $d+2$, and in magic-state factories as the
+   jump from one distillation round to two. Whole-number resources are
+   why real resource estimates are so often dominated by rounding.
+
+   **Now compare the two targets, which is where the polylogarithm stops
+   being an asymptotic remark.** Relaxing the requirement from
+   $10^{-18}$ to $10^{-9}$, a *billion-fold* weakening of the accuracy
+   demand, saves exactly one level: $117{,}649$ qubits become $16{,}807$,
+   a factor of $7$. That cuts both ways, and the direction that matters
+   is the encouraging one. Since demanding a billion times more accuracy
+   costs only $7\times$ the hardware, a fault-tolerant machine's size is
+   set almost entirely by how many logical qubits and gates the algorithm
+   needs, and almost not at all by how reliable each one has to be. That
+   is the practical content of "polylogarithmic overhead," and it is why
+   resource estimates spend their pages on gate counts rather than on
+   target error rates.
+
+   **The wrong turn** is taking $L=4.05$ and rounding to the nearest
+   integer. The formula returns the real-valued level at which $p_L$
+   would exactly equal $\varepsilon$; anything below it is a level that
+   has not reached the target. Always round up, and when the fractional
+   part is small, check the recursion directly, since $L=4$ misses here
+   by only $53\%$ and a plot would not show the difference.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -517,19 +717,19 @@ the same machinery drives the logical error rate *up*, not down.
 - Inverting the recursion shows a target logical error rate
   $\varepsilon$ needs only $L=O(\log\log(1/\varepsilon))$ concatenation
   levels, and therefore only **polylogarithmic**, not polynomial or
-  exponential, total qubit overhead in $1/\varepsilon$ — the theorem's
-  real quantitative content.
+  exponential, total qubit overhead in $1/\varepsilon$. That is the
+  theorem's real quantitative content.
 - The surface code's numerical, decoder-specific threshold estimates
   (prerequisite lesson) and the original concatenated-code proofs reach
   the same qualitative conclusion by different mechanisms, with
   different tradeoffs: rigorous-but-pessimistic versus
   numerical-but-realistic, not competing physics.
 - This is the mathematical fact underwriting the Quantum Hardware
-  pillar's entire scaling roadmap: below threshold, physical error
-  rates do not compound without bound, they can be suppressed
+  track's entire scaling roadmap: below threshold, physical error
+  rates do not compound without bound; they can be suppressed
   arbitrarily far at polylog cost.
 
-## Further Exploration
+## From Proven Constant to Engineering Target
 
 <NextDiscovery>
   The [capstone](/lessons/apex/fault-tolerance-frontiers/capstone-resource-estimation-for-a-real-algorithm)

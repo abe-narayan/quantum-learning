@@ -44,6 +44,6 @@ export const traceDistanceAtHalfDamping: NumericProblem = {
   },
   explanation: {
     correctIdea: "The closed-form D(gamma) derived directly from amplitude damping's Kraus operators applied to |+><+| lets trace distance be computed at any gamma without rebuilding the density matrix from scratch.",
-    whyCorrect: "This is the exact eigenvalue-based trace distance formula, verified against the platform's engine at gamma=0.3 in the lesson; evaluating it at a different gamma is the same formula, different input.",
+    whyCorrect: "The eigenvalue-based trace-distance expression is exact rather than approximate, and the lesson checked it against the engine at gamma=0.3. Evaluating it at a different gamma is the same formula with a different input, so nothing new needs justifying.",
   },
 };

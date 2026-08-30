@@ -21,7 +21,7 @@ export const qubit1MeasurementProbabilityAsymmetricState: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "For the state $\\frac{1}{2}|00\\rangle + \\frac{\\sqrt3}{2}|01\\rangle$ (the same one from this lesson's worked example), find $P(\\text{qubit }1{=}0)$ — this time measuring qubit 1 instead of qubit 0.",
+      "For the state $\\frac{1}{2}|00\\rangle + \\frac{\\sqrt3}{2}|01\\rangle$ (the same one from this lesson's worked example), find $P(\\text{qubit }1{=}0)$, measuring qubit 1 this time rather than qubit 0.",
     inputHint: "as a decimal between 0 and 1",
   },
   answer: {
@@ -37,7 +37,7 @@ export const qubit1MeasurementProbabilityAsymmetricState: NumericProblem = {
   },
   hints: [
     { text: "Qubit 1 is the second (rightmost) label in each ket." },
-    { text: "In |00⟩, qubit 1 = 0. In |01⟩, qubit 1 = 1 — only one of the two terms has qubit 1 = 0." },
+    { text: "In |00⟩, qubit 1 = 0; in |01⟩, qubit 1 = 1. Only one of the two terms contributes." },
     { text: "Sum |amplitude|² only over the term(s) where qubit 1 = 0." },
   ],
   solution: {
@@ -52,9 +52,9 @@ export const qubit1MeasurementProbabilityAsymmetricState: NumericProblem = {
   },
   explanation: {
     correctIdea: "Partial measurement of a different qubit sums over a different subset of basis terms, generally giving a different probability than measuring qubit 0 did.",
-    whyCorrect: "Only |00⟩ has qubit 1 = 0 in this state, so P(qubit 1=0) is just that one term's probability, 1/4 — different from the worked example's P(qubit 0=0)=1.",
+    whyCorrect: "Only |00⟩ has qubit 1 = 0 in this state, so P(qubit 1=0) is that one term's probability, 1/4, unlike the worked example's P(qubit 0=0)=1.",
     whyWrong: [
-      "Reusing the worked example's P(qubit 0=0)=1 for this different question conflates measuring qubit 0 with measuring qubit 1 — they're generally not the same calculation.",
+      "Reusing the worked example's P(qubit 0=0)=1 for this different question conflates measuring qubit 0 with measuring qubit 1. They are not the same calculation.",
       "Assuming symmetry between the two qubits ignores that this particular state isn't symmetric under swapping which qubit is which.",
     ],
   },

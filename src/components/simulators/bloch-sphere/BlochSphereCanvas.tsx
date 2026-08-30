@@ -14,7 +14,7 @@ const INITIAL_PITCH = 0.32;
 const MAX_PITCH = 1.45;
 const ROTATE_SENSITIVITY = 0.0085;
 const CIRCLE_SAMPLES = 56;
-/** Radians per arrow-key press — the keyboard equivalent of the pointer-drag rotation, since
+/** Radians per arrow-key press, the keyboard equivalent of the pointer-drag rotation, since
  * dragging the sphere has no keyboard counterpart otherwise. */
 const KEY_ROTATE_STEP = 0.12;
 
@@ -82,7 +82,16 @@ function WireCircle({
             y1={point.sy}
             x2={next.sx}
             y2={next.sy}
-            style={{ stroke: "var(--border)" }}
+            // `--axis-grid`, not `--border`. These three great circles are the
+            // optional ruling of this figure: helpful for reading where the
+            // vector sits relative to the equator, never the only way to read
+            // it, which is exactly what `--axis-grid` (deliberately under 3:1)
+            // is authored for. `--border` is 1.41:1 panel chrome, and it is
+            // *quieter* than `--axis-grid` in both themes (#2b3547 vs #44526b
+            // dark, #d7dbe4 vs #b9c0cd on paper), so this is the ruling coming
+            // up to its own floor rather than down to it. The depth fade below
+            // still runs on top, so back-facing arcs stay recessive.
+            style={{ stroke: "var(--axis-grid)" }}
             strokeWidth={1}
             strokeDasharray={dashed || isBack ? "3 4" : undefined}
             opacity={depthOpacity(avgDepth)}
@@ -111,25 +120,37 @@ function AxisLine({
   return (
     <g opacity={depthOpacity(b.depth)}>
       <line x1={a.sx} y1={a.sy} x2={b.sx} y2={b.sy} style={{ stroke: "var(--muted-foreground)" }} strokeWidth={1} />
-      {/* 11 -> 15 units. This SVG renders `w-full` on a 400-unit viewBox
+      {/* 11 -> 15 -> 17 units. This SVG renders `w-full` on a 400-unit viewBox
           inside a `SimulatorInstrument` (`p-4 sm:p-5` on a 1px-bordered
-          `.instrument`), so on a 320px phone its box is 320 − 32 − 2 ×
-          (16 + 1) = 254px and authored type scales by 254/400 = 0.635. The
-          axis names painted at 11 × 0.635 = 6.99px — under the ~9px floor,
-          and they are the only thing distinguishing the x, y and z axes of a
-          sphere the reader is being asked to rotate. 15 units gives 9.53px.
-          The dy offsets grow with the type (−8/+14 -> −11/+19) so the gap
-          between an axis tip and its label stays proportional instead of
-          closing up as the glyphs get taller; a single character at 15 units
-          in the mono face is ~9 units wide, so the ±4.5 half-width around an
-          axis tip at 52..348 stays well inside the 400-unit box. */}
+          `.instrument`). The 15 was measured against a 254px box: a 320px
+          viewport, less the `Container px-4` gutters, less that one instrument
+          frame at 2 × (16 + 1) = 34px. That is the `/simulators` bench box.
+          Every explorer that mounts this canvas is also embedded in lessons
+          (15 for the Bloch explorer alone), and a lesson embed nests inside
+          `InteractiveSection`, itself an `.instrument` with a `p-4` body: its
+          `has-[[data-mdx-slot=embed]_.instrument]` de-framing selector drops
+          that wrapper's border *colour*, wash and shadow, and keeps both its
+          1px border box and its 16px of padding. The narrowest real box is
+          therefore 320 − 32 − 34 − 34 = **220px**, confirmed against the
+          served markup of a lesson simulator embed, where authored type scales
+          by 220/400 = 0.55 rather than 0.635. At 15 units that is 8.25px, back
+          under the ~9px floor, on the only labels distinguishing the x, y and
+          z axes of a sphere the reader is asked to rotate. 17 units gives
+          **9.35px** at 220px, 10.8px on the bench, and a literal 17px from
+          400px up.
+
+          The dy offsets grow with the type (−8/+14 -> −11/+19 -> −12/+21) so
+          the gap between an axis tip and its label stays proportional instead
+          of closing up as the glyphs get taller; a single character at 17
+          units in the mono face is ~10.2 units wide, so the ±5.1 half-width
+          around an axis tip at 52..348 stays well inside the 400-unit box. */}
       {label ? (
         <text
           x={b.sx}
           y={b.sy}
-          dy={b.sy > a.sy ? 19 : -11}
+          dy={b.sy > a.sy ? 21 : -12}
           textAnchor="middle"
-          className="font-mono text-[15px]"
+          className="font-mono text-[17px]"
           style={{ fill: "var(--muted-foreground)" }}
         >
           {label}
@@ -145,7 +166,7 @@ export function BlochSphereCanvas({
   className,
 }: {
   blochPoint: { x: number; y: number; z: number };
-  /** Brief flash at the vector's tip — used to mark a discontinuous event like measurement collapse. */
+  /** Brief flash at the vector's tip, used to mark a discontinuous event like measurement collapse. */
   pulse?: boolean;
   className?: string;
 }) {
@@ -187,7 +208,7 @@ export function BlochSphereCanvas({
     }
   }, []);
 
-  // Keyboard equivalent of the pointer drag above — dragging only rotates the camera view
+  // Keyboard equivalent of the pointer drag above. Dragging only rotates the camera view
   // (never the physical state), but it was previously mouse/touch-only with no way for a
   // keyboard user to reach it at all.
   const handleKeyDown = useCallback((event: React.KeyboardEvent<SVGSVGElement>) => {
@@ -233,15 +254,15 @@ export function BlochSphereCanvas({
       // handles four arrow keys, so `img` was an outright false promise: it
       // tells assistive tech "static graphic, nothing to operate here", and a
       // focusable image is a shape screen readers have no interaction model
-      // for — the reader lands on a tab stop whose role says it cannot be a
+      // for. The reader lands on a tab stop whose role says it cannot be a
       // tab stop, and nothing in the exposed semantics says arrow keys do
       // anything. `img` also forces every descendant presentational, which is
       // why the pole labels below were silently dropped from the tree.
       //
       // `group` is the role for "a focusable container of related graphics you
       // operate as one thing", and `aria-roledescription` restores the useful
-      // half of what `img` was communicating — the reader hears "interactive
-      // Bloch sphere" rather than a bare "group" — without claiming the thing
+      // half of what `img` was communicating: the reader hears "interactive
+      // Bloch sphere" rather than a bare "group", without claiming the thing
       // is inert. The `aria-label` still carries the vector's coordinates and
       // the operating instructions, so the announcement on focus is unchanged
       // in substance and now honest about being operable.
@@ -267,7 +288,17 @@ export function BlochSphereCanvas({
         </linearGradient>
       </defs>
 
-      <circle cx={CENTER.x} cy={CENTER.y} r={RADIUS} fill="none" style={{ stroke: "var(--border)" }} strokeWidth={1.5} />
+      {/* The sphere's silhouette, on `--axis` rather than `--border`.
+          This one line is the surface, and "on the surface versus inside it"
+          is the entire reading of two of the instruments that mount this
+          canvas: the Density Matrix Explorer ("distance from the sphere's
+          surface is exactly how much they don't know") and the Noise Explorer
+          ("the further inside the surface it sinks, the more of that state has
+          been lost"). A reference boundary a reader must perceive to read the
+          figure is what `--axis` (4.5:1) is for; `--border` is 1.41:1
+          decorative panel chrome, and it was drawing the one mark those two
+          simulators ask the reader to measure against. */}
+      <circle cx={CENTER.x} cy={CENTER.y} r={RADIUS} fill="none" style={{ stroke: "var(--axis)" }} strokeWidth={1.5} />
 
       <WireCircle plane="xy" yaw={yaw} pitch={pitch} dashed={false} />
       <WireCircle plane="xz" yaw={yaw} pitch={pitch} dashed />
@@ -288,10 +319,11 @@ export function BlochSphereCanvas({
         //
         // The old answer was to shrink the offsets (-6/+11 rather than the
         // axis labels' -8/+14). That does not survive the type rising from 11
-        // to 15 units — see the AxisLine note above for the 254px measurement
-        // that forced it — because at 15 units the ascent alone is ~11 units,
-        // so at pitch 0 a baseline at north.sy − 6 = 5 puts the cap tops at
-        // −6 and SVG clips them away with no scrollbar and no symptom.
+        // to 15 and then to 17 units (see the AxisLine note above for the
+        // 220px measurement that forced it), because at 17 units the ascent
+        // alone is ~13 units, so at pitch 0 a baseline at north.sy − 6 = 5
+        // puts the cap tops at −8 and SVG clips them away with no scrollbar
+        // and no symptom.
         //
         // So the offsets go back to matching the axis labels and the result is
         // *clamped* to the box instead. `Math.max`/`Math.min` against the
@@ -302,24 +334,24 @@ export function BlochSphereCanvas({
         // so the clamp is already inactive by a hair). The worst case it
         // permits is the ket resting on its own axis tip at pitch 0, which is
         // legible; the worst case it replaces was the ket being invisible.
-        const ASCENT = 13;
-        const DESCENT = 5;
+        const ASCENT = 15;
+        const DESCENT = 6;
         return (
           <>
             <text
               x={north.sx}
-              y={Math.max(north.sy - 11, ASCENT)}
+              y={Math.max(north.sy - 12, ASCENT)}
               textAnchor="middle"
-              className="font-mono text-[15px]"
+              className="font-mono text-[17px]"
               style={{ fill: "var(--foreground)" }}
             >
               |0⟩
             </text>
             <text
               x={south.sx}
-              y={Math.min(south.sy + 19, VIEW_SIZE - DESCENT)}
+              y={Math.min(south.sy + 21, VIEW_SIZE - DESCENT)}
               textAnchor="middle"
-              className="font-mono text-[15px]"
+              className="font-mono text-[17px]"
               style={{ fill: "var(--foreground)" }}
             >
               |1⟩

@@ -21,16 +21,28 @@ export const whyOneBitIsTheMaximum: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["two eigenvalues", "sum to 1", "0.5 and 0.5", "both 0.5", "both equal", "equal eigenvalues", "equal split", "50/50", "50-50", "half and half", "p=0.5", "p = 0.5", "1/2 and 1/2", "two outcome", "two-outcome", "coin"],
-      ["maxim", "largest", "biggest", "greatest", "highest", "peak", "balanced", "most uncertain", "most mixed", "hardest to predict"],
+      {
+        phrases: ["0.5 and 0.5", "both 0.5", "both equal", "equal eigenvalues", "equal split", "evenly split", "even split", "50/50", "50-50", "half and half", "p=0.5", "p = 0.5", "1/2 and 1/2", "both one half", "each one half", "balanced", "fair coin", "unbiased coin"],
+        missingFeedback:
+          "You have said where the entropy peaks in general. Now say what the two eigenvalues have to be at that peak, given that they are nonnegative and add to one.",
+      },
+      {
+        phrases: ["entropy is largest", "largest when", "largest at", "maximized when", "maximised when", "maximum when", "maximum at", "maximum of shannon", "maximum of the shannon", "peaks when", "peaks at", "top of the curve", "most uncertain", "most mixed", "hardest to predict", "least predictable", "highest at", "greatest when"],
+        missingFeedback:
+          "You have named the even case. Now say why that case is the answer: what is it about a two-outcome distribution's entropy that makes that point special?",
+      },
     ],
     incorrectFeedback: "Think of a general distribution over a pair of outcomes and ask which split of probability makes the result hardest to guess, then translate that into eigenvalues.",
-    partialFeedback: "Good direction. Connect this to the eigenvalues of ρ, which behave exactly like a classical probability pair.",
+    partialFeedback: "Connect this to the eigenvalues of ρ, which behave like a classical probability pair.",
+    modelAnswers: [
+      "The two eigenvalues are a probability distribution over two outcomes, and Shannon entropy for two outcomes is largest when the two are equal. Both 0.5 gives 1 bit, and nothing can beat it.",
+      "Entropy is maximized when the distribution is as even as it can be. For a qubit that means eigenvalues 1/2 and 1/2, the most uncertain case, which gives exactly 1 bit.",
+    ],
   },
   hints: [
-    { text: "A qubit's two eigenvalues are nonnegative and add up to 1. What familiar classical object do they form?" },
-    { text: "For a biased coin with bias p, which p makes the outcome hardest to guess?" },
-    { text: "Evaluate the entropy formula at that special p. How many bits come out?" },
+    { text: "The two numbers on the diagonal after diagonalizing are nonnegative and add up to 1. What familiar classical object is that?" },
+    { text: "Treat p as a dial. Where along its range from 0 to 1 does the classical entropy function reach its top?" },
+    { text: "Evaluate the entropy formula at that value of p. How many bits come out?" },
   ],
   solution: {
     steps: [

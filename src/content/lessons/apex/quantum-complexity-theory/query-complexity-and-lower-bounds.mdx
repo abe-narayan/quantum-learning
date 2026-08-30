@@ -48,7 +48,7 @@ export const scalingAdvValues = scalingNValues.map((n) => Math.sqrt(n));
 export const lessonMeta = {
   title: "Query Complexity and Lower Bounds",
   description:
-    "BQP and Oracle Complexity stated Grover's Ω(√N) lower bound via BBBV's hybrid method; this lesson goes deeper, developing the quantum adversary method and the polynomial method as two independent proof techniques for the same bound, and computing a genuine adversary-method lower bound by hand.",
+    "BQP and Oracle Complexity stated Grover's Ω(√N) lower bound via BBBV's hybrid method; this lesson goes deeper, developing the quantum adversary method and the polynomial method as two independent proof techniques for the same bound, and computing an adversary-method lower bound by hand.",
   course: "quantum-complexity-theory",
   module: "query-complexity-and-lower-bounds",
   order: 4,
@@ -57,13 +57,13 @@ export const lessonMeta = {
   prerequisites: ["apex/quantum-complexity-theory/complexity-classes-p-np-and-bqp"],
   objectives: [
     "Explain the query (black-box) complexity model precisely: an algorithm's cost is measured only in oracle queries, all other computation is free, and state why this model is the right setting for PROVING (not just conjecturing) lower bounds",
-    "State and apply the quantum adversary method (Ambainis' method, at a conceptual/structural level) to derive a genuine, checkable lower bound for a small concrete search problem",
-    "Explain the polynomial method as a second, independent proof technique for query lower bounds, and state why having TWO independently-verified techniques both giving the Grover-optimality result strengthens confidence in it",
+    "State and apply the quantum adversary method (Ambainis' method, at a conceptual/structural level) to derive a checkable lower bound for a small concrete search problem",
+    "Contrast the polynomial method as a second, independent proof technique for query lower bounds, and state why having TWO independently-verified techniques both giving the Grover-optimality result strengthens confidence in it",
   ],
   related: [
     {
       slug: "quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity",
-      note: "That lesson's BBBV proof sketch used the 'hybrid method' — comparing an algorithm's state against a no-marked-item baseline — to get Ω(√N). This lesson develops the more general adversary method (which compares pairs of hard instances against each other rather than against a baseline) and an entirely independent polynomial method, both confirming the identical bound.",
+      note: "That lesson's BBBV proof sketch used the 'hybrid method' (comparing an algorithm's state against a no-marked-item baseline) to get Ω(√N). This lesson develops the more general adversary method (which compares pairs of hard instances against each other rather than against a baseline) and an entirely independent polynomial method, both confirming the identical bound.",
     },
   ],
 };
@@ -71,19 +71,19 @@ export const lessonMeta = {
 <LessonHook eyebrow="Best known, or provably best possible?">
   Nobody has found an unstructured-search algorithm faster than Grover's.
   That is not the same claim as: nobody ever could. Two independent
-  proofs — sharing almost no machinery — close that gap for good.
+  proofs, sharing almost no machinery, close that gap for good.
 </LessonHook>
 
-## Motivation
+## Proving No Algorithm Can Do Better
 
-BQP and Oracle Complexity proved the BBBV theorem — Grover's algorithm is
-query-optimal for unstructured search — and sketched its proof via the
+BQP and Oracle Complexity proved the BBBV theorem (Grover's algorithm is
+query-optimal for unstructured search) and sketched its proof via the
 "hybrid method": compare an algorithm's state when the oracle marks item
 $x$ against its state when the oracle marks nothing, and show a single
 query can't move that comparison by much. That sketch answered *whether*
 $\Theta(\sqrt N)$ is optimal. It did not answer a harder question this
 lesson takes on directly: **how do we know, in general, that no cleverer
-algorithm — one nobody has thought of yet — could beat $\sqrt N$?** "Best
+algorithm, one nobody has thought of yet, could beat $\sqrt N$?** "Best
 known" and "provably best possible" are different claims, and the entire
 content of a lower-bound proof is closing that gap for *every conceivable*
 algorithm at once, not just the ones anyone has tried.
@@ -94,22 +94,21 @@ an algorithm's evolving state is between two hard problem instances, and
 the **polynomial method** (Beals, Buhrman, Cleve, Mosca, and de Wolf,
 1998), which shows a quantum algorithm's acceptance probability is
 literally a low-degree polynomial and appeals to classical approximation
-theory. They share almost no machinery — one is a state-evolution
-argument, the other a function-approximation argument — and yet both land
-on exactly $\Theta(\sqrt N)$ for unstructured search. That agreement,
-reached by two independent roads, is the intellectual payoff this lesson
-is built around.
+theory. They share almost no machinery: one is a state-evolution
+argument, the other a function-approximation argument. Both land on
+$\Theta(\sqrt N)$ for unstructured search. That agreement, reached by two
+independent roads, is the intellectual payoff this lesson is built around.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/0/09/Andris_Ambainis_%282009%29_front.jpg"
   alt="Portrait photograph of Andris Ambainis, the theoretical computer scientist who introduced the quantum adversary method"
-  caption="Andris Ambainis, whose 2000–2002 adversary method is one of the two independent techniques this lesson develops for proving quantum query lower bounds — the other being the polynomial method of Beals, Buhrman, Cleve, Mosca, and de Wolf."
+  caption="Andris Ambainis, whose 2000–2002 adversary method is one of the two independent techniques this lesson develops for proving quantum query lower bounds. The other is the polynomial method of Beals, Buhrman, Cleve, Mosca, and de Wolf."
   credit="Marozols / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Andris_Ambainis_(2009)_front.jpg"
   license="CC BY-SA 3.0"
 />
 
-## Mathematical Development
+## The Adversary Method and the Polynomial Method
 
 ### Recap: the query model, and what a lower bound has to defeat
 
@@ -117,7 +116,7 @@ is built around.
 
 An algorithm is given oracle access to an unknown function $f$ (here,
 $f:\{0,1,\dots,N-1\}\to\{0,1\}$, marking one item among $N=2^n$) via a
-query gate — this platform's `applyPhaseOracle`, which flips the sign of
+query gate, this platform's `applyPhaseOracle`, which flips the sign of
 exactly the marked basis state(s) and leaves every other amplitude
 untouched. **Query complexity counts only calls to this gate.** Every
 other unitary the algorithm applies between queries is free, unlimited,
@@ -129,9 +128,9 @@ consistent with the promise.
 
 </DefinitionBox>
 
-That universal quantifier — every possible algorithm, every possible
-oracle — is exactly what makes a lower bound hard to prove and exactly
-what a proof by exhaustive search over algorithms could never establish:
+That universal quantifier (every possible algorithm, every possible
+oracle) is what makes a lower bound hard to prove, and what a proof by
+exhaustive search over algorithms could never establish:
 there are infinitely many quantum circuits to rule out, and "nobody has
 found a faster one" is evidence, not proof. Classical randomized
 unstructured search needs $\Theta(N)$ queries (checking a constant
@@ -143,16 +142,16 @@ mathematical certainty rather than an empirical observation.
 ### The quantum adversary method (Ambainis, 2000–2002)
 
 The adversary method's structural idea: pick a **hard distribution** over
-problem instances — pairs (or larger families) of inputs that are
-different enough to require distinguishing, but similar enough that
-distinguishing them is provably hard — and track a numerical **progress
-measure** of how distinguishable the algorithm's state has become after
+problem instances (pairs, or larger families, of inputs different enough
+to require distinguishing but similar enough that distinguishing them is
+provably hard) and track a numerical **progress measure** of how
+distinguishable the algorithm's state has become after
 $t$ queries. Because a single oracle query is a fixed, bounded, linear
 (in fact unitary, hence norm-preserving) operation, it can only move that
 progress measure by a bounded amount per step. If succeeding requires the
 progress measure to move by more than (bound per query) $\times$ (number
-of queries) can supply, the algorithm needs more queries — a genuine
-lower bound, not an observation about tried algorithms.
+of queries) can supply, the algorithm needs more queries. That is a lower
+bound, not an observation about the algorithms anyone has tried.
 
 <TheoremBox title="The adversary bound (Ambainis, general form)" provenance="cited">
 
@@ -164,10 +163,10 @@ position $i$. Then the bounded-error quantum query complexity satisfies
 
 <EquationReveal
   terms={[
-    { id: "Q2", symbol: "Q₂(f)", gloss: "The bounded-error quantum query complexity of f — the minimum number of oracle queries any algorithm needs." },
+    { id: "Q2", symbol: "Q₂(f)", gloss: "The bounded-error quantum query complexity of f: the minimum number of oracle queries any algorithm needs." },
     { id: "ADV", symbol: "ADV(f)", gloss: "The adversary bound: the best lower bound this method can certify, computed from any valid Γ." },
-    { id: "Gamma", symbol: "Γ", gloss: "A nonnegative matrix relating NO-instances to YES-instances, zero wherever the two sides agree on f's value — the 'hard distribution' the method picks." },
-    { id: "Di", symbol: "D_i", gloss: "A 0/1 matrix marking which instance pairs differ at input position i — how much a single query at position i can possibly reveal." },
+    { id: "Gamma", symbol: "Γ", gloss: "A nonnegative matrix relating NO-instances to YES-instances, zero wherever the two sides agree on f's value. This is the 'hard distribution' the method picks." },
+    { id: "Di", symbol: "D_i", gloss: "A 0/1 matrix marking which instance pairs differ at input position i, which bounds how much a single query at position i can reveal." },
   ]}
 >
 $$
@@ -177,8 +176,8 @@ $$
 </EquationReveal>
 
 where $\lVert\cdot\rVert$ is the spectral norm and $\circ$ is the
-entrywise (Hadamard) product. This spectral/matrix form — the one used
-below because it is small enough to compute by hand — is an equivalent
+entrywise (Hadamard) product. This spectral/matrix form, the one used
+below because it is small enough to compute by hand, is an equivalent
 reformulation, due to Barnum, Saks, and Szegedy (2003), of Ambainis'
 original relational lower-bound method; both compute the same quantity.
 The $\Omega(\cdot)$ hides a universal constant, common to every $f$, that
@@ -189,20 +188,20 @@ treatment reproduces from scratch).
 
 </TheoremBox>
 
-**A genuine, checkable computation:** take $f=\mathrm{OR}_N$, restricted
-to the promise "exactly one bit is $1$" — precisely unstructured search
+**A checkable computation:** take $f=\mathrm{OR}_N$, restricted
+to the promise "exactly one bit is $1$", which is unstructured search
 for one marked item among $N$. There is exactly one NO-instance
 ($x=0^N$, nothing marked) and $N$ YES-instances ($y_k$, marked at
 position $k$, for $k=1,\dots,N$).
 
 <DerivationSteps>
-<DerivationStep annotation="Γ relates the one NO-instance to every YES-instance — allowed since f(x) ≠ f(y_k) for every k. A single row vector of N ones has spectral norm equal to its Euclidean norm.">
+<DerivationStep annotation="Γ relates the one NO-instance to every YES-instance, allowed since f(x) ≠ f(y_k) for every k. A single row vector of N ones has spectral norm equal to its Euclidean norm.">
 Take $\Gamma$ to be the $1\times N$ all-ones matrix:
 $$
 \lVert\Gamma\rVert = \sqrt{N}.
 $$
 </DerivationStep>
-<DerivationStep annotation="D_i marks which YES-instances differ from the all-zero NO-instance at position i — exactly y_i, and no other. So Γ∘D_i has a single 1 entry, and a matrix with one nonzero entry equal to 1 has spectral norm exactly 1.">
+<DerivationStep annotation="D_i marks which YES-instances differ from the all-zero NO-instance at position i: exactly y_i, and no other. So Γ∘D_i has a single 1 entry, and a matrix with one nonzero entry equal to 1 has spectral norm exactly 1.">
 For each input position $i\in\{1,\dots,N\}$:
 $$
 \max_i \lVert \Gamma\circ D_i\rVert = 1.
@@ -215,8 +214,8 @@ $$
 </DerivationStep>
 </DerivationSteps>
 
-and by the theorem above, $Q_2(\mathrm{OR}_N) = \Omega(\sqrt N)$ — the
-adversary method's own, independently-derived confirmation of exactly
+and by the theorem above, $Q_2(\mathrm{OR}_N) = \Omega(\sqrt N)$, the
+adversary method's own independently derived confirmation of
 the bound BBBV's hybrid method already gave. This is real arithmetic, not
 an approximation: for the worked-example value $N=16$ below,
 `adversaryGammaNorm` $=\sqrt{16}=4$, `adversaryPerBitNorm` $=1$, and
@@ -225,9 +224,9 @@ an approximation: for the worked-example value $N=16$ below,
 **One number, correctly scoped.** $\mathrm{ADV}(\mathrm{OR}_N)=\sqrt N$
 is a single number for a single $N$; the theorem's content is that
 $Q_2(\mathrm{OR}_N)$ grows *at least as fast, up to a fixed constant, as*
-$\sqrt N$ grows — an assertion about the whole family of problems as $N$
-increases, not a claim that the raw number $\sqrt N$ is itself the exact
-query count for any one $N$. The Worked Example section below makes this
+$\sqrt N$ grows. That is an assertion about the whole family of problems
+as $N$ increases, not a claim that the raw number $\sqrt N$ is itself the
+exact query count for any one $N$. The worked example below makes this
 distinction concrete and checks it against this platform's own Grover
 engine.
 
@@ -250,7 +249,7 @@ exactly a multilinear polynomial of degree at most $2T$.
 *Why this is true.* A phase query multiplies the amplitude of a
 computational-basis branch by a factor depending on one bit $x_i$ in a
 way that is degree-$1$ in $x_i$ (concretely $1-2x_i$, which equals $+1$
-when $x_i=0$ and $-1$ when $x_i=1$ — exactly `applyPhaseOracle`'s sign
+when $x_i=0$ and $-1$ when $x_i=1$; this is `applyPhaseOracle`'s sign
 flip, written as a polynomial). Composing $T$ such degree-$\le 1$ steps
 with fixed, $x$-independent unitaries in between multiplies these
 factors together along each computational path, so every output
@@ -278,21 +277,28 @@ $\widetilde{\deg}(\mathrm{OR}_N) = \Theta(\sqrt N)$.
 </TheoremBox>
 
 This is a classical fact about polynomial approximation theory, not
-about quantum computing at all: the *exact*-representation degree of
-$\mathrm{OR}_N$ is $N$ (Nisan and Szegedy, 1994), and Paturi's 1992
-bound on the approximate degree of symmetric Boolean functions — proved
-using a Markov-brothers-inequality-style argument bounding how fast a
-degree-bounded, range-bounded polynomial can change — sharpens this to
-$\Theta(\sqrt N)$ once bounded error is allowed, in exact analogy to how
+about quantum computing at all. The *exact*-representation degree of
+$\mathrm{OR}_N$ is $N$, and that part is elementary: the unique
+multilinear polynomial representing $\mathrm{OR}_N$ exactly is
+$1-\prod_{i=1}^{N}(1-x_i)$, whose $x_1x_2\cdots x_N$ term has
+coefficient $\pm1$ and so cannot be dropped. The $\Theta(\sqrt N)$
+*approximate* degree is the real theorem, and it is Nisan and Szegedy's
+(1994); Paturi's 1992 characterization of the approximate degree of
+*symmetric* Boolean functions, proved
+with a Markov-brothers-inequality argument bounding how fast a
+degree-bounded, range-bounded polynomial can change, places
+$\mathrm{OR}_N$ inside a general family and recovers the same
+$\sqrt N$ there. Bounded error is what collapses the exact degree $N$ to
+$\Theta(\sqrt N)$, in exact analogy to how
 BQP and Oracle Complexity's Deutsch-Jozsa discussion showed bounded error
 collapses an exponential *exact* classical query gap. Combining both
 theorems: a $T$-query algorithm's acceptance probability is a degree-$\le
 2T$ polynomial that must $\varepsilon$-approximate $\mathrm{OR}_N$, so
 $2T \ge \widetilde{\deg}(\mathrm{OR}_N) = \Omega(\sqrt N)$, giving
-$T=\Omega(\sqrt N)$ — the *same* bound, reached by a completely
-different mathematical route: classical approximation theory, with no
-state vectors, inner products, or adversary matrices anywhere in the
-argument.
+$T=\Omega(\sqrt N)$: the *same* bound, reached by a completely
+different mathematical route. Classical approximation theory does the
+work, with no state vectors, inner products, or adversary matrices
+anywhere in the argument.
 
 <ResearchConnection
   title="The two techniques, in their own papers"
@@ -308,8 +314,8 @@ argument.
   functions, quantum and deterministic classical query complexity are
   polynomially related, so no total function admits more than a polynomial
   quantum speedup in this model. Exponential query separations therefore
-  require promise problems, which is why every one you have seen — Deutsch-Jozsa,
-  Simon, period-finding — comes with a promise attached.
+  require promise problems, which is why every one you have seen
+  (Deutsch-Jozsa, Simon, period-finding) comes with a promise attached.
 </ResearchConnection>
 
 ### Where each technique stops
@@ -341,31 +347,31 @@ two techniques are not merely different routes to the same place. Each is
 the only available route for some functions.
 
 None of this weakens the $\mathrm{OR}_N$ result. Both methods are tight
-there, which is exactly why it is the example to learn them on.
+there, which is why it is the example to learn them on.
 
 | Technique | What it tracks | Key inequality | Attribution |
 |---|---|---|---|
 | Adversary method | Distinguishability between hard instances, as a state-evolution progress measure | $\mathrm{ADV}(f)=\max_\Gamma \lVert\Gamma\rVert/\max_i\lVert\Gamma\circ D_i\rVert$, and $Q_2(f)=\Omega(\mathrm{ADV}(f))$ | Ambainis (2000–2002); matrix form Barnum–Saks–Szegedy (2003) |
-| Polynomial method | The algorithm's acceptance probability as a real polynomial in the oracle bits | Degree $\le 2T$ after $T$ queries; $\widetilde{\deg}(\mathrm{OR}_N)=\Theta(\sqrt N)$ (Paturi 1992, building on Nisan–Szegedy 1994) | Beals, Buhrman, Cleve, Mosca, de Wolf (1998) |
+| Polynomial method | The algorithm's acceptance probability as a real polynomial in the oracle bits | Degree $\le 2T$ after $T$ queries; $\widetilde{\deg}(\mathrm{OR}_N)=\Theta(\sqrt N)$ (Nisan–Szegedy 1994; symmetric-function characterization, Paturi 1992) | Beals, Buhrman, Cleve, Mosca, de Wolf (1998) |
 
-## Why This Matters
+## Optimality as Theorem, Not Belief
 
 <InsightBlock>
-  Grover's optimality is not a belief with strong evidence behind it — it
-  is a genuinely, doubly-proven theorem: two arguments sharing almost no
-  machinery both land on exactly √N, which is a far stronger guarantee
-  than either proof alone would give.
+  Grover's optimality is not a belief with strong evidence behind it. It
+  is a doubly-proven theorem: two arguments sharing almost no machinery
+  both land on √N, a far stronger guarantee than either proof alone
+  would give.
 </InsightBlock>
 
 Contrast this lesson's situation with the previous lesson's honest
-scoping of $\mathsf{NP}\subseteq\mathsf{BQP}$: that question is **open**
-— widely believed false, supported by real but limited evidence, with
-zero proof either way. Grover's optimality is not in that category at
-all. It is a **genuine, doubly-proven theorem**: two structurally
-unrelated arguments — one tracking how a quantum state's overlap with
-itself under different oracles can evolve, the other tracking the
-algebraic degree of a polynomial — independently arrive at exactly
-$\Theta(\sqrt N)$, matching Grover's constructive upper bound exactly.
+scoping of $\mathsf{NP}\subseteq\mathsf{BQP}$: that question is **open**,
+widely believed false, supported by real but limited evidence, with
+zero proof either way. Grover's optimality is not in that category. It is
+a **doubly-proven theorem**. Two structurally unrelated arguments, one
+tracking how a quantum state's overlap with itself under different
+oracles can evolve, the other tracking the algebraic degree of a
+polynomial, independently arrive at $\Theta(\sqrt N)$, matching Grover's
+constructive upper bound exactly.
 
 This is one of the few places in all of complexity theory where "quantum
 computers cannot do better than this" is not a conjecture awaiting proof,
@@ -373,27 +379,26 @@ a belief resting on decades of failed attempts (like
 $\mathsf{P}\ne\mathsf{NP}$), or evidence conditional on an unproven
 assumption (like Shor's algorithm's significance, resting on the unproven
 hardness of factoring). It is unconditional, information-theoretic-style
-mathematics, checkable from the definitions up — and checkable *twice*,
+mathematics, checkable from the definitions up, and checkable *twice*,
 by two techniques sharing essentially no machinery. If one proof had a
-subtle gap, it is astronomically unlikely both would share the same gap
-and still land on the same number. That redundancy is itself evidence of
-a different, stronger kind than a single proof provides, which is exactly
-why this platform's complexity-theory lessons draw such a sharp,
-recurring line between "proven" and "believed" — this is what the
-"proven" side of that line looks like at its strongest.
+subtle gap, both would have to share it and still land on the same number.
+That redundancy is evidence of a different and stronger kind than a single
+proof provides. It is also why this platform's complexity-theory lessons
+draw such a sharp, recurring line between "proven" and "believed": this is
+what the "proven" side of that line looks like at its strongest.
 
 <PredictBeforeReveal
   question="For N=16, the adversary-method computation above gives ADV(OR₁₆) = √16 = 4 by hand. Before this platform's own real optimalGroverIterations(4) engine is called below, predict how the actual optimal number of Grover queries for N=16 will compare to that 4."
   options={[
-    { label: "Exactly 4 — matches the hand-computed bound exactly", value: "exact" },
-    { label: "Below 4 — the theorem only guarantees Ω(ADV(f)), up to a constant", value: "below" },
-    { label: "Above 4 — real circuits need strictly more queries than the bound suggests", value: "above" },
+    { label: "Below 4, since the theorem only guarantees Ω(ADV(f)), up to a constant", value: "below" },
+    { label: "Exactly 4, matching the hand-computed bound", value: "exact" },
+    { label: "Above 4, since real circuits need strictly more queries than the bound suggests", value: "above" },
   ]}
   correctValue="below"
-  explanation="optimalGroverIterations(4) returns 3, strictly below the raw adversary number 4. This is not a contradiction: the theorem states Q₂(f)=Ω(ADV(f)) — some fixed constant c times ADV(f), not ADV(f) itself. 3 ≥ c·4 holds for any c ≤ 3/4. The adversary bound proves the right order of growth (√N), not the tightest exact constant for one specific N — exactly the distinction the Worked Example below makes concrete."
+  explanation="optimalGroverIterations(4) returns 3, strictly below the raw adversary number 4. This is not a contradiction: the theorem states Q₂(f)=Ω(ADV(f)), meaning some fixed constant c times ADV(f), not ADV(f) itself. 3 ≥ c·4 holds for any c ≤ 3/4. The adversary bound proves the right order of growth (√N), not the tightest exact constant for one specific N. The worked example below makes that distinction concrete."
 />
 
-## Worked Example
+## A Lower Bound Computed by Hand
 
 **For $N=16$ ($n=4$ qubits), compute the adversary bound
 $\mathrm{ADV}(\mathrm{OR}_{16})$ by hand, compare it against this
@@ -403,26 +408,26 @@ whether the two numbers disagreeing is a problem.**
 Following the derivation above: $\Gamma$ is the $1\times 16$ all-ones
 matrix (`adversaryGammaNorm`$=\sqrt{16}=4$), and $\max_i\lVert\Gamma\circ
 D_i\rVert=1$ (`adversaryPerBitNorm`), so
-$\mathrm{ADV}(\mathrm{OR}_{16})=4/1=4$ (`adversaryBoundValue`) — matching
+$\mathrm{ADV}(\mathrm{OR}_{16})=4/1=4$ (`adversaryBoundValue`), matching
 $\sqrt{16}=4$ (`illustrationSqrtN`) exactly, as the general formula
 guarantees for every $N$.
 
 Now call this platform's own real engine: `optimalGroverIterations(4)`
 (the same function BQP and Oracle Complexity's chart used) returns
-**`illustrationGroverQueries`$=3$** — the actual number of phase-oracle
+**`illustrationGroverQueries`$=3$**, the actual number of phase-oracle
 queries Grover's algorithm needs for $N=16$, computed from
-$\lfloor(\pi/4)\sqrt{16}-\tfrac12\rceil$, not from the adversary formula
-at all.
+$\lfloor(\pi/4)\sqrt{16}-\tfrac12\rceil$ rather than from the adversary
+formula.
 
 $3<4$ does **not** contradict the adversary bound. The theorem states
-$Q_2(f)=\Omega(\mathrm{ADV}(f))$ — there is *some* universal constant
+$Q_2(f)=\Omega(\mathrm{ADV}(f))$: there is *some* universal constant
 $c>0$, the same for every Boolean function, with $Q_2(f)\ge
-c\cdot\mathrm{ADV}(f)$, and $3\ge c\cdot 4$ is perfectly consistent for
+c\cdot\mathrm{ADV}(f)$, and $3\ge c\cdot 4$ is consistent for
 any $c\le 3/4$. The raw number $\mathrm{ADV}(\mathrm{OR}_{16})=4$ is a
 single data point in a family that is guaranteed to *grow like* $\sqrt N$
-up to that fixed constant, not a claim that $4$ itself is $N=16$'s exact
-minimal query count. That distinction — proven **order of growth**
-versus an exact constant — is precisely the "exact vs. asymptotic" theme
+up to that fixed constant. It says nothing about whether $4$ itself is
+$N=16$'s exact minimal query count. That distinction, proven **order of growth**
+versus an exact constant, is the "exact vs. asymptotic" theme
 this platform's other master-level lessons return to repeatedly (compare
 `optimalGroverIterations`'s own $\pi/4$ correction to the bare
 $\sqrt N$ estimate).
@@ -431,21 +436,22 @@ What the bound *does* rule out unconditionally is any **fixed**,
 $N$-independent query count $k$ working for every $N$: since
 $\mathrm{ADV}(\mathrm{OR}_N)=\sqrt N\to\infty$, for `scalingNValues`
 $=[16,64,256,1024,4096]$ the bound itself grows as `scalingAdvValues`
-$=[4,8,16,32,64]$ — unboundedly. Whatever the universal constant $c$
+$=[4,8,16,32,64]$, without ceiling. Whatever the universal constant $c$
 turns out to be, once $N$ is large enough that $c\sqrt N$ exceeds $k$, no
 $k$-query algorithm can succeed, for *any* fixed $k$. That is the precise
 sense in which "1 query, always" or "2 queries, always" are ruled out
-below — not that they fail for $N=16$ specifically (the bound's raw
+below. It is not that they fail for $N=16$ specifically (the bound's raw
 number doesn't pin that down without knowing $c$), but that no constant
 query count can work for every $N$, which is exactly the claim
 $\Theta(\sqrt N)$ (growing, unbounded) makes and $\Theta(1)$ (flat) would
 have to contradict.
 
-## Interactive Visualization
+## The Query Floor, Plotted
 
 <BarChart
   bars={queryFloorBars}
-  ariaLabel={`Query counts for N=${illustrationN} unstructured search: two fixed hypothetical counts (${hypotheticalQueryCounts.join(", ")}) that cannot work for every N, the adversary-method bound sqrt(${illustrationN})=${adversaryBoundValue}, and the actual optimal Grover circuit's real query count ${illustrationGroverQueries} from this platform's own optimalGroverIterations engine`}
+  maxValue={adversaryBoundValue}
+  ariaLabel={`Query counts for N=${illustrationN} unstructured search, all drawn against a fixed scale whose full height is the adversary bound ${adversaryBoundValue}: two fixed hypothetical counts (${hypotheticalQueryCounts.join(", ")}) that cannot work for every N, the adversary-method bound sqrt(${illustrationN})=${adversaryBoundValue}, and the actual optimal Grover circuit's real query count ${illustrationGroverQueries} from this platform's own optimalGroverIterations engine`}
 />
 
 All four bars are real numbers, not illustrations: the two hypothetical
@@ -454,21 +460,21 @@ is `adversaryBoundValue`, computed above from the $\Gamma$/$D_i$
 spectral-norm recipe; the highlighted bar is
 `illustrationGroverQueries`, this platform's own Grover engine's real
 output for $N=16$. The fixed hypothetical bars are what the adversary
-method's *unbounded growth in $N$* rules out — not because $1$ or $2$
+method's *unbounded growth in $N$* rules out. It is not because $1$ or $2$
 happens to be numerically less than $4$ for this one $N$, but because
 $\mathrm{ADV}(\mathrm{OR}_N)=\sqrt N$ has no ceiling as $N$ grows, so any
 algorithm claiming to work in a fixed number of queries for every $N$
 must eventually be overtaken by the bound, regardless of the proof's
 suppressed constant.
 
-## Common Mistakes
+## Queries Are Not Running Time
 
 <Callout type="warning">
 **Treating a query lower bound as a general circuit-complexity or
 time-complexity lower bound.** Both the adversary method and the
-polynomial method bound the number of calls to a black-box oracle — they
+polynomial method bound the number of calls to a black-box oracle. They
 say nothing about algorithms that get to inspect $f$'s internal structure
-directly, which is exactly the room a concrete, explicitly-given problem
+directly, which is exactly the room a concrete, explicitly given problem
 (a real circuit or formula, not an oracle) leaves open. This is the same
 scope restriction BQP and Oracle Complexity attached to BBBV; it applies
 identically to both of this lesson's independent techniques.
@@ -478,8 +484,8 @@ identically to both of this lesson's independent techniques.
 **Reading a computed bound like $\mathrm{ADV}(\mathrm{OR}_{16})=4$ as an
 exact minimal query count instead of an asymptotic order-of-growth
 statement.** The general theorem only guarantees $Q_2(f)\ge
-c\cdot\mathrm{ADV}(f)$ for some fixed, unspecified constant $c>0$ — not
-$Q_2(f)\ge\mathrm{ADV}(f)$ exactly. This is precisely why the real Grover
+c\cdot\mathrm{ADV}(f)$ for some fixed, unspecified constant $c>0$, not
+$Q_2(f)\ge\mathrm{ADV}(f)$ exactly. This is why the real Grover
 optimum for $N=16$ ($3$ queries) can be numerically *below* the raw
 adversary number ($4$) with no contradiction: the theorem promises the
 right growth rate, $\Theta(\sqrt N)$, not the tightest possible constant
@@ -491,20 +497,183 @@ for one specific $N$.
 1. Using the same $\Gamma$/$D_i$ recipe worked through above, compute
    $\mathrm{ADV}(\mathrm{OR}_{64})$ by hand and state which general
    theorem turns that number into a query-complexity lower bound.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\mathrm{ADV}(\mathrm{OR}_{64}) = 8$.
+
+   Take $X=\{0^{64}\}$, the single NO-instance, and $Y=\{e_1,\dots,e_{64}\}$,
+   the $64$ YES-instances with exactly one marked item, and let $\Gamma$
+   be the $1\times64$ all-ones matrix. It is a legal choice because
+   $\mathrm{OR}$ differs on every $(x,y)$ pair it connects, which is what
+   $\Gamma(x,y)=0$ whenever $f(x)=f(y)$ requires.
+
+   **Numerator.** A $1\times N$ all-ones matrix has one nonzero singular
+   value, the Euclidean length of its row, so
+
+   $$
+   \lVert\Gamma\rVert = \sqrt{64} = 8.
+   $$
+
+   **Denominator.** $D_i$ marks the pairs differing at position $i$. The
+   all-zero instance differs from $e_j$ at position $i$ only when $j=i$,
+   so $\Gamma\circ D_i$ has exactly one nonzero entry, equal to $1$. A
+   matrix with a single entry of $1$ has spectral norm $1$, so
+   $\max_i\lVert\Gamma\circ D_i\rVert = 1$.
+
+   $$
+   \mathrm{ADV}(\mathrm{OR}_{64}) = \frac{8}{1} = 8 = \sqrt{64}.
+   $$
+
+   **The theorem that converts it** is the adversary bound itself,
+   $Q_2(f) = \Omega(\mathrm{ADV}(f))$: for *any* legal $\Gamma$, the
+   bounded-error quantum query complexity is at least a constant times
+   that ratio. Note the direction of the quantifier, since it is what
+   makes the method usable. The theorem holds for every valid $\Gamma$,
+   and $\mathrm{ADV}$ is defined as the maximum over them, so exhibiting
+   one $\Gamma$ is a complete proof of the bound it certifies. Finding a
+   better $\Gamma$ can only improve the bound, never invalidate this one.
+
+   **What the number does and does not say.** It certifies
+   $Q_2(\mathrm{OR}_{64}) = \Omega(\sqrt{64})$, and by the same
+   calculation at general $N$, $Q_2(\mathrm{OR}_N)=\Omega(\sqrt N)$,
+   which is Grover-optimality proved a second time by a route with no
+   relation to the hybrid argument. It does not say that $8$ queries are
+   required. The $\Omega$ carries an unspecified constant, and question 3
+   is about what happens when that is forgotten.
+
+   </details>
+
 2. Explain, in your own words, why the polynomial method's degree-$2T$
    fact requires *squaring* an amplitude's degree-$T$ polynomial, and
    why that specific step is where the factor of $2$ in "$2T$" comes
    from.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the object with degree $T$ is an *amplitude*, and the object
+   the lower bound needs to talk about is a *probability*. The Born rule
+   is the entire source of the factor of $2$.
+
+   Track the degree through a $T$-query algorithm. The only place the
+   input enters is the oracle, which multiplies a basis state by
+   $(-1)^{x_i} = 1-2x_i$, a polynomial of degree exactly $1$ in that
+   input bit. Every unitary between queries has entries that do not
+   depend on the input at all, degree $0$. So each amplitude of the final
+   state is a sum of products of at most $T$ degree-$1$ factors:
+   a polynomial of degree at most $T$ in the input bits.
+
+   But nobody can observe an amplitude. The algorithm's acceptance
+   probability is
+
+   $$
+   p_{\text{acc}}(x) = \sum_{z \in \text{accept}} \big|\alpha_z(x)\big|^2 = \sum_z \alpha_z(x)\,\overline{\alpha_z(x)},
+   $$
+
+   and each summand is a product of two polynomials, each of degree at
+   most $T$. A product of two degree-$T$ polynomials has degree at most
+   $2T$. That is the whole derivation, and the $2$ is the count of
+   factors in $|\alpha|^2$: one for the amplitude, one for its conjugate.
+
+   One small step keeps the result usable. Since every $x_i\in\{0,1\}$
+   satisfies $x_i^2=x_i$, any repeated variable can be collapsed without
+   raising the degree, so the result is a *multilinear* polynomial of
+   degree at most $2T$. Multilinearity matters because the approximation
+   theory the method then invokes, Nisan-Szegedy's lower bound on the
+   approximate degree of $\mathrm{OR}$, is a theorem about multilinear
+   polynomials on the Boolean cube.
+
+   Putting the two halves together: a $T$-query algorithm gives a
+   degree-$\le2T$ polynomial that approximates $\mathrm{OR}_N$ to within
+   a constant, approximation theory says no such polynomial has degree
+   below $\Omega(\sqrt N)$, so $2T = \Omega(\sqrt N)$ and
+   $T=\Omega(\sqrt N)$. The factor of $2$ disappears into the constant,
+   which is why it costs nothing here.
+
+   **Two wrong turns.** The first is attributing the $2$ to circuit
+   structure: two oracle calls per step, or a query plus its
+   uncomputation. There is no such doubling. The algorithm makes exactly
+   $T$ queries and the amplitude's degree is exactly bounded by $T$; the
+   second factor of $T$ never touches the circuit. The second is
+   supposing that an algorithm with real amplitudes would escape it.
+   It would not: $\overline{\alpha}=\alpha$ then, and $\alpha^2$ still
+   has degree $2T$. Squaring is not about complex numbers, it is about
+   probabilities.
+
+   **The cost of the step, worth knowing.** Passing from amplitudes to
+   probabilities throws information away, and the polynomial method
+   never gets it back. There are functions whose approximate degree is
+   strictly smaller than their quantum query complexity, so the method
+   cannot always be tight, and that limitation traces directly to this
+   squaring. It is one of the reasons the adversary method is worth
+   having as an independent tool rather than a redundant one.
+
+   </details>
+
 3. A colleague argues: "Since $\mathrm{ADV}(\mathrm{OR}_{16})=4$ but
    Grover's algorithm only needs $3$ queries for $N=16$, the adversary
    method's theorem must be wrong." Identify the precise error in this
    argument.
 
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The theorem says $Q_2(f) = \Omega(\mathrm{ADV}(f))$, not
+   $Q_2(f) \ge \mathrm{ADV}(f)$. The colleague has read an asymptotic
+   statement with an unspecified constant as an exact per-instance
+   inequality, and those are different claims.
+
+   Written out, the theorem promises a constant $c>0$ such that
+   $Q_2(\mathrm{OR}_N) \ge c\sqrt N$ for all large enough $N$.
+   Observing $3 < 4$ at $N=16$ refutes nothing: it is consistent with
+   every $c \le 3/4$, and it is a single small value of $N$, which an
+   asymptotic statement is entitled to ignore entirely.
+
+   **The colleague's numbers are also generous to the wrong side.** At
+   $N=16$ the marked amplitude is $\sin\theta=1/4$, so
+   $\theta=0.2527$ and the success probability after $m$ Grover
+   iterations is $\sin^2((2m+1)\theta)$. That gives $0.473$ at $m=1$,
+   $0.908$ at $m=2$, and $0.961$ at $m=3$. Since $0.908$ already clears
+   the standard $2/3$ bounded-error threshold, **two** queries suffice,
+   not three. The gap the colleague thinks is a contradiction is twice
+   as large as they stated.
+
+   **And the misreading fails at every $N$, not only small ones,** which
+   is the version of the answer worth remembering. Grover's optimal
+   iteration count is about $\tfrac{\pi}{4}\sqrt N \approx 0.785\sqrt N$,
+   and that constant is known to be tight. So a bounded-error algorithm
+   for $\mathrm{OR}_N$ uses fewer than $\sqrt N$ queries at *every* $N$,
+   asymptotically included, and $Q_2 \ge \mathrm{ADV}$ read literally is
+   false for all $N$ rather than merely for $N=16$. The adversary bound
+   certifies an order of growth. It was never in the business of
+   certifying a count.
+
+   **What would actually falsify the theorem.** An algorithm solving
+   $\mathrm{OR}_N$ with bounded error in $O(N^{0.4})$ queries, or any
+   count that is $o(\sqrt N)$. That would contradict the bound for every
+   constant $c$ at once, and it is the only shape of evidence that can.
+   A discrepancy in constant factors at fixed $N$ is not evidence of
+   anything, and reading it as such is the standard way an asymptotic
+   result gets misused.
+
+   Two smaller confusions are worth separating out, since they often
+   travel with this one. $\mathrm{ADV}(f)$ is a number computed from a
+   matrix, not a query count; it is an *input* to the theorem, and the
+   theorem's *output* is asymptotic. And $\mathrm{ADV}$ is defined as a
+   maximum over all valid $\Gamma$, so any particular $\Gamma$ gives a
+   valid but possibly weak bound. Getting a smaller number than you
+   hoped means your $\Gamma$ was a poor choice, never that the method
+   broke.
+
+   </details>
+
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
-- Query complexity counts only oracle calls; a genuine lower bound must
+- Query complexity counts only oracle calls; a lower bound must
   rule out *every* possible algorithm against *every* possible oracle,
   which is why "nobody has found anything faster" is not itself a proof.
 - The **adversary method** (Ambainis, 2000–2002; matrix form due to
@@ -515,19 +684,21 @@ for one specific $N$.
 - The **polynomial method** (Beals, Buhrman, Cleve, Mosca, and de Wolf,
   1998) shows a $T$-query algorithm's acceptance probability is a
   degree-$\le 2T$ multilinear polynomial; since
-  $\widetilde{\deg}(\mathrm{OR}_N)=\Theta(\sqrt N)$ (Paturi 1992, building
-  on Nisan–Szegedy 1994), this independently gives $T=\Omega(\sqrt N)$.
-- Both techniques share essentially no machinery — state evolution versus
-  polynomial approximation theory — yet agree exactly. Unlike
+  $\widetilde{\deg}(\mathrm{OR}_N)=\Theta(\sqrt N)$ (Nisan–Szegedy 1994,
+  with Paturi's 1992 characterization of symmetric functions giving the
+  same bound as a special case), this independently gives
+  $T=\Omega(\sqrt N)$.
+- Both techniques share essentially no machinery (state evolution versus
+  polynomial approximation theory) yet agree exactly. Unlike
   $\mathsf{P}\ne\mathsf{NP}$ or $\mathsf{P}\ne\mathsf{BQP}$, Grover's
-  optimality is a genuinely, doubly-proven theorem, not a belief.
+  optimality is a doubly-proven theorem, not a belief.
 - A computed bound's raw number (e.g. $\mathrm{ADV}(\mathrm{OR}_{16})=4$)
   proves the right *order of growth*, not necessarily the tightest exact
-  constant for one specific $N$ — this platform's real
-  `optimalGroverIterations(4)=3` is fully consistent with, not a
-  counterexample to, the theorem.
+  constant for one specific $N$. This platform's real
+  `optimalGroverIterations(4)=3` is consistent with the theorem; it does
+  not contradict it.
 
-## Further Exploration
+## What These Techniques Cannot Reach
 
 <NextDiscovery>
   The [capstone](/lessons/apex/quantum-complexity-theory/capstone-what-we-know-and-dont)

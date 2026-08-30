@@ -16,9 +16,9 @@ export const uVsRBoundaryCondition: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "The substitution u(r)=rR(r) requires the boundary condition u(0)=0. What does this imply about R(0) for the 1s state specifically, given radial1s(r)=2e^{-r}?",
     options: [
-      { id: "a", text: "R(0)=2, which is finite and nonzero — consistent with u(0)=r·R(0)=0·2=0" },
-      { id: "b", text: "R(0) must also be exactly 0, the same as u(0)" },
-      { id: "c", text: "R(0) is undefined because u(0)=0 forces division by zero" },
+      { id: "a", text: "R(0)=2, finite and nonzero, which is consistent with u(0)=r·R(0)=0·2=0" },
+      { id: "b", text: "R(0) must also be exactly 0, since u and R can only vanish together" },
+      { id: "c", text: "R(0) is undefined, since recovering it from u(0)=0 divides by zero" },
       { id: "d", text: "u(0)=0 is inconsistent with R(0)≠0, so radial1s must be wrong" },
     ],
   },
@@ -26,9 +26,9 @@ export const uVsRBoundaryCondition: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "u(0)=0 constrains u, not R directly — R(r)=u(r)/r can stay finite even as the numerator and denominator both go to 0.",
+      b: "u(0)=0 constrains u, not R directly. R(r)=u(r)/r can stay finite even as the numerator and denominator both go to 0.",
       c: "0/0 is only undefined in general; here u(r)~r·R(0) near r=0, so the limit is exactly R(0), a finite number.",
-      d: "radial1s(0)=2·e^0=2, a finite nonzero value — fully consistent with u(0)=r·R(0)|_{r=0}=0.",
+      d: "radial1s(0)=2·e^0=2, a finite nonzero value, fully consistent with u(0)=r·R(0)|_{r=0}=0.",
     },
     defaultIncorrectFeedback: "Compute radial1s(0) directly, and separately check that u(r)=r·radial1s(r) does go to 0 as r→0.",
   },
@@ -40,8 +40,8 @@ export const uVsRBoundaryCondition: MultipleChoiceProblem = {
   solution: {
     steps: [
       { description: "radial1s(0) = 2e^0 = 2, a finite nonzero value." },
-      { description: "u(r) = r·radial1s(r), so u(0) = 0 × 2 = 0 — the boundary condition holds automatically." },
-      { description: "This confirms u(0)=0 constrains u, not R — R(0) can be (and for 1s, is) nonzero." },
+      { description: "u(r) = r·radial1s(r), so u(0) = 0 × 2 = 0, and the boundary condition holds automatically." },
+      { description: "This confirms u(0)=0 constrains u, not R. R(0) can be, and for 1s is, nonzero." },
     ],
     finalAnswer: "R(0) = 2, finite and nonzero, and u(0) = 0·2 = 0 holds anyway.",
   },

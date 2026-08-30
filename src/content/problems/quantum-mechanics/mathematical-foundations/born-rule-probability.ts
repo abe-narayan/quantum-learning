@@ -29,8 +29,9 @@ export const bornRuleProbability: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The Born rule: P(outcome) = |overlap with that eigenvector|²." },
-    { text: "Here the overlap is 0.6 — square it." },
+    { text: "The two numbers given are overlaps, which are amplitudes rather than probabilities. Notice that they do not sum to 1, but their squares do." },
+    { text: "The Born rule is what turns the amplitude for one outcome into that outcome's probability. Apply it to the overlap with the eigenvector belonging to the outcome asked for." },
+    { text: "Only one of the two overlaps belongs to the $+1$ outcome. Choose that one before squaring, then check that the two probabilities you could build this way still add to 1." },
   ],
   solution: {
     steps: [
@@ -40,7 +41,7 @@ export const bornRuleProbability: NumericProblem = {
     finalAnswer: "$P(+1) = 0.36$",
   },
   explanation: {
-    correctIdea: "Probabilities come from squared overlaps with eigenvectors, exactly as the Born rule states.",
+    correctIdea: "Probabilities come from squared overlaps with eigenvectors, just as the Born rule states.",
     whyCorrect: "0.6² = 0.36 directly. (Check: P(-1)=0.8²=0.64, and 0.36+0.64=1, consistent with normalization.)",
     whyWrong: ["Using 0.6 directly as a probability skips the squaring the Born rule requires."],
   },

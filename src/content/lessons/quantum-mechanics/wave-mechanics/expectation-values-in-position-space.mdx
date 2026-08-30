@@ -60,7 +60,7 @@ export const topHatDensityFrames = [
 export const lessonMeta = {
   title: "Expectation Values in Position Space",
   description:
-    "Turning the abstract <A> = <psi|A|psi> from the last course into concrete integrals over psi(x), and deriving position variance and the shape of the uncertainty it measures.",
+    "Turning the abstract ⟨A⟩ = ⟨ψ|A|ψ⟩ from the last course into concrete integrals over ψ(x), and deriving position variance and the shape of the uncertainty it measures.",
   course: "wave-mechanics",
   module: "expectation-values-in-position-space",
   order: 1,
@@ -68,17 +68,17 @@ export const lessonMeta = {
   estimatedMinutes: 20,
   prerequisites: ["quantum-mechanics/wave-mechanics/probability-density-and-normalization"],
   objectives: [
-    "Derive <x> and <x^2> as integrals from the abstract expectation-value postulate",
+    "Derive ⟨x⟩ and ⟨x²⟩ as integrals from the abstract expectation-value postulate",
     "Compute position variance and connect it to the engine's variancePosition() implementation",
-    "Generalize to <f(x)> for an arbitrary function of position",
+    "Generalize to ⟨f(x)⟩ for an arbitrary function of position",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The sum becomes an integral">
 The last course defined ⟨A⟩ = ⟨ψ|A|ψ⟩ for a finite-dimensional observable, computed as a sum over basis states. This lesson makes that same definition concrete for position, where the sum becomes an integral.
 </LessonHook>
 
-## Motivation
+## One more observable, taken to the continuum
 
 Take the finite-dimensional average $\langle A\rangle=\sum_i a_i|c_i|^2$
 and let the basis label become continuous: the sum over outcomes turns
@@ -86,7 +86,7 @@ into an integral over $x$. That is the same continuum-limit move as the
 last two lessons, now applied to a specific, extremely useful
 observable: position itself.
 
-## Intuition
+## Multiply each outcome by its probability, again
 
 If $|\psi(x)|^2$ is the probability density of finding the particle at
 $x$, then the *average* position, over many identical measurements, is the
@@ -94,7 +94,7 @@ probability-weighted average of $x$: the same "multiply each outcome by
 its probability and sum" recipe from the first probability lesson of the
 last course, with the sum turned into an integral.
 
-## Mathematical Development
+## From the abstract postulate to an integral over x
 
 ### Deriving $\langle x\rangle$ from the abstract postulate
 
@@ -138,9 +138,19 @@ $$
 measures how spread out the position probability density is.
 `Wavefunction1D.variancePosition()` computes this quantity. For the
 Gaussian wave packets this course builds constantly, $\Delta x$ *is* the
-packet's "width" parameter by construction (verified numerically in the
-engine's test suite: a Gaussian packet built with width $\sigma$ has
-`variancePosition()` equal to $\sigma^2$).
+packet's `width` parameter by construction: a packet built with
+`width` $=w$ has `variancePosition()` equal to $w^2$, verified numerically
+in the engine's test suite.
+
+Watch that symbol, because two conventions are in play and they differ by
+a factor of $\sqrt2$. The engine's `width` is the standard deviation of the
+density itself, so its envelope carries $e^{-(x-x_0)^2/4w^2}$. The
+analytic Gaussians written out in this course's prose use the other common
+convention, $\psi\propto e^{-x^2/2\sigma^2}$, whose density is
+$e^{-x^2/\sigma^2}$ and whose spread is therefore $\Delta x = \sigma/\sqrt2$
+rather than $\sigma$. Both are standard, and they name the same packet only
+when $w = \sigma/\sqrt2$. Practice question 1 works the second convention
+through in full, so compare its answer against $\sigma$, not against `width`.
 
 <InteractiveSection
   title="Widen σ, predict ⟨x⟩ and Δx before checking"
@@ -148,7 +158,7 @@ engine's test suite: a Gaussian packet built with width $\sigma$ has
   <LazyWavefunctionExplorer showMeanSpreadOverlay />
 </InteractiveSection>
 
-## Physical Interpretation
+## What the mean and the spread each tell you
 
 $\langle x\rangle$ is where you'd expect to find the particle on average;
 $\Delta x$ is how much any single measurement is likely to deviate from
@@ -176,7 +186,7 @@ never adequately summarized by its mean, and why the next lesson's
 uncertainty relation is a statement about $\Delta x$ rather than about
 $\langle x\rangle$.
 
-## Worked Example
+## Mean and spread of a top-hat
 
 **For the top-hat $\psi(x)=1/\sqrt L$ on $[0,L]$, find $\langle x\rangle$
 and $\Delta x$.**
@@ -222,7 +232,7 @@ x\rangle$ as to the right, the same "balance point" reading as a center
 of mass with uniform density, which is what $\int x\,|\psi(x)|^2\,dx$
 computes.
 
-## Common Mistakes
+## Squaring the average against averaging the square
 
 <Callout type="warning">
 **Computing $\langle x^2\rangle$ as $\langle x\rangle^2$.** These are
@@ -242,11 +252,139 @@ for complex $\psi$ means $\psi^*\psi$, not $\psi$ or $\psi^2$.
 1. For the Gaussian $\psi(x) = (\pi\sigma^2)^{-1/4}e^{-x^2/(2\sigma^2)}$
    centered at the origin, what is $\langle x\rangle$ by symmetry alone,
    with no integral needed?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\langle x\rangle = 0$.
+
+   The integrand is $x\,|\psi(x)|^2$. The density
+   $|\psi(x)|^2 = (\pi\sigma^2)^{-1/2}e^{-x^2/\sigma^2}$ depends on $x$ only
+   through $x^2$, so it is an *even* function: it takes the same value at
+   $-x$ as at $x$. Multiplying an even function by the odd function $x$
+   gives an odd integrand, and the integral of an odd function over a
+   symmetric interval is zero, because the contribution from every $x>0$ is
+   cancelled exactly by its mirror at $-x$.
+
+   $$
+   \langle x\rangle = \int_{-\infty}^{\infty} x\,|\psi(x)|^2\,dx = 0
+   $$
+
+   The physical reading is that the density is balanced about the origin,
+   so its centre of mass sits there, in the same sense that a symmetric
+   object balances at its midpoint.
+
+   Two guards on this argument, since parity shortcuts are easy to
+   over-apply.
+
+   The symmetry has to be of $|\psi|^2$, not of $\psi$. That is automatic
+   when $\psi$ is even, and it is also automatic when $\psi$ is *odd*: a
+   negative sign disappears under the squared magnitude. The first excited
+   state of a symmetric well is odd and still has $\langle x\rangle=0$. So
+   "odd wavefunction" does not defeat the argument, and it is worth
+   checking which function you are claiming symmetry of.
+
+   The shortcut settles $\langle x\rangle$ and nothing else. $\langle
+   x^2\rangle$ has an even integrand, so no cancellation occurs and it is
+   emphatically nonzero: for this Gaussian it is $\sigma^2/2$, giving
+   $\Delta x = \sigma/\sqrt2$. Concluding that a centred state has no
+   spread because it has no mean is the error the next question and the
+   two densities plotted above are both aimed at.
+
+   </details>
+
 2. Using the general formula $\langle f(x)\rangle=\int f(x)|\psi(x)|^2dx$,
    write down (don't evaluate) the integral for $\langle V(x)\rangle$
    given a potential $V(x)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \langle V(x)\rangle = \int_{-\infty}^{\infty} V(x)\,|\psi(x)|^2\,dx
+   $$
+
+   Substitute $f=V$ and stop. This is what the engine's
+   `expectationPotential(V)` computes, as a Riemann sum of
+   $V(x_i)|\psi(x_i)|^2\Delta x$ over the grid.
+
+   The reason this substitution is legitimate is worth making explicit,
+   because it is the one thing that does not generalize. The formula
+   $\langle f(x)\rangle=\int f|\psi|^2dx$ holds because $\hat x$ is
+   *diagonal* in the position basis: it acts by multiplication, so
+   $f(\hat x)$ also acts by multiplication, and the general sandwich
+   $\int\psi^*\,f(\hat x)\psi\,dx$ collapses to $\int f\,|\psi|^2dx$ with
+   the two factors of $\psi$ combining into the density. Any function of
+   position alone inherits this, and $V(x)$ is one.
+
+   Now the boundary of the trick. The analogous move for momentum is
+   wrong:
+
+   $$
+   \langle p\rangle \ne \int p\,|\psi(x)|^2\,dx
+   $$
+
+   which is not even a sensible expression, since there is no $p$ in the
+   integrand to integrate. $\hat p$ is not diagonal in the position basis;
+   it differentiates. Its expectation value is
+   $\int\psi^*\left(-i\hbar\,d\psi/dx\right)dx$, where the operator sits
+   *between* the two factors and cannot be pulled out to meet the density.
+   The same applies to $\langle H\rangle$, whose kinetic part carries a
+   second derivative.
+
+   So the correct summary is narrower than the formula looks: expectation
+   values become plain density-weighted averages exactly for observables
+   that are functions of position. Everything else has to keep the operator
+   sandwiched, which is why the engine computes $\langle p\rangle$ by
+   transforming to momentum space rather than by weighting $|\psi(x)|^2$.
+
+   </details>
+
 3. True or false, with justification: $\Delta x$ can be exactly zero for
    some valid, <Term id="normalization">normalized</Term> wavefunction.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   False. No normalized wavefunction has $\Delta x = 0$.
+
+   Suppose one did. Writing $\bar x = \langle x\rangle$, the variance is
+
+   $$
+   (\Delta x)^2 = \int (x-\bar x)^2\,|\psi(x)|^2\,dx = 0
+   $$
+
+   The integrand is a product of two non-negative factors, so the integral
+   vanishes only if the integrand vanishes almost everywhere. At every
+   $x\ne\bar x$ the factor $(x-\bar x)^2$ is strictly positive, so
+   $|\psi(x)|^2$ must be zero there. That leaves $\psi$ supported on the
+   single point $\bar x$, and a function that is zero except at one point
+   has $\int|\psi|^2dx = 0$, not $1$. The state was not normalized after
+   all, so the supposition fails.
+
+   The physical content is that a position eigenstate does not exist as a
+   state of the theory. What plays that role is the Dirac delta
+   $\delta(x-\bar x)$, and it is not a function in $L^2(\mathbb{R})$ at
+   all: it has no finite norm, and the earlier lesson introduced it only as
+   something defined by what it does inside an integral. Squeezing a real
+   wavefunction narrower and narrower drives $\Delta x$ toward zero without
+   ever reaching it, exactly as the momentum-eigenstate discussion in
+   Free-Particle Wave Packets does at the other end.
+
+   Two things this does *not* say. It does not say $\Delta x$ has some
+   positive lower bound in general: no such bound exists, and $\Delta x$
+   can be made as small as you like. And it is a separate fact from the
+   uncertainty relation, which forbids $\Delta x$ and $\Delta p$ from both
+   being small at once. The result here forbids $\Delta x = 0$ on its own,
+   for reasons of normalizability, before any commutator is mentioned.
+
+   Notice this is also what rescues the callout above. The warning says
+   $\langle x^2\rangle$ and $\langle x\rangle^2$ are equal "only for a
+   state with zero variance," and the point of this question is that the
+   exception is empty: for every genuine state the two really are
+   different, and the gap between them is a strictly positive number.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -262,7 +400,7 @@ for complex $\psi$ means $\psi^*\psi$, not $\psi$ or $\psi^2$.
   `expectationPotential()` are direct, discretized implementations of
   these integrals.
 
-## Further Exploration
+## The operator this lesson took on trust
 
 <NextDiscovery>
 This lesson took $\hat x$ on trust as "multiply by $x$." [The Position and

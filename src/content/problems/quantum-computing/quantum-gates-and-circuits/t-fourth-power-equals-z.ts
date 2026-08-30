@@ -24,10 +24,10 @@ export const tFourthPowerEqualsZ: MultipleChoiceProblem = {
     prompt:
       "The lesson notes $T^2=S$ and $S^2=Z$. Is the four-gate sequence $T\\cdot T\\cdot T\\cdot T$ (applying $T$ four times) a valid decomposition of the Pauli $Z$ gate?",
     options: [
-      { id: "a", text: "Yes — $T^4=Z$ exactly, not just up to global phase" },
+      { id: "a", text: "Yes; $T^4=Z$ exactly, not merely up to global phase" },
       { id: "b", text: "Yes, but only up to an unavoidable global phase factor" },
-      { id: "c", text: "No — four applications of $T$ give $S$, not $Z$" },
-      { id: "d", text: "No — $T$ has infinite order, so no finite power of $T$ equals any Pauli gate" },
+      { id: "c", text: "No; four applications of $T$ give $S$, not $Z$" },
+      { id: "d", text: "No; $T$ has infinite order, so no finite power of $T$ equals any Pauli gate" },
     ],
   },
   answer: {
@@ -44,7 +44,7 @@ export const tFourthPowerEqualsZ: MultipleChoiceProblem = {
   hints: [
     { text: "T is diagonal: $T=\\text{diag}(1,e^{i\\pi/4})$, so $T^k=\\text{diag}(1,e^{ik\\pi/4})$ for any power $k$." },
     { text: "At $k=4$: the phase entry becomes $e^{i4\\pi/4}=e^{i\\pi}=-1$." },
-    { text: "$\\text{diag}(1,-1)$ is exactly the Z matrix — an exact match, no global-phase tolerance required." },
+    { text: "Compare $\\text{diag}(1,-1)$ entry by entry against the Z matrix, and note whether any global-phase allowance is needed to make them agree." },
   ],
   solution: {
     steps: [

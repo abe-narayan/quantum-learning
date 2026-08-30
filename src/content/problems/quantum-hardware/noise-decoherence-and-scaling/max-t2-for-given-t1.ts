@@ -40,7 +40,7 @@ export const maxT2ForGivenT1: NumericProblem = {
   },
   explanation: {
     correctIdea: "This directly applies the lesson's stated T2≤2T1 bound, matching its own worked example's numbers exactly.",
-    whyCorrect: "Matches the lesson's explicit Worked Example.",
+    whyCorrect: "Energy relaxation destroys phase coherence at half the rate it destroys population, so relaxation on its own already caps T2 at 2T1. Any pure dephasing on top only lowers it, which makes 160 μs a ceiling rather than a prediction.",
     whyWrong: ["Answering T1 itself (80) or an unrelated value confuses the bound's factor of 2, which comes from the physical asymmetry between energy relaxation and pure dephasing."],
   },
 };

@@ -29,8 +29,9 @@ export const probabilityInSubregion: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The probability density here is uniform: |psi(x)|^2 = 1/10 everywhere inside [0,10]." },
-    { text: "Integrate that constant density over the subregion's width." },
+    { text: "The probability of finding the particle somewhere is the area under the density there, not the value of psi itself." },
+    { text: "Square psi to get the density, note that it is constant, then integrate it across the subregion." },
+    { text: "For a constant density that integral is density times width. Work the subregion's width out carefully: it runs from 2 to 5, not from 0 to 5." },
   ],
   solution: {
     steps: [

@@ -175,7 +175,7 @@ function PhaseSpaceEllipsePanel({
         {onCurve ? (
           <span className="text-accent font-medium">On the E = {energy} contour.</span>
         ) : (
-          <span>Off the E = {energy} contour — this state has a different energy.</span>
+          <span>Off the E = {energy} contour: this state has a different energy.</span>
         )}
       </p>
 

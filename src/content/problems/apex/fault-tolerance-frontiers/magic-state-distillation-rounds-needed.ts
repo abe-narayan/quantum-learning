@@ -46,7 +46,7 @@ export const magicStateDistillationRoundsNeeded: NumericProblem = {
   },
   hints: [
     { text: "Compute ε₁ = 35 × (0.01)³ first, and compare it to 10⁻¹⁰." },
-    { text: "ε₁ ≈ 3.5×10⁻⁵, which is still far above 10⁻¹⁰ — one round isn't enough." },
+    { text: "ε₁ ≈ 3.5×10⁻⁵, still far above 10⁻¹⁰, so one round is not enough." },
     { text: "Feed ε₁ back into the same formula to get ε₂ = 35 × ε₁³, and compare that to 10⁻¹⁰." },
   ],
   solution: {
@@ -60,6 +60,6 @@ export const magicStateDistillationRoundsNeeded: NumericProblem = {
   explanation: {
     correctIdea: "Each round applies the same cubic-suppression formula to the previous round's output, so the exponent on the original ε₀ roughly triples each round, a double-exponential collapse.",
     whyCorrect: "35×10⁻⁶ ≈ 3.5×10⁻⁵ (round 1) is still 5 orders of magnitude above the 10⁻¹⁰ target; feeding that back in gives ≈1.5×10⁻¹² (round 2), which clears the target.",
-    whyWrong: ["Answering 1 round mistakes ε₁ ≈ 3.5×10⁻⁵ for something below 10⁻¹⁰, when it is actually five orders of magnitude larger.", "Answering 3 or more overshoots — round 2's output already clears the target with room to spare."],
+    whyWrong: ["Answering 1 round mistakes ε₁ ≈ 3.5×10⁻⁵ for something below 10⁻¹⁰, when it is five orders of magnitude larger.", "Answering 3 or more overshoots. Round 2's output already clears the target with room to spare."],
   },
 };

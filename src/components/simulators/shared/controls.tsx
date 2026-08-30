@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
  * `globals.css` retypes into the instrument voice), a slider with a tabular
  * numeric readout, a run/step/reset button row, and a pill-button
  * radiogroup for presets/modes. Existing per-simulator controls keep working
- * unmodified — these exist so new and touched controls converge on one
+ * unmodified; these exist so new and touched controls converge on one
  * look rather than each simulator inventing its own slider chrome.
  */
 
@@ -27,7 +27,7 @@ export function ControlSection({
   children,
   className,
 }: {
-  /** Base id — the rendered heading id is `${id}-heading`. */
+  /** Base id; the rendered heading id is `${id}-heading`. */
   id: string;
   title: ReactNode;
   description?: ReactNode;
@@ -39,7 +39,7 @@ export function ControlSection({
     <section aria-labelledby={headingId} className={cn(className)}>
       {/* No typographic classes here on purpose. globals.css section 7 styles
           every `h3[id$="-heading"]` into the technical/instrument voice (mono,
-          uppercase, tracked, muted) — that rule is unlayered, so it beats any
+          uppercase, tracked, muted). That rule is unlayered, so it beats any
           Tailwind utility written here, and utilities on this element would be
           silently dead code. The `-heading` id suffix is the contract; the
           look belongs to the stylesheet. */}
@@ -57,7 +57,7 @@ export function ControlSection({
  * Symbol glosses
  * ============================================================
  * Every instrument on this bench is reachable *before* any lesson has
- * introduced its notation — the Rabi Explorer is linked straight off the
+ * introduced its notation: the Rabi Explorer is linked straight off the
  * homepage, and `/simulators` explicitly promises "no lesson to finish
  * first." A control labelled only `Δ` or `V` or `γ` is therefore a dead end
  * for the reader it was most meant for. `docs/BEGINNER_REVIEW.md` named
@@ -65,11 +65,11 @@ export function ControlSection({
  * standard.
  *
  * So: every single-letter control symbol gets a plain-English gloss at the
- * point of contact, right under the control that uses it — not a tooltip, not
+ * point of contact, right under the control that uses it, not a tooltip, not
  * a lesson link, not a definition the reader has to go find. `glossaryId` is
  * optional and adds a "full entry" link; it MUST be an id that already exists
  * in `src/lib/content/glossary.ts` (the glossary page anchors on the raw id),
- * so never invent one — grep first.
+ * so never invent one; grep first.
  */
 export function SymbolGloss({
   items,
@@ -95,13 +95,31 @@ export function SymbolGloss({
           <dt className="w-8 shrink-0 font-mono text-pillar">{item.symbol}</dt>
           <dd className="min-w-0 flex-1">
             <span className="font-medium text-foreground">{item.name}</span>
-            {" — "}
+            {": "}
             {item.means}
             {item.glossaryId ? (
               <>
                 {" "}
+                {/* `/simulators` mounts every bench on one page, so this
+                    link's two visible words appeared 21 times on it with 21
+                    different destinations. A screen-reader user pulling up
+                    the links list (WCAG 2.4.4) got "full entry" twenty-one
+                    times and nothing to choose between them: the `<dd>` that
+                    supplies the context visually is not one of the containers
+                    2.4.4 counts as programmatically determined, so the name
+                    has to carry the symbol's own name.
+
+                    "for <name>" appended, not "Full entry: <name>": the
+                    visible words have to survive inside the accessible name
+                    as one contiguous run (SC 2.5.3 Label in Name) so a speech
+                    user who says "click full entry" still hits it, and both
+                    forms satisfy that, but a colon is read by some screen
+                    readers as a pause and by others as nothing at all,
+                    while "full entry for detuning" is a phrase either way.
+                    Same construction as `mdx/Term.tsx`'s gloss link. */}
                 <Link
                   href={`/glossary#${item.glossaryId}`}
+                  aria-label={`full entry for ${item.name}`}
                   className="whitespace-nowrap text-pillar-text underline decoration-dotted underline-offset-2 hover:decoration-solid"
                 >
                   full entry
@@ -153,8 +171,8 @@ export function SimulatorSlider({
   // means nothing connected it to the input it explains. That is tolerable for
   // "The relative phase between |0⟩ and |1⟩", and not tolerable at all for the
   // case this control actually has: `ThreeComponentMixtureExplorer` disables
-  // its p₁ slider when p₀ has taken all the weight and puts the *reason* —
-  // "p₀ has taken all of the weight … Lower p₀ to free some up" — in the hint.
+  // its p₁ slider when p₀ has taken all the weight and puts the *reason*,
+  // "p₀ has taken all of the weight … Lower p₀ to free some up", in the hint.
   // A disabled input is out of the tab order, so a screen-reader user reached
   // a control they could not operate (or never reached it at all) with the
   // explanation sitting in unassociated text nearby. `aria-describedby` makes
@@ -190,9 +208,9 @@ export function SimulatorSlider({
         // centres its track vertically inside whatever height it's given, so
         // this buys the full touch target the mobile audit asks for without
         // changing how the track looks. Keyboard use is native to
-        // `input[type=range]` (arrows step, Home/End jump) — nothing here
+        // `input[type=range]` (arrows step, Home/End jump); nothing here
         // overrides it.
-        className="mt-1 h-11 w-full accent-[var(--pillar-accent)] disabled:opacity-50"
+        className="mt-1 h-11 w-full accent-pillar disabled:opacity-50"
       />
       {hint ? (
         <p id={hintId} className="mt-1 text-xs text-muted-foreground">
@@ -246,7 +264,7 @@ export function RunControls({
   );
 }
 
-/** A radiogroup of pill buttons — presets, modes, discrete choices. */
+/** A radiogroup of pill buttons: presets, modes, discrete choices. */
 export function PillGroup({
   label,
   value,
@@ -307,7 +325,7 @@ export function PillGroup({
             // `border` is on the shared line, not the branches. Only the
             // *unselected* pill used to carry one, so every selection shrank
             // the chosen pill's border box by 2px in each axis and nudged
-            // every pill after it along the row — and, once a row wrapped,
+            // every pill after it along the row and, once a row wrapped,
             // could move a pill onto another line. That is a reflow on every
             // click of a control whose entire job is being clicked, and it
             // reads as the layout flinching away from the pointer. It is also

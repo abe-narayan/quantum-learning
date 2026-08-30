@@ -34,40 +34,42 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Not every state is generic">
-The 2^n wall assumes every amplitude is independent information that must be stored. Many physically important states aren't nearly this generic — their entanglement structure is limited, and tensor networks exploit exactly that.
+The 2^n wall assumes every amplitude is independent information that must be stored. Many physically important states aren't nearly this generic: their entanglement structure is limited, and tensor networks exploit that.
 </LessonHook>
 
-## Motivation
+## Which States Are Worth Compressing
 
 Computational Cost & Scaling's exponential wall assumed nothing special
 about the state being simulated: every one of the $2^n$ amplitudes was
 treated as independent information that must be stored. Many physically
-important states are far less generic than that. This lesson covers the
-main classical technique that exploits such structure, tensor networks,
-along with the precise condition (limited entanglement) that determines
-when the technique works and when it fails.
+important states are far less generic than that. So which states carry
+enough structure to be worth compressing, and how much structure is
+enough? Tensor networks are the classical machinery that exploits it,
+and limited entanglement is the sharp condition separating the states
+they handle from the states they cannot.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/f8/Frontier_supercomputer_%2852291130197%29.jpg"
   alt="Rows of Frontier supercomputer cabinets at Oak Ridge National Laboratory"
-  caption="Oak Ridge National Laboratory's Frontier supercomputer, the world's first exascale system. Classically simulating quantum systems, whether by brute-force state-vector storage or the tensor-network methods this lesson covers, is HPC-bound work in practice; machines like this are what a serious simulation run actually targets."
+  caption="Oak Ridge National Laboratory's Frontier, the world's first exascale system. Read it against the numbers below rather than as scenery: a generic 50-qubit state vector wants roughly 18 petabytes of memory, the scale at which a machine of this class stops being overkill and becomes the binding constraint, while the same state held as a bond-dimension-16 matrix product state is 400 kilobytes and would fit on a phone."
   credit="Oak Ridge National Laboratory / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Frontier_supercomputer_(52291130197).jpg"
   license="CC BY 2.0"
 />
 
-## Engineering Development
+## Bond Dimension as the Tradeoff Knob
 
 ### The key structural fact: limited entanglement
 
 Entanglement, Mixed States & Bell Tests built **entanglement entropy**
 as a precise measure of how "spread out" correlations are between parts
-of a system. A generic $n$-qubit state can have entanglement entropy up
-to $\sim n$ (near-maximal, requiring the full $2^n$-dimensional
+of a system. Split a generic $n$-qubit state down the middle and the entanglement
+entropy across that cut can run all the way up to $n/2$ (near-maximal,
+requiring the full $2^n$-dimensional
 description); many physically realistic states, particularly the
 ground states of many real physical Hamiltonians, have entanglement
 entropy that grows much more slowly, often just with the *boundary*
-between regions rather than their full volume (an "area law," a genuine
+between regions rather than their full volume (an "area law," a
 physics result well beyond this course's scope to derive, but directly
 motivating why tensor networks work as well as they do for these
 specific systems).
@@ -83,7 +85,7 @@ can represent the state *exactly* (or to excellent approximation) using
 far fewer total numbers than $2^n$, sometimes only *linearly* many in
 $n$, not exponentially many.
 
-<InteractiveSection title="Structure, not just cost: what the network itself looks like" description="Left: a generic state vector, drawn as one fully-connected blob — every one of its 2ⁿ amplitudes is independent information, so nothing can be dropped. Right: a matrix-product-state tensor network, one small tensor per qubit, chained by bond indices of dimension D. Flip D and watch the chain's edges thicken and the 32·n·D² readout grow, tracing the same MPS memory formula the curve above plots as a function of qubit count instead.">
+<InteractiveSection title="Structure, not just cost: what the network itself looks like" description="Left: a generic state vector, drawn as one fully-connected blob, because every one of its 2ⁿ amplitudes is independent information and nothing can be dropped. Right: a matrix-product-state tensor network, one small tensor per qubit, chained by bond indices of dimension D. Flip D and watch the chain's edges thicken and the 32·n·D² readout grow, tracing the same MPS memory formula the curve further down plots as a function of qubit count instead.">
   <TensorNetworkDiagram
     ariaLabel="Structural comparison of a generic state vector versus a matrix-product-state tensor network, with an adjustable bond dimension D"
     n={20}
@@ -95,7 +97,7 @@ $n$, not exponentially many.
 Tensor networks are not a general replacement for state-vector
 simulation. A state with high (near-maximal) entanglement entropy
 requires bond dimensions that grow back toward the same $2^n$ cost this
-technique was trying to avoid. This is a real, principled
+technique was trying to avoid. This is a principled
 tradeoff, not a limitation of current tensor-network techniques waiting
 to be engineered away: highly-entangled states do not compress this way, by the same information-counting argument that
 established the $2^n$ wall in the first place.
@@ -108,21 +110,23 @@ linear in $n$ instead of exponential. Fixing $D=16$ (a modest bond
 dimension, enough for mild entanglement but far from generic):
 
 <PredictBeforeReveal
-  question="At n=50 qubits, a bond-dimension-16 MPS storing 32nD² bytes versus the full 16·2ⁿ-byte state vector — how big is the gap?"
+  question="At n=50 qubits, a bond-dimension-16 MPS storing 32nD² bytes versus the full 16·2ⁿ-byte state vector: how big is the gap?"
   options={[
     { label: "MPS is somewhat smaller, maybe half the size", value: "half" },
     { label: "About the same order of magnitude", value: "same" },
-    { label: "MPS is many orders of magnitude smaller (kilobytes vs. petabytes)", value: "huge-gap" },
+    { label: "MPS is many orders of magnitude smaller", value: "huge-gap" },
   ]}
   correctValue="huge-gap"
-  explanation="32·50·16² is 409,600 bytes, about 400 KB. 16·2⁵⁰ is about 18 PB — roughly 44 billion times larger. That gap is the entire payoff of exploiting limited entanglement, and it only holds for states a bond dimension of 16 can actually represent; a highly entangled 50-qubit state would force D back up toward 2²⁵, erasing the gap almost completely."
+  explanation="32·50·16² is 409,600 bytes, about 400 KB. 16·2⁵⁰ is about 18 PB, roughly 44 billion times larger. That gap is the entire payoff of exploiting limited entanglement, and it only holds for states a bond dimension of 16 can represent; a highly entangled 50-qubit state would force D back up toward 2²⁵, erasing the gap almost completely."
 />
 
 Plotting both curves on the same log scale over 10-50 qubits:
 
-<InteractiveSection title="Watch the MPS curve stay flat where state-vector explodes" description="Trace the MPS curve: it barely rises across the whole range, because it only grows linearly in qubit count. The state-vector curve is the same exponential line from Computational Cost & Scaling. The gap between them, not either curve alone, is what 'exploiting limited entanglement' buys you, and only for states an MPS with this bond dimension can actually represent.">
+<InteractiveSection title="Watch the MPS curve stay flat where state-vector explodes" description="Trace the MPS curve: it barely rises across the whole range, because it only grows linearly in qubit count. The state-vector curve is the same exponential line from Computational Cost & Scaling. The gap between them, not either curve alone, is what 'exploiting limited entanglement' buys you, and only for states an MPS with this bond dimension can represent.">
   <ParametricCurve
     ariaLabel="Log10 memory in bytes versus qubit count for generic state-vector simulation and a bond-dimension-16 matrix product state, 10 to 50 qubits"
+    xAxisLabel="qubit count n"
+    yAxisLabel="log₁₀(bytes)"
     frames={[
       {
         paramLabel: "10-50 qubits, MPS bond dimension D=16",
@@ -148,24 +152,24 @@ Plotting both curves on the same log scale over 10-50 qubits:
 </InteractiveSection>
 
 This is the tradeoff the rest of this lesson describes in words:
-the MPS curve is only honest for states this bond dimension can actually
+the MPS curve is only honest for states this bond dimension can
 capture. Raise the true entanglement past what $D=16$ can represent and
 the required $D$ climbs back toward $2^{n/2}$, and the accent curve
 above would swing back up to meet the brand one.
 
-## Physical Interpretation
+## Exploiting Structure, Where It Exists
 
-Tensor networks are a genuine example of a broader theme: exploiting
+Tensor networks are a clear example of a broader theme: exploiting
 known structure in a specific problem to beat a generic worst-case cost
-bound. They work spectacularly well for many real physical systems
+bound. They work well for many real physical systems
 (especially in condensed matter physics, where "area law" entanglement
-is common) and are one of the most successful classical simulation
+is common) and are among the most successful classical simulation
 techniques in existence for THOSE systems, while being no help
 whatsoever for a circuit specifically designed (like many quantum
 algorithm circuits, including Quantum Algorithms I's Grover's algorithm)
 to generate near-maximal entanglement.
 
-## Worked Example
+## Where the Method Fails
 
 **Why would a tensor network method be a poor choice for simulating
 Quantum Algorithms I's Grover's algorithm at scale, even though it might
@@ -179,7 +183,7 @@ more local correlations. A tensor network representation would need bond
 dimensions that grow back toward exponential to capture this, defeating
 the entire purpose of using the technique.
 
-## Common Mistakes
+## Treating Tensor Networks as a General Win
 
 <Callout type="note">
 **Treating tensor networks as a general solution that makes the 2ⁿ wall
@@ -199,15 +203,233 @@ whenever the state's entanglement structure isn't known to be limited.
 ## Practice Questions
 
 1. What specific physical property does a tensor network representation
-   exploit that a generic state-vector representation ignores?
+   exploit that a generic state-vector representation ignores? Then name
+   one property that is commonly mistaken for it, and say why it is not
+   the same thing.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Limited entanglement**, measured as the entanglement entropy across
+   a cut through the system, and paid for in the representation as bond
+   dimension.
+
+   Cut the register into two halves and ask how much entanglement crosses
+   the cut. For a generic $n$-qubit state that number runs up toward
+   $n/2$. For many physically realistic states, particularly ground
+   states of real local Hamiltonians, it is far smaller and grows with
+   the *boundary* between the regions rather than with their volume, the
+   area-law behaviour the lesson names. A tensor network's bond index
+   across each cut is sized to carry exactly that entanglement, so when
+   the entropy is small the bonds are small and the whole state fits in
+   a number of parameters linear in $n$.
+
+   **Why a state vector cannot exploit it.** A flat array of $2^n$
+   amplitudes stores every amplitude as independent information. It has
+   no place to record that the two halves are barely correlated, so it
+   cannot spend less on a nearly product state than on a maximally
+   entangled one. A product state of 50 qubits and a maximally entangled
+   state of 50 qubits cost the same 18 petabytes. The representation is
+   blind to the structure, which is exactly what it means to ignore it.
+
+   The size of the gap when the structure is there: at $n=50$ with bond
+   dimension $D=16$, an MPS storing $32nD^2$ bytes is
+   $32\times50\times256=409{,}600$ bytes, about 400 KB, against
+   $1.80\times10^{16}$ bytes for the state vector. A factor of about
+   $4.4\times10^{10}$.
+
+   Three properties that are commonly named instead, each wrong in an
+   instructive way.
+
+   **Sparsity.** A different structure entirely. Physically interesting
+   states are typically dense in the computational basis, with almost
+   every amplitude nonzero, and they compress anyway. Compressibility
+   here is about correlations between amplitudes, not about how many are
+   zero.
+
+   **Shallow circuits, stored as the gate list.** That defers the cost
+   rather than removing it. You still have to contract the network to get
+   an amplitude, and how expensive that is depends on the entanglement
+   the circuit generated.
+
+   **Locality of the Hamiltonian.** This is the most seductive, because
+   it is usually *true of the same systems*. Local interactions are a
+   common cause of bounded entanglement, but they are not the property
+   being exploited, and the two come apart: a critical one-dimensional
+   system has a perfectly local Hamiltonian and long-range correlations,
+   with entanglement entropy growing logarithmically with subsystem size.
+   The bond dimension tracks the entropy, not the interaction range.
+
+   </details>
+
 2. Explain, in your own words, why a highly-entangled state requires
    large bond dimensions, defeating the purpose of the tensor-network
    approach.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the bond dimension is not a tuning parameter you get to
+   choose. It is bounded below by how much entanglement actually crosses
+   the cut.
+
+   Split the state at some bond and write it in Schmidt form,
+   $|\psi\rangle=\sum_\alpha \lambda_\alpha|L_\alpha\rangle|R_\alpha\rangle$.
+   The number of nonzero terms is the Schmidt rank $\chi$ across that
+   cut, and an MPS with bond dimension $D$ there can represent exactly
+   those states with $\chi\le D$. The entanglement entropy obeys $S\le
+   \log_2\chi$, so
+
+   $$
+   \chi \ge 2^{S}.
+   $$
+
+   The bond dimension has to grow exponentially in the entanglement
+   entropy. That is the whole mechanism.
+
+   **Now put a generic state through it.** Cut a 50-qubit register down
+   the middle and a generic state has $S\approx25$, forcing
+   $D\gtrsim2^{25}=33{,}554{,}432$. The MPS then stores
+   $32nD^2=32\times50\times2^{50}\approx1.80\times10^{18}$ bytes.
+
+   Compare the plain state vector at the same size:
+   $16\times2^{50}\approx1.80\times10^{16}$ bytes.
+
+   **The tensor network is a hundred times worse.** Not merely as bad,
+   worse, and by an exactly calculable factor: $32n$ against 16, which is
+   $2n$, or 100 at $n=50$. This is the sharpest possible answer to the
+   question. In the regime it was supposed to rescue, the technique
+   stores the same information and pays a linear penalty for the
+   structure it added.
+
+   The reason has to be information-theoretic rather than technical. A
+   generic $n$-qubit state carries $2^n$ independent complex numbers'
+   worth of information, and no representation can carry that in fewer
+   numbers. An MPS at $D=2^{n/2}$ is not compressing anything; it has
+   simply spread the same content across $n$ tensors, with overhead.
+
+   The wrong turn is treating this as an efficiency gap that better
+   tensor-network algorithms might close. It is the same counting
+   argument that established the $2^n$ wall in the first place, and it
+   applies to any exact representation of a generic state. What tensor
+   networks buy is not a better encoding of arbitrary states; it is the
+   ability to spend less on states that carry less.
+
+   </details>
+
 3. Name one class of physical systems (per this lesson) where tensor
    networks work especially well, and explain why.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Ground states of gapped, local, one-dimensional Hamiltonians**, the
+   condensed-matter systems the lesson points at.
+
+   The reason is an area law. For a one-dimensional system with local
+   interactions and a spectral gap above the ground state, the ground
+   state's entanglement entropy across a cut is bounded by a *constant*,
+   independent of how large the system is. Cut a chain of 20 spins or
+   20,000 and the entropy across the cut is the same, because the
+   "boundary" between two halves of a line is a single point and does not
+   grow.
+
+   Feed that through question 2's relation. Constant $S$ means a constant
+   bound on the Schmidt rank, so a constant bond dimension suffices no
+   matter how long the chain is, and the total cost $32nD^2$ is *linear*
+   in system size. That is why matrix product states, and the DMRG
+   algorithm that variationally optimizes over them, have been the
+   workhorse of one-dimensional condensed-matter physics for decades.
+   They are not a promising approach for those systems; they are the best
+   available one.
+
+   **Every hypothesis in that sentence is load-bearing, and dropping any
+   of them changes the answer.**
+
+   *Gapped.* At a critical point the gap closes, and the entropy grows
+   logarithmically with subsystem size instead of saturating. The
+   required bond dimension then grows polynomially in system size:
+   much better than exponential, still not constant, and genuinely harder.
+
+   *One-dimensional.* In two dimensions the boundary between two regions
+   is a line rather than a point, so an area law bounds the entropy by
+   something that grows with the linear size of the region, and the bond
+   dimension grows exponentially in that. Two-dimensional tensor networks
+   exist and are far more expensive.
+
+   *Local.* An area law is a theorem about locally interacting systems.
+   All-to-all coupled models offer no such guarantee.
+
+   *Ground state.* Time-evolve a gapped local system after a quench and
+   entanglement grows roughly linearly with time, so bond dimension grows
+   exponentially with the simulated time. Tensor networks are excellent
+   at these systems' equilibrium properties and run out of room on their
+   long-time dynamics.
+
+   The wrong turn is remembering the conclusion as "tensor networks are
+   good for physics problems and bad for algorithm circuits." The
+   condition is limited entanglement, and it is checkable. Some physics
+   problems fail it, and some circuits, the low-depth ones on
+   bounded-degree graphs, pass.
+
+   </details>
+
 4. Using the worked example's reasoning, would you expect tensor
    networks to help simulate Quantum Algorithms II's QAOA on a densely
    connected graph? Explain your reasoning by analogy.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **No, and for the same reason Grover fails**, with a second reason
+   stacked on top that is specific to the word "densely."
+
+   **The Grover analogy.** The worked example's argument was that
+   amplitude amplification generically produces substantial entanglement
+   across the whole register, with no area-law structure limiting its
+   growth, so the required bond dimension climbs back toward exponential
+   and the technique buys nothing. QAOA's cost layer applies a two-qubit
+   entangling rotation for every edge of the problem graph, and it is
+   *designed* to build correlations spanning the register, because that
+   is what encodes the combinatorial problem. The circuit's purpose is
+   the thing that defeats the representation.
+
+   **What "densely connected" adds.** Take any bipartition of the qubits
+   and count how many graph edges cross it. On a dense graph with $n=100$
+   vertices there are 4,950 edges, and a balanced cut is crossed by about
+   2,500 of them. Every one of those is an entangling gate acting across
+   the cut, in every cost layer. Entanglement across every cut therefore
+   grows quickly in both the graph density and the QAOA depth $p$, and
+   bond dimension follows it exponentially.
+
+   There is a second, more structural version of the same problem. A
+   matrix product state is a *chain*: its bonds sit between neighbouring
+   sites in some chosen ordering. An edge between two distant sites in
+   that ordering has to be carried along the whole path between them,
+   inflating every bond it passes through. On a dense graph no ordering
+   of the qubits makes the edges local, because there are far more edges
+   than there are adjacent pairs in a line. This is exactly the routing
+   problem the Compilation course meets on hardware with limited
+   connectivity, showing up here as a simulation cost instead of a SWAP
+   count.
+
+   **The honest qualification**, because "tensor networks and QAOA" is
+   not a settled no. At small depth, one or two layers, on a *sparse*
+   bounded-degree graph, tensor-network simulation of QAOA is a real and
+   actively used technique, and it has been used to challenge quantum
+   advantage claims. The conditions are low depth and bounded degree, and
+   both appear in the question's premise with the wrong values. "Densely
+   connected" is precisely the hypothesis that removes them.
+
+   The general test to carry away, which is what the analogy is teaching
+   rather than the particular verdict: for any circuit, ask how much
+   entanglement crosses a cut and how fast it grows with depth. If the
+   circuit was designed to generate entanglement, or if its interaction
+   graph is dense enough that every cut is crossed many times, then bond
+   dimension tracks that growth exponentially and the technique will not
+   help.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -217,18 +439,18 @@ whenever the state's entanglement structure isn't known to be limited.
   connected tensors rather than one flat $2^n$-amplitude list,
   exploiting limited entanglement to use far fewer numbers when
   possible.
-- This is a real, principled tradeoff, not a general win. States with
+- This is a principled tradeoff and not a general win. States with
   near-maximal entanglement require bond dimensions that grow back
   toward the same exponential cost.
 - Works especially well for many real physical systems (condensed
   matter ground states with "area law" entanglement); offers no help for
   circuits specifically designed to generate high entanglement.
 
-## Further Exploration
+## Back to Brute Force, With Noise
 
 <NextDiscovery>
 [Noise Simulation](/lessons/quantum-software/simulating-quantum-systems/noise-simulation) returns to state-vector-style
 simulation (density matrices, not tensor networks) to model what a
-noisy circuit's output actually looks like, reusing Advanced Topics in
+noisy circuit's output looks like, reusing Advanced Topics in
 Quantum Mechanics' Kraus-channel machinery directly.
 </NextDiscovery>

@@ -11,7 +11,7 @@ export const MAX_GATES = 1200;
 export const lessonMeta = {
   title: "Scaling Challenges",
   description:
-    "Compounding per-gate error rates across a deep circuit, computed directly: even a 99.9% per-gate fidelity drops below 37% success probability by 1000 sequential gates. The concrete numerical reason 'just add more qubits' badly understates what scaling a useful quantum computer actually requires.",
+    "Compounding per-gate error rates across a deep circuit, computed directly: even a 99.9% per-gate fidelity drops below 37% success probability by 1000 sequential gates. The concrete numerical reason 'just add more qubits' badly understates what scaling a useful quantum computer requires.",
   course: "noise-decoherence-and-scaling",
   module: "scaling-challenges",
   order: 1,
@@ -26,27 +26,27 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="A number that sounds bigger than it is">
-A press release announcing "1000 qubits" sounds like an order of magnitude more computer than one announcing "100 qubits." It might not be.
+A press release announcing "1000 qubits" sounds like an order of magnitude more computer than one announcing "100 qubits." It might not be, and the arithmetic that tells you so fits on one line.
 </LessonHook>
 
-## Motivation
+## Two Different Things Called Scaling
 
 Physical Qubit Platforms and this course's earlier lessons built up
 individual error sources, <Term id="t1-t2-coherence-times">T1/T2</Term>, <Term id="crosstalk">crosstalk</Term>, readout error, one at a
-time, in isolation. This lesson asks the question that actually decides
+time, in isolation. This lesson asks the question that decides
 whether a device is useful: what happens when hundreds or thousands of
 imperfect operations run back to back?
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Quantum_metamaterial_with_24_artificial_atoms.png/1280px-Quantum_metamaterial_with_24_artificial_atoms.png"
   alt="An electron micrograph of a real superconducting chip patterned with 24 transmon qubit 'artificial atoms', coupled through shared microwave resonators"
-  caption="A real 24-qubit chip. Raw qubit count like this is the incomplete metric this lesson warns about: every one of these qubits' gates still compounds error multiplicatively, which is the bottleneck the p^N table below quantifies."
+  caption="Twenty-four superconducting artificial atoms on one chip, coupled through shared microwave resonators. Counting them takes a second, and a headline can be written from that count alone; deciding what depth of circuit they will actually run takes p^N, and a photograph shows neither p nor N."
   credit="FMN Laboratory, Bauman Moscow State Technical University"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_metamaterial_with_24_artificial_atoms.png"
   license="CC BY 4.0"
 />
 
-## Engineering Development
+## Why Errors Compound Multiplicatively
 
 ### Errors compound multiplicatively
 
@@ -61,10 +61,13 @@ not a linear one.
 | 99% | 90.4% | 36.6% | $4.3\times10^{-5}$ |
 | 95% | 59.9% | 0.6% | $\approx0$ |
 
-Where does 99.9% sit relative to real hardware? Single-qubit gates
-routinely exceed it on today's devices; it is *two-qubit* gates where
-most platforms still fall short of that mark, with trapped-ion systems
-having demonstrated two-qubit fidelities at or above 99.9%. And even
+Where does 99.9% sit relative to real hardware? Through the mid-2020s,
+single-qubit gates routinely exceeded it across platforms; it is
+*two-qubit* gates where most devices still fell short of that mark, with
+trapped-ion systems having demonstrated two-qubit fidelities at or above
+99.9%. Treat that as a dated snapshot rather than a standing fact: the
+two-qubit column is the fastest-moving number in the field, and which
+platform leads it has changed hands more than once. And even
 granting 99.9% for every gate in the circuit, overall success still
 drops to 36.8% by 1000 gates, barely better than a coin flip's worth of
 confidence in the final answer. This single table is the quantitative core of why
@@ -77,12 +80,12 @@ shape, and how differently each fidelity ages, visible directly:
 <PredictBeforeReveal
   question="Two devices run 200 sequential gates: one at 99% per-gate fidelity, one at 99.9%. Both numbers 'round to about 99%.' How different is their overall success probability at N=200?"
   options={[
-    { label: "About the same, both round to ~99%", value: "same" },
-    { label: "Modestly different, maybe 20-30% apart", value: "modest" },
-    { label: "Dramatically different, several times apart", value: "dramatic" },
+    { label: "Dramatically different, several-fold apart", value: "dramatic" },
+    { label: "Modestly different, maybe 20-30 points apart", value: "modest" },
+    { label: "About the same; both round to roughly 99%", value: "same" },
   ]}
   correctValue="dramatic"
-  explanation="0.99^200 ≈ 13.4% success; 0.999^200 ≈ 81.9% success. That's a factor of six apart, from two numbers that look nearly identical written as percentages. Exponentiation is unforgiving of small differences in the base once N gets large, which is exactly what the curve below lets you watch happen as you step from 95% up to 99.99%."
+  explanation="0.99^200 ≈ 13.4% success; 0.999^200 ≈ 81.9% success. That's a factor of six apart, from two numbers that look nearly identical written as percentages. Exponentiation is unforgiving of small differences in the base once N gets large, which is what the curve below lets you watch happen as you step from 95% up to 99.99%."
 />
 
 <InteractiveSection title="Step through per-gate fidelities from 95% to 99.99%" description="Step through the fidelity values from 95% up to 99.99%. At each one, watch how far along the x-axis the curve survives before collapsing toward zero. The gap between 99% and 99.9% is enormous, even though both round to 'about 99%.'">
@@ -96,6 +99,8 @@ shape, and how differently each fidelity ages, visible directly:
       }]
     }))}
     sliderLabel="Per-gate fidelity p"
+    xAxisLabel="sequential gates N"
+    yAxisLabel="success probability pᴺ"
     referenceLines={[{ y: 0.5, label: "50% success" }]}
     ariaLabel="Success probability p^N versus number of sequential gates N, for several per-gate fidelities"
   />
@@ -134,7 +139,7 @@ than simply thicker cable bundles.
 ### Where error correction fits in
 
 Error Correction & Fault Tolerance's **threshold theorem** result
-(already built in the Quantum Computing pillar) is the direct answer to
+(already built in the Quantum Computing track) is the direct answer to
 this lesson's compounding-error problem: if the *physical* per-gate
 error rate is below a certain threshold, encoding logical qubits
 redundantly (Quantum Computing's bit-flip and Shor codes) can suppress
@@ -142,17 +147,18 @@ the *logical* error rate arbitrarily far below the physical rate, at
 the cost of needing many physical qubits per logical qubit. This lesson's
 compounding-error table is the problem that result exists to solve.
 
-## Physical Interpretation
+## Qubit Count Is Not a Capability
 
 "Scaling" a quantum computer means two different, both-necessary things
 simultaneously: increasing qubit count, AND decreasing per-gate error
 rate (or adding error correction overhead to compensate). A device that
 scales only the first while ignoring the second doesn't become more
-useful, per this lesson's own compounding-error numbers.
+useful, and this lesson's own compounding-error numbers are how you
+check that for any device you are handed.
 
-## Worked Example
+## Where Success Probability Crosses One Half
 
-**How many sequential 99.9%-fidelity gates can run before overall
+**How many sequential 99.9%-fidelity gates can you run before overall
 success probability drops below 50%?**
 
 $$
@@ -160,38 +166,242 @@ $$
 $$
 
 Fewer than 700 gates, even at a fidelity most current hardware's
-two-qubit gates haven't reached. This concretely illustrates why useful, deep quantum circuits
+two-qubit gates haven't reached. That is why deep quantum circuits
 (many algorithms need thousands to millions of gates) are out of reach
 without either substantially better physical fidelities or active error
 correction.
 
-## Common Mistakes
+## Comparing Devices by Qubit Count Alone
 
 <Callout type="warning">
 **Treating "N qubits" as a complete description of a device's
 capability.** As this lesson's table shows, per-gate error rate matters
-at least as much as qubit count. A large, noisy device can be less
-useful than a smaller, cleaner one for a given task.
+at least as much as qubit count. For the task you actually have, a
+large noisy device can be less useful than a smaller, cleaner one.
 </Callout>
 
 <Callout type="warning">
 **Assuming error compounds additively (subtracting N×(1-p) from 1)
 rather than multiplicatively (p^N).** These give very different answers
-at large N. The multiplicative form is what unitarity/independent-trial
-probability actually requires.
+at large N. The multiplicative form is what independent-trial
+probability requires.
 </Callout>
 
 ## Practice Questions
 
 1. Using $p^N$, compute the success probability for 500 gates at 99.9%
-   per-gate fidelity.
+   per-gate fidelity. Then compute what the additive approximation
+   $1-N(1-p)$ would have said, and find roughly where the two stop
+   agreeing.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   0.999^{500} \approx 0.6064,
+   $$
+
+   so about a 60.6% chance the whole circuit runs clean. Sitting between
+   the table's 90.5% at $N=100$ and 36.8% at $N=1000$, as it should.
+
+   **The additive approximation gives 0.500:**
+   $1-500\times0.001=0.5$. That is 17.5% low in relative terms, and it is
+   wrong in the direction that matters, since it makes the device look
+   worse than it is at this depth and then catastrophically wrong further
+   out.
+
+   **Where they part company.** Track both:
+
+   at $N=10$, $0.990045$ against $0.990000$, agreeing to five decimals;
+
+   at $N=100$, $0.904792$ against $0.900000$, about 0.5% apart;
+
+   at $N=200$, $0.818649$ against $0.800000$, about 2.3% apart;
+
+   at $N=500$, $0.606379$ against $0.500000$, about 17.5% apart;
+
+   at $N=1000$, $0.367695$ against $0.000000$, where the additive form
+   has not merely lost accuracy but has crossed into predicting outright
+   impossibility for a circuit that in fact succeeds more than a third of
+   the time.
+
+   So the two agree while $N(1-p)$ stays well under 1, which is exactly
+   the regime where the first-order expansion
+   $p^N=(1-\epsilon)^N\approx1-N\epsilon$ is valid, and they diverge as
+   $N(1-p)$ approaches 1. Here $1-p=0.001$, so trouble starts somewhere
+   in the low hundreds of gates and is total by a thousand.
+
+   That is precisely the regime the lesson is about. The additive form is
+   not a harmless simplification for this material, because the
+   interesting depths are exactly the depths where it fails, and its
+   particular failure mode, predicting zero and then meaningless negative
+   numbers, hides the exponential tail that makes 99.9% and 99.99%
+   different devices.
+
+   The structural reason for the multiplicative form is worth restating.
+   Overall success requires *every* gate to succeed, and for independent
+   events the probability that all of them do is the product of their
+   individual probabilities, $p\times p\times\dots\times p=p^N$. The
+   additive form is answering a different, linearized question.
+
+   </details>
+
 2. Redo the worked example's calculation for a 99.99% per-gate fidelity
    target: how many gates can run before dropping below 50% success?
+   Then compare with the 99.9% case: what factor in depth does a tenfold
+   reduction in error rate buy?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   0.9999^N = 0.5 \implies N = \frac{\ln 0.5}{\ln 0.9999} \approx 6931 \text{ gates}.
+   $$
+
+   Against 693 at 99.9%. **A tenfold reduction in per-gate error rate
+   buys almost exactly a tenfold increase in usable depth**, a ratio of
+   $6931/693=10.004$.
+
+   The near-exactness is not a coincidence, and the reason is worth
+   extracting as a rule of thumb. For small error rates,
+   $\ln p=\ln(1-\epsilon)\approx-\epsilon$, so
+
+   $$
+   N_{1/2} = \frac{\ln 2}{-\ln p} \approx \frac{0.693}{1-p}.
+   $$
+
+   The half-success depth is inversely proportional to the error rate.
+   Check it: $0.693/0.001=693$ and $0.693/0.0001=6931$. Both land on the
+   exact answers. The same formula gives 69 gates at 99%, which the exact
+   calculation puts at 68.97.
+
+   That linear relation is the piece of good news in an otherwise grim
+   lesson, and it is worth being clear about how limited it is. Error
+   rates are hard-won: getting a two-qubit gate from 99.9% to 99.99% is a
+   major engineering programme, not a firmware update, and most platforms
+   have not reached the first of those numbers. What that programme buys
+   is ten times the depth. Meanwhile algorithms that matter want
+   thousands to millions of gates. Even 99.99% everywhere leaves you
+   short of a million-gate circuit by more than two orders of magnitude,
+   and there is no error rate short of exactly 1 that fixes this by
+   itself, because $p^N$ decays for every $p<1$.
+
+   The wrong turn is treating the improvement as though it compounded,
+   reasoning that ten times fewer errors surely buys much more than ten
+   times the depth given how violently the exponential behaves. It does
+   not. The exponential is violent in $N$ at fixed $p$; the trade between
+   $p$ and the half-depth is linear. That asymmetry is the whole argument
+   for error correction: pushing $p$ down is a losing race against an
+   algorithm's gate count, so the relationship itself has to change.
+
+   </details>
+
 3. Explain in one sentence why quantum volume (or similar combined
    metrics) exist, rather than reporting qubit count alone.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a useful computation needs qubit count, circuit depth and
+   connectivity *at the same time*, and any single-axis number can be
+   improved without the device becoming able to run anything new, so a
+   combined metric asks what a device can actually execute rather than
+   what it contains.
+
+   Unpacking that. Qubit count is the easiest axis to grow and the
+   easiest to report, which is exactly why it is the one most often
+   quoted. But this lesson's table shows that adding qubits does nothing
+   for a device already limited by depth, and a chip whose qubits are
+   sparsely connected pays SWAP routing overhead that inflates $N$ for
+   any circuit needing distant pairs, making the depth problem worse.
+   Three axes, and a headline that reports one of them tells you almost
+   nothing about the other two.
+
+   Quantum volume's construction is a direct response to that. It asks
+   for the largest *square* circuit, width equal to depth, that the
+   device can run with the right output distribution more often than
+   chance, and reports $2^n$ for that width $n$. Because the circuit is
+   square, adding qubits you cannot reach or cannot drive deeply enough
+   does not raise the number. The metric cannot be inflated on one axis
+   alone, which is the entire design goal.
+
+   Two honest caveats, since a combined metric is not a solved problem
+   either. Quantum volume is exponential in the width, so a device with
+   $n=20$ reports a "volume" of 1,048,576, a number whose size is a
+   property of the exponential rather than of the machine, and comparing
+   such figures across vendors invites confusion. And it says nothing
+   about speed, which is why separate metrics for circuit-layer
+   throughput exist, or about error-corrected performance, which is the
+   regime the next lesson is aiming at.
+
+   The wrong turn is to swap one headline number for another and treat
+   quantum volume as the true scalar capability of a device. The lesson
+   is not that some other single number is the right one; it is that
+   capability is multidimensional, and any scalar is a projection that
+   discards something. The reason to prefer a combined metric is only
+   that it discards less.
+
+   </details>
+
 4. How does this lesson's compounding-error problem directly motivate
    the existence of Error Correction & Fault Tolerance's threshold
    theorem?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because compounding error says that for any fixed $p<1$ there is a
+   depth beyond which the answer is worthless, and the threshold theorem
+   is the result that changes what "fixed $p$" means.
+
+   Lay the problem out first. Success is $p^N$, which decays
+   exponentially in depth for every $p$ short of 1. Question 2 showed
+   that improving $p$ buys depth only linearly. Algorithms of real
+   interest want thousands to millions of gates. So there are only two
+   possible escapes: drive $p$ all the way to 1, which physics does not
+   allow, or stop treating the physical error rate as the rate the
+   algorithm sees.
+
+   The threshold theorem takes the second route. Encode each logical
+   qubit redundantly across many physical qubits and measure syndromes,
+   and the *logical* error rate becomes a function of the physical one.
+   For a code of distance $d$ it behaves roughly as
+
+   $$
+   p_L \sim \left(\frac{p}{p_{\text{th}}}\right)^{\lfloor (d+1)/2\rfloor},
+   $$
+
+   so provided $p<p_{\text{th}}$, the logical error rate falls
+   exponentially in the code distance while the physical qubit cost grows
+   only polynomially in it. Depth stops being rationed and becomes
+   something you buy with qubits.
+
+   **The reversal is the point, and it is exactly the reversal this
+   lesson sets up.** Before the theorem, the binding constraint is a
+   depth ceiling and there is no way to raise it far. After it, the
+   binding constraint is an *error-rate* ceiling, the threshold, and
+   below that ceiling any depth is purchasable at polynomial cost.
+
+   That also gives the sharpest possible version of the lesson's warning
+   about qubit count. The threshold is a genuine sign change, not a soft
+   guideline. Below $p_{\text{th}}$, adding physical qubits to a code
+   makes the logical qubit better. Above it, adding physical qubits makes
+   it *worse*, because each additional component is another chance to
+   fail and the code cannot correct faster than errors arrive. "More
+   qubits" is not merely an incomplete description of capability; whether
+   more qubits help at all depends on which side of the threshold the
+   device sits.
+
+   The wrong turn is reading the theorem as a promise that error
+   correction makes the compounding problem go away. It does not come
+   free, and the bill is the subject of the next lesson: the redundancy
+   costs on the order of a thousand physical qubits per logical one, plus
+   continuous syndrome measurement, plus the fact that the syndrome
+   circuits are themselves built from the same faulty gates. The theorem
+   converts an impossibility into an overhead. That is an enormous
+   change, and it is not the same as a solution.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -206,7 +416,7 @@ probability actually requires.
 - Qubit count alone is an incomplete capability metric; per-gate error
   rate (and connectivity) matter at least as much.
 
-## Further Exploration
+## The Overhead That Buys the Way Out
 
 <NextDiscovery>
 [Roadmaps to Fault Tolerance](/lessons/quantum-hardware/noise-decoherence-and-scaling/roadmaps-to-fault-tolerance) closes this course,

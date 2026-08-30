@@ -11,7 +11,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Sources of Noise",
   description:
-    "Every hardware course so far treated noise as a single abstract 'decoherence.' This lesson catalogs its actual physical sources, and classifies each as a coherent (gate) error or an incoherent (environment) error using the Kraus-channel language already built in Advanced Topics in Quantum Mechanics.",
+    "Every hardware course so far treated noise as a single abstract 'decoherence.' This lesson catalogs its physical sources, and classifies each as a coherent (gate) error or an incoherent (environment) error using the Kraus-channel language already built in Advanced Topics in Quantum Mechanics.",
   course: "noise-decoherence-and-scaling",
   module: "sources-of-noise",
   order: 1,
@@ -19,7 +19,7 @@ export const lessonMeta = {
   estimatedMinutes: 25,
   prerequisites: ["quantum-hardware/control-and-readout/calibration"],
   objectives: [
-    "Distinguish coherent errors (miscalibration, systematic) from incoherent errors (genuine environmental decoherence)",
+    "Distinguish coherent errors (miscalibration, systematic) from incoherent errors (environmental decoherence)",
     "Name at least four concrete physical noise sources across this platform's covered hardware types",
     "Explain why classifying a noise source correctly (coherent vs. incoherent) determines how it can be mitigated",
   ],
@@ -35,7 +35,7 @@ export const lessonMeta = {
 Ask an experimentalist why yesterday's calibration is off today, and the honest answer is usually "could be a dozen things."
 </LessonHook>
 
-## Motivation
+## Naming What Goes Wrong
 
 Advanced Topics
 in Quantum Mechanics built the mathematics of open-system <Term id="coherence">decoherence</Term> in
@@ -47,13 +47,13 @@ into two categories that call for different fixes.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/4/48/Basic_Science_%2854395491965%29.jpg"
   alt="A neutral-atom quantum computing vacuum chamber at Sandia National Laboratories, showing objective lenses for single-atom traps and surrounding magnetic field coils"
-  caption="Real noise-mitigation hardware: at Sandia, a custom Faraday cage inside this vacuum chamber minimizes the stray electric field around trapped atoms. That is physical isolation — the fix this lesson prescribes for incoherent (environmental) errors, and a different move from the recalibration that fixes a coherent one."
+  caption="Real noise-mitigation hardware: at Sandia, a custom Faraday cage inside this vacuum chamber minimizes the stray electric field around trapped atoms. That is physical isolation: the fix this lesson prescribes for incoherent (environmental) errors, and a different move from the recalibration that fixes a coherent one."
   credit="Craig Fritz / Sandia National Laboratories, U.S. Department of Energy"
   creditUrl="https://commons.wikimedia.org/wiki/File:Basic_Science_(54395491965).jpg"
-  license="Public Domain (U.S. Government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Engineering Development
+## Coherent Against Incoherent, and Why It Matters
 
 ### Coherent vs. incoherent errors
 
@@ -62,9 +62,9 @@ device does something slightly wrong, consistently, the same way every
 time (Control & Readout's Calibration lesson: a stale $\Omega$ value
 implements a systematically wrong rotation angle). This is, in
 principle, fully correctable once diagnosed; recalibration fixes it
-exactly.
+completely.
 
-An **incoherent error** is a real, irreversible loss of information to
+An **incoherent error** is an irreversible loss of information to
 an uncontrolled environment, the same process Advanced Topics in
 Quantum Mechanics' <Term id="kraus-operators-cptp-maps">Kraus channels</Term> model. It can be *mitigated* (better
 isolation, error correction) but recalibrating a number won't fix it,
@@ -136,8 +136,8 @@ branch of the catalog:
   options={[
     { label: "At the north pole |0⟩", value: "north" },
     { label: "At the south pole |1⟩", value: "south" },
-    { label: "Shrinks straight to the exact center of the sphere", value: "center" },
-    { label: "Stays exactly on the equator's surface", value: "equator" },
+    { label: "At the sphere's exact center", value: "center" },
+    { label: "Still on the equator's surface", value: "equator" },
   ]}
   correctValue="center"
   explanation="Dephasing shrinks x and y toward zero while leaving z untouched. Starting at the equator, z is already 0, so shrinking x and y to 0 lands the point at the exact center: the maximally mixed state. Amplitude damping moves the state differently: it pulls everything toward the north pole instead. Neither motion is a rotation a later recalibration could undo, which is why both sit in the incoherent branch of the tree above."
@@ -171,6 +171,7 @@ Platforms has its own characteristic short list:
 | Superconducting | Charge and flux noise, thermal photons leaking into the readout resonator, two-level-system (TLS) defects in the circuit's materials |
 | Trapped ions | Motional heating of the shared vibrational mode, laser phase and intensity noise on the drive beams |
 | Neutral atoms | Atom loss from the optical tweezer, photon scattering off the trap light itself |
+| Spin qubits | Charge noise coupling in through the gate electrodes that define the dot, and, on unpurified silicon, the nuclear-spin bath of the host material |
 | Photonic | Photon loss (fiber, components, coupling), detector inefficiency |
 
 The photonic row deserves the flag Photonic Qubits promised this course
@@ -180,7 +181,7 @@ than silently flipping a bit or a phase, and error correction can
 exploit that located-ness in ways it cannot for the other rows'
 bit-flip and dephasing errors.
 
-## Physical Interpretation
+## The Hardware Face of a Familiar Split
 
 This distinction is the practical, hardware-facing version of a theme
 this platform's Advanced Topics in Quantum Mechanics course already
@@ -190,7 +191,7 @@ real device's overall error budget is a mix of both categories, and
 serious engineering effort goes into correctly attributing observed
 errors to the right bucket.
 
-## Worked Example
+## Classifying an Error From Its Behavior
 
 **A device's gate fidelity drops over the course of a day, but is
 restored to its original value immediately after recalibration. Is this
@@ -198,17 +199,17 @@ most likely a coherent or incoherent error source?**
 
 Coherent: recalibration alone restoring full fidelity, with no hardware
 change, is the signature of a systematic, deterministic parameter drift
-(Control & Readout's Calibration lesson). A genuinely environmental
-error wouldn't be fixable just by re-measuring and re-setting a
-classical control parameter.
+(Control & Readout's Calibration lesson). An environmental error
+wouldn't be fixable just by re-measuring and re-setting a classical
+control parameter.
 
-## Common Mistakes
+## Calling Every Error Decoherence
 
 <Callout type="warning">
 **Assuming all noise is "decoherence."** Miscalibration and other
 coherent errors are a different (and often more easily fixed) category.
 Lumping everything together as "decoherence" obscures which mitigation
-strategy actually applies.
+strategy applies.
 </Callout>
 
 <Callout type="warning">
@@ -223,20 +224,216 @@ improvements or active error correction instead.
 1. Classify each as coherent or incoherent: (a) a stale Rabi frequency
    value from Control & Readout, (b) amplitude damping from spontaneous
    emission, (c) dephasing from fluctuating magnetic flux.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **(a) Coherent. (b) Incoherent. (c) Incoherent.**
+
+   The test to apply, in every case, is: *would remeasuring and resetting
+   a classical control parameter undo this?*
+
+   **(a) A stale $\Omega$ is coherent.** Nothing has gone wrong
+   physically. The drive strength has a definite value, the hardware is
+   faithfully executing the pulse it was asked for, and the only fault is
+   that the number used to compute the pulse duration is out of date.
+   Every gate is therefore wrong by the same factor, in the same
+   direction, every time. Remeasure $\Omega$ and the error is gone
+   completely.
+
+   **(b) Amplitude damping is incoherent.** The qubit released a real
+   energy quantum into its surroundings, and that quantum is not on the
+   device any more. Something in the environment is now holding a record
+   of which state the qubit was in, and that record is what destroys the
+   superposition. No control parameter on the device is wrong, so there
+   is nothing to reset.
+
+   **(c) Dephasing from fluctuating flux is incoherent, and the word
+   doing the work is "fluctuating."** This one is worth taking slowly,
+   because the same physical mechanism can land in either category. If
+   the local flux were offset by a *fixed*, unchanging amount, the qubit
+   would simply pick up the same extra $Z$ rotation on every run, which
+   is a deterministic unitary and therefore a coherent error you could
+   characterize once and compensate. What makes flux *noise* incoherent
+   is that the offset is different from shot to shot in a way nobody
+   tracks, so averaging over runs washes the phase out rather than
+   displacing it. The Bloch vector's $x$ and $y$ components shrink toward
+   zero instead of rotating to a new place.
+
+   The wrong turn most people take here is classifying by timescale:
+   slow drift feels like decoherence, sudden events feel like faults. The
+   timescale is not the axis. A coherent error is free to appear
+   gradually over hours, which is precisely what (a) does, and an
+   incoherent one can act in nanoseconds. The deciding question is
+   whether retuning a number brings the fidelity back.
+
+   </details>
+
 2. Why does recalibration fully fix a coherent error but not an
    incoherent one?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because recalibration replaces a classical number, and a coherent
+   error *is* a wrong classical number, while an incoherent error is
+   quantum information that has physically left the device.
+
+   In the coherent case nothing was lost. The state the qubit ended up in
+   is a definite, known, reversible rotation away from the state you
+   wanted. Measure the parameter properly, recompute the pulse, and the
+   error does not merely shrink; it is gone, with no new hardware and no
+   extra qubits.
+
+   In the incoherent case the missing information is not sitting anywhere
+   on the device in a form you could correct by adjusting a setting. It
+   is spread across an environment you neither control nor measure: a
+   photon emitted into a lossy line, a phase correlated with a flux
+   fluctuation nobody recorded. There is no number to fix because no
+   number is wrong.
+
+   The sharpest way to say this uses purity. A coherent error is a
+   unitary, and unitaries are invertible, so some other unitary undoes
+   it. Every unitary also *preserves* purity exactly. An incoherent
+   channel reduces purity, which means no gate, however perfectly
+   calibrated, can undo it: applying a unitary to a mixed state leaves it
+   exactly as mixed as it was. The best-calibrated pulse in the world is
+   still a unitary.
+
+   That is also what this lesson's explorer is showing. Dephasing pulls
+   the Bloch vector straight toward the $z$-axis and amplitude damping
+   pulls it toward the north pole. Both are contractions of the sphere,
+   and a rotation cannot invert a contraction, because a rotation moves
+   points around the sphere and never moves them inward or outward. A
+   coherent error moves the vector to the wrong place on the surface;
+   an incoherent one moves it off the surface.
+
+   The wrong turn is to conclude from all this that incoherent errors are
+   simply hopeless. They are not correctable *by recalibration*, which is
+   a much narrower claim. Question 3 is about what does work.
+
+   </details>
+
 3. Name two engineering mitigation strategies for incoherent errors,
    and explain why neither is "recalibration."
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **First: better physical isolation.** Reduce the coupling to the
+   environment in the first place, so the information has less
+   opportunity to leak. This is a materials and hardware programme, and
+   the course is full of specific instances. A Faraday cage inside the
+   vacuum chamber, cutting the stray electric field around trapped atoms.
+   Isotopically purified silicon-28 for spin qubits, removing the
+   nuclear-spin bath entirely rather than fighting its effects. Staged
+   attenuation down a dilution refrigerator, stripping thermal photons
+   off the control lines at each stage. A Purcell filter, transparent at
+   the readout frequency and opaque at the qubit's, closing the path by
+   which a qubit decays out through its own readout resonator. Better
+   interfaces and oxides, reducing the density of two-level-system
+   defects.
+
+   **Second: active quantum error correction.** Encode one logical qubit
+   redundantly across many physical qubits, measure syndromes that reveal
+   *that* an error occurred without revealing the logical state, and
+   correct. The redundancy supplies what isolation could not: a way to
+   detect and undo a loss that has already happened.
+
+   A third is worth knowing because it looks deceptively like
+   recalibration and is not: **dynamical decoupling**. A train of
+   refocusing pulses causes the phase accumulated during one interval to
+   be cancelled by the next, so the qubit becomes insensitive to
+   environmental fluctuations slower than the pulse spacing. It works by
+   reshaping which frequencies of noise the qubit is exposed to, not by
+   correcting any parameter, and it is why the millisecond spin-qubit
+   coherence figures carry "with dynamical decoupling" attached.
+
+   **Why none of these is recalibration.** Recalibration adjusts a
+   classical control parameter and works only when the fault was a wrong
+   parameter. These three do something else entirely. Isolation changes
+   the physical coupling itself, and costs materials, shielding, cooling
+   and design time rather than a measurement. Error correction adds
+   redundancy, and costs physical qubits, gate depth and syndrome
+   measurement rounds, which is where the thousand-to-one overhead in
+   Roadmaps to Fault Tolerance comes from. Dynamical decoupling costs
+   pulses and circuit time and only suppresses noise in a particular
+   frequency band. Run any of them against a stale $\Omega$ and nothing
+   improves; run recalibration against amplitude damping and nothing
+   improves. The categories select the tool.
+
+   One thing deliberately not on this list: error *mitigation*, in the
+   sense of zero-noise extrapolation. It is a real and valuable
+   technique, and it is neither of these, because it never produces a
+   less noisy state. It recovers a better estimate of an expectation
+   value by running noisy circuits and extrapolating. The Quantum Error
+   Mitigation lesson develops that distinction properly.
+
+   </details>
+
 4. If crosstalk between two qubits were purely systematic (the same
    deterministic shift every time), would it belong in the coherent or
    incoherent category? Explain your reasoning.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Coherent.** The number of qubits involved is not what the
+   classification is about.
+
+   Read the definition again: a coherent error is a systematic,
+   deterministic deviation, the same way every time, correctable in
+   principle once diagnosed. A crosstalk term that applies exactly the
+   same unwanted rotation to a spectator qubit on every run satisfies
+   that word for word. It is a unitary, so it is invertible, so it is
+   correctable by control-side means: characterize the leaked rotation
+   once, then compensate for it with a corrective pulse, a reshaped
+   envelope, or a schedule that avoids the offending pair. This is
+   exactly what crosstalk compensation on real devices does.
+
+   The wrong turn is the intuitive one: crosstalk involves a second
+   qubit, the second qubit is "outside" the first, so surely the first
+   qubit is losing information to something external and this is
+   environmental. The distinction that actually matters is whether the
+   deviation is a deterministic unitary you could in principle undo, not
+   whether its origin is on the chip or off it. A neighbouring qubit you
+   control and can model is not an uncontrolled environment.
+
+   So why does this lesson pull crosstalk out and give it its own
+   chapter, if it is just another coherent error? Because of the
+   conditional in the question. Real crosstalk is deterministic *given
+   the full context of what every other qubit is doing at that moment*,
+   and that context changes gate by gate and circuit by circuit. A
+   spectator's leaked rotation depends on which neighbours are being
+   driven, with what pulses, at the same time. There is no single number
+   to calibrate; there is a table over simultaneous-operation contexts,
+   and the number of contexts grows with the device. Correctable in
+   principle, and expensive in practice, which is a different problem
+   from being incorrigible.
+
+   Two further notes worth carrying.
+
+   In practice crosstalk is usually not purely systematic. Some of it
+   tracks parameters that drift, and some of it depends on neighbours in
+   ways that look random from the point of view of a circuit that does
+   not model them, so a real device shows a mixture with both a coherent
+   and an effectively stochastic component.
+
+   And being coherent is not the same as being harmless. As Calibration
+   showed, coherent errors accumulate in the rotation angle and so grow
+   quadratically with circuit depth, while stochastic errors accumulate
+   linearly. A small deterministic crosstalk rotation is more dangerous
+   over a deep circuit than a stochastic error of the same per-gate size,
+   not less.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
 - Coherent errors are systematic and deterministic (fixable by better
-  calibration); incoherent errors are genuine information loss to an
+  calibration); incoherent errors are information lost to an
   environment (mitigated by isolation or error correction, not
   recalibration).
 - Real noise sources include miscalibration drift, amplitude damping,
@@ -245,7 +442,7 @@ improvements or active error correction instead.
 - Correctly classifying an observed error is a prerequisite for choosing
   an effective mitigation strategy.
 
-## Further Exploration
+## Putting Numbers on the Two Big Ones
 
 <NextDiscovery>
 [T1 & T2 Decoherence](/lessons/quantum-hardware/noise-decoherence-and-scaling/t1-and-t2-decoherence) quantifies the two specific

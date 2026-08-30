@@ -117,7 +117,12 @@ describe("partialTrace validation", () => {
 
   it("throws when tracing out every qubit", () => {
     const rho = pureStateDensityMatrix(bellPhiPlus());
-    expect(() => partialTrace(rho, 2, [0, 1])).toThrow(/at least one/);
+    // Case-insensitive: the thrown message reads "...cannot trace out every
+    // qubit. At least one must remain." The clause became sentence-initial
+    // when the em dash that used to join the two halves was replaced with a
+    // full stop, and a case-sensitive /at least one/ silently stopped
+    // matching. Assert on the words, not on where the sentence break falls.
+    expect(() => partialTrace(rho, 2, [0, 1])).toThrow(/at least one/i);
   });
 
   it("always returns a Hermitian, unit-trace matrix", () => {

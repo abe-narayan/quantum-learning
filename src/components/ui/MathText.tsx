@@ -13,7 +13,7 @@ import katex from "katex";
  * gzip, so any `"use client"` module that reaches it — directly, or through
  * an intermediate like `ScrollableMathText` that carries no directive of its
  * own — puts the whole KaTeX runtime in that route's eager browser bundle.
- * That is exactly how all 547 problem pages came to ship it. The fix, and the
+ * That is exactly how every problem page came to ship it. The fix, and the
  * pattern to copy, is `src/components/problems/mathRuns.ts`: render on the
  * server, hand the client the HTML string. `app/courses/[slug]/page.tsx`, the
  * remaining caller, is a Server Component. `clientBoundary.test.ts` fails any

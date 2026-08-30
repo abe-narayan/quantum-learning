@@ -77,11 +77,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Two spots, and nothing in between">
 Otto Stern and Walther Gerlach sent a beam of silver atoms through a non-uniform magnetic field and let it land on a glass screen. Classical physics predicted a smear. They got two spots, with nothing at all in between them.
 </LessonHook>
 
-## Motivation
+## The classical prediction, stated fairly
 
 The classical prediction is worth stating carefully, because it is not a
 weak one. A silver atom's magnetic moment gets deflected by an amount
@@ -118,7 +118,7 @@ did.
   license="CC BY-SA 3.0"
 />
 
-## Mathematical Development
+## What the apparatus reads, and what a sequence does
 
 ### What the apparatus measures
 
@@ -138,7 +138,7 @@ overlap with each, and therefore its measured probability, varies
 continuously with the angle. The two *outcomes* stay two; only the odds
 move.
 
-<InteractiveSection title="Rotate the apparatus, not the atom" description="The atom's state is fixed. Drag the analyzer axis n̂ around and watch its own two eigenstates move with it, and the Born-rule probability of each recompute live. Press Measure to sample one real outcome and see the displayed state collapse onto whichever eigenstate n̂ currently defines as its own.">
+<InteractiveSection title="Rotate the apparatus, not the atom" description="The atom's state is fixed. Drag the analyzer axis n̂ around and watch its own two eigenstates move with it, and the Born-rule probability of each recompute live. Press Measure to sample one real outcome, and see where the displayed state lands relative to the two eigenstates n̂ currently defines.">
   <SpinAxisMeasurement inputTheta={Math.PI / 3} ariaLabel="A fixed spin state measured along a rotatable Stern-Gerlach analyzer axis, showing the axis's own two eigenstates and the real Born-rule probability of each." />
 </InteractiveSection>
 
@@ -151,6 +151,18 @@ $|{\uparrow}\rangle=\frac1{\sqrt2}(|{+}\rangle+|{-}\rangle)$ (standard
 basis change), the <Term id="born-rule">Born rule</Term> gives $50\%/50\%$ for the two $x$-outcomes.
 Post-select on "$+x$" and send that atom through a **third** apparatus,
 oriented back along $z$.
+
+<PredictBeforeReveal
+  question="An atom measures 'up' along z, is then measured along x, then measured along z a third time. Does the third measurement reproduce 'up' with certainty?"
+  options={[
+    { label: "Yes, always up again", value: "always-up" },
+    { label: "Only if the x-measurement gave '+'", value: "conditional" },
+    { label: "No, it's 50/50 up or down", value: "5050" },
+    { label: "No, it's always down", value: "always-down" },
+  ]}
+  correctValue="5050"
+  explanation="After the x-measurement the state is |+⟩ or |−⟩, and either one has equal overlap with |↑⟩ and |↓⟩. The z-information is not merely hidden by the x-measurement; there is no longer anywhere in the state for it to be kept. The third apparatus therefore splits 50/50, with no trace of the original 'up'. Note this holds for both x-outcomes, so it is not something you can dodge by post-selecting on one of them."
+/>
 
 The atom was measured "$\uparrow$" a moment ago and nothing has touched
 its $z$-component since, so "$\uparrow$" again with certainty looks like
@@ -171,10 +183,10 @@ That last sentence is the useful way to hold this. Collapse is not the
 apparatus jostling the atom; a two-dimensional state space has room for
 one sharp answer at a time, and writing an $x$-answer into it necessarily
 overwrites the $z$-answer. The uncertainty relation derived in this
-pillar's Expectation Values lesson is the quantitative version of the
+track's Expectation Values lesson is the quantitative version of the
 same cramped bookkeeping.
 
-## Physical Interpretation
+## Ruling out the obvious rescue
 
 The two-spot result on its own established quantization. The *sequential*
 experiment does something the single measurement cannot: it rules out the
@@ -186,7 +198,7 @@ after the $x$-measurement, and the third apparatus would recover it. The
 third apparatus recovers nothing. Whatever the atom carries, it is not a
 list of answers to every question you might ask.
 
-## Worked Example
+## The joint probability of one three-step sequence
 
 **Compute the joint probability of the sequence
 "$\uparrow$" (first, $z$), "$+$" (second, $x$), "$\uparrow$" (third,
@@ -209,27 +221,15 @@ The full branching structure makes this concrete: every path through the
 tree below carries probability $\tfrac12\times\tfrac12\times\tfrac12=\tfrac18$,
 including the "↑,+,↑" path just computed and its seven siblings.
 
-<MeasurementTree root={sequentialTree} ariaLabel="Sequential Stern-Gerlach measurement tree: z, then x, then z again" />
+<MeasurementTree root={sequentialTree} ariaLabel="A three-level branching tree from a single unpolarized start. The first z apparatus splits it into up and down at 50 percent each. Each of those splits again at the x apparatus, plus and minus at 50 percent each. Each of those four splits once more at the second z apparatus, up and down at 50 percent each. Every one of the eight leaves therefore carries 12.5 percent, and no branch anywhere in the tree is any more likely than its sibling: the final z outcome is 50/50 regardless of which path reached it." />
 
 Try the same sequence yourself, one measurement at a time:
-
-<PredictBeforeReveal
-  question="An atom measures 'up' along z, is then measured along x, then measured along z a third time. Does the third measurement reproduce 'up' with certainty?"
-  options={[
-    { label: "Yes, always up again", value: "always-up" },
-    { label: "No, it's 50/50 up or down", value: "5050" },
-    { label: "No, it's always down", value: "always-down" },
-    { label: "Only if the x-measurement gave '+'", value: "conditional" },
-  ]}
-  correctValue="5050"
-  explanation="After the x-measurement the state is |+⟩ or |−⟩, and either one has equal overlap with |↑⟩ and |↓⟩. The z-information is not merely hidden by the x-measurement; there is no longer anywhere in the state for it to be kept. The third apparatus therefore splits 50/50, with no trace of the original 'up'. Note this holds for both x-outcomes, so it is not something you can dodge by post-selecting."
-/>
 
 <InteractiveSection description="Measure along Z, then X, then Z again. The point jumps to a pole, then to the equator, then back to a pole chosen afresh. Run it several times: the third outcome tracks the first no better than chance, which is every path in the tree above splitting 50/50 no matter which branch reached it.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
-## Common Mistakes
+## The third magnet does not remember the first
 
 <Callout type="mistake">
 **Expecting the third measurement to reproduce the first with
@@ -243,25 +243,168 @@ about the apparatus's quality enters the calculation.
 **Picturing the original two-spot result as consistent with a classical
 "hidden" continuous magnetic moment that just happens to always measure
 as one of two values.** The sequential experiment specifically rules out
-this picture; see the Physical Interpretation above.
+this picture, for the reason given under "Ruling out the obvious rescue"
+above: a stored $z$-component would have to survive the $x$-measurement,
+and the third apparatus finds no trace of it.
 </Callout>
 
 ## Practice Questions
 
 1. Compute $P(\downarrow\text{ third}\mid+\text{ second})$, and confirm
    it sums with $P(\uparrow\text{ third}\mid+\text{ second})$ to $1$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $P(\downarrow\mid+)=\tfrac12$. After the $x$-apparatus reports "$+$"
+   the atom is in $|{+}\rangle=\tfrac1{\sqrt2}(|{\uparrow}\rangle+
+   |{\downarrow}\rangle)$, so the Born rule gives
+
+   $$
+   P(\downarrow\mid+) = \left|\langle{\downarrow}|{+}\rangle\right|^2 = \left|\frac{1}{\sqrt2}\right|^2 = \frac12, \qquad P(\uparrow\mid+) + P(\downarrow\mid+) = \frac12+\frac12 = 1
+   $$
+
+   It is worth being clear about what that sum does and does not confirm.
+   It is guaranteed in advance. $\{|{\uparrow}\rangle,|{\downarrow}\rangle\}$
+   is a complete orthonormal basis, so for any normalized state
+   $\sum_k|\langle k|\psi\rangle|^2=\langle\psi|\psi\rangle=1$, whatever
+   $|\psi\rangle$ happens to be. The check catches arithmetic slips and
+   nothing else; it would have come out to $1$ just as reliably if the
+   split had been $90/10$.
+
+   The physics is in the individual value, $\tfrac12$, and specifically in
+   the fact that it is $\tfrac12$ rather than $0$. An atom that measured
+   "up" along $z$ two steps ago now has an even chance of reporting "down."
+   That is the number worth staring at, and no normalization identity
+   produces it.
+
+   </details>
+
 2. Repeat the joint-probability calculation for the sequence
    "$\uparrow$," "$-$" (second apparatus's other $x$-outcome),
    "$\downarrow$" (third).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\tfrac18$ again, by the same three factors.
+
+   From an unpolarized beam, $P(\uparrow\text{ first})=\tfrac12$ by
+   symmetry. The state is then $|{\uparrow}\rangle$, and with
+   $|{-}\rangle=\tfrac1{\sqrt2}(|{\uparrow}\rangle-|{\downarrow}\rangle)$:
+
+   $$
+   P(-\mid\uparrow) = \left|\langle{-}|{\uparrow}\rangle\right|^2 = \left|\frac{1}{\sqrt2}\right|^2 = \frac12, \qquad P(\downarrow\mid-) = \left|\langle{\downarrow}|{-}\rangle\right|^2 = \left|-\frac{1}{\sqrt2}\right|^2 = \frac12
+   $$
+
+   $$
+   P(\uparrow,-,\downarrow) = \frac12\times\frac12\times\frac12 = \frac18
+   $$
+
+   The minus sign in $\langle{\downarrow}|{-}\rangle$ vanished under the
+   modulus, which is why this path has the same probability as the
+   "$\uparrow,+,\uparrow$" path and every other leaf of the tree.
+
+   That sign is not meaningless, though, and this is the caution worth
+   carrying away. Multiplying the three factors is legitimate only because
+   the middle apparatus *records* which branch the atom took, which is what
+   makes the branches classical alternatives to be added as probabilities.
+   Remove the record, recombining the $+x$ and $-x$ beams without learning
+   which one the atom used, and the amplitudes add instead, the relative
+   minus sign matters, and the two paths interfere: the atom emerges in
+   $|{\uparrow}\rangle$ again and the third apparatus reports "up" with
+   certainty. The $z$-information is destroyed by *learning* the
+   $x$-answer, not by the magnet touching the atom. That experiment is
+   real, and the tree diagram above quietly assumes it was not performed.
+
+   </details>
+
 3. If the *second* apparatus were oriented along $z$ again instead of
    $x$ (i.e., measuring the same axis twice in a row with nothing in
    between), what would $P(\uparrow\text{ second}\mid\uparrow\text{
    first})$ be, and why is this case different from the $x$-then-$z$
    sequence?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $P(\uparrow\text{ second}\mid\uparrow\text{ first})=1$. After the first
+   measurement the atom *is* in $|{\uparrow}\rangle$, which is already an
+   eigenstate of the second apparatus's observable, so
+   $|\langle{\uparrow}|{\uparrow}\rangle|^2=1$ and the second measurement
+   changes nothing.
+
+   The structural difference is compatibility. $[S_z,S_z]=0$, so the two
+   apparatuses are asking the same question and the second one finds the
+   answer already written down. $[S_x,S_z]=-i\hbar S_y\neq0$, so an
+   $x$-apparatus asks a question the state has no room to answer alongside
+   the $z$-one, and recording an $x$-answer overwrites the $z$-answer. The
+   $x$ eigenstates $|{\pm}\rangle$ are the states maximally *unaligned*
+   with the $z$ basis, giving $|\langle{\uparrow}|{\pm}\rangle|^2=\tfrac12$,
+   which is the worst case rather than a middling one.
+
+   Two hypotheses are hiding in "with nothing in between," and both are
+   load-bearing.
+
+   The measurement has to be projective and ideal: it leaves the atom in
+   the eigenstate corresponding to the outcome rather than absorbing it or
+   partially disturbing it. A real detector that destroys the atom has no
+   second measurement to make.
+
+   And nothing may act on the spin during the flight between magnets. If
+   any stray field with a component off the $z$ axis is present, the spin
+   precesses under a Hamiltonian that does not commute with $S_z$, and the
+   probability drops below $1$ by an amount that grows with the flight
+   time. Repeatability is a statement about compatible *measurements*, not
+   a promise that a state sits still. It is also why the answer is exactly
+   $1$ here and only approximately $1$ in a laboratory.
+
+   Repeatability is what entitles the word "measurement" to mean anything.
+   An apparatus whose immediate repeat gave a different answer would not
+   be reading a property of the atom at all.
+
+   </details>
+
 4. Explain, in your own words, why the original single-apparatus result,
    two spots and no smear, was already enough to rule out a classical
    continuous magnetic moment, before the sequential experiment is
    considered at all.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the classical model's prediction is not a distribution shape
+   that could be off by some factor. It is the claim that the deflection
+   takes a continuous *range* of values, and the experiment found it takes
+   two.
+
+   The classical chain is short and hard to escape. An atom leaving an
+   oven has its moment $\vec\mu$ pointing in some direction with no reason
+   to prefer the magnet's axis, which the experimenter chose. The
+   deflection is proportional to $\mu_z=|\vec\mu|\cos\theta$, and $\theta$
+   ranges over the sphere, so $\mu_z$ ranges continuously over
+   $[-|\vec\mu|,+|\vec\mu|]$ and the screen should show a band. The
+   damning detail is the gap in the middle. Undeflected atoms would be the
+   ones with $\vec\mu$ lying in the plane perpendicular to the field, an
+   entirely ordinary orientation with no reason to be rare, and there were
+   none. Not few: none.
+
+   The honest limit of the argument, which is also why the sequential
+   experiment exists. Two spots rules out a *continuum* of orientations.
+   It does not rule out every classical picture. A stubborn model in which
+   each atom carries a definite moment that is only ever allowed to point
+   along $+z$ or $-z$ reproduces the photograph perfectly, and one magnet
+   cannot distinguish it from quantum mechanics.
+
+   What breaks that model is that the axis was the experimenter's free
+   choice. Turn the magnet to any other direction and you still get two
+   spots, along the new axis, so the atoms would have to be pre-aligned
+   with every axis at once. The sequential experiment turns that into a
+   measurement rather than an argument: the third magnet finds no trace of
+   the stored $z$-value, so the definite pre-existing value is not there
+   to be found.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -277,10 +420,10 @@ this picture; see the Physical Interpretation above.
   ($[S_x,S_z]\neq0$), demonstrated on a real historical experiment, not
   just asserted abstractly.
 
-## Further Exploration
+## Combining two spins instead of measuring one
 
 <NextDiscovery>
-The story continues, chronologically, in
+The story continues in
 [Addition of Angular Momentum](/lessons/quantum-mechanics/angular-momentum-and-spin/addition-of-angular-momentum):
 combining two spin-$\tfrac12$ particles, connecting directly to the Bell
 states this platform built in Quantum Gates & Circuits.

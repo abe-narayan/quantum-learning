@@ -32,13 +32,12 @@ export const lessonMeta = {
   estimatedMinutes: 25,
   prerequisites: ["quantum-computing/error-correction-and-fault-tolerance/surface-codes-a-conceptual-introduction"],
   objectives: [
-    "Explain the threshold theorem's qualitative logic: why larger distance only helps below a critical physical error rate",
-    "State why concatenation/larger distance makes logical error rate worse, not better, above threshold",
+    "Explain the threshold theorem's qualitative logic: why larger distance only helps below a critical physical error rate, and why it makes things worse above one",
     "Connect this course's own distance-3 codes to what Shor's algorithm (Quantum Algorithms II) actually needs at scale",
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="More correction, sometimes worse">
 This course's distance-3 codes correct up to 1 error, but real hardware makes errors continuously, at some physical rate per gate. Does adding more error correction always help? The threshold theorem answers precisely: only sometimes.
 </LessonHook>
 
@@ -46,7 +45,7 @@ This course's distance-3 codes correct up to 1 error, but real hardware makes er
 Does adding more error correction always help a noisy quantum computer?
 </Question>
 
-## Motivation
+## Correcting errors was never free
 
 Every code in this course has been described as though correcting errors
 were free. It is not. Each code spends physical qubits, and each of those
@@ -58,7 +57,7 @@ also closes the loop back to Quantum Algorithms II's capstone, which named
 fault-tolerant hardware as the missing ingredient for factoring at
 cryptographic scale without saying what that would cost.
 
-## Mathematical Development
+## The threshold's logic, and honest overhead
 
 ### The qualitative logic of the threshold
 
@@ -96,22 +95,24 @@ make the qualitative crossover visible without claiming a realistic
 number. Before sweeping it, make a call:
 
 <PredictBeforeReveal
-  question="In this toy majority-vote model, the physical error rate is p = 0.7, well above the toy crossover at p = 0.5. If you increase the code distance d (more physical qubits per logical qubit), what happens to the failure probability?"
+  question="Below p = 0.5 the toy model's failure probability falls as distance d grows; above it, the same probability rises. Set p to exactly 0.5 and sweep d from 1 to 11. What does the failure probability do there?"
   options={[
-    { label: "It drops toward zero, same as below threshold", value: "drops" },
-    { label: "It stays flat, distance doesn't matter above threshold", value: "flat" },
-    { label: "It rises, more distance makes things worse", value: "rises" },
-    { label: "It oscillates unpredictably with d", value: "oscillates" },
+    { label: "It drifts slowly downward: even at the crossover, some redundancy still helps", value: "down" },
+    { label: "It drifts slowly upward, since more qubits mean more chances for one to fail", value: "up" },
+    { label: "It climbs toward 1, because half of many qubits failing is still a lot of failures", value: "toward-one" },
+    { label: "It sits at exactly 0.5 for every d", value: "exactly-half" },
   ]}
-  correctValue="rises"
-  explanation="Above the crossover each additional physical qubit is more likely than not to be wrong, so a majority vote among more of them is more likely to land on the wrong answer, not less. Failure probability climbs with d instead of falling. Real error correction behaves the same way: past threshold, added error-correction machinery introduces more error than it removes. Sweep the slider below and watch the curve's slope flip sign at p = 0.5. This is why hardware groups chase gate fidelity before they chase qubit count."
+  correctValue="exactly-half"
+  explanation="At p = 0.5 every one of the 2^d ways the d qubits can fail is equally likely, and because d is odd there are no ties, so exactly half of those ways have a majority failing. The failure probability is 1/2 at d = 1, at d = 11, and everywhere between. That flat line is what a threshold actually is: the single rate at which distance buys you nothing in either direction. Sweep the slider below and watch the curve's slope flip sign as p crosses it. Real error correction has the same structure, which is why hardware groups chase gate fidelity before they chase qubit count."
 />
 
-<InteractiveSection title="Above and below threshold, opposite trends" description="Drag the slider to sweep the toy physical error rate p from 0.1 to 0.9. Below this model's p=0.5 crossover, failure probability drops as distance grows and more redundancy helps. Above it, failure probability grows instead, which is the 'more error correction makes it worse' case Common Mistakes warns about. The curve's slope flips sign at p = 0.5.">
+<InteractiveSection title="Above and below threshold, opposite trends" description="Drag the slider to sweep the toy physical error rate p from 0.1 to 0.9. Below this model's p=0.5 crossover, failure probability drops as distance grows and more redundancy helps. Above it, failure probability grows instead, which is the 'more error correction makes it worse' case the closing warnings below take up. The curve's slope flips sign at p = 0.5.">
   <ParametricCurve
     frames={toyThresholdFrames}
     sliderLabel="p"
-    ariaLabel="Toy binomial majority-vote failure probability versus code distance, swept over physical error rate p from 0.1 to 0.9; the curve slopes downward (more distance helps) below the toy crossover at p=0.5 and upward (more distance hurts) above it"
+    xAxisLabel="Code distance d"
+    yAxisLabel="Probability of logical failure"
+    ariaLabel="Toy binomial majority-vote failure probability versus code distance, swept over physical error rate p from 0.1 to 0.9; the curve slopes downward (more distance helps) below the toy crossover at p=0.5, sits flat at exactly 0.5 at the crossover, and slopes upward (more distance hurts) above it"
   />
 </InteractiveSection>
 
@@ -139,7 +140,7 @@ range from the literature; the course's own 3-qubit codes and the
 $[[9,1,3]]$ Shor code are far too small to derive such a figure, and no
 claim is made that they could.
 
-## Physical Interpretation
+## Closing the gap the algorithms capstone left
 
 This closes the gap Quantum Algorithms II's capstone left open. Shor's
 algorithm needs one long circuit to succeed in a single shot at
@@ -153,7 +154,7 @@ the same distinction the earlier capstone drew, now with the reason
 attached: fault tolerance is expensive, and only one of the two families
 has to pay for it.
 
-## Worked Example
+## A distance-3 code above threshold
 
 **Using the qualitative threshold argument, explain (without citing a
 specific number) why a distance-3 code run on hardware with physical
@@ -165,13 +166,13 @@ Error correction adds physical qubits and additional two-qubit gates
 an opportunity for a new physical error. Above threshold, the rate at
 which these *extra* gates introduce new errors outpaces the rate at which
 the code corrects existing ones, so the *net* logical error rate is
-higher with the code running than without it, the same reasoning
-Lesson 6's weight-2-error worked example illustrated concretely
-(recovery, run past the code's design limit, actively converts a
-correctable-looking situation into a full logical error) generalized to
-the many-error, above-threshold regime.
+higher with the code running than without it. Lesson 6's weight-2 worked
+example is the same failure in miniature: run past the code's design
+limit, the recovery step converted a two-qubit physical error into a full
+logical one. Above threshold, that outcome stops being the exception and
+becomes the usual case.
 
-## Common Mistakes
+## More error correction is not always better
 
 <Callout type="warning">
 **Assuming more error correction is always better.** Above threshold,
@@ -195,17 +196,221 @@ something this platform computed.
    distance-5 code's failure probability (needing $\geq3$ simultaneous
    errors) is lower than a distance-3 code's (needing $\geq2$) at the
    same small physical error rate $p$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because failure needs one more coincidence, and each additional
+   required coincidence multiplies the probability by another factor of
+   $p$. A polynomial number of extra chances cannot keep up with that.
+
+   Keep only the dominant term in each tail, the minimum number of
+   failures that does the damage:
+
+   $$
+   P_3 \approx \binom{3}{2}p^2 = 3p^2,
+   \qquad
+   P_5 \approx \binom{5}{3}p^3 = 10p^3,
+   \qquad
+   \frac{P_5}{P_3} \approx \frac{10}{3}p.
+   $$
+
+   The bigger code has more ways to fail, $10$ against $3$, which is the
+   polynomial part; but it needs a rarer event to do it, $p^3$ against
+   $p^2$, which is the exponential part. For small $p$ the exponential
+   part wins by a mile. At $p=10^{-3}$ that ratio is about $1/300$, so
+   the distance-5 code fails roughly three hundred times less often. At
+   $p=10^{-4}$ it is three thousand times less often. Every step up in
+   distance adds a power of $p$, which is why the logical error rate can
+   be driven arbitrarily low by a code family with a size dial.
+
+   The leading-order estimate also shows you where the argument stops.
+   The ratio $\tfrac{10}{3}p$ reaches $1$ at $p=0.3$, which looks like it
+   should be the crossover. The exact binomial tails are worth carrying
+   out, because they say something cleaner. Writing them in full,
+
+   $$
+   P_3 = 3p^2-2p^3,
+   \qquad
+   P_5 = 10p^3-15p^4+6p^5,
+   $$
+
+   and setting them equal gives $(p-1)^2(2p-1)=0$. The only crossing
+   below $1$ is at $p=\tfrac12$ exactly, which is this toy model's
+   threshold, the same $0.5$ the slider above flattens at. Below it,
+   distance 5 beats distance 3 and every further step keeps winning.
+   Above it, the ordering reverses and every step makes matters worse.
+   The leading-order estimate was conservative, and it was the neglected
+   $(1-p)$ factors, the requirement that the *other* qubits survive, that
+   made up the difference.
+
+   </details>
+
 2. Why does the threshold depend on the *decoding algorithm* used, not
    just the code's stabilizer structure? (Hint: recall Lesson 6's
    distinction between "detected" and "correctly recovered.")
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the code produces a syndrome and the decoder produces a
+   correction, and the threshold is defined by whether the *correction*
+   is right. Those are two different pieces of the system, and only the
+   first is fixed by the stabilizers.
+
+   Lesson 6 drew the line precisely: a syndrome does not name an error,
+   it names a whole coset of errors that share it. The stabilizer
+   structure determines which errors are distinguishable in principle.
+   Choosing which member of the coset to blame is the decoder's job, and
+   it is a guess, informed by a model of what noise is likely. Swap the
+   decoder and you swap the failure rate, on identical hardware running
+   an identical code, so the physical error rate at which encoding stops
+   paying for itself moves too.
+
+   The gap is not marginal. For the surface code, a decoder that ignores
+   the correlation between the $X$ and $Z$ halves of a $Y$ error is
+   throwing away real information about where the error chain went, and
+   pays for it in threshold. Minimum-weight perfect matching does much
+   better than any lookup-style rule, and full maximum-likelihood
+   decoding does better still. Published thresholds for one and the same
+   surface code span roughly an order of magnitude across the range from
+   simple decoders under idealized noise to practical decoders under
+   circuit-level noise with faulty measurements, which is the range this
+   lesson's cited $0.5$ to $1\%$ figure sits at the pessimistic end of.
+   Quoting a threshold without naming the decoder and the noise model is
+   not quite meaningful.
+
+   There is a second, more brutal way the decoder enters, and it belongs
+   in the same answer. Speed counts. A decoder that is accurate but
+   slower than the syndrome measurement rate accumulates a backlog that
+   grows without bound, and by the time a correction is computed the
+   state it applied to has moved on. In practice that behaves exactly
+   like a worse threshold, since the useful figure is the logical error
+   rate of the running machine, not of an offline analysis of its logs.
+
+   The wrong turn is to file this as an engineering detail underneath a
+   physics result. The threshold theorem is a statement about a
+   *scheme*: a code, a noise model, and a decoder, together. Change any
+   one and the number changes.
+
+   </details>
+
 3. Referring back to Quantum Algorithms II's capstone, explain in your
    own words why VQE's hybrid structure makes it comparatively insensitive
    to being run somewhat above a hypothetical "threshold" for its own
    error tolerance, in a way Shor's algorithm's circuit is not.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because VQE's quantum step outputs an average and Shor's outputs a
+   single interference pattern. Averages degrade smoothly under noise.
+   Interference patterns do not; they wash out.
+
+   Look at what each algorithm asks the hardware for. VQE runs a shallow
+   circuit many times, measures Pauli expectation values, and hands one
+   number, the energy, to a classical optimizer. Noise perturbs that
+   number. The optimizer does not need it to be correct, only to be
+   monotone enough locally that stepping downhill still goes downhill,
+   and the variational principle keeps a one-sided grip on the result:
+   whatever state the noisy circuit prepares, mixed or not, that state's
+   energy is still an upper bound on the true ground energy. The bound
+   is on the prepared state rather than on the estimate of it, so
+   readout error and finite sampling can still put a measured number
+   below it, but the error the circuit itself makes has a sign. Errors
+   move an estimate, and moving an estimate leaves an estimate.
+
+   Shor's circuit is one long coherent computation whose entire output is
+   the phase held in the counting register. That phase exists only as a
+   pattern of relative amplitudes across an exponentially large
+   superposition, and the inverse QFT's job is to concentrate it onto one
+   string. Every gate that fails perturbs the pattern, so the probability
+   that the run survives intact falls roughly as $(1-p)^{G}$ with $G$ the
+   gate count, and at cryptographic scale $G$ is astronomical. There is
+   no averaging structure to fall back on: a corrupted run does not give
+   you a slightly wrong period, it gives you a uniform-looking sample
+   with no period in it, and averaging noise gives noise.
+
+   That is the asymmetry, and it is worth stating as a general rule
+   rather than a fact about two algorithms. Sampling-based algorithms
+   that estimate an expectation value tolerate noise as a bias to be
+   fought with more shots. Algorithms whose answer lives in a
+   phase relationship maintained across a long circuit tolerate noise
+   only until the coherence budget runs out, after which they fail
+   completely rather than gradually.
+
+   Two honest qualifications, because the question's framing is looser
+   than it looks. First, VQE has no code and therefore no threshold; the
+   scare quotes in the question are doing real work, and "somewhat above
+   its own threshold" means only "noisier than you would like", not
+   anything with a theorem behind it. Second, VQE's robustness is
+   routinely overstated, and the algorithms capstone said so. Noise does
+   not merely offset the landscape, it flattens it, and at scale
+   noise-induced barren plateaus can leave the optimizer with no gradient
+   to descend at all. VQE is graceful under the noise levels of small
+   problems. Nobody has shown it stays graceful at the sizes where it
+   would beat a classical computer, and that gap is the honest limit of
+   this comparison.
+
+   </details>
+
 4. If a real device's physical error rate is confirmed below
    $p_{\text{th}}$, does that guarantee today's hardware can already run
    a cryptographically relevant factoring computation? What else does the
    resource-overhead discussion suggest is still needed?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. Below threshold is a necessary condition, not a sufficient one.
+   It says the logical error rate *can* be driven down by adding
+   distance. It says nothing about how much distance, how many qubits
+   that costs, or whether you have them.
+
+   Being below threshold is a statement about the sign of a slope. What
+   determines the bill is how far below you are, because the suppression
+   you get per unit of distance depends on the ratio $p/p_{\text{th}}$. A
+   device sitting just barely under the line needs an enormous code to
+   reach a useful logical error rate; one an order of magnitude under
+   needs a far smaller one. "Below threshold" and "below threshold with
+   margin" are different machines.
+
+   Four other things the overhead discussion points at.
+
+   Scale. The cited figure is hundreds to low thousands of physical
+   qubits per logical qubit, and a cryptographically relevant factoring
+   run needs thousands of logical qubits. Multiplying those gives
+   millions of physical qubits. Today's largest devices are three or four
+   orders of magnitude short, and no threshold result closes that gap.
+
+   Non-Clifford gates. Threshold statements typically cover Clifford
+   operations and measurement, which are the cheap part. Shor's circuit
+   needs $T$ gates, and in a surface code those arrive through magic
+   state distillation, a separate factory occupying its own large block
+   of qubits and its own share of the runtime. In published resource
+   estimates that factory is often the dominant cost, and it is not
+   included in a per-qubit error rate.
+
+   Time. The wall clock matters as much as the qubit count. Each logical
+   operation costs many rounds of syndrome extraction, and estimates for
+   cryptographic factoring run to hours or days of continuous operation.
+   The machine has to stay calibrated and stable for that entire
+   duration, with a real-time decoder keeping pace throughout.
+
+   The noise model behind the number. A threshold is quoted against a
+   specific model, and a device "below threshold" under independent
+   depolarizing noise may not be under what it actually experiences:
+   leakage out of the computational subspace, crosstalk, correlated and
+   drifting errors, none of which the idealized figure covers.
+
+   The Willow result the lesson cites is worth placing precisely against
+   all this, because it is easy to over-read. It showed one logical
+   qubit's error rate falling as the patch grew from distance 3 to 5 to
+   7. That is the sign of the slope, measured, on real hardware, and it
+   is a genuine milestone. It is not a computation, and it is not a
+   machine.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -222,10 +427,10 @@ something this platform computed.
   enough distance" regime this lesson describes; VQE/QAOA's NISQ-friendliness
   is exactly why they don't need it.
 
-## Further Exploration
+## The end of the track
 
 <NextDiscovery>
 This completes **Quantum Error Correction & Fault Tolerance**, and with
-it, the full Quantum Computing pillar sequence from single qubits through
+it, the full Quantum Computing track sequence from single qubits through
 fault-tolerant hardware requirements.
 </NextDiscovery>

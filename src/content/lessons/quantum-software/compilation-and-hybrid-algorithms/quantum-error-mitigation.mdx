@@ -21,10 +21,8 @@ export const zneE3 = Math.pow(1 - zneP, 3);
 export const zneExtrapolated = 1.5 * zneE1 - 0.5 * zneE3;
 export const zneResidualError = 1 - zneExtrapolated;
 
-export const zneMeasuredPoints = [
-  { x: 1, y: zneE1 },
-  { x: 3, y: zneE3 },
-];
+export const zneMeasuredAt1 = [{ x: 1, y: zneE1 }];
+export const zneMeasuredAt3 = [{ x: 3, y: zneE3 }];
 
 export const zneExtrapolationLinePoints = [
   { x: 0, y: zneExtrapolated },
@@ -85,7 +83,7 @@ export const lessonMeta = {
     },
     {
       slug: "quantum-computing/quantum-algorithms-ii/capstone-hybrid-algorithms-nisq-and-honest-scope",
-      note: "That capstone says a hybrid algorithm's classical loop can 'partially compensate for imperfect quantum execution' without saying how. This lesson names and derives the actual techniques behind that sentence.",
+      note: "That capstone says a hybrid algorithm's classical loop can 'partially compensate for imperfect quantum execution' without saying how. This lesson names and derives the techniques behind that sentence.",
     },
   ],
 };
@@ -94,7 +92,7 @@ export const lessonMeta = {
 A noisy qubit gets measured, and somehow a classical optimizer ends up trusting the number that comes out of it. How, if the state itself is never made any cleaner?
 </LessonHook>
 
-## Motivation
+## What to Do Before Correction Is Affordable
 
 Quantum SDKs Overview
 said outright that a real production SDK's feature set includes "error
@@ -105,9 +103,9 @@ Tolerance built a different, related idea (repairing the quantum state
 itself with extra qubits), and the NISQ capstone said a hybrid
 algorithm's classical loop can "partially compensate for imperfect
 quantum execution," without ever saying how. Both leave the same real,
-standard NISQ-era technique unnamed. This lesson answers the opening
-question directly: it names the technique, derives its core formula, and
-works a second technique numerically end to end.
+standard NISQ-era technique unnamed, and both leave the opening question
+standing: how does a number extracted from noisy runs end up more
+trustworthy than any of the runs it came from?
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/a/ae/IBM_Q_System_One_%28Fraunhofer%29_installation.jpg"
@@ -118,7 +116,7 @@ works a second technique numerically end to end.
   license="CC BY 2.0"
 />
 
-## Engineering Development
+## Zero-Noise Extrapolation and Readout Unfolding
 
 ### Mitigation is not correction
 
@@ -135,17 +133,6 @@ run is noisy, and instead corrects the **statistics computed from many
 noisy runs**, using no extra qubits at all, just extra circuit
 executions and classical post-processing.
 
-<PredictBeforeReveal
-  question="After running an error-mitigation protocol, is the quantum state the device actually prepared during any single circuit execution cleaner (less noisy) than before?"
-  options={[
-    { label: "Yes, mitigation purifies the state on every run", value: "yes" },
-    { label: "No, every individual run is exactly as noisy as ever; only the extrapolated NUMBER is corrected", value: "no" },
-    { label: "It depends on which mitigation technique is used", value: "depends" },
-  ]}
-  correctValue="no"
-  explanation="This is the single most important distinction from error correction. Mitigation never touches the physical state produced by any one run; every run is exactly as noisy as an unmitigated one. What gets corrected is the classically-computed NUMBER (an expectation value) obtained by combining several noisy runs in a specific way. Error correction repairs states; error mitigation repairs statistics."
-/>
-
 ### Zero-noise extrapolation, derived
 
 The idea: deliberately run the SAME circuit at several different,
@@ -159,7 +146,7 @@ $$
 \varepsilon(\rho) = (1-p)\rho + p\,\frac{I}{2}
 $$
 
-For an observable $O$ with $\text{Tr}(O)=0$ (**traceless** — true of
+For an observable $O$ with $\text{Tr}(O)=0$ (**traceless**: true of
 every individual Pauli, and hence of any Pauli-string Hamiltonian this
 platform's VQE/QAOA lessons use), the maximally-mixed piece contributes
 nothing:
@@ -216,16 +203,33 @@ $$
 \langle Z\rangle(1) \approx 0.9500, \qquad \langle Z\rangle(3) \approx 0.8574
 $$
 
-<InteractiveSection title="The noisy curve, the two sampled points, and the extrapolation" description="The smooth curve is the exact (1-p)^lambda decay; the two marked points are what a real experiment actually measures, at lambda=1 (original circuit) and lambda=3 (folded once); the short line through them, extended back to lambda=0, is zero-noise extrapolation's estimate of the noise-free result.">
+The true noise-free answer is exactly $1$. Run those two numbers through
+the two-point formula before reading on:
+
+<PredictBeforeReveal
+  question="Extrapolating ⟨Z⟩(1)=0.9500 and ⟨Z⟩(3)=0.8574 back to λ=0, where does the straight line land relative to the true value 1?"
+  options={[
+    { label: "Slightly below 1, near 0.996", value: "below" },
+    { label: "Exactly on 1; that is what extrapolation buys", value: "exact" },
+    { label: "Slightly above 1, near 1.004", value: "above" },
+  ]}
+  correctValue="below"
+  explanation="1.5(0.9500) − 0.5(0.8574) ≈ 0.9963, about 0.37% short. The reason it lands short rather than long is worth holding onto: (1−p)^λ curves upward, so a straight line drawn through two points on it and extended backwards passes underneath the curve, and underneath the curve at λ=0 means underneath 1. Extrapolation removes most of the bias, not all of it."
+/>
+
+<InteractiveSection title="The noisy curve, the two sampled points, and the extrapolation" description="The smooth muted curve is the exact (1-p)^lambda decay, which no experiment ever gets to see. Two markers sit on it, at the only noise levels a real run can measure: a circle at lambda=1, the circuit as written, and a square at lambda=3, the same circuit with every gate folded once. The straight warning-coloured line is the fit through those two markers, continued left to lambda=0, and where it lands is the mitigated estimate. It lands just under the dashed ideal line at 1, and that gap is the bias extrapolation fails to remove: the fitted line is straight, the decay it is sampling is curved.">
   <ParametricCurve
     ariaLabel="Zero-noise extrapolation: exact exponential decay of the Z expectation value versus noise level lambda, the two measured points at lambda=1 and lambda=3, and the linear extrapolation back to lambda=0"
+    xAxisLabel="noise scale λ"
+    yAxisLabel="⟨Z⟩"
     frames={[
       {
         paramLabel: "p = 0.05 depolarizing noise per unit",
         series: [
           { label: "Exact decay (1-p)^λ", color: "muted", points: zneCurvePoints },
-          { label: "Measured (λ=1, λ=3)", color: "brand", points: zneMeasuredPoints },
-          { label: "Linear extrapolation to λ=0", color: "warning", points: zneExtrapolationLinePoints },
+          { label: `measured at λ=1: ⟨Z⟩ = ${zneE1.toFixed(4)}`, color: "brand", mode: "points", points: zneMeasuredAt1 },
+          { label: `measured at λ=3: ⟨Z⟩ = ${zneE3.toFixed(4)}`, color: "accent", mode: "points", points: zneMeasuredAt3 },
+          { label: `linear extrapolation to λ=0: ${zneExtrapolated.toFixed(4)}`, color: "warning", points: zneExtrapolationLinePoints },
         ],
       },
     ]}
@@ -267,7 +271,7 @@ $$
 \vec p_{\text{true}} = M^{-1}\vec p_{\text{meas}}
 $$
 
-## Physical Interpretation
+## Fixing the Average, Never the Run
 
 Both techniques share the same shape: accept that any single circuit
 execution is noisy, then use EXTRA classical work (more circuit
@@ -283,10 +287,18 @@ capstone left unexplained, cashed out.
 
 **A device's calibration gives**
 $M=\begin{pmatrix}0.98&0.15\\0.02&0.85\end{pmatrix}$ **(a
-15%-of-the-time $1\to0$ misread, a realistic asymmetric T1-during-readout
-error, versus only 2% the other way). A circuit's raw, uncorrected
-measurement gives $\vec p_{\text{meas}}=(0.20,0.80)$. Recover the true
-distribution.**
+15%-of-the-time $1\to0$ misread against only 2% the other way). A
+circuit's raw, uncorrected measurement gives
+$\vec p_{\text{meas}}=(0.20,0.80)$. Recover the true distribution.**
+
+The asymmetry here is realistic in *shape*, and it is the shape T1 decay
+during the readout window produces: a $|1\rangle$ has somewhere to fall
+and a $|0\rangle$ does not. The magnitude is deliberately exaggerated so
+the correction is visible in three digits. Averaged over the two states
+this matrix is about 91.5% readout fidelity, worse than the 95-99% range
+Qubit Readout Techniques quotes as representative. On a device inside
+that range the arithmetic below is identical and the correction is a few
+points rather than fourteen.
 
 <MatrixGrid
   matrix={romMatrix}
@@ -308,18 +320,21 @@ $$
 
 <BarChart
   bars={romBars}
+  maxValue={1}
   ariaLabel="Bar chart comparing the raw measured distribution, P(0) 0.20 and P(1) 0.80, against the readout-corrected distribution, P(0) 0.06 and P(1) 0.94, with the corrected pair highlighted"
 />
 
 **Check:** $M\vec p_{\text{true}} = (0.98\times0.060+0.15\times0.940,\ 0.02\times0.060+0.85\times0.940) \approx (0.0588+0.1410,\ 0.0012+0.7990) = (0.200,\ 0.800)$,
-reproducing $\vec p_{\text{meas}}$ exactly, confirming the inversion.
+reproducing $\vec p_{\text{meas}}$ to the three digits shown here, and
+exactly when the unrounded $\vec p_{\text{true}}$ is used, confirming
+the inversion.
 The correction is substantial: the raw circuit looked like $80\%$
 $|1\rangle$, but the readout-corrected estimate is closer to $94\%$
-$|1\rangle$ — the extra $14$ points were entirely the asymmetric
+$|1\rangle$. The extra $14$ points were entirely the asymmetric
 misread rate, not the circuit's real behavior, and a VQE cost function
 computed from the raw (uncorrected) $80\%$ would be measurably biased.
 
-## Common Mistakes
+## Mistaking Mitigation for Cheap Correction
 
 <Callout type="warning">
 **Treating error mitigation as a cheaper substitute for error
@@ -331,8 +346,8 @@ extrapolation or probabilistic error cancellation (a related, cited-not-derived
 technique using a quasi-probability decomposition of the noise instead
 of a linear fit) to deeper, noisier circuits requires exponentially MORE
 circuit repetitions to keep the statistical estimate's variance under
-control — a proven fundamental limit (Takagi et al. 2022;
-Quek et al.), not an engineering gap that better algorithms will close.
+control, a proven fundamental limit (Takagi et al. 2022;
+Quek et al. 2024), not an engineering gap that better algorithms will close.
 Mitigation is a useful NISQ-era tool with no qubit overhead;
 it is not a scalable alternative to fault tolerance.
 </Callout>
@@ -355,18 +370,250 @@ exact answer."
    then apply the two-point extrapolation formula. How does the
    residual error compare to this lesson's $p=0.05$ case, and why does
    it grow with $p$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $\langle O\rangle_{\text{ideal}}=1$:
+
+   $$
+   \langle O\rangle(1) = 0.9, \qquad \langle O\rangle(3) = 0.9^3 = 0.729,
+   $$
+
+   $$
+   \langle O\rangle(0) \approx \tfrac32(0.9) - \tfrac12(0.729) = 1.35 - 0.3645 = 0.9855 .
+   $$
+
+   A residual error of $0.0145$, or **1.45%**, against the lesson's
+   $0.36875\%$ at $p=0.05$. Both closed forms are confirmed by pushing
+   the real depolarizing channel through `applyChannelRepeatedly`, which
+   returns $\langle Z\rangle=0.9000000000$ and $0.7290000000$ at
+   $\lambda=1$ and $3$, matching $(1-p)^\lambda$ to ten digits.
+
+   **The residual grew by a factor of 3.93, so doubling $p$ roughly
+   quadrupled it.** That is not a coincidence, and the algebra gives it
+   exactly. Substitute the model into the formula:
+
+   $$
+   \tfrac32(1-p) - \tfrac12(1-p)^3 = \tfrac32 - \tfrac32 p - \tfrac12\left(1 - 3p + 3p^2 - p^3\right) = 1 - \tfrac32 p^2 + \tfrac12 p^3 .
+   $$
+
+   So the residual is exactly
+
+   $$
+   1 - \langle O\rangle(0) = \tfrac32 p^2 - \tfrac12 p^3 .
+   $$
+
+   Check it: at $p=0.05$ that is $0.00375-0.0000625=0.00368750$, and at
+   $p=0.1$ it is $0.015-0.0005=0.01450000$. Both agree with the direct
+   computation to every digit.
+
+   **Why it grows.** The leading term is $\tfrac32p^2$, quadratic, so
+   doubling $p$ quadruples the residual to leading order, and the small
+   cubic correction is why the observed ratio is 3.93 rather than exactly
+   4. Notice what the $p^2$ says: the linear term cancelled completely.
+   That is the whole point of extrapolating. The raw $\lambda=1$
+   measurement is wrong by $p$, a first-order error, and the two-point
+   fit removes that entirely, leaving only the curvature of
+   $(1-p)^\lambda$ that a straight line cannot follow. At $p=0.1$ the
+   raw measurement is 10% off and the mitigated estimate is 1.45% off, a
+   sevenfold improvement from two measurements instead of one.
+
+   The direction of the error is also fixed rather than random.
+   $(1-p)^\lambda$ is convex, curving upward, so a chord through two
+   points on it lies *above* the curve between them and *below* it when
+   extended backwards. The estimate therefore always lands short of the
+   true value, never over. That is a bias, and a known-sign one, which is
+   why adding a third point at $\lambda=5$ and fitting a quadratic
+   shrinks it further.
+
+   The wrong turn is calling the extrapolated number the answer. It is a
+   corrected estimate with the first-order bias removed, and this
+   lesson's own Common Mistakes box says so. On real hardware, where the
+   noise is not a single clean depolarizing channel, the residual is
+   larger still.
+
+   </details>
+
 2. Why does zero-noise extrapolation's derivation specifically require
    $\text{Tr}(O)=0$? What would change in the derivation for an
    observable with $\text{Tr}(O)\ne0$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the tracelessness is what makes the noise a *pure shrink*,
+   with no offset, which is what turns repeated application into a clean
+   geometric decay.
+
+   Work the single step. With
+   $\varepsilon(\rho)=(1-p)\rho+p\,I/2$,
+
+   $$
+   \langle O\rangle_\varepsilon = \operatorname{Tr}(O\varepsilon(\rho)) = (1-p)\operatorname{Tr}(O\rho) + p\,\frac{\operatorname{Tr}(O)}{2} .
+   $$
+
+   With $\operatorname{Tr}(O)=0$ the second term vanishes and every
+   application multiplies the expectation by the same factor $(1-p)$.
+   Compounding is then immediate: $\langle O\rangle(\lambda) =
+   (1-p)^\lambda\langle O\rangle_{\text{ideal}}$, one parameter, decaying
+   to zero, which is exactly the model the two-point formula inverts.
+
+   **With $\operatorname{Tr}(O)\ne0$**, write $c=\operatorname{Tr}(O)/2$.
+   The step becomes affine rather than linear:
+
+   $$
+   \langle O\rangle \mapsto (1-p)\langle O\rangle + pc ,
+   $$
+
+   a map whose fixed point is $c$ rather than 0. Iterating gives
+
+   $$
+   \langle O\rangle(\lambda) = (1-p)^\lambda\left(\langle O\rangle_{\text{ideal}} - c\right) + c .
+   $$
+
+   Same exponential, now decaying toward $c$ instead of toward zero. The
+   depolarizing channel drives the state to $I/2$, and $\operatorname{Tr}
+   (O\,I/2)=c$ is simply what $O$ reads on the maximally mixed state.
+
+   **What changes in practice: less than it looks.** The extrapolation
+   still works, because the shape is still exponential in $\lambda$;
+   there is just a known constant to account for. And $c$ *is* known:
+   $\operatorname{Tr}(O)/2$ is computable from the observable alone,
+   with no experiment. So the cleanest fix is to subtract it, extrapolate
+   $\langle O\rangle-c$ exactly as before, and add it back. Failing to
+   account for it is what breaks things: the two-point formula assumes
+   the decay heads to zero, so applied to an observable with an offset it
+   extrapolates the wrong line and is biased even at first order.
+
+   **Why the condition is usually satisfied anyway.** Every non-identity
+   Pauli matrix is traceless, and a tensor product of Pauli operators is
+   traceless as long as it is not the identity string. A Hamiltonian
+   written as a sum of Pauli strings is therefore traceless unless it
+   carries an explicit identity term, and an identity term is a constant
+   energy offset that can be pulled out and added back at the end. That
+   is why the lesson can say the condition is "true of every individual
+   Pauli, and hence of any Pauli-string Hamiltonian" this platform's VQE
+   and QAOA lessons use.
+
+   The wrong turn is treating the tracelessness as a limitation on which
+   observables can be mitigated. It is a condition on which *model* to
+   fit, and the general case just has one more known constant in it.
+
+   </details>
+
 3. For the readout confusion matrix
    $M=\begin{pmatrix}0.98&0.15\\0.02&0.85\end{pmatrix}$, what raw
    measured distribution would a TRUE distribution of exactly
    $(1,0)$ (perfect $|0\rangle$) produce? (Hint: this is $M$ applied
    directly to $(1,0)^T$, no inversion needed.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   M\begin{pmatrix}1\\0\end{pmatrix} = \begin{pmatrix}0.98\\0.02\end{pmatrix} .
+   $$
+
+   A perfectly prepared $|0\rangle$ is reported as "0" 98% of the time
+   and as "1" 2% of the time.
+
+   Multiplying by $(1,0)^T$ just selects the first column, so the
+   arithmetic is trivial. What the question is really checking is that
+   you read the matrix the right way round, so it is worth being explicit
+   about the layout. Rows are the reported outcome; columns are the true
+   state. So column 0 is the conditional distribution of readings given a
+   true $|0\rangle$, and column 1 is the same given a true $|1\rangle$.
+   Both columns sum to 1, as conditional distributions must: $0.98+0.02$
+   and $0.15+0.85$.
+
+   That column-stochastic structure is also the built-in check on the
+   most common mistake here, which is reading the first *row* and
+   answering $(0.98,\,0.15)$. Those two numbers sum to 1.13, which is not
+   a probability distribution, and noticing that catches the error before
+   it propagates. The second common mistake is reaching for $M^{-1}$
+   because the lesson's worked example did. Inversion goes the other way,
+   from a measured distribution back to a true one; here the true
+   distribution is given and the measured one is what is wanted.
+
+   Two things worth reading off the answer.
+
+   **This is exactly what calibration measures.** The way $M$ is built is
+   to prepare $|0\rangle$ many times and record the reported outcomes,
+   which hands you column 0 directly, then repeat with $|1\rangle$ for
+   column 1. So this question is not a hypothetical; it is a description
+   of the calibration experiment.
+
+   **The asymmetry is physical.** A $|1\rangle$ is misread 15% of the
+   time, seven and a half times more often than a $|0\rangle$'s 2%,
+   because during the several hundred nanoseconds of readout integration
+   a qubit in $|1\rangle$ can relax toward $|0\rangle$, and there is no
+   comparable route upward. That asymmetry is why the correction in the
+   lesson's worked example is large, moving 80% to 94%, and why simply
+   subtracting a flat error rate would not have worked.
+
+   </details>
+
 4. Explain, in your own words, why "more circuit repetitions, no extra
    qubits" (mitigation) and "more physical qubits, exponential
    suppression" (correction) are different resource trades, not two
    versions of the same idea.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because they repair different objects, spend different resources, and
+   scale in opposite shapes.
+
+   **Different objects.** Error correction repairs the *quantum state*.
+   Ancilla qubits measure syndromes, a recovery operation is applied, and
+   the register is genuinely restored, so the computation can continue on
+   corrected data. Error mitigation repairs *a number*. It accepts that
+   every single run is exactly as noisy as it was, and uses classical
+   post-processing over many such runs to produce a less biased estimate
+   of an expectation value. After a full zero-noise-extrapolation
+   protocol finishes, no state the device prepared on any single run was
+   any cleaner than before.
+
+   **Different resources.** Correction spends physical qubits, on the
+   order of hundreds to thousands per logical qubit, plus continuous
+   syndrome measurement and real-time classical decoding. Mitigation
+   spends circuit executions and classical arithmetic, and no qubits at
+   all. That is why mitigation is usable today on hardware that cannot
+   support a single logical qubit.
+
+   **Opposite scaling shapes, which is the decisive difference.** Below
+   the threshold, error correction gives *exponential* suppression of the
+   logical error rate in the code distance at *polynomial* physical-qubit
+   overhead. Buying more qubits buys accuracy very cheaply in the
+   exponent. Mitigation has no such curve. Keeping the variance of the
+   estimate under control as circuits get deeper and noisier requires
+   exponentially more repetitions, and that is a proven fundamental
+   limit rather than a gap better algorithms will close.
+
+   So the two are not points on one spectrum with correction at the
+   expensive end. One converts qubits into accuracy at a favourable
+   exponential rate; the other converts shots into accuracy at an
+   unfavourable one. Neither substitutes for the other: mitigation cannot
+   make a deep circuit work, because the sampling cost explodes exactly
+   where you would need it, and correction cannot be run today, because
+   the qubit counts do not exist.
+
+   One further restriction on mitigation is worth carrying, because it
+   is easy to miss and it is structural. Mitigation only helps when the
+   thing you want *is* an expectation value averaged over many runs. VQE
+   and QAOA qualify, which is why the technique belongs to the NISQ era
+   specifically. An algorithm whose output is a particular measured bit
+   string, Shor's period-finding for instance, has no expectation value
+   to de-bias: you need the run itself to be right, and only correction
+   delivers that.
+
+   The wrong turn is the one the lesson names outright: reading
+   mitigation as cheap error correction that happens to also work at
+   scale. It is a genuinely useful tool with no qubit overhead, and it is
+   not a path to fault tolerance.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -388,10 +635,10 @@ exact answer."
 - Mitigation's fundamental limit: sampling overhead grows (provably,
   eventually exponentially) with circuit noise, the opposite tradeoff
   shape from error correction's polynomial-overhead, exponential-suppression
-  threshold theorem. Mitigation is a real NISQ-era tool, not a
-  substitute for fault tolerance at scale.
+  threshold theorem. Mitigation earns its place in the NISQ era; it does
+  not substitute for fault tolerance at scale.
 
-## Further Exploration
+## What NISQ Actually Leaves You
 
 <NextDiscovery>
 This closes **Quantum Software**, on the piece the NISQ capstone's "the

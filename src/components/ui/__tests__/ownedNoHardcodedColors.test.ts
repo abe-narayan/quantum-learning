@@ -21,9 +21,33 @@ import { describe, expect, it } from "vitest";
  * eight other agents are editing curriculum/, layout/, search/, simulators/,
  * visualizations/, mdx/, narrative/, problems/, currentQuantum/, glossary/,
  * map/, and various app/ routes concurrently, and some of those
- * legitimately need literals (e.g. src/app/opengraph-image.tsx, which
- * renders outside any CSS cascade) — this test does not, and should not,
- * reach into any of that.
+ * legitimately need literals — this test does not, and should not, reach
+ * into any of that.
+ *
+ * ## The literal-hex exception list, in full
+ *
+ * There are exactly THREE files in this app where a literal colour is
+ * correct rather than a violation of "tokens only," and all three are
+ * rendered outside any CSS cascade, so a `var(--...)` in them would resolve
+ * to nothing:
+ *
+ *   - `src/app/opengraph-image.tsx`  — Satori (`next/og`) cannot read custom
+ *     properties.
+ *   - `src/app/apple-icon.tsx`       — same renderer, same constraint.
+ *   - `src/app/manifest.ts`          — a JSON manifest consumed by the OS
+ *     (`background_color`, `theme_color`); there is no stylesheet involved
+ *     at all.
+ *
+ * The list used to name only the first, which read as "opengraph-image is
+ * the one place" and left the other two looking like unflagged violations.
+ * Neither scanner in this directory reaches any of the three (`manifest.ts`
+ * is not even a `.tsx`), so this comment is the whole enforcement: anything
+ * NOT on this list that carries a literal colour is a bug.
+ *
+ * All three hold *resolved copies* of dark-theme tokens, so retuning
+ * `--depth-0`, `--brand`, `--accent` or `--foreground` in globals.css means
+ * updating them by hand. Each file names the token it copied in its own
+ * header comment.
  */
 
 const SRC_ROOT = path.resolve(import.meta.dirname, "../../../..");

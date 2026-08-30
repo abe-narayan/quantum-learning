@@ -1,5 +1,16 @@
 # Adversarial UX & visual-QA review
 
+> **This file is a findings log, not a guide.** It is the *first* of two
+> adversarial reviews, and its findings have been worked: read
+> [`UX_REVIEW_2.md`](UX_REVIEW_2.md) first, which re-judges every P0 and P1
+> here against the code. **Nothing in this file is a rule.** Findings are
+> preserved as originally written, with dated resolution notes appended
+> rather than edited in, because a finding rewritten after the fact stops
+> being evidence of what was actually there.
+>
+> Counts and line numbers below are point-in-time and several are known to
+> have moved. Re-measure before quoting one.
+
 Read against `docs/DESIGN_SYSTEM.md`, `docs/NARRATIVE_COMPONENTS.md` and
 `src/app/globals.css`, then every page from home through lessons, simulators,
 problems, current-quantum, glossary and map. Everything below is a defect.
@@ -274,14 +285,14 @@ documentation describing something that isn't there.
 > 219 lessons): `AnnotatedFigure` **8**, `ObservePredictExplain` **1**,
 > `Question` **4**, `HistoricalMoment` **17**, `EquationReveal` **32**,
 > `ResearchConnection` **34**, `ChallengePrompt` **38**, `InsightBlock`
-> **40**, `DerivationSteps` **47**, `InteractiveSection` **163**,
+> **40**, `DerivationSteps` **48**, `InteractiveSection` **163**,
 > `PredictBeforeReveal` **213**, `LessonHook` **218**, `NextDiscovery`
 > **219**, `Callout` **219**. Nothing is at zero any more.
 > `ObservePredictExplain`'s single call site is deliberate and is the
 > blocker on retiring it — see `docs/NARRATIVE_COMPONENTS.md`, which
 > recommends removing the component rather than growing its usage. The
 > inline glossary `Term`, which did not exist when this table was measured,
-> now stands at 559 calls across 191 lessons, and is still climbing.
+> now stands at 562 calls across 191 lessons (recounted 2026-08-29).
 
 The clearest case of the gap: `AnnotatedFigure` was built for exactly
 multi-feature apparatus photos, and Quantum Hardware's platform/dilution-fridge
@@ -315,6 +326,20 @@ If `AnnotatedFigure`/`ObservePredictExplain` are intentionally deferred,
 remove them and their doc sections rather than shipping documented, compiled,
 unused vocabulary.
 
+> **Follow-up, 2026-08-29.** Two specifics named in the finding body above
+> have since moved and are recorded here rather than edited into the finding:
+>
+> - The `AnnotatedFigure` gap is **closed** for the case that motivated it.
+>   All six Quantum Hardware platform/cryogenics lessons now use
+>   `AnnotatedFigure`, plus two more in Computing and Mastery.
+> - `ObservePredictExplain` was **not** deferred and **not** removed. It
+>   still has its one call site, and `NARRATIVE_COMPONENTS.md` now carries
+>   the migrate-then-delete sequence for retiring it. It is no longer in the
+>   global `mdx-components.tsx` mapping; that lesson imports it directly.
+>
+> The Schmidt-decomposition hand-rolled preset switcher was **not**
+> re-verified in this pass.
+
 ### P1-8 · 142 of 219 lessons open on a bare heading; 142 close on one too
 
 `LessonHook` appears in 76/219 lessons; the other 143 drop straight from
@@ -345,6 +370,14 @@ has already appeared — not the cold open it's meant to be.
 paragraph is usually already the hook, just unstyled — and standardize on
 hook-before-first-heading everywhere it's used.
 
+> **Resolved 2026-08-29.** `LessonHook` is now in **218 of 219** lessons and
+> `NextDiscovery` in **all 219**. The seam this finding names, "whether a
+> lesson feels authored or generic depends on which agent wrote it", is
+> closed for these two beats specifically. The placement half of the finding
+> (hook nested *after* a `## Motivation` heading) was **not** re-verified
+> lesson by lesson; the rule itself is stated in
+> `NARRATIVE_COMPONENTS.md`'s `LessonHook` section, which is where it binds.
+
 ### P1-9 · `InteractiveSection`'s `mode` prop is documented but used at zero of 161 call sites
 
 `docs/NARRATIVE_COMPONENTS.md` documents `mode` (`"observe" | "predict" | "run" | "compare"`)
@@ -362,6 +395,13 @@ uniformly overstated.
 meaning (pure-observation embeds should say "OBSERVE," not "RUN EXPERIMENT"),
 or remove the feature — as shipped it exists in the API and nowhere in the
 content.
+
+> **Partly resolved 2026-08-29.** The dishonest half is fixed at the
+> component: `mode` no longer defaults to `"run"`, so an embed that does not
+> pass one gets a neutral "Interact" badge instead of an overstated "RUN
+> EXPERIMENT." The adoption half is not: 7 of 215 call sites pass `mode`.
+> That is correct-but-uninformative rather than wrong, which is the right
+> place to have landed, but the label is still doing very little work.
 
 ### P1-10 · 11 lessons contain 120+ line unbroken prose stretches, concentrated exactly where the material is hardest
 

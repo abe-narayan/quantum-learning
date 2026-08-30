@@ -20,28 +20,40 @@ export const whyOddOrderFails: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["not an integer", "r/2", "no integer", "fraction"],
-      ["difference of squares", "identity requires", "can't apply"],
+      {
+        phrases: ["not an integer", "r/2", "no integer", "fraction"],
+        missingFeedback:
+          "Write down the quantity the reduction needs, a raised to half the order, and say what happens to that exponent when the order is odd.",
+      },
+      {
+        phrases: ["difference of squares", "identity requires", "can't apply"],
+        missingFeedback:
+          "You have said what goes wrong with the exponent. Now name the specific algebraic identity the reduction is built on, and say what it has left to work with once that quantity is gone.",
+      },
     ],
-    incorrectFeedback: "Consider what r/2 actually equals when r is odd — is it a whole number?",
-    partialFeedback: "Good — now connect this directly to why the difference-of-squares identity can't be applied at all.",
+    incorrectFeedback: "You answered that odd orders are 'rare' or 'unlucky', which is about frequency rather than mechanism. Halve the order and ask whether the result can be used as an exponent at all, then check what the reduction needs that exponent for.",
+    partialFeedback: "You have the half-integer exponent. Now connect it to the algebraic identity the reduction leans on: what does that identity need, and which ingredient is missing?",
+    modelAnswers: [
+      "If r is odd then r/2 is not an integer, so a^(r/2) is not an integer power at all. The difference of squares identity requires that quantity to exist, so there is nothing to factor and the reduction is undefined rather than merely unsuccessful.",
+      "a^(r/2) only makes sense for even r. With odd r the exponent is a fraction, so you can't apply the difference of squares identity the whole reduction is built on.",
+    ],
   },
   hints: [
-    { text: "The reduction needs a^(r/2) to be a well-defined integer exponent." },
-    { text: "If r is odd, r/2 is not an integer." },
-    { text: "Without a^(r/2), the identity (a^(r/2)-1)(a^(r/2)+1)≡0 has no meaning to apply." },
+    { text: "Write down the algebraic identity the reduction uses, and note which exponent it needs." },
+    { text: "Halve an odd order and look at the result. Can it serve as an exponent in that identity?" },
+    { text: "With that exponent unavailable, say what is left of the identity and what the algorithm can still do with it." },
   ],
   solution: {
     steps: [
       { description: "The reduction's identity is (a^(r/2))²≡1, factored as (a^(r/2)-1)(a^(r/2)+1)≡0." },
       { description: "This requires r/2 to be an integer exponent, which only happens when r is even." },
-      { description: "For odd r, there's no well-defined a^(r/2) to plug into the identity at all — the reduction simply doesn't apply, not that it applies and fails." },
+      { description: "For odd r there is no integer a^(r/2) to substitute into the identity, so the reduction does not apply at all rather than applying and failing." },
     ],
-    finalAnswer: "For odd r, a^(r/2) isn't an integer power, so the difference-of-squares identity has nothing to factor — the reduction is undefined, not merely unsuccessful.",
+    finalAnswer: "For odd r, a^(r/2) isn't an integer power, so the difference-of-squares identity has nothing to factor. The reduction is undefined, not merely unsuccessful.",
   },
   explanation: {
     correctIdea: "The reduction's applicability, not just its success, depends on r's parity.",
     whyCorrect: "This is exactly why the algorithm's random-restart strategy checks r's parity before attempting the gcd step at all.",
-    whyWrong: ["Saying 'it just doesn't work as well' understates the issue — the reduction has no defined quantity to compute for odd r, not merely a worse one."],
+    whyWrong: ["Saying 'it doesn't work as well' understates the issue: for odd r the reduction has no defined quantity to compute, not merely a worse one."],
   },
 };

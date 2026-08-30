@@ -48,11 +48,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
-Everything up to now has described qubit states: points on the sphere. This lesson introduces the operations: the tools that move a qubit from one point to another.
+<LessonHook eyebrow="The gates you have been borrowing">
+You have been clicking gate buttons in the simulator since Lesson 1, and last lesson you borrowed two of H's rules outright on the promise they would be paid for later. This is later: six matrices, and one requirement that rules out almost every other matrix you could write down.
 </LessonHook>
 
-## Motivation
+## Six matrices, and one requirement
 
 The operations that move a qubit from one Bloch-sphere point to another
 are <Term id="quantum-gates">quantum gates</Term>, and every quantum circuit
@@ -60,7 +60,7 @@ you'll ever see is a sequence of them. There are only six you need for now,
 and one structural rule they all obey. The rule comes first, because it is
 what rules out most matrices you could write down.
 
-## Intuition
+## Classical gates throw information away
 
 A classical logic gate (AND, NOT, OR) takes a bit and produces a bit, and
 most of them are irreversible: given the output of an AND gate, you can't
@@ -70,15 +70,21 @@ must be **reversible**, which turns out to mean every quantum gate is a
 Rotate one way, then rotate back, and you are where you started.
 That single constraint shapes everything about how quantum gates behave.
 
-## Mathematical Development
+## Why unitary, then the six of them
 
 ### Why gates must be unitary
 
 A gate is a matrix $U$ acting on the state vector: $|\psi'\rangle=U|\psi\rangle$.
 Since $|\psi'\rangle$ must itself be a valid, normalized state, we need
-$\langle\psi'|\psi'\rangle=1$ whenever $\langle\psi|\psi\rangle=1$. Expand
-the left side using $\langle\psi'| = \langle\psi|U^\dagger$ (the bra
-transforms with the conjugate-transpose, written $U^\dagger$):
+$\langle\psi'|\psi'\rangle=1$ whenever $\langle\psi|\psi\rangle=1$. Getting
+the bra of $|\psi'\rangle$ needs one rule about conjugate transposes
+beyond the vector case from Dirac Notation: taking the conjugate
+transpose of a product *reverses the order* of its factors, the same way
+undoing "socks then shoes" means removing shoes first. Writing $U^\dagger$
+for the conjugate transpose of the matrix $U$, that rule turns
+$|\psi'\rangle = U|\psi\rangle$ into $\langle\psi'| = \langle\psi|U^\dagger$,
+with the bra now sitting to the *left* of the dagger. Expand the left
+side with it:
 
 $$
 \langle\psi'|\psi'\rangle = \langle\psi|U^\dagger U|\psi\rangle
@@ -147,8 +153,8 @@ H = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}, \qquad H|0\rangle=|+\
 $$
 
 Let's verify $H|0\rangle$ directly, writing out the matrix-vector product
-from Dirac Notation in full — row 0 of $H$ against the whole column to
-make entry 0, row 1 against the whole column to make entry 1:
+from Dirac Notation in full: row 0 of $H$ against the whole column to
+make entry 0, row 1 against the whole column to make entry 1.
 
 $$
 H|0\rangle = \frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}\begin{pmatrix}1\\0\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\cdot1 + 1\cdot0\\1\cdot1 + (-1)\cdot0\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix} = \frac{1}{\sqrt2}(|0\rangle+|1\rangle) = |+\rangle
@@ -177,7 +183,7 @@ quarter turn), $T$ by $\pi/4$ (an eighth turn). Unlike $X,Y,Z,H$, neither
 is its own inverse: $S^2=Z$ (two quarter-turns make a half-turn) and
 $S^4=I$.
 
-## Physical Interpretation
+## Every one of them is a rotation
 
 Every gate here rotates the Bloch vector by a fixed angle about a fixed
 axis. That's not a coincidence of these six examples. It's a general
@@ -186,25 +192,25 @@ you see it that way, you don't need to memorize six unrelated matrices;
 you need one geometric picture ("rotate the sphere") and six axis/angle
 pairs.
 
-## Interactive Experiment
+## Apply each gate and find the axis it turns about
 
 <PredictBeforeReveal
-  question="Apply H to |1⟩ using the matrix above. Which Bloch point does the result land on?"
+  question="Apply H to |−⟩ using the matrix above. Which Bloch point does the result land on?"
   options={[
     { label: "The north pole, |0⟩", value: "north" },
     { label: "The south pole, |1⟩", value: "south" },
     { label: "The +x point on the equator, |+⟩", value: "plusx" },
-    { label: "The −x point on the equator, |−⟩", value: "minusx" },
+    { label: "The −x point, |−⟩: H leaves it fixed", value: "minusx" },
   ]}
-  correctValue="minusx"
-  explanation="H|1⟩ = (1/√2)[[1,1],[1,-1]]·[0,1]ᵀ = (1/√2)[1,-1]ᵀ = (1/√2)(|0⟩−|1⟩) = |−⟩, the equatorial point diametrically opposite |+⟩. It's easy to guess |+⟩ by pattern-matching to H|0⟩=|+⟩, but the minus sign on the second row of H flips the sign of |1⟩'s contribution, landing on the opposite side of the equator instead."
+  correctValue="south"
+  explanation="H|−⟩ = (1/√2)[[1,1],[1,-1]]·(1/√2)[1,-1]ᵀ = (1/2)[1−1, 1+1]ᵀ = [0,1]ᵀ = |1⟩, the south pole. The quick route is H²=I: H sent |1⟩ to |−⟩, so a second H has to send |−⟩ straight back to |1⟩. H does not only create superposition, it removes it, and which pole you land on is decided by the sign inside the superposition you started from: |+⟩ goes to |0⟩, |−⟩ goes to |1⟩."
 />
 
 <InteractiveSection title="Survey the gates, then compose two" description="Starting from |0⟩, apply each gate one at a time (resetting to |0⟩ between each) and watch where the vector lands. Then try composing two gates without resetting, e.g. H then S then H, and predict the final position before you click, using the matrices above.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
-## Worked Example
+## Y on the north pole, and where it lands
 
 **Compute $Y|0\rangle$ by matrix multiplication, and confirm it lands on
 the same Bloch point as $X|0\rangle$.**
@@ -219,7 +225,7 @@ $z=|\alpha|^2-|\beta|^2 = 0-1=-1$. That's $(0,0,-1)$, the south pole,
 where $X|0\rangle=|1\rangle$ also lands. Same point, different
 amplitudes: $i|1\rangle$ vs. plain $|1\rangle$.
 
-## Common Mistakes
+## Not every gate is its own inverse
 
 <Callout type="note">
 **Assuming every gate is its own inverse.** $X,Y,Z,H$ are (applying any
@@ -239,14 +245,152 @@ answer, write out $|\psi\rangle$ as an explicit column vector first.
 1. Compute $X|+\rangle$ by matrix multiplication. Does the result match
    what you'd expect geometrically (recall $|+\rangle$ sits on the
    $x$-axis)?
-2. Compute $Z|+\rangle$. What state is this, in terms of
-   $|0\rangle,|1\rangle$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   X|+\rangle = \begin{pmatrix}0&1\\1&0\end{pmatrix}\frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix} = |+\rangle.
+   $$
+
+   $X$ swaps the two amplitudes, and $|+\rangle$'s two amplitudes are already
+   equal, so the swap changes nothing at all. $|+\rangle$ is a fixed point
+   of $X$.
+
+   That is exactly what the geometry predicts. $X$ is a $180°$ rotation *about
+   the $x$-axis*, and every rotation leaves the points on its own axis alone,
+   the way spinning a globe moves every city except the two poles.
+   $|+\rangle$ sits at the $+x$ pole, so $X$ cannot move it. ($|-\rangle$, at
+   the $-x$ pole, is fixed too: $X|-\rangle = |-\rangle$ is worth checking as
+   a second case.)
+
+   The reflex that misfires here is "$X$ is the quantum NOT gate, so it must
+   flip something". It flips $|0\rangle \leftrightarrow |1\rangle$, and that
+   description is complete only on the computational basis. On a general state
+   $X$ is a rotation, and a rotation's effect depends entirely on where the
+   state already is.
+
+   </details>
+
+2. Compute $Z|+\rangle$. What state is this in terms of
+   $|0\rangle,|1\rangle$, and where on the Bloch sphere did it move to?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   Z|+\rangle = \begin{pmatrix}1&0\\0&-1\end{pmatrix}\frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\\-1\end{pmatrix} = |-\rangle.
+   $$
+
+   On the sphere the state moved from $(1,0,0)$ to $(-1,0,0)$: straight across
+   the equator to the antipodal point, half a turn about the $z$-axis, which is
+   what $Z$ is.
+
+   The pairing with question 1 is the point of this pair. $X$ left $|+\rangle$
+   alone because $|+\rangle$ lies on $X$'s rotation axis. $Z$ moves it as far
+   as anything on the sphere can move, because $|+\rangle$ lies as far from
+   $Z$'s axis as possible, out on the equator. Same state, two gates, opposite
+   extremes, and the deciding factor is geometric rather than algebraic.
+
+   Notice also what a measurement would and would not see. $P(0) = P(1) = \tfrac12$
+   both before and after, so a computational-basis measurement is completely
+   blind to what just happened. The change is entirely in the relative phase,
+   and the way to see it is to measure in the X basis, where $P(+)$ goes from 1
+   to 0.
+
+   </details>
+
 3. Verify $S^2=Z$ by multiplying $S$'s matrix by itself.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   S^2 = \begin{pmatrix}1&0\\0&i\end{pmatrix}\begin{pmatrix}1&0\\0&i\end{pmatrix} = \begin{pmatrix}1&0\\0&i^2\end{pmatrix} = \begin{pmatrix}1&0\\0&-1\end{pmatrix} = Z \checkmark
+   $$
+
+   Diagonal matrices multiply entrywise, so the whole computation is
+   $i \times i = -1$.
+
+   The rotation picture says the same thing with no arithmetic. $S$ is a
+   quarter turn ($\pi/2$) about the $z$-axis and $Z$ is a half turn ($\pi$)
+   about the same axis, so doing $S$ twice must be $Z$: rotations about a
+   shared axis simply add their angles. By the same argument $T^2 = S$
+   ($\pi/4$ twice is $\pi/2$) and $Z^2 = I$, and you can build the whole
+   $\{T, S, Z\}$ family as powers of $T$ without multiplying a single matrix.
+
+   The slip to watch for is writing $i^2$ as $+1$ by treating the square as
+   "size squared". Squaring the matrix entry means multiplying the complex
+   number by itself, not by its conjugate. $i \cdot i = -1$; it is
+   $i \cdot i^* = i \cdot (-i) = +1$ that gives the positive answer, and that
+   product appears when you compute probabilities, not when you compose gates.
+
+   </details>
+
 4. Which gate(s) from this lesson leave $|0\rangle$ unchanged?
    Explain geometrically why that has to be true for those gates
    specifically.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $Z$, $S$ and $T$.
+
+   All three are diagonal with a 1 in the top-left corner:
+   $Z = \mathrm{diag}(1,-1)$, $S = \mathrm{diag}(1,i)$,
+   $T = \mathrm{diag}(1,e^{i\pi/4})$. Applied to $|0\rangle = (1,0)^\mathsf{T}$,
+   the lower entry is multiplied by zero, so only the 1 survives and the state
+   comes back exactly, not merely up to a phase.
+
+   Geometrically all three are rotations about the $z$-axis, and $|0\rangle$ is
+   the north pole, sitting *on* that axis. A rotation fixes its own axis, so it
+   cannot move a state at either pole. The same argument immediately gives the
+   companion fact: these three also leave $|1\rangle$ where it is, at the south
+   pole, though there they multiply it by a phase (for instance
+   $Z|1\rangle = -|1\rangle$), which is invisible because with only one nonzero
+   amplitude that phase is global.
+
+   The other three fail, each for a visible reason. $X$ and $Y$ are half turns
+   about the $x$- and $y$-axes, both perpendicular to $z$, so they carry the
+   north pole all the way to the south pole: $X|0\rangle = |1\rangle$ and
+   $Y|0\rangle = i|1\rangle$. $H$ rotates about the diagonal axis halfway
+   between $x$ and $z$ and sends $|0\rangle$ to $|+\rangle$, out on the equator.
+
+   </details>
+
 5. Predict, without a calculator, what $T^8|1\rangle$ equals. Justify it
    from the rotation-angle picture, not matrix multiplication.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $T^8|1\rangle = |1\rangle$, exactly, with no leftover phase.
+
+   $T$ is a $\pi/4$ rotation about $z$, so eight of them make
+   $8 \times \pi/4 = 2\pi$: one complete turn. A full turn of the Bloch sphere
+   returns every point to itself, so the state must come back.
+
+   The reason "exactly" is worth saying is that a full turn does *not*
+   guarantee this in general. $R_z(2\pi) = -I$, a full turn that returns every
+   Bloch point but leaves a global phase of $-1$ behind, and that sign is real
+   enough to matter inside a controlled operation. What makes $T$ different is
+   the convention its matrix is written in: $T = \mathrm{diag}(1, e^{i\pi/4})$
+   puts the entire phase on $|1\rangle$ and none on $|0\rangle$, so
+
+   $$
+   T^8 = \mathrm{diag}\!\left(1, \left(e^{i\pi/4}\right)^8\right) = \mathrm{diag}(1, e^{2\pi i}) = I,
+   $$
+
+   the identity on the nose. $R_z$ splits the same rotation symmetrically as
+   $\mathrm{diag}(e^{-i\theta/2}, e^{i\theta/2})$, and it is that split, not the
+   rotation, that produces the sign. Same physical operation, different choice
+   of global phase.
+
+   The trap is stopping at "eight eighth-turns is a full turn, so it is the
+   identity up to phase" and calling that the answer. Up to phase is the easy
+   half; the question asks what $T^8|1\rangle$ *equals*.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -260,7 +404,7 @@ answer, write out $|\psi\rangle$ as an explicit column vector first.
 - $Y|0\rangle=i|1\rangle$ lands on the same Bloch point as $X|0\rangle=|1\rangle$,
   same rotation, different overall phase.
 
-## Further Exploration
+## One formula that covers all six
 
 <NextDiscovery>
 [Single-Qubit Rotations](/lessons/quantum-computing/qubits-and-quantum-states/single-qubit-rotations) generalizes every gate in this

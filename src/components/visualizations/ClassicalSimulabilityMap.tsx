@@ -124,8 +124,36 @@ export function ClassicalSimulabilityMap({
   };
 
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
-      <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel} className="mx-auto w-full max-w-lg">
+    // `w-full max-w-lg` is gone from the `<svg>`, and that is what finally
+    // makes the type in this figure legible. The arithmetic the two notes
+    // below run is right and their conclusion was still a failure: a 480-unit
+    // viewBox painting `w-full` into the real content box scales by
+    // 320 - 32 (Container `px-4`) = 288, less 2 x (16px `p-4` + 1px
+    // `panel-inset` border) = 254px, i.e. 254/480 = 0.529 px per unit. At that
+    // scale the sizes the last pass installed paint at
+    //   13 units -> 6.88px   (band labels, axis names, dot names, y endpoints)
+    //   12 units -> 6.35px   (Clifford and bounded-band labels)
+    //   11 units -> 5.82px   (per-dot notes)
+    // Every one of those is under the ~9px floor, and the notes say so ("~7px",
+    // "~5.9px") while leaving them there, because no size that fits the 259-unit
+    // hard region horizontally can clear 9px at a 0.529 scale: 9px needs
+    // 9 x 480/254 = 17 units, and the 34-character hard-region label is ~320
+    // units at 17 against a 259-unit band.
+    //
+    // With no `w-full` the `<svg>`'s intrinsic `width={480}` wins, one unit is
+    // one CSS pixel, and 13/12/11 units are a literal 13/12/11px. The wrapper's
+    // `overflow-x-auto` (already here, and until now never triggered because
+    // `w-full` guaranteed it fit) takes the 226px of overflow on a phone. This
+    // is the same trade `EnergyLevelDiagram` and `LevelSplittingDiagram` make:
+    // a figure a reader must pan is strictly better than one they cannot read.
+    //
+    // `tabIndex={0}` because that scroller is now real. `overflow-x-auto` is
+    // focusable by default in no browser but Firefox, so without it a
+    // keyboard-only reader could see the Clifford band and never reach the
+    // non-Clifford dots on the right, which are half the figure's content. No
+    // `role`/`aria-label` here: the `<svg>` already carries both.
+    <div tabIndex={0} className="not-prose overflow-x-auto panel-inset p-4">
+      <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={ariaLabel}>
         {/* Hard region: everything outside both bands. */}
         <rect
           x={PLOT.x + cliffordBandW}

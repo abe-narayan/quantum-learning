@@ -178,7 +178,7 @@ export function DiscretizationLimit({ ariaLabel }: { ariaLabel: string }) {
       <FrameSlider label="Grid resolution" valueLabel={frame.paramLabel} index={index} max={FRAMES.length - 1} onChange={setIndex} boxed={false} />
 
       <p className="font-mono text-xs text-muted-foreground">
-        &Sigma;<sub>i</sub> |c<sub>i</sub>|&sup2; &asymp; {frame.areaSum.toFixed(4)} &mdash; stays &asymp; 1 at every N, exactly the Riemann sum in
+        &Sigma;<sub>i</sub> |c<sub>i</sub>|&sup2; &asymp; {frame.areaSum.toFixed(4)}: stays &asymp; 1 at every N, exactly the Riemann sum in
         the derivation above.
       </p>
     </div>

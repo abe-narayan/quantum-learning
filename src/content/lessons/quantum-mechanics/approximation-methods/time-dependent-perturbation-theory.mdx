@@ -50,11 +50,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="A question a stationary state cannot answer">
 Every previous lesson in this course asked what the corrected energy is. This one asks something a stationary state cannot answer: switch on a coupling between two states at t=0, and what is the probability of finding the system in the other one later?
 </LessonHook>
 
-## Motivation
+## Switch on a coupling and wait
 
 A system sits in state $|i\rangle$. At $t=0$ a perturbation $V$ switches
 on, coupling it to a nearby state $|f\rangle$. What is the probability of
@@ -76,7 +76,7 @@ reporting probabilities greater than one.
   license="Public domain"
 />
 
-## Mathematical Development
+## The first-order probability, and an exact check
 
 ### The first-order transition probability
 
@@ -91,7 +91,7 @@ $$
 
 This is derived by integrating $i\hbar\dot c_f=V_{fi}e^{i\omega_{fi}t}$ to
 first order in $V$, starting from $c_f(0)=0,c_i(0)=1$ (a standard,
-if lengthy, integration this lesson states rather than re-derives step
+if lengthy, integration this lesson states without re-deriving step
 by step). Two limits worth noting: as $\omega_{fi}\to0$ (degenerate
 levels), the formula's $\sin^2$ ratio limit gives
 $P_{i\to f}(t)\to|V_{fi}|^2t^2/\hbar^2$ (quadratic growth); for
@@ -106,10 +106,10 @@ $i\hbar\dot{\vec c}=H\vec c$ with
 $H=\begin{pmatrix}E_i&V\\V&E_f\end{pmatrix}$ via fourth-order
 Runge-Kutta, a general-purpose small-step ODE method that knows nothing
 about perturbation theory. It makes no assumption that $V$ is small,
-which is what makes it a usable check rather than a restatement: the two
+which is what makes it a usable check instead of a restatement: the two
 calculations can disagree, and where they do is informative.
 
-## Physical Interpretation
+## Reading the formula factor by factor
 
 Read the formula factor by factor. $|V_{fi}|^2$ sets the overall
 strength: with no coupling there is no transition, whatever else is true.
@@ -125,7 +125,7 @@ as the levels approach degeneracy. A ceiling that exceeds $1$ is not a
 prediction; it is the approximation reporting that it has left its
 domain, and the worked example below walks straight into that.
 
-## Worked Example
+## Weak coupling against strong, side by side
 
 **Compare perturbative and exact transition probabilities for weak vs.
 strong coupling ($E_i=0,E_f=1,\hbar=1$).**
@@ -149,32 +149,42 @@ confidently wrong the answer becomes. Longer times do not average the
 error out; they compound it.
 
 Watching both curves over time, at several coupling strengths, makes the
-breakdown visible directly rather than only from the table's four rows:
+breakdown visible directly rather than only from the table's four rows.
+The strongest frame is the one to think about first. With
+$\hbar=\omega_{fi}=1$ the perturbative ceiling $4|V_{fi}|^2$ comes out to
+exactly $1$ at $V=0.5$, which is also the hard cap unitarity puts on the
+exact answer, so on that frame the two calculations are at least allowed
+to agree.
 
 <PredictBeforeReveal
-  question="The bound above caps P_{i→f}(t) at 4|V_{fi}|²/(ħ²ω_{fi}²). With this lesson's convention (ħ=1, ω_{fi}=1), what happens to that cap once you push coupling strength V past 0.5?"
+  question="At V=0.5 the perturbative ceiling is exactly 1, and unitarity caps the exact probability at 1 as well. Do the two curves in fact climb to the same height?"
   options={[
-    { label: "It stays at exactly 1 no matter how large V gets", value: "self-limits" },
-    { label: "It climbs above 1, giving a 'probability' greater than 1", value: "exceeds-one" },
-    { label: "It falls back toward 0", value: "drops" },
-    { label: "It becomes negative", value: "negative" },
+    { label: "Yes: both reach 1, they just arrive there at different times", value: "both-one" },
+    { label: "No: the exact curve overshoots, peaking above the perturbative one", value: "over" },
+    { label: "No: the exact curve tops out at 1/2, half the perturbative ceiling", value: "half" },
   ]}
-  correctValue="exceeds-one"
-  explanation="With ħ=ω_{fi}=1 the cap is 4V². At V=0.5 it lands on 1; beyond that the formula's own ceiling rises above 1, which no probability can do. The arithmetic is not wrong: the formula is reporting that it has been asked something outside its range, and this is the most useful property a leading-order approximation can have. Compare the curves below: past V≈0.5 the perturbative line keeps climbing while the exact line, held under 1 by unitarity whatever V does, turns over and comes back down."
+  correctValue="half"
+  explanation="Sharing a ceiling is not the same as reaching it. The exact two-level solution peaks at 4V²/(ωfi² + 4V²), which at V=0.5 and ωfi=1 is exactly 1/2, and it gets there at t≈2.22 before turning back down to 0.363 by t=3. The perturbative curve is still climbing at t=3, where it reads 0.995. The denominator is the whole difference: the level splitting ωfi is a detuning, and a detuned two-level system never transfers its full population however hard it is driven. First order drops that term entirely, so it has no way to represent the limit."
 />
 
 <ParametricCurve
   frames={transitionCurveFrames}
   sliderLabel="Coupling strength V"
   referenceLines={[{ y: 1, label: "P = 1 (unitarity bound)" }]}
-  ariaLabel="Perturbative versus exact transition probability over time, at several coupling strengths"
+  ariaLabel="Perturbative and exact transition probability against time from 0 to 3, with a slider for coupling strength V from 0.01 to 0.5 and a dashed reference line at P = 1. At V = 0.01 the two curves are indistinguishable, both rising to 0.0004. As V grows they part company: at V = 0.1 the perturbative curve reaches 0.0398 against the exact 0.0384; at V = 0.5 the perturbative curve is still climbing at t = 3, where it reads 0.995, while the exact curve has already peaked at 0.5 near t = 2.2 and fallen back to 0.363."
 />
 
 Increase $V$ from $0.01$ toward $0.5$. At weak coupling the two curves
 lie on top of one another. Past roughly $V\approx0.1$ the perturbative
-curve climbs through the exact curve's first peak and keeps going,
-eventually crossing the $P=1$ line. The exact curve turns over instead
-and comes back down, then repeats: the Rabi oscillation.
+curve climbs through the exact curve's first peak and keeps going, while
+the exact curve turns over and comes back down, then repeats: the Rabi
+oscillation. The last frame stops just short of the dashed line, at
+$0.995$; hold $V=0.5$ and the perturbative curve rises to touch it exactly
+at $t=\pi$, and nudge $V$ any higher and it reports a probability above
+$1$. The arithmetic is
+not wrong. The formula is telling you it has been asked something outside
+its range, which is the most useful thing a leading-order approximation
+can do.
 
 Notice where they first separate. It is not at some fixed time but at
 the exact curve's first turning point, which arrives sooner as $V$ grows.
@@ -183,11 +193,11 @@ $|V_{fi}|\ll\hbar|\omega_{fi}|$: first order is trustworthy for as long as
 the system has not yet had time to come back.
 
 The frames above sample a handful of coupling strengths at one fixed
-level splitting, $\omega_{fi}=1$. That splitting is the detuning: it is
-how far the two levels sit from degeneracy, and it is what caps the exact
-curve's oscillation at $4V^2/(\omega_{fi}^2+4V^2)$ rather than letting it
-reach $1$. At $V=0.5$ that ceiling is exactly $\tfrac12$, which is the
-height the exact curve tops out at in the last frame. The explorer below
+level splitting, $\omega_{fi}=1$, and that splitting is a detuning: how
+far the two levels sit from degeneracy. It is the term in
+$4V^2/(\omega_{fi}^2+4V^2)$ that holds the exact curve below $1$, and the
+one first order throws away. Nothing in the frames lets you vary it. The
+explorer below
 runs the identical exact two-level engine (`exactTwoLevelTrajectory`, the
 same underlying solver behind `exactTwoLevelTransitionProbability` used
 throughout this lesson) with the detuning made adjustable, a parameter
@@ -198,14 +208,14 @@ trajectory live.
   <LazyRabiExplorer />
 </InteractiveSection>
 
-## Common Mistakes
+## Where a factor of 2.7 appears
 
 <Callout type="warning">
 **Trusting the perturbative formula for strong coupling or long times.**
 The worked example's $V=0.5$ case shows a factor-of-2.7 disagreement.
 First-order perturbation theory is a leading-order approximation, valid
 specifically when $|V_{fi}|\ll\hbar|\omega_{fi}|$ (weak coupling relative
-to the energy splitting), not a universally accurate formula.
+to the energy splitting). Universal accuracy was never on offer.
 </Callout>
 
 <Callout type="warning">
@@ -213,7 +223,7 @@ to the energy splitting), not a universally accurate formula.
 physical.** The exact probability is always $\leq1$ by unitarity, no
 matter how strong $V$ is; if a perturbative estimate exceeds what's
 physically sensible, that's itself a signal the perturbative
-approximation has broken down, not a real prediction.
+approximation has broken down, and should be read that way.
 </Callout>
 
 ## Practice Questions
@@ -221,15 +231,169 @@ approximation has broken down, not a real prediction.
 1. In the limit $\omega_{fi}\to0$ (degenerate $E_i,E_f$), what happens to
    $P_{i\to f}(t)$ as $t$ grows? Does it stay bounded, or grow without
    limit? Is this consistent with $P\leq1$ for large enough $t$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It grows without limit, as $t^2$, and it is flatly inconsistent with
+   $P\le1$ past a certain time. That inconsistency is a fact about the
+   approximation, not about the physics.
+
+   Taking $\omega_{fi}\to0$ with $\sin^2(x)\to x^2$ for small argument:
+
+   $$
+   P_{i\to f}(t) = \frac{4|V_{fi}|^2}{\hbar^2\omega_{fi}^2}\sin^2\!\left(\frac{\omega_{fi}t}{2}\right) \longrightarrow \frac{4|V_{fi}|^2}{\hbar^2\omega_{fi}^2}\cdot\frac{\omega_{fi}^2t^2}{4} = \frac{|V_{fi}|^2t^2}{\hbar^2}
+   $$
+
+   which passes $1$ at $t=\hbar/|V_{fi}|$ and keeps climbing. A probability
+   of $4$ is not a prediction anyone should carry away.
+
+   What actually happens is available in closed form, because at zero
+   detuning the exact two-level solution is the resonant Rabi formula:
+
+   $$
+   P^{\text{exact}}_{i\to f}(t) = \sin^2\!\left(\frac{|V_{fi}|t}{\hbar}\right)
+   $$
+
+   which oscillates between $0$ and $1$ forever. Expanding it for small
+   argument gives $|V_{fi}|^2t^2/\hbar^2$, the perturbative answer exactly.
+   So first order is not wrong; it is the leading term of the truth, and
+   it stays good as long as the argument of that sine is small.
+
+   The lesson to extract is about which parameter has to be small. It is
+   not $|V_{fi}|$ on its own. It is the dimensionless combination
+   $|V_{fi}|t/\hbar$, so *any* coupling, however weak, eventually breaks
+   the formula if you wait long enough. Time-dependent perturbation theory
+   is a short-time approximation, and the practical test is the one the
+   formula fails here: if it reports $P$ approaching $1$, it has already
+   stopped being trustworthy, because its own validity required $P\ll1$.
+
+   </details>
+
 2. Using the table above, at what rough combination of $V$ and $t$ does
    the perturbative and exact answer start to visibly diverge (say, by
    more than 5%)?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Somewhere just past $V\approx0.1$ at these times. The table's four rows
+   read $0.00\%$, $0.04\%$, $3.7\%$ and $174\%$ error, so the $5\%$ line
+   falls between the $V=0.1$ and $V=0.5$ rows, much nearer the first.
+
+   The rows do better than bracket the answer, though, because they reveal
+   the parameter that controls it. Compare the two ceilings. First order
+   caps out at $4V^2/\omega_{fi}^2$; the exact solution caps out at
+   $4V^2/(\omega_{fi}^2+4V^2)$. Their ratio is
+
+   $$
+   \frac{4V^2/\omega_{fi}^2}{4V^2/(\omega_{fi}^2+4V^2)} = 1 + \frac{4V^2}{\omega_{fi}^2}
+   $$
+
+   With $\omega_{fi}=1$ that predicts errors of $0.04\%$ at $V=0.01$ and
+   $4\%$ at $V=0.1$, which is what the table's second and third rows
+   report. Setting $4V^2/\omega_{fi}^2=0.05$ puts the $5\%$ threshold at
+   $V\approx0.11$.
+
+   The $V=0.5$ row does not follow the rule, and the discrepancy is
+   informative rather than a failure of the estimate. The ratio formula
+   compares peak heights; at $V=0.5$ and $t=3$ the exact curve has already
+   passed its peak and fallen back to $0.363$ while the perturbative curve
+   is still climbing toward $0.995$. So a second error has appeared on top
+   of the amplitude error: the perturbative curve has the wrong *period*
+   as well as the wrong height, and once the two are out of step the
+   disagreement depends on when you look.
+
+   That is the honest way to state the validity condition. Not "$V$ small"
+   but $|V_{fi}|\ll\hbar|\omega_{fi}|$ *and* a time short enough that the
+   exact system has not yet turned around. Once it has, the error stops
+   being a percentage and becomes a matter of comparing two curves that no
+   longer have anything to do with each other.
+
+   </details>
+
 3. Explain physically why $P_{i\to f}(t)$ oscillating in time (rather
-   than monotonically increasing) is required by unitarity, not just a
+   than monotonically increasing) is required by unitarity, beyond being a
    mathematical curiosity of the formula.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because there is nowhere for the probability to go. With only two
+   states, $P_i(t)+P_f(t)=1$ at all times, so every bit of population that
+   reaches $|f\rangle$ came out of $|i\rangle$ and is still available to
+   come back. Nothing about the coupling distinguishes the two directions.
+
+   The stronger version of the argument does not even need the count to be
+   two. For a closed system with a time-independent $H$ and finitely many
+   levels, every amplitude is a finite sum $\sum_k a_k e^{-iE_kt/\hbar}$
+   of pure phases. A finite sum of phases cannot settle down: it is
+   quasi-periodic and returns arbitrarily close to its starting value,
+   again and again. Monotone approach to a limit is simply not among the
+   behaviours available. Here, with exactly two eigenvalues, the return is
+   not merely approximate but exactly periodic, which is the Rabi
+   oscillation the numerical curve shows.
+
+   The point that makes this worth understanding rather than reciting is
+   that real atoms *do* decay monotonically, and that is not a violation.
+   An excited atom in free space empties into a continuum of photon modes,
+   with infinitely many final states rather than one. Each individual mode
+   would still like to give the population back, but they return it at
+   incommensurate frequencies and the sum never reassembles, so the
+   recurrence time goes to infinity and exponential decay is the correct
+   description. This is where Fermi's golden rule comes from: a constant
+   transition *rate*, linear rather than oscillating growth, obtained by
+   summing this same $\sin^2$ formula over a dense band of final states.
+
+   So the correct statement is that irreversibility comes from the size of
+   the final-state space, never from the dynamics being non-unitary. Two
+   levels oscillate. A continuum decays. Both evolve unitarily.
+
+   </details>
+
 4. Why does this lesson use direct Runge-Kutta integration as the
    "exact" check, rather than another perturbative formula at a higher
    order?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a check has to be able to fail independently, and a
+   higher-order term in the same series cannot. It shares the assumption
+   under test.
+
+   The whole question is whether treating $V$ as small is legitimate at
+   $V=0.5$. Second order is still an expansion in $V$, still built from
+   the same starting point, and still inherits whatever goes wrong when
+   the expansion parameter stops being small. It would give a different
+   number, and no way to tell whether the difference was progress. Worse,
+   the perturbation series is generally asymptotic rather than convergent,
+   so past a certain order the terms start growing again and "higher
+   order" is not reliably "more accurate."
+
+   Runge-Kutta assumes nothing about $V$. It integrates
+   $i\hbar\dot{\vec c}=H\vec c$ as written, and its error comes from a
+   completely different source: the finite step size, which can be shrunk
+   until the answer stops moving, with no reference to how large $V$ is.
+   Two methods whose errors have unrelated causes can disagree
+   informatively. Two methods sharing an error source can only agree
+   uninformatively.
+
+   The choice is affordable here for a specific reason worth noticing.
+   The system is two-dimensional, so "just solve it" costs almost nothing.
+   That is exactly the situation where a validity check should be built,
+   and it is why this lesson's example is a system nobody needs
+   perturbation theory for: calibrating a tool against a known answer
+   requires a known answer. The finding then transfers to the systems
+   where the exact route is unavailable and the first-order formula is all
+   there is.
+
+   As a further check, this particular problem also has a closed-form
+   solution, the Rabi formula with its $4V^2/(\omega_{fi}^2+4V^2)$ ceiling,
+   so the numerical integration is itself verifiable rather than being
+   trusted on reputation.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -242,11 +406,11 @@ approximation has broken down, not a real prediction.
   exact for weak coupling, badly wrong (off by a factor of $\sim2.7$ in
   this course's worked example) for strong coupling and long times.
 - A perturbative ceiling above $P=1$ is the formula flagging its own
-  failure, which makes it a usable diagnostic rather than a hidden trap.
+  failure, which makes it a usable diagnostic instead of a hidden trap.
 - First order is reliable until the exact solution reaches its first
   turning point, and that arrives sooner as the coupling grows.
 
-## Further Exploration
+## A different kind of complication entirely
 
 <NextDiscovery>
 This closes **Approximation Methods**. The next course, **Identical

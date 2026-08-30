@@ -2,11 +2,11 @@ import type { ComponentType, SVGProps } from "react";
 import type { CurrentQuantumCategory } from "@/lib/content/currentQuantum/types";
 
 /**
- * One small line glyph per Current Quantum category — the non-color-only
+ * One small line glyph per Current Quantum category, the non-color-only
  * half of the category signal (pillar tint carries the curriculum-area
  * color; these carry the *kind of result*, and always render next to the
- * category's text label, never alone). Generic, schematic shapes — a
- * circuit graph, a shield, a beaker — not literal illustrations of any real
+ * category's text label, never alone). Generic, schematic shapes, a
+ * circuit graph, a shield, a beaker, not literal illustrations of any real
  * apparatus, so there's no factual claim for them to get wrong.
  *
  * All props forward to the root `<svg>`, so a call site sets

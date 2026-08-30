@@ -28,7 +28,7 @@ export const verifyLxLyCommutatorSign: MultipleChoiceProblem = {
     optionFeedback: {
       b: "This ignores the antisymmetry every commutator has: [A,B]=−[B,A] always.",
       c: "Swapping the operators in a commutator doesn't change which operator appears on the right-hand side, only the overall sign.",
-      d: "Lx and Ly don't commute — that's the entire content of this lesson.",
+      d: "Lx and Ly do not commute. That is the entire content of this lesson.",
     },
     defaultIncorrectFeedback: "Recall the general commutator identity [A,B]=−[B,A].",
   },

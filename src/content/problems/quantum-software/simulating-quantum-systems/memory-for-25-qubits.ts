@@ -40,8 +40,8 @@ export const memoryFor25Qubits: NumericProblem = {
     finalAnswer: "536,870,912 bytes (≈512 MB)",
   },
   explanation: {
-    correctIdea: "This sits comfortably within the lesson's 'runs on a laptop' range (20 qubits) and well below the 'needs a cluster' 30-qubit mark — a good illustration of the exponential growth's specific location.",
-    whyCorrect: "Matches stateVectorMemoryBytes(25) computed directly from the engine.",
+    correctIdea: "This sits comfortably within the lesson's 'runs on a laptop' range at 20 qubits, and well below the 'needs a cluster' 30-qubit mark, which illustrates where the exponential growth actually bites.",
+    whyCorrect: "Each of the 2²⁵ amplitudes is a complex double, so 16 bytes apiece: 16 × 33,554,432 = 536,870,912. The doubling per qubit is the whole story, which is why 25 qubits fits in half a gigabyte and 45 would not fit at all. stateVectorMemoryBytes(25) agrees.",
     whyWrong: ["Forgetting the factor of 16 bytes per amplitude (using just 2^25 as the answer) would understate the true memory requirement by 16×."],
   },
 };

@@ -48,11 +48,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The measure already in the codebase">
 A function in this platform's code already computes an entanglement measure. It was written long before this lesson, for what looks like an unrelated purpose. Finding it, and proving why it works, is the subject here.
 </LessonHook>
 
-## Motivation
+## An eigenvalue calculation, and an alternative to it
 
 Entanglement entropy needed an eigenvalue calculation. That is a small
 computation for a $2\times2$ reduced state, but it is a different kind of
@@ -75,7 +75,7 @@ well-posed question rather than an artifact of one definition.
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## A determinant of amplitudes, and what it equals
 
 ### The formula, and where it already lives
 
@@ -86,9 +86,10 @@ $$
 C(|\psi\rangle) = 2|ad-bc|
 $$
 
-Quantum Gates & Circuits' `testSeparability` already computes
+`testSeparability` already computes
 `determinantMagnitude`$=|ad-bc|$ to test whether $|\psi\rangle$ factors
-into a product state: the *same* quantity, used there as a yes/no
+into a product state, which is the criterion Lesson 5 derived from
+coefficient matching: the *same* quantity, used there as a yes/no
 separability test. Concurrence is nothing more than twice that same
 number, kept as a graded quantity instead of thresholded into a boolean.
 `concurrenceOfPureState` in `entanglement.ts` is a two-line function that
@@ -122,7 +123,7 @@ from the reduced density matrix's trace, and the right bar from plugging
 that same trace into the identity's right-hand side, with no reference to
 $C$ anywhere. Watch the right bar track the left one as $\theta$ sweeps.
 
-<InteractiveSection title="The identity, checked at every θ" description="Step θ from 0 to 90°. C(θ) (left bar) is computed directly from the amplitudes; √(2(1−Tr(ρ_A²))) (right bar) is computed from the reduced state's purity with no reference to C. They match at every step, confirming the boxed identity rather than just asserting it.">
+<InteractiveSection title="The identity, checked at every θ" description="Step θ from 0 to 90°. C(θ) (left bar) is computed directly from the amplitudes; √(2(1−Tr(ρ_A²))) (right bar) is computed from the reduced state's purity with no reference to C. Step across the full range and compare the two bars at each θ. The boxed identity above claims something specific about that comparison, and this is where the claim gets tested rather than asserted.">
   <BarChartExplorer
     frames={concurrenceIdentityFrames}
     sliderLabel="θ"
@@ -138,27 +139,28 @@ normalized state allows, matching Lesson 5's proof that $|ad-bc|\leq0.5$).
 For $|\psi(\theta)\rangle=\cos\theta|00\rangle+\sin\theta|11\rangle$
 ($b=c=0$): $C(\theta)=2|\cos\theta\sin\theta|=|\sin2\theta|$, computed
 directly and checked against the engine for several values of $\theta$,
-including the general formula, not just the endpoints.
+including the general formula that covers everything between the endpoints.
 
-### Concurrence vs. entanglement entropy: related, not identical
+### Concurrence set against entanglement entropy
 
 Both $C(\theta)=|\sin2\theta|$ and $E(\theta)$ (Lesson 7's entanglement
 entropy for the same family) are 0 at $\theta=0$ and reach their maximum
 at $\theta=\pi/4$, and both are verified to be zero or nonzero together
 for every state tested. $C$ is built from amplitudes with no logarithm
 anywhere; $E$ is a Shannon entropy, built from $\cos^2\theta,\sin^2\theta$
-through $-p\log_2p$ terms. Before plotting them together, predict
-whether that shared structure makes them the same function.
+through $-p\log_2p$ terms. Two different functions, then, sharing two
+fixed points. The interesting question is how they leave those points.
 
 <PredictBeforeReveal
-  question="C(θ) and E(θ) are both 0 at θ=0 and both maximal at θ=π/4. Does that mean C(θ)=E(θ) for every θ in between?"
+  question="Near θ=0, where |ψ(θ)⟩ is barely entangled, one of C(θ) and E(θ) climbs away from zero much faster than the other. Which, and why?"
   options={[
-    { label: "Yes: two names for the same quantity", value: "same" },
-    { label: "No: they agree on the endpoints and on ordering, but differ in between", value: "different" },
-    { label: "No: they can even disagree on which states are entangled", value: "disagree" },
+    { label: "C rises faster: it grows like 2θ, while E's slope at θ=0 is zero", value: "c-faster" },
+    { label: "E rises faster, because entropy involves a logarithm and logarithms change fastest near zero", value: "e-faster" },
+    { label: "They rise at the same rate, since both are pinned to 0 at θ=0 and to their maximum at θ=π/4", value: "same-rate" },
+    { label: "Neither rises appreciably near θ=0; the two separate only close to the peak", value: "neither" },
   ]}
-  correctValue="different"
-  explanation="C(θ)=|sin2θ| is built from a sine; E(θ) is a Shannon entropy built from a logarithm. Plotted below, both curves start at 0 and peak at θ=π/4, but C climbs faster near the endpoints, because E's slope vanishes at θ=0 and it stays flatter until it catches up near π/4. They never disagree about which states are entangled, or about which of two states is more entangled. They are two independent cross-checking measures, not duplicates."
+  correctValue="c-faster"
+  explanation="C(θ)=sin2θ has derivative 2cos2θ, which is 2 at θ=0: a straight climb from the very first increment of entanglement. E(θ) has derivative −sin2θ·log₂(tan²θ), and although the logarithm does diverge, sin2θ goes to zero faster, so the product goes to zero: E leaves the origin flat and only catches up near π/4. Concretely, at θ=0.3 concurrence is already 0.565 while the entropy is 0.428. The logarithm intuition points the right way about E's shape and the wrong way about its slope."
 />
 
 They agree on *which* states are entangled, and on the direction of
@@ -184,12 +186,16 @@ not just asserted:
       ]
     }
   ]}
+  xAxisLabel="theta (radians)"
+  yAxisLabel="Concurrence C, and entropy E in bits"
   ariaLabel="Concurrence and entanglement entropy plotted together as functions of theta from 0 to pi/2"
 />
 
 Both curves start at 0, both reach their maximum at $\theta=\pi/4$, and
-both vanish only at $\theta=0$, which is the agreement predicted above.
-Between the endpoints they separate. $C(\theta)$, built from a sine, rises
+both come back to 0 together at $\theta=\pi/2$, where the state is the
+product state $|11\rangle$ again. They vanish at exactly the same two
+values of $\theta$ and nowhere else, which is the agreement predicted
+above. Between those points they separate. $C(\theta)$, built from a sine, rises
 faster near $\theta=0$ than $E(\theta)$, built from a logarithm, because
 $E$'s slope vanishes there and it stays flat before catching up. Two
 different functions, agreeing on the two things this course needs: zero
@@ -208,7 +214,7 @@ $2\times2$-Hermitian-only eigensolver cannot handle and does not attempt.
 drop-in replacement for the general formula, and this course does not
 claim it is.
 
-## Physical Interpretation
+## Two roads to a consistent verdict
 
 Two structurally different roads, diagonalizing a <Term id="partial-trace">reduced density
 matrix</Term> or evaluating a determinant of amplitudes, arrive at consistent
@@ -223,7 +229,7 @@ state" is a well-posed physical question with an answer robust to which
 valid measure you use to ask it, at least for the pure 2-qubit states
 this course covers.
 
-## Worked Example
+## The same concurrence, computed two ways
 
 **Compute the concurrence of $|\psi(0.3)\rangle=\cos(0.3)|00\rangle+\sin(0.3)|11\rangle$
 two ways: directly from the determinant, and from the $|\sin2\theta|$
@@ -238,7 +244,7 @@ one. $\theta=0.3$ sits well left of the peak on the curve plotted
 earlier, consistent with both derivations landing on a value clearly
 below concurrence's maximum of 1.
 
-## Common Mistakes
+## This formula has no mixed-state input
 
 <Callout type="warning">
 **Using $C=2|ad-bc|$ on a mixed 2-qubit density matrix.** This formula
@@ -259,25 +265,188 @@ formula) comes out to a different number.
 ## Practice Questions
 
 1. Compute the concurrence of $|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$
-   directly from $a,b,c,d$.
+   directly from $a,b,c,d$. Then say what $C$ would be if that minus sign
+   were a plus, and what the comparison tells you about which features of
+   the amplitudes concurrence responds to.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Read off $a=0$, $b=\tfrac{1}{\sqrt2}$, $c=-\tfrac{1}{\sqrt2}$, $d=0$:
+
+   $$
+   C = 2|ad-bc| = 2\left|0 - \left(\tfrac{1}{\sqrt2}\right)\left(-\tfrac{1}{\sqrt2}\right)\right| = 2\left(\tfrac12\right) = 1
+   $$
+
+   Maximal, and `concurrenceOfPureState` returns $1.0000000000000002$.
+
+   With a plus sign, $|\Psi^+\rangle$ has $b=c=\tfrac{1}{\sqrt2}$ and
+   $ad-bc = -\tfrac12$, whose magnitude is again $\tfrac12$, so $C=1$
+   unchanged. Both are maximally entangled, and so are $|\Phi^\pm\rangle$
+   by the same arithmetic with the roles of the diagonals exchanged.
+
+   The comparison isolates what $C$ can and cannot see. It responds only to
+   the *magnitude* of a single determinant built from the four amplitudes,
+   so any change that leaves $|ad-bc|$ alone is invisible to it: the sign
+   here, and more generally any relative phase, since multiplying $b$ by
+   $e^{i\varphi}$ multiplies $ad-bc$'s components without changing the
+   magnitude in the two-term case. That is the right behaviour, because the
+   four Bell states are interconvertible by single-qubit gates and
+   single-qubit gates cannot change how entangled a pair is. A measure that
+   scored $|\Psi^+\rangle$ and $|\Psi^-\rangle$ differently would be
+   measuring the wrong thing.
+
+   What $C$ does see is the balance between the two diagonals of the
+   amplitude array. Change $b$ to $0.9$ and $c$ to $-\sqrt{0.19}$ and the
+   determinant magnitude falls to $0.392$, giving $C=0.785$.
+
+   The wrong turn is placing $|\Psi^-\rangle$'s amplitudes in the $a,d$
+   slots because the state looks symmetric. The slot order is
+   $|00\rangle,|01\rangle,|10\rangle,|11\rangle$, and this state occupies
+   the middle two. Here the mistake happens to give the same magnitude,
+   which is exactly why it survives to bite on a state like
+   $\tfrac{1}{\sqrt2}(|00\rangle+|01\rangle)$, where the correct answer is
+   $C=0$ and the swapped one is not.
+
+   </details>
+
 2. Using the exact relationship derived above, find $\text{Tr}(\rho_A^2)$
    for a state with concurrence $C=0.6$, without computing the reduced
-   density matrix directly.
+   density matrix directly. Then run the relation the other way: what
+   concurrence corresponds to a reduced purity of $0.9$, and is that state
+   more or less entangled than the $C=0.6$ one?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The identity is $1-\text{Tr}(\rho_A^2)=C^2/2$, so
+
+   $$
+   \text{Tr}(\rho_A^2) = 1 - \frac{0.6^2}{2} = 1 - 0.18 = 0.82 .
+   $$
+
+   Comfortably between the pure-state value $1$ and the Bell-state floor
+   $0.5$: partially entangled, and correspondingly partially mixed.
+
+   Inverting, $C = \sqrt{2\left(1-\text{Tr}(\rho_A^2)\right)}$, so purity
+   $0.9$ gives $C = \sqrt{0.2} \approx 0.447$. Less entangled than the
+   $C=0.6$ state, and consistently so: higher purity means a reduced state
+   closer to pure, which means less has been lost to the correlation.
+
+   The pairing is worth reading as a single dial. As entanglement runs from
+   none to maximal, $C$ climbs $0 \to 1$ while purity falls $1 \to 0.5$,
+   and the identity pins them to each other exactly, with no state
+   anywhere in between escaping the relation. So for a two-qubit pure
+   state, "how entangled" and "how mixed is either half" are one quantity
+   with two names, and which one to compute is purely a matter of
+   convenience: $C$ from four amplitudes with no diagonalization, purity
+   from a partial trace and a matrix square.
+
+   The wrong turn is dropping the factor of $2$ and writing
+   $\text{Tr}(\rho_A^2) = 1-C^2 = 0.64$. That value is below the $0.5$ floor
+   as soon as $C$ passes $\tfrac{1}{\sqrt2}$, which is the fastest way to
+   notice the error: any formula that lets a single qubit's purity fall
+   under $0.5$ has a coefficient wrong. Checking the endpoint $C=1$ against
+   the known Bell answer $0.5$ pins the factor without re-deriving
+   anything.
+
+   </details>
+
 3. Compute $E(0.3)$ (entanglement entropy, from Lesson 7's formula, using
-   $\cos^2(0.3)\approx0.9126,\sin^2(0.3)\approx0.0874$) and compare it
+   $\cos^2(0.3)\approx0.9127,\sin^2(0.3)\approx0.0873$) and compare it
    numerically to $C(0.3)\approx0.5646$ from the worked example, confirming
    they're close but not equal.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The reduced state is $\mathrm{diag}(0.9127, 0.0873)$, already diagonal,
+   so its entropy is the Shannon entropy of that pair:
+
+   $$
+   E(0.3) = -0.9127\log_2 0.9127 - 0.0873\log_2 0.0873 = 0.1203 + 0.3072 = 0.4275 \text{ bits}
+   $$
+
+   The engine returns $0.4275017710560216$ for $E$ and
+   $0.5646424733950353$ for $C$, the latter matching $\sin(0.6)$ to the
+   last digit, as $C(\theta)=|\sin 2\theta|$ predicts.
+
+   Close, and not equal, and the gap is the interesting part. Both are $0$
+   at $\theta=0$ and both reach their maximum of $1$ at $\theta=\pi/4$, so
+   they agree at the endpoints and are forced to agree on the *ordering* of
+   states in this family: whenever one says a state is more entangled, so
+   does the other. They disagree on the scale in between, because $C$ is
+   built from amplitudes and $E$ from a logarithm of probabilities, and no
+   change of units turns one into the other.
+
+   Near $\theta=0$ they separate fastest. $C \approx 2\theta$ climbs with
+   slope $2$, while $E$ leaves the origin with zero slope, since its
+   leading behaviour is $\varepsilon\log_2(1/\varepsilon)$ in the small
+   weight $\varepsilon=\sin^2\theta \approx \theta^2$. At $\theta=0.3$ that
+   already shows: $C$ has covered $56\%$ of its range and $E$ only $43\%$.
+
+   Neither is wrong, and that is the honest conclusion. "How entangled is
+   this state" has a well-posed *ordering* but no unique numerical scale,
+   the way temperature has a well-posed ordering readable in Celsius or
+   Fahrenheit. $E$ is the one to quote when the answer must be in bits and
+   comparable to a channel capacity; $C$ is the one to compute when you
+   have amplitudes and no eigensolver. The wrong turn is treating a
+   disagreement between them as evidence that one is miscalibrated.
+
+   </details>
+
 4. Explain, using this lesson's exact identity, why $C=1$ forces
    $\text{Tr}(\rho_A^2)=0.5$ exactly, i.e., why maximal concurrence
-   necessarily means a maximally mixed reduced state, not just a "very
-   mixed" one.
+   necessarily means an exactly maximally mixed reduced state, rather
+   than merely a "very mixed" one. Then state the matching claim for
+   entanglement entropy.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The identity is an equation, not an inequality, so substituting
+   $C=1$ leaves nothing to estimate:
+
+   $$
+   1 - \text{Tr}(\rho_A^2) = \frac{C^2}{2} = \frac12 \quad\Longrightarrow\quad \text{Tr}(\rho_A^2) = 0.5
+   $$
+
+   Exactly $0.5$, for every state with $C=1$, with no family of nearly
+   maximal states sitting just above it. And $0.5$ is the minimum a single
+   qubit's purity can reach, so the reduced state is not merely very mixed
+   but at the floor, which for a $2\times2$ density matrix means
+   eigenvalues $(\tfrac12,\tfrac12)$ and therefore $\rho_A = I/2$ exactly:
+   the maximally mixed state, with no freedom left in it.
+
+   The matching claim for entropy follows immediately, since the
+   eigenvalues are now pinned: $E = -2\left(\tfrac12\log_2\tfrac12\right) = 1$
+   bit, again exactly, and again the maximum a qubit's entropy can take.
+   So the three statements "$C=1$", "$\rho_A=I/2$" and "$E=1$ bit" are
+   equivalent for a two-qubit pure state, each forcing the other two.
+
+   Why the exactness is worth insisting on: it is what makes "maximally
+   entangled" a sharp class rather than a vague region. Any state achieving
+   $C=1$ has both halves in precisely $I/2$, which is what teleportation
+   and superdense coding need, and it is why those protocols are exact
+   rather than approximate. Drop $C$ to $0.99$ and the purity is $0.51$,
+   close but no longer the floor, and the protocols degrade measurably.
+
+   The wrong turn is arguing from an inequality: $C\leq1$ implies
+   $\text{Tr}(\rho_A^2)\geq0.5$, so $C=1$ makes the purity "as low as
+   possible", and inferring that it is near $0.5$ rather than equal to it.
+   The identity does the work an inequality cannot. It is also worth
+   noticing what the identity does *not* claim, namely anything at all
+   about a mixed global state, where $\rho_A=I/2$ is perfectly compatible
+   with zero entanglement, as the previous lesson's $I/4$ case shows.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
 - $C(|\psi\rangle)=2|ad-bc|$ is exactly twice the determinant magnitude
-  `testSeparability` already computes, a direct reuse, not a
+  `testSeparability` already computes: a direct reuse, with no
   reimplementation.
 - $C$ and reduced purity satisfy the exact identity
   $C=\sqrt{2(1-\text{Tr}(\rho_A^2))}$, tying the two measures together
@@ -289,7 +458,7 @@ formula) comes out to a different number.
   mixed-state Wootters concurrence needs non-Hermitian eigenvalues this
   platform does not compute.
 
-## Further Exploration
+## Two measures worth remembering together
 
 <NextDiscovery>
 The `testSeparability`/`concurrenceOfPureState` connection is a good

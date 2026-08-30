@@ -66,7 +66,7 @@ export const lessonMeta = {
 Can two people agree on a secret string of bits over a channel anyone might be listening to, in a way that makes listening detectable? BB84 says yes, and the reason is the no-cloning theorem.
 </LessonHook>
 
-## Motivation
+## What no-cloning forbids an eavesdropper
 
 The last lesson proved that an unknown qubit state cannot be copied, which
 reads like a mathematical curiosity until you notice what it forbids an
@@ -86,10 +86,10 @@ than described.
   caption="NIST's high-speed fiber-optic quantum key distribution hardware. It runs this lesson's protocol: bits encoded in conjugate bases and sent, one photon at a time, down an optical fiber."
   credit="NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:High-Speed_Quantum_Key_System_Wins_Research_Award_(5884514398).jpg"
-  license="Public Domain (U.S. Government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Intuition
+## Two conjugate bases, and no quiet copy
 
 A classical bit sent in the open can always be copied and read without
 leaving a trace. A qubit is different: it can be encoded in one of two
@@ -105,7 +105,7 @@ the bit values were. Wherever the bases matched, Bob's measurement recovered
 Alice's bit exactly; wherever they didn't, the result is discarded. What's
 left is a shared, secret string: the key.
 
-## Mathematical Development
+## Encode, measure, sift, and count the errors
 
 ### Encoding a bit in a basis
 
@@ -260,7 +260,7 @@ Eve switches on.
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## No entanglement anywhere in this protocol
 
 Nothing about BB84 requires entanglement or anything exotic. Every qubit
 Alice sends is in a definite, unentangled state, and the security comes
@@ -276,7 +276,7 @@ Alice and Bob use. Because copying is impossible, she has to gamble on a
 basis for the one real qubit in transit, and gambling wrong is what makes
 her visible.
 
-## Worked Example
+## One bit, one basis match, one eavesdropper
 
 **Alice sends the bit $0$ in the X basis. Bob measures in the X basis (a
 basis match). Verify Bob recovers bit $0$ with certainty, then check what
@@ -307,7 +307,7 @@ rather than averaged).
   </DerivationStep>
 </DerivationSteps>
 
-## Common Mistakes
+## BB84 needs no entangled pairs
 
 <Callout type="warning">
 **"BB84 requires entanglement."** It doesn't. Every qubit Alice sends is a
@@ -334,19 +334,222 @@ detectable disturbance.
 ## Practice Questions
 
 1. Alice encodes bit $0$ in the Z basis. Using the same method as the
-   Worked Example, compute Bob's measurement probabilities for each of the
-   four choices of his basis, and identify which ones are the matching
-   case.
+   single-bit walkthrough above, compute Bob's measurement probabilities
+   for each of his two possible bases, and identify which one is the
+   matching case.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Alice's state is $\text{Z-basis encode}(0) = |0\rangle$.
+
+   Bob measuring in Z reads the computational-basis probabilities directly:
+   $[1, 0]$. He gets $0$ with certainty, so Z is the matching case.
+
+   Bob measuring in X applies $H$ first, giving $H|0\rangle = |+\rangle$,
+   whose computational-basis probabilities are $[\tfrac12, \tfrac12]$. A
+   fair coin, carrying nothing about Alice's bit. The engine returns
+   exactly these two distributions.
+
+   The structure is the same on every one of the four preparations, and it
+   is worth stating in the general form. Matching bases are certain because
+   Bob's basis change is literally the inverse of Alice's encoding gate:
+   $H$ applied and then $H$ applied again is $H^2 = I$, so nothing happened
+   at all. Mismatched bases are exactly $50/50$ because $|\langle 0|+\rangle|^2 = |\langle 1|+\rangle|^2 = \tfrac12$,
+   which is what makes Z and X *conjugate* bases: every state of one is
+   maximally undecided in the other. Neither result is a near-miss that
+   better hardware could improve.
+
+   The wrong turn is reporting the mismatched case as "Bob usually gets 0,
+   since Alice sent 0". There is no residual bias. All of the information
+   is gone, not most of it, and that total loss is what the protocol is
+   built on: it means announcing bases in public is safe, and it means Eve
+   in the wrong basis learns exactly nothing.
+
+   </details>
+
 2. Suppose Eve always guesses the Z basis (never randomizes). For a key
    where Alice picks her own basis uniformly at random, what fraction of
-   *all* qubits (not just the sifted ones) does Eve guess correctly? Does
-   this change the $25\%$ sifted-key error rate derived above?
-3. Why does comparing a random public sample of the sifted key (and
-   discarding it afterward) work to detect eavesdropping, rather than
-   Alice and Bob needing to inspect the entire key?
-4. The basis-combination sweep shows $50/50$ for both mismatch cases.
-   Explain why that is also Eve's own measurement distribution when she
-   guesses the wrong basis, and why the two are the same calculation.
+   *all* qubits does Eve guess correctly? Does this change the $25\%$
+   sifted-key error rate derived above? Then say *where in the key* the
+   errors now sit, and how Alice and Bob could use that pattern to tell
+   this Eve from the randomizing one.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Eve guesses correctly on exactly half of all qubits: her basis is always
+   Z, Alice's is Z half the time, so they match with probability
+   $\tfrac12$, the same fraction a randomizing Eve gets.
+
+   The sifted-key error rate is also unchanged, at $25\%$, but it is now
+   built out of two very different halves. Split the sifted key by which
+   basis Alice used.
+
+   On Z positions, Eve measures in the basis Alice actually prepared in, so
+   she reads the bit without disturbing the state and resends an identical
+   qubit. Bob, also in Z, recovers Alice's bit with certainty. Error rate
+   $0\%$, and Eve knows those bits perfectly.
+
+   On X positions, Alice sent $|+\rangle$ or $|-\rangle$ and Eve measures
+   in Z, collapsing to $|0\rangle$ or $|1\rangle$ at $50/50$ and resending
+   that. Bob applies $H$ and gets $H|0\rangle = |+\rangle$ or
+   $H|1\rangle = |-\rangle$, either of which is $50/50$ in his readout, so
+   he disagrees with Alice half the time. Error rate $50\%$, and Eve learns
+   nothing about those bits.
+
+   Alice's basis is uniform, and sifting does not bias it, so the sifted
+   key is half of each:
+
+   $$
+   \tfrac12 \times 0 + \tfrac12 \times \tfrac12 = \tfrac14 = 25\%.
+   $$
+
+   Identical to the randomizing attack, engine confirmed. Eve's information
+   is identical too: half the sifted bits known exactly and half unknown,
+   which is $\tfrac12$ a bit per sifted bit either way. So this strategy
+   buys her nothing.
+
+   What it costs her is stealth, and that is the part the averaged number
+   hides. The errors are no longer scattered uniformly; they are perfectly
+   sorted by Alice's basis. If Alice and Bob bin their public sample by the
+   basis they announced anyway and count separately, a randomizing Eve
+   shows roughly $25\%$ in both bins, while this Eve shows about $0\%$ in
+   the Z bin and about $50\%$ in the X bin. Same headline number,
+   completely different fingerprint, and the bins cost nothing to compute
+   since the bases are already public.
+
+   The wrong turn is concluding that committing to one basis must be
+   better, because "at least she is right half the time for sure" instead
+   of gambling. The gamble was never the problem. The quantity that
+   matters is the probability her measurement leaves the qubit in a state
+   Bob will misread, and averaging $0\%$ and $50\%$ lands in exactly the
+   same place as $25\%$ everywhere. Removing the randomness only removed
+   the camouflage.
+
+   </details>
+
+3. Alice and Bob sacrifice a random sample of $m$ bits from their sifted
+   key and find zero disagreements. If Eve had in fact been running the
+   full intercept-resend attack, what is the probability they would see
+   that? How large must $m$ be to push it below one in a million, and why
+   does the sample have to be chosen at random and then discarded?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Each sampled bit independently disagrees with probability $\tfrac14$
+   under the attack, so it agrees with probability $\tfrac34$, and a clean
+   sample of $m$ bits has probability
+
+   $$
+   \left(\tfrac34\right)^{m}.
+   $$
+
+   That falls off geometrically: about $5.6\%$ at $m = 10$, $3.2\times10^{-3}$
+   at $m = 20$, $1.0\times10^{-5}$ at $m = 40$. Solving
+   $(3/4)^m < 10^{-6}$ gives $m > \log(10^{-6})/\log(3/4) \approx 48.02$, so
+   $m = 49$ suffices, where the value is $7.6\times10^{-7}$. Forty-eight
+   bits is just short, at $1.007\times10^{-6}$.
+
+   Fifty sacrificed bits is nothing. That is the practical point: detection
+   confidence grows exponentially in the sample size while the cost grows
+   linearly, so a key of ten thousand sifted bits can buy near-certainty
+   against a full intercept-resend attack for half a percent of its length.
+
+   The sample has to be random because Eve chooses which qubits to attack.
+   If Alice and Bob always compared, say, the first hundred sifted
+   positions, Eve would pass those through untouched and attack the rest,
+   and the test would certify a key she holds half of. Randomizing the
+   sample after the fact means any attack on a fraction $f$ of the qubits
+   is caught with probability $1 - (1 - f/4)^m$, and Eve has no way to
+   arrange to be in the unsampled part.
+
+   The sample has to be discarded because comparing it made it public.
+   Announcing those bit values over the classical channel hands them to
+   anyone listening, so they can no longer be key. Keeping them would be
+   the one flaw large enough to defeat everything else in the protocol.
+
+   Two wrong turns are worth naming. The first is treating a clean sample
+   as proof of no eavesdropping. It is a bound on the probability of having
+   been fooled, not a certificate, which is why the size of $m$ has to be
+   chosen against the confidence you want. The second is expecting an
+   honest channel to give exactly $0\%$. Real hardware has loss and noise,
+   so practical QKD sets a threshold error rate and runs privacy
+   amplification below it, rather than aborting on a single disagreement.
+   The derivation here is the idealized case that sets where that threshold
+   can sit.
+
+   </details>
+
+4. Eve tries a third strategy. Instead of choosing Z or X, she measures
+   every qubit in the *Breidbart basis*, the one exactly halfway between
+   them, spanned by $\cos\frac{\pi}{8}|0\rangle+\sin\frac{\pi}{8}|1\rangle$
+   and $-\sin\frac{\pi}{8}|0\rangle+\cos\frac{\pi}{8}|1\rangle$, and
+   resends whichever of those two she collapsed onto. Find the error rate
+   she causes on the sifted key and the probability her own outcome
+   matches Alice's bit, and compare both with the random-basis attack.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The error rate is $25\%$, exactly the same as the random-basis attack,
+   but Eve's own guess is right $\cos^2\frac{\pi}{8} \approx 85.4\%$ of the
+   time instead of $75\%$. Same disturbance, better per-bit accuracy, and
+   the last paragraph of this answer explains why "better" is not the same
+   as "more information".
+
+   Take Alice sending bit $0$ in the Z basis, so $|0\rangle$, with Bob in
+   the matching Z basis. Write $b_0$ and $b_1$ for Eve's two basis states.
+   Her outcome probabilities are the overlaps
+   $|\langle b_0|0\rangle|^2 = \cos^2\frac{\pi}{8} \approx 0.8536$ and
+   $|\langle b_1|0\rangle|^2 = \sin^2\frac{\pi}{8} \approx 0.1464$.
+   Whichever she gets, she resends that state, and Bob then measures it in
+   Z. From $b_0$ he misreads with probability
+   $\sin^2\frac{\pi}{8}$; from $b_1$ he misreads with probability
+   $\cos^2\frac{\pi}{8}$. So
+
+   $$
+   P(\text{error}) = 2\cos^2\tfrac{\pi}{8}\sin^2\tfrac{\pi}{8} = \tfrac12\sin^2\tfrac{\pi}{4} = \tfrac14 .
+   $$
+
+   The engine runs this for all four of Alice's preparations and returns
+   $0.25$ every time, along with $0.8536$ for Eve's guess. The symmetry is
+   the reason: the Breidbart basis sits at the same angle from Z as from X,
+   so it treats all four preparations identically, which is also why Eve
+   has no basis choice left to get wrong.
+
+   Compare the random-basis attack. There Eve is right with certainty on
+   the half where she guessed Alice's basis and at chance on the other
+   half, so $\tfrac12 \times 1 + \tfrac12 \times \tfrac12 = 75\%$. The
+   headline lesson is that the $25\%$ figure is not the signature of one
+   naive attack. Two quite different intercept-resend strategies pay
+   exactly the same price, and Eve cannot buy her way under it by being
+   cleverer about her basis.
+
+   The wrong turn is expecting the halfway basis to be a compromise that
+   halves the damage, on the reasoning that it is "half right" on every
+   qubit rather than fully wrong on half of them. Disturbance does not
+   average that way. What decides it is the overlap between Bob's basis and
+   whatever Eve resent, and Eve's resent state is always tilted $\pi/8$
+   away from what Alice prepared, which costs the same $25\%$ in
+   expectation as being at $\pi/2$ half the time.
+
+   One further subtlety is worth the extra minute, because $85.4\%$ against
+   $75\%$ makes the Breidbart attack look like a free upgrade and it is
+   not. Higher guess accuracy is not the same as more information. Eve's
+   knowledge of a sifted bit is a binary symmetric channel, and its
+   capacity is $1 - H(p)$ where $H$ is the binary entropy and $p$ the error
+   rate. Breidbart gives $1 - H(0.1464) = 1 - 0.601 = 0.399$ bits per
+   sifted bit. The random-basis attack gives certainty on half the bits and
+   nothing on the other half, which is $\tfrac12 \times 1 + \tfrac12 \times 0 = 0.5$
+   bits. So the strategy with the better hit rate carries *less* usable
+   information, because a uniform small edge on every bit is worth less
+   than perfect knowledge of half of them. Which strategy Eve should prefer
+   depends on what she plans to do next, and that is a real question in
+   QKD security proofs rather than a quibble.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -364,7 +567,7 @@ detectable disturbance.
   must guess a basis; guessing wrong introduces a $25\%$ error rate on the
   sifted key, detectable by sacrificing and comparing a public sample.
 
-## Further Exploration
+## The same pieces, used the other way round
 
 <NextDiscovery>
 A related application built from the very same toolkit, a shared Bell

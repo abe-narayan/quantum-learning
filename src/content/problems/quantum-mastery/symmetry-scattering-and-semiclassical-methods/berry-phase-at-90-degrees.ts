@@ -42,6 +42,6 @@ export const berryPhaseAt90Degrees: NumericProblem = {
   },
   explanation: {
     correctIdea: "θ=90° is exactly the hemisphere case: the loop encloses half the sphere of field directions, and the Berry phase is minus half of that hemisphere's solid angle.",
-    whyCorrect: "Matches the lesson's own numeric loop-integral computation at θ=90°, one of the seven angles plotted directly against this closed form.",
+    whyCorrect: "The phase is minus half the solid angle the field direction encloses. An equatorial sweep encloses a hemisphere, 2π steradians, so γ = −π. The lesson's numerical loop integral lands on the same value at this angle, which is what makes the closed form trustworthy.",
   },
 };

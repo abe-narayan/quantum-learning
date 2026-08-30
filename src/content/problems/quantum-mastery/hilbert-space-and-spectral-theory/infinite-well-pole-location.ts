@@ -26,7 +26,7 @@ export const infiniteWellPoleLocation: NumericProblem = {
     type: "numeric",
     value: firstPoleEnergy,
     tolerance: 0.01,
-    incorrectFeedback: "Use E=n²π²/(8a²) with n=1, a=1.5 — this is exactly the lesson's boxed pole condition sin(2ka)=0, i.e. 2ka=π for the first pole.",
+    incorrectFeedback: "Use E=n²π²/(8a²) with n=1, a=1.5. This is the lesson's boxed pole condition sin(2ka)=0, i.e. 2ka=π for the first pole.",
     nearMisses: [
       { value: Math.PI ** 2 / 72, tolerance: 0.005, feedback: "That substitutes the full width 2a = 3 where the formula wants the half-width a = 1.5." },
       { value: (4 * Math.PI ** 2) / 18, tolerance: 0.01, feedback: "That is the n = 2 pole. The question asks for the first one." },
@@ -45,14 +45,14 @@ export const infiniteWellPoleLocation: NumericProblem = {
         latex: "E = \\frac{1}{2}\\left(\\frac{\\pi}{3}\\right)^2 = \\frac{\\pi^2}{18} \\approx 0.5483",
       },
     ],
-    finalAnswer: "E ≈ 0.5483, matching infiniteSquareWellEnergyLevel(1, 3) exactly (full width 2a=3).",
+    finalAnswer: "E ≈ 0.5483, matching the n=1 level of an infinite well of full width 2a=3.",
   },
   explanation: {
     correctIdea:
-      "The Green's function's pole condition E=n²π²/(8a²) is exactly the already-known infinite-well energy formula, now reached from the resolvent's analytic structure instead of directly solving the Schrödinger equation.",
-    whyCorrect: "Directly verified against this platform's real infiniteSquareWellEnergyLevel(1, 2×1.5) function.",
+      "The Green's function's pole condition E=n²π²/(8a²) is the already-known infinite-well energy formula, now reached from the resolvent's analytic structure instead of by solving the Schrödinger equation directly.",
+    whyCorrect: "The pole energy matches the platform's own infinite-well energy-level computation at n=1 for full width 2a=3.",
     whyWrong: [
-      "Using the well's full width (2a=3) in place of the half-width a in the formula E=n²π²/(8a²) would give a different (wrong) energy — the boxed formula uses the half-width a specifically.",
+      "Using the well's full width (2a=3) in place of the half-width a in E=n²π²/(8a²) gives a different, wrong energy. The boxed formula uses the half-width a specifically.",
     ],
   },
 };

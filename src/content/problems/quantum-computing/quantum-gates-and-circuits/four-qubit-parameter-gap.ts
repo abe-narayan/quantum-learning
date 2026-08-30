@@ -55,7 +55,7 @@ export const fourQubitParameterGap: NumericProblem = {
       { description: "Product of 4 single-qubit states: 2 real parameters per factor.", latex: `4\\times2 = ${productStateParameters}` },
       { description: "The gap between them:", latex: `${generalStateParameters} - ${productStateParameters} = ${gap}` },
     ],
-    finalAnswer: `${gap} real parameters — states in this gap are exactly the entangled 4-qubit states.`,
+    finalAnswer: `${gap} real parameters. The states in this gap are the entangled 4-qubit states.`,
   },
   explanation: {
     correctIdea: "The gap between the general state space and the product-state subset grows with the number of qubits, showing entanglement becomes an even larger share of the full state space as systems get bigger.",

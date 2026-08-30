@@ -14,7 +14,7 @@ import {
  *
  *   1. It draws something (a silent no-op regime would ship unnoticed).
  *   2. It never emits a non-finite coordinate. NaN in a path is the classic
- *      canvas failure — it doesn't throw, it just makes the rest of the frame
+ *      canvas failure, it doesn't throw, it just makes the rest of the frame
  *      vanish, and it is exactly what a divide-by-zero at scroll extremes or
  *      a zero-size viewport would produce.
  *   3. It leaves `globalAlpha` as it found it. Every renderer composes with
@@ -26,7 +26,7 @@ import {
  *
  * On (4): the ceiling is imported from the module it governs rather than
  * restated here. It used to be a local `0.75`, which was loose enough to be
- * no rule at all — `drawState` painted its state vector at 0.7, which
+ * no rule at all, `drawState` painted its state vector at 0.7, which
  * composites to 5.09:1 over `--background` (body text is 4.5:1), through the
  * reading column, and this suite passed the whole time. See the comment on
  * `REGIME_ALPHA_CEILING` for where the number comes from.
@@ -51,7 +51,7 @@ function createRecorder(): Recorder {
 
   let globalAlpha = 1;
 
-  /** Draw calls — the ones whose output actually lands on the canvas, and so
+  /** Draw calls, the ones whose output actually lands on the canvas, and so
    *  the only ones at which the current `globalAlpha` matters. Sampling alpha
    *  on assignment instead would just record the value `withAlpha` restores
    *  to (1), which says nothing about how loud the frame is. */
@@ -192,7 +192,7 @@ describe("journey regime", () => {
     expect(atStart.calls).toBeGreaterThan(0);
     expect(atEnd.calls).toBeGreaterThan(0);
 
-    // Sampling across the range must never produce a blank frame — a gap in
+    // Sampling across the range must never produce a blank frame, a gap in
     // the crossfade would read as the background switching off mid-scroll.
     for (let i = 0; i <= 20; i += 1) {
       const recorder = createRecorder();

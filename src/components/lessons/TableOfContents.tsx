@@ -182,7 +182,27 @@ export function TableOfContentsDesktop({ containerId }: { containerId: string })
   return (
     <nav
       aria-label="On this page"
-      className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto"
+      // `pl-1.5 pr-1 pb-1` is not rhythm, it is the focus ring's clearance, and
+      // it is the same remedy `GlossaryFilter`'s two scrolling A-Z rails already
+      // carry. `overflow-y: auto` computes `overflow-x` from `visible` to
+      // `auto`, so this nav clips at its padding box on *both* axes. The links
+      // below are `-ml-px` block-level flex items that fill the content box,
+      // and they take the sitewide `:focus-visible` outline, which paints 2px
+      // to 4px outside their border box: with no padding, the left and right
+      // edges of that ring were entirely outside the padding box, as was the
+      // bottom edge of the last link. Outlines contribute nothing to
+      // scrollable overflow, so there was nothing to scroll back to and the
+      // ring was simply gone on all 219 lesson pages. WCAG 2.4.7.
+      //
+      // The left edge needs 6px, not 4px, and the extra half-step is not
+      // slack: `-ml-px` puts a link's border box 1px to the LEFT of this
+      // nav's content box, and the outline reaches 4px beyond that, so the
+      // ring's outer edge sat at -5px against 4px of padding. Overflow to the
+      // start side is never scrollable, so that last 1px was clipped outright
+      // rather than pushed into a scroll range. 6px clears it with the
+      // `-ml-px` counted; 4px is exactly the ring's reach everywhere the
+      // content box is not shifted, which is the right and bottom edges here.
+      className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto lg:pr-1 lg:pb-1 lg:pl-1.5"
     >
       {/* An instrument readout, not a plain label: the section the reader is
           currently in relative to the total is visible at a glance, and the
@@ -190,7 +210,7 @@ export function TableOfContentsDesktop({ containerId }: { containerId: string })
           same identity as everything else PillarScope retints. */}
       <div className="flex items-baseline justify-between gap-3 border-b border-border pb-2">
         <TechLabel>On this page</TechLabel>
-        <span className="tech-value text-[0.65rem] text-subtle-foreground">{positionLabel}</span>
+        <span className="tech-value text-micro text-subtle-foreground">{positionLabel}</span>
       </div>
       <ul className="mt-3 space-y-1 border-l border-border text-sm">
         {entries.map((entry, index) => {
@@ -213,7 +233,7 @@ export function TableOfContentsDesktop({ containerId }: { containerId: string })
                 <span
                   aria-hidden="true"
                   data-decorative=""
-                  className="tech-value shrink-0 text-[0.65rem] text-subtle-foreground"
+                  className="tech-value shrink-0 text-micro text-subtle-foreground"
                 >
                   {String(index + 1).padStart(2, "0")}
                 </span>
@@ -280,12 +300,12 @@ export function TableOfContentsMobile({ containerId }: { containerId: string }) 
   return (
     <div
       ref={containerRef}
-      // `max-w-[46rem]`, the lesson page's reading measure, not `max-w-3xl`
+      // `max-w-reading`, the lesson page's reading measure, not `max-w-3xl`
       // (48rem): this sits directly between the pre-content stack and the
       // prose column, both of which are 46rem, so the extra 32px put the
       // contents toggle's right edge outside both of its neighbours at every
       // viewport between `sm` and `lg`. See LessonMetaStrip.tsx.
-      className="mt-8 max-w-[46rem] lg:hidden"
+      className="mt-8 max-w-reading lg:hidden"
       onBlur={(event) => {
         if (!containerRef.current?.contains(event.relatedTarget as Node | null)) {
           setIsOpen(false);
@@ -318,7 +338,7 @@ export function TableOfContentsMobile({ containerId }: { containerId: string }) 
           <span className="tech-label text-subtle-foreground">
             {activeIndex >= 0 ? `Section ${activeIndex + 1} of ${entries.length}` : "Contents"}
           </span>
-          <span className="mt-0.5 truncate font-medium text-foreground">{currentLabel}</span>
+          <span className="mt-1 truncate font-medium text-foreground">{currentLabel}</span>
         </span>
         <svg
           aria-hidden="true"
@@ -350,7 +370,7 @@ export function TableOfContentsMobile({ containerId }: { containerId: string }) 
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <span aria-hidden="true" data-decorative="" className="tech-value text-[0.65rem] text-subtle-foreground">
+                <span aria-hidden="true" data-decorative="" className="tech-value text-micro text-subtle-foreground">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <span>{entry.text}</span>

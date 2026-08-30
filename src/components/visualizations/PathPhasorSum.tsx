@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Complex } from "@/lib/quantum/complex";
 import { cn } from "@/lib/utils";
 
@@ -103,6 +103,39 @@ function hueForAngle(angle: number): number {
   return (wrapped / twoPi) * 360;
 }
 
+/**
+ * Phase hue -> the stroke colour for that path's phasor, in OKLCH rather
+ * than HSL and on the pillar ramp's own lightness token rather than a
+ * literal.
+ *
+ * `hsl(H 70% 55%)` was theme-blind, and worse, was not perceptually uniform:
+ * HSL's "lightness" is a coordinate of a colour cube, not a lightness, so
+ * one number reads as a different apparent lightness at every hue. Measured
+ * as WCAG contrast against this figure's `panel-inset` fill, composited at
+ * the 0.75 opacity the sample paths are actually drawn at (the phasor panel's
+ * 0.8 lands a little better and is not the binding case), the old ramp ran
+ * from 1.85:1 at hue 240 to 7.19:1 at hue 60 on the dark theme: a 3.9x
+ * spread, with the blues under the 3:1 floor for a graphical object while the
+ * yellows sat at body-text contrast. On light paper it inverted, bottoming
+ * out at 1.24:1 in the yellows. Hue is this figure's one data channel, so a
+ * quarter of the phase circle being illegible is not a cosmetic complaint.
+ *
+ * OKLCH is what globals.css section 2 already picked for the pillar ramp, for
+ * exactly this reason. `oklch(var(--pillar-l-accent) 0.13 H)` holds the whole
+ * sweep inside 5.13:1 to 5.70:1 on the dark theme and 3.05:1 to 3.48:1 on the
+ * light one, a 1.1x spread, so there is no weak hue left.
+ *
+ * The lightness is the ramp's token, not a number, so this tracks the theme
+ * for free the way every other identity colour on the site does (0.78 dark,
+ * 0.51 light, 0.5 under the print stylesheet). The chroma stays a literal
+ * 0.13 rather than `var(--pillar-chroma)`: Apex sets chroma to 0.045, which
+ * would flatten the phase rainbow to near-greyscale in a figure whose whole
+ * argument is carried by hue.
+ */
+function strokeForPhase(hue: number): string {
+  return `oklch(var(--pillar-l-accent) 0.13 ${hue.toFixed(0)})`;
+}
+
 export function PathPhasorSum({
   pathCount = DEFAULT_PATH_COUNT,
   initialHbarEff = DEFAULT_HBAR_EFF,
@@ -115,6 +148,14 @@ export function PathPhasorSum({
   className?: string;
 }) {
   const [hbarEff, setHbarEff] = useState(initialHbarEff);
+  // `useId()` rather than a literal id string. Two instances of this figure
+  // on one page emitted duplicate ids, which is invalid HTML and leaves
+  // every reference ambiguous: an `id` lookup resolves to the first match in
+  // document order, so the second instance's references silently pointed at
+  // the first instance's element. Harmless while both are identical, wrong
+  // the moment they are not. Matches `ProjectionShadow`, which already does
+  // this.
+  const idBase = useId();
 
   const paths = useMemo(() => buildPaths(pathCount % 2 === 0 ? pathCount + 1 : pathCount), [pathCount]);
   const maxActionProxy = useMemo(() => Math.max(...paths.map((p) => p.actionProxy), 1e-9), [paths]);
@@ -158,7 +199,7 @@ export function PathPhasorSum({
   const ariaLabel =
     `Left panel: ${paths.length} illustrative paths from a fixed start to a fixed end point, each colored by its phase. ` +
     `Right panel: those paths' phasors summed tip to tail. At effective h-bar = ${hbarEff.toFixed(2)}, ` +
-    `the resultant arrow carries ${amplitudePct} percent of the maximum possible amplitude — ${interferenceLabel} interference.`;
+    `the resultant arrow carries ${amplitudePct} percent of the maximum possible amplitude: ${interferenceLabel} interference.`;
 
   return (
     <div className={cn("not-prose space-y-4 panel-inset p-4", className)}>
@@ -204,7 +245,7 @@ export function PathPhasorSum({
                 key={p.id}
                 d={p.points.map((pt, i) => `${i === 0 ? "M" : "L"}${tOf(pt.t).toFixed(1)},${xOf(pt.x).toFixed(1)}`).join(" ")}
                 fill="none"
-                stroke={p.deviationFrac === 0 ? "var(--foreground)" : `hsl(${p.hue.toFixed(0)} 70% 55%)`}
+                stroke={p.deviationFrac === 0 ? "var(--foreground)" : strokeForPhase(p.hue)}
                 strokeWidth={p.deviationFrac === 0 ? 2.5 : 1.25}
                 strokeOpacity={p.deviationFrac === 0 ? 1 : 0.75}
               />
@@ -262,7 +303,7 @@ export function PathPhasorSum({
                 y1={imOf(cumulativePoints[i]).toFixed(1)}
                 x2={reOf(cumulativePoints[i + 1]).toFixed(1)}
                 y2={imOf(cumulativePoints[i + 1]).toFixed(1)}
-                stroke={p.deviationFrac === 0 ? "var(--foreground)" : `hsl(${p.hue.toFixed(0)} 70% 55%)`}
+                stroke={p.deviationFrac === 0 ? "var(--foreground)" : strokeForPhase(p.hue)}
                 strokeWidth={p.deviationFrac === 0 ? 2 : 1.25}
                 strokeOpacity={0.8}
               />
@@ -275,10 +316,10 @@ export function PathPhasorSum({
               y2={imOf(cumulativePoints[cumulativePoints.length - 1]).toFixed(1)}
               className="stroke-accent"
               strokeWidth={2.5}
-              markerEnd="url(#resultant-arrowhead)"
+              markerEnd={`url(#${idBase}-resultant-arrowhead)`}
             />
             <defs>
-              <marker id="resultant-arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+              <marker id={`${idBase}-resultant-arrowhead`} markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
                 <path d="M0,0 L8,4 L0,8 Z" className="fill-accent" />
               </marker>
             </defs>

@@ -1,12 +1,74 @@
 import { EMPTY_LESSON_PROGRESS, type LessonProgress, type LessonProgressStore } from "./types";
 
-const STORAGE_KEY_PREFIX = "quantumlearn:lesson-progress:";
+const STORAGE_KEY_PREFIX = "studyquantum:lesson-progress:";
+
+/**
+ * The pre-rename prefix. Every lesson a reader had finished before the
+ * StudyQuantum rename is stored under it, and progress is the one thing on
+ * this site a visitor cannot get back: there are no accounts, so the browser
+ * *is* the record. Renaming the prefix without this would have read as "the
+ * site forgot everything I did."
+ *
+ * See `ensureLegacyKeysMigrated` below for the copy-forward. Kept, not
+ * deleted, once copied — see the note there.
+ */
+const LEGACY_STORAGE_KEY_PREFIX = "quantumlearn:lesson-progress:";
 
 /**
  * Cached the same way as `lib/problems/progress/localStorageStore` — reads
  * must return a referentially stable value for `useSyncExternalStore`.
  */
 const cache = new Map<string, LessonProgress>();
+
+let legacyMigrationAttempted = false;
+
+/**
+ * Copies every `quantumlearn:lesson-progress:*` record forward to the
+ * `studyquantum:` prefix, once per page load, before the first read.
+ *
+ * A whole-namespace sweep rather than a per-slug fallback on read: the store
+ * is read one slug at a time *and* enumerated wholesale by
+ * `getAllCompletedLessonSlugs`, and a per-slug fallback would have to be
+ * duplicated in both paths (and the enumeration one would have to de-duplicate
+ * the two prefixes). Copying the namespace once means every path below this
+ * line only ever knows about one prefix.
+ *
+ * Details that matter:
+ *  - The keys are collected before anything is written. `localStorage.key(i)`
+ *    is index-based and inserting during the loop reshuffles the indices, so
+ *    writing inline would skip records.
+ *  - An existing new-prefix record always wins. The copy is a restore of
+ *    history, never an overwrite of something the reader has done since.
+ *  - `legacyMigrationAttempted` is set *before* the work, so a browser where
+ *    `localStorage` throws (private mode, blocked site data) pays the cost
+ *    once rather than on every read, and every caller below still gets a
+ *    correct empty answer from its own try/catch.
+ *  - The legacy keys are left in place. Removing them is unnecessary (a few KB
+ *    of JSON), and keeping them means rolling this build back does not strand
+ *    a reader's progress under a prefix the old code cannot see.
+ */
+function ensureLegacyKeysMigrated() {
+  if (legacyMigrationAttempted) return;
+  legacyMigrationAttempted = true;
+  try {
+    const pending: [string, string][] = [];
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      if (!key || !key.startsWith(LEGACY_STORAGE_KEY_PREFIX)) continue;
+      const value = window.localStorage.getItem(key);
+      if (value !== null) {
+        pending.push([STORAGE_KEY_PREFIX + key.slice(LEGACY_STORAGE_KEY_PREFIX.length), value]);
+      }
+    }
+    for (const [key, value] of pending) {
+      if (window.localStorage.getItem(key) === null) window.localStorage.setItem(key, value);
+    }
+  } catch {
+    // Storage unavailable or full — nothing is copied forward and every read
+    // below simply sees no stored progress, which is the same graceful state
+    // a first-time visitor is in. The page still renders.
+  }
+}
 
 /** Parses one raw `localStorage` value the same way regardless of whether it came from `getItem` (this tab) or a `storage` event's `newValue` (another tab) — shared so the two paths can't drift apart. */
 function parseProgress(raw: string | null): LessonProgress {
@@ -29,6 +91,8 @@ function parseProgress(raw: string | null): LessonProgress {
 function readFromStorage(slug: string): LessonProgress {
   const cached = cache.get(slug);
   if (cached) return cached;
+
+  ensureLegacyKeysMigrated();
 
   let progress: LessonProgress;
   try {
@@ -66,6 +130,11 @@ export function handleExternalStorageChange(event: StorageEvent): boolean {
 
 function writeToStorage(slug: string, progress: LessonProgress) {
   cache.set(slug, progress);
+  // Before the write, not after: completing a lesson can be the very first
+  // storage touch of a page view, and the sweep must not land on top of the
+  // record this call is about to make (it skips keys that already exist, so
+  // ordering it after would be harmless but only by accident).
+  ensureLegacyKeysMigrated();
   try {
     window.localStorage.setItem(STORAGE_KEY_PREFIX + slug, JSON.stringify(progress));
   } catch {
@@ -137,6 +206,10 @@ export function invalidateCompletedLessonSlugsCache() {
 export function getAllCompletedLessonSlugs(): Set<string> {
   if (completedSlugsCache) return completedSlugsCache;
   if (typeof window === "undefined") return NO_COMPLETED_SLUGS;
+
+  // The enumeration path. It scans keys by prefix, so it only sees a
+  // pre-rename reader's history once that history has been copied forward.
+  ensureLegacyKeysMigrated();
 
   const slugs = new Set<string>();
   try {

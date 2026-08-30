@@ -63,13 +63,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The microscope story was never the proof">
   Heisenberg's own 1927 argument for the <Term id="heisenberg-uncertainty-principle">uncertainty principle</Term> was a
   thought experiment about a microscope disturbing a particle. It is not
   a proof, and it is not the reason the principle holds.
 </LessonHook>
 
-## Motivation
+## Vivid, memorable, and not a derivation
 
 Heisenberg's original 1927 argument for $\Delta x\,\Delta p\ge\hbar/2$
 used a thought experiment: a gamma-ray microscope that necessarily kicks
@@ -96,7 +96,7 @@ a theorem with a proof, not a story about disturbing what you measure.
   license="CC BY-SA 3.0 DE"
 />
 
-## Intuition
+## Average and spread, as any laboratory would
 
 If you measured the same observable on many identically-prepared copies
 of the same state, you would get a distribution of outcomes with some
@@ -111,7 +111,7 @@ once, so if quantum mechanics forbids it, the prohibition has to come
 from somewhere specific in the formalism. Finding that place is the work
 of this lesson.
 
-## Mathematical Development
+## Cauchy-Schwarz, applied to two observables
 
 ### Expectation value and uncertainty, formally
 
@@ -213,12 +213,16 @@ untouched. Heisenberg's microscope could never have produced it.
 
 If $[A,B]=0$ (the operators **commute**), the right-hand side is zero,
 and the inequality places no restriction at all. Both observables *can*
-be made simultaneously as sharp as you like (in particular, simultaneous
-eigenstates of both exist). Uncertainty trade-offs are specifically a
-consequence of **non-commuting** observables, not a universal fact about
-all pairs.
+be made simultaneously as sharp as you like (and in finite dimensions, or
+whenever the spectra are purely discrete, simultaneous eigenstates of both
+exist; with continuous spectra the eigenstates can fail to live in the
+Hilbert space at all, which
+[Continuous Spectra and Rigged Hilbert Space](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/continuous-spectra-and-rigged-hilbert-space)
+takes up properly). Uncertainty trade-offs are specifically a consequence
+of **non-commuting** observables, rather than a universal fact about all
+pairs.
 
-## Physical Interpretation
+## Substituting the canonical commutator in
 
 The familiar position-momentum uncertainty principle, $\Delta x\,\Delta p
 \ge \hbar/2$, is this relation with $[x,p]=i\hbar$ substituted in (the
@@ -231,7 +235,7 @@ structural fact about two operators that fail to commute, and it survives
 intact for perfect, idealized measurements made on separate copies of the
 state, where nothing is being disturbed at all.
 
-## Worked Example
+## Checking the bound for X and Y in the zero state
 
 **For Pauli operators $A=X$, $B=Y$ (from the Mathematical Foundations
 course), $[X,Y]=2iZ$. In the state $|0\rangle$ (a $Z$-eigenstate,
@@ -257,7 +261,7 @@ chosen.)
   explanation="At θ = 45°, |ψ⟩ = |+⟩ is an eigenstate of X, so ΔX = 0 exactly, killing the product no matter what ΔY does. The bound ½|⟨[X,Y]⟩| = |⟨Z⟩| drops to 0 alongside it, because |+⟩ sits on the equator where ⟨Z⟩ = 0. The relation is not merely satisfied here; both sides are zero, so the trade-off is absent for this state rather than small."
 />
 
-<InteractiveSection title="Slide θ, watch the bound track the product" description="|ψ(θ)⟩ = cos θ|0⟩ + sin θ|1⟩ carries the state from |0⟩ (θ = 0°, the worked example) through |+⟩ (θ = 45°, practice question 2). Both ΔX·ΔY and the bound ½|⟨[X,Y]⟩| are recomputed by the platform's expectation-value and commutator functions rather than typed in by hand. They stay equal across the entire range, including θ = 45° where both drop to zero: this pair saturates the inequality for every state on this path.">
+<InteractiveSection title="Slide θ, and compare the product against the bound" description="|ψ(θ)⟩ = cos θ|0⟩ + sin θ|1⟩ carries the state from |0⟩ (θ = 0°, the worked example) through |+⟩ (θ = 45°, practice question 2). Both ΔX·ΔY and the bound ½|⟨[X,Y]⟩| are recomputed by the platform's expectation-value and commutator functions rather than typed in by hand. Compare the two bars at several θ, including θ = 45°, and decide from that whether this pair merely satisfies the inequality along this path or saturates it.">
   <BarChartExplorer
     frames={uncertaintyFrames}
     sliderLabel="θ (degrees)"
@@ -273,7 +277,7 @@ is drawn centered at the origin, which shows the *shape* of the trade-off
 rather than tracking $\langle X\rangle,\langle Y\rangle$ (those do drift
 as $|\psi(\theta)\rangle$ rotates):
 
-<InteractiveSection title="Same trade-off, drawn as a region instead of two bars" description="The ellipse's semi-axes ΔX and ΔY are the same values plotted above for |ψ(θ)⟩. The dot marks (0, 0), a fixed reference origin, not ⟨X⟩ and ⟨Y⟩, which drift with θ as noted above. At θ = 0° and θ = 90° the bound is saturated with ΔX = ΔY = 1 and the ellipse is a circle. At θ = 45°, ΔX collapses to 0 while ΔY stays 1, so the ellipse flattens into a vertical segment: the same product going to zero that the bar chart shows, seen as a shape losing a dimension.">
+<InteractiveSection title="Same trade-off, drawn as a region instead of two bars" description="The ellipse's semi-axes ΔX and ΔY are the same values plotted above for |ψ(θ)⟩. The dot marks (0, 0), a fixed reference origin, not ⟨X⟩ and ⟨Y⟩, which drift with θ as noted above. Step θ across the full range and watch the ellipse's shape rather than its position: somewhere in there it is a circle, and somewhere else it loses a dimension entirely. Find both, and match each against what the bar chart above was doing at that same θ.">
   <UncertaintyEllipse
     frames={ellipseFrames}
     center={ellipseCenter}
@@ -285,7 +289,7 @@ as $|\psi(\theta)\rangle$ rotates):
   />
 </InteractiveSection>
 
-## Common Mistakes
+## Nothing in the derivation disturbs anything
 
 <Callout type="mistake">
 **Describing uncertainty as "measuring one property disturbs the other."**
@@ -306,15 +310,204 @@ any trade-off at all.
 1. For $A=Z, B=X$ (so $[Z,X]=2iY$, by antisymmetry of the commutator
    applied to the relation used in the worked example), in state
    $|0\rangle$: find $\langle[Z,X]\rangle$ and the right-hand side bound.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\langle[Z,X]\rangle = 0$, and the bound is $0$.
+
+   The commutator itself is not zero. Multiplying out confirms the
+   relation quoted in the question:
+
+   $$
+   [Z,X] = 2iY = \begin{pmatrix}0&2\\-2&0\end{pmatrix}
+   $$
+
+   But the bound is not built from the commutator, it is built from the
+   commutator's *expectation value in the given state*, and
+
+   $$
+   \langle[Z,X]\rangle = 2i\langle Y\rangle_{|0\rangle} = 2i\cdot 0 = 0
+   $$
+
+   because $|0\rangle$ sits at the north pole of the Bloch sphere, where
+   $\langle X\rangle = \langle Y\rangle = 0$. The bound is
+   $\tfrac12|0| = 0$.
+
+   That is the result to sit with, because it looks like a contradiction
+   and is not. $Z$ and $X$ do not commute, yet in this particular state
+   the uncertainty relation imposes no trade-off whatsoever. Check the
+   left-hand side to see why nothing is broken: $|0\rangle$ is an
+   eigenstate of $Z$, so $\Delta Z = 0$, while $\Delta X = 1$. The
+   product is $0$, and $0 \ge 0$ holds, saturated.
+
+   The wrong turn here is extremely common and worth naming precisely. It
+   is reading $\Delta A\,\Delta B \ge \tfrac12|\langle[A,B]\rangle|$ as
+   though the right-hand side were a property of the pair $(A,B)$, so
+   that non-commuting operators always carry a nonzero floor. It is a
+   property of the pair *and the state*. Position and momentum are the
+   exception that creates the habit: $[\hat x,\hat p] = i\hbar$ is a
+   number times the identity, so its expectation value is the same in
+   every state and the floor never drops. For $Z$ and $X$ it drops to
+   zero at both poles, which the bar-chart explorer above shows happening
+   as $\theta$ moves.
+
+   Question 4 explains the zero from the other direction: whenever a
+   state makes one observable definite, it forces
+   $\langle[A,B]\rangle=0$ for *every* $B$.
+
+   </details>
+
 2. In the state $|+\rangle$, $X$ is definite (it's an eigenstate of $X$),
    so $\Delta X=0$. Compute $\Delta Z$ in $|+\rangle$, then compute
    $\langle[Z,X]\rangle$ in $|+\rangle$ and verify the uncertainty
    relation still holds even with one side exactly zero.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $\Delta Z = 1$, $\langle[Z,X]\rangle = 0$, and the relation reads
+   $0 \ge 0$.
+
+   For $\Delta Z$, use $\operatorname{Var}(Z)=\langle Z^2\rangle-\langle
+   Z\rangle^2$. In $|+\rangle$ the two computational outcomes are equally
+   likely, so $\langle Z\rangle = \tfrac12(+1)+\tfrac12(-1) = 0$, and
+   $Z^2 = I$ gives $\langle Z^2\rangle = 1$. Hence
+   $\operatorname{Var}(Z) = 1 - 0 = 1$ and $\Delta Z = 1$.
+
+   For the right-hand side, $\langle[Z,X]\rangle = 2i\langle
+   Y\rangle_{|+\rangle}$, and $|+\rangle$ sits on the $+x$ axis of the
+   Bloch sphere where $\langle Y\rangle = 0$. So
+   $\langle[Z,X]\rangle = 0$ and the bound is $0$.
+
+   Putting the two sides together:
+
+   $$
+   \Delta Z\,\Delta X = (1)(0) = 0 \;\ge\; \tfrac12\left|\langle[Z,X]\rangle\right| = 0
+   $$
+
+   The relation holds, and it holds with equality.
+
+   The point of the question is what does *not* happen. A student who has
+   absorbed the slogan "non-commuting observables cannot both be sharp"
+   expects a contradiction here: $X$ is perfectly sharp, $Z$ and $X$ do
+   not commute, so surely something must forbid this. Nothing does. What
+   the theorem actually forbids is both sides being sharp while
+   $\langle[A,B]\rangle$ is nonzero, and the moment $\Delta X$ hits zero
+   the right-hand side is dragged to zero with it. The two events are not
+   a coincidence; question 4 shows one implies the other.
+
+   Notice also that $\Delta Z = 1$ is the largest it can be for a Pauli
+   operator, whose outcomes are $\pm1$. Making $X$ perfectly definite has
+   pushed $Z$ to maximal spread. So the trade-off is real and visible in
+   the numbers, even though the inequality is not what enforces it here.
+   The inequality is a floor, and a floor of zero simply stops
+   constraining; the actual behaviour comes from the states themselves.
+
+   </details>
+
 3. If $[A,B]=0$ for two observables, what does the derivation above say
    about whether a state can be a simultaneous eigenstate of both?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Strictly, it says only that nothing forbids it. The derivation gives
+   permission, not existence.
+
+   Set $[A,B]=0$ in the result and the right-hand side is zero, so the
+   inequality reads $\Delta A\,\Delta B\ge0$. That is true of any two
+   non-negative numbers and rules nothing out. In particular it no longer
+   rules out $\Delta A = \Delta B = 0$, which is what a simultaneous
+   eigenstate would mean. Removing an obstruction is not the same as
+   producing the thing the obstruction was blocking, and the derivation
+   does exactly the first.
+
+   Existence is a separate theorem, and it comes with a hypothesis worth
+   keeping. The lesson states it above: in finite dimensions, or whenever
+   the spectra are purely discrete, two commuting Hermitian operators do
+   admit a common eigenbasis. With continuous spectra the argument can
+   fail in a specific way, because the would-be eigenvectors need not be
+   normalizable and so need not live in the Hilbert space at all;
+   $\hat x$ is the standard example, and Quantum Mastery's lesson on
+   rigged Hilbert space is where that is handled properly. Dropping the
+   hypothesis and asserting "commuting operators always share an
+   eigenbasis" is the mistake this question is guarding against.
+
+   There is a second, smaller overreach to avoid. Even where the common
+   eigenbasis does exist, it does not follow that *the state you happen to
+   have* is one of those simultaneous eigenstates. Commuting observables
+   guarantee such states are available, not that every state is one. Take
+   $A=Z$ and $B=Z$, which certainly commute; the state $|+\rangle$ is an
+   eigenstate of neither, and $\Delta Z = 1$ in it. The relation is
+   satisfied, $1\cdot1\ge0$, with nothing sharp anywhere.
+
+   So the honest summary is three-layered. Commuting kills the forced
+   trade-off; a separate theorem, under stated hypotheses, supplies a
+   basis of simultaneous eigenstates; and being in one of them is a fact
+   about your particular state, not about the operators.
+
+   </details>
+
 4. Explain, using the derivation, why $\operatorname{Var}(A)=0$ (a
    definite value for $A$) forces $\langle[A,B]\rangle=0$ for that
    particular state, for any $B$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $\operatorname{Var}(A)$ is the squared *length* of the vector
+   $|f\rangle=\tilde A|\psi\rangle$, and a vector of length zero is the
+   zero vector, whose overlap with anything at all is zero.
+
+   Follow the derivation's own construction. It set
+   $|f\rangle = \tilde A|\psi\rangle$ and showed
+   $\langle f|f\rangle = \operatorname{Var}(A)$. If
+   $\operatorname{Var}(A)=0$ then $\langle f|f\rangle = 0$, and
+   positive-definiteness of the inner product (the Inner Products lesson)
+   says the only vector with zero norm is $|f\rangle = 0$ itself.
+
+   Now take any Hermitian $B$ and build $|g\rangle = \tilde B|\psi\rangle$
+   as the derivation does. Then
+
+   $$
+   \langle f|g\rangle = 0
+   $$
+
+   because $|f\rangle$ is the zero vector, with no inequality needed. But
+   the derivation also computed that same overlap in two pieces:
+
+   $$
+   \langle f|g\rangle = \underbrace{\tfrac12\langle\{\tilde A,\tilde B\}\rangle}_{\text{real}} + \underbrace{\tfrac12\langle[A,B]\rangle}_{\text{purely imaginary}}
+   $$
+
+   A complex number is zero only if its real and imaginary parts are both
+   zero separately. The second piece is the whole imaginary part, so
+   $\langle[A,B]\rangle = 0$. Since $B$ was arbitrary, this holds for
+   every observable at once.
+
+   It is worth taking this route rather than the shortcut of putting
+   $\Delta A = 0$ into $\Delta A\,\Delta B \ge
+   \tfrac12|\langle[A,B]\rangle|$ and reading off $0 \ge
+   \tfrac12|\langle[A,B]\rangle|$. That shortcut does give the right
+   answer here, but it multiplies $\Delta A$ by $\Delta B$ and so quietly
+   assumes $\Delta B$ is finite, which for an unbounded operator on an
+   infinite-dimensional space is exactly the kind of assumption that
+   fails. Going back to $\langle f|g\rangle$ never forms that product.
+
+   This is also the general fact behind questions 1 and 2. In $|0\rangle$,
+   $\operatorname{Var}(Z)=0$, so $\langle[Z,B]\rangle$ vanishes for
+   *every* $B$, and $B=X$ was just one instance. In $|+\rangle$,
+   $\operatorname{Var}(X)=0$ does the same job with the roles swapped.
+   Neither zero was a numerical accident of the Pauli matrices.
+
+   The reading to resist is "so a definite value for $A$ makes $A$ commute
+   with everything." It does not. $[Z,X]=2iY$ is a nonzero operator
+   whatever state you are in. What collapses is its expectation value in
+   this one state, and move to a state on the equator and the same
+   commutator's expectation value comes back.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -329,7 +522,7 @@ any trade-off at all.
 - This is a structural theorem about non-commuting Hermitian operators,
   not a story about measurement disturbance.
 
-## Further Exploration
+## Does a sign change reach the bound?
 
 <ChallengePrompt prompt="The worked example computed the bound for A=X, B=Y in the state |0⟩. Redo it for |1⟩. Does the bound come out the same, or different?">
   $\langle[X,Y]\rangle=2i\langle Z\rangle$ still holds, and only

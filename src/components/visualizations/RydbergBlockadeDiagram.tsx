@@ -67,7 +67,7 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
               the *page column* on a 320px phone (320 less Container's `px-4`
               gutters), but this SVG renders into `panel-inset p-4`, and
               `panel-inset` (globals.css) supplies border, radius and fill and
-              no padding — the `p-4` does. The real box is 288 − 2 × (16px
+              no padding - the `p-4` does. The real box is 288 − 2 × (16px
               padding + 1px border) = **254px**, so the scale is 254/520 =
               0.4885 and every figure in the old note was ~13% optimistic.
 
@@ -77,12 +77,12 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
 
               Four strings had to change again, because 19-unit mono is 11.4
               units per character and the 520-unit viewBox holds ~45 of them
-              edge to edge — and SVG silently CLIPS what overruns a viewBox,
+              edge to edge - and SVG silently CLIPS what overruns a viewBox,
               it does not scroll it. Each shortening is noted where it
               happens; none of them drops a fact the drawing does not already
               make. */}
-          <text x={WIDTH / 2} y={22} textAnchor="middle" fontSize={20} className="fill-axis font-mono">
-            {/* The blocked branch was 45 characters = 540 units at 20 — 20
+          <text x={WIDTH / 2} y={22} textAnchor="middle" fontSize={20} className="fill-muted-foreground font-mono">
+            {/* The blocked branch was 45 characters = 540 units at 20 - 20
                 units wider than the whole viewBox, so it was clipped at both
                 ends. The 32 kept are 384 units, centred at 260, so 68..452.
                 What was dropped ("'s excitation") is what the suppressed
@@ -98,7 +98,7 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
           {/* r_b, the blockade radius. This is the figure's threshold line:
               the entire lesson point is whether atom B falls inside or
               outside THIS circle, so it is the most load-bearing mark on the
-              canvas — and it was drawn in `--border`, the panel-edge token,
+              canvas - and it was drawn in `--border`, the panel-edge token,
               measured at 1.41:1 on `--surface-muted` against the 3:1 WCAG
               2.1 SC 1.4.11 floor. `--axis` clears 3:1 on every panel depth
               in both themes. */}
@@ -109,10 +109,10 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
               This caption is about both atoms equally, and at 19 units it is
               38 characters = 433 units wide, so half of it is 217. Atom B is
               draggable, so the old midpoint anchor swept between x = 210 (at
-              minimum separation) and x = 300 — at 210 the string started at
+              minimum separation) and x = 300 - at 210 the string started at
               −7 and its first characters were clipped away. Anchoring at
               WIDTH/2 = 260 puts it at 43..477 at every separation. */}
-          <text x={WIDTH / 2} y={54} textAnchor="middle" fontSize={19} className="fill-axis font-mono">
+          <text x={WIDTH / 2} y={54} textAnchor="middle" fontSize={19} className="fill-muted-foreground font-mono">
             same laser on both atoms: ground &rarr; |r&#10217;
           </text>
           <line
@@ -187,14 +187,14 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
             y={ATOM_Y - (blocked ? SUPPRESSED_R : ORBITAL_R) - 14}
             textAnchor="middle"
             fontSize={19}
-            className={blocked ? "fill-axis font-semibold" : "fill-accent font-semibold"}
+            className={blocked ? "fill-muted-foreground font-semibold" : "fill-accent font-semibold"}
           >
             {/* "B: excited to |r⟩" is 17 characters = 194 units at 19, and
                 this label is centred on the draggable atom. The unblocked
                 branch only appears past r_b, where atomBX runs out to 425, so
                 the label would have ended at 522 and lost its last glyph off
                 the right edge. "B: excited" is 114 units, ending at 482, and
-                the ket it is excited *to* is already named twice above — in
+                the ket it is excited *to* is already named twice above - in
                 the laser caption and on atom A. */}
             {blocked ? "B: blocked" : "B: excited"}
           </text>
@@ -213,7 +213,7 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
             y={ATOM_Y + 30}
             textAnchor="middle"
             fontSize={19}
-            className={blocked ? "fill-axis font-mono" : "fill-brand font-mono"}
+            className={blocked ? "fill-muted-foreground font-mono" : "fill-brand font-mono"}
           >
             separation = {separation.toFixed(0)}
           </text>
@@ -232,7 +232,7 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
             x={ATOM_A_X + BLOCKADE_R * Math.cos(-0.55) + 6}
             y={ATOM_Y + BLOCKADE_R * Math.sin(-0.55) - 4}
             fontSize={19}
-            className="fill-axis font-mono"
+            className="fill-muted-foreground font-mono"
           >
             r_b = {BLOCKADE_R}
           </text>
@@ -240,21 +240,21 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
           {/* x moved from ATOM_A_X - ORBITAL_R (= 120) to 12, and the
               leading "atom B" trimmed to "B". Left-aligned at 120, the longer
               branch ("atom B sits outside r_b, so its energy levels", 44
-              characters = 502 units at 19) would have ended at 622 — 102
+              characters = 502 units at 19) would have ended at 622 - 102
               units past the viewBox, with most of the sentence clipped away.
               At x = 12 the trimmed 40-character version runs 12..468, which
               leaves enough room that a wide fallback face cannot push it off
               the edge. The pair no longer sits under atom A specifically,
               which is right: it describes atom B. */}
-          <text x={12} y={ATOM_Y + ORBITAL_R + 56} fontSize={19} className="fill-axis font-mono">
+          <text x={12} y={ATOM_Y + ORBITAL_R + 56} fontSize={19} className="fill-muted-foreground font-mono">
             {blocked
               ? "B sits within r_b, so its energy levels"
               : "B sits outside r_b, so its energy levels"}
           </text>
-          <text x={12} y={ATOM_Y + ORBITAL_R + 82} fontSize={19} className="fill-axis font-mono">
+          <text x={12} y={ATOM_Y + ORBITAL_R + 82} fontSize={19} className="fill-muted-foreground font-mono">
             {blocked
               ? "are shifted off resonance with the laser"
-              : "are unaffected -- it excites normally"}
+              : "are unaffected, it excites normally"}
           </text>
 
           <defs>
@@ -274,7 +274,11 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
             Atom B separation
           </label>
           <span className="font-mono text-xs text-muted-foreground">
-            r = {separation.toFixed(0)} ({blocked ? "< r_b, blocked" : "> r_b, allowed"})
+            {/* The threshold value itself, not just which side of it we are on. The
+                readout used to say "< r_b" without ever printing r_b next to it, so a
+                reader could see that something had flipped but not by how much they
+                had missed it. Both numbers, in the same units, side by side. */}
+            r = {separation.toFixed(0)}, r_b = {BLOCKADE_R} ({blocked ? "inside, blocked" : "outside, allowed"})
           </span>
         </div>
         <input
@@ -285,20 +289,25 @@ export function RydbergBlockadeDiagram({ ariaLabel }: { ariaLabel: string }) {
           step={1}
           value={separation}
           onChange={(event) => setSeparation(Number(event.target.value))}
-          // `h-11` (44px) touch target — a range input centres its track in
+          // `h-11` (44px) touch target - a range input centres its track in
           // whatever height it gets, so only the hit area changes (it was the
           // browser default ~16px). `accent-brand` rather than the raw
           // `accent-[var(--brand)]` arbitrary value: `--color-brand` is
           // already registered in the Tailwind v4 theme, so the utility
           // exists, and every other slider in this directory uses it.
           className="h-11 w-full accent-brand"
-          aria-label="Distance between atom B and atom A"
+          // No `aria-label` here. The visible <label htmlFor> already names this
+          // control "Atom B separation"; the aria-label that used to sit here
+          // ("Distance between atom B and atom A") REPLACED that name with words
+          // the visible text does not contain, which is exactly the WCAG 2.1
+          // SC 2.5.3 (Label in Name) failure - a speech-input user saying "atom B
+          // separation" would not have matched the control they can see.
           aria-valuetext={`separation = ${separation.toFixed(0)}, ${blocked ? "inside" : "outside"} the blockade radius`}
         />
         <p className="text-xs text-muted-foreground">
           Drag the slider to move atom B closer to or farther from atom A. Inside the blockade
           radius r_b, atom B&rsquo;s excitation is suppressed; drag past r_b and atom B excites to
-          |r&#10217; just like atom A &mdash; the blockade is a distance-limited effect, not a
+          |r&#10217; just like atom A. The blockade is a distance-limited effect, not a
           property of the atoms themselves.
         </p>
       </div>

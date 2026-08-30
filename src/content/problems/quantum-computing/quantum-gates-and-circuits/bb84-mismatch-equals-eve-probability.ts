@@ -21,20 +21,11 @@ export const bb84MismatchEqualsEveProbability: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      [
-        "same mismatch case",
-        "identical mismatch scenario",
-        "exact same operation",
-        "same operation",
-        "same computation",
-        "same calculation",
-        "same measurement",
-        "same scenario",
-        "same situation",
-        "same physical setup",
-        "literally the same",
-        "identical",
-      ],
+      {
+        phrases: ["same mismatch case", "identical mismatch scenario", "exact same operation", "same operation", "same computation", "same calculation", "same measurement", "same scenario", "same situation", "same physical setup", "literally the same", "identical"],
+        missingFeedback:
+          "You have said the probabilities agree. Now say why the two cases are not merely similar: compare what physically happens to the qubit in each of them.",
+      },
       {
         phrases: [
           "not about who is measuring",
@@ -52,38 +43,33 @@ export const bb84MismatchEqualsEveProbability: ConceptualProblem = {
           "whose measurement",
         ],
         missingFeedback:
-          "You have identified that the two cases are the same operation. Say why that settles it: a Born-rule probability depends only on the state and the chosen basis, and carries no record of who is holding the measuring device.",
+          "You have already matched the two cases step for step. Say why that settles it: list the ingredients a Born-rule probability is computed from, and note that the person operating the apparatus is not among them.",
       },
-      [
-        "conjugate basis",
-        "wrong basis measurement",
-        "wrong basis",
-        "other basis",
-        "different basis",
-        "mismatched basis",
-        "non-commuting",
-        "noncommuting",
-        "incompatible bas",
-        "measuring in the other basis",
-        "x basis",
-        "z basis",
-      ],
+      {
+        phrases: ["conjugate basis", "wrong basis measurement", "wrong basis", "other basis", "different basis", "mismatched basis", "non-commuting", "noncommuting", "incompatible bas", "measuring in the other basis", "x basis", "z basis"],
+        missingFeedback:
+          "You have said the two cases are one and the same operation. Now name that operation precisely: which basis is the qubit encoded in, and which one is it read out in?",
+      },
     ],
     incorrectFeedback:
-      "Compare, step by step, what Bob does when his basis doesn't match Alice's encoding basis to what Eve does when her guessed interception basis doesn't match Alice's encoding basis — are they mathematically the same operation on the same kind of state?",
+      "You explained where 0.5 comes from without comparing the two situations. Write the two out side by side, step for step, and then ask what, if anything, the Born-rule calculation is allowed to depend on.",
     partialFeedback:
-      "Good — now be explicit that it's not a coincidence because the underlying math (measuring a state in its conjugate basis) doesn't care whose measurement it is.",
+      "Now say why it is not a coincidence: name what the Born rule's inputs actually are, and check whether any of them records the identity of the person operating the device.",
+    modelAnswers: [
+      "Bob measuring in the wrong basis and Eve intercepting in the wrong basis are literally the same operation: measuring a conjugate-basis-encoded qubit in the other basis. The probability depends only on the state and the basis, not on who is holding the detector, so both come out 50/50.",
+      "It is the exact same operation physically. In both cases someone measures a qubit prepared in the X basis using a Z basis measurement, or the other way round. Quantum probabilities do not care who is measuring, so the same calculation gives the same number.",
+    ],
   },
   hints: [
-    { text: "Bob's mismatch case and Eve's wrong-guess case are both: 'measure a Z-basis-encoded (or X-basis-encoded) qubit in the other, conjugate basis.'" },
-    { text: "That's literally the same mathematical operation — apply $H$, then read off computational-basis probabilities — regardless of whether the person doing it is named Bob or Eve." },
-    { text: "The $50/50$ result comes purely from the qubit's own state and which basis it's measured in — it has no way of 'knowing' or caring who is holding the measuring device." },
+    { text: "Write out, using one notation for both, what Bob does when his basis fails to match, and what Eve does after an incorrect guess." },
+    { text: "Put the two expressions beside each other. Do they differ in any symbol other than the name attached to the person?" },
+    { text: "The probability that comes out is fixed by the state and by which measurement is performed. Ask whether either of those two carries any record of who is operating the apparatus." },
   ],
   solution: {
     steps: [
       { description: "Bob's mismatch case (e.g. Alice Z-encodes, Bob measures X) and Eve's wrong-guess case (Alice Z-encodes, Eve guesses X) are the exact same physical setup: an X-basis measurement of a Z-basis-encoded qubit." },
-      { description: "The Born-rule probabilities of that measurement depend only on the qubit's own state and the chosen measurement basis — never on any label attached to who is performing the measurement." },
-      { description: "So Bob-mismatched and Eve-wrong-guess necessarily give identical $50/50$ statistics: they are literally the same calculation, $H$ then read off probabilities, applied to the same kind of input state." },
+      { description: "The Born-rule probabilities of that measurement depend only on the qubit's own state and the chosen measurement basis, never on a label attached to who performs it." },
+      { description: "So Bob-mismatched and Eve-wrong-guess necessarily give identical $50/50$ statistics: they are the same calculation, $H$ then read off probabilities, applied to the same kind of input state." },
     ],
     finalAnswer:
       "It's not a coincidence: Bob's mismatch case and Eve's wrong-guess case are the identical operation (measuring a conjugate-basis-encoded qubit), and quantum probabilities depend only on the state and the measurement, not on who is measuring.",
@@ -92,9 +78,9 @@ export const bb84MismatchEqualsEveProbability: ConceptualProblem = {
     correctIdea:
       "Measurement probabilities are a property of the quantum state and the chosen basis, not of any label attached to the observer.",
     whyCorrect:
-      "Both Bob's mismatch case and Eve's wrong-basis guess reduce to the identical calculation once you strip away the names — hence identical probabilities.",
+      "Both Bob's mismatch case and Eve's wrong-basis guess reduce to the same calculation once the names are stripped away, which is why the probabilities match.",
     whyWrong: [
-      "Treating this as a numerical coincidence misses that the two scenarios are literally the same underlying computation, not merely two calculations that happen to agree.",
+      "Treating this as a numerical coincidence misses that the two scenarios are the same underlying computation, not two calculations that happen to agree.",
     ],
   },
 };

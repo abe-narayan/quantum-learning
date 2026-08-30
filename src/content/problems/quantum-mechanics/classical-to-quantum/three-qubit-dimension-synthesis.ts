@@ -28,8 +28,9 @@ export const threeQubitDimensionSynthesis: NumericProblem = {
     ],
   },
   hints: [
-    { text: "dim(V⊗W⊗X) = dim(V) × dim(W) × dim(X)." },
-    { text: "Here all three factors are 2-dimensional." },
+    { text: "The tensor product does not set the three spaces side by side. It builds one space whose basis vectors are the combinations of the three factors' basis labels." },
+    { text: "Count those combinations: each qubit contributes an independent choice between its two basis labels." },
+    { text: "That count is a product of three factors, not a sum of them. If your answer came out near 6, check which operation you used." },
   ],
   solution: {
     steps: [
@@ -40,6 +41,6 @@ export const threeQubitDimensionSynthesis: NumericProblem = {
   explanation: {
     correctIdea: "This is the Mathematical Foundations course's tensor-product rule, applied directly to qubits.",
     whyCorrect: "2×2×2=8, matching a 3-qubit state vector's 8 amplitudes exactly.",
-    whyWrong: ["Adding instead of multiplying (2+2+2=6) gives the wrong, much smaller count — dimensions of composite quantum systems multiply, which is exactly why simulating many qubits classically gets hard fast."],
+    whyWrong: ["Adding instead of multiplying (2+2+2=6) gives a far smaller count. Dimensions of composite quantum systems multiply, which is why simulating many qubits classically gets hard so fast."],
   },
 };

@@ -16,10 +16,10 @@ export const twoImplementationsCrossCheck: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "Why does the QuantumCircuit-based VQE matching Quantum Algorithms II's matrix-based exactGroundStateEnergy serve as a genuine correctness check?",
     options: [
-      { id: "a", text: "The two compute the same physics along independent code paths, so agreement rules out bugs that live in only one of them" },
-      { id: "b", text: "Both ultimately call the same gate-application helpers, so a matching result confirms those helpers are correct" },
-      { id: "c", text: "The matrix computation is the reference implementation, so any circuit result matching it inherits its correctness" },
-      { id: "d", text: "VQE converges to the ground-state energy for any correct ansatz, so agreement confirms the ansatz was chosen well" },
+      { id: "a", text: "The two compute the same physics along independent code paths, so agreement rules out a bug in either one alone" },
+      { id: "b", text: "Both ultimately call the same gate-application helpers, so a matching result confirms that those helpers are correct" },
+      { id: "c", text: "The matrix computation is the reference implementation, so any circuit result that matches it inherits its correctness" },
+      { id: "d", text: "VQE converges to the ground-state energy for any correct ansatz, so agreement confirms the ansatz was a good one" },
     ],
   },
   answer: {
@@ -43,7 +43,7 @@ export const twoImplementationsCrossCheck: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "A cross-check is worth as much as the independence of the things being crossed. Shared code means a shared bug passes unnoticed.",
-    whyCorrect: "Matches the lesson's Physical Interpretation section.",
+    whyCorrect: "The value of the cross-check is that the two paths share no code. One builds a circuit as data and dispatches through gate helpers; the other multiplies matrices. A bug would have to appear identically in both to survive, which is far less likely than a bug in either alone.",
     whyWrong: [
       { optionId: "b", text: "Would make the check vacuous. A shared layer is where a common bug would hide." },
       { optionId: "c", text: "Grants one path authority it has not earned. The evidence is symmetric between them." },

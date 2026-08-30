@@ -123,6 +123,87 @@ export function renderSolutionMath(solution: Solution, explanation?: Explanation
   };
 }
 
+/** Does this authored string carry at least one complete inline run? The same
+ *  delimiter pair `splitMathSegments` splits on, asked as a yes/no question so
+ *  the feedback map can skip the ~97% of the corpus that is plain prose. */
+const HAS_INLINE_MATH = /\$[^$]+\$/;
+
+/**
+ * Every feedback string this problem could hand back that was **authored**.
+ *
+ * Deliberately mirrors the return paths of `src/lib/problems/validators/*`,
+ * and deliberately covers only those: `validateNumeric`'s unparseable-input
+ * messages and its exact-value `note`, `validateConceptual`'s
+ * framing/predication/echo feedback and the "select an option first" guards
+ * are composed at runtime and are not authored content. They carry no math,
+ * and `Feedback`'s plain-text fallback is what renders them.
+ *
+ * Both verdicts are covered, not just the failing one: since `validateAnswer`
+ * answers a correct submission with `explanation.correctIdea`, the success
+ * path has an authored message too.
+ *
+ * `__tests__/feedbackMath.test.ts` walks the corpus and fails if an authored
+ * feedback field carrying `$…$` is not reachable from here, which is what
+ * stops this list from going quietly stale when the data model grows a
+ * fourth answer type or a second targeted-feedback slot.
+ */
+function authoredFeedback(problem: Problem): string[] {
+  return [...authoredIncorrectFeedback(problem), ...authoredCorrectFeedback(problem)];
+}
+
+/**
+ * The success path's authored message.
+ *
+ * `validateAnswer` answers a correct submission with the problem's
+ * `explanation.correctIdea` rather than the word "Correct" a second time, so
+ * that field is now a feedback string and has to be in this map like any
+ * other. 11 of the 556 carry inline math; without this they would be answered
+ * with raw LaTeX at the one moment the reader has earned a clean screen.
+ *
+ * A single-element list rather than an inlined string so the shape matches
+ * `authoredIncorrectFeedback` and a second success-path source (a per-problem
+ * `correctFeedback`, say) has somewhere obvious to go.
+ */
+function authoredCorrectFeedback(problem: Problem): string[] {
+  const correctIdea = problem.explanation?.correctIdea?.trim();
+  return correctIdea ? [correctIdea] : [];
+}
+
+function authoredIncorrectFeedback(problem: Problem): string[] {
+  const answer = problem.answer;
+  switch (answer.type) {
+    case "multiple-choice":
+      return [answer.defaultIncorrectFeedback, ...Object.values(answer.optionFeedback ?? {})];
+    case "numeric":
+      return [answer.incorrectFeedback, ...(answer.nearMisses ?? []).map((miss) => miss.feedback)];
+    case "conceptual":
+      return [
+        answer.incorrectFeedback,
+        ...(answer.partialFeedback ? [answer.partialFeedback] : []),
+        ...answer.requiredConceptGroups.flatMap((group) =>
+          Array.isArray(group) || !group.missingFeedback ? [] : [group.missingFeedback]
+        ),
+      ];
+  }
+}
+
+/**
+ * This problem's authored grading feedback, rendered, keyed by the authored
+ * string — see `ProblemMath.feedback` for why the string is the key and why
+ * the map is sparse.
+ *
+ * Exported so a caller holding only a `Problem` (this component's tests) can
+ * build the same map the page does, the way `renderSolutionMath` already is.
+ */
+export function renderFeedbackMath(problem: Problem): Record<string, MathRuns> {
+  const rendered: Record<string, MathRuns> = {};
+  for (const message of authoredFeedback(problem)) {
+    if (!HAS_INLINE_MATH.test(message)) continue;
+    rendered[message] = renderMathRuns(message);
+  }
+  return rendered;
+}
+
 /**
  * Everything `ProblemView`'s client subtree needs to render, rendered.
  *
@@ -140,6 +221,15 @@ export function renderSolutionMath(solution: Solution, explanation?: Explanation
  * solution, `answer` and all — as a client-component prop, so the flight
  * payload has carried the authored text the whole time. What is gated is the
  * *reveal*, in `SolutionPanel`, and that is unchanged.
+ *
+ * `feedback` is the same trade at a tenth of the size, and it is sparse where
+ * the others are not: only 30 of the 556 problems author feedback carrying
+ * math, so 526 of them get an empty object and pay nothing. Measured on the
+ * 30 that do: 907 bytes gzip on average, median 721B, max 2.0KB — 49 bytes
+ * averaged across the whole corpus. Rendering it on demand was never an
+ * option: it is wanted in the same frame as the wrong answer that asked for
+ * it, and a `Feedback` that could render math would be a `Feedback` that
+ * imports KaTeX.
  */
 export function prerenderProblemMath(problem: Problem): ProblemMath {
   const options =
@@ -153,5 +243,6 @@ export function prerenderProblemMath(problem: Problem): ProblemMath {
     options,
     hints: problem.hints.map((hint) => renderMathRuns(hint.text)),
     solution: renderSolutionMath(problem.solution, problem.explanation),
+    feedback: renderFeedbackMath(problem),
   };
 }

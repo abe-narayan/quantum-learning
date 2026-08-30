@@ -121,7 +121,7 @@ export function findMatchingBrace(source, openIndex) {
     // brace — a silently wrong slice from a silently wrong pattern.
     throw new Error(
       `findMatchingBrace: expected "{" at index ${openIndex}, found ` +
-        `${JSON.stringify(source[openIndex] ?? "<end of input>")} — the key pattern must end at the opening brace.`
+        `${JSON.stringify(source[openIndex] ?? "<end of input>")}. The key pattern must end at the opening brace.`
     );
   }
 
@@ -245,7 +245,7 @@ export function assertPlainData(value, label, pathParts = []) {
 export function extractObjectLiteral(source, keyPattern, filePath, label) {
   if (keyPattern.global || keyPattern.sticky) {
     throw new Error(
-      `extractObjectLiteral: key pattern ${keyPattern} must not be global or sticky — ` +
+      `extractObjectLiteral: key pattern ${keyPattern} must not be global or sticky. ` +
         `lastIndex carries between calls and would make extraction order-dependent.`
     );
   }
@@ -332,7 +332,7 @@ export async function writeGenerated(outputPath, contents) {
   const fail = (err) => {
     throw new Error(
       `Failed to write ${outputPath} (${err.code ?? "no code"}: ${err.message}). ` +
-        `On Windows this is almost always another process holding the file open — a running ` +
+        `On Windows this is almost always another process holding the file open, usually a running ` +
         `\`next dev\`, an editor, a file watcher, or an antivirus scanner. Stop the dev server and ` +
         `re-run. The previous version of the file has been left intact.`,
       { cause: err }

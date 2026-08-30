@@ -15,14 +15,14 @@ const SIMULATOR_ENTRIES: SearchEntry[] = [
     type: "simulator",
     title: "Bloch Sphere Explorer",
     description:
-      "Rotate and manipulate a single qubit's state on the Bloch sphere in real time — apply gates, watch the state vector move, and measure.",
+      "Rotate a single qubit's state on the Bloch sphere in real time. Apply gates, watch the state vector move, and measure it.",
     href: "/simulators#bloch-sphere",
   },
   {
     type: "simulator",
     title: "Complex Plane & Amplitude Explorer",
     description:
-      "Manipulate a complex amplitude directly — real part, imaginary part, magnitude, and phase — and see how they relate to probability.",
+      "Drag a complex amplitude around and watch its real part, imaginary part, magnitude and phase move together, then see which of them the probability depends on.",
     href: "/simulators#complex-amplitude-explorer",
   },
   {
@@ -71,7 +71,7 @@ const SIMULATOR_ENTRIES: SearchEntry[] = [
     type: "simulator",
     title: "Wavefunction Explorer",
     description:
-      "A 1D numerical wavefunction simulator — position and momentum grids, a real FFT, and time evolution via the split-operator method.",
+      "A one-dimensional wavefunction solved in your browser: position and momentum grids, a real FFT, and time evolution by the split-operator method.",
     href: "/simulators#wavefunction-explorer",
   },
   {
@@ -99,14 +99,14 @@ const SIMULATOR_ENTRIES: SearchEntry[] = [
     type: "simulator",
     title: "Syndrome Explorer",
     description:
-      "Inject a real X or Z error into a 3-qubit repetition code and watch the platform's error-correction engine extract the syndrome and apply the correction — bit-flip and phase-flip, both live.",
+      "Inject a real X or Z error into a 3-qubit repetition code, then watch the platform's own error-correction engine read the syndrome and apply the fix. Bit-flip and phase-flip, both live.",
     href: "/simulators#syndrome-explorer",
   },
   {
     type: "simulator",
     title: "Cross-Simulator Comparison",
     description:
-      "One real qubit state, one set of shared controls, and three of this page's own rendering lenses side by side — the Bloch sphere, the complex amplitude plane, and the probability bar chart.",
+      "One real qubit state and one set of controls, shown through three of this page's own lenses at once: the Bloch sphere, the complex amplitude plane, and the probability bar chart.",
     href: "/simulators#compare-states-explorer",
   },
 ];
@@ -187,7 +187,14 @@ export function buildSearchIndex(
    *  `scripts/generate-search-index.mjs` under plain Node, which resolves no
    *  `@/...` alias, so its only runtime imports must be ones Node can follow.
    *  Defaulted so existing callers that only want a count still compile. */
-  pillars: PillarInfo[] = []
+  pillars: PillarInfo[] = [],
+  /** How many times each glossary id is linked from the lesson corpus, used
+   *  only to weight glossary results against each other (see `linkCount` in
+   *  ./types.ts). Counted by the generator, which is already walking every
+   *  lesson file, and passed in rather than computed here because this module
+   *  reads no files. Defaulted, so every existing caller still compiles and
+   *  simply gets no weighting. */
+  termLinkCounts: Record<string, number> = {}
 ): SearchEntry[] {
   const coursePillarBySlug = new Map(courses.map((course) => [course.slug, course.pillar]));
   // The course a lesson/problem lives in, by title. A result row that says
@@ -276,6 +283,9 @@ export function buildSearchIndex(
     description: term.definition,
     href: `/glossary#${term.id}`,
     pillar: term.pillar,
+    // Ranking only, never rendered. See `linkCount` in ./types.ts for the tie
+    // it settles and why alphabetical order was the wrong answer to it.
+    linkCount: termLinkCounts[term.id] ?? 0,
   }));
 
   // Track landing pages. Six entries, and the reason they exist is narrow and

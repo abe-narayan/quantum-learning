@@ -45,7 +45,7 @@ export const phaseComparisonFrames = [
 export const lessonMeta = {
   title: "Capstone: Symmetry and the Classical Limit",
   description:
-    "Berry phase, the adiabatic theorem, and WKB, three seemingly separate topics, are three convergent routes to the same place: the classical/geometric structure hiding inside quantum phase. This capstone makes the convergence explicit, with a real computed comparison of an unbounded dynamical phase against a fixed geometric one.",
+    "Berry phase, the adiabatic theorem, and WKB, three seemingly separate topics, are three convergent routes to the same place: the classical/geometric structure hiding inside quantum phase. This capstone makes the convergence explicit, computing both kinds of phase for the same slowly traversed loop and letting the loop's duration settle which of the two is a fact about the path and which is a fact about the clock.",
   course: "symmetry-scattering-and-semiclassical-methods",
   module: "capstone-symmetry-and-the-classical-limit",
   order: 1,
@@ -70,7 +70,7 @@ export const lessonMeta = {
   disguise.
 </LessonHook>
 
-## Motivation
+## Three Lessons That Turn Out to Be One
 
 Three lessons, seemingly about different things: The WKB Approximation
 turned a rapidly-oscillating quantum phase into a classical trajectory.
@@ -91,9 +91,9 @@ faster. This capstone makes that convergence explicit.
   license="Public domain"
 />
 
-## Mathematical Development
+## Two Kinds of Phase, Two Kinds of Limit
 
-### Two kinds of phase, two kinds of limit
+### Which phase grows without bound, and which does not
 
 WKB's quantization condition, $\int_{x_1}^{x_2}p(x)\,dx=(n+\tfrac12)\pi\hbar$,
 says the classical action integral (in units of $\hbar$) is quantized. As
@@ -127,10 +127,12 @@ residue.
 
 <InteractiveSection
   title="Watch one grow, one stay fixed"
-  description="Both curves use The Adiabatic Theorem and Berry Phase's own θ=60° example (ω₀=ħ=1). The dynamical phase (brand) grows linearly as the loop is traversed more slowly, the same divergence WKB's action phase exhibits as ħ→0. The Berry phase (accent) sits at a fixed π/2 for every duration shown, precisely because it depends only on the loop's shape, never on how long that loop takes."
+  description="Both curves use The Adiabatic Theorem and Berry Phase's own θ=60° example (ω₀=ħ=1). The dynamical phase (brand) grows linearly as the loop is traversed more slowly, the same divergence WKB's action phase exhibits as ħ→0. The Berry phase (accent) sits at a fixed π/2 for every duration shown, because it depends only on the loop's shape and never on how long that loop takes. One caveat about that flat line: it is the strict adiabatic value π(1−cosθ). At finite T the true phase carries non-adiabatic corrections of order 1/T, so the line is exact only in the limit the rest of the plot is walking toward, and it becomes a better approximation as you move right."
 >
   <ParametricCurve
     frames={phaseComparisonFrames}
+    xAxisLabel="loop duration T"
+    yAxisLabel="|phase| (rad)"
     ariaLabel="Dynamical phase magnitude growing linearly with loop duration, compared to a constant Berry phase magnitude of pi over 2, for cone half angle 60 degrees"
   />
 </InteractiveSection>
@@ -141,8 +143,8 @@ WKB's quantization condition is not a purely quantum invention: it is the
 direct descendant of a **classical** fact, that the action
 variable $I=\frac1{2\pi}\oint p\,dx$ is an **adiabatic invariant**,
 staying constant under a slowly-varying classical Hamiltonian (a
-classical theorem, cited here rather than re-derived, from Hamiltonian
-mechanics rather than quantum theory). Old quantum theory's Bohr-Sommerfeld
+classical theorem, cited here from Hamiltonian mechanics and not from
+quantum theory). Old quantum theory's Bohr-Sommerfeld
 rule simply quantized this classical invariant in units of $\hbar$; WKB
 derives the *same* condition properly, as the leading semiclassical
 approximation to the true Schrödinger equation, matching what
@@ -158,7 +160,7 @@ point: Berry phase is not an artifact of quantization but a geometric
 fact about slowly-varied systems that quantum mechanics inherits rather
 than invents).
 
-## Physical Interpretation
+## Where the Classical Shadow Falls
 
 Three lessons, one convergent picture: **WKB** shows a classical
 trajectory crystallizing out of a rapidly-oscillating quantum phase as
@@ -175,7 +177,7 @@ is literally defined by parallel transport around a loop, a statement
 about the *geometry* (symmetry of parallel transport) of the space of
 quantum states themselves.
 
-## Worked Example
+## Racing a Geometric Phase Against a Dynamical One
 
 **At what loop duration $T$ does the dynamical phase from the plot above
 first reach a full $2\pi$, and how does this compare to the fixed
@@ -183,12 +185,13 @@ geometric phase at that same $T$?**
 
 $\theta_{\rm dyn}(T)=\omega_0T/2=2\pi\Rightarrow T=4\pi/\omega_0\approx12.566$
 (natural units, $\omega_0=1$). At that duration, the geometric phase is
-still exactly $\pi/2$, unchanged from its value at $T=1$: the dynamical
-phase has by then wound around the full unit circle **four times** further
-than the geometric phase's fixed $\pi/2$, a concrete numeric picture of
-"one piece keeps growing, the other doesn't move at all."
+still exactly $\pi/2$, unchanged from its value at $T=1$. So by then the
+dynamical phase has run a full turn around the circle while the geometric
+phase has managed a quarter turn: a ratio of **four**, and still climbing,
+since only one of the two depends on $T$ at all. At $T=40$, the right
+edge of the plot, the ratio is $20/(\pi/2)\approx12.7$.
 
-## Common Mistakes
+## Treating the Geometric Residue as Bookkeeping
 
 <Callout type="note">
 **Thinking Berry phase is a purely quantum phenomenon with no classical
@@ -212,17 +215,178 @@ plot makes explicit.
 
 1. Using the same $\omega_0=1$ convention, find the loop duration $T$ at
    which the dynamical phase equals $10\pi$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $T=20\pi\approx62.832$.
+
+   $$
+   \theta_{\rm dyn}(T)=\frac{\omega_0T}{2}=10\pi \;\Longrightarrow\; T=\frac{20\pi}{\omega_0}=20\pi\approx62.832.
+   $$
+
+   Two observations make this more than arithmetic. First, that duration
+   sits well off the right edge of the plot, which stops at $T=40$.
+   Extrapolating is legitimate here only because $\theta_{\rm dyn}$ is
+   exactly linear in $T$ with no saturation anywhere, which is precisely
+   the "unbounded" claim the capstone is making: there is no $T$ at which
+   the dynamical phase stops growing.
+
+   Second, compare the two phases at that duration. The geometric phase is
+   still $\pi/2$, its value at every $T$, so the ratio is
+   $10\pi/(\pi/2)=20$. At $T=4\pi$ the same ratio was $4$; at $T=40$ it was
+   about $12.7$. The ratio grows linearly and without limit, which is the
+   quantitative form of "one of these depends on the clock and the other
+   does not."
+
+   Worth being precise about what $\theta_{\rm dyn}=10\pi$ means
+   physically: $e^{i10\pi}=1$, so the dynamical phase has come back to
+   where it started, having wound five full times. A single measurement at
+   that instant cannot tell $10\pi$ from $0$. This is exactly why the
+   dynamical phase carries no geometric information and why real
+   geometric-phase experiments go to the trouble of cancelling it rather
+   than measuring it: its value is enormous, it depends on details of
+   timing no experiment controls to that precision, and modulo $2\pi$ it is
+   effectively a random number.
+
+   </details>
+
 2. Explain in your own words why the Berry phase curve in the plot above
    is exactly flat, using the path-dependence (not time-dependence)
    argument from The Adiabatic Theorem and Berry Phase.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the integral that defines $\gamma$ has no $dt$ left in it once
+   the chain rule has been applied, so the loop's duration has nothing to
+   attach to.
+
+   Follow the cancellation explicitly. The adiabatic derivation produced
+
+   $$
+   \gamma_n=i\int_0^T\langle n(t)|\dot n(t)\rangle\,dt
+   =i\int_0^T\langle n|\nabla_R n\rangle\cdot\frac{d\vec R}{dt}\,dt
+   =i\oint_{\mathcal C}\langle n|\nabla_R n\rangle\cdot d\vec R,
+   $$
+
+   where $\mathcal C$ is the closed curve the control parameters trace. The
+   $dt$ in the measure is consumed by the $d\vec R/dt$ from the chain rule.
+   What remains is a line integral over a curve, and a curve is a set of
+   points in parameter space, not a schedule for visiting them. Stretch $T$
+   by a factor of ten, run the loop unevenly, pause halfway around: the
+   curve $\mathcal C$ is unchanged, so $\gamma$ is unchanged.
+
+   Contrast the dynamical phase, $\theta_n=-\frac1\hbar\int_0^TE_n\,dt$.
+   Nothing in that integrand is a rate of change of anything, so the $dt$
+   survives, and the integral simply accumulates for as long as the loop
+   takes. That is the whole difference between the two curves in the plot.
+
+   Two qualifications keep this from being over-claimed. The invariance is
+   under *orientation-preserving* reparametrization only: traverse the same
+   loop backwards and $\gamma$ changes sign, since $d\vec R$ reverses. And
+   the flat line in the plot is the strict adiabatic value. At finite $T$
+   the true phase carries non-adiabatic corrections of order $1/T$ (from
+   the inter-level terms the derivation dropped), so the line is exact only
+   in the limit the horizontal axis is walking toward and becomes a better
+   approximation as $T$ grows. The plot's honest reading is therefore not
+   "geometric phase is constant" but "geometric phase converges to a
+   constant while dynamical phase diverges", which is a stronger statement
+   about their difference, not a weaker one.
+
+   </details>
+
 3. WKB's quantization condition and the classical adiabatic invariance of
    $I=\frac1{2\pi}\oint p\,dx$ are described here as "the same statement,"
    one classical and one quantized. What specifically gets added going
    from the classical statement to the WKB one?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Three things get added, and the third is the one that makes the pairing
+   more than an analogy.
+
+   **A discrete set of allowed values.** Classically, $I$ is a real number
+   and every value is available; a pendulum can swing at any amplitude.
+   Adiabatic invariance says only that whatever $I$ you have, slow changes
+   preserve it. WKB says the allowed $I$ are $\hbar(n+\tfrac12)$ for
+   non-negative integers $n$, so the continuum of classical orbits is
+   replaced by a discrete ladder. Equivalently, each quantum state occupies
+   a phase-space area of exactly $2\pi\hbar$, which is where the
+   semiclassical density of states comes from.
+
+   **The half-integer offset, which is not classical at all.** The $\tfrac12$
+   in $\int p\,dx=(n+\tfrac12)\pi\hbar$ has no counterpart in $I$. It is
+   the Maslov index: the WKB connection formulas cost the wave a phase of
+   $\pi/2$ at each of the two classical turning points, where the naive
+   semiclassical form breaks down and has to be matched through an Airy
+   function. Old quantum theory's Bohr-Sommerfeld rule quantized the
+   classical invariant without it and got the harmonic oscillator's zero
+   point wrong; WKB derives it, which is the concrete sense in which WKB is
+   a derivation rather than a postulate.
+
+   **Control of the error.** Classical adiabatic invariance is a theorem
+   about exact dynamics under slow driving. WKB is an asymptotic
+   approximation to the Schrödinger equation, exact only as $\hbar\to0$,
+   with corrections that are small when the de Broglie wavelength varies
+   slowly compared to itself and that fail outright near turning points.
+   They are statements of different logical type about the same integral.
+
+   The reason the pairing is not a coincidence is Ehrenfest's, and it runs
+   the other direction. A quantity can be consistently quantized under slow
+   driving only if it is an adiabatic invariant. If $I$ drifted under slow
+   variation, then $n=I/\hbar-\tfrac12$ would have to drift too, and $n$ is
+   an integer that cannot change continuously. So classical adiabatic
+   invariance of $I$ is exactly what makes the *quantum* adiabatic theorem
+   consistent in the semiclassical regime: the quantum number is stuck
+   because the classical action it quantizes is stuck. That is the link
+   this capstone is pointing at, with the two lessons standing on opposite
+   sides of it.
+
+   </details>
+
 4. Name, in one sentence each, the "unbounded" phase and the "fixed,
    geometric" phase in all three of: WKB, the adiabatic theorem applied
    to a general slow loop, and the spin-$\tfrac12$-in-a-rotating-field
    example specifically.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **WKB.** The unbounded piece is the action phase
+   $\frac1\hbar\int p(x)\,dx$, which grows without limit as $\hbar\to0$ at
+   fixed classical orbit, piling up oscillations no experiment resolves.
+   The fixed geometric piece is the quantized enclosed phase-space area
+   $\oint p\,dx=2\pi\hbar(n+\tfrac12)$: a property of the closed orbit as a
+   curve, unchanged by where you start on it or how fast you go around.
+
+   **The adiabatic theorem, general slow loop.** The unbounded piece is
+   the dynamical phase $\theta_n=-\frac1\hbar\int_0^TE_n(t)\,dt$, growing
+   linearly with the loop's duration. The fixed geometric piece is the
+   Berry phase $\gamma_n=i\oint_{\mathcal C}\langle n|\nabla_R n\rangle\cdot d\vec R$,
+   a functional of the closed curve $\mathcal C$ in parameter space and of
+   nothing else.
+
+   **Spin-$\tfrac12$ in a rotating field.** The unbounded piece is
+   $\theta=\omega_0T/2$, half the Larmor frequency times however long the
+   loop took, which is the brand curve in the plot above. The fixed
+   geometric piece is $\gamma=-\tfrac12\Omega=-\pi(1-\cos\theta)$, minus
+   half the solid angle the field direction traces out, which is $-\pi/2$
+   for the $\theta=60°$ cone used throughout.
+
+   One clarification the phrasing invites. "Fixed" always means fixed with
+   respect to the limit being taken, not constant in general. The Berry
+   phase moves the moment you change the loop's shape, as the whole
+   $\gamma$-versus-$\theta$ sweep in the previous lesson shows, and the WKB
+   action changes with the orbit. What none of them does is depend on the
+   thing that is being sent to a limit, which is $\hbar$ in the first case
+   and $T$ in the other two. That is the shared structure the capstone is
+   naming: in each pair, one quantity counts how much of the limit
+   parameter has been spent and the other records the geometry that
+   survives spending it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -240,11 +404,11 @@ plot makes explicit.
   Berry phase sits at a fixed $\pi/2$ throughout, a concrete instance of
   the general pattern this capstone unifies.
 
-## Further Exploration
+## What Closes With This Course
 
 <NextDiscovery>
   This closes **Symmetry, Scattering & Semiclassical Methods**, and with
-  it the Quantum Mastery pillar's mathematical-physics thread that began
+  it the Quantum Mastery track's mathematical-physics thread that began
   in Hilbert Space & Spectral Theory. Between them the two courses take
   five results the core curriculum was honest about citing rather than
   proving (degenerate perturbation theory, general angular-momentum

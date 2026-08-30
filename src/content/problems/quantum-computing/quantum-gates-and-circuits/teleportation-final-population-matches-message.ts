@@ -36,14 +36,14 @@ export const teleportationFinalPopulationMatchesMessage: NumericProblem = {
     type: "numeric",
     prompt:
       "The message state in this lesson is $|\\psi\\rangle=0.6|0\\rangle+0.8i|1\\rangle$, so $P(1)=0.64$ for a direct measurement of it. After the full teleportation protocol completes (Alice's outcomes both 1, Bob applies $X$ then $Z$), what is $P(1)$ for measuring Bob's corrected qubit?",
-    inputHint: "as a decimal between 0 and 1 — predict it before computing, then check",
+    inputHint: "as a decimal between 0 and 1; predict it before computing, then check",
   },
   answer: {
     type: "numeric",
     value: bobP1,
     tolerance: 0.01,
     incorrectFeedback:
-      "The whole point of the correction table is that Bob's qubit, after the right correction, is exactly $|\\psi\\rangle$ again — its measurement statistics should match the original message state exactly.",
+      "The whole point of the correction table is that Bob's qubit, after the right correction, is $|\\psi\\rangle$ again, so its measurement statistics match the original message state.",
     nearMisses: [
       { value: 0.36, feedback: "0.36 is P(0) for the message state. The question asks for P(1), which is |0.8i|²." },
       { value: 0.8, feedback: "0.8 is the magnitude of the |1⟩ amplitude. The Born rule squares it." },
@@ -51,8 +51,8 @@ export const teleportationFinalPopulationMatchesMessage: NumericProblem = {
     ],
   },
   hints: [
-    { text: "You don't need to redo the full derivation — the lesson already states the correction recovers $|\\psi\\rangle$ exactly for this branch." },
-    { text: "If Bob's corrected qubit really equals $|\\psi\\rangle$, its measurement probabilities must equal $|\\psi\\rangle$'s own measurement probabilities exactly." },
+    { text: "The full derivation is not needed. The lesson already states that the correction recovers $|\\psi\\rangle$ exactly for this branch." },
+    { text: "If Bob's corrected qubit equals $|\\psi\\rangle$, its measurement probabilities must match $|\\psi\\rangle$'s own exactly." },
     { text: "$P(1)$ for $|\\psi\\rangle=0.6|0\\rangle+0.8i|1\\rangle$ is $|0.8i|^2$." },
   ],
   solution: {

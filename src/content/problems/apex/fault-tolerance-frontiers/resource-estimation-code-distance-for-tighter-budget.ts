@@ -35,11 +35,11 @@ export const resourceEstimationCodeDistanceForTighterBudget: NumericProblem = {
       {
         value: 5,
         feedback:
-          "d=5 rounds the raw 6.40 down. Check it against the budget: (0.1)^((5+1)/2) = 10⁻³, five times larger than the 2×10⁻⁴ allowance, so it fails.",
+          "d=5 rounds the raw 6.40 down to the nearest odd value. Check it against the budget: (0.1)^((5+1)/2) = 10⁻³, five times larger than the 2×10⁻⁴ allowance, so it fails.",
       },
       {
         value: 6,
-        feedback: "6 is the next integer above 6.40's floor, but surface-code distance must be odd. Round up to the next odd value.",
+        feedback: "6 is the raw 6.40 rounded down, and it is even. Surface-code distance must be odd, and rounding has to go up to meet the budget, so take the next odd value above 6.40.",
       },
       {
         value: 9,

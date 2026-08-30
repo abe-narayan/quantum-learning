@@ -29,7 +29,7 @@ export const measurementFrames = measuredOutcomes.map((k, i) => ({
 export const lessonMeta = {
   title: "Worked Example: Factoring 15",
   description:
-    "Every piece from the last two lessons run end to end: the quantum period-finding circuit's exact output, a peak read off and confirmed against the classical order, and the gcd step recovering 15 = 3 × 5, with an honest account of what did and didn't need a quantum computer.",
+    "Every piece from the last two lessons run end to end on N=15: the quantum period-finding circuit's exact output, a peak read off and checked against the classical order, then the gcd step that finishes the factorization, with an honest account of what did and didn't need a quantum computer.",
   course: "quantum-algorithms-ii",
   module: "worked-example-factoring-15",
   order: 1,
@@ -43,11 +43,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Not a description, a run">
 This lesson does not describe Shor's algorithm running. It runs it: N=15, worked by hand, step by step, through this platform's own engine.
 </LessonHook>
 
-## Motivation
+## Small enough to check every step by hand
 
 $N=15$ is the standard first example for Shor's algorithm because it is
 small enough to compute every step by hand and to run through this
@@ -59,7 +59,7 @@ four steps is quantum. Second, one of the four possible measurement
 outcomes gives the wrong period and another gives no information, which is
 the kind of detail a clean summary of the algorithm leaves out.
 
-## Mathematical Development
+## Four steps, from one choice to two factors
 
 ### Step 1: choose a
 
@@ -127,7 +127,7 @@ $$
 \boxed{15 = 3 \times 5}
 $$
 
-## Physical Interpretation
+## Exactly one step needed a quantum computer
 
 One step in this pipeline needed a quantum computer: producing the
 period-finding distribution's sharp peaks through interference. Every other
@@ -148,7 +148,7 @@ in one narrow subroutine rather than throughout the algorithm.
   ariaLabel="The full factor-15 pipeline, with the single genuinely quantum step highlighted"
 />
 
-## Worked Example
+## Confirming the choice was legitimate
 
 **Confirm $\gcd(7,15)=1$ directly, verifying $a=7$ was a legitimate
 choice.**
@@ -157,7 +157,7 @@ $15=2(7)+1$, so $\gcd(7,15)=\gcd(7,1)=1$ (Euclid's algorithm, one step).
 This confirms $7$ is coprime to $15$, so the whole pipeline above was
 valid to run.
 
-## Common Mistakes
+## Four bits against a few thousand
 
 <Callout type="mistake">
 **Treating "factoring 15" as evidence Shor's algorithm threatens real
@@ -181,14 +181,170 @@ and combining results, not by trusting one shot.
 1. Repeat the pipeline for $N=21$, $a=2$ (order $r=6$, from earlier
    practice): predict the period-finding peaks with $t=6$ counting qubits,
    then carry out the classical reduction to find $21$'s factors.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The peaks first, and this case does *not* behave like $N=15$.
+   $2^t/r = 64/6 = 10.667$ is not an integer, so amplitude cannot
+   concentrate on exact multiples. It concentrates on the nearest integers
+   to $k\cdot 64/6$ for $k=0,\dots,5$, which are
+
+   $$
+   0,\ 10.67,\ 21.33,\ 32,\ 42.67,\ 53.33 \ \longrightarrow\ 0,\ 11,\ 21,\ 32,\ 43,\ 53 .
+   $$
+
+   The engine agrees precisely: those six outcomes are the six largest,
+   with probability $0.167$ at $0$ and $32$ (where the multiple is exact)
+   and $0.114$ at the four rounded ones, about $79\%$ of the total. Unlike
+   the $N=15$ run there is no floor of exact zeros; the remaining $21\%$
+   is spread thinly across the other $58$ outcomes.
+
+   Now the classical reduction, which does not care about any of that
+   provided the measurement yields $r=6$. $r$ is even, and
+   $a^{r/2}=2^3=8$. Check the second condition: $-1\equiv20\pmod{21}$ and
+   $8\neq20$, so the reduction applies. Then
+
+   $$
+   \gcd(8-1,\,21)=\gcd(7,21)=7, \qquad \gcd(8+1,\,21)=\gcd(9,21)=3,
+   $$
+
+   giving $21 = 3\times7$.
+
+   The instructive difference from the lesson's $N=15$ run is entirely in
+   step 2. Both reductions are identical arithmetic; the quantum output is
+   clean in one case and smeared in the other, purely because $4$ divides
+   $64$ and $6$ does not. Since $r$ is unknown before you run, a real
+   implementation must assume the smeared case, which is what continued
+   fractions and repeated runs are for.
+
+   The wrong turn is predicting six sharp peaks at multiples of $10.667$
+   and reporting non-integer outcome labels. A measurement returns an
+   integer between $0$ and $63$; the non-integer multiples are where the
+   peaks *would* be if they could, and rounding is what actually happens.
+
+   </details>
+
 2. Suppose the measured outcome in Step 3 had been $16$ instead of $32$.
    What fraction would $16/64$ reduce to, and would it still correctly
    identify $r=4$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $16/64$ reduces to $1/4$, whose denominator is $4$, and yes, that is
+   the correct $r$.
+
+   Compare all four possible outcomes for this run, which the engine's
+   distribution says are equally likely at $0.25$ each:
+   $0/64 \to 0/1$, denominator $1$, no information at all;
+   $16/64 \to 1/4$, denominator $4$, correct;
+   $32/64 \to 1/2$, denominator $2$, an undercount;
+   $48/64 \to 3/4$, denominator $4$, correct.
+
+   So two of the four outcomes give $r$ directly, one gives a proper
+   divisor of it, and one gives nothing. The mechanism is that the
+   measured outcome is $k\cdot2^t/r$ for a uniformly random $k$ in
+   $\{0,\dots,r-1\}$, and reducing $k/r$ to lowest terms recovers $r$
+   exactly when $\gcd(k,r)=1$. Here $k=1$ and $k=3$ are coprime to $4$ and
+   work; $k=2$ shares a factor and undersells; $k=0$ collapses entirely.
+
+   That is the honest reason real implementations repeat the circuit. A
+   single shot succeeds with probability $\phi(r)/r$, which is $1/2$ here,
+   and combining the denominators from a few shots by least common
+   multiple recovers $r$ with high probability. It also explains why the
+   lesson's chosen illustration, $x=32$, was the awkward one: it was
+   picked to show the failure mode rather than to flatter the algorithm.
+
+   The wrong turn is reading a denominator of $2$ as evidence that the
+   period really is $2$ and moving on. It would send you into the
+   reduction with $a^{r/2}=7^1=7$, and $\gcd(6,15)=3$, $\gcd(8,15)=1$: one
+   real factor and one trivial, so you would still stumble onto $3$ here,
+   but only by luck. Verifying the candidate $r$ by checking
+   $a^{r}\equiv1\pmod N$ costs one modular exponentiation and catches it.
+
+   </details>
+
 3. Why does checking $\gcd(a,N)=1$ *before* running the quantum circuit
    matter? What would go wrong (conceptually) with modular exponentiation
    if $a$ and $N$ shared a common factor?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Two reasons, and the first is the happy one: if $\gcd(a,N)\neq1$ then
+   that gcd is *already* a nontrivial factor of $N$, computed by Euclid's
+   algorithm in microseconds. You are done, and running any quantum
+   circuit would be wasted effort.
+
+   The second is that order-finding is not defined otherwise. The order
+   $r$ is the smallest positive integer with $a^r\equiv1\pmod N$, and such
+   an $r$ exists only when $a$ is invertible mod $N$, which is exactly the
+   condition $\gcd(a,N)=1$. If $a$ shares a factor $d>1$ with $N$, then
+   every power $a^k$ is divisible by $d$, so $a^k\bmod N$ is always
+   divisible by $d$ and can never equal $1$. The sequence
+   $a^0, a^1, a^2,\dots \bmod N$ still eventually repeats, but it never
+   returns to $1$, so it has a pre-period before entering its cycle and is
+   not purely periodic in $x$.
+
+   That last point is what breaks the circuit rather than merely the
+   definition. The QFT extraction assumes $f(x)=a^x\bmod N$ is periodic
+   from $x=0$ onward, so that grouping the sum by residue class mod $r$
+   gives equal-sized classes whose phases interfere cleanly. An eventually
+   periodic function with a lead-in has classes of unequal size, the
+   cancellation is no longer exact, and the peaks blur or shift. The
+   engine's `classicalOrder` refuses such an $a$ outright, which is the
+   same boundary enforced in code.
+
+   The wrong turn is treating the gcd check as a formality that a
+   well-chosen random $a$ will pass anyway. It usually will, since for
+   $N=pq$ only a $1/p+1/q$ fraction of bases fail, but the check costs
+   almost nothing and its failure is a *win*, not an error. It is the one
+   place in Shor's algorithm where bad luck hands you the answer for free.
+
+   </details>
+
 4. List, in order, every step of this worked example that was purely
-   classical computation, and the one step that was not.
+   classical computation, and the one step that was not. Then say which of
+   those classical steps stay cheap at cryptographic scale, and which one
+   in this demonstration would not.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   In order: (1) pick $a=7$, classical. (2) check $\gcd(7,15)=1$ by
+   Euclid, classical. (3) run the period-finding circuit and measure,
+   **quantum**, and the only quantum step. (4) reduce the measured
+   fraction $32/64$ to identify $r$, classical. (5) compute
+   $a^{r/2}=7^2\bmod15=4$, classical. (6) run Euclid twice on
+   $\gcd(3,15)$ and $\gcd(5,15)$, classical. Five classical steps around
+   one quantum one.
+
+   At cryptographic scale every one of those classical steps stays cheap,
+   and that is precisely why the reduction counts as a reduction. Euclid's
+   algorithm is $O(\log^2 N)$; modular exponentiation by square-and-multiply
+   is $O(\log^3 N)$; continued fractions on a fraction with denominator
+   $2^t$ is polynomial in $t$. None of them is the bottleneck at any size.
+
+   The step that would not stay cheap is one this demonstration used
+   without listing it: `classicalOrder(7,15)`, the brute-force order check
+   that confirmed $r=4$ independently. Brute force costs $O(r)$
+   multiplications and $r$ can be about the size of $N$, so it is
+   exponential in the digit count. It appears here only as a checking
+   tool, and it is exactly the job the quantum step exists to replace. A
+   real run has no such oracle and must trust the measured outcome, which
+   is why the fraction-reduction subtlety in question 2 matters.
+
+   The wrong turn is describing Shor's algorithm as "a quantum algorithm
+   for factoring" and leaving it there. Five of six steps run on a laptop,
+   the quantum computer is asked one narrow question, and the honest
+   summary is that Shor's algorithm is a classical factoring algorithm
+   with one exponentially expensive subroutine offloaded. It is also worth
+   saying plainly, as the lesson does, that $15=3\times5$ is a number you
+   could factor in your head: this run demonstrates the mechanism and no
+   advantage whatsoever.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -205,7 +361,7 @@ and combining results, not by trusting one shot.
   is not, and does not claim to be, a cryptographically relevant
   factorization.
 
-## Further Exploration
+## A completely different style of algorithm
 
 <NextDiscovery>
 Up next, [The Variational Principle and Ansatz Circuits](/lessons/quantum-computing/quantum-algorithms-ii/the-variational-principle-and-ansatz-circuits) is a completely

@@ -41,7 +41,7 @@ export function secondOrderEnergyCorrection(H0diag: readonly number[], Hprime: M
     if (m === n) continue;
     const gap = H0diag[n] - H0diag[m];
     if (Math.abs(gap) < 1e-12) {
-      throw new Error(`secondOrderEnergyCorrection: degenerate levels at n=${n}, m=${m} — non-degenerate PT does not apply.`);
+      throw new Error(`secondOrderEnergyCorrection: degenerate levels at n=${n}, m=${m}. Non-degenerate perturbation theory does not apply.`);
     }
     total += Hprime.get(m, n).magnitudeSquared() / gap;
   }
@@ -59,7 +59,7 @@ export function firstOrderStateCorrection(H0diag: readonly number[], Hprime: Mat
     if (m === n) return Complex.ZERO;
     const gap = H0diag[n] - H0diag[m];
     if (Math.abs(gap) < 1e-12) {
-      throw new Error(`firstOrderStateCorrection: degenerate levels at n=${n}, m=${m} — non-degenerate PT does not apply.`);
+      throw new Error(`firstOrderStateCorrection: degenerate levels at n=${n}, m=${m}. Non-degenerate perturbation theory does not apply.`);
     }
     return Hprime.get(m, n).scale(1 / gap);
   });

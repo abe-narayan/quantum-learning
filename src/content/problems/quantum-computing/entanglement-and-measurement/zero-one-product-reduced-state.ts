@@ -24,7 +24,7 @@ export const zeroOneProductReducedState: MultipleChoiceProblem = {
   },
   question: {
     type: "multiple-choice",
-    prompt: "For the product state $|01\\rangle$, what is $\\text{Tr}_A(\\rho)$ — qubit 1's reduced state?",
+    prompt: "For the product state $|01\\rangle$, what is $\\text{Tr}_A(\\rho)$, the reduced state of qubit 1?",
     options: [
       { id: "a", text: "$|1\\rangle\\langle1|$" },
       { id: "b", text: "$|0\\rangle\\langle0|$" },
@@ -36,20 +36,20 @@ export const zeroOneProductReducedState: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "That's qubit 0's state (|0⟩), not qubit 1's — |01⟩ has qubit 0 = |0⟩ and qubit 1 = |1⟩.",
-      c: "$I/2$ (maximally mixed) only arises from tracing out an entangled partner — |01⟩ is a product state, so both reduced states stay pure.",
-      d: "Nothing in |01⟩ involves the X basis — its qubits are both in computational-basis eigenstates.",
+      b: "That is qubit 0's state, not qubit 1's: in |01⟩, qubit 0 is |0⟩ and qubit 1 is |1⟩.",
+      c: "$I/2$ (maximally mixed) only arises from tracing out an entangled partner. $|01\rangle$ is a product state, so both reduced states stay pure.",
+      d: "Nothing in |01⟩ involves the X basis; both qubits sit in computational-basis eigenstates.",
     },
-    defaultIncorrectFeedback: "|01⟩ is a product state — its reduced states are just the individual factors, unchanged.",
+    defaultIncorrectFeedback: "|01⟩ is a product state, so its reduced states are the individual factors, unchanged.",
   },
   hints: [
-    { text: "|01⟩ = |0⟩ (qubit 0) ⊗ |1⟩ (qubit 1) — a product state." },
+    { text: "|01⟩ = |0⟩ (qubit 0) ⊗ |1⟩ (qubit 1), a product state." },
     { text: "For a product state, the partial trace returns the untouched factor exactly." },
     { text: "Which factor is qubit 1's part of |01⟩?" },
   ],
   solution: {
     steps: [
-      { description: "$|01\\rangle=|0\\rangle\\otimes|1\\rangle$ — a product state, with qubit 1 in state $|1\\rangle$." },
+      { description: "$|01\\rangle=|0\\rangle\\otimes|1\\rangle$, a product state with qubit 1 in state $|1\\rangle$." },
       { description: "Tracing out qubit 0 from a product state returns qubit 1's factor unchanged: $\\text{Tr}_A(\\rho)=|1\\rangle\\langle1|$." },
     ],
     finalAnswer: "$\\text{Tr}_A(\\rho)=|1\\rangle\\langle1|$",

@@ -21,16 +21,32 @@ export const equatorStatesSameThetaDifferentPhi: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["equal probability", "50/50", "same probability", "p(0)=p(1)"],
-      ["phase", "relative phase", "φ", "varphi"],
+      {
+        phrases: ["equal probability", "50/50", "same probability", "p(0)=p(1)"],
+        missingFeedback:
+          "The question asks for two things. Say what every equator state has in common, in terms of what a computational-basis measurement would give.",
+      },
+      {
+        phrases: ["relative phase", "phase difference", "phase angle", "differ in phase", "differs in phase", "differing phase", "the phase between", "azimuthal angle", "φ", "varphi"],
+        missingFeedback:
+          "You have said what they share. Now say what actually distinguishes two equator points, given that latitude is the same for both.",
+        anchors: {
+          "φ": "The bare angle symbol is what a student writes who names the coordinate rather than the concept. It strips to nothing, so the raw glyph is the test.",
+        },
+      },
     ],
     incorrectFeedback:
-      "Be specific: what quantity is identical for every equator point (hint: it's tied to θ), and what quantity varies as you move around the equator (hint: it's tied to φ)?",
-    partialFeedback: "Good — now make sure you've covered both halves: what stays the same across the equator, and what changes.",
+      "You said the equator points are 'the same state up to a global factor', which is exactly what they are not. Split the two angles: say which measurable quantity θ pins down, and what changes as you travel round the equator that a computational-basis measurement cannot see.",
+    partialFeedback: "Cover both halves: what stays the same across the equator, and what changes.",
+    modelAnswers: [
+      "What stays the same is the measurement probabilities: every equator state gives 50/50 in the computational basis, because theta fixes those. What differs is the relative phase between the two amplitudes, the azimuthal angle phi.",
+      "All equator points have the same probability of 0 and 1, P(0)=P(1)=1/2. They differ in phase: the angle phi is the phase difference between the |0> and |1> components, and that is a real physical difference.",
+    ],
   },
   hints: [
-    { text: "θ is the same (π/2) for every equator point — what does θ control?" },
-    { text: "φ is different at different equator points — what does φ control?" },
+    { text: "Write a general Bloch-sphere state in terms of its two angles, then set the polar angle to π/2 and see what survives." },
+    { text: "Compute the computational-basis probabilities for that state. Which of the two angles do they involve?" },
+    { text: "The other angle has not disappeared from the state. Say what it does to the two amplitudes, and name a measurement that would notice." },
   ],
   solution: {
     steps: [
@@ -40,7 +56,7 @@ export const equatorStatesSameThetaDifferentPhi: ConceptualProblem = {
       },
       {
         description:
-          "Equator points differ in φ, the relative phase between the |0⟩ and |1⟩ components — invisible to a direct computational-basis measurement, but physically real (it shows up once gates or a different measurement basis get involved).",
+          "Equator points differ in φ, the relative phase between the |0⟩ and |1⟩ components. It is invisible to a direct computational-basis measurement but physically real, showing up once gates or a different measurement basis are involved.",
       },
     ],
     finalAnswer: "Same: measurement probabilities (P(0)=P(1)=1/2, fixed by θ). Different: relative phase φ.",

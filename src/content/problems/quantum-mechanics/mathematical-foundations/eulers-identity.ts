@@ -19,22 +19,23 @@ export const eulersIdentity: MultipleChoiceProblem = {
       { id: "a", text: "$-1$" },
       { id: "b", text: "$1$" },
       { id: "c", text: "$i$" },
-      { id: "d", text: "$0$" },
+      { id: "d", text: "$-i$" },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Check the sign — cos(π) is -1, not 1.",
+      b: "Check the sign: cos(π) is -1, not 1.",
       c: "That would be e^{iπ/2}, not e^{iπ}.",
-      d: "e^{iθ} always has modulus 1, so it can never equal 0.",
+      d: "That is a quarter turn past the answer, at θ = 3π/2 (equivalently −π/2). At θ = π you have gone half way round the circle and landed on the negative real axis, where sin vanishes, so the answer has no imaginary part at all.",
     },
     defaultIncorrectFeedback: "Apply Euler's formula: e^{iθ} = cos(θ) + i sin(θ), with θ = π.",
   },
   hints: [
-    { text: "Euler's formula: e^{iθ} = cos(θ) + i sin(θ)." },
-    { text: "Evaluate at θ = π: what are cos(π) and sin(π)?" },
+    { text: "Euler's formula puts $e^{i\\theta}$ on the unit circle, so whatever the answer is, it has modulus 1. That alone does not separate the four options." },
+    { text: "Write $e^{i\\theta}=\\cos\\theta+i\\sin\\theta$ and set $\\theta=\\pi$, which is a half turn around that circle." },
+    { text: "Evaluate the sine at a half turn first. If it vanishes, so does the whole imaginary part, which settles two of the four options immediately." },
   ],
   solution: {
     steps: [
@@ -49,7 +50,7 @@ export const eulersIdentity: MultipleChoiceProblem = {
     whyWrong: [
       { optionId: "b", text: "Takes cos(π) as +1. It is −1; +1 is the value at θ=0 or θ=2π." },
       { optionId: "c", text: "Lands a quarter turn short. That is e^{iπ/2}, where cos vanishes and sin is 1." },
-      { optionId: "d", text: "Ruled out without any evaluation: |e^{iθ}| = 1 for every real θ, so it never reaches 0." },
+      { optionId: "d", text: "Overshoots by a quarter turn. −i sits at θ = 3π/2; half a turn stops on the negative real axis, not the imaginary one." },
     ],
   },
 };

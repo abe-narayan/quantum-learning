@@ -14,7 +14,7 @@ export function BlochSphereStatePanel({ state, angles }: { state: StateVector; a
       {/* No `overflow-x-auto` here: the only child is a block-level
           `.katex-display`, which fills this content box and carries its own
           horizontal scroll (globals.css §6), so this box never had anything to
-          scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+          scroll, and `overflow-x: auto` with `overflow-y: visible` computes the
           y axis to `auto` too, which would silently clip a tall equation. The tab
           stop the slab needs now lives on `.katex-display` itself; see
           `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}

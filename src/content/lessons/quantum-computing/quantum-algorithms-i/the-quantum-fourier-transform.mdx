@@ -7,6 +7,7 @@ import { VectorDiagramExplorer } from "@/components/visualizations/VectorDiagram
 import { InteractiveSection } from "@/components/mdx/InteractiveSection";
 import { PredictBeforeReveal } from "@/components/mdx/PredictBeforeReveal";
 import { ExternalFigure } from "@/components/mdx/ExternalFigure";
+import { ScrollableFigure } from "@/components/mdx/ScrollableFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "quantum-computing/quantum-algorithms-i/the-quantum-fourier-transform"
@@ -78,7 +79,7 @@ export const lessonMeta = {
 Deutsch-Jozsa's Hadamard trick could extract a single yes/no bit from a phase. The quantum Fourier transform generalizes it to extract an entire periodic pattern.
 </LessonHook>
 
-## Motivation
+## Generalizing the Hadamard interference step
 
 Deutsch-Jozsa used $H^{\otimes n}$ as an interference step: turn phases into
 measurable amplitudes. The **<Term id="quantum-fourier-transform">quantum Fourier transform (QFT)</Term>** is the
@@ -96,7 +97,7 @@ lesson) and, eventually, Shor's algorithm need.
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## The definition, the product form, and the circuit
 
 ### The definition
 
@@ -117,15 +118,17 @@ $$
 
 This is the ordinary discrete Fourier transform, applied directly to a
 state vector's <Term id="amplitude">amplitudes</Term> instead of a classical array, and it's the
-closed-form definition, not a circuit yet; the circuit comes next.
+closed-form definition; the circuit that implements it comes next.
 
 ### Checking it reduces to H
 
 For $n=1$ ($N=2$): $\text{QFT}|0\rangle =
 \frac{1}{\sqrt2}\left(e^{0}|0\rangle+e^{0}|1\rangle\right)=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)=H|0\rangle$,
 and $\text{QFT}|1\rangle=\frac{1}{\sqrt2}\left(|0\rangle+e^{i\pi}|1\rangle\right)=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)=H|1\rangle$.
-So the QFT *is* $H$ for a single qubit, confirmed against the engine as
-well as algebraically. That is not a coincidence of small numbers.
+So the QFT *is* $H$ for a single qubit, and `quantumFourierTransform`
+reduces to exactly that one Hadamard at $n=1$: its controlled-rotation
+loop and its final swap layer both have nothing left to do on a
+one-qubit register. That is not a coincidence of small numbers.
 $H^{\otimes n}$, Deutsch-Jozsa's tool, and the QFT are the same
 construction at $n=1$, and they diverge only once $n>1$ calls for finer
 phase resolution than a Hadamard's single sign flip can provide.
@@ -141,7 +144,7 @@ Write $j$'s binary digits as $j_1j_2\ldots j_n$ (most significant first),
 and likewise for $k$.
 
 <DerivationSteps>
-  <DerivationStep annotation="Expand k in binary. Because k = k₁2^{n-1} + ⋯ + kₙ2⁰, dividing by N = 2ⁿ turns each bit's weight into a negative power of two: k/N = k₁/2 + k₂/4 + ⋯ + kₙ/2ⁿ.">
+  <DerivationStep annotation="Expand k in binary. Because k = k₁2ⁿ⁻¹ + ⋯ + kₙ2⁰, dividing by N = 2ⁿ turns each bit's weight into a negative power of two: k/N = k₁/2 + k₂/4 + ⋯ + kₙ/2ⁿ.">
 $$
 \frac{k}{N} = \sum_{l=1}^{n} k_l\,2^{-l}
 $$
@@ -156,7 +159,7 @@ $$
 \text{QFT}|j\rangle = \frac{1}{\sqrt{N}}\bigotimes_{l=1}^{n}\left(|0\rangle + e^{2\pi i j/2^{l}}|1\rangle\right)
 $$
   </DerivationStep>
-  <DerivationStep annotation="Finally, e^{2πij/2^l} only cares about j modulo 2^l, i.e. about j's last l bits. Writing 0.j_a…j_n for the binary fraction j_a/2 + ⋯ + j_n/2^{n-a+1} gives the standard form.">
+  <DerivationStep annotation="Finally, the phase e^(2πij/2^l) only cares about j modulo 2^l, that is, about j's last l bits. Writing 0.j_a…j_n for the binary fraction j_a/2 + ⋯ + j_n/2^(n−a+1) gives the standard form.">
 $$
 \text{QFT}|j\rangle = \bigotimes_{l=1}^{n}\frac{|0\rangle + e^{2\pi i\,0.j_{n-l+1}\ldots j_n}|1\rangle}{\sqrt2}
 $$
@@ -183,10 +186,10 @@ naturally deposits $0.j_1\ldots j_n$ on qubit $1$ and $0.j_n$ on qubit
 $n$, which is the product form's ordering reversed. A layer of swaps at
 the end puts each factor back on the qubit the product form assigns it to.
 
-### The circuit
+### The circuit, gate by gate
 
-Implementing the $N\times N$ DFT matrix directly would cost $O(N^2)$ gate
-operations, exponential in $n$. The product form above says that cost is
+Implementing the $N\times N$ DFT matrix directly would cost $O(N^2)$
+arithmetic operations, exponential in $n$. The product form above says that cost is
 avoidable, and the standard QFT circuit instead uses
 only $O(n^2)$ gates: apply $H$ to qubit 0, then a chain of controlled-phase
 rotations $\text{CPHASE}(2\pi/2^k)$ from each later qubit onto qubit 0 (each
@@ -209,7 +212,7 @@ shape is drawn directly here, the same way Quantum Phase Estimation draws
 its own circuit. Both diagrams read their angles straight off the functions
 they depict:
 
-<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
+<ScrollableFigure label="Quantum Fourier transform circuit for three qubits">
   <svg width={600} height={168} viewBox="0 0 600 168" role="img" aria-label="Quantum Fourier transform circuit for n=3 qubits: H on q0, controlled-phase pi/2 from q1 and pi/4 from q2 onto q0, H on q1, controlled-phase pi/2 from q2 onto q1, H on q2, then a final swap of q0 and q2" className="min-w-full">
     <line x1={40} y1={28} x2={600} y2={28} className="stroke-border" strokeWidth={2} />
     <text x={4} y={32} className="fill-muted-foreground text-xs font-mono">q0</text>
@@ -246,7 +249,7 @@ they depict:
     <text x={495} y={33} textAnchor="middle" className="fill-brand text-base font-bold">×</text>
     <text x={495} y={145} textAnchor="middle" className="fill-brand text-base font-bold">×</text>
   </svg>
-</div>
+</ScrollableFigure>
 
 Reading it left to right matches the derivation exactly: $H$ on $q_0$,
 then two progressively finer controlled-phase corrections onto $q_0$ from
@@ -263,9 +266,9 @@ $\text{QFT}^{-1}$ reverses every step in the opposite order, with every
 rotation angle negated. `inverseQuantumFourierTransform` composed with
 `quantumFourierTransform` returns the original state exactly (checked to
 $10^{-9}$ on an arbitrary normalized 2-qubit state), the defining property
-of an inverse, not just a name.
+of an inverse, which is more than the name alone would promise.
 
-## Physical Interpretation
+## A change of basis, into frequencies
 
 The QFT is a change of <Term id="basis">basis</Term>: from "which computational basis state" to
 "which frequency of phase oscillation across computational basis states."
@@ -273,10 +276,10 @@ The circuit above needs only $O(n^2)$ gates on $n$ qubits to do it, versus
 the $O(N^2)$ cost of the direct $N\times N$ DFT matrix derived above.
 
 <PredictBeforeReveal
-  question="The classical FFT computes the identical discrete Fourier transform on a 2^n-element array in O(n·2^n) operations. How does the QFT's O(n^2)-gate circuit compare, for the same n?"
+  question="The classical FFT computes the identical discrete Fourier transform on a 2ⁿ-element array in O(n·2ⁿ) operations. How does the QFT's O(n²)-gate circuit compare, for the same n?"
   options={[
     { label: "No real advantage: the same scaling", value: "same" },
-    { label: "A modest constant-factor speedup", value: "constant" },
+    { label: "A modest constant-factor speedup, the same asymptotic scaling with a better constant", value: "constant" },
     { label: "Exponentially fewer gates than the FFT's operation count", value: "exponential" },
     { label: "It's slower than the FFT", value: "slower" },
   ]}
@@ -290,7 +293,7 @@ phase estimation (next lesson) builds. The point of the next several
 lessons is what this change of basis buys you when a phase already
 encodes something you want to know.
 
-## Worked Example
+## Transforming one basis state by hand
 
 **Compute $\text{QFT}|01\rangle$ for $n=2$ ($j=1$, $N=4$) directly from the
 formula, and compare to the engine's output.**
@@ -363,7 +366,7 @@ imaginary part); at $j=3$ the fan reappears running the opposite direction.
 Every one of these four patterns is the same formula,
 $e^{2\pi ijk/4}$, evaluated at a different $j$, not four separate facts.
 
-## Common Mistakes
+## The QFT and the FFT do different jobs
 
 <Callout type="note">
 **Confusing the QFT with the classical FFT conceptually.** Both compute a
@@ -384,13 +387,171 @@ this lesson's worked example relies on.
 ## Practice Questions
 
 1. Compute $\text{QFT}|10\rangle$ for $n=2$ directly from the formula.
-2. Verify $\text{QFT}|00\rangle$ gives the uniform superposition (all four
-   amplitudes equal), for any $n$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Here $n=2$, so $N=4$, and $|10\rangle$ is $j=2$. The definition gives
+   amplitude $\tfrac12 e^{2\pi i\,\cdot\,2k/4} = \tfrac12 e^{i\pi k}$ on
+   $|k\rangle$, and $e^{i\pi k}=(-1)^k$:
+
+   $$
+   \text{QFT}|10\rangle = \frac12\big(|00\rangle - |01\rangle + |10\rangle - |11\rangle\big)
+   $$
+
+   `quantumFourierTransform` returns exactly $0.5, -0.5, 0.5, -0.5$, with
+   zero imaginary part everywhere. The imaginary part of the $|11\rangle$
+   amplitude is $0$.
+
+   Two checks are worth making. Normalization:
+   $4\times\left(\tfrac12\right)^2 = 1$. And the state factorizes:
+   $\tfrac12(|00\rangle-|01\rangle+|10\rangle-|11\rangle) = |+\rangle\otimes|-\rangle$,
+   a product state with no entanglement, exactly as the lesson's product
+   form guarantees for any basis-state input. Reading the product form off
+   directly, with $j = j_1j_2 = 10$: the first output qubit carries phase
+   $0.j_2 = 0.0 = 0$, giving $|+\rangle$, and the second carries
+   $0.j_1j_2 = 0.10 = \tfrac12$, giving $e^{i\pi}=-1$ and so $|-\rangle$.
+   Same answer by two routes.
+
+   Compare with $j=1$: `quantumFourierTransform` returns
+   $\tfrac12(|00\rangle + i|01\rangle - |10\rangle - i|11\rangle)$, with
+   genuinely complex amplitudes. The real-only answer for $j=2$ is not
+   typical; it happens because $2k/4$ is always a half-integer, so the
+   phase only ever lands on $\pm1$. That is also why $\text{QFT}$ on the
+   top half of the register looks like a Hadamard and only shows its finer
+   phase resolution on the odd $j$.
+
+   The wrong turn is using $e^{2\pi i jk/n}$ with $n=2$ instead of
+   $N=2^n=4$ in the denominator. The exponent's denominator is the
+   dimension, not the qubit count, and mixing them up gives a transform
+   with the wrong period.
+
+   </details>
+
+2. Verify $\text{QFT}|0\rangle^{\otimes n}$ gives the uniform superposition
+   (all $2^n$ amplitudes equal), for any $n$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Put $j=0$ into the definition. Every exponent becomes
+   $2\pi i\cdot 0\cdot k/N = 0$, so every phase factor is $e^0=1$:
+
+   $$
+   \text{QFT}|0\rangle^{\otimes n} = \frac{1}{\sqrt N}\sum_{k=0}^{N-1}e^{0}|k\rangle = \frac{1}{\sqrt N}\sum_k|k\rangle
+   $$
+
+   All $N=2^n$ amplitudes equal $1/\sqrt N$, which is the uniform
+   superposition, and the argument used nothing about $n$. The engine
+   confirms it at $n=2$ ($0.5$ four times) and $n=3$ ($0.353553$ eight
+   times).
+
+   So $\text{QFT}$ and $H^{\otimes n}$ agree on this one input. They agree
+   on no other input once $n>1$: question 1's $j=2$ gave
+   $|+\rangle|-\rangle$, while $H^{\otimes 2}|10\rangle$ gives
+   $|-\rangle|+\rangle$, a different state. The coincidence at $j=0$ is
+   that a zero phase is the only phase both transforms can express.
+
+   The product form says the same thing more structurally. Every factor is
+   $\left(|0\rangle+e^{2\pi i\,\cdot\,0}|1\rangle\right)/\sqrt2 = |+\rangle$,
+   so the output is $|+\rangle^{\otimes n}$, which is what $H^{\otimes n}$
+   produces from $|0\rangle^{\otimes n}$ too.
+
+   The wrong turn is generalizing to "$\text{QFT}$ of any basis state is
+   uniform in magnitude, so $\text{QFT}$ always destroys information about
+   $j$". The magnitudes really are all $1/\sqrt N$ for every basis input,
+   which is a genuine and important fact. What survives is the *phase*
+   pattern, and reading a phase pattern back out is what the inverse
+   $\text{QFT}$ does and what phase estimation is built on.
+
+   </details>
+
 3. Using the definition, explain why $\text{QFT}$ is a unitary operation
    (Hint: what is $\sum_k|e^{2\pi ijk/N}|^2$?).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Unitary means norm-preserving, equivalently that the transformed basis
+   states stay orthonormal. Take the two halves in turn.
+
+   Norms first, which is the hint. Each phase factor has modulus one,
+   $\left|e^{2\pi ijk/N}\right|=1$, so
+   $\sum_{k}\left|e^{2\pi ijk/N}\right|^2 = \sum_{k}1 = N$, and with the
+   $1/\sqrt N$ out front the norm of $\text{QFT}|j\rangle$ is
+   $\tfrac{1}{N}\cdot N = 1$. Every basis state maps to a unit vector.
+
+   Orthogonality is the other half, and it needs a geometric sum. For
+   $j\neq j'$,
+
+   $$
+   \langle \text{QFT}\,j' \mid \text{QFT}\,j\rangle = \frac{1}{N}\sum_{k=0}^{N-1}e^{2\pi i(j-j')k/N} = \frac{1}{N}\cdot\frac{1-e^{2\pi i(j-j')}}{1-e^{2\pi i(j-j')/N}} = 0
+   $$
+
+   because the numerator is $1-1=0$ (as $j-j'$ is a nonzero integer) while
+   the denominator is not, since $0<|j-j'|<N$ keeps
+   $e^{2\pi i(j-j')/N}\neq1$. So the $N$ output states are orthonormal, and
+   a map carrying one orthonormal basis to another is unitary.
+
+   The engine's check is the practical version of the same statement:
+   applying `inverseQuantumFourierTransform` to
+   `quantumFourierTransform(|10\rangle)` returns $|10\rangle$ with
+   amplitude $1$ and nothing anywhere else.
+
+   The wrong turn is stopping after the norm calculation. Preserving the
+   length of every basis vector is necessary and not sufficient: a map
+   sending both $|0\rangle$ and $|1\rangle$ to $|0\rangle$ preserves norms
+   on the basis and is catastrophically non-unitary, because it destroys
+   orthogonality and so fails to preserve the norm of $|+\rangle$. The
+   geometric sum is where the real work happens, and it is the same
+   cancellation that makes the inverse transform recover $j$ exactly.
+
+   </details>
+
 4. Why does implementing the $N\times N$ DFT matrix directly cost $O(N^2)$
    operations, while the circuit version costs $O(n^2)=O((\log N)^2)$? What
    resource is being traded for what?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Multiplying an $N$-vector by a dense $N\times N$ matrix takes $N^2$
+   multiply-adds because every output entry is a sum over every input
+   entry, and none of the $N^2$ matrix elements is zero here. The classical
+   fast Fourier transform improves this to $O(N\log N)$ by exploiting the
+   phase structure, and that is still linear in $N$ rather than in $n$.
+
+   The quantum circuit costs $O(n^2)$ gates because the product form
+   factorizes the output into $n$ independent single-qubit factors, so the
+   circuit is one Hadamard per qubit plus one controlled rotation for each
+   pair of qubits: $n + \binom{n}{2}$ gates, which is $O(n^2)$. At
+   $n=20$ that is a few hundred gates against a classical $N\log N$ of
+   about twenty million operations.
+
+   What is traded is *access to the output*. The classical FFT hands you an
+   array of $N$ numbers you can read, index, sort, and save. The quantum
+   circuit leaves the transformed amplitudes inside a state you cannot
+   read: measuring gives one $k$, sampled from $|{\hat c}_k|^2$, and the
+   amplitudes themselves are never available. So the quantum transform is
+   exponentially cheaper and exponentially less informative, and it is
+   useful only when a single sampled $k$, or a property visible in one
+   sample, is what you actually needed.
+
+   That condition is exactly what the next two lessons arrange. Phase
+   estimation applies the inverse transform to a state whose amplitudes are
+   a pure phase ramp, so the transform concentrates nearly all the
+   probability onto one $k$, and one sample is enough. Shor's algorithm
+   does the same for a periodic state. In both cases the answer was a
+   single number to begin with.
+
+   The wrong turn is describing this as "the QFT computes the Fourier
+   transform exponentially faster" and stopping. Stated that way it implies
+   a classical speedup for signal processing, and there is none: you cannot
+   load $N$ classical numbers into amplitudes for free, and you cannot read
+   them back out at all. The speedup is real and it is only available
+   inside an algorithm that never needs the spectrum itself.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -405,7 +566,7 @@ this lesson's worked example relies on.
 - `inverseQuantumFourierTransform` undoes it exactly, checked directly by
   round-trip.
 
-## Further Exploration
+## Reading an eigenphase off a register
 
 <NextDiscovery>
 [Quantum Phase Estimation](/lessons/quantum-computing/quantum-algorithms-i/quantum-phase-estimation) uses the QFT's inverse as its

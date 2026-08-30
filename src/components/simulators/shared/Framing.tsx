@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  * shared shape in the tech voice, pillar-tinted so it reads as instrument
  * documentation rather than a generic callout.
  *
- * All three slots are optional and independently omittable — a simulator
+ * All three slots are optional and independently omittable; a simulator
  * with nothing surprising to flag just skips `watchFor`.
  */
 export function SimulatorFraming({

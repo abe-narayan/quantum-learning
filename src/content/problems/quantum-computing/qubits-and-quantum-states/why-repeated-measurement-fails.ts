@@ -21,18 +21,30 @@ export const whyRepeatedMeasurementFails: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["collapse", "collapsed", "already collapsed", "no longer in superposition"],
-      ["re-prepare", "reprepare", "prepare again", "fresh copy", "new qubit", "start over"],
+      {
+        phrases: ["collapse", "collapsed", "already collapsed", "no longer in superposition"],
+        missingFeedback:
+          "Say what the first measurement did to the qubit. That is what decides whether the second one is looking at the state the student cares about.",
+      },
+      {
+        phrases: ["re-prepare", "reprepare", "prepare again", "fresh copy", "new qubit", "start over"],
+        missingFeedback:
+          "You have said why the second measurement is useless. Now say what the student should do instead to get a second genuinely independent data point.",
+      },
     ],
     incorrectFeedback:
       "Think about what the measurement postulate says happens to the state itself, not just what number you read out.",
     partialFeedback:
-      "You're on the right track — now connect it to what estimating a probability actually requires: many independent repetitions.",
+      "Now connect it to what estimating a probability requires: many independent repetitions.",
+    modelAnswers: [
+      "The first measurement collapses the qubit, so it is no longer in superposition at all. Measuring it again just gives 0 again and tells you nothing about the original state. To estimate P(0) you have to prepare a fresh copy each time and measure many independent qubits.",
+      "After the first measurement the qubit has already collapsed to |0>. Repeating the measurement on the same qubit is not an independent trial. You need to re-prepare the state and start over with a new qubit for each shot.",
+    ],
   },
   hints: [
-    { text: "The measurement postulate says two things: an outcome, AND a new state for the qubit afterward." },
-    { text: "After collapsing to |0⟩, is the qubit still in the superposition |+⟩?" },
-    { text: "If it's not still in |+⟩, what would a second measurement actually be measuring?" },
+    { text: "The measurement postulate has two clauses. Write both down: what you read, and what the qubit becomes." },
+    { text: "Apply the second clause to this case. Is the qubit still where it started?" },
+    { text: "If it is not, ask what the second measurement is a measurement of, and what estimating a probability actually requires you to have many of." },
   ],
   solution: {
     steps: [
@@ -40,14 +52,14 @@ export const whyRepeatedMeasurementFails: ConceptualProblem = {
       { description: "The qubit is no longer in $|+\\rangle$: a second measurement on it measures $|0\\rangle$, not the original state." },
       { description: "Measuring $|0\\rangle$ in the computational basis is deterministic (always gives 0), so the second reading contributes no new statistical information about the original $P(0)$." },
     ],
-    finalAnswer: "The first measurement collapses the qubit, so a second measurement on the same qubit no longer probes the original state at all — estimating P(0) requires re-preparing |+⟩ from scratch and measuring many independent copies.",
+    finalAnswer: "The first measurement collapses the qubit, so a second measurement on the same qubit no longer probes the original state. Estimating P(0) requires re-preparing |+⟩ from scratch and measuring many independent copies.",
   },
   explanation: {
     correctIdea: "Estimating a measurement probability requires many independent trials on freshly prepared identical states, not repeated measurements of one already-collapsed qubit.",
-    whyCorrect: "Collapse is not optional or avoidable — it's part of the measurement postulate itself, so the post-measurement qubit no longer carries the original superposition.",
+    whyCorrect: "Collapse is not optional or avoidable; it is part of the measurement postulate, so the post-measurement qubit no longer carries the original superposition.",
     whyWrong: [
       "Assuming the qubit 'remembers' its pre-measurement superposition and can be measured again for a fresh random sample.",
-      "Confusing 'measuring twice' with 'measuring two different, independently prepared qubits' — only the second genuinely gives new statistical information.",
+      "Confusing 'measuring twice' with 'measuring two independently prepared qubits'. Only the second gives new statistical information.",
     ],
   },
 };

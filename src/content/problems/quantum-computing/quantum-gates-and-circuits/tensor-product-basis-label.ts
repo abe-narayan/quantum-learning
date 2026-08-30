@@ -28,15 +28,16 @@ export const tensorProductBasisLabel: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: correctLabel,
     optionFeedback: {
-      "00": "That would be |0⟩ ⊗ |0⟩ — check which ket becomes qubit 1.",
+      "00": "That would be |0⟩ ⊗ |0⟩. Check which ket becomes qubit 1.",
       "10": "That reverses the order. Qubit 0 is the left label; qubit 1 is the right one.",
       "11": "That would require both input kets to be |1⟩.",
     },
     defaultIncorrectFeedback: "Recall that basis states tensor by concatenating their labels: |i⟩⊗|j⟩ = |ij⟩.",
   },
   hints: [
-    { text: "Basis states tensor by concatenating labels: |i⟩⊗|j⟩ = |ij⟩." },
-    { text: "Here i = 0 (from the first ket) and j = 1 (from the second)." },
+    { text: "A two-qubit basis label is a record of both qubits at once, read in a fixed order: first qubit first, second qubit second." },
+    { text: "Tensoring two basis kets writes their labels side by side rather than combining them arithmetically." },
+    { text: "The order the two kets appear in the product is the order their labels appear in the answer. Two of the options differ only by that ordering." },
   ],
   solution: {
     steps: [

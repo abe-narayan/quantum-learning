@@ -1,6 +1,8 @@
 import type { RefObject } from "react";
 import { cn } from "@/lib/utils";
 import type { ValidationResult } from "@/lib/problems/validators/types";
+import { RenderedScrollableMathText } from "./RenderedMathText";
+import type { MathRuns } from "./mathRuns";
 
 const STATUS_STYLES: Record<ValidationResult["status"], string> = {
   correct: "border-success/40 bg-success/10 text-success",
@@ -55,13 +57,46 @@ function StatusGlyph({ status }: { status: ValidationResult["status"] }) {
  * `resultRef` exists so a caller can move focus onto the result box. Only
  * `ProblemView` does, and only on the one transition where focus would
  * otherwise be destroyed — see the comment on its effect.
+ *
+ * ---------------------------------------------------------------------------
+ * Why the math arrives pre-rendered
+ * ---------------------------------------------------------------------------
+ * 62 authored feedback strings across 30 problems carry inline `$…$`, and this
+ * component rendered `result.message` as a plain string, so a student who got
+ * one of those wrong was shown the LaTeX source: `Use
+ * $P(+)=\frac{1+2\operatorname{Re}(\alpha^*\beta)}{2}$ …`. Hints and the
+ * worked solution had been rendering their math correctly since problem math
+ * moved to the server; this was the one surface the move missed.
+ *
+ * It cannot be fixed by rendering here. This file sits inside
+ * `ProblemViewClient`'s `"use client"` boundary, so importing `MathText` or
+ * `KatexMath` would put the 268KB / 74.1KB-gzip KaTeX runtime back into the
+ * eager bundle of all 556 problem pages — the exact regression
+ * `src/lib/design/__tests__/clientBoundary.test.ts` names this component's
+ * parent for. So the feedback strings are rendered at build time alongside
+ * the hints and the solution (`renderProblemMath.ts`) and looked up here.
  */
 export function Feedback({
   result,
+  math,
   resultRef,
   submissionId,
 }: {
   result: ValidationResult | null;
+  /**
+   * This problem's authored feedback, rendered to KaTeX HTML and keyed by the
+   * authored string — `ProblemMath["feedback"]`, see `mathRuns.ts`.
+   *
+   * Optional, and a miss falls back to the plain string, because the map can
+   * only ever hold *authored* text. `validateNumeric` composes its own
+   * message for a submission it cannot parse ("Enter the number on its own,
+   * without the unit."), `validateConceptual` has three of its own for a
+   * framed, unpredicated or echoed answer, and both multiple-choice guards
+   * ("Select an option before submitting.") are written in the validator.
+   * None of those can be in a build-time map, none of them carries math, and
+   * all of them must keep rendering exactly as they do now.
+   */
+  math?: Record<string, MathRuns>;
   /** The rendered result box, for a caller that needs to focus it. Attached
    *  to the inner box rather than the live-region wrapper so focusing it
    *  cannot be confused with re-announcing it. */
@@ -83,10 +118,22 @@ export function Feedback({
    */
   submissionId?: number;
 }) {
+  // `undefined` for every runtime-composed message and for the ~97% of
+  // authored feedback that is plain prose; both take the string branch below,
+  // which is character for character what this component always rendered.
+  const messageRuns = result ? math?.[result.message] : undefined;
+
   return (
     /* An empty wrapper carries no margin and so no height: the always-mounted
-       region costs nothing in layout until it has something to say. */
-    <div role="status" aria-live="polite" className={result ? "mt-4" : undefined}>
+       region costs nothing in layout until it has something to say.
+
+       `aria-atomic` because the status label and the message are two separate
+       elements and a submission usually changes only one of them: adjusting
+       0.70 → 0.71 keeps "Not quite" and swaps the sentence beneath it, and a
+       non-atomic region is permitted to announce only the changed node. The
+       heading without its reason, or the reason without the verdict, is half
+       a result. The whole box is one message, so the whole box is re-read. */
+    <div role="status" aria-live="polite" aria-atomic="true" className={result ? "mt-4" : undefined}>
       {result ? (
         <div
           key={submissionId}
@@ -104,9 +151,31 @@ export function Feedback({
           <span className="mt-0.5 shrink-0">
             <StatusGlyph status={result.status} />
           </span>
-          <span>
+          {/* `min-w-0`: a flex item's `min-width` is `auto`, and an authored
+              message can carry a long unbreakable token (a 17-digit expected
+              value, a function name). At 320px this column is ~200px, so
+              without this the box widens past the panel instead of wrapping. */}
+          <span className="min-w-0">
             <p className="font-semibold">{STATUS_LABEL[result.status]}</p>
-            <p className="mt-1 text-foreground/90">{result.message}</p>
+            {/* `RenderedScrollableMathText`, not `RenderedMathText`, for the
+                reason `HintPanel` gives on the same component: a feedback
+                sentence can carry a long bra-ket, and at 320px this column is
+                ~200px wide. A run past `WIDE_MATH_CHARS` gets its own
+                focusable scroll box instead of widening the box and taking the
+                document's horizontal scrollbar with it. */}
+            <p className="mt-1 text-foreground/90">
+              {messageRuns ? (
+                <RenderedScrollableMathText runs={messageRuns} />
+              ) : (
+                result.message
+              )}
+            </p>
+            {/* The grader's own line, under the authored one. Always plain
+                text by construction (see `ValidationResult["note"]`), so no
+                map lookup: it is composed from what this reader typed and
+                could never be a build-time key. Quieter than the message
+                because it is a footnote to it, not a second verdict. */}
+            {result.note ? <p className="mt-1 text-foreground/70">{result.note}</p> : null}
           </span>
         </div>
       ) : null}

@@ -2,6 +2,7 @@ import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
 import { Callout } from "@/components/mdx/Callout";
 import { DefinitionBox } from "@/components/mdx/DefinitionBox";
+import { ScrollableFigure } from "@/components/mdx/ScrollableFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "apex/research-methods-and-synthesis/evaluating-quantum-advantage-claims"
@@ -28,7 +29,7 @@ export const lessonMeta = {
   related: [
     {
       slug: "apex/simulation-and-compilation-frontiers/when-classical-simulation-works",
-      note: "That lesson's two classical-simulability loopholes — Gottesman-Knill/stabilizer structure and bounded bond-dimension/entanglement growth — are the exact structural checks this lesson's checklist asks a claimed-hard task to survive.",
+      note: "That lesson's two classical-simulability loopholes, Gottesman-Knill/stabilizer structure and bounded bond-dimension/entanglement growth, are the exact structural checks this lesson's checklist asks a claimed-hard task to survive.",
     },
   ],
 };
@@ -40,7 +41,7 @@ export const lessonMeta = {
   five separate, checkable questions.
 </LessonHook>
 
-## Motivation
+## What Would Actually Convince You
 
 What would it take for you to believe a "quantum advantage" headline?
 You already own most of the answer. Distinguishing Theorem from
@@ -85,7 +86,7 @@ one either survives the claim or narrows what the claim is actually saying.
    or a plausible-but-unproven complexity-theoretic assumption?** As the
    Complexity Theory capstone established, essentially every real
    classical-hardness argument for a sampling task rests on something
-   like the polynomial hierarchy not collapsing: a real, citable, Tier 2
+   like the polynomial hierarchy not collapsing: a real, Tier 2
    argument, not a Tier 1 theorem. Naming the assumption is not a
    weakness in the claim; failing to name it is a weakness in how the
    claim is being reported.
@@ -124,15 +125,15 @@ saying, and what comes out the other end is five separate, checkable
 statements instead of one unevaluable headline.
 
 <PredictBeforeReveal
-  question="A press release reads: 'Our 100-qubit processor solved in minutes a problem that would take the world's fastest supercomputer millennia.' Assuming every word of it is literally true, which checklist question is it most likely dodging?"
+  question="A 2019 press release says a sampling task took the processor 200 seconds and would take the best classical supercomputer 10,000 years. Three years later a classical team reproduces the same distribution in about a day. Which checklist question does that later result bear on most directly?"
   options={[
-    { label: "Q1 — the task is probably not even a well-defined computation", value: "q1" },
-    { label: "Q2 — the supercomputer figure probably came from a weak baseline", value: "q2" },
-    { label: "Q3 — the classical-hardness claim probably rests on an unnamed assumption", value: "q3" },
-    { label: "Q5 — the task is probably one nobody wanted solved", value: "q5" },
+    { label: "Q1: it shows the task was never precisely specified", value: "q1" },
+    { label: "Q2: it replaces the baseline the original comparison used", value: "q2" },
+    { label: "Q3: it disproves the complexity assumption behind the claim", value: "q3" },
+    { label: "Q5: it shows the task was not useful after all", value: "q5" },
   ]}
-  correctValue="q5"
-  explanation="Q2 and Q3 are both live, and a careful reader checks them. But the sentence as written can be entirely true — best-known baseline, honestly stated assumption, cleanly specified task — and still tell you nothing about whether the result matters, because Q5 is the one question a runtime comparison structurally cannot answer. That is why Q5 sits last in the checklist rather than first: it survives every other question passing. A claim that clears Q1 through Q4 and fails Q5 is a capability demonstration, which is a real and valuable thing to be, and not the thing the sentence above invites you to hear."
+  correctValue="q2"
+  explanation="Q2. The later result supplies a better classical baseline than the one the original comparison was measured against, which is exactly what Question 2's 'best known at the time' clause exists to anticipate. It is not Q3: a faster classical algorithm for one circuit family at one size does not disprove a hardness argument built on the polynomial hierarchy not collapsing, which is a statement about asymptotics rather than about a single 53-qubit instance. And it touches neither Q1 nor Q5, both of which the original paper answered on its own terms and neither of which a runtime number can change."
 />
 
 Notice what this checklist is not. It is not a way to debunk every
@@ -142,7 +143,7 @@ checkable statements. A claim that answers all five precisely is a
 strong claim, in the same measure that a claim dodging two or three of
 them is a weak one.
 
-## Physical Interpretation: Why This Matters
+## Hard to Simulate Is Not Useful
 
 <InsightBlock>
   "Hard to classically simulate" and "practically useful" are two
@@ -259,8 +260,8 @@ sides of it.
   url="https://arxiv.org/abs/2111.03011"
 >
   A tensor-network contraction method that produced correlated samples
-  from the same Sycamore circuit distribution in a matter of days on a
-  GPU cluster. Question 2's "best known at the time" is doing visible work
+  from the same Sycamore circuit distribution in on the order of a day on
+  a several-hundred-GPU cluster. Question 2's "best known at the time" is doing visible work
   here: the 2019 estimate was not wrong about the 2019 baseline, and this
   result is what testing a Tier 2 claim looks like when it succeeds.
 </ResearchConnection>
@@ -273,7 +274,7 @@ sides of it.
 **Question 2, the classical baseline.** The original classical-runtime estimate was produced by the best classical simulation technique known and published *at that time*.
 </DerivationStep>
 <DerivationStep annotation="This was true on day one, not a detail that emerged later. Naming the assumption up front is what makes later classical progress a test, not a refutation.">
-**Question 3, the assumption.** The classical-hardness argument rests on a real, citable complexity-theoretic argument tied to the polynomial hierarchy not collapsing: Tier 2, not Tier 1.
+**Question 3, the assumption.** The classical-hardness argument rests on a citable complexity-theoretic argument tied to the polynomial hierarchy not collapsing: Tier 2, not Tier 1.
 </DerivationStep>
 <DerivationStep annotation="This is why circuits like this were chosen as the demonstration task in the first place.">
 **Question 4, the structural check.** Built from gates outside the Clifford group (no Gottesman-Knill shortcut), run deep enough that entanglement grows across the whole system (no efficient matrix-product-state description).
@@ -293,7 +294,8 @@ more than the conclusion:
   known at the time," not "best possible ever"). A conjecture that
   invites attempts to break it, and gets tested by them, is a
   conjecture behaving as a conjecture should.
-- A narrowed margin is still often a real, if smaller, advantage. Going
+- A narrowed margin usually leaves an advantage standing, just a
+  smaller one. Going
   from "10,000 classical years" to "a few classical days" for a
   specific instance is a massive change in the classical-hardness
   margin, but it does not necessarily erase an advantage entirely, and
@@ -313,7 +315,7 @@ underlying research program is broken.*
 
 ## The Two-Axis Map
 
-<div className="not-prose my-8 overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
+<ScrollableFigure label="Two axis map of quantum advantage claims, classical simulability against practical usefulness" className="my-8">
   <div className="grid min-w-[560px] grid-cols-[120px_1fr_1fr] gap-2">
     <div />
     <div className="rounded-(--radius-tight) px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
@@ -328,23 +330,23 @@ underlying research program is broken.*
     </div>
     <div className="rounded-(--radius-tight) border border-brand/40 bg-brand/5 p-4">
       <p className="text-sm font-semibold text-brand">Random circuit sampling / boson sampling</p>
-      <p className="mt-2 text-sm leading-snug text-foreground">
+      <div className="mt-2 text-sm leading-snug text-foreground">
         Avoids both Gottesman-Knill and bounded-bond-dimension loopholes by
         design. A real test of raw hardware capability and indirect
         evidence for a quantum-classical complexity separation, but the
         sampled distribution itself has no independent economic or
         scientific use.
-      </p>
+      </div>
     </div>
     <div className="rounded-(--radius-tight) border border-accent/40 bg-accent/5 p-4">
       <p className="text-sm font-semibold text-accent">Ground-state energy of a classically-intractable molecule</p>
-      <p className="mt-2 text-sm leading-snug text-foreground">
+      <div className="mt-2 text-sm leading-snug text-foreground">
         The valuable target: independently useful (chemistry, materials,
         drug design) <em>and</em>, for the hard instances, structurally
         resistant to both classical-simulability loopholes. Whether any
         specific molecule lands here is the open, case-by-case question
         quantum chemistry is built around.
-      </p>
+      </div>
     </div>
 
     <div className="flex items-center justify-center rounded-(--radius-tight) px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
@@ -352,23 +354,23 @@ underlying research program is broken.*
     </div>
     <div className="rounded-(--radius-tight) border border-border bg-surface-muted/60 p-4">
       <p className="text-sm font-semibold text-foreground">A Clifford-only or shallow, low-entanglement demonstration circuit</p>
-      <p className="mt-2 text-sm leading-snug text-foreground">
+      <div className="mt-2 text-sm leading-snug text-foreground">
         Falls into one of the prerequisite lesson's own loopholes
         (Gottesman-Knill or bounded bond dimension), so it is efficiently
         classically simulable regardless of how it's marketed. No
         advantage claim survives question 4 here.
-      </p>
+      </div>
     </div>
     <div className="rounded-(--radius-tight) border border-border bg-surface-muted/60 p-4">
       <p className="text-sm font-semibold text-foreground">Ground-state energy of a small, weakly-entangled molecule</p>
-      <p className="mt-2 text-sm leading-snug text-foreground">
+      <div className="mt-2 text-sm leading-snug text-foreground">
         Practically useful to compute, but classically tractable for this
         specific case: a legitimate quantum computation with no quantum
         advantage claim attached, and none needed for it to be worth doing.
-      </p>
+      </div>
     </div>
   </div>
-</div>
+</ScrollableFigure>
 
 Read this grid as the visual form of question 5: the right column and
 the top row answer two independent questions. Random circuit sampling
@@ -378,7 +380,7 @@ Most of its actual, current results, being classically tractable today,
 sit in the bottom-right instead, which is not a failure, just an
 accurate description of where the field currently stands.
 
-## Common Mistakes
+## Dismissal as the Opposite Error
 
 <Callout type="note">
 **Treating a narrowed quantum-advantage margin after improved classical
@@ -423,12 +425,138 @@ category error in opposite directions.
    satisfies Question 2's "best known at the time" standard, and name the
    specific complexity-theoretic status (per Question 3) of the
    classical-hardness argument behind the 3-year estimate.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Question 1: the task.** Not "sampled from a random circuit," which
+   is a description rather than a specification. The task is: given a
+   publicly specified circuit family (gate set, connectivity, and the
+   seed or procedure by which the instance was drawn) on 60 qubits at
+   depth 20, emit a stated number of bitstrings achieving a stated score
+   on a stated verification metric.
+
+   Three things have to be pinned down before anyone can say whether it
+   was done. What counts as success: exact sampling, approximate sampling
+   within a total-variation distance, or, as in every real experiment, a
+   linear cross-entropy benchmark score, which is a weaker and different
+   target than either. How many samples. And how the score was verified,
+   which for cross-entropy benchmarking requires computing ideal output
+   probabilities classically, so the verification is only feasible in the
+   regime where classical simulation is feasible. That tension is
+   structural rather than a flaw in this hypothetical: a task is being
+   certified by the very computation it claims to be beyond.
+
+   Worth noting the task has no input and no useful output. Nothing is
+   being decided or computed for anyone. Question 5 is going to have
+   something to say.
+
+   **Question 2: the baseline.** "Best published in 2023" is a
+   respectable standard and it is not the same as "best known at the
+   time," and the gap has three parts.
+
+   Publication lags implementation, so the best method known to
+   practitioners at the moment of the claim may not yet be in print. The
+   figure is an *estimate*, presumably extrapolated from the 2023
+   method's scaling rather than measured, and the history of this
+   particular estimate has been that better contraction orderings, which
+   are engineering rather than new algorithms, beat it repeatedly. And
+   "3 classical years" is meaningless without saying three years on what:
+   one node, one GPU cluster, or a leadership-class supercomputer differ
+   by four orders of magnitude, and the comparison is only fair if the
+   classical hardware is comparable in cost or power to the quantum
+   system.
+
+   One point in the claim's favour on the way past. A trapped-ion device
+   has all-to-all connectivity, so there is no 1D or 2D geometry for a
+   tensor-network contraction to exploit, and the entanglement across
+   every cut grows faster than it would on a planar superconducting chip.
+   That makes depth 20 more likely to be genuinely scrambling here than
+   the same depth would be elsewhere, which is a real structural argument
+   and belongs in Question 4.
+
+   **Question 3: the status of the hardness argument.** Tier 2, resting
+   on two unproven assumptions rather than one. The chain is that an
+   efficient *exact* classical sampler would collapse the polynomial
+   hierarchy, and since real hardware samples approximately, bridging to
+   the approximate case additionally requires an average-case hardness
+   conjecture for computing output probabilities. Neither the
+   non-collapse of the hierarchy nor the average-case conjecture is
+   proven.
+
+   And one more scoping point that is easy to lose: both are *asymptotic*
+   statements. They say nothing about 60 qubits specifically. The theory
+   motivates the belief that this family gets hard; the 3-year figure is
+   an empirical estimate about one finite instance, and no theorem
+   certifies it.
+
+   </details>
 2. Two years later, an improved classical algorithm reduces the
    estimated classical runtime for that same circuit family from 3 years
    to 3 weeks. Using this lesson's worked example and its Common Mistakes
    callout, explain why this development alone does not mean the
    original claim was "debunked," and state precisely what would have
    had to be true about the *original* claim for that word to apply.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the original claim, correctly stated, was already a claim
+   about the best classical method *known at the time*, and a better
+   method updates a comparison rather than falsifying a result.
+
+   Three separate things were asserted, and the new algorithm touches
+   exactly one.
+
+   The **measurement** stands untouched. The device produced samples at a
+   given score in a given time. A classical algorithm published later has
+   no bearing on whether that happened.
+
+   The **comparison** is what moved, and Question 2's phrasing
+   anticipated it. "Best known at the time" is not a hedge inserted for
+   safety; it is an accurate description of what any such number can ever
+   be, since nobody can quantify over algorithms not yet invented.
+
+   The **hardness argument** is untouched too, and this is where the
+   "debunked" framing usually goes wrong. That argument is asymptotic and
+   conditional on the polynomial hierarchy not collapsing. A faster
+   contraction of one circuit family at one fixed size is not an
+   asymptotic statement and cannot contradict one.
+
+   It is also worth doing the arithmetic before reaching for a verdict.
+   Three years is 156 weeks, so this is a $52\times$ classical speedup,
+   which is substantial, and it leaves three weeks of classical
+   computation against seconds of quantum runtime. The margin narrowed by
+   a large factor and did not close. "Debunked" describes a claim that
+   fell, not one that shrank.
+
+   **What would have made the word right.** Four things, in ascending
+   order of how damning each is.
+
+   If the original claim had been stated unconditionally, "no classical
+   computer can ever reproduce this," then any classical reproduction
+   refutes it, and the fault lies in the original phrasing rather than in
+   the later work. This is the common case, and it is why overclaiming is
+   costly: it converts normal progress into your own refutation.
+
+   If the improved algorithm ran in time polynomial in the circuit's
+   size and depth for the general family, rather than faster on one
+   instance. That would attack the hardness conjecture itself.
+
+   If the classical work showed the device had not actually achieved the
+   reported score, by exposing the verification metric as invalid or the
+   fidelity as inflated. That attacks the measurement, which is the only
+   thing that cannot be updated later.
+
+   And if the faster classical method had already been published before
+   the quantum claim was made. Then the original comparison was against
+   the wrong baseline at the moment it was made, Question 2 was failed on
+   the day of publication, and "debunked" is precisely the right word.
+   That is a claim about the authors' diligence, not about the passage of
+   time, and the two are worth never confusing.
+
+   </details>
+
 3. A separate claim states: "our quantum processor computed the
    ground-state energy of a 12-atom cluster relevant to battery-catalyst
    design, a computation intractable for classical methods." Apply
@@ -437,6 +565,73 @@ category error in opposite directions.
    evidence would you need to see to confirm Question 4, and how does
    this claim's position on the usefulness axis differ from the
    random-circuit-sampling example worked through above?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   **Question 4 is where this claim is most exposed, and "12 atoms" is
+   not the number that decides it.** The number that decides it is the
+   size of the correlated active space in spin-orbitals, which the
+   sentence does not give. A 12-atom cluster can be anything from a
+   trivial 8-orbital problem to something well past exact
+   diagonalization, depending on the basis set and how the active space
+   was chosen.
+
+   *The stabilizer loophole.* A chemistry circuit contains arbitrary-angle
+   rotations, so it is generically non-Clifford and Gottesman-Knill does
+   not apply directly. But the relevant question is quantitative, not
+   binary: stabilizer-rank simulation costs time exponential in the
+   *number of non-Clifford gates* rather than in the qubit count, so a
+   circuit with a modest T-count is classically simulable regardless of
+   how many qubits it uses. The evidence to ask for is the non-Clifford
+   gate count, and it needs to be large.
+
+   *The bond-dimension loophole.* This is the more likely one to catch a
+   chemistry claim, because molecular ground states tend to be
+   *low*-entanglement, which is exactly why DMRG and coupled-cluster
+   methods work as well as they do. The evidence to ask for is a
+   converged DMRG study showing the energy does not settle at achievable
+   bond dimension, together with evidence that coupled-cluster fails,
+   which usually means demonstrating strong static correlation, a small
+   HOMO-LUMO gap, or significant multireference character.
+
+   *And the decisive one, which subsumes both.* How was the quantum
+   answer verified? If the true energy is known classically, the
+   computation was not intractable and the claim refutes itself. If it is
+   not known classically, the quantum answer cannot be checked against
+   anything, and "computed the ground-state energy" is an assertion
+   rather than a result. Chemistry advantage claims live inside that
+   dilemma, and a serious one addresses it head on, usually by
+   demonstrating agreement in a regime where classical methods still
+   reach and arguing that the method extends. Ask for the accuracy too:
+   chemical accuracy is about $1.6$ millihartree, and an energy correct
+   to $50$ millihartree answers no chemical question.
+
+   **Question 5: the usefulness axis, where this claim sits opposite the
+   sampling one.** Random circuit sampling is honestly useless and does
+   not pretend otherwise; its entire purpose is to be classically hard.
+   A catalyst's electronic structure is something a chemist actually
+   wants. So if this claim survived Question 4, it would matter far more
+   than any sampling result, and that asymmetry is real and worth saying.
+
+   But the usefulness assertion needs its own scrutiny, and "relevant to"
+   is the tell. Catalyst design does not turn on one ground-state energy
+   at one geometry. It turns on *differences*: reaction barriers along a
+   pathway, across many geometries, each to chemical accuracy, with the
+   errors correlated enough to cancel. A single energy, even an exact
+   one, typically changes no design decision. So the honest question is
+   not "is this useful" but "how many such computations, at what
+   accuracy, would a decision require, and does the demonstrated method
+   scale to that?"
+
+   **The two claims therefore fail on opposite questions, which is the
+   thing to carry.** The sampling claim passes Question 4 comfortably and
+   concedes Question 5. This one asserts Question 5 and is in real
+   trouble on Question 4. Neither is obviously the better result, and a
+   reader who only owns one of the two questions will misjudge one of the
+   two claims.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -465,7 +660,7 @@ category error in opposite directions.
   assessing any current or future claim about quantum computing's
   progress.
 
-## Further Exploration
+## From Judging Claims to Designing Them
 
 <NextDiscovery>
   Continue to [Reproducing and Designing

@@ -60,11 +60,11 @@ export const lessonMeta = {
 export const ketZeroOne = StateVector.zero(1).tensor(StateVector.basis(1, 1));
 export const ketOneZero = StateVector.basis(1, 1).tensor(StateVector.zero(1));
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Not the single-qubit thing, twice">
 Everything in the last course lived on one qubit's Bloch sphere. Real computation needs several qubits working together, and "several qubits" is not "the single-qubit thing, twice."
 </LessonHook>
 
-## Motivation
+## Four possibilities, held all at once
 
 A classical 2-bit register needs 2 bits to describe: which one of
 $\{00,01,10,11\}$ it is in. A quantum 2-qubit register has to describe a
@@ -75,7 +75,7 @@ $2^n$ amplitudes, the one fact that makes quantum computers hard to
 simulate classically and (in later courses) part of why they can be
 powerful.
 
-## Intuition
+## Two spheres, and what combining them should cost
 
 Think of two independent qubits as two independent Bloch spheres. Fully
 describing "where qubit A is" takes its own $(\theta,\varphi)$, and
@@ -86,7 +86,7 @@ combines two qubit states needs to preserve both spheres' worth of detail
 between them that isn't just "A's state" plus "B's state" separately. The
 **<Term id="tensor-product">tensor product</Term>**, written $\otimes$, is that operation.
 
-## Mathematical Development
+## Every amplitude times every amplitude
 
 ### Defining the tensor product
 
@@ -200,7 +200,7 @@ $|100\rangle$ has qubit 0 equal to 1 and qubits 1, 2 equal to 0. This
 matches how the simulator engine indexes qubits, and it's the convention
 every lesson, test, and future circuit diagram on this platform will use.
 
-## Physical Interpretation
+## Another postulate, not a consequence
 
 That composite systems are described by the tensor product of their
 parts' state spaces is itself a postulate of quantum mechanics, not
@@ -215,7 +215,7 @@ tensor product of two single-qubit states.**
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
-## Worked Example
+## Tensoring plus with minus
 
 **Compute $|+\rangle \otimes |-\rangle$**, where
 $|\pm\rangle=\frac{1}{\sqrt2}(|0\rangle\pm|1\rangle)$.
@@ -233,7 +233,7 @@ and $|-\rangle$ are each individually 50/50 in the computational basis,
 and the qubits here are independent: nothing in this construction has
 correlated them.
 
-## Common Mistakes
+## Multiply amplitudes, not probabilities
 
 <Callout type="warning">
 **Multiplying probabilities instead of amplitudes.** It's tempting to
@@ -252,13 +252,152 @@ track which ket is qubit 0.
 ## Practice Questions
 
 1. Compute $|1\rangle\otimes|+\rangle$ explicitly as a 4-component vector.
+   Then compute $|+\rangle\otimes|1\rangle$ the same way. Which components
+   do the two column vectors share, which differ, and what does each state
+   predict for a measurement of qubit 0 on its own?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Feed each pair into the definition, every entry of the first vector
+   times every entry of the second:
+
+   $$
+   |1\rangle\otimes|+\rangle = \begin{pmatrix}0\\1\end{pmatrix}\otimes\frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}0\cdot1\\0\cdot1\\1\cdot1\\1\cdot1\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}0\\0\\1\\1\end{pmatrix} = \frac{|10\rangle+|11\rangle}{\sqrt2}
+   $$
+
+   $$
+   |+\rangle\otimes|1\rangle = \frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix}\otimes\begin{pmatrix}0\\1\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\cdot0\\1\cdot1\\1\cdot0\\1\cdot1\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}0\\1\\0\\1\end{pmatrix} = \frac{|01\rangle+|11\rangle}{\sqrt2}
+   $$
+
+   The two vectors agree in slot 1 (the $|00\rangle$ amplitude, zero in
+   both) and in slot 4 (the $|11\rangle$ amplitude, $1/\sqrt2$ in both).
+   They disagree in slots 2 and 3: the first state puts its second
+   $1/\sqrt2$ on $|10\rangle$, the second puts it on $|01\rangle$. Two of
+   four components differ, which is enough to make them orthogonal states,
+   not merely differently written ones.
+
+   The measurement question is where the difference stops being
+   bookkeeping. In $|1\rangle\otimes|+\rangle$ every surviving term starts
+   with the label 1, so measuring qubit 0 returns 1 with probability
+   $\tfrac12+\tfrac12 = 1$, a certainty. In $|+\rangle\otimes|1\rangle$ the
+   surviving labels are $01$ and $11$, so qubit 0 comes out 0 half the time
+   and 1 half the time. The certain qubit and the coin-flip qubit have
+   traded places, exactly as the written order says they should.
+
+   The wrong turn is treating $\otimes$ like ordinary multiplication and
+   assuming it commutes, which it does not. What makes this seductive is
+   that both states really do contain "one definite qubit and one
+   $|+\rangle$ qubit", so they feel like the same physical situation
+   described in either order. They are not: the labels record *which
+   physical wire* is which, and a laboratory that measures wire 0 gets a
+   guaranteed 1 in one case and a fair coin in the other. If you ever need
+   to convert between them, that takes a real operation, the SWAP gate, and
+   SWAP costs three CNOTs.
+
+   </details>
+
 2. Compute $|{+i}\rangle\otimes|0\rangle$, where
    $|{+i}\rangle=\frac{1}{\sqrt2}(|0\rangle+i|1\rangle)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   |{+i}\rangle\otimes|0\rangle = \frac{1}{\sqrt2}\begin{pmatrix}1\\i\end{pmatrix}\otimes\begin{pmatrix}1\\0\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\cdot1\\1\cdot0\\i\cdot1\\i\cdot0\end{pmatrix} = \frac{1}{\sqrt2}\begin{pmatrix}1\\0\\i\\0\end{pmatrix} = \frac{|00\rangle + i|10\rangle}{\sqrt2}
+   $$
+
+   Normalization survives, as the lesson proved it must:
+   $\left|\tfrac{1}{\sqrt2}\right|^2 + \left|\tfrac{i}{\sqrt2}\right|^2 = \tfrac12+\tfrac12 = 1$.
+   The four measurement probabilities are $\tfrac12, 0, \tfrac12, 0$.
+
+   The slot the $i$ lands in is the whole exercise. It comes from qubit
+   0's $|1\rangle$ amplitude, and qubit 1 is definitely $|0\rangle$, so the
+   basis label is qubit 0's digit followed by qubit 1's digit: $10$, not
+   $01$. Writing $i|01\rangle$ is the standard slip, and it is seductive
+   because $|{+i}\rangle$ is written first while its interesting amplitude
+   sits second, so the eye wants to pair "second thing" with "second
+   digit". Concatenate labels instead of counting positions and the
+   ambiguity disappears.
+
+   One more thing worth noticing: that $i$ is not a global phase you may
+   discard. It is a *relative* phase between the $|00\rangle$ and
+   $|10\rangle$ branches, and it is what distinguishes this state from
+   $|+\rangle\otimes|0\rangle$, which has the same four probabilities. A
+   computational-basis measurement cannot tell the two apart; putting an
+   $H$ on qubit 0 first can, since $H$ turns $|+\rangle$ into $|0\rangle$
+   but sends $|{+i}\rangle$ to a state that is still an even split.
+
+   </details>
+
 3. How many amplitudes does a 5-qubit state vector have? A 20-qubit one?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $2^5 = 32$ amplitudes for 5 qubits, and $2^{20} = 1{,}048{,}576$ for 20.
+
+   The trap is $2n$: 10 and 40. That answer counts the amplitudes needed to
+   describe each qubit *separately*, two per qubit, and it is the right
+   count for a product state. It is the wrong count for a general state,
+   because the general state also has to carry every correlation between
+   the qubits, and there are exponentially many patterns of correlation to
+   record. The dimension multiplies as qubits are added rather than adding,
+   which is what the tensor product's "every entry times every entry" rule
+   does.
+
+   Attaching a unit to the numbers makes the difference concrete. Stored in
+   double-precision complex numbers, 16 bytes each, the 5-qubit vector is
+   $32 \times 16 = 512$ bytes, small enough to sit in a CPU's registers and
+   caches. The 20-qubit vector is $1{,}048{,}576 \times 16 = 16{,}777{,}216$
+   bytes, about 17 MB, still ordinary but now a real array in memory. Add
+   another 20 qubits and the same formula gives about 18 TB. The bar chart
+   above plots exactly this, and the straight line of bar tops is the point:
+   the cost has no bend anywhere to grow out of.
+
+   </details>
+
 4. Verify by direct calculation that
    $\langle 01|(|0\rangle\otimes|1\rangle) = 1$ and
    $\langle 00|(|0\rangle\otimes|1\rangle) = 0$, using the inner product
    from Dirac Notation.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   First write the state as a column vector. From the lesson's worked
+   expansion, $|0\rangle\otimes|1\rangle = (0,1,0,0)^\mathsf{T} = |01\rangle$.
+   The two bras are the conjugate transposes of the corresponding basis
+   columns, $\langle 01| = (0,1,0,0)$ and $\langle 00| = (1,0,0,0)$, with
+   conjugation doing nothing here because every entry is real.
+
+   $$
+   \langle 01|(|0\rangle\otimes|1\rangle) = (0,1,0,0)\begin{pmatrix}0\\1\\0\\0\end{pmatrix} = 0\cdot0 + 1\cdot1 + 0\cdot0 + 0\cdot0 = 1
+   $$
+
+   $$
+   \langle 00|(|0\rangle\otimes|1\rangle) = (1,0,0,0)\begin{pmatrix}0\\1\\0\\0\end{pmatrix} = 1\cdot0 + 0\cdot1 + 0\cdot0 + 0\cdot0 = 0
+   $$
+
+   Only one product term is ever nonzero, because a basis bra picks out one
+   slot of the column and discards the rest. That is the general fact these
+   two calculations are instances of: the four two-qubit computational
+   basis states are orthonormal, $\langle ij|kl\rangle = \delta_{ik}\delta_{jl}$,
+   which is precisely why $|\langle ij|\psi\rangle|^2$ is a probability and
+   why the four probabilities sum to 1.
+
+   Two habits go wrong here. The first is reading $\langle 01|$ as somehow
+   "the state $|01\rangle$ again" and expecting the answer to be a vector.
+   A bra times a ket is a *number*, an overlap; a ket times a bra would be a
+   $4\times4$ matrix. The second is forgetting the complex conjugate in the
+   bra. It costs nothing on this example and everything on the previous
+   question's state: $\langle {+i}0|({+i}\otimes 0)$ comes out to
+   $\overline{(1/\sqrt2)}\cdot(1/\sqrt2) + \overline{(i/\sqrt2)}\cdot(i/\sqrt2) = \tfrac12+\tfrac12 = 1$
+   only because the conjugate turns $i \cdot i$ into $(-i)\cdot i = +1$.
+   Without it you would get $\tfrac12 - \tfrac12 = 0$ and conclude that a
+   perfectly good normalized state has zero length.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -273,7 +412,7 @@ track which ket is qubit 0.
 - Qubit 0 is the leftmost label in a multi-qubit ket, everywhere on this
   platform.
 
-## Further Exploration
+## Is every state reachable this way?
 
 <NextDiscovery>
 Up next, [Multi-Qubit State Vectors](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-state-vectors) asks the sharper question

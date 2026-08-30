@@ -49,13 +49,13 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="One number, a whole subspace">
   Knowing a system's exact energy doesn't always tell you its exact
   state. When an <Term id="eigenvalue-eigenvector">eigenvalue</Term> is degenerate, that single number only
   narrows things down to a whole subspace.
 </LessonHook>
 
-## Motivation
+## The easy case, and what it assumed away
 
 Mathematical Foundations stated the spectral decomposition
 $A=\sum_i\lambda_i|e_i\rangle\langle e_i|$ and verified it for Pauli-$Z$,
@@ -67,7 +67,7 @@ eigenvectors, which is the rule rather than the exception once systems get
 more interesting (multiple energy levels sharing one energy, as you'll
 see for real in the future Hydrogen Atom course).
 
-## Intuition
+## A projector is a shadow on a wall
 
 A **projection operator** does what the name suggests: given any vector,
 it keeps the part lying in some subspace and discards the rest, the
@@ -85,9 +85,9 @@ down from $v$ to $Pv$ is the "cast a shadow" step, and the small loop at
 $Pv$ is $P$ applied a second time, landing on the same point it started
 from. That loop is idempotence, drawn rather than proven.
 
-<ProjectionShadow ariaLabel="Drag a vector and see its shadow projected onto a one-dimensional or two-dimensional eigenspace" />
+<ProjectionShadow ariaLabel="A draggable vector v in the plane with its projection Pv marked, and a dashed segment joining the two. Onto a one-dimensional eigenspace, Pv sits on that line and the dashed segment meets it at a right angle, so part of v is discarded. Onto the two-dimensional eigenspace, Pv lands exactly on v and the dashed segment has no length, because there is nothing outside the subspace left to discard. A small loop at Pv shows a second application of P returning to the same point." />
 
-## Mathematical Development
+## Two properties, then eigenspaces of any dimension
 
 ### Two defining properties
 
@@ -111,6 +111,25 @@ $$
 using $\langle e|e\rangle=1$. Physically: projecting twice does nothing
 more than projecting once. Once you've kept only the component along
 $|e\rangle$, projecting *that* again changes nothing.
+
+Hermiticity is the shorter of the two. Daggering an outer product
+reverses it and conjugates each factor, so
+$(|e\rangle\langle e|)^\dagger=(\langle e|)^\dagger(|e\rangle)^\dagger=|e\rangle\langle e|$,
+and a rank-1 projector is its own adjoint with nothing to check.
+
+Idempotence alone, before any of the physics arrives, already fixes
+something about what a projector can measure.
+
+<PredictBeforeReveal
+  question="Suppose the only thing you know about an operator P is that P² = P. What does that alone force its eigenvalues to be?"
+  options={[
+    { label: "Only 0 and 1", value: "zero-one" },
+    { label: "Any real number, since P is also Hermitian", value: "any-real" },
+    { label: "Only ±1, like any Hermitian operator squaring to I", value: "plus-minus" },
+  ]}
+  correctValue="zero-one"
+  explanation="Let P|v⟩ = λ|v⟩. Apply P again: P²|v⟩ = λ²|v⟩. But P² is P, so λ²|v⟩ = λ|v⟩, and for a nonzero eigenvector λ² = λ. The only numbers satisfying that are 0 and 1. Hermiticity is not what does the work here; idempotence alone is. And this is the shadow picture in algebra: a projector either keeps a direction whole (eigenvalue 1, everything in the subspace) or discards it entirely (eigenvalue 0, everything orthogonal to it). There is no partial keeping. The measurement postulate three lessons ahead is built on that being a yes-or-no operator."
+/>
 
 ### Projectors onto degenerate eigenspaces
 
@@ -146,18 +165,7 @@ $\sum_iP_i=I$ (**completeness**: projecting onto every eigenspace and
 adding the results has to reconstruct the original vector, since the
 eigenvectors span the whole space).
 
-## Physical Interpretation
-
-<PredictBeforeReveal
-  question="A measurement finds a system's energy is exactly Ei, and Ei happens to be a degenerate eigenvalue with a 2-dimensional eigenspace. Does that measurement pin down the system's exact state?"
-  options={[
-    { label: "Yes, one eigenvalue always means one exact state", value: "yes" },
-    { label: "No, the state could be anywhere in the 2-dimensional eigenspace", value: "no" },
-    { label: "Only if the two eigenvectors happen to be orthogonal", value: "orthogonal-only" },
-  ]}
-  correctValue="no"
-  explanation="No. Knowing the energy is Ei tells you the state lives somewhere in that eigenvalue's eigenspace, and for a degenerate Ei that is a whole subspace rather than a single ray. This is why the projector Pi for a degenerate eigenvalue sums over every eigenvector in the eigenspace instead of picking one out."
-/>
+## Knowing the energy without knowing the state
 
 Degeneracy means an eigenvalue alone doesn't fully identify a unique
 basis state. Knowing "the energy is $E_i$" only tells you the state
@@ -174,7 +182,7 @@ next lesson builds the tool for resolving this: a second, compatible
   license="CC BY-SA 3.0 NL"
 />
 
-## Worked Example
+## Decomposing diag(1,1,2)
 
 **Let $N=\mathrm{diag}(1,1,2)$ on $\mathbb{C}^3$. Find its spectral
 decomposition.**
@@ -195,14 +203,14 @@ $$
 which is $N$ back again, confirming both projectors and the decomposition
 in one step.
 
-<InteractiveSection title="Check idempotence for both projectors" description="Switch between P₁ (built from platform's real projectorOntoSubspace on N's 2-dimensional degenerate eigenspace) and P₂ (the ordinary rank-1 case). Both satisfy P² = P, confirmed by direct computation rather than the general proof alone.">
+<InteractiveSection title="Check idempotence for both projectors" description="Switch between P₁ (built from platform's real projectorOntoSubspace on N's 2-dimensional degenerate eigenspace) and P₂ (the ordinary rank-1 case). Compute P² for each and compare it against P itself. One is an ordinary rank-1 projector and one is not, so the thing to settle is whether the rank makes any difference here.">
   <MatrixGridExplorer
     presets={idempotencePresets}
     ariaLabel="Choose a projector to compare it against its own square, confirming both the degenerate and nondegenerate projectors are idempotent"
   />
 </InteractiveSection>
 
-## Common Mistakes
+## One term per eigenvalue, not per eigenvector
 
 <Callout type="warning">
 **Writing a separate term for every eigen*vector* instead of every
@@ -211,7 +219,7 @@ groups all its eigenvectors into one projector $P_i$. Writing
 $\lambda_i|e_{i,1}\rangle\langle e_{i,1}| + \lambda_i|e_{i,2}\rangle
 \langle e_{i,2}|$ separately gives the same operator, but treating them
 as two *different* terms with the same eigenvalue obscures that they're
-one eigenspace, which matters for the measurement postulate two lessons
+one eigenspace, which matters for the measurement postulate three lessons
 ahead.
 </Callout>
 
@@ -225,11 +233,129 @@ projectors. Pauli-$Z$ is Hermitian but $Z^2=I\ne Z$. Idempotence is an
 
 1. Verify $P_1^2=P_1$ directly for the $N$ example above, by matrix
    multiplication.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   P_1^2 = \begin{pmatrix}1&0&0\\0&1&0\\0&0&0\end{pmatrix}\begin{pmatrix}1&0&0\\0&1&0\\0&0&0\end{pmatrix} = \begin{pmatrix}1&0&0\\0&1&0\\0&0&0\end{pmatrix} = P_1 \checkmark
+   $$
+
+   For a diagonal matrix, squaring squares each diagonal entry
+   independently, so the check reduces to $1^2=1$ and $0^2=0$. Those are
+   the only two numbers that survive being squared, which is exactly the
+   eigenvalue condition $\lambda^2=\lambda$ the prediction above derived
+   from idempotence alone. Applying the platform's
+   `projectorOntoSubspace` to $\{|0\rangle,|1\rangle\}$ and squaring the
+   result reproduces the same matrix.
+
+   The point worth extracting is that the rank made no difference.
+   $P_1$ projects onto a two-dimensional subspace and $P_2$ onto a
+   one-dimensional one, and both are idempotent for the same reason: the
+   general proof only ever used $\langle e_{i,j}|e_{i,k}\rangle
+   =\delta_{jk}$, orthonormality of the vectors spanning the subspace, and
+   never how many of them there were. That is why the degenerate case needs
+   no separate theorem.
+
+   The seductive wrong instinct here is to expect the degenerate projector
+   to behave differently, perhaps by "double counting" the two directions
+   it keeps. It cannot, because the cross terms
+   $|0\rangle\langle0|1\rangle\langle1|$ vanish: $\langle0|1\rangle=0$.
+   Orthogonality is what stops the sum of projectors from interfering with
+   itself, and it is why the eigenvectors have to be chosen orthonormal
+   (via Gram-Schmidt if they do not start that way) before this
+   construction is legitimate at all.
+
+   </details>
+
 2. For a Hermitian operator with three distinct eigenvalues on a
    4-dimensional space, what are the possible dimensions of its
    eigenspaces (listing all ways they could add up to 4)?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Only one pattern: dimensions $2,1,1$, in some order. One eigenvalue is
+   doubly degenerate and the other two are nondegenerate.
+
+   Two facts pin this down. Every eigenspace has dimension at least $1$,
+   since each distinct eigenvalue has at least one eigenvector by
+   definition. And completeness, $\sum_iP_i=I$, forces the dimensions to
+   sum to the dimension of the whole space, $4$, because the spectral
+   theorem for a Hermitian operator supplies a full orthonormal eigenbasis
+   with nothing left over. So the question is: in how many ways can three
+   positive integers sum to $4$? Only $2+1+1$. There is no $3+1+0$, because
+   a dimension of zero would mean the third eigenvalue had no eigenvector
+   and was therefore not an eigenvalue.
+
+   Which of the three eigenvalues carries the degeneracy is not determined
+   by the counting; that depends on the operator. So there are three
+   *assignments* ($\lambda_1$ degenerate, or $\lambda_2$, or $\lambda_3$)
+   of the one dimension pattern.
+
+   The general statement worth carrying forward is that the eigenspace
+   dimensions form a partition of $\dim\mathcal{H}$ into as many positive
+   parts as there are distinct eigenvalues. That immediately gives two
+   useful bounds: an operator on a $d$-dimensional space has at most $d$
+   distinct eigenvalues, and having exactly $d$ of them means every
+   eigenspace is one-dimensional, so the spectrum is completely
+   nondegenerate. Every departure from $d$ distinct eigenvalues is
+   degeneracy, measured exactly by the shortfall.
+
+   The mistake to name is treating "three distinct eigenvalues on a
+   4-dimensional space" as leaving room for choice. It does not. The
+   moment you know the count of distinct eigenvalues and the dimension,
+   the degeneracy structure is forced, which is precisely why the next
+   lesson can promise that one extra observable will be enough to resolve
+   this case.
+
+   </details>
+
 3. Confirm $P_1P_2=0$ for the $N$ example's two projectors, by direct
    matrix multiplication.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   P_1P_2 = \begin{pmatrix}1&0&0\\0&1&0\\0&0&0\end{pmatrix}\begin{pmatrix}0&0&0\\0&0&0\\0&0&1\end{pmatrix} = \begin{pmatrix}0&0&0\\0&0&0\\0&0&0\end{pmatrix} \checkmark
+   $$
+
+   and $P_2P_1$ gives the zero matrix too, which matters: unlike most
+   operator products, this one is symmetric in the order. Both are $0$
+   because the two projectors keep *disjoint* sets of diagonal slots, so
+   every product term multiplies a $1$ from one matrix against a $0$ from
+   the other.
+
+   The structural reason is orthogonality of the eigenspaces. $P_2$ sends
+   everything into $\mathrm{span}\{|2\rangle\}$, and $P_1$ then discards
+   anything orthogonal to $\mathrm{span}\{|0\rangle,|1\rangle\}$, which is
+   all of it. This is not a coincidence of $N$'s diagonality: the
+   Mathematical Foundations theorem that eigenvectors of a Hermitian
+   operator with *distinct* eigenvalues are orthogonal guarantees
+   $P_iP_j=0$ for every $i\ne j$, for every Hermitian operator.
+
+   Two consequences that get used later, so worth naming now.
+
+   Together with completeness, $P_1+P_2=I$, this is what makes the
+   probabilities in the generalized Born rule sum to one:
+   $\sum_iP(a_i)=\langle\psi|\sum_iP_i|\psi\rangle=\langle\psi|\psi
+   \rangle=1$, with the orthogonality guaranteeing there is no
+   double counting between outcomes.
+
+   And it is why measuring an observable twice in a row returns the same
+   answer. After the first measurement the state lies entirely inside one
+   eigenspace, so every *other* projector annihilates it and every other
+   outcome has probability exactly zero.
+
+   The check that catches an error fastest is the trace. $\mathrm{Tr}(P_1)
+   = 2$ and $\mathrm{Tr}(P_2) = 1$, each equal to the rank, that is, to the
+   dimension of the eigenspace projected onto, and the two sum to $3$, the
+   dimension of the whole space. A projector whose trace is not a
+   non-negative integer, or a set whose traces do not sum to the dimension,
+   has gone wrong somewhere upstream.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -248,7 +374,7 @@ projectors. Pauli-$Z$ is Hermitian but $Z^2=I\ne Z$. Idempotence is an
   completeness, and the reconstruction of Pauli-$Z$ from its own
   projectors.
 
-## Further Exploration
+## Splitting five dimensions between two eigenspaces
 
 <ChallengePrompt prompt="A Hermitian operator on a 5-dimensional space has exactly two distinct eigenvalues. Using completeness (the projectors' dimensions must sum to 5), what are the possible dimension splits between the two eigenspaces?">
   Same reasoning as the worked example's $N=\mathrm{diag}(1,1,2)$: each
@@ -267,5 +393,5 @@ projectors. Pauli-$Z$ is Hermitian but $Z^2=I\ne Z$. Idempotence is an
   projection-valued-measure spectral theorem (the version that also covers
   operators like $\hat x$ with a continuous spectrum), see
   [The Spectral Theorem for Unbounded Operators](/lessons/quantum-mastery/hilbert-space-and-spectral-theory/the-spectral-theorem-for-unbounded-operators)
-  in the Quantum Mastery pillar's Hilbert Space & Spectral Theory course.
+  in the Quantum Mastery track's Hilbert Space & Spectral Theory course.
 </NextDiscovery>

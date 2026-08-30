@@ -4,6 +4,7 @@ import { DefinitionBox } from "@/components/mdx/DefinitionBox";
 import { TheoremBox } from "@/components/mdx/TheoremBox";
 import { Callout } from "@/components/mdx/Callout";
 import { ComplexityClassDiagram } from "@/components/visualizations/ComplexityClassDiagram";
+import { ScrollableFigure } from "@/components/mdx/ScrollableFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "apex/quantum-complexity-theory/the-local-hamiltonian-problem"
@@ -125,7 +126,7 @@ export const toyPropagationEnergyOnWrongSlice = dot(
 export const lessonMeta = {
   title: "The Local Hamiltonian Problem",
   description:
-    "The prerequisite lesson's closing observation — a many-body ground state has no known compact classical description, yet fits perfectly as a poly-size quantum witness — made precise and completed: the k-Local Hamiltonian problem is defined exactly, shown to sit inside QMA via an estimation argument on the witness itself, and shown to be QMA-hard via a structural sketch of Kitaev's history-state construction.",
+    "The prerequisite lesson closed by observing that a many-body ground state has no known compact classical description yet fits as a poly-size quantum witness. This lesson makes that precise: the k-Local Hamiltonian problem is defined exactly, shown to sit inside QMA via an estimation argument on the witness itself, and shown to be QMA-hard via a structural sketch of Kitaev's history-state construction.",
   course: "quantum-complexity-theory",
   module: "the-local-hamiltonian-problem",
   order: 3,
@@ -135,7 +136,7 @@ export const lessonMeta = {
   objectives: [
     "State the k-Local Hamiltonian problem precisely: given a Hamiltonian H = sum of terms each acting on at most k qubits, decide whether its ground-state energy is below a or above b (with b-a at least inverse-polynomial), promised one of the two holds",
     "Explain why this problem is naturally in QMA (the ground state itself is a natural quantum witness) and sketch, at a conceptual level, Kitaev's QMA-hardness construction via a 'history state' encoding a verification circuit's execution",
-    "State the precise sequence of hardness results (5-local, then 2-local, then physically-motivated model-specific results like 2D nearest-neighbor spin lattices) and what each successive tightening actually establishes",
+    "Trace the precise sequence of hardness results (5-local, then 2-local, then physically-motivated model-specific results like 2D nearest-neighbor spin lattices) and what each successive tightening actually establishes",
   ],
   related: [
     {
@@ -157,12 +158,12 @@ export const lessonMeta = {
   can verify.
 </LessonHook>
 
-## Motivation
+## The Witness That Is a Ground State
 
 The prerequisite lesson ended by pointing at a specific kind of witness: the
 ground state of a many-body Hamiltonian, a state that can be highly
-entangled across every qubit it touches and — as far as anyone knows — has
-no compact classical description at all. That observation was left as an
+entangled across every qubit it touches and that, as far as anyone knows,
+has no compact classical description at all. That observation was left as an
 intuition pump for why a quantum witness could plausibly outperform a
 classical one. This lesson turns it into an actual theorem.
 
@@ -170,26 +171,26 @@ The **Local Hamiltonian problem** asks something a condensed-matter
 physicist or a quantum chemist asks every day in disguise: is this
 system's lowest-energy state below some physically important threshold?
 Framed as a decision problem with a locality restriction on the
-Hamiltonian, it turns out to be $\mathsf{QMA}$-complete — exactly as hard
+Hamiltonian, it turns out to be $\mathsf{QMA}$-complete, exactly as hard
 as any problem $\mathsf{QMA}$ can verify. That result, due to Kitaev, is
 the quantum analogue of the Cook-Levin theorem: just as 3-SAT is the
 canonical hard problem that every other $\mathsf{NP}$ problem reduces to,
 Local Hamiltonian is the canonical hard problem every other $\mathsf{QMA}$
-problem reduces to. Getting there requires two separate arguments — an
-easy direction (membership) and a genuinely deep one (hardness) — and this
-lesson gives both, being explicit about which one it derives in full and
-which one it only sketches the architecture of.
+problem reduces to. Getting there requires two separate arguments, an
+easy direction (membership) and a deep one (hardness). This lesson gives
+both, and is explicit about which one it derives in full and which one it
+only sketches the architecture of.
 
 <ComplexityClassDiagram
   outer={{ id: "PSPACE", label: "PSPACE" }}
   ring={{ id: "QMA", label: "QMA" }}
   lensB={{ id: "NP", label: "NP" }}
   markedPoint={{ label: "Local Hamiltonian", note: "QMA-complete" }}
-  footnote="NP ⊆ QMA ⊆ PSPACE were proven in the prerequisite lesson. This lesson's own theorem is the marked point: Local Hamiltonian sits right at QMA's boundary — every other QMA problem reduces to it."
-  ariaLabel="A containment diagram: a solid outer boundary labeled PSPACE contains a solid ring labeled QMA, which contains NP. A marked point on QMA's boundary is labeled Local Hamiltonian, QMA-complete — this lesson's theorem, that Local Hamiltonian is exactly as hard as any problem QMA can verify."
+  footnote="NP ⊆ QMA ⊆ PSPACE were proven in the prerequisite lesson. This lesson's own theorem is the marked point: Local Hamiltonian sits right at QMA's boundary, since every other QMA problem reduces to it."
+  ariaLabel="A containment diagram: a solid outer boundary labeled PSPACE contains a solid ring labeled QMA, which contains NP. A marked point on QMA's boundary is labeled Local Hamiltonian, QMA-complete. That is this lesson's theorem: Local Hamiltonian is exactly as hard as any problem QMA can verify."
 />
 
-## Mathematical Development
+## Kitaev's History-State Construction
 
 ### The k-Local Hamiltonian problem, precisely
 
@@ -208,9 +209,9 @@ is either $\leq a$ or $\geq b$.
 
 </DefinitionBox>
 
-Every piece of this statement is load-bearing. $k$ is a constant (not
-growing with $n$) — that's what "local" means here, and it's exactly the
-same locality convention the Hamiltonian-simulation prerequisite used for
+Every piece of this statement is load-bearing. $k$ is a constant, not
+growing with $n$; that's what "local" means here, and it's the same
+locality convention the Hamiltonian-simulation prerequisite used for
 decomposing $H$ into simulatable pieces. $m = \mathrm{poly}(n)$ keeps the
 *description* of $H$ polynomial-size, even though $H$ itself is a
 $2^n \times 2^n$ matrix no one ever writes down explicitly. And the
@@ -232,12 +233,12 @@ $\mathsf{QMA}$.
 The witness is the obvious one: Merlin sends the actual ground state
 $|\psi_0\rangle$ (or, if the true ground state needs more qubits to write
 down than is convenient, any state with energy within the promise gap of
-it — the argument only needs *a* state achieving energy close to the true
+it; the argument only needs *a* state achieving energy close to the true
 minimum). Arthur's job is to estimate $\langle \psi_0 | H | \psi_0
 \rangle$ and accept if the estimate is below the midpoint $(a+b)/2$.
 
-The reason this is efficient — and the entire point of the locality
-restriction — is that $\langle \psi_0 | H | \psi_0 \rangle = \sum_{i=1}^m
+The reason this is efficient, and the entire point of the locality
+restriction, is that $\langle \psi_0 | H | \psi_0 \rangle = \sum_{i=1}^m
 \langle \psi_0 | H_i | \psi_0 \rangle$, a sum of $m = \mathrm{poly}(n)$
 terms, and **each term only requires a measurement on $k$ qubits of
 $|\psi_0\rangle$.** Since $H_i$ is Hermitian and acts on a
@@ -251,8 +252,8 @@ prerequisite Hamiltonian-simulation lesson's phase-estimation cousin uses
 to read out an eigenvalue of $e^{-iH_it}$ (this platform's own
 **Quantum Phase Estimation** lesson covers that circuit in full; estimating
 $\langle H_i \rangle$ directly by measuring in $H_i$'s own eigenbasis is
-the simpler of the two standard routes and the one used here, precisely
-because $H_i$ is only a constant-size operator and never needs to be
+the simpler of the two standard routes and the one used here, because
+$H_i$ is only a constant-size operator and never needs to be
 exponentiated or Trotterized at all).
 
 Averaging repeated independent samples drives the estimate's error down,
@@ -264,9 +265,9 @@ sides of the threshold) with each individual estimate failing with
 probability at most $1/(3m)$ (so a union bound over all $m$ terms keeps
 the total failure probability under $1/3$). Both the required precision
 and the required per-term confidence are $1/\mathrm{poly}(n)$, so a
-polynomial number of samples per term — and hence a polynomial number of
-copies of $|\psi_0\rangle$, exactly as the amplification discussion
-required — suffices. Every step here uses only $k$-qubit measurements and
+polynomial number of samples per term suffices, and hence a polynomial
+number of copies of $|\psi_0\rangle$, exactly as the amplification
+discussion required. Every step here uses only $k$-qubit measurements and
 polynomially many repetitions; nothing about it needs to look at all $n$
 qubits at once or resolve exponentially fine precision. That is the whole
 membership proof: **locality is what makes the witness checkable in
@@ -274,9 +275,9 @@ polynomial time**, not any special property of the ground state itself.
 
 ### QMA-hardness: Kitaev's history-state construction (a structural sketch)
 
-The other direction — that *every* problem in $\mathsf{QMA}$ reduces to
-Local Hamiltonian — is Kitaev's theorem, and it is genuinely one of the
-most technically involved constructions in the field. What follows is
+The other direction, that *every* problem in $\mathsf{QMA}$ reduces to
+Local Hamiltonian, is Kitaev's theorem, and it is one of the most
+technically involved constructions in the field. What follows is
 **the architecture of the construction, verified piece by piece on a tiny
 example**, not a from-scratch derivation of the full theorem (which also
 requires a careful spectral-gap analysis this lesson does not attempt).
@@ -289,7 +290,7 @@ every language in $\mathsf{QMA}$ reduces to it in polynomial time.
 </TheoremBox>
 
 Start from an arbitrary $\mathsf{QMA}$ verification circuit
-$U = U_T \cdots U_2 U_1$ — a sequence of $T = \mathrm{poly}(n)$
+$U = U_T \cdots U_2 U_1$, a sequence of $T = \mathrm{poly}(n)$
 elementary gates acting on a witness register (initialized to whatever
 Merlin sends) and an ancilla register (initialized to
 $|0\cdots0\rangle$), ending with a measurement of a designated answer
@@ -301,10 +302,10 @@ state**
 
 <EquationReveal
   terms={[
-    { id: "eta", symbol: "|η⟩", gloss: "The history state — a single quantum state encoding every intermediate snapshot of the circuit's execution at once, in superposition." },
+    { id: "eta", symbol: "|η⟩", gloss: "The history state: a single quantum state encoding every intermediate snapshot of the circuit's execution at once, in superposition." },
     { id: "T", symbol: "T", gloss: "The total number of gates in the verification circuit U = U_T ⋯ U_1." },
     { id: "clock", symbol: "|t⟩_clock", gloss: "The clock register: tags which timestep of the circuit's execution a given branch of the superposition represents." },
-    { id: "Ut", symbol: "Uₜ⋯U₁", gloss: "The circuit's first t gates applied in sequence — the computational register's actual state at time t." },
+    { id: "Ut", symbol: "Uₜ⋯U₁", gloss: "The circuit's first t gates applied in sequence, giving the computational register's actual state at time t." },
     { id: "psi", symbol: "|ψ⟩", gloss: "The witness Merlin sends, occupying part of the computational register alongside the ancillas." },
   ]}
 >
@@ -314,9 +315,9 @@ $$
 </EquationReveal>
 
 This is a single quantum state that is, in superposition, *every
-intermediate snapshot of the circuit's own execution at once* — the state
+intermediate snapshot of the circuit's own execution at once*: the state
 before any gates, the state after $U_1$, after $U_2U_1$, and so on through
-the full circuit — each tagged by the clock value recording how far along
+the full circuit, each tagged by the clock value recording how far along
 it is. $H_{\rm Kit}$ is built from three families of local terms, each
 one a projector-like penalty that is zero on a valid history state and
 strictly positive on anything that deviates from one:
@@ -335,7 +336,7 @@ unconstrained at $t=0$, since Merlin is free to choose them).
 
 **3. An output term**, acting only on the clock-$T$ subspace, penalizing
 any $t=T$ computational state whose designated answer qubit would be
-*rejected* by the original verifier — i.e. reads out "reject" rather than
+*rejected* by the original verifier, i.e. reads out "reject" rather than
 "accept."
 
 Each of these terms touches only a bounded number of qubits: a
@@ -343,33 +344,32 @@ propagation term touches the (at most two, in a two-qubit-gate circuit)
 computational qubits $U_t$ acts on, plus a constant number of clock
 qubits needed to identify $t$ and $t-1$; the input and output terms are
 similarly localized to the ancilla register and the answer qubit,
-respectively, plus the clock. Bundling in the clock bookkeeping is exactly
-where the "$5$" in "$5$-local" comes from.
+respectively, plus the clock. Bundling in the clock bookkeeping is where
+the "$5$" in "$5$-local" comes from.
 
 <Callout type="note">
-**Why this is honestly a sketch, not a proof.** Showing that $H_{\rm Kit}$'s
-ground-state energy is genuinely *low* if and only if some witness makes
-$U$ accept, and genuinely *high* (by an inverse-polynomial gap) otherwise,
-requires a careful spectral analysis of how the propagation terms'
-individual zero-energy subspaces combine — a real, delicate argument
-(originally Kitaev's, later simplified by Kempe-Kitaev-Regev and others).
-That analysis is cited, not reproduced, here. What *is* verified below,
-completely honestly, is the easy but essential local fact that makes the
-whole architecture sensible: a single propagation term really does assign
-zero energy to a correct transition and positive energy to an incorrect
-one.
+**Why this is a sketch, not a proof.** Showing that $H_{\rm Kit}$'s
+ground-state energy is *low* if and only if some witness makes $U$ accept,
+and *high* (by an inverse-polynomial gap) otherwise, requires a careful
+spectral analysis of how the propagation terms' individual zero-energy
+subspaces combine, a delicate argument (originally Kitaev's, later
+simplified by Kempe-Kitaev-Regev and others). That analysis is cited, not
+reproduced, here. What *is* verified below is the easy but essential local
+fact that makes the whole architecture sensible: a single propagation term
+really does assign zero energy to a correct transition and positive energy
+to an incorrect one.
 </Callout>
 
 Why the acceptance condition mirrors $\mathsf{QMA}$'s own exactly: if
 Merlin has a witness $|\psi\rangle$ that makes $U$ accept with high
 probability, then the corresponding history state $|\eta\rangle$ has low
-energy under $H_{\rm Kit}$ — the propagation terms vanish by
+energy under $H_{\rm Kit}$: the propagation terms vanish by
 construction (each slice really is the previous slice evolved by the
 right gate), the input term vanishes (the ancillas really do start at
 $|0\cdots0\rangle$), and the output term contributes only a small penalty
 (the final answer qubit accepts with high probability). Conversely, if
-*no* witness makes $U$ accept, then *no* state — history state or
-otherwise — can simultaneously satisfy all three term families, and the
+*no* witness makes $U$ accept, then no state, history state or
+otherwise, can simultaneously satisfy all three term families, and the
 ground-state energy is bounded away from zero by an inverse-polynomial
 gap. The existential/universal structure is identical to $\mathsf{QMA}$'s
 own completeness/soundness quantifiers: "some witness works" becomes "some
@@ -391,8 +391,8 @@ Kitaev's original construction (circulated around 1999-2002 and published
 in Kitaev, Shen, and Vyalyi's book *Classical and Quantum Computation*)
 established $5$-Local Hamiltonian as $\mathsf{QMA}$-complete. Kempe,
 Kitaev, and Regev (2006) tightened this substantially, showing that even
-$2$-Local Hamiltonian — Hamiltonians built entirely from terms acting on
-just *pairs* of qubits — is already $\mathsf{QMA}$-complete, using
+$2$-Local Hamiltonian (Hamiltonians built entirely from terms acting on
+just *pairs* of qubits) is already $\mathsf{QMA}$-complete, using
 perturbation-theory "gadgets" to simulate higher-locality terms with
 combinations of $2$-local ones. Subsequent work pushed the result further,
 toward physically motivated, highly restricted models: Oliveira and
@@ -418,7 +418,7 @@ platforms) that remain $\mathsf{QMA}$-complete.
 </ResearchConnection>
 
 Each tightening establishes something strictly
-stronger than the last — not just "some artificial 5-local construction is
+stronger than the last: not just "some artificial 5-local construction is
 hard" but "hardness survives even when an experimentalist is handed
 essentially the simplest lattice geometry they could ask for." The same
 family of exchange-coupled qubit interactions introduced physically in
@@ -426,7 +426,7 @@ this platform's own Spin Qubits lesson is, in the worst case over all
 possible coupling patterns, exactly the kind of system these later results
 describe.
 
-## Physical Interpretation: Why This Matters
+## QMA's Cook-Levin Problem
 
 <InsightBlock>
   Local Hamiltonian is QMA's Cook-Levin problem: the ground state is
@@ -440,33 +440,34 @@ Local Hamiltonian is $\mathsf{QMA}$'s canonical complete problem in
 problem every other problem in the class reduces to, so proving anything
 is $\mathsf{QMA}$-hard can be done by reducing from Local Hamiltonian
 instead of re-deriving hardness from scratch every time. But unlike
-3-SAT, Local Hamiltonian is not an artificial combinatorial puzzle — it is
-the literal computational core of condensed-matter physics and quantum
+3-SAT, Local Hamiltonian is not an artificial combinatorial puzzle; it is
+the computational core of condensed-matter physics and quantum
 chemistry's central question: *does this real physical system have a
 low-energy state below some threshold?* $\mathsf{QMA}$-completeness says,
 in a precise and worst-case sense, that finding or certifying such
 ground states is exactly as hard as any problem a quantum computer can
-efficiently *verify* — though, critically, not necessarily efficiently
-*solve* (see the Common Mistakes section below). This is directly relevant
-to the quantum-chemistry problem this pillar's own later **Quantum
-Simulation of Molecules** lesson engages with practically: knowing that
-the general problem is $\mathsf{QMA}$-complete is exactly the honest
-context needed to understand why that lesson's practical algorithms
-target specific, structured molecular instances rather than claiming a
-general efficient solution. More broadly, Kitaev's theorem is the
-starting point of an entire subsequent research program —
-**Hamiltonian complexity theory** — where the object being classified as
-hard or easy is a real spin lattice or molecular Hamiltonian, not an
-encoded combinatorial puzzle: the tightening sequence above (5-local, to
-2-local, to 2D nearest-neighbor lattices) is that program measuring
-exactly how much physical realism its own hardness results can survive.
+efficiently *verify*. Verifying is not solving: nothing in the result says
+a quantum computer can efficiently *find* such a ground state, and the
+discussion below returns to that gap. This is
+directly relevant to the quantum-chemistry problem this track's own later
+**Quantum Simulation of Molecules** lesson engages with practically:
+knowing that the general problem is $\mathsf{QMA}$-complete is the context
+needed to understand why that lesson's practical algorithms target
+specific, structured molecular instances rather than claiming a general
+efficient solution. More broadly, Kitaev's theorem is the starting point
+of an entire research program, **Hamiltonian complexity theory**, where
+the object being classified as hard or easy is a real spin lattice or
+molecular Hamiltonian rather than an encoded combinatorial puzzle. The
+tightening sequence above (5-local, to 2-local, to 2D nearest-neighbor
+lattices) is that program measuring how much physical realism its own
+hardness results can survive.
 
-## Worked Example
+## A Two-Gate Circuit, Made a Hamiltonian
 
 **A tiny two-gate history state, built and checked by real arithmetic.**
 
 Take a toy circuit with $T=2$ elementary gates on a single qubit (no
-witness or ancilla structure — this is purely to make the bookkeeping of
+witness or ancilla structure; this is purely to make the bookkeeping of
 $|\eta\rangle$ concrete, not a real verification circuit): $U_1 = X$
 (the Pauli bit-flip) and $U_2 = H$ (the Hadamard). Starting from
 $|0\rangle$, the three slices of the history state are
@@ -478,42 +479,42 @@ computed directly by `applyPauliX` and `applyHadamard` above
 one-qubit state (norm exactly $1$, since $X$ and $H$ are unitary), so the
 full history state $|\eta\rangle = \tfrac{1}{\sqrt3}\sum_{t=0}^{2}
 |t\rangle|\phi_t\rangle$ has total norm-squared
-$3 \times \tfrac13 \times 1 = 1$ — verified numerically by
+$3 \times \tfrac13 \times 1 = 1$, verified numerically by
 `toyHistoryStateNormCheck`, which evaluates to $1$ (up to floating-point
 rounding).
 
 <PredictBeforeReveal
-  question="H_prop,1 is built to penalize any t=0→t=1 transition that does NOT correctly apply the circuit's next gate U₁=X. Before computing it directly, predict how the energy of a wrong transition slice — (|0,0⟩+|1,0⟩)/√2, where the computational register is left unchanged instead of flipped by X — will compare to the correct transition slice (|0,0⟩+|1,1⟩)/√2."
+  question="H_prop,1 is built to penalize any t=0→t=1 transition that does NOT correctly apply the circuit's next gate U₁=X. Before computing it directly, predict how the energy of a wrong transition slice, (|0,0⟩+|1,0⟩)/√2, where the computational register is left unchanged instead of flipped by X, will compare to the correct transition slice (|0,0⟩+|1,1⟩)/√2."
   options={[
-    { label: "Lower energy — leaving the register unchanged is cheaper", value: "lower" },
-    { label: "Equal energy — both are equally valid histories", value: "equal" },
-    { label: "Higher (strictly positive) energy — it fails to apply the gate", value: "higher" },
+    { label: "Lower energy, since leaving the register unchanged is cheaper", value: "lower" },
+    { label: "Equal energy, since both are equally valid histories", value: "equal" },
+    { label: "Higher (strictly positive) energy, since it fails to apply the gate", value: "higher" },
   ]}
   correctValue="higher"
-  explanation="toyPropagationEnergyOnCorrectSlice ≈ 0 — the correct transition costs nothing, exactly as a valid history state must. toyPropagationEnergyOnWrongSlice ≈ 0.5 — strictly positive, a real, checkable penalty for a transition that doesn't apply U₁ correctly. This one local, hand-verifiable fact is the load-bearing piece Kitaev's full construction scales up to all T propagation terms at once."
+  explanation="toyPropagationEnergyOnCorrectSlice ≈ 0: the correct transition costs nothing, exactly as a valid history state must. toyPropagationEnergyOnWrongSlice ≈ 0.5, strictly positive, a real and checkable penalty for a transition that doesn't apply U₁ correctly. This one local, hand-verifiable fact is the load-bearing piece Kitaev's full construction scales up to all T propagation terms at once."
 />
 
 Now check the propagation term's actual job on the $t{=}0 \to t{=}1$
 transition, using $U_1 = X$ in the general formula above:
 `propagationTerm1` is the real $4\times4$ matrix $H_{\text{prop},1}$,
-built by literal matrix arithmetic (`kron`, `matAdd`, `matSub`) from
+built by explicit matrix arithmetic (`kron`, `matAdd`, `matSub`) from
 $X$, exactly as the formula specifies, in the ordered basis
 $\{|0,0\rangle, |0,1\rangle, |1,0\rangle, |1,1\rangle\}$ (clock qubit
 first, computational qubit second).
 
-- The **correct** transition slice, $(|0,0\rangle + |1,1\rangle)/\sqrt2$
-  (clock $0$ paired with $|0\rangle$, clock $1$ paired with
-  $X|0\rangle = |1\rangle$, exactly matching the history state above) —
-  `correctTransitionSlice` — has energy
-  `toyPropagationEnergyOnCorrectSlice` $\approx 0$.
-- A **wrong** transition slice, $(|0,0\rangle + |1,0\rangle)/\sqrt2$
-  (the computational register left unchanged instead of flipped by
-  $U_1$) — `wrongTransitionSlice` — has energy
+- The **correct** transition slice `correctTransitionSlice`,
+  $(|0,0\rangle + |1,1\rangle)/\sqrt2$ (clock $0$ paired with $|0\rangle$,
+  clock $1$ paired with $X|0\rangle = |1\rangle$, matching the history
+  state above), has energy `toyPropagationEnergyOnCorrectSlice`
+  $\approx 0$.
+- A **wrong** transition slice `wrongTransitionSlice`,
+  $(|0,0\rangle + |1,0\rangle)/\sqrt2$ (the computational register left
+  unchanged instead of flipped by $U_1$), has energy
   `toyPropagationEnergyOnWrongSlice` $\approx 0.5$, strictly positive.
 
-That is the propagation term doing exactly its stated job, verified on a
+That is the propagation term doing its stated job, verified on a
 case small enough to compute by hand: zero energy on a transition that
-correctly applies the circuit's next gate, and a real, positive penalty on
+correctly applies the circuit's next gate, and a strictly positive penalty on
 one that does not.
 
 ## Visualizing the History State
@@ -525,8 +526,8 @@ at the locations where they act: the input term only at $t=0$, a
 propagation term straddling each adjacent pair of clock values, and the
 output term only at $t=T$.
 
-<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-<svg viewBox="0 0 760 340" width={760} className="w-full" role="img" aria-label="A timeline of five clock values t=0 through t=4 connected by four gate boxes labeled U1 through U4, representing the history state as a superposition over every intermediate step of a verification circuit's execution. Above the timeline, the formula for the history state: the sum over t of the clock register value t tensored with the computational register after applying the first t gates, all divided by the square root of 5. Below the timeline, three colored annotations show where Kitaev's three penalty terms act: a brand-colored bracket under t=0 labeled the input term, checking that ancilla qubits start at all zeros; four accent-colored brackets, one spanning each adjacent pair of clock values, labeled propagation terms, each checking that the computational register at the later time correctly equals the gate applied to the register at the earlier time; and a danger-colored bracket under t=4 (the final clock value T) labeled the output term, checking that the verifier's designated answer qubit reads accept.">
+<ScrollableFigure label="Clock timeline of five steps linked by four gates, building the history state">
+<svg viewBox="0 0 760 340" width={760} height={340} role="img" aria-label="A timeline of five clock values t=0 through t=4 connected by four gate boxes labeled U1 through U4, representing the history state as a superposition over every intermediate step of a verification circuit's execution. Above the timeline, the formula for the history state: the sum over t of the clock register value t tensored with the computational register after applying the first t gates, all divided by the square root of 5. Below the timeline, three colored annotations show where Kitaev's three penalty terms act: a brand-colored bracket under t=0 labeled the input term, checking that ancilla qubits start at all zeros; four accent-colored brackets, one spanning each adjacent pair of clock values, labeled propagation terms, each checking that the computational register at the later time correctly equals the gate applied to the register at the earlier time; and a danger-colored bracket under t=4 (the final clock value T) labeled the output term, checking that the verifier's designated answer qubit reads accept.">
   <text x={380} y={22} textAnchor="middle" className="fill-foreground text-[12px] font-semibold">
     |η⟩ = (1/√5) Σ₍t=0..4₎ |t⟩_clock ⊗ |φₜ⟩_computation, where |φₜ⟩ = Uₜ⋯U₁|ψ⟩|0…0⟩
   </text>
@@ -562,7 +563,7 @@ output term only at $t=T$.
 
   <path d="M 62 172 L 62 182 L 98 182 L 98 172" className="fill-none stroke-brand" strokeWidth={2} />
   <text x={80} y={198} textAnchor="middle" className="fill-brand text-[9.5px] font-semibold">H_in</text>
-  <text x={80} y={211} textAnchor="middle" className="fill-muted-foreground text-[8.5px]">ancillas = |0…0⟩?</text>
+  <text x={80} y={211} textAnchor="middle" className="fill-muted-foreground text-[9px]">ancillas = |0…0⟩?</text>
 
   <path d="M 100 172 L 100 182 L 210 182 L 210 172" className="fill-none stroke-accent" strokeWidth={2} />
   <path d="M 250 172 L 250 182 L 360 182 L 360 172" className="fill-none stroke-accent" strokeWidth={2} />
@@ -572,31 +573,31 @@ output term only at $t=T$.
   <text x={305} y={198} textAnchor="middle" className="fill-accent text-[9.5px] font-semibold">H_prop,2</text>
   <text x={455} y={198} textAnchor="middle" className="fill-accent text-[9.5px] font-semibold">H_prop,3</text>
   <text x={605} y={198} textAnchor="middle" className="fill-accent text-[9.5px] font-semibold">H_prop,4</text>
-  <text x={380} y={215} textAnchor="middle" className="fill-muted-foreground text-[8.5px]">each checks: register at t equals Uₜ applied to register at t-1</text>
+  <text x={380} y={215} textAnchor="middle" className="fill-muted-foreground text-[9px]">each checks: register at t equals Uₜ applied to register at t-1</text>
 
   <path d="M 662 172 L 662 182 L 698 182 L 698 172" className="fill-none stroke-danger" strokeWidth={2} />
   <text x={680} y={198} textAnchor="middle" className="fill-danger text-[9.5px] font-semibold">H_out</text>
-  <text x={680} y={211} textAnchor="middle" className="fill-muted-foreground text-[8.5px]">answer qubit = accept?</text>
+  <text x={680} y={211} textAnchor="middle" className="fill-muted-foreground text-[9px]">answer qubit = accept?</text>
 
   <rect x={90} y={250} width={12} height={12} className="fill-brand/20 stroke-brand" strokeWidth={1.5} />
-  <text x={110} y={260} className="fill-muted-foreground text-[10px]">Input term — acts only at t=0</text>
+  <text x={110} y={260} className="fill-muted-foreground text-[10px]">Input term: acts only at t=0</text>
   <rect x={90} y={272} width={12} height={12} className="fill-accent/20 stroke-accent" strokeWidth={1.5} />
-  <text x={110} y={282} className="fill-muted-foreground text-[10px]">Propagation term — acts on each adjacent pair (t-1, t)</text>
+  <text x={110} y={282} className="fill-muted-foreground text-[10px]">Propagation term: acts on each adjacent pair (t-1, t)</text>
   <rect x={90} y={294} width={12} height={12} className="fill-danger/20 stroke-danger" strokeWidth={1.5} />
-  <text x={110} y={304} className="fill-muted-foreground text-[10px]">Output term — acts only at t=T</text>
+  <text x={110} y={304} className="fill-muted-foreground text-[10px]">Output term: acts only at t=T</text>
 </svg>
-</div>
+</ScrollableFigure>
 
 Reading the diagram left to right traces the same argument as the
-Mathematical Development section: the input term is the only one
+derivation above: the input term is the only one
 inspecting $t=0$, the four propagation terms each glue one clock value to
 the next via the corresponding gate, and the output term is the only one
-inspecting the final clock value $t=T$ — together penalizing every way a
+inspecting the final clock value $t=T$. Together they penalize every way a
 state could fail to be a valid, accepted history of the circuit's
-execution, and assigning zero energy only to a true history state built
+execution, and assign zero energy only to a true history state built
 from a witness the original verifier would have accepted.
 
-## Common Mistakes
+## Worst Case Versus the Physics You Care About
 
 <Callout type="warning">
 **Treating $\mathsf{QMA}$-completeness of Local Hamiltonian as a blanket
@@ -605,9 +606,9 @@ statement that "quantum many-body physics is intractable."** It is a
 constructed from the hardest problems in $\mathsf{QMA}$) for which no
 efficient algorithm is believed to exist. It does **not** say every
 physically important Hamiltonian is like that. Many structured special
-cases are efficiently solvable — one-dimensional gapped systems, for
+cases are efficiently solvable. One-dimensional gapped systems, for
 instance, are tractable with the tensor-network / matrix-product-state
-methods covered elsewhere on this platform, precisely because their
+methods covered elsewhere on this platform, because their
 entanglement structure is far more restricted than the entanglement a
 worst-case Kitaev-style construction can encode. Local-Hamiltonian
 hardness identifies the ceiling on the general problem, not the floor on
@@ -617,7 +618,7 @@ every instance a physicist actually cares about.
 <Callout type="warning">
 **Confusing "Local Hamiltonian is in $\mathsf{QMA}$" with "ground states
 are easy to find."** $\mathsf{QMA}$ membership only says the ground state
-is easy to *verify* once Merlin hands it over — exactly as $\mathsf{NP}$
+is easy to *verify* once Merlin hands it over, exactly as $\mathsf{NP}$
 membership for 3-SAT says a satisfying assignment is easy to check, not
 easy to find. Nothing in this lesson's membership argument produces
 $|\psi_0\rangle$; it only estimates $\langle\psi_0|H|\psi_0\rangle$ given
@@ -633,18 +634,204 @@ $\mathsf{NP}$-complete problems have efficient classical ones.
    QMA-membership proof above (per-term precision $(b-a)/(3m)$, per-term
    failure probability at most $1/(3m)$), what additive precision $\varepsilon$
    must each of the $m$ per-term energy estimates achieve?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \varepsilon = \frac{b-a}{3m} = \frac{0.006}{3\times120} = \frac{0.006}{360} = 1.667\times10^{-5}.
+   $$
+
+   Both halves of the budget check out. The $m$ per-term errors sum to at
+   most $120\times1.667\times10^{-5} = 0.002 = (b-a)/3$, which is the
+   third of the gap the argument set aside. And the union bound over
+   per-term failures gives $120\times\frac1{360}=\frac13$, the failure
+   probability $\mathsf{QMA}$'s soundness bound allows.
+
+   **What that costs, since "polynomial" is doing a lot of work here.**
+   Each term's eigenvalues sit in a range of width $O(1)$, so Hoeffding
+   says the number of samples per term is about
+
+   $$
+   n \approx \frac{1}{2\varepsilon^2}\ln\frac{2}{\delta}
+   = \frac{1}{2(1.667\times10^{-5})^2}\ln(720) \approx 1.2\times10^{10},
+   $$
+
+   and across all $120$ terms that is roughly $1.4\times10^{12}$ copies
+   of the witness. Merlin sends every one of them. The membership proof
+   is correct and the count is genuinely polynomial in the instance size,
+   and it is also completely impractical, which is worth seeing once
+   rather than inferring later.
+
+   **The structural point hiding in the formula.** Sample count goes as
+   $1/\varepsilon^2 = 9m^2/(b-a)^2$, so it is quadratic in the number of
+   terms and, more importantly, **quadratic in the inverse promise gap**.
+   That is why Local Hamiltonian is posed as a promise problem with
+   $b-a \ge 1/\mathrm{poly}(n)$ rather than as the plain question "what
+   is the ground-state energy." A general Hamiltonian's spectral gaps can
+   be exponentially small; ask for the energy to that resolution and the
+   witness count becomes exponential and the $\mathsf{QMA}$-membership
+   argument collapses on the spot. The promise is not a technical
+   convenience attached to make the statement tidy. It is the hypothesis
+   the entire proof runs on.
+
+   </details>
+
 2. The propagation term $H_{\text{prop},t}$ was verified above to
    annihilate $(|t-1\rangle|\phi\rangle + |t\rangle U_t|\phi\rangle)/\sqrt2$
    for the specific case $U_t = X$. Redo the algebra symbolically for an
    arbitrary unitary $U_t$, and identify exactly which property of $U_t$
    (as opposed to, say, an arbitrary linear operator) is what makes the
    two cross terms in $H_{\text{prop},t}$ cancel the two diagonal terms.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The property is $U_t^\dagger U_t = I$, the isometry half of
+   unitarity. Nothing else about $U_t$ is used.
+
+   Write $|\chi\rangle=\tfrac1{\sqrt2}\big(|t-1\rangle|\phi\rangle
+   +|t\rangle U_t|\phi\rangle\big)$ and apply the four pieces of
+   $H_{\text{prop},t}$ one at a time.
+
+   $$
+   \tfrac12\big(|t-1\rangle\langle t-1|\otimes I\big)|\chi\rangle = \tfrac{1}{2\sqrt2}\,|t-1\rangle|\phi\rangle
+   $$
+
+   $$
+   \tfrac12\big(|t\rangle\langle t|\otimes I\big)|\chi\rangle = \tfrac{1}{2\sqrt2}\,|t\rangle U_t|\phi\rangle
+   $$
+
+   $$
+   -\tfrac12\big(|t\rangle\langle t-1|\otimes U_t\big)|\chi\rangle = -\tfrac{1}{2\sqrt2}\,|t\rangle U_t|\phi\rangle
+   $$
+
+   $$
+   -\tfrac12\big(|t-1\rangle\langle t|\otimes U_t^\dagger\big)|\chi\rangle = -\tfrac{1}{2\sqrt2}\,|t-1\rangle U_t^\dagger U_t|\phi\rangle
+   $$
+
+   Adding them,
+
+   $$
+   H_{\text{prop},t}|\chi\rangle = \tfrac{1}{2\sqrt2}\,|t-1\rangle\big(I - U_t^\dagger U_t\big)|\phi\rangle,
+   $$
+
+   which vanishes for every $|\phi\rangle$ if and only if
+   $U_t^\dagger U_t = I$.
+
+   **The two cancellations are not the same kind of thing, and that is
+   the most useful thing to take away.** Look at where each one came
+   from.
+
+   The $|t\rangle$ pair cancelled because the operator appearing in the
+   state matched the operator appearing in the Hamiltonian. Replace the
+   state by $\tfrac1{\sqrt2}(|t-1\rangle|\phi\rangle+|t\rangle
+   A|\phi\rangle)$ for some other $A$ and those two terms leave
+   $\tfrac{1}{2\sqrt2}|t\rangle(A-U_t)|\phi\rangle$, which is nonzero
+   exactly when the wrong gate was applied. **That cancellation is the
+   check.** It is what makes the term a penalty on incorrect
+   propagation, and it is the algebra behind the lesson's numerical
+   finding that the wrong transition slice costs $0.5$.
+
+   The $|t-1\rangle$ pair is different. It has nothing to do with which
+   gate the state used and everything to do with the gate being
+   invertible in the strong sense. **That cancellation is what makes the
+   penalty well-posed at all.**
+
+   The cleanest way to see the second point is to notice what
+   $H_{\text{prop},t}$ actually is. Put
+   $A = |t\rangle\langle t|\otimes I - |t\rangle\langle t-1|\otimes U_t$
+   and expand $A^\dagger A$: you get the two diagonal terms, the two
+   off-diagonal terms, and a final $|t-1\rangle\langle t-1|\otimes
+   U_t^\dagger U_t$. So
+
+   $$
+   H_{\text{prop},t} = \tfrac12 A^\dagger A \quad\text{precisely when}\quad U_t^\dagger U_t = I.
+   $$
+
+   Unitarity is what turns the propagation term into half of an operator
+   times its own adjoint, hence manifestly positive semidefinite, with
+   the correct transitions sitting in its kernel. Drop unitarity and the
+   term may have negative eigenvalues, at which point "zero energy means
+   a valid history" stops being a statement anyone can make, and Kitaev's
+   whole construction loses its floor.
+
+   **The wrong turn** is answering "Hermiticity." $H_{\text{prop},t}$ is
+   Hermitian for any operator whatsoever, since the two off-diagonal
+   pieces were written as adjoints of each other by construction.
+   Hermiticity is free and does no work here. The load is carried by
+   $U_t^\dagger U_t = I$, which is exactly the fact that quantum circuits
+   are built from unitary gates, and this is where that physical
+   restriction enters the complexity-theoretic construction.
+
+   </details>
+
 3. Kitaev's original construction, built from two-qubit gates with an
    adjacent clock encoding, produces a Hamiltonian that is $5$-local.
    Explain in your own words where each of the (at most) $5$ qubits a
    single term touches comes from, and why Kempe-Kitaev-Regev's tightening
-   to $2$-local needed genuinely new "gadgets" rather than simply a
-   cleverer way of encoding the clock.
+   to $2$-local needed new "gadgets" rather than a cleverer way of
+   encoding the clock.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Two from the gate, three from the clock.
+
+   **The two computational qubits** are the ones $U_t$ acts on. The
+   circuit is compiled into two-qubit gates, so a propagation term has to
+   reach exactly those two to apply $U_t$ and $U_t^\dagger$.
+
+   **The three clock qubits** come from the unary encoding. The clock
+   stores time $t$ as $|1^t0^{T-t}\rangle$, so the state of the clock is
+   a single domain wall and the time is the wall's position. A
+   propagation term for step $t$ has to do two things at once with that
+   register. It must recognize that the wall sits at position $t$ or
+   $t-1$, which means examining the qubits on both sides of the wall, and
+   it must also penalize illegal clock strings such as $|1010\rangle$
+   that no unary encoding should ever produce. Both jobs are local
+   inspections of a short window, and the window that suffices is three
+   consecutive clock qubits. Two plus three is five.
+
+   **Why a cleverer encoding does not get you to two.** A binary clock is
+   the obvious idea and it makes things worse: $\lceil\log(T+1)\rceil$
+   clock qubits instead of $T+1$ is a lovely saving in qubit count, and
+   catastrophic for locality, because identifying one specific time now
+   requires reading *every* clock qubit. The term becomes
+   $\Theta(\log T)$-local, and locality is the resource being minimized.
+   The general obstruction is that a propagation term has an irreducible
+   list of jobs: apply a two-qubit gate, and condition that application
+   on a particular time. The gate costs two qubits no matter what, and
+   any encoding in which the time is checkable by touching fewer than
+   three qubits is an encoding in which times are not distinguishable
+   from each other. Encodings are exact rewrites, and an exact rewrite
+   cannot make a term touch fewer qubits than the number of independent
+   things it has to know.
+
+   **What gadgets do instead, and it is a change of category.** Kempe,
+   Kitaev, and Regev do not re-encode anything. They keep a Hamiltonian
+   with higher-locality terms and then *simulate* each one with a cluster
+   of $2$-local terms acting on the original qubits plus fresh ancillas,
+   chosen so that the cluster's low-energy effective Hamiltonian,
+   computed by perturbation theory, reproduces the target term to
+   sufficient accuracy. The $3$-local term is never rewritten. It is
+   approximated, in a subspace, by something $2$-local.
+
+   That is why it is a different kind of move and why it could not have
+   been found by thinking harder about clocks. It is also why it is not
+   free. The gadget needs a large energy scale to separate its low-energy
+   subspace from the rest, the approximation is only good below that
+   scale, and the promise gap of the resulting $2$-local instance is a
+   smaller inverse polynomial than the one you started with. For
+   $\mathsf{QMA}$-completeness that is harmless, since any
+   inverse-polynomial gap qualifies. For anyone hoping to read the result
+   as a statement about physically realizable spin systems, that shrinking
+   gap and that large energy scale are exactly the caveats worth carrying
+   forward, and they are the reason the later work on $2$D lattices and
+   physically motivated interaction families was a research programme
+   rather than a corollary.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -656,16 +843,16 @@ $\mathsf{NP}$-complete problems have efficient classical ones.
   ground-state energy is $\leq a$ or $\geq b$, promised $b-a\geq
   1/\mathrm{poly}(n)$.
 - **QMA membership** (derived in full here): the ground state itself is
-  the witness; because $H$ decomposes into $\mathrm{poly}(n)$ genuinely
-  $k$-qubit terms, each $\langle H_i\rangle$ can be estimated from
+  the witness; because $H$ decomposes into $\mathrm{poly}(n)$ terms each
+  acting on $k$ qubits, each $\langle H_i\rangle$ can be estimated from
   $k$-qubit measurements, and a union bound over polynomially many terms,
   each needing only $1/\mathrm{poly}(n)$ precision and confidence, keeps
   the whole verification efficient.
 - **QMA-hardness** (Kitaev's theorem, sketched structurally and verified
   on a small case, not derived in full): every $\mathsf{QMA}$ verification
   circuit reduces to a local Hamiltonian whose ground state is a
-  **history state** — a superposition over every intermediate step of the
-  circuit's execution, tagged by a clock register — enforced by
+  **history state**, a superposition over every intermediate step of the
+  circuit's execution tagged by a clock register, enforced by
   propagation, input, and output terms that together vanish exactly on
   valid, accepted histories.
 - The hardness result tightens from $5$-local (Kitaev) to $2$-local
@@ -676,10 +863,10 @@ $\mathsf{NP}$-complete problems have efficient classical ones.
 - This makes Local Hamiltonian $\mathsf{QMA}$'s Cook-Levin-style complete
   problem, tying condensed-matter and quantum-chemistry ground-state
   questions to the exact frontier of what a quantum computer can
-  efficiently verify — a **worst-case** statement, not a claim that every
-  physically realistic instance is intractable.
+  efficiently verify. That is a **worst-case** statement, not a claim that
+  every physically realistic instance is intractable.
 
-## Further Exploration
+## Lower Bounds From the Other Direction
 
 <NextDiscovery>
   [Query Complexity and Lower Bounds](/lessons/apex/quantum-complexity-theory/query-complexity-and-lower-bounds)

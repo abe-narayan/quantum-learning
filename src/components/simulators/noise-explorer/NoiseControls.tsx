@@ -34,7 +34,7 @@ export function NoiseControls({
       <ControlSection
         id="noise-preset"
         title="Starting state"
-        description="The undisturbed quantum state the noise is applied to. |+⟩ is the most fragile of these — it lives on the equator, where phase noise does the most damage."
+        description="The undisturbed quantum state the noise is applied to. |+⟩ is the most fragile of these: it lives on the equator, where phase noise does the most damage."
       >
         <PresetToggle
           options={STATE_PRESETS.map((preset) => ({ label: preset.ket }))}
@@ -72,7 +72,7 @@ export function NoiseControls({
               symbol: "T2",
               name: "coherence time",
               means:
-                "how long a qubit keeps a well-defined phase — the thing superposition is made of. Always the tighter constraint of the two in practice, and what the dephasing channel models.",
+                "how long a qubit keeps a well-defined phase, the thing superposition is made of. Always the tighter constraint of the two in practice, and what the dephasing channel models.",
               glossaryId: "decoherence",
             },
           ]}
@@ -119,7 +119,7 @@ export function NoiseControls({
                     name: "dephasing probability",
                     means: `the chance, per step, that the environment randomizes the qubit's phase. At ${strength.toFixed(
                       2
-                    )} that's about a ${Math.round(strength * 100)}% chance each time — energy untouched, phase gone.`,
+                    )} that's about a ${Math.round(strength * 100)}% chance each time: energy untouched, phase gone.`,
                     glossaryId: "kraus-operators-cptp-maps",
                   },
                 ]
@@ -130,7 +130,7 @@ export function NoiseControls({
       <ControlSection
         id="noise-steps"
         title="How long the noise has been acting"
-        description="Each step is one more application of the channel above — this slider is the instrument's clock."
+        description="Each step is one more application of the channel above; this slider is the instrument's clock."
       >
         <FrameSlider
           label="Number of channel applications"

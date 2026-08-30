@@ -31,11 +31,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Through a hill it could never climb">
 Picture a ball rolled at a hill it doesn't have enough energy to climb. Classically the outcome is never in doubt: it rises partway, stalls, and rolls back down, every time. Give a quantum particle the same hill and the same shortfall in energy, and every so often it turns up on the far side anyway, having never had the energy to get over the top.
 </LessonHook>
 
-## Motivation
+## What 'cannot get over' means for a wavefunction
 
 No energy bookkeeping is violated when a particle turns up beyond a
 barrier it lacked the energy to climb; what changes is what "can't get over"
@@ -47,7 +47,7 @@ to the far side of a barrier that isn't infinitely thick.
 
 <LazyTunnelingIntroVisual />
 
-## Intuition
+## Oscillation on one side, decay on the other
 
 The infinite well's math showed that in a classically *allowed* region
 ($E>V$), $\psi$ oscillates (sines and cosines). This lesson asks: what
@@ -55,7 +55,7 @@ happens in a classically *forbidden* region ($E<V$)? The same equation,
 solved honestly, gives a different but equally legitimate kind of
 solution: not zero, not oscillatory, but exponential.
 
-## Mathematical Development
+## Exponentials inside, and what survives to the far edge
 
 ### Inside the barrier
 
@@ -94,7 +94,7 @@ disappears at everyday ones: doubling $a$ squares an already tiny number.
 If the barrier were infinitely wide, $e^{-2\kappa a}\to0$ exactly,
 recovering the classical "never crosses" result as a limiting case.
 
-## Physical Interpretation
+## Continuity of psi and its slope does all the work
 
 Tunneling isn't the particle "borrowing energy" or briefly violating
 energy conservation. Energy is exactly conserved throughout. It's a
@@ -139,7 +139,7 @@ own, one of the physical limits on how far that layer can be scaled down.
   license="CC BY-SA 2.0"
 />
 
-## Interactive Experiment
+## Send a packet at the barrier and watch it split
 
 <PredictBeforeReveal
   question="A Gaussian wave packet with energy below the barrier's height hits a barrier of finite width. Classically the packet always bounces back. Does any probability make it through quantum mechanically?"
@@ -150,14 +150,14 @@ own, one of the physical limits on how far that layer can be scaled down.
     { label: "It depends only on momentum, not the barrier", value: "momentum-only" },
   ]}
   correctValue="nonzero"
-  explanation="Inside the barrier ψ decays exponentially (Ce^{κx}+De^{-κx}), but decaying isn't vanishing: continuity of ψ and ψ' forces a nonzero, if small, amplitude to survive to the far side, giving real transmission of order e^(-2κa). That is what the Explorer's Tunneling preset below shows: a nonzero P(transmitted), splitting the packet's probability between transmission and reflection."
+  explanation="Inside the barrier ψ is a combination of the real exponentials e^(κx) and e^(-κx) rather than a wave, so it decays. But decaying isn't vanishing: continuity of ψ and ψ' forces a nonzero, if small, amplitude to survive to the far side, giving real transmission of order e^(-2κa). That is what the Explorer's Tunneling preset below shows: a nonzero P(transmitted), splitting the packet's probability between transmission and reflection."
 />
 
-<InteractiveSection title="Raise the barrier, watch it shrink" description="The Wavefunction Explorer's Tunneling Through a Barrier preset sends a Gaussian packet at a rectangular barrier. Play it forward past the interaction and check the comparison panel: P(transmitted) and P(reflected) should sum to almost exactly 1 (probability conservation, nothing is created or destroyed by the barrier), split between the two outcomes in a ratio that depends sharply on the barrier's height and width, as e^(-2κa) predicts. Try raising the barrier height and watch the transmitted fraction shrink.">
+<InteractiveSection title="Raise the barrier, then read the two fractions" description="The Wavefunction Explorer's Tunneling Through a Barrier preset sends a Gaussian packet at a rectangular barrier. Play it forward past the interaction and check the comparison panel: read P(transmitted) and P(reflected), add them, and decide what that sum says about whether a barrier can create or destroy probability. Then raise the barrier height, read the transmitted fraction again, and compare the change against what e^(-2κa) predicts.">
   <LazyWavefunctionExplorer initialPresetId="tunneling" />
 </InteractiveSection>
 
-## Worked Example
+## Doubling the barrier height
 
 **Qualitatively, if the barrier height is doubled (with width fixed),
 does the transmission probability increase or decrease, and roughly by
@@ -191,7 +191,7 @@ exponential: whichever atom on the tip is closest to the surface carries
 almost all the current, so the instrument images with a single atom
 whether or not it was built to.
 
-## Common Mistakes
+## Exponentially small is still not zero
 
 <Callout type="mistake">
 **Thinking $\psi=0$ inside a classically forbidden region.** It's
@@ -212,12 +212,170 @@ the other, matching the correct probabilistic interpretation.
 1. Why does $\kappa^2$ flip sign between the classically allowed
    ($E>V$) and forbidden ($E<V$) cases? Trace it through the
    Schrödinger equation directly.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the equation is $\psi'' = \dfrac{2m(V-E)}{\hbar^2}\psi$, and the
+   bracket $V-E$ is what changes sign. Everything else in the coefficient
+   is positive.
+
+   Rearrange the time-independent Schrödinger equation to isolate the
+   second derivative:
+
+   $$
+   -\frac{\hbar^2}{2m}\psi'' + V\psi = E\psi \quad\Longrightarrow\quad \psi'' = \frac{2m\left(V-E\right)}{\hbar^2}\,\psi
+   $$
+
+   In an allowed region $E>V$, so the coefficient is negative and the
+   equation reads $\psi'' = -k^2\psi$ with $k=\sqrt{2m(E-V)}/\hbar$. In a
+   forbidden region $E<V$, so the coefficient is positive and it reads
+   $\psi'' = +\kappa^2\psi$ with $\kappa=\sqrt{2m(V-E)}/\hbar$. The two
+   definitions differ only in which way the subtraction runs, chosen so
+   that the square root stays real in each case.
+
+   The sign is not cosmetic; it changes what kind of function solves the
+   equation. $\psi''=-k^2\psi$ says the curvature always points *back
+   toward the axis*, which is a restoring behaviour and produces the
+   oscillating $\sin$ and $\cos$. $\psi''=+\kappa^2\psi$ says the curvature
+   points *away* from the axis, which is runaway behaviour and produces
+   the real exponentials $e^{\pm\kappa x}$. A function cannot oscillate
+   without curving back, so no combination of exponentials will ever cross
+   zero more than once, and no combination of sines will ever decay
+   monotonically.
+
+   The reading that matters physically is what happens to kinetic energy.
+   In the allowed region $E-V>0$ is the kinetic energy, and it sets a
+   wavelength. In the forbidden region $E-V<0$ would be a negative kinetic
+   energy, which is why classical mechanics stops here: no real momentum
+   corresponds to it. Quantum mechanics does not stop, because the equation
+   still has a solution. It just stops being a wave, and the "imaginary
+   momentum" $i\hbar\kappa$ that a formal substitution would give is
+   another way of naming the decay rate rather than a physical momentum
+   anyone could measure.
+
+   The wrong turn to name is concluding from $E<V$ that $\psi=0$ inside,
+   by analogy with the infinite well. The infinite well gets $\psi=0$
+   because $V\to\infty$ sends $\kappa\to\infty$ and the decay becomes
+   instantaneous. For finite $V_0$, $\kappa$ is finite, the decay is
+   gradual, and the difference between "small" and "zero" is the entire
+   tunnelling effect.
+
+   </details>
+
 2. If a barrier's width is doubled (height fixed), what happens to the
-   rough transmission estimate $e^{-2\kappa a}$?
+   rough transmission estimate $e^{-2\kappa a}$? Express the new estimate
+   in terms of the old one, then apply it to the scanning-tunneling
+   numbers above: what does widening that $0.5$ nm gap to $1.0$ nm do to
+   the current?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The estimate is **squared**. Since $\kappa$ is unchanged (it depends on
+   $V_0-E$, not on $a$),
+
+   $$
+   e^{-2\kappa(2a)} = e^{-4\kappa a} = \left(e^{-2\kappa a}\right)^{2}
+   $$
+
+   so $T_{\text{new}} = T_{\text{old}}^{2}$. Squaring a number already far
+   below $1$ is catastrophic for it, which is the point.
+
+   With the lesson's STM numbers, $\kappa\approx10.2\ \mathrm{nm^{-1}}$
+   and $T\approx3.7\times10^{-5}$ at $a=0.5$ nm, or roughly one electron in
+   $27{,}000$. Doubling the gap gives
+
+   $$
+   T \approx \left(3.7\times10^{-5}\right)^2 \approx 1.4\times10^{-9}
+   $$
+
+   about one electron in $700$ million. The current falls by the same
+   factor of $27{,}000$ that the original transmission was, from an extra
+   half-nanometre of vacuum.
+
+   Two things follow, and both are worth stating.
+
+   The dependence on width is exponential, not proportional. Doubling $a$
+   does not halve the current; it squares an already tiny fraction. A
+   student who reasons "twice as thick, half as much gets through" is
+   applying an intuition that fits a leaky pipe and does not fit an
+   exponential. The same arithmetic run backwards is what makes the STM
+   work: the lesson's $0.1$ nm approach multiplied the current by about
+   $7.8$, and it is that steepness, not any sharpening of the tip, that
+   gives atomic resolution.
+
+   Height and width do not enter symmetrically. Width sits linearly in the
+   exponent, so doubling it squares $T$. Height enters through
+   $\kappa\propto\sqrt{V_0-E}$, so doubling $V_0-E$ multiplies $\kappa$ by
+   $\sqrt2\approx1.41$ and raises $T$ to the power $1.41$: a large effect,
+   but a smaller one than doubling the width. Width is the more powerful
+   knob, which is why flash-memory scaling runs into tunnelling by thinning
+   an oxide rather than by weakening it.
+
+   One honest caveat: $e^{-2\kappa a}$ is the exponential *scale* of the
+   transmission, not the exact coefficient. The full expression carries a
+   prefactor that depends on $E$, $V_0$ and $a$ algebraically. That
+   prefactor is of order one and changes slowly, so it never competes with
+   an exponential, which is why the estimate is good enough to predict
+   ratios like these.
+
+   </details>
+
 3. Explain briefly why $P(\text{transmitted})+P(\text{reflected})\approx1$
    is a *check* on the simulator's correctness, not merely a nice-to-have.
    What would it mean physically if this sum were significantly less
    than 1?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because it is the norm-conservation theorem restated for this geometry.
+   Unitary evolution preserves $\int|\psi|^2dx = 1$ exactly, and once the
+   packet has finished interacting, all of that probability is either to
+   the left of the barrier or to the right of it. So the two fractions must
+   add to one, as an identity rather than an approximation, and a
+   simulator that reports otherwise has a defect.
+
+   That makes the sum a genuine test with a pass condition known in
+   advance, which is what separates a check from a decoration. It does not
+   require knowing the right answer for $T$; it holds for every barrier
+   height, width and incident energy, so it can be run on any preset
+   without a reference calculation to compare against.
+
+   If the sum came out significantly below $1$, the candidate explanations
+   are all numerical, since no physical process here destroys probability.
+
+   Probability is still inside the barrier, or still in transit. The
+   accounting is only meaningful after the interaction is complete; read
+   too early, some amplitude is in neither region yet. This is the first
+   thing to rule out, and the fix is to run longer.
+
+   Probability has left the grid. A finite simulation box means a packet
+   that reaches an edge is either wrapped around by periodic boundaries or
+   clipped, and the left-and-right accounting no longer covers all of
+   space.
+
+   The evolution operator is not unitary. A method not built from
+   pure-phase factors leaks norm every step, which is the failure mode the
+   split-operator method exists to avoid.
+
+   What the sum would *not* mean is that the barrier absorbed the particle.
+   A real, static potential barrier has no mechanism to do that: it is a
+   Hermitian term in the Hamiltonian, and a Hermitian Hamiltonian conserves
+   probability. Absorption in a simulation is something you have to add
+   deliberately, as a complex potential, and if it is not there the missing
+   probability is missing from the arithmetic rather than from the physics.
+
+   Note also the direction of the check. The sum being $1$ confirms nothing
+   about whether $T$ itself is *correct*: a method could conserve
+   probability perfectly while splitting it between the two sides in the
+   wrong proportion. That is the same distinction the next lesson draws
+   between norm conservation and accuracy, and it is why the lesson also
+   asks you to compare $T$ against $e^{-2\kappa a}$ rather than stopping at
+   the sum.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -235,7 +393,7 @@ the other, matching the correct probabilistic interpretation.
 - The Wavefunction Explorer's tunneling preset numerically confirms
   probability conservation across the whole process.
 
-## Further Exploration
+## How the simulator actually integrates this
 
 <NextDiscovery>
 [Numerically Evolving Quantum States](/lessons/quantum-mechanics/wave-mechanics/numerically-evolving-quantum-states)

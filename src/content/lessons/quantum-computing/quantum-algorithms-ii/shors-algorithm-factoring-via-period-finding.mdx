@@ -64,7 +64,7 @@ export const lessonMeta = {
 RSA encryption's security rests on factoring large numbers being hard. Shor's algorithm starts by turning that problem into an entirely classical one: finding the order of a number, mod N.
 </LessonHook>
 
-## Motivation
+## One sentence holding up RSA
 
 No known *classical* algorithm factors an $n$-digit number in time
 polynomial in $n$. That one sentence carries most of the weight of RSA's
@@ -76,7 +76,7 @@ sentence.
   question="Shor's algorithm factors N on a quantum computer. Compared to the best known classical factoring algorithms, is the speedup a modest constant-factor improvement, or something bigger?"
   options={[
     { label: "A modest constant-factor speedup", value: "constant" },
-    { label: "Faster, but still not polynomial-time", value: "still-not-poly" },
+    { label: "Faster, but still exponential in n, just with a noticeably smaller exponent", value: "still-not-poly" },
     { label: "Polynomial time in n, a different complexity class entirely", value: "polynomial" },
     { label: "It does not speed up factoring at all", value: "none" },
   ]}
@@ -107,7 +107,7 @@ FOCS 1994 presentation, also available as arXiv:quant-ph/9508027.
   license="CC BY 3.0"
 />
 
-## Mathematical Development
+## Order-finding, and the reduction to it
 
 ### The order-finding problem
 
@@ -150,7 +150,7 @@ with overwhelming probability. This platform doesn't prove that
 probability bound; it's cited as a known classical result the rest of the
 algorithm depends on, not derived from scratch.
 
-<InteractiveSection title="One base fails where the others succeed" description="Slide through every base a coprime to 15 (a=1 excluded as trivial). Most choices land on a nontrivial factor pair (3 and 5, bars lit up), computed the same way as the a=7 worked example above, straight from classicalOrder and two real gcd calls. Watch a=14 specifically: r=2 is even, but 14≡−1 (mod 15), so both gcd's come back trivial (1 and 15): the second Common Mistake below in action, not a hypothetical.">
+<InteractiveSection title="One base fails where the others succeed" description="Slide through every base a coprime to 15 (a=1 excluded as trivial). Most choices land on a nontrivial factor pair (3 and 5, bars lit up), computed the same way as the a=7 worked example above, straight from classicalOrder and two real gcd calls. Watch a=14 specifically: r=2 is even, but 14≡−1 (mod 15), so both gcd's come back trivial (1 and 15): the second warning below in action, not a hypothetical.">
   <BarChartExplorer
     frames={reductionFrames}
     sliderLabel="base a (coprime to 15)"
@@ -159,7 +159,7 @@ algorithm depends on, not derived from scratch.
   />
 </InteractiveSection>
 
-## Physical Interpretation
+## Everything classical, except one step
 
 Every step above (the algebra, the gcd computation, the random restarts) is
 classical and efficient. A classical computer does all of it in polynomial
@@ -172,7 +172,7 @@ proportions in mind when you read claims about quantum computers breaking
 encryption: the quantum part of breaking RSA is one subroutine, and
 everything else is arithmetic a laptop can do.
 
-## Worked Example
+## Factoring fifteen through the reduction
 
 **Given $N=15$, $a=7$: verify $r=4$ (already computed via
 `classicalOrder`) leads to genuine factors via the reduction above.**
@@ -198,7 +198,7 @@ below:
   ariaLabel="The classical reduction pipeline from order r to the two gcd factors, for a=7, N=15"
 />
 
-## Common Mistakes
+## The factoring itself is not the quantum part
 
 <Callout type="warning">
 **Believing Shor's algorithm is "a quantum computer that factors
@@ -217,14 +217,165 @@ picking a new $a$, not for concluding $N$ is prime.
 ## Practice Questions
 
 1. For $N=21$, $a=2$: compute the order $r$ of $2$ mod $21$ (by trial
-   multiplication), and check whether $r$ is even.
+   multiplication), and check whether $r$ is even. Then say what upper
+   bound number theory puts on $r$ *before* you start multiplying, and use
+   it to say how many trial multiplications you could have needed at
+   worst.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Multiply by $2$ and reduce mod $21$ at each step:
+
+   $2^1=2$, $2^2=4$, $2^3=8$, $2^4=16$, $2^5=32\equiv11$, $2^6=22\equiv1$.
+
+   So $r=6$, which is even. `classicalOrder(2, 21)` returns $6$.
+
+   The bound comes from Lagrange's theorem: $r$ must divide the order of
+   the multiplicative group mod $21$, which is
+   $\varphi(21)=\varphi(3)\varphi(7)=2\times6=12$. So without multiplying
+   anything you already know $r\in\{1,2,3,4,6,12\}$, and twelve
+   multiplications is the worst case. The sharper bound is Carmichael's
+   $\lambda(21)=\mathrm{lcm}(\lambda(3),\lambda(7))=\mathrm{lcm}(2,6)=6$,
+   which every element's order divides, so in fact $r\in\{1,2,3,6\}$ and
+   six multiplications suffice. Here $r$ hits that ceiling exactly.
+
+   That bound is worth having because it makes the algorithm's whole point
+   visible. Brute-force order-finding costs $O(r)$ multiplications, and $r$
+   can be as large as $\lambda(N)$, which for a product of two large primes
+   is itself about the size of $N$. So brute force is exponential in the
+   number of digits, and it is precisely this step, not the gcd's and not
+   the difference-of-squares, that Shor's quantum subroutine replaces.
+
+   The wrong turn is stopping at $2^5\equiv11$ and concluding no small $r$
+   exists, or reducing incorrectly at $2^6$: $2^6=64$ and $64-63=1$, so
+   $64\equiv1$, not $64\equiv22$. Reducing $32$ to $11$ and then doubling
+   to $22$ and forgetting to reduce again is the standard slip, and it
+   makes $r$ look larger than it is.
+
+   </details>
+
 2. Using the $r$ found in question 1, compute the two gcd's and confirm
-   they give nontrivial factors of $21$.
+   they give nontrivial factors of $21$. Then check the *other* condition
+   the reduction needs before those gcd's are guaranteed to be useful, and
+   say what you would have done had it failed.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $r=6$, $a^{r/2}=2^3=8$, and $8\bmod 21=8$. Then
+
+   $$
+   \gcd(8-1,\,21)=\gcd(7,21)=7, \qquad \gcd(8+1,\,21)=\gcd(9,21)=3
+   $$
+
+   and $21=3\times7$. Both are nontrivial, and the engine reproduces both
+   gcd's exactly.
+
+   The other condition is $a^{r/2}\not\equiv-1\pmod N$. Here
+   $-1\equiv20\pmod{21}$ and $a^{r/2}=8\neq20$, so the reduction applies.
+   That check is not decoration. If $a^{r/2}\equiv-1$ then $N$ divides
+   $a^{r/2}+1$ outright, so $\gcd(a^{r/2}+1,N)=N$ and the other gcd is
+   $1$: both answers trivial, no factorization. The lesson's $a=14$,
+   $N=15$ case is exactly this, and the engine confirms it returns
+   $\gcd(13,15)=1$ and $\gcd(15,15)=15$.
+
+   Had it failed, the response is the same as for an odd $r$: discard this
+   $a$, draw a new random $a$ coprime to $N$, and run the order-finding
+   again. A standard number-theoretic result, cited in the lesson rather
+   than proved, says a random $a$ succeeds with probability at least
+   $1/2$, so a handful of restarts succeeds with overwhelming probability.
+
+   The wrong turn is computing $2^3=8$ and then taking $\gcd(8,21)$
+   instead of $\gcd(8\pm1,21)$. That returns $1$, since $8$ and $21$ are
+   coprime, and it must: $a$ was chosen coprime to $N$, so every power of
+   $a$ is too. The whole trick is that $a^{r/2}\mp1$ need not be, and the
+   difference of squares is what puts those two numbers in front of you.
+
+   </details>
+
 3. Explain, using the difference-of-squares identity, why an *odd* $r$
    gives the reduction nothing to work with (there's no integer $r/2$).
+   Then give a concrete $(a,N)$ pair with odd order, and say what happens
+   if you try the reduction anyway.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The reduction begins by rewriting $a^r\equiv1\pmod N$ as
+   $(a^{r/2})^2\equiv1$, then factoring the difference of squares:
+
+   $$
+   (a^{r/2}-1)(a^{r/2}+1)\equiv0 \pmod N .
+   $$
+
+   Every step after this takes gcd's of the two integers $a^{r/2}\mp1$. If
+   $r$ is odd, $r/2$ is not an integer, so $a^{r/2}$ is not an integer
+   power of $a$ and there are no such integers to hand to Euclid's
+   algorithm. There is nothing to fix downstream; the object the rest of
+   the reduction operates on does not exist.
+
+   A concrete case: $a=4$, $N=21$. The engine's `classicalOrder(4,21)`
+   returns $3$, since $4^1=4$, $4^2=16$, $4^3=64=3\times21+1\equiv1$. Odd.
+   Trying the reduction anyway would ask for $4^{1.5}=8$, which happens to
+   be an integer here by coincidence, and $\gcd(7,21)=7$, $\gcd(9,21)=3$
+   would even give the right factors. That coincidence survives only
+   because $4$ is a perfect square. $a^{r/2}$ is meaningful when $r/2$ is an
+   integer and not otherwise, so take $a=11$, $N=35$, whose order is $3$
+   ($11^2\equiv16$, $11^3\equiv1$): the reduction would ask for
+   $11^{3/2}=11\sqrt{11}$, an irrational number with no gcd to take. The
+   honest description is that the case does not arise, not that it arises
+   and fails gracefully.
+
+   Worth noticing while you are here: mod $15$, every $a$ coprime to $15$
+   has even order ($r\in\{2,4\}$ for all seven of them, confirmed by the
+   engine), so the odd-$r$ failure never shows up in this course's usual
+   example. Mod $21$ it does, at $a=4$ and $a=16$. Choosing $N=15$ for
+   worked examples quietly hides one of the reduction's two failure modes.
+
+   The wrong turn is thinking the fix is to use $r$ itself instead of
+   $r/2$, giving $\gcd(a^r-1,N)$. That is always $N$ or close to it, since
+   $a^r\equiv1$ means $N$ divides $a^r-1$ exactly, so the gcd is $N$: the
+   trivial factor, every time. Halving the exponent is what creates two
+   numbers whose product $N$ divides while dividing neither.
+
+   </details>
+
 4. If $a^{r/2}\equiv-1\pmod N$ for your chosen $a$, what should you do
    next, and why does trying a *different* $a$ have a reasonable chance of
    avoiding the same failure?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Discard that $a$, pick a new one uniformly at random from the integers
+   coprime to $N$, and run order-finding again. Nothing about $N$ needs to
+   change, and no partial progress is lost, since the failure was a
+   property of the pair $(a,N)$ rather than of $N$.
+
+   The reason a fresh $a$ helps is that the failure is not a property of
+   $N$ at all. The standard result, cited in the lesson rather than proved
+   there, is that for $N$ odd with at least two distinct prime factors, a
+   uniformly random $a$ coprime to $N$ gives an even $r$ with
+   $a^{r/2}\not\equiv-1$ with probability at least $1/2$. So each attempt
+   is an independent coin flip weighted in your favour, and $k$ attempts
+   fail with probability at most $2^{-k}$: ten restarts leave under a one
+   in a thousand chance of never succeeding.
+
+   The lesson's own sweep is the concrete version. Among the seven bases
+   coprime to $15$, only $a=14$ fails, and it fails for exactly this
+   reason: $r=2$ is even, but $14\equiv-1\pmod{15}$, so both gcd's come
+   back trivial. Six of seven succeed, comfortably above the guaranteed
+   half.
+
+   The wrong turn is treating a failed $a$ as evidence that $N$ is prime
+   or otherwise resistant. It is evidence about $a$ only. It is also worth
+   noticing what the algorithm does *not* need: no cleverness in choosing
+   $a$, no search, no structure. Random choice with a constant success
+   probability is enough, which is what keeps the expected number of
+   quantum runs constant rather than growing with $N$.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -240,7 +391,7 @@ picking a new $a$, not for concluding $N$ is prime.
   succeeding with probability at least $1/2$ per attempt (a cited, not
   re-derived, number-theory result).
 
-## Further Exploration
+## Building the order quantum-mechanically
 
 <NextDiscovery>
 [The Quantum Period-Finding Circuit](/lessons/quantum-computing/quantum-algorithms-ii/the-quantum-period-finding-circuit) builds $r$

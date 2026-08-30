@@ -6,7 +6,7 @@ export const lcuPrepareRegisterSize: NumericProblem = {
     title: "Sizing the PREPARE Ancilla Register",
     course: "algorithmic-frontiers",
     lesson: "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries",
-    difficulty: "master",
+    difficulty: "intermediate",
     estimatedMinutes: 5,
     problemType: "numeric",
     tags: ["lcu", "prepare", "ancilla-overhead"],
@@ -54,11 +54,11 @@ export const lcuPrepareRegisterSize: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "The ancilla register size in an LCU block encoding is set by ceil(log2 m), the number of qubits needed to index m distinct SELECT branches, exactly as this lesson's PREPARE step requires.",
+      "The ancilla register size in an LCU block encoding is set by ceil(log2 m), the number of qubits needed to index m distinct SELECT branches, as this lesson's PREPARE step requires.",
     whyCorrect:
-      "This is exactly the general sizing rule this lesson states for PREPARE: an ancilla of ceil(log2 m) qubits, since a k-qubit register has 2^k, not k, basis states.",
+      "This is the general sizing rule this lesson states for PREPARE: an ancilla of ceil(log2 m) qubits, since a k-qubit register has 2^k, not k, basis states.",
     whyWrong: [
-      "Using m itself (5) as the number of qubits massively overcounts -- a k-qubit register already has exponentially many, 2^k, basis states available, so the needed qubit count scales as log2(m), not linearly with m.",
+      "Using m itself (5) as the number of qubits badly overcounts. A k-qubit register already offers exponentially many basis states, 2^k of them, so the needed qubit count scales as log2(m), not linearly with m.",
     ],
   },
 };

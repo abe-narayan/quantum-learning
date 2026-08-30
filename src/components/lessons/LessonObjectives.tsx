@@ -88,7 +88,7 @@ export function LessonObjectives({
         {objectives.map((objective, i) => (
           <li
             key={objective}
-            className="flex gap-3 text-sm leading-relaxed text-foreground/90 sm:text-[0.95rem]"
+            className="flex gap-3 text-sm leading-relaxed text-foreground/90 sm:text-base"
           >
             <span className="tech-value shrink-0 pt-px text-xs text-pillar-text">
               {String(i + 1).padStart(2, "0")}

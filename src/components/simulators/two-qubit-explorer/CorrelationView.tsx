@@ -17,7 +17,7 @@ function Cell({ value }: { value: number }) {
           // where neither near-white nor near-black text reaches 4.5:1 at this
           // 12px size. Measured in a browser across the full ramp: the old
           // `percent > 45` flip put dark text on 3.00:1 at 46%, 3.32 at 50%,
-          // 4.22 at 60% — every cell from 46% to about 63% failed AA, and no
+          // 4.22 at 60%: every cell from 46% to about 63% failed AA, and no
           // choice of threshold fixes it, because the two curves cross at
           // ~4.2:1. The dead zone was in the fill colour, not the switch point.
           //
@@ -43,12 +43,12 @@ export function CorrelationView({ state }: { state: StateVector }) {
     <div>
       <h3 className="text-sm font-semibold text-foreground">Correlation</h3>
       <p className="mt-1 text-xs text-muted-foreground">
-        The joint probability of each (q0, q1) outcome — read a row to see how q1&rsquo;s outcome depends on
+        The joint probability of each (q0, q1) outcome. Read a row to see how q1&rsquo;s outcome depends on
         q0&rsquo;s.
       </p>
       {/* `overflow-x-auto`, not `overflow-hidden`. The `overflow` is here to
           clip the table's square corners to the rounded border, and either
-          value does that — but `hidden` also decides what happens when the
+          value does that, but `hidden` also decides what happens when the
           table does not fit, and its answer is to destroy the overflowing
           column with no scrollbar, no ellipsis and no symptom of any kind.
           Every other table wrapper in these simulators (`StatePanel`,
@@ -57,8 +57,8 @@ export function CorrelationView({ state }: { state: StateVector }) {
 
           At default text size it does fit: min-content is about 79px for the
           "q0 \ q1" header plus ~69px for each probability column (px-3 cell
-          padding, a px-2 chip, and a 4-character `100%` in font-mono text-xs)
-          — roughly 217px against the ~254px content box a 320px phone leaves
+          padding, a px-2 chip, and a 4-character `100%` in font-mono text-xs),
+          roughly 217px against the ~254px content box a 320px phone leaves
           after the page's 16px gutters and this panel's padding. That margin
           is 37px, and it is gone the moment a reader uses browser text zoom,
           which WCAG 1.4.4 requires to work to 200%. Under `hidden` that reader
@@ -67,7 +67,7 @@ export function CorrelationView({ state }: { state: StateVector }) {
 
           `tabIndex={0}` + `role="group"` because an `overflow-x-auto` div is
           focusable by default in no browser except Firefox, so scrolling it
-          would otherwise be mouse-and-trackpad only (WCAG 2.1.1) — the same
+          would otherwise be mouse-and-trackpad only (WCAG 2.1.1), the same
           remedy, and the same `group`-not-`region` reasoning, as the sibling
           `StatePanel` table one file over. */}
       <div

@@ -28,8 +28,9 @@ export const pauliZEigenvalueProduct: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The product of the eigenvalues of any matrix equals its determinant." },
-    { text: "det(Z) = Z_11·Z_22 - Z_12·Z_21." },
+    { text: "Two routes reach the same place: read the eigenvalues straight off a diagonal matrix, or use the fact that their product is the determinant." },
+    { text: "If you take the determinant route, write the $2\\times2$ determinant out in terms of the four entries before substituting." },
+    { text: "One of $Z$'s diagonal entries is negative and the other is positive. Settle the sign of their product before you write anything down." },
   ],
   solution: {
     steps: [
@@ -39,7 +40,7 @@ export const pauliZEigenvalueProduct: NumericProblem = {
     finalAnswer: "$-1$ (consistent with the actual eigenvalues $+1$ and $-1$, whose product is $-1$.)",
   },
   explanation: {
-    correctIdea: "Z is already diagonal, so its eigenvalues are just its diagonal entries — but the determinant shortcut works regardless.",
+    correctIdea: "Z is already diagonal, so its eigenvalues are its diagonal entries, but the determinant shortcut works regardless.",
     whyCorrect: "det(Z) = (1)(-1) - 0 = -1, matching the product of the diagonal entries directly since Z is diagonal.",
     whyWrong: ["Adding the eigenvalues instead of multiplying them would give the trace (0), not the determinant."],
   },

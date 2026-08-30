@@ -16,8 +16,8 @@ export const nameAPriorSimulationResult: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "This lesson's framing is that state-vector simulation is what the platform has been doing all along. Which of these earlier numeric results was produced that way, rather than by ordinary classical arithmetic?",
     options: [
-      { id: "a", text: "Grover's success probability after the optimal number of iterations (Quantum Algorithms I)" },
-      { id: "b", text: "gcd(7, 15) from Shor's classical post-processing step (Quantum Algorithms II)" },
+      { id: "a", text: "Grover's success probability after the optimal iteration count (Quantum Algorithms I)" },
+      { id: "b", text: "gcd(7, 15) from the classical post-processing step of Shor's (Quantum Algorithms II)" },
       { id: "c", text: "The thermal photon occupation n̄ from the Bose-Einstein formula (Cryogenic Systems)" },
       { id: "d", text: "A trapped-ion device's gate budget, coherence time divided by gate time (Trapped Ions)" },
     ],

@@ -31,10 +31,10 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="A circuit diagram is a wish list">
-Every <Term id="single-qubit-gates">gate</Term> this platform's Quantum Computing pillar has discussed — X, H, Rz(θ) — is, physically, implemented by a classical control system generating a precisely-shaped microwave pulse and sending it to the qubit.
+Every <Term id="single-qubit-gates">gate</Term> this platform's Quantum Computing track has discussed (X, H, Rz(θ)) is, physically, implemented by a classical control system generating a precisely-shaped microwave pulse and sending it to the qubit. What you write as a rotation angle, the instrument receives as a duration.
 </LessonHook>
 
-## Motivation
+## The Rack Between Diagram and Qubit
 
 Between an abstract circuit diagram and a physical qubit sits a rack of
 classical electronics whose job is to turn each gate symbol into a
@@ -43,7 +43,7 @@ laser for an ion or atom. This lesson makes that translation concrete,
 reusing machinery already built and verified: Approximation Methods'
 exact two-level <Term id="rabi-oscillation">Rabi model</Term>. It then
 asks the question the idealized model skips entirely: what shape should
-the pulse actually be?
+the pulse be?
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Microwave_Apparatus_%286029992084%29.jpg"
@@ -51,25 +51,25 @@ the pulse actually be?
   caption="Real control hardware in action: a pair of trapped ions held by electric fields and manipulated with microwaves at NIST, the same resonant-driving physics this lesson's pulse-duration formula computes, just implemented here with ions instead of a superconducting circuit."
   credit="Y. Colombe / NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Microwave_Apparatus_(6029992084).jpg"
-  license="Public Domain (U.S. Government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Engineering Development
+## From Rotation Angle to Pulse Duration
 
 ### Resonant driving reproduces exact Rabi oscillation
 
 Physical Qubit Platforms' superconducting-qubit lesson already
 established: at exact resonance ($E_i=E_f$), this platform's
-`exactTwoLevelTransitionProbability(0,0,\Omega,t)` reproduces
-$P_1(t)=\sin^2(\Omega t)$ to machine precision, a real, verified
+`exactTwoLevelTransitionProbability(0, 0, Omega, t)` reproduces
+$P_1(t)=\sin^2(\Omega t)$ to machine precision, a verified
 identity connecting the abstract two-level Schrödinger equation to
 observable population transfer. Driving a real qubit with a microwave
 tone at its resonance frequency, for a controlled duration $t$, realizes
-exactly this dynamics.
+this dynamics.
 
 <Callout type="warning">
 **Watch the Rabi convention when reading datasheets and papers.**
-Throughout this pillar, $P_1(t)=\sin^2(\Omega t)$ and a $\pi$-pulse
+Throughout this track, $P_1(t)=\sin^2(\Omega t)$ and a $\pi$-pulse
 takes $t_\pi=\pi/(2\Omega)$. The more common convention in the
 literature defines $\Omega$ so that $P_1(t)=\sin^2(\Omega t/2)$ and
 $t_\pi=\pi/\Omega$. Same physics, but the two $\Omega$s differ by a
@@ -78,7 +78,7 @@ pulse-duration formulas produces gate times off by exactly that factor.
 Convert first.
 </Callout>
 
-<InteractiveSection title="Detune it, watch the ceiling drop" description={`Set the detuning slider below to zero and increase the coupling strength V (playing the role of Ω here): watch the population curve trace out P_1(t)=sin²(Vt) exactly, and the Bloch vector sweep smoothly from the north pole to the south pole and back at t_π=π/(2V). Then move detuning away from zero and watch the population curve stop reaching 1: this is what happens when a control pulse's frequency doesn't exactly match the qubit's resonance frequency.`}>
+<InteractiveSection title="Detune it, watch the ceiling drop" description={`Set the detuning slider below to zero and increase the coupling strength V (playing the role of Ω here): watch the population curve trace out P_1(t)=sin²(Vt) exactly, and the Bloch vector sweep smoothly from the north pole to the south pole and back at t_π=π/(2V). Then move detuning away from zero and watch the population curve stop reaching 1: this is what happens when a control pulse's frequency misses the qubit's resonance frequency.`}>
   <LazyRabiExplorer />
 </InteractiveSection>
 
@@ -139,11 +139,11 @@ generators described below exist to synthesize these shaped envelopes,
 sample by sample; a box that could only switch a tone on and off would
 not be enough.
 
-## Physical Interpretation
+## Where the Abstraction Meets the Instrument
 
 This is the concrete link between "abstract quantum circuit" (this
-platform's Quantum Computing pillar) and "real hardware" (this pillar):
-every gate in a circuit diagram ultimately becomes a specific,
+platform's Quantum Computing track) and "real hardware" (this track):
+every gate you draw in a circuit diagram ultimately becomes a specific,
 computed pulse duration and amplitude, generated by classical arbitrary
 waveform generators and up-converted to the qubit's microwave frequency.
 
@@ -157,12 +157,16 @@ through an amplifier chain to a room-temperature digitizer:
 
 <ControlSignalChainDiagram ariaLabel="The full drive and readout signal chain: a room-temperature AWG and IQ mixer send a pulse down through the fridge's cooling stages, attenuated at each one, to the qubit, while the readout tone returns up through an amplifier chain to a room-temperature digitizer" />
 
-The generator has to be fast enough to actually place a pulse edge where
-the math says. A control-grade arbitrary waveform generator typically
-samples at 1-2 GS/s, a 0.5-1 ns tick, which is coarse next to the
-$4.17\text{ ns}$ pulse computed below but still gives several samples
-across it; slower, cheaper AWGs (a few hundred MS/s) start to blur a
-pulse that short. There's real cable delay to account for too: a meter
+The generator has to be fast enough to place a pulse edge where
+the math says. A control-grade arbitrary waveform generator synthesizing
+a baseband envelope for later up-conversion typically samples at 1-2
+GS/s, a 0.5-1 ns tick, which is coarse next to the $4.17\text{ ns}$
+pulse computed below but still gives several samples across it; slower,
+cheaper AWGs (a few hundred MS/s) start to blur a pulse that short.
+Systems that skip the mixer and synthesize the microwave tone directly,
+the RF-system-on-chip designs increasingly used for this, run several
+times faster still, and the arithmetic below is the same with a finer
+tick. There's real cable delay to account for too: a meter
 of coax adds roughly 5 ns of one-way propagation delay, and by the time
 a signal has gone from a room-temperature rack down through a
 meter-plus of cryostat wiring to the mixing chamber and back, tens of
@@ -170,10 +174,11 @@ nanoseconds have typically elapsed, latency that matters directly for
 anything needing a fast measure-then-react loop, like active qubit
 reset or mid-circuit feedback.
 
-## Worked Example
+## A Quarter Turn, in Nanoseconds
 
-**What pulse duration implements a $\theta=\pi/3$ rotation, at Rabi
-frequency $\Omega=2\pi\times20\text{ MHz}$?**
+**You want a $\theta=\pi/3$ rotation at Rabi frequency
+$\Omega=2\pi\times20\text{ MHz}$. What pulse duration do you ask the
+waveform generator for?**
 
 $$
 \Omega t = \frac\theta2 = \frac\pi6 \implies t = \frac\pi{6\Omega} = \frac\pi{6(2\pi\times20\times10^6)} \approx 4.17\text{ ns}
@@ -183,13 +188,14 @@ Verified directly: `exactTwoLevelTransitionProbability(0,0,Ω,t)` at
 this $t$ gives $P_1\approx\sin^2(\pi/6)=0.25$, matching the target
 rotation's expected population transfer exactly.
 
-## Common Mistakes
+## The Factor of Two That Bites
 
 <Callout type="warning">
 **Confusing rotation angle θ with the Rabi phase Ωt.** The relationship
 is $\Omega t=\theta/2$, not $\Omega t=\theta$. This factor of 2
 (already seen in Physical Qubit Platforms' $t_\pi=\pi/(2\Omega)$ formula
-for a full $\theta=\pi$ rotation) is easy to drop.
+for a full $\theta=\pi$ rotation) is easy to drop, and dropping it costs
+you exactly double the rotation you asked for.
 </Callout>
 
 <Callout type="note">
@@ -202,19 +208,213 @@ precisely, not one universally "correct" method.
 ## Practice Questions
 
 1. Using $\Omega t=\theta/2$, find the pulse duration for a $\theta=\pi/2$
-   rotation at $\Omega=2\pi\times20\text{ MHz}$.
+   rotation at $\Omega=2\pi\times20\text{ MHz}$. Then say what fraction
+   of shots would come back as 1 at that duration, and why a $\pi/2$
+   pulse rather than a $\pi$ pulse is the sensitive place to check
+   whether $\Omega$ is right.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \Omega t=\frac{\theta}{2}=\frac{\pi}{4} \implies t=\frac{\pi}{4\Omega}=\frac{\pi}{4(2\pi\times20\times10^{6})}=\frac{1}{1.6\times10^{8}}\text{ s}=6.25\text{ ns}.
+   $$
+
+   Half the $\pi$-pulse duration at the same drive strength, which is the
+   whole content of "duration sets the angle."
+
+   **What comes back:** $P_1=\sin^2(\theta/2)=\sin^2(\pi/4)=0.5$. Checked
+   against the engine, `exactTwoLevelTransitionProbability(0, 0, Omega,
+   6.25e-9)` returns $0.4999999999999979$. No individual shot returns
+   0.5; each returns a 0 or a 1, and the 0.5 is what the fraction
+   approaches over many shots. This is a state on the equator of the
+   Bloch sphere, and the equator is where the $Z$ measurement carries the
+   least information about which state you actually prepared.
+
+   **Why $\pi/2$ is the sensitive check.** Differentiate the population
+   with respect to the Rabi phase:
+
+   $$
+   \frac{dP_1}{d(\Omega t)} = \frac{d}{d(\Omega t)}\sin^2(\Omega t) = \sin(2\Omega t).
+   $$
+
+   At the $\pi/2$ pulse, $\Omega t=\pi/4$, that derivative is exactly 1,
+   its largest possible value. At the $\pi$ pulse, $\Omega t=\pi/2$, it
+   is 0. So a drive that is a few percent off its assumed $\Omega$ shifts
+   the measured population at a $\pi/2$ pulse in direct proportion to the
+   error, and shifts it only at *second* order at a $\pi$ pulse. The
+   comfortable-looking test, "fire the X gate and check that the qubit
+   flipped," is the least informative one available: a 5% error in
+   $\Omega$ still leaves $P_1$ above 0.99, and it looks like a working
+   gate.
+
+   That is why real calibration does not stop at a single population
+   measurement. It either scans the whole curve and fits, as the
+   Calibration lesson does, or repeats a nominally identical pulse many
+   times so that a small per-pulse error accumulates into something large
+   enough to see.
+
+   One practical caveat that this number brings out. A control-grade AWG
+   samples at 1 to 2 GS/s, a 0.5 to 1 ns tick, and 6.25 ns does not land
+   on either grid. Asking for 6 ns instead gives $\theta=1.508$ rad
+   against a target of $1.571$, a 4% angle error and $P_1=0.469$ rather
+   than 0.500. Asking for 7 ns is 12% off. The formula gives a real
+   number; the instrument gives you the nearest tick.
+
+   </details>
+
 2. If a fixed pulse duration of 5 ns is used, what Rabi frequency
    $\Omega$ would implement a full $\theta=\pi$ (X gate) rotation?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \Omega t=\frac{\theta}{2}=\frac{\pi}{2} \implies \Omega=\frac{\pi}{2t}=\frac{\pi}{2(5\times10^{-9})}\approx3.1416\times10^{8}\ \text{rad/s},
+   $$
+
+   which in the frequency form this text quotes is
+   $\Omega=2\pi\times50\text{ MHz}$. Verified: the engine at
+   $\Omega=3.1416\times10^{8}$ and $t=5$ ns returns
+   $P_1=1.0000000000000004$.
+
+   This is question 1 of the Superconducting Qubits practice set run
+   backwards, and it should give the same pair of numbers, which it does:
+   $\Omega=2\pi\times50$ MHz has $t_\pi=5$ ns, so 5 ns demands
+   $2\pi\times50$ MHz. Solving in either direction is the same single
+   relation $\Omega t=\theta/2$.
+
+   Two wrong turns.
+
+   The first is answering "$3.14\times10^{8}$" and stopping, or answering
+   "50 MHz" and stopping. Those are the same physical quantity written
+   two ways, and the factor of $2\pi$ between them is exactly the factor
+   that makes gate-time calculations go wrong when a number is copied
+   between sources. Say which one you mean.
+
+   The second is the convention trap this lesson's warning box flags. If
+   you looked up a device's Rabi frequency in a paper written with
+   $P_1=\sin^2(\Omega t/2)$ and $t_\pi=\pi/\Omega$, the $\Omega$ that
+   gives a 5 ns $\pi$-pulse there is $2\pi\times100$ MHz, twice this
+   answer. Neither number is wrong; they label different quantities with
+   the same symbol. Convert before substituting.
+
+   </details>
+
 3. Explain why $P_1(t)=\sin^2(\theta/2)$, not $\sin^2(\theta)$, is the
    correct relationship between measured population and rotation angle.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $\theta$ is an angle swept on the *Bloch sphere*, and
+   amplitudes live on a sphere of half-angles.
+
+   Start from the state. A rotation by $\theta$ about the drive axis,
+   applied to $|0\rangle$ at the north pole, produces a state at polar
+   angle $\theta$ from the pole, and the canonical form for such a state
+   is $\cos(\theta/2)|0\rangle+e^{i\varphi}\sin(\theta/2)|1\rangle$. The
+   Born rule then gives $P_1=\sin^2(\theta/2)$ directly. Everything
+   traces back to that half-angle in the canonical form.
+
+   The half-angle is not a convention. It is there so that *orthogonal*
+   states land at *antipodal* points. Two orthogonal states are $90°$
+   apart in amplitude space, and the Bloch sphere puts them $180°$ apart,
+   so the map from one angle to the other carries a factor of two.
+   Without it, $|0\rangle$ and $|1\rangle$ would not be opposite poles
+   and the picture would not work at all.
+
+   The consistency with the drive is then automatic rather than a second
+   fact. This lesson's model is $P_1(t)=\sin^2(\Omega t)$ and its
+   translation rule is $\Omega t=\theta/2$. Substitute the second into
+   the first and you get $\sin^2(\theta/2)$, as required. Both statements
+   carry the same factor of two, which is why dropping it in one place
+   and not the other produces a contradiction rather than a small error.
+
+   Two checks that kill the wrong version instantly, and either is worth
+   doing in your head before trusting an algebra step.
+
+   Set $\theta=\pi$, the X gate. The right formula gives
+   $\sin^2(\pi/2)=1$: the qubit flipped, which is what an X gate does.
+   The wrong formula gives $\sin^2(\pi)=0$: the X gate did nothing.
+
+   Set $\theta=\pi/2$, a quarter turn from the pole to the equator. The
+   right formula gives $\sin^2(\pi/4)=0.5$, an equal superposition,
+   which is what sitting on the equator means. The wrong formula gives
+   $\sin^2(\pi/2)=1$, a complete flip from a half-way rotation.
+
+   A structural version of the same objection: $\sin^2(\theta)$ has
+   period $\pi$ in $\theta$, which would say a $180°$ rotation returns
+   the qubit to where it started. The correct $\sin^2(\theta/2)$ has
+   period $2\pi$, so a full turn returns and a half turn does not.
+
+   </details>
+
 4. Why does this lesson describe pulse-duration and pulse-amplitude
-   control as "equivalent," rather than one being strictly better?
+   control as "equivalent," rather than one being strictly better? Then
+   name one situation where the two knobs are not interchangeable in
+   practice.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because only the *product* $\Omega t$ appears in the rotation angle.
+   The condition is $\Omega t=\theta/2$, so $(\Omega,t)$ and
+   $(2\Omega,\ t/2)$ produce the identical rotation, and there is no
+   third quantity in the expression to distinguish them. Duration is set
+   by how long the generator gates the tone on; $\Omega$ is set by the
+   drive amplitude, to which it is proportional. Either can be swept with
+   the other held fixed, and real hardware picks whichever it can hold
+   more steadily.
+
+   Two wrong turns, both of which try to break the symmetry that is not
+   there. The first is "amplitude gets there sooner, because $\Omega$
+   enters squared." It does not: $\Omega$ and $t$ enter the angle
+   symmetrically, in one product. (A squared dependence on $\Omega$ does
+   appear elsewhere, in the *generalized* Rabi frequency that governs
+   off-resonant driving, which is probably where the intuition comes
+   from.) The second is "changing $\Omega$ tilts the rotation axis rather
+   than the angle." The axis is set by the drive's *phase*, not its
+   amplitude; $\Omega$ sets how fast the state turns about the axis you
+   have already chosen.
+
+   **Where they part company.** Once you leave the idealized square-pulse
+   two-level model, the two knobs have different side effects, and real
+   transmon control almost always fixes the duration and scales the
+   amplitude. Three reasons, in rough order of importance.
+
+   *Spectral width.* A pulse's bandwidth is set by its duration, roughly
+   $1/t$. Shortening a gate to make it faster widens its spectrum, and
+   the transmon's anharmonicity, the gap between the 0→1 and 1→2
+   transitions, is exactly what that widening walks into. Amplitude
+   scaling at fixed duration leaves the spectrum where it is, so the
+   leakage behaviour is the same for every gate on the qubit. Duration
+   scaling changes it gate by gate.
+
+   *Resolution.* An AWG's time axis is quantized at its sample tick, 0.5
+   to 1 ns. On a 6.25 ns pulse that is granularity of 8 to 16%, and
+   question 1 showed the resulting angle error is 4% at the nearest tick.
+   The same generator's amplitude is a 14- or 16-bit DAC value, finer by
+   orders of magnitude. When the target is a few nanoseconds long,
+   amplitude is simply the more precise knob.
+
+   *Scheduling.* Fixed-duration gates make every operation on the chip
+   the same length, which makes aligning simultaneous gates on different
+   qubits, and reasoning about when a spectator qubit is idle, enormously
+   simpler.
+
+   None of that makes the lesson's claim wrong. The equivalence is a
+   statement about the target physics, $\Omega t=\theta/2$, and it is
+   exact. The asymmetry lives in the instrument and in the levels the
+   two-level model leaves out.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
 ## Summary
 
-- Resonant microwave driving realizes exactly the two-level Rabi model
+- Resonant microwave driving realizes the two-level Rabi model
   already verified in Approximation Methods: $P_1(t)=\sin^2(\Omega t)$.
 - A target rotation angle $\theta$ requires pulse duration
   $t=\theta/(2\Omega)$, a direct, computable translation from abstract
@@ -227,7 +427,7 @@ precisely, not one universally "correct" method.
   so hardware uses smooth Gaussian-style envelopes, with DRAG as the
   standard leakage-canceling refinement.
 
-## Further Exploration
+## The Reverse Direction: Getting Answers Out
 
 <NextDiscovery>
 [Qubit Readout Techniques](/lessons/quantum-hardware/control-and-readout/qubit-readout-techniques) covers the reverse direction:

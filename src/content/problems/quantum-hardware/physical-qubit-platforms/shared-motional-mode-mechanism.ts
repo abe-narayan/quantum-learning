@@ -16,7 +16,7 @@ export const sharedMotionalModeMechanism: MultipleChoiceProblem = {
     type: "multiple-choice",
     prompt: "How does a two-qubit gate entangle two trapped ions that aren't in direct contact?",
     options: [
-      { id: "a", text: "One ion's internal state briefly excites the chain's shared vibrational mode, which the other ion's internal state then senses" },
+      { id: "a", text: "One ion's internal state excites the chain's shared vibrational mode, which the other ion then senses" },
       { id: "b", text: "Their Coulomb repulsion couples the internal states directly, since both ions carry the same charge" },
       { id: "c", text: "One laser beam illuminates both ions at once, and the shared drive field links their internal states directly" },
       { id: "d", text: "A photon emitted by the first ion is reabsorbed by the second, carrying the state across the gap" },
@@ -43,7 +43,7 @@ export const sharedMotionalModeMechanism: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Trapped-ion gates route through a collective degree of freedom, the chain's motion, which is why any pair in the chain can be coupled and connectivity is all-to-all.",
-    whyCorrect: "Matches the lesson's description of two-qubit gates in trapped-ion systems.",
+    whyCorrect: "The ions are too far apart for their internal states to couple directly, but they share a vibrational mode of the whole chain. Writing one ion's internal state into that mode and reading it back out with the other turns a common mechanical degree of freedom into an entangling link.",
     whyWrong: [
       { optionId: "b", text: "Stops at the Coulomb coupling of the motion, which is the setup rather than the gate. Repulsion alone touches no internal state." },
       { optionId: "c", text: "Removes the intermediary. A shared beam addresses each ion separately; it does not connect them." },

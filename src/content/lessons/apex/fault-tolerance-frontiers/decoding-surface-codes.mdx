@@ -1,5 +1,6 @@
 import { PracticeLinks } from "@/components/problems/PracticeLinks";
 import { getProblemMetaForLesson } from "@/lib/problems/metaRegistry";
+import { ScrollableFigure } from "@/components/mdx/ScrollableFigure";
 
 export const practiceProblems = getProblemMetaForLesson(
   "apex/fault-tolerance-frontiers/decoding-surface-codes"
@@ -18,7 +19,7 @@ export const lessonMeta = {
   objectives: [
     "Explain the decoding problem: given a syndrome (which stabilizers flagged), infer the most likely physical error and correct it, and why this is fundamentally a graph-matching problem for the surface code",
     "Describe minimum-weight perfect matching (MWPM) decoding explicitly: syndrome defects as graph vertices, edge weights from error probabilities, and a matching that pairs defects via plausible error chains",
-    "State and interpret the empirical/numerical relationship between code distance d and logical error rate: exponential suppression below threshold, p_L ~ (p/p_th)^{(d+1)/2}, and explain precisely what 'threshold' means operationally",
+    "State and interpret the empirical/numerical relationship between code distance d and logical error rate: exponential suppression below threshold, p_L ~ (p/p_th)^((d+1)/2), and explain precisely what 'threshold' means operationally",
   ],
   related: [
     {
@@ -158,21 +159,26 @@ export const boundaryErrorSyndrome = syndromeFor(boundaryErrorQubits);
 export const boundaryTrueChainVertices = ["N10", "N11", "N12"];
 export const boundaryResidualIsLogical = !isFaceStabilizerCombo(boundaryErrorQubits);
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The syndrome arrives without labels">
   A real syndrome is the union of every recent error's defect pair, with
   no label attached saying which defect came from which error. Decoding
   works backward from that raw list to the most probable error, and the
   problem it solves turns out to be graph matching.
 </LessonHook>
 
-## Motivation
+## From Syndrome to Correction
 
-Surface Codes in Depth built an explicit $d\times d$ patch: physical
+Surface Codes in Depth built an explicit distance-3 patch (13 data
+qubits, 12 stabilizers, 6 of each type, all weight 3 or 4): physical
 qubits on the edges of a grid, a Z-type stabilizer at every vertex, an
 X-type stabilizer on every face, and the single most important fact for
 what comes next: away from a boundary, a lone Pauli error on one qubit
 flips exactly **two** stabilizers of the opposite type, the two it
-touches. That pair of flipped stabilizers is a **defect pair**.
+touches. That pair of flipped stabilizers is a **defect pair**. The
+worked cases at the end of this lesson run on a smaller, deliberately
+simplified lattice with its own counts, flagged explicitly where it is
+introduced; what carries over from the prerequisite is the defect-pair
+mechanism, not the qubit inventory.
 
 That lesson stopped at "here's what one error does to the syndrome."
 Real devices don't get one error at a time between rounds of correction:
@@ -180,7 +186,7 @@ many qubits fail simultaneously, every measurement round, for as long as
 the computation runs. This lesson shows by direct construction that
 decoding becomes **minimum-weight perfect matching** on a graph.
 
-## Mathematical Development
+## Decoding as Graph Matching
 
 ### The decoding problem, stated precisely
 
@@ -240,8 +246,8 @@ and "solve a matching problem" are the same sentence in the literature.
    shortest chain connecting them (any chain with the right two
    endpoints is an equally valid correction, since two such chains
    differ by a closed loop, and a closed loop that bounds a region of
-   faces is itself a stabilizer; see the Worked Example's degeneracy
-   check below).
+   faces is itself a stabilizer; see Case 2 under Three Syndromes,
+   Matched by Hand below).
 
 X errors (caught by vertex/Z-type stabilizers) and Z errors (caught by
 face/X-type stabilizers) are decoded on **two separate, independent**
@@ -288,17 +294,20 @@ one just above it, evaluated at code distances 3 through 15:
 >
   <ParametricCurve
     frames={scalingFrames}
+    xAxisLabel="code distance d"
+    yAxisLabel="log₁₀(logical error rate)"
     ariaLabel="Log base 10 of the logical error rate plotted against code distance from 3 to 15, for four values of the ratio of physical error rate to threshold. At ratio 0.1 the curve falls steeply from about -3 to about -9; at ratio 0.5 it falls gently to about -3.4; at ratio 0.9 it falls barely at all, ending near -1.4; at ratio 1.1, above threshold, the curve rises instead, from about -0.9 to about -0.7."
   />
 </InteractiveSection>
 
-Read the slopes rather than the values. Every step of $2$ in distance
+The slopes carry the point here; the values do not. Every step of $2$ in distance
 multiplies $p_L$ by exactly one more factor of $p/p_{th}$, so going from
 $d=7$ to $d=9$ multiplies the logical error rate by
 {scalingGainPerTwoDistance[0].factor.toFixed(2)} at $p/p_{th}=0.1$, by
 {scalingGainPerTwoDistance[2].factor.toFixed(2)} at $p/p_{th}=0.9$, and
-by {scalingGainPerTwoDistance[3].factor.toFixed(2)} — upward — at
-$p/p_{th}=1.1$. Those two extra rows and columns of physical qubits buy
+by {scalingGainPerTwoDistance[3].factor.toFixed(2)} at $p/p_{th}=1.1$,
+where a multiplier above $1$ means the error rate goes up rather than
+down. Those two extra rows and columns of physical qubits buy
 a tenfold improvement in the first case, a $10\%$ improvement in the
 second, and a $10\%$ regression in the third. Operating just barely
 below threshold is technically below threshold and practically almost
@@ -316,10 +325,10 @@ whole content of the law, untouched.
   The standard derivation maps the decoding problem onto a
   **random-bond Ising model**, with $p_{th}$ corresponding to a phase
   transition (the Nishimori point) in that model. The exponent quoted
-  above comes from this analysis, cited here rather than re-derived.
+  above is quoted from that analysis.
 </ResearchConnection>
 
-## Physical Interpretation
+## What a Threshold Buys the Engineer
 
 <InsightBlock>
   A decoder doesn't need to guess the true error, only a correction
@@ -340,11 +349,11 @@ promise of fault-tolerant quantum computing rests on this one
 inequality holding. Above threshold, the sign of the exponent's effect
 flips against you: $(p/p_{th})>1$ raised to a *larger* power is a
 *larger* number, so a bigger patch gets **less** reliable, not more.
-This is why "just add more qubits" is not
-automatically a fix for a noisy device, not a minor caveat: every additional physical qubit
-and every additional syndrome-extraction gate is one more chance to
-introduce an error, and above threshold, the corrections start
-introducing errors faster than they remove them.
+This is why "just add more qubits" is not automatically a fix for a
+noisy device. Every additional physical qubit and every additional
+syndrome-extraction gate is one more chance to introduce an error, and
+above threshold the corrections start introducing errors faster than
+they remove them.
 
 <HistoricalMoment date="December 2024" place="Google Quantum AI">
   The Willow chip runs this experiment on real hardware:
@@ -385,10 +394,9 @@ use **Union-Find decoders** (near-linear time, trading a little accuracy
 for a lot of speed) and increasingly **neural-network decoders** (trained
 rather than derived, aiming to match MWPM's accuracy while running
 faster or more easily in parallel on custom hardware), alongside
-continued work on parallelizing MWPM itself. None of this is settled.
-Which decoder wins on which hardware, at which code distance, is the
-kind of open engineering problem real fault-tolerance roadmaps are
-still actively solving.
+continued work on parallelizing MWPM itself. Which decoder wins on which
+hardware, and at which code distance, is not settled, and real
+fault-tolerance roadmaps are still being written around that gap.
 
 <ResearchConnection
   title="Trading a little accuracy for a lot of speed"
@@ -405,14 +413,43 @@ still actively solving.
   with the syndrome stream and not.
 </ResearchConnection>
 
-## Worked Example
+## Three Syndromes, Matched by Hand
 
-All three cases below use the same small patch: 9 vertices (Z-type
-stabilizers, weight {vertexWeights.N00} at each corner, weight
-{vertexWeights.N01} along each edge, weight {vertexWeights.N11} at the
-center) and {allQubits.length} data qubits sitting on the edges between
-them, the lattice convention from Surface Codes in Depth. Every number
-below is computed directly from that lattice's incidence structure.
+All three cases below use the same small patch: {vertexList.length}
+vertices (Z-type stabilizers, weight {vertexWeights.N00} at each corner,
+weight {vertexWeights.N01} along each edge, weight {vertexWeights.N11}
+at the center) and {allQubits.length} data qubits sitting on the edges
+between them. Every number below is computed directly from that
+lattice's incidence structure.
+
+<Callout type="note">
+**This is a deliberately simplified lattice, not the distance-3 patch
+from Surface Codes in Depth.** That lesson's $5\times5$ coordinate patch
+carries 13 data qubits and 12 stabilizers, 6 of each type, every one of
+them weight 3 or 4, with an explicit callout that its boundary
+generators are the weight-3 ones. The toy used here is a plain
+$3\times3$ grid of vertices: {allQubits.length} data qubits,
+{vertexList.length} vertex ($Z$) stabilizers of weight
+{vertexWeights.N00}, {vertexWeights.N01} and {vertexWeights.N11}, and
+{faceList.length} face ($X$) stabilizers. Lattice Surgery makes the same
+kind of departure and flags it in its own callout, trimming the patch
+until its boundary generators drop to weight 2; the reason here is the
+same one: the matching arithmetic below is then small enough to check by
+hand at every step.
+
+One consequence is worth stating rather than gliding past.
+{allQubits.length} qubits carry {vertexList.length - 1} *independent*
+vertex generators (the product of all {vertexList.length} of them is the
+identity, since every qubit is touched exactly twice) plus
+{faceList.length} independent face generators, leaving
+{allQubits.length - (vertexList.length - 1) - faceList.length} logical
+qubits. This closed toy lattice encodes nothing at all until Case 3
+opens a boundary by adding half-edges. So Cases 1 and 2 below are about
+returning to the **code space**, and only Case 3, once a boundary
+exists, is about a logical operator corrupting encoded information. Each
+case demonstrates the real mechanism; the counts are this toy's, not a
+distance-3 patch's.
+</Callout>
 
 ### Case 1: a single-qubit error (success)
 
@@ -427,7 +464,7 @@ qubit itself), so the minimum-weight matching is unambiguous: pair
 $X$ on {singleErrorQubit[0]} again. $X^2=I$, so this is an exact
 recovery, checked directly.
 
-### Case 2: a 2-qubit chain (still a success, with a genuine degeneracy)
+### Case 2: a 2-qubit chain (still a success, with a degeneracy)
 
 X errors strike **both** {chainErrorQubits[0]} and {chainErrorQubits[1]},
 a connected path N01 → N11 → N12. The middle vertex N11 is touched by
@@ -438,8 +475,7 @@ and N12 on the lattice has length 2, realized by the chain
 {chainMatchVertices.join(" → ")}: the two qubits that actually
 failed, so MWPM reconstructs the true error qubit for qubit.
 
-One subtlety is worth pausing on: this shortest path is
-**not unique**. The alternate 2-edge route through N02,
+That shortest path is **not unique**. The alternate 2-edge route through N02,
 {chainErrorAltPath.join(" and ")}, produces the identical computed
 syndrome, **{chainAltSyndrome.join(" and ")}**, so a decoder could
 equally well have matched along that path instead. Does guessing the
@@ -448,12 +484,12 @@ symmetric difference between the two candidate chains is
 {chainDegeneracyDifference.join(", ")}. Checking every combination of
 the patch's four face stabilizers shows this set equals the TR
 face stabilizer{chainDegeneracyIsTrivial ? " (confirmed: it is a stabilizer product)" : ""}.
-A correction differing from the true error by a stabilizer acts
-trivially on the encoded state, so both candidate chains are equally
-valid corrections. This is ordinary, harmless decoding **degeneracy**,
+A correction differing from the true error by a stabilizer returns the
+state to the code space and acts trivially there, so both candidate
+chains are equally valid corrections. This is ordinary, harmless decoding **degeneracy**,
 not an error.
 
-### Case 3: a chain that reaches the boundary (a logical-error failure)
+### Case 3: a chain that reaches the boundary
 
 Now X errors strike {boundaryErrorQubits[0]} and {boundaryErrorQubits[1]},
 the path N10 → N11 → N12 straight across the patch's middle row, from
@@ -504,9 +540,10 @@ is a logical operator: the decoder has completed the error into a
 logical $X$ on the encoded qubit, silently, with a clean syndrome. This
 is not a harmless degenerate relabeling like Case 2's.
 
-Count what that failure required: two physical errors on a distance-3
-patch. The code guarantees correction of any
-$\lfloor (d-1)/2 \rfloor = 1$ error, and the guarantee is tight. Once a
+Count what that failure required: two physical errors. On a genuine
+distance-3 patch that is exactly where the guarantee runs out, since
+such a code corrects any $\lfloor (d-1)/2 \rfloor = 1$ error and makes
+no promise about two, and the guarantee is tight. Once a
 real chain's length reaches about $d/2$, the boundary stubs that
 complete it into a logical operator become jointly as cheap as, or
 cheaper than, the chain itself, and the decoder can no longer separate
@@ -517,10 +554,10 @@ the minimum number of errors a fatal chain requires.
 
 ## Visualizing the Decode
 
-<div className="not-prose overflow-x-auto rounded-panel border border-border bg-surface-muted/40 p-4">
-  <p className="mb-3 text-center text-[11px] font-mono text-muted-foreground">
+<ScrollableFigure label="Two surface code decoding cases, each drawn before and after minimum weight matching">
+  <div className="mb-3 text-center text-[11px] font-mono text-muted-foreground">
     Case 2 (left pair): the 2-qubit chain N01→N11→N12, correctly matched
-  </p>
+  </div>
   <div className="flex flex-wrap justify-center gap-6">
     <svg width={280} height={260} viewBox="0 0 300 260" role="img" aria-label="Before: physical X errors on qubits V01 and H11, drawn as thick highlighted edges on the 3 by 3 lattice">
       {allQubits.map((q) => (
@@ -559,9 +596,9 @@ the minimum number of errors a fatal chain requires.
     </svg>
   </div>
 
-  <p className="mb-3 mt-8 text-center text-[11px] font-mono text-muted-foreground">
+  <div className="mb-3 mt-8 text-center text-[11px] font-mono text-muted-foreground">
     Case 3: the boundary-to-boundary chain N10→N11→N12, tie broken the wrong way
-  </p>
+  </div>
   <div className="flex flex-wrap justify-center gap-6">
     <svg width={280} height={260} viewBox="0 0 300 260" role="img" aria-label="Before: physical X errors on qubits H10 and H11, spanning the left boundary vertex N10 to the right boundary vertex N12">
       {allQubits.map((q) => (
@@ -601,15 +638,15 @@ the minimum number of errors a fatal chain requires.
       <text x={150} y={20} textAnchor="middle" className="fill-brand text-[11px] font-medium">after: both matched to boundary (cost 1+1, wrong)</text>
     </svg>
   </div>
-  <p className="mt-4 text-center text-xs text-muted-foreground">
+  <div className="mt-4 text-center text-xs text-muted-foreground">
     Brand-colored dashed lines are the decoder's chosen corrections. In the
     last panel the true error chain (dashed red) is never touched; joined to
     the two half-edge correction stubs, it forms one unbroken crossing of the
     patch: a logical error with a clean syndrome.
-  </p>
-</div>
+  </div>
+</ScrollableFigure>
 
-## Common Mistakes
+## Misreading What the Syndrome Says
 
 <Callout type="warning">
 **Thinking "threshold" means errors stop happening below $p_{th}$.**
@@ -636,14 +673,166 @@ syndrome alone.
 
 1. In Case 2's worked example, why does the middle vertex N11 show no
    defect at all, even though both error qubits touch it?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a stabilizer reports a *parity*, not a count, and two is even.
+
+   N11 is a weight-4 vertex generator on $\{$H10, H11, V01, V11$\}$. The
+   error is $X$ on V01 and $X$ on H11, and both of those qubits are in
+   N11's support. $X$ and $Z$ anticommute at V01, giving one sign flip,
+   and again at H11, giving a second. Two sign flips cancel, so N11
+   commutes with the error and measures $+1$: no defect, indistinguishable
+   from a vertex nothing happened to.
+
+   The general form of this is worth extracting, because everything else
+   in the lesson depends on it. A stabilizer measurement returns one bit.
+   For a chain of $X$ errors, each vertex reports the parity of how many
+   chain qubits touch it, which for a connected path is $2$ at every
+   interior vertex (one edge arriving, one leaving) and $1$ at each of the
+   two ends. So a chain of any length announces exactly two defects, at
+   its endpoints, and reveals nothing at all about the route between them.
+   In the language the lesson uses later, the syndrome is the *boundary*
+   of the error chain over $\mathbb{F}_2$.
+
+   Three consequences follow immediately, and they are the whole lesson.
+   Decoding is a matching problem because endpoints come in pairs.
+   Case 2's degeneracy exists because two routes with the same endpoints
+   produce byte-identical syndromes. And Case 3 fails because a route
+   that leaves the patch has no second endpoint to announce.
+
+   **The wrong turn** is to expect the syndrome to report how many errors
+   touched each stabilizer. If it did, decoding would be close to
+   trivial: read the multiplicities and the chain reconstructs itself. It
+   cannot, because measuring a stabilizer projects onto its $\pm1$
+   eigenspaces and there is no third outcome to carry a count. That
+   single-bit-per-check restriction is the reason a nontrivial inference
+   problem exists at all.
+
+   </details>
+
 2. Case 3's failure specifically exploited both defects sitting *near
    opposite boundaries*. Would the same failure happen if the true error
    chain instead connected two defects both deep in the patch's
    interior, far from any boundary? Explain using edge weights.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No, and the edge weights say why in one line: deep in the interior the
+   boundary edges are expensive, so the competing explanation is not
+   competitive.
+
+   Put the same weight-2 chain in the middle of a distance-5 patch. The
+   defect-to-defect edge still costs 2, the length of the shortest chain
+   joining them. But each defect now sits roughly $(d-1)/2\approx2$ steps
+   from the nearest boundary, so the rival matching costs about
+   $2+2=4$. Minimum-weight matching picks the direct pairing by a margin
+   of 2, not by a coin flip, and the correction reproduces the true error.
+   Case 3's tie existed only because both boundary edges cost 1, which is
+   the cheapest a boundary edge can ever be.
+
+   The sharper statement is that boundary proximity is not really the
+   variable. What competes with the true explanation is *the cheapest
+   completion of the true chain into a logical operator*, and a decoder
+   fails exactly when that completion costs no more than the chain
+   itself. Near a boundary the completion is two short stubs. In the
+   interior it is a whole crossing of the patch.
+
+   That turns into a clean guarantee. Let $E$ be the true error and $C$
+   the decoder's chosen correction. Since $C$ is minimum weight among
+   chains with the observed endpoints, and $E$ is one such chain,
+   $|C|\le|E|$. The residual $E+C$ is a closed chain, so it is either a
+   stabilizer or a logical operator, and every logical operator has
+   weight at least $d$. Therefore
+
+   $$
+   |E+C| \le |E| + |C| \le 2|E| < d \quad\text{whenever}\quad |E| < d/2,
+   $$
+
+   which forces the residual to be a stabilizer. Any error of weight
+   below $d/2$ is decoded correctly wherever it sits on the patch, and
+   the position, the boundary distances, and the tie-breaking rule are
+   all irrelevant to that conclusion.
+
+   Run the numbers back through Case 3 as a check. There $|E|=2$ and
+   $d=3$, so $|E|=2\ge d/2=1.5$ and the guarantee does not apply: the
+   failure is permitted, and it happens. Move the identical weight-2 chain
+   onto a distance-5 patch and $2 < 2.5$, so no weight-2 error fails
+   anywhere on that patch, interior or boundary. The failure was never
+   about geometry. It was about a patch too small for the error it was
+   asked to absorb.
+
+   **The wrong turn** is concluding that interior errors are therefore
+   safe and boundaries are the weak spot to engineer around. There is
+   nothing to engineer around. Every logical operator must run
+   boundary-to-boundary, so every logical failure ends at a boundary by
+   definition, and shrinking or reshaping the boundary does not remove
+   it. The only lever is the length of the cheapest crossing, which is
+   the code distance, which is why the response to a failure rate is
+   always a bigger patch and never a cleverer perimeter.
+
+   </details>
+
 3. A distance-11 patch and a distance-7 patch run at the same physical
    error rate, both comfortably below threshold. Without computing an
    exact number, which patch's logical error rate falls faster as $p$ is
    reduced further, and why does the exponent $(d+1)/2$ make that true?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The distance-11 patch, and by a lot. Its logical error rate scales as
+   $p^6$ against the distance-7 patch's $p^4$.
+
+   Read the exponent as a power of $p$ directly. Holding $A$ and
+   $p_{th}$ fixed,
+
+   $$
+   p_L \propto p^{(d+1)/2},
+   $$
+
+   which is $p^4$ at $d=7$ and $p^6$ at $d=11$. On log-log axes those are
+   straight lines of slope 4 and 6, so halving $p$ divides the
+   distance-7 patch's logical error rate by $2^4=16$ and the distance-11
+   patch's by $2^6=64$. The larger patch was already the lower curve, and
+   it also descends more steeply, so the gap widens with every
+   improvement to the hardware.
+
+   The exponent is not a fitted parameter, which is what makes this more
+   than a plotting observation. It counts errors. Question 2 established
+   that a logical failure requires an error chain of weight at least
+   $d/2$, so at odd $d$ it takes at least $\lceil d/2\rceil = (d+1)/2$
+   simultaneous physical faults: 4 of them at $d=7$, 6 at $d=11$. Under
+   an independent-error model a specified coincidence of $k$ faults has
+   probability of order $p^k$, so the leading term in $p_L$ is $p^{(d+1)/2}$
+   and the exponent in the scaling law is a headcount. Rarer coincidences
+   thin out faster when the individual event gets rarer, which is the
+   whole of the answer.
+
+   The comparison worth making, since it is the one an engineer faces.
+   At $p/p_{th}=0.5$, going from $d=11$ to $d=13$ buys one more factor of
+   $0.5$: a $2\times$ improvement, at a cost of $13^2-11^2=4d+4=48$ extra
+   data qubits per logical qubit in the rotated layout (about $96$ once
+   each patch's measurement ancillas are counted). Halving the
+   physical error rate instead buys $2^6=64\times$ at $d=11$, for no extra
+   qubits at all. Below threshold both levers work, but they do not work
+   equally, and the lesson's fan chart is that inequality drawn: better
+   hardware moves you to a steeper curve, while more qubits only move you
+   further along the one you are on.
+
+   **The wrong turn** is reading "exponential suppression with distance"
+   as a claim about how $p_L$ responds to $p$. Those are two different
+   derivatives of the same law. At fixed $p$ below threshold, $p_L$ falls
+   exponentially in $d$, which is the statement the whole field rests on.
+   At fixed $d$, $p_L$ falls only polynomially in $p$, with degree
+   $(d+1)/2$. This question asks the second one, and the answer happens to
+   be that a larger $d$ raises the polynomial's degree, which is why the
+   two statements point the same way here. They do not always: above
+   threshold the first reverses sign while the second does not.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -655,9 +844,11 @@ syndrome alone.
 - A single-qubit error is one graph edge; a connected chain of errors
   only shows defects at its two *endpoints*, since interior vertices get
   touched (and re-flipped to even) twice.
-- Worked directly on a small patch: a 1-qubit and a 2-qubit chain both
+- Worked directly on a deliberately simplified toy lattice, whose own
+  counts are named where it is introduced rather than borrowed from the
+  prerequisite: a 1-qubit and a 2-qubit chain both
   decode correctly (the second with a harmless, checked degeneracy). A
-  2-qubit chain spanning the middle row of a distance-3 patch creates a
+  2-qubit chain spanning the toy's middle row creates a
   decoding **tie**: pairing the defects costs 2, and matching each to
   its nearby boundary costs 1 + 1 = 2. Broken the wrong way, the tie
   completes the chain into a boundary-to-boundary logical operator, so
@@ -672,7 +863,7 @@ syndrome alone.
   which is why Union-Find and neural-network decoders are active
   current research, not settled alternatives.
 
-## Further Exploration
+## Decoders on a Real-Time Clock
 
 <NextDiscovery>
   [Lattice Surgery](/lessons/apex/fault-tolerance-frontiers/lattice-surgery)

@@ -11,7 +11,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Complexity Classes: P, NP, and BQP",
   description:
-    "BQP and Oracle Complexity proved what oracle separations do and don't say about BPP vs. BQP; this lesson places BQP precisely within the classical P/NP/PSPACE landscape and states, with full rigor, exactly which containments are proven theorems and which — including whether NP is contained in BQP, whether BQP is contained in NP, and whether P equals BQP at all — remain genuinely open.",
+    "BQP and Oracle Complexity proved what oracle separations do and don't say about BPP vs. BQP; this lesson places BQP within the classical P/NP/PSPACE landscape and sorts every relationship among them into proven, disproven, and still undecided, taking the two directions of NP versus BQP and the status of P versus BQP as its three worked cases.",
   course: "quantum-complexity-theory",
   module: "complexity-classes-p-np-and-bqp",
   order: 1,
@@ -20,7 +20,7 @@ export const lessonMeta = {
   prerequisites: ["quantum-mastery/advanced-algorithms-and-complexity/bqp-and-oracle-complexity"],
   objectives: [
     "Define P, NP, and BQP precisely as classes of decision problems (with the standard error-bounded/verifier definitions), and state the known containment relationships (P subseteq BQP, P subseteq NP, BQP subseteq PSPACE)",
-    "Explain exactly why 'NP subseteq BQP?' and 'BQP subseteq NP?' are BOTH open questions, and what a positive/negative resolution of each would mean",
+    "Explain why 'NP subseteq BQP?' and 'BQP subseteq NP?' are BOTH open questions, and what a positive/negative resolution of each would mean",
     "State Shor's algorithm's actual complexity-theoretic status honestly and precisely: it shows an integer-factoring problem is in BQP with no known classical polynomial algorithm, but does NOT prove P != BQP (since factoring is not known to be NP-complete, and even a superpolynomial classical hardness proof for factoring remains unproven)",
   ],
   related: [
@@ -32,13 +32,13 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="Proven, or merely believed?">
-  P, NP, and BQP have exactly three proven containments between them —
-  and exactly three questions about how they relate that nobody has
-  resolved either way, including whether quantum computers are more
-  powerful than classical ones at all.
+  Exactly three containments among P, NP, and BQP are proven. Three
+  further questions about how they relate have never been resolved in
+  either direction, and one of them is whether quantum computers are
+  more powerful than classical ones at all.
 </LessonHook>
 
-## Motivation
+## Precision About a Sentence Everyone Repeats
 
 BQP and Oracle Complexity did two things carefully: it gave BQP a formal
 definition, and it proved that Deutsch-Jozsa, Simon's algorithm, and
@@ -49,26 +49,26 @@ it proved what those specific algorithms do and don't establish, but it
 never placed BQP within the broader classical complexity landscape most
 popular accounts gesture at with a Venn diagram and move on.
 
-This lesson does that placement precisely. Three classes — $\mathsf{P}$,
-$\mathsf{NP}$, $\mathsf{BQP}$ — turn out to have exactly three proven
-containments between them and exactly three genuinely open questions,
-and conflating a "proven containment" with an "open question believed
-one way" is the single most common way popular writing about quantum
-computing goes wrong. Getting this exactly right is also the necessary
-setup for the rest of this course: QMA (quantum verification), the Local
-Hamiltonian problem, and query-complexity lower bounds all live in the
-open territory this lesson maps out.
+This lesson does that placement. Among the three classes $\mathsf{P}$,
+$\mathsf{NP}$, and $\mathsf{BQP}$ there are exactly three proven
+containments and exactly three open questions, and conflating a "proven
+containment" with an "open question believed one way" is the single most
+common way popular writing about quantum computing goes wrong. Getting
+this right is also the necessary setup for the rest of this course. QMA
+(quantum verification), the Local Hamiltonian problem, and
+query-complexity lower bounds all live in the open territory this lesson
+maps out.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/1/1d/BQP_complexity_class_diagram.svg"
   alt="Diagram showing BQP's suspected position relative to P, NP, and PSPACE among complexity classes"
-  caption="BQP's suspected (not proven) position relative to P, NP, and PSPACE. This lesson replaces the loose 'Venn diagram and move on' version of this picture with exactly which containments are proven theorems and which remain open."
+  caption="BQP's suspected (not proven) position relative to P, NP, and PSPACE. This lesson replaces the loose 'Venn diagram and move on' version of this picture with a statement of which containments are proven theorems and which remain open."
   credit="Mike1024, based on a diagram by Booyabazooka / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:BQP_complexity_class_diagram.svg"
   license="Public domain"
 />
 
-## Mathematical Development
+## Three Classes, Three Containments, Two Open Questions
 
 ### Recap: the three classes, precisely
 
@@ -78,7 +78,7 @@ $\mathsf{P}$ is the class of decision problems (languages
 $L\subseteq\{0,1\}^*$) solvable by a deterministic classical algorithm
 running in time polynomial in the input length $n=|x|$: there exists a
 polynomial $p$ and an algorithm that, for every input $x$, halts within
-$p(|x|)$ steps and outputs $1$ if $x\in L$, $0$ otherwise — always
+$p(|x|)$ steps and outputs $1$ if $x\in L$ and $0$ otherwise, always
 correctly, with zero error.
 
 </DefinitionBox>
@@ -90,7 +90,7 @@ YES instance $x\in L$ has a **certificate** $w$ of length polynomial in
 $|x|$, verifiable in deterministic polynomial time: there exists a
 polynomial-time algorithm $V$ and a polynomial $q$ such that $x\in L$
 if and only if there exists $w$ with $|w|\leq q(|x|)$ and $V(x,w)=1$.
-Verification is cheap and deterministic; *finding* $w$ is exactly what's
+Verification is cheap and deterministic; *finding* $w$ is what's
 believed to be hard in general.
 
 </DefinitionBox>
@@ -102,8 +102,8 @@ polynomial-time-uniform family of quantum circuits $\{C_n\}$, built from
 a fixed universal gate set, such that for input $x$ of length $n$,
 measuring a designated output qubit of $C_n|x\rangle|0\cdots0\rangle$
 outputs $1$ with probability $\geq2/3$ if $x\in L$ and $\leq1/3$ if
-$x\notin L$. (Full formal treatment, including exactly what
-"polynomial-time-uniform" rules out, is in the prerequisite lesson —
+$x\notin L$. (Full formal treatment, including what
+"polynomial-time-uniform" rules out, is in the prerequisite lesson;
 this recap states the definition without re-deriving it.)
 
 </DefinitionBox>
@@ -114,22 +114,22 @@ taking the majority vote drives the failure probability down to
 $2^{-\Omega(k)}$ by a Chernoff-Hoeffding bound on sums of independent
 bounded random variables, so *any* pair of constants bounded away from
 $1/2$ defines the identical class $\mathsf{BQP}$, up to polynomial
-overhead in circuit size. That amplification fact is exactly why "the
-error bound is $1/3$" is a convention, not a substantive commitment,
-the same reasoning applies verbatim to $\mathsf{BPP}$, the classical
+overhead in circuit size. That amplification fact is why "the error
+bound is $1/3$" is a convention rather than a substantive commitment.
+The same reasoning applies verbatim to $\mathsf{BPP}$, the classical
 bounded-error analogue.
 
 ### The three proven containments
 
 | Containment | Status | Why |
 |---|---|---|
-| $\mathsf{P}\subseteq\mathsf{BQP}$ | **Proven** | Any classical poly-time algorithm can be simulated by a reversible (hence unitary) circuit with only polynomial overhead, then run on a quantum computer that simply never uses superposition — a classical circuit is a special case of a quantum one. |
-| $\mathsf{P}\subseteq\mathsf{NP}$ | **Proven** | A poly-time decision algorithm for $L$ needs no certificate at all — take $V(x,w)=$ "run the $\mathsf{P}$ algorithm on $x$ and ignore $w$" with the trivial empty certificate. |
-| $\mathsf{BQP}\subseteq\mathsf{PSPACE}$ | **Proven** | A classical algorithm can compute any output amplitude of a poly-size quantum circuit to sufficient precision by summing over computational-basis paths, reusing the same polynomial workspace for each term — polynomial *space*, even though this simulation generally takes *exponential time*. |
+| $\mathsf{P}\subseteq\mathsf{BQP}$ | **Proven** | Any classical poly-time algorithm can be simulated by a reversible (hence unitary) circuit with only polynomial overhead, then run on a quantum computer that never uses superposition. A classical circuit is a special case of a quantum one. |
+| $\mathsf{P}\subseteq\mathsf{NP}$ | **Proven** | A poly-time decision algorithm for $L$ needs no certificate at all: take $V(x,w)=$ "run the $\mathsf{P}$ algorithm on $x$ and ignore $w$" with the trivial empty certificate. |
+| $\mathsf{BQP}\subseteq\mathsf{PSPACE}$ | **Proven** | A classical algorithm can compute any output amplitude of a poly-size quantum circuit to sufficient precision by summing over computational-basis paths, reusing the same polynomial workspace for each term. That is polynomial *space*, even though the simulation generally takes *exponential time*. |
 
 The $\mathsf{BQP}\subseteq\mathsf{PSPACE}$ containment is worth
 dwelling on, because it's easy to state carelessly. It does **not** say
-quantum computers are only as powerful as classical ones — it says a
+quantum computers are only as powerful as classical ones. It says a
 classical computer with enough *memory* (polynomial) can eventually
 compute what a quantum computer computes, given enough *time*
 (potentially exponential). Space and time are different resources, and
@@ -142,14 +142,14 @@ open questions below, actually need.
 ### The genuinely open questions
 
 <PredictBeforeReveal
-  question="Three questions remain about how P, NP, and BQP relate: is NP⊆BQP? Is BQP⊆NP? Is P=BQP? Before reading on, predict how many of these three have actually been proven — true or false, either direction — by anyone."
+  question="Three questions remain about how P, NP, and BQP relate: is NP⊆BQP? Is BQP⊆NP? Is P=BQP? Before reading on, predict how many of these three have actually been proven by anyone, true or false, in either direction."
   options={[
-    { label: "All three — proven one way or the other", value: "all" },
+    { label: "All three, proven one way or the other", value: "all" },
     { label: "Some proven, some still open", value: "some" },
-    { label: "None — all three are genuinely open questions", value: "none" },
+    { label: "None: all three are open questions", value: "none" },
   ]}
   correctValue="none"
-  explanation="None of the three has been proven either way. NP⊆BQP is widely believed false, on real but black-box-limited evidence, not proof. BQP⊆NP has no consensus belief at all; the one substantial piece of evidence, an oracle separation discussed below, is again black-box-limited. P=BQP is widely believed false, largely on the strength of Shor's algorithm — but belief, however strong, is not proof. Notice the pattern the rest of this lesson makes precise: every piece of evidence anyone has on these three questions lives in the query model, and the relativization barrier says query-model evidence cannot settle any of them."
+  explanation="None of the three has been proven either way. NP⊆BQP is widely believed false, on real but black-box-limited evidence, not proof. BQP⊆NP has no consensus belief at all; the one substantial piece of evidence, an oracle separation discussed below, is again black-box-limited. P=BQP is widely believed false, largely on the strength of Shor's algorithm. Belief, however strong, is not proof. Notice the pattern the rest of this lesson makes precise: every piece of evidence anyone has on these three questions lives in the query model, and the relativization barrier says query-model evidence cannot settle any of them."
 />
 
 Three questions about how $\mathsf{P}$, $\mathsf{NP}$, and
@@ -164,14 +164,14 @@ be made polynomial in general, the way Grover's algorithm makes
 unstructured search quadratically faster but not exponentially faster.
 This is **not known**, and it is **widely believed to be false**. The
 evidence is real but limited: the prerequisite lesson's BBBV theorem
-proves that Grover's $\Theta(\sqrt N)$ query complexity is exactly
-optimal for *unstructured black-box search* — no black-box quantum
-algorithm can turn an $N$-item search into anything better than a
-quadratic speedup, for every possible oracle. A later lesson in this
-course (Query Complexity and Lower Bounds) develops this technique
-further. But this is suggestive, not conclusive: an $\mathsf{NP}$-complete
-problem like 3-SAT is not a black box — its clauses are explicit and
-structured — so a black-box lower bound says nothing decisive about
+proves that Grover's $\Theta(\sqrt N)$ query complexity is optimal for
+*unstructured black-box search*, meaning no black-box quantum algorithm
+can turn an $N$-item search into anything better than a quadratic
+speedup, for every possible oracle. A later lesson in this course
+(Query Complexity and Lower Bounds) develops this technique further.
+But this is suggestive, not conclusive. An $\mathsf{NP}$-complete
+problem like 3-SAT is not a black box (its clauses are explicit and
+structured), so a black-box lower bound says nothing decisive about
 whether some structure-exploiting quantum algorithm could still solve
 it in polynomial time. $\mathsf{NP}\subseteq\mathsf{BQP}$ is disbelieved
 on the strength of this evidence and the field's decades of failure to
@@ -179,25 +179,25 @@ find such an algorithm, not because anyone has proven it false.
 
 **(2) Is $\mathsf{BQP}\subseteq\mathsf{NP}$?** This asks whether every
 quantum algorithm's YES-answer can be checked by an ordinary,
-classical, polynomial-length certificate — whether quantum computation's
-power can always be *verified* the $\mathsf{NP}$ way after the fact,
-even if it can't be *found* that way. This is also **not known**. Unlike
+classical, polynomial-length certificate. Can quantum computation's
+power always be *verified* the $\mathsf{NP}$ way after the fact, even
+when it cannot be *found* that way? This is also **not known**. Unlike
 question (1), there isn't even a strong heuristic argument pointing one
-way: specific problems believed to be in $\mathsf{BQP}$ are known for
-which no $\mathsf{NP}$-style classical certificate is currently known:
-the natural "certificate," the full quantum computational transcript,
-isn't classically polynomial-length or obviously checkable in
-polynomial time. But the absence of a *known* certificate is not a proof
-that none exists. This question is the direct motivation for this
-course's next lesson, which builds $\mathsf{QMA}$ — the class where the
-certificate itself is allowed to be quantum.
+way. Problems believed to lie in $\mathsf{BQP}$ have no known
+$\mathsf{NP}$-style classical certificate; the natural "certificate,"
+the full quantum computational transcript, isn't classically
+polynomial-length or obviously checkable in polynomial time. But the
+absence of a *known* certificate is not a proof that none exists. This
+question is the direct motivation for this course's next lesson, which
+builds $\mathsf{QMA}$, the class where the certificate itself is allowed
+to be quantum.
 
 One qualification on "not even a strong heuristic argument," because the
 relativized picture has moved and the unrelativized one has not. There is
 now an oracle relative to which $\mathsf{BQP}\not\subseteq\mathsf{PH}$,
 and since $\mathsf{NP}\subseteq\mathsf{PH}$, that oracle also separates
 $\mathsf{BQP}$ from $\mathsf{NP}$. So there is evidence pointing one way
-after all, of exactly the kind this course keeps insisting on scoping:
+after all, of the kind this course keeps insisting on scoping:
 evidence in the black-box model, which by the relativization barrier
 cannot on its own settle the unrelativized question. The honest
 statement is therefore narrower than "no argument either way" and wider
@@ -207,17 +207,19 @@ transfer.
 
 <ResearchConnection
   title="The oracle evidence on question (2)"
-  source="Aaronson & Ambainis, STOC 2015 (arXiv:1411.5729); Raz & Tal, STOC 2019"
+  source="Aaronson, STOC 2010 (arXiv:0910.4698); Aaronson & Ambainis, STOC 2015 (arXiv:1411.5729); Raz & Tal, STOC 2019"
   url="https://arxiv.org/abs/1411.5729"
 >
-  Aaronson and Ambainis introduced the Forrelation problem, which is
-  easy for a quantum algorithm and provably hard for classical ones in
-  the query model, and conjectured it could separate $\mathsf{BQP}$ from
-  the polynomial hierarchy relative to an oracle. Raz and Tal proved that
-  conjecture, giving the first oracle separation of $\mathsf{BQP}$ from
-  $\mathsf{PH}$. Read the pair as a case study in how relativized
+  Aaronson introduced the problem, under the name Fourier Checking, and
+  conjectured that it could separate $\mathsf{BQP}$ from the polynomial
+  hierarchy relative to an oracle. Aaronson and Ambainis renamed it
+  Forrelation and proved the matching bounds that make it easy for a
+  quantum algorithm and provably hard for classical ones in the query
+  model. Raz and Tal then proved the conjecture, giving the first oracle
+  separation of $\mathsf{BQP}$ from
+  $\mathsf{PH}$. Read the three as a case study in how relativized
   evidence accumulates: a well-chosen problem, a conjecture about it, a
-  proof years later, and a conclusion that is real, rigorous, and still
+  proof years later, and a conclusion that is real and still
   silent about the unrelativized world.
 </ResearchConnection>
 
@@ -235,7 +237,7 @@ widely shared among experts, is not proof.
   lensB={{ id: "NP", label: "NP" }}
   core={{ id: "P", label: "P" }}
   openLabel="NP⊆BQP? / BQP⊆NP?"
-  footnote="Both containments between BQP and NP are genuinely open — neither has been proven either way."
+  footnote="Both containments between BQP and NP are open; neither has been proven either way."
   ariaLabel="A containment diagram: a solid outer boundary labeled PSPACE contains everything drawn. Inside it, two dashed ellipses labeled BQP and NP overlap. A small solid circle labeled P sits inside the region where both ellipses overlap, since P is proven to be a subset of both BQP and NP. The open question NP⊆BQP? / BQP⊆NP? is marked in the overlap; the dashed ellipse outlines signal that their boundaries relative to each other are illustrative only, not a claimed fact."
 />
 
@@ -247,30 +249,30 @@ $\mathsf{PSPACE}$ boundary is solid because $\mathsf{BQP}\subseteq
 \mathsf{PSPACE}$ is a theorem too ($\mathsf{NP}\subseteq\mathsf{PSPACE}$
 is also a standard, separately proven fact, which is why $\mathsf{NP}$'s
 ellipse is drawn fitting inside the same boundary). What's dashed is
-exactly what's uncertain: the $\mathsf{BQP}$ and $\mathsf{NP}$ ellipses'
-sizes, and how much they overlap beyond the $\mathsf{P}$ core they're
-both proven to contain, are drawn *illustratively*, not as a claimed
-fact — the real answer could be that one class contains the other, that
-they're equal, or that they overlap only partially the way it's drawn.
-That is precisely the content of open questions (1) and (2) above.
+what's uncertain: the $\mathsf{BQP}$ and $\mathsf{NP}$ ellipses' sizes,
+and how much they overlap beyond the $\mathsf{P}$ core they're both
+proven to contain, are drawn *illustratively*, not as a claimed fact.
+The real answer could be that one class contains the other, that they're
+equal, or that they overlap only partially the way it's drawn. That is
+the content of open questions (1) and (2) above.
 
 ### Shor's algorithm's actual complexity-theoretic status
 
 <PredictBeforeReveal
   question="Shor's algorithm gives a polynomial-size quantum circuit that factors integers, with no known classical polynomial-time algorithm for the same task. Before reading the precise analysis below, predict: does this prove P ≠ BQP?"
   options={[
-    { label: "Yes — it's an unconditional proof that P ≠ BQP", value: "yes" },
-    { label: "No — it's strong evidence, but conditional on an unproven assumption", value: "conditional" },
-    { label: "No — factoring says nothing relevant to P vs. BQP at all", value: "irrelevant" },
+    { label: "Yes, it's an unconditional proof that P ≠ BQP", value: "yes" },
+    { label: "No: strong evidence, but conditional on an unproven assumption", value: "conditional" },
+    { label: "No, factoring says nothing relevant to P vs. BQP at all", value: "irrelevant" },
   ]}
   correctValue="conditional"
-  explanation="Shor's algorithm unconditionally proves factoring is in BQP — that part is a real theorem. But it does NOT prove P ≠ BQP, because that would additionally require factoring ∉ P, and 'factoring has no classical polynomial algorithm' is itself only a conjecture (the RSA security assumption), never proven. So Shor's algorithm is strong conditional evidence for P ≠ BQP, not a separation theorem — a distinction the next two sections make precise."
+  explanation="Shor's algorithm unconditionally proves factoring is in BQP; that part is a real theorem. But it does NOT prove P ≠ BQP, because that would additionally require factoring ∉ P, and 'factoring has no classical polynomial algorithm' is itself only a conjecture (the RSA security assumption), never proven. So Shor's algorithm is strong conditional evidence for P ≠ BQP, not a separation theorem. The next two sections make the distinction precise."
 />
 
 <TheoremBox title="What Shor's algorithm proves" provenance="cited">
 
-Integer factoring (as a decision problem — e.g., "does $N$ have a
-nontrivial factor less than $k$?") is in $\mathsf{BQP}$: there is a
+Integer factoring, phrased as a decision problem ("does $N$ have a
+nontrivial factor less than $k$?"), is in $\mathsf{BQP}$: there is a
 polynomial-size quantum circuit family that solves it with bounded
 error, via period-finding and the quantum Fourier transform (built and
 run on the factor-15 example in Quantum Algorithms II). No known
@@ -295,7 +297,7 @@ $\mathsf{NP}$-complete problems like 3-SAT, and would not resolve
 question (1) above.
 
 **"Factoring has no classical polynomial-time algorithm" is itself
-unproven.** It is the load-bearing conjecture behind RSA's security —
+unproven.** It is the load-bearing conjecture behind RSA's security:
 widely believed, extensively tested against decades of attempted
 classical attacks, and not remotely proven. No unconditional lower
 bound rules out a fast classical factoring algorithm; nobody has found
@@ -309,27 +311,27 @@ assumption that factoring is classically hard, Shor's algorithm would
 witness $\mathsf{P}\neq\mathsf{BQP}$ for the specific case of
 factoring. Without that assumption, all that's unconditionally proven
 is "factoring $\in\mathsf{BQP}$, and nobody has found a classical
-polynomial algorithm for it" — real and important, but a different and
-weaker claim than a separation theorem. Distinguishing "a proven
-theorem" from "strong conditional evidence built on a widely-believed
-but unproven assumption" is exactly the habit this platform's later
-Research Methods course trains as a general skill; this is its first,
-sharpest worked instance.
+polynomial algorithm for it." That is real and important, but a
+different and weaker claim than a separation theorem. Distinguishing "a
+proven theorem" from "strong conditional evidence built on a
+widely-believed but unproven assumption" is the habit this platform's
+later Research Methods course trains as a general skill; this is its
+first, sharpest worked instance.
 
-## Physical Interpretation: why this precision matters
+## What Shor's Algorithm Does and Does Not Settle
 
 <InsightBlock>
   "Quantum computers are more powerful than classical ones" is not one
-  claim but several, and precisely which of P⊆BQP, NP⊆BQP, BQP⊆NP, and
-  P=BQP a given result actually bears on is exactly what separates a
-  checkable claim from an impressive-sounding one.
+  claim but several, and which of P⊆BQP, NP⊆BQP, BQP⊆NP, and P=BQP a
+  given result bears on is what separates a checkable claim from an
+  impressive-sounding one.
 </InsightBlock>
 
-Complexity theory can look like classification for its own sake —
-sorting problems into labeled boxes — but its actual job is supplying
+Complexity theory can look like classification for its own sake
+(sorting problems into labeled boxes), but its actual job is supplying
 the only language precise enough to say what "quantum computers are
 more powerful than classical ones" does and doesn't mean, and to name
-exactly which open questions are the deep ones. Without that language,
+which open questions are the deep ones. Without that language,
 "quantum advantage" claims are unfalsifiable by construction: any
 speedup on any problem sounds equally impressive, whether it resolves a
 decades-old open question or exploits an oracle model that hides the
@@ -341,10 +343,10 @@ algorithm" becomes checkable rather than merely impressive-sounding.
 If that claim is about a genuinely *worst-case*, *general* instance of
 an $\mathsf{NP}$-complete problem, with a real correctness proof and a
 real classical lower bound to compare against, it would be direct
-evidence toward $\mathsf{NP}\subseteq\mathsf{BQP}$ — a famous, open,
-widely-disbelieved question — and a landmark result by any measure.
-That combination (huge implication, decades of failed attempts by
-everyone else) is exactly the situation that calls for maximal scrutiny
+evidence toward $\mathsf{NP}\subseteq\mathsf{BQP}$ (a famous, open,
+widely disbelieved question) and a landmark result by any measure.
+That combination, huge implication plus decades of failed attempts by
+everyone else, is the situation that calls for maximal scrutiny
 of the fine print: is the instance class really general, or secretly
 promise-restricted? Is the comparison against every classical algorithm,
 or just the ones tried so far? Is there an actual proof, or a numerical
@@ -352,38 +354,38 @@ experiment on small instances? This lesson's job was to make it
 possible to ask those questions precisely instead of just intuiting
 that something sounds too good to be true.
 
-## Worked Reasoning Example
+## Taking Apart a Popular Claim
 
 **Claim under evaluation:** "Shor's algorithm proves quantum computers
-are fundamentally more powerful than classical computers."
+are more powerful than classical computers."
 
 <DerivationSteps>
 <DerivationStep annotation="Shor's algorithm gives a polynomial-size quantum circuit family that decides integer factoring with bounded error. This half is a proven theorem, not a conjecture.">
-What does Shor's algorithm actually establish? Factoring $\in\mathsf{BQP}$ — unconditionally.
+What does Shor's algorithm actually establish? Factoring $\in\mathsf{BQP}$, unconditionally.
 </DerivationStep>
-<DerivationStep annotation="A separation P ≠ BQP would additionally require factoring ∉ P — and that is exactly the unproven RSA security conjecture, not a theorem.">
+<DerivationStep annotation="A separation P ≠ BQP would additionally require factoring ∉ P, which is the unproven RSA security conjecture, not a theorem.">
 Does this alone imply $\mathsf{P}\neq\mathsf{BQP}$? Only if factoring $\notin\mathsf{P}$, which is not proven.
 </DerivationStep>
-<DerivationStep annotation="Factoring sits in NP ∩ coNP, not known to be NP-complete, so any result about it — even an unconditional one — does not transfer to NP-complete problems in general.">
+<DerivationStep annotation="Factoring sits in NP ∩ coNP, not known to be NP-complete, so any result about it, even an unconditional one, does not transfer to NP-complete problems in general.">
 Does it resolve $\mathsf{NP}\subseteq\mathsf{BQP}$ or $\mathsf{BQP}\subseteq\mathsf{NP}$? Neither.
 </DerivationStep>
 <DerivationStep annotation="Separate the conditional claim (real, and strong) from the unconditional one (real, but weaker) instead of collapsing them into one.">
 The precise conclusion: *conditional* on factoring's classical hardness, Shor's algorithm separates $\mathsf{P}$ from $\mathsf{BQP}$; *unconditionally*, only factoring $\in\mathsf{BQP}$ plus decades of failed classical attempts is proven.
 </DerivationStep>
-<DerivationStep annotation="Longer, and correct — exactly the habit of precision this course's Research Methods material trains as a general skill.">
-Restated claim: Shor's algorithm gives strong conditional evidence — resting on an assumption nobody has proven but real cryptographic infrastructure depends on — that quantum computers are more powerful than classical ones for at least this one specific, practically important problem.
+<DerivationStep annotation="Longer, and correct: the habit of precision this course's Research Methods material trains as a general skill.">
+Restated claim: Shor's algorithm gives strong conditional evidence, resting on an assumption nobody has proven but real cryptographic infrastructure depends on, that quantum computers are more powerful than classical ones for at least this one specific, practically important problem.
 </DerivationStep>
 </DerivationSteps>
 
-## Common Mistakes
+## Containments Read Backwards
 
 <Callout type="mistake">
 **Treating Shor's algorithm as a proof that $\mathsf{P}\neq\mathsf{BQP}$.**
 Shor's algorithm proves quantum computers can factor efficiently; it does
 NOT prove $\mathsf{P}\neq\mathsf{BQP}$ or resolve any of the classical
 open complexity questions above. It shows factoring $\in\mathsf{BQP}$
-with no known classical polynomial algorithm — strong conditional
-evidence, resting on the unproven assumption that factoring is
+with no known classical polynomial algorithm: strong conditional
+evidence resting on the unproven assumption that factoring is
 classically hard, not an unconditional separation theorem.
 </Callout>
 
@@ -392,10 +394,10 @@ classically hard, not an unconditional separation theorem.
 $\mathsf{NP}\not\subseteq\mathsf{BQP}$.** BBBV rules out a generic,
 structure-blind quantum speedup better than quadratic for *unstructured
 black-box search specifically*. An $\mathsf{NP}$-complete problem given
-explicitly (a real 3-SAT formula, say) is not a black box — a smart
-algorithm can inspect its structure directly. BBBV is real, strong
-evidence that $\mathsf{NP}\subseteq\mathsf{BQP}$ is unlikely, not a
-proof that it's false in the unrestricted, non-black-box setting.
+explicitly (a real 3-SAT formula, say) is not a black box; a smart
+algorithm can inspect its structure directly. BBBV is strong evidence
+that $\mathsf{NP}\subseteq\mathsf{BQP}$ is unlikely. It is not a proof
+that the containment fails in the unrestricted, non-black-box setting.
 </Callout>
 
 ## Practice Questions
@@ -405,13 +407,170 @@ proof that it's false in the unrestricted, non-black-box setting.
    real problem solved by a quantum computer, it follows that
    $\mathsf{NP}\subseteq\mathsf{BQP}$." Identify every logical gap in
    this argument.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   There are three, and they fail at different points.
+
+   **The two containments point the wrong way.** $\mathsf{P}\subseteq
+   \mathsf{BQP}$ and $\mathsf{P}\subseteq\mathsf{NP}$ say that both
+   classes contain a common core. That places no constraint at all on how
+   $\mathsf{NP}$ and $\mathsf{BQP}$ relate to each other. $\{1,2\}$ and
+   $\{1,3\}$ both contain $\{1\}$, and neither contains the other. To get
+   $\mathsf{NP}\subseteq\mathsf{BQP}$ you would need every problem in
+   $\mathsf{NP}$ to sit in $\mathsf{BQP}$, and the two theorems only
+   cover the ones that were already in $\mathsf{P}$.
+
+   **One problem is not a class, unless it is complete.** The step from
+   "factoring is in $\mathsf{BQP}$" to "all of $\mathsf{NP}$ is in
+   $\mathsf{BQP}$" needs factoring to be $\mathsf{NP}$-complete, so that
+   every other $\mathsf{NP}$ problem reduces to it in polynomial time and
+   inherits the quantum algorithm. Factoring is not known to be
+   $\mathsf{NP}$-complete, and it is widely believed not to be. The
+   decision version sits in $\mathsf{NP}\cap\mathsf{coNP}$ (a prime
+   factorization certifies both a yes and a no answer), and an
+   $\mathsf{NP}$-complete problem in $\mathsf{coNP}$ would force
+   $\mathsf{NP}=\mathsf{coNP}$, which almost nobody expects. So the one
+   piece of evidence the argument leans on is drawn from the corner of
+   $\mathsf{NP}$ least likely to be representative of it.
+
+   **The conclusion would not follow even from a much stronger premise.**
+   Suppose someone proved outright that factoring has no classical
+   polynomial-time algorithm. That would settle $\mathsf{P}\neq
+   \mathsf{BQP}$, a genuinely enormous result, and $\mathsf{NP}\subseteq
+   \mathsf{BQP}$ would still be exactly as open as it is today. A
+   separation between two classes and a containment between two other
+   classes are different kinds of statement, and no amount of the first
+   produces the second.
+
+   Worth noticing what the argument gets right, because the instinct is
+   not silly. Every step in it is the kind of step that *would* work in a
+   world where these classes were linearly ordered. Complexity classes are
+   not linearly ordered, and expecting them to be is the single most
+   common way that arguments of this shape go wrong.
+
+   </details>
+
 2. Explain, precisely, why "no known classical polynomial-time
    algorithm for factoring" and "no classical polynomial-time algorithm
    for factoring exists" are different claims, and which one Shor's
    algorithm's significance actually rests on.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The first is a fact about what people have found. The second is a
+   mathematical claim about what can exist, and nobody has any proof of
+   it.
+
+   That gap is not a technicality that will close with more effort.
+   Complexity theory currently has no superpolynomial lower bound for
+   *any* problem in $\mathsf{NP}$ against general classical computation.
+   And the specific claim in question is at least as hard as the field's
+   most famous open problem, for a reason that takes one line: the
+   decision version of factoring is in $\mathsf{NP}$, so proving it is
+   not in $\mathsf{P}$ would immediately prove
+   $\mathsf{P}\neq\mathsf{NP}$. Anyone who could establish "no classical
+   polynomial-time factoring algorithm exists" would have settled
+   $\mathsf{P}$ versus $\mathsf{NP}$ on the way past.
+
+   Which claim does Shor's significance rest on? Split the question,
+   because the honest answer differs by what kind of significance is
+   meant.
+
+   **Shor's theorem itself rests on neither.** It is unconditional: there
+   is a polynomial-size uniform quantum circuit family that factors, so
+   factoring is in $\mathsf{BQP}$. That proof does not mention classical
+   algorithms at all and cannot be weakened by anything discovered about
+   them.
+
+   **Its status as evidence for a quantum speedup rests entirely on the
+   second, unproven claim.** "Quantum computers can do something
+   classical ones cannot" is the statement $\mathsf{P}\neq\mathsf{BQP}$,
+   and factoring witnesses that separation only if factoring is genuinely
+   outside $\mathsf{P}$. Absent that, Shor's algorithm is an interesting
+   quantum algorithm for a problem that might turn out to be classically
+   easy, which would be a disappointment rather than a contradiction.
+
+   **Its cryptographic significance rests on the first, plus deployment.**
+   RSA is in use because decades of attack have not produced a fast
+   classical factoring algorithm, which is an empirical assumption people
+   have chosen to stake infrastructure on. Shor's algorithm threatens
+   that assumption from a new direction without needing the second claim
+   to be true.
+
+   The history is the reason to be careful rather than pedantic here.
+   Primality testing was for a long time in the "no known efficient
+   deterministic algorithm" category, and in 2002 the AKS algorithm put
+   it in $\mathsf{P}$. Nothing broke, because nothing had been built on
+   its hardness. Factoring is a different story precisely because a great
+   deal has.
+
+   </details>
+
 3. Suppose a future result proved $\mathsf{BQP}\subseteq\mathsf{NP}$.
    Explain in your own words what this would and would not imply about
    $\mathsf{NP}\subseteq\mathsf{BQP}$, and about $\mathsf{P}=\mathsf{BQP}$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It would settle neither, but it would not leave them untouched either.
+   It is strong evidence *against* $\mathsf{NP}\subseteq\mathsf{BQP}$,
+   and it is completely silent on $\mathsf{P}=\mathsf{BQP}$.
+
+   **What it would say directly.** Every language a quantum computer can
+   decide would have a short classical certificate for its yes-instances.
+   Any quantum advantage could be checked after the fact by a classical
+   verifier, which is a remarkable practical statement and the exact
+   opposite of the situation that motivates $\mathsf{QMA}$ in the next
+   lesson.
+
+   **Why it bears on $\mathsf{NP}\subseteq\mathsf{BQP}$, via one extra
+   fact.** $\mathsf{BQP}$ is closed under complement: flip the output
+   qubit and the completeness and soundness bounds swap symmetrically, so
+   $\mathsf{BQP}=\mathsf{coBQP}$. Taking complements of both sides of
+   $\mathsf{BQP}\subseteq\mathsf{NP}$ then gives
+   $\mathsf{BQP}\subseteq\mathsf{coNP}$ as well, so in fact
+
+   $$
+   \mathsf{BQP}\subseteq\mathsf{NP}\cap\mathsf{coNP}.
+   $$
+
+   Now suppose $\mathsf{NP}\subseteq\mathsf{BQP}$ held too. Chaining the
+   two gives $\mathsf{NP}\subseteq\mathsf{NP}\cap\mathsf{coNP}$, hence
+   $\mathsf{NP}\subseteq\mathsf{coNP}$, hence
+   $\mathsf{NP}=\mathsf{coNP}$: a collapse almost nobody expects, since
+   it would mean unsatisfiability has short certificates. So the two
+   containments cannot comfortably coexist, and proving one would be a
+   serious argument against the other. That is a real deduction rather
+   than an intuition, and it is the sharpest thing this question has to
+   offer.
+
+   **Why it says nothing about $\mathsf{P}=\mathsf{BQP}$.** There is
+   nothing contradictory about $\mathsf{P}\subsetneq\mathsf{BQP}\subseteq
+   \mathsf{NP}$. Factoring is the ready-made illustration: its decision
+   version already sits in $\mathsf{NP}\cap\mathsf{coNP}$, so it is
+   perfectly consistent for factoring to be in $\mathsf{BQP}$, outside
+   $\mathsf{P}$, and inside $\mathsf{NP}$ all at once. A world where
+   quantum computers are strictly more powerful than classical ones and
+   every quantum answer is classically checkable is a coherent world, and
+   arguably the one most people would guess we live in.
+
+   **One thing the proof itself would have to be like.** There is an
+   oracle relative to which $\mathsf{BQP}\not\subseteq\mathsf{PH}$, and
+   $\mathsf{NP}\subseteq\mathsf{PH}$, so relative to that oracle
+   $\mathsf{BQP}\not\subseteq\mathsf{NP}$. Any proof of
+   $\mathsf{BQP}\subseteq\mathsf{NP}$ therefore has to be
+   non-relativizing: it cannot go through by simulating one machine with
+   another in a way that survives being handed an arbitrary black box.
+   That is not a reason to doubt the statement. It is a constraint on
+   what a proof of it could look like, and the same constraint that makes
+   all three of this lesson's open questions resistant to the techniques
+   that settled the easy containments.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -427,17 +586,17 @@ proof that it's false in the unrestricted, non-black-box setting.
   false, on real but black-box-limited BBBV-style evidence; the second
   has no strong heuristic pointing either way; the third is widely
   believed false largely on the strength of Shor's algorithm.
-- Shor's algorithm proves factoring $\in\mathsf{BQP}$ (a real,
+- Shor's algorithm proves factoring $\in\mathsf{BQP}$ (an
   unconditional theorem), but does not prove $\mathsf{P}\neq
   \mathsf{BQP}$, because factoring is not known to be
   $\mathsf{NP}$-complete and its classical hardness is itself an
   unproven (if widely believed) conjecture.
 - This distinction, a proven theorem versus strong conditional
-  evidence resting on an unproven assumption, is precisely the tool
-  needed to evaluate extraordinary quantum-advantage claims without
-  either dismissing or over-crediting them.
+  evidence resting on an unproven assumption, is the tool needed to
+  evaluate extraordinary quantum-advantage claims without either
+  dismissing or over-crediting them.
 
-## Further Exploration
+## When the Certificate Goes Quantum
 
 <NextDiscovery>
   [QMA and Quantum Verification](/lessons/apex/quantum-complexity-theory/qma-and-quantum-verification)

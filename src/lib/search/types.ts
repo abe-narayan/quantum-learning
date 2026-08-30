@@ -43,4 +43,32 @@ export type SearchEntry = {
    * the field existed still parses and simply matches nothing extra.
    */
   keywords?: string;
+  /**
+   * How many times the lesson corpus links to this glossary entry, via
+   * `<Term id="...">`. Terms only, ranking only, never rendered.
+   *
+   * It settles ties, and the tie is real. A reader who types a bare surname
+   * wants the mainline idea: `Dirac` should lead with Dirac Notation, not the
+   * Dirac delta; `Grover` with Grover's Algorithm, not the Grover diffusion
+   * operator. Both members of each pair score identically, because the query
+   * is a whole word at the front of both titles, so before this field the
+   * last tie-break decided them and that tie-break is alphabetical: `Delta`
+   * beat `Notation`, and `Diffusion` beat the apostrophe in `Grover's`. The
+   * alphabet is not relevance, and the ten glossary entries added this sprint
+   * exposed it by landing on the wrong side of it twice.
+   *
+   * Two other signals were tried first and are recorded here so nobody
+   * reaches for them again. Difficulty does not discriminate: both Dirac
+   * entries are `foundational`, both Grover entries `intermediate`. Degree in
+   * `TERM_RELATIONS` discriminates backwards, because a newly authored entry
+   * arrives with a generous relation list while an old central one accreted
+   * few (Dirac Delta 5 against Dirac Notation 3). Both measure how the
+   * glossary was *written*. Link count measures what the curriculum actually
+   * leans on, which is the thing a reader's bare query is asking after.
+   *
+   * Zero is the common case and is not a defect: a term no lesson links to
+   * simply falls through to the alphabetical tie-break exactly as before.
+   * Optional, so an index generated before the field existed still parses.
+   */
+  linkCount?: number;
 };

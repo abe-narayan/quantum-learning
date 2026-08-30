@@ -38,11 +38,11 @@ export const LdotSCoupled = U.dagger().mul(LdotS).mul(U);
 export const ldotsPresets = [
   {
     label: "Uncoupled |mL,mS⟩ basis",
-    panels: [{ label: "L·S — not diagonal", cells: matrixToCells(LdotS), highlightDiagonal: true }],
+    panels: [{ label: "L·S, not diagonal", cells: matrixToCells(LdotS), highlightDiagonal: true }],
   },
   {
     label: "Coupled |j,mj⟩ basis",
-    panels: [{ label: "U†(L·S)U — exactly diagonal", cells: matrixToCells(LdotSCoupled), highlightDiagonal: true }],
+    panels: [{ label: "U†(L·S)U, exactly diagonal", cells: matrixToCells(LdotSCoupled), highlightDiagonal: true }],
   },
 ];
 
@@ -103,7 +103,7 @@ export const lessonMeta = {
   earlier lesson could only bound.
 </LessonHook>
 
-## Motivation
+## The Gap the Introduction Admitted
 
 Fine Structure (Introduction) was honest about a gap: it named spin-orbit
 coupling as one of two effects splitting hydrogen's $l$-degeneracy, stated
@@ -116,7 +116,7 @@ degenerate: the denominator vanishes for any other degenerate state $m$,
 and the formula divides by zero. Hydrogen's $n=2$ level is $4$-fold
 degenerate (2s and 2p, before spin; $8$-fold with spin) in the
 non-relativistic theory, so this is the generic situation, not an edge
-case. This lesson derives the fix, then uses it to actually finish
+case. This lesson derives the fix, then uses it to finish
 the calculation the earlier lesson set aside.
 
 <ExternalFigure
@@ -128,7 +128,7 @@ the calculation the earlier lesson set aside.
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## Diagonalizing Within the Degenerate Subspace
 
 ### Why non-degenerate perturbation theory fails
 
@@ -169,12 +169,33 @@ restricted to the degenerate subspace (Hermitian, since $H'$ is). Its
 eigenvalues are the correct first-order energy corrections, splitting the
 degeneracy; its eigenvectors are the correct zeroth-order states, the
 specific combinations of $|\alpha\rangle$'s that $H'$ doesn't mix with
-each other at this order. Only in *this* basis does the ordinary
-non-degenerate machinery apply cleanly beyond first order. This is a
-derivation, not a stated recipe: it uses nothing beyond
-first-order perturbation expansion and $H_0$'s Hermiticity, both already
-established in Time-Independent Perturbation Theory and Hermitian
-Operators.
+each other at this order. This is a derivation, not a stated recipe: it
+uses nothing beyond first-order perturbation expansion and $H_0$'s
+Hermiticity, both already established in Time-Independent Perturbation
+Theory and Hermitian Operators.
+
+One hypothesis is worth stating before it gets used, because this
+lesson's own example violates it. The claim "the eigenvectors of
+$H'_{\text{sub}}$ *are* the correct zeroth-order states" needs
+$H'_{\text{sub}}$ to have **non-degenerate** eigenvalues. When it does,
+first order lifts the degeneracy completely, each eigenvector is pinned,
+and the ordinary non-degenerate machinery takes over from second order
+on. When $H'_{\text{sub}}$ has a repeated eigenvalue, first order has
+only *partially* resolved the subspace: inside each surviving eigenvalue
+block the correct combination is still undetermined, and settling it
+requires going to second order, or finding a further operator that
+commutes with both $H_0$ and $H'$ and using its eigenvalues as extra
+labels.
+
+Hydrogen's $2p$ level is the second case, not the first.
+$\vec L\cdot\vec S$ below has eigenvalue $+\tfrac12$ four times and $-1$
+twice, so first order leaves a $4$-fold and a $2$-fold degeneracy
+standing. Those are not an accident to be resolved at higher order: they
+are the $2j+1$ values of $m_j$, and rotational invariance of
+$H_0+H'_{SO}$ protects them exactly. It is the second route that applies
+here, with $J_z$ supplying the extra label $m_j$. Splitting *those*
+degeneracies requires breaking the rotational symmetry with an external
+field, which is what the Zeeman effect does.
 
 ### Applying it: hydrogen's 2p spin-orbit coupling
 
@@ -244,7 +265,7 @@ $$
 \frac1{n^3l(l+\tfrac12)(l+1)}\Big|_{n=2,l=1} = \frac1{24} \approx 0.041667
 $$
 
-Independent agreement to 5 decimal places, not assumed. Plugging $n=2,l=1$
+The two agree to eight decimal places. Plugging $n=2,l=1$
 into the boxed formula for both $2p$ fine-structure levels:
 
 <PredictBeforeReveal
@@ -252,7 +273,7 @@ into the boxed formula for both $2p$ fine-structure levels:
   options={[
     { label: "2p₃/₂ (j=3/2) sits higher", value: "32" },
     { label: "2p₁/₂ (j=1/2) sits higher", value: "12" },
-    { label: "They stay exactly degenerate — spin-orbit coupling doesn't split them", value: "same" },
+    { label: "They stay exactly degenerate, since spin-orbit coupling does not split them", value: "same" },
   ]}
   correctValue="32"
   explanation="⟨L·S⟩=+1/2 for j=3/2 and −1 for j=1/2, so the j=3/2 quadruplet is pushed up and the j=1/2 doublet is pushed down, which is what the diagram below shows numerically. The weighted average still comes out to zero (4×(+1/2)+2×(−1)=0), since spin-orbit coupling only splits the level, it can't shift the l=1 subspace's center of mass."
@@ -269,8 +290,8 @@ into the boxed formula for both $2p$ fine-structure levels:
 />
 
 $E_{SO}(2p_{3/2})\approx1.5096\times10^{-5}\text{ eV}$,
-$E_{SO}(2p_{1/2})\approx-3.0192\times10^{-5}\text{ eV}$, a real,
-computed splitting of $\Delta E\approx4.5287\times10^{-5}\text{ eV}$:
+$E_{SO}(2p_{1/2})\approx-3.0192\times10^{-5}\text{ eV}$, a computed
+splitting of $\Delta E\approx4.5287\times10^{-5}\text{ eV}$:
 the exact number Fine Structure (Introduction) only bounded by order of
 magnitude ($\sim\alpha^2\times13.6\text{ eV}\approx7\times10^{-4}\text{ eV}$,
 the right ballpark, now made precise: this specific splitting sits about
@@ -278,7 +299,7 @@ an order of magnitude below that overall fine-structure *scale*, because
 of the additional numeric prefactors this lesson's diagonalization
 supplies).
 
-## Physical Interpretation
+## How a Sixfold Degeneracy Actually Splits
 
 The 2p level's $6$-fold spin-orbital degeneracy is actually lifted, not
 just relabeled: $2p_{3/2}$ (four states, $m_j=\pm\tfrac32,\pm\tfrac12$)
@@ -294,7 +315,7 @@ $\vec L\cdot\vec S<0$ means anti-aligned (lower energy). $2s$ ($l=0$) is
 untouched by this particular splitting, since $\vec L=0$ there makes
 $\vec L\cdot\vec S\equiv0$ identically, regardless of any diagonalization.
 
-## Worked Example
+## Hydrogen's 2p Spin-Orbit Splitting
 
 **Confirm the $j=\tfrac32$ eigenvalue of $\vec L\cdot\vec S$ directly from
 the coupled-basis formula, without reading it off the matrix.**
@@ -307,7 +328,7 @@ above exactly ($U^\dagger(\vec L\cdot\vec S)U$'s first four diagonal
 entries), computed here from the formula alone, independently of the
 matrix diagonalization.
 
-## Common Mistakes
+## Applying the Non-Degenerate Formula Anyway
 
 <Callout type="mistake">
 **Applying the non-degenerate formula $E_n^{(2)}=\sum_{m\neq
@@ -322,7 +343,7 @@ formula.
 **Assuming the uncoupled $|m_L,m_S\rangle$ basis is "good enough" since
 it's a valid basis for the degenerate subspace.** It's a valid basis, but
 not the *correct zeroth-order* one: the uncoupled-basis panel above shows
-$\vec L\cdot\vec S$ actually mixing these states, meaning a state that
+$\vec L\cdot\vec S$ mixing these states, meaning a state that
 starts as pure $|m_L,m_S\rangle$ does not stay an energy eigenstate once
 $H'_{SO}$ turns on.
 </Callout>
@@ -332,21 +353,249 @@ $H'_{SO}$ turns on.
 1. Using the boxed splitting formula, compute $E_{SO}(2p_{3/2})-E_{SO}(2p_{1/2})$
    for $n=3,l=1$ (the $3p$ level), and compare its order of magnitude to
    the $2p$ splitting computed above.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   For $l=1$ the denominator's angular factor is
+   $l(l+\tfrac12)(l+1)=1\cdot\tfrac32\cdot2=3$, and the brackets are
+   $j(j+1)-l(l+1)-\tfrac34$, giving $+1$ at $j=\tfrac32$ and $-2$ at
+   $j=\tfrac12$. So at $n=3$,
+
+   $$
+   E_{SO}(3p_{3/2})=\frac{(13.6)\alpha^2(+1)}{2\cdot27\cdot3}=4.4728\times10^{-6}\text{ eV},
+   \qquad
+   E_{SO}(3p_{1/2})=\frac{(13.6)\alpha^2(-2)}{2\cdot27\cdot3}=-8.9457\times10^{-6}\text{ eV},
+   $$
+
+   and the splitting is
+
+   $$
+   \Delta E_{3p}=1.34185\times10^{-5}\text{ eV},
+   $$
+
+   using `RYDBERG_EV` $=13.6$ and $\alpha=1/137$, the two constants this
+   lesson's `spinOrbitEnergyEV` actually uses.
+
+   Same order of magnitude as the $2p$ splitting, $10^{-5}$ eV, and
+   smaller by a clean factor. The bracket difference is
+   $1-(-2)=3$, which cancels the $3$ in the denominator exactly, so for
+   any $p$ level the splitting collapses to
+
+   $$
+   \Delta E_{np}=\frac{(13.6\text{ eV})\,\alpha^2}{2n^3},
+   $$
+
+   depending on nothing but $n$. Hence
+   $\Delta E_{3p}/\Delta E_{2p}=(2/3)^3=8/27=0.2963$, and indeed
+   $4.52874\times10^{-5}\times8/27=1.34185\times10^{-5}$. The engine
+   returns the ratio as $0.2962962962962963$, which is $8/27$ to machine
+   precision.
+
+   The $1/n^3$ is worth reading physically rather than just recording. It
+   comes from $\langle1/r^3\rangle_{nl}=1/\big(n^3l(l+\tfrac12)(l+1)\big)$:
+   spin-orbit coupling is a short-range effect, weighted by how much of
+   the wavefunction sits close to the nucleus, and higher-$n$ orbitals
+   keep the electron further out. Fine structure fades quickly up the
+   Rydberg ladder.
+
+   The wrong turn is expecting the $n^{-3}$ scaling to be $n^{-2}$ by
+   analogy with the gross Bohr energies $E_n=-13.6/n^2$. The two scalings
+   are different because they weight different radial quantities: the
+   Bohr energy tracks $\langle1/r\rangle\propto n^{-2}$ while the
+   spin-orbit shift tracks $\langle1/r^3\rangle\propto n^{-3}$ at fixed
+   $l$. Assuming one scaling governs everything hydrogenic gives $3p$ a
+   splitting of $2.0\times10^{-5}$ eV, high by half again.
+
+   </details>
+
 2. The trace of $\vec L\cdot\vec S$ (sum of all six diagonal entries in
    either basis) is exactly zero. Using the four $j=\tfrac32$ eigenvalues
    ($+\tfrac12$ each) and two $j=\tfrac12$ eigenvalues ($-1$ each), verify
    this by direct arithmetic, and explain in words why a basis change
    (uncoupled to coupled) can never change a matrix's trace.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   4\times\left(+\tfrac12\right)+2\times(-1)=2-2=0 .
+   $$
+
+   The uncoupled basis reaches the same zero by a completely different
+   route, which is the part worth seeing. In the $|m_L,m_S\rangle$ basis
+   $L_x$ and $L_y$ have no diagonal entries at all (they raise or lower
+   $m_L$), and the same is true of $S_x,S_y$, so the only surviving
+   diagonal contribution is from $L_zS_z$, and the $k$-th diagonal entry
+   is simply $m_Lm_S$. Running over $m_L\in\{1,0,-1\}$ and
+   $m_S\in\{\pm\tfrac12\}$ gives
+   $+\tfrac12,-\tfrac12,0,0,-\tfrac12,+\tfrac12$, which is exactly the
+   diagonal a rebuild of the matrix prints, and it sums to zero because
+   $\sum m_L=0$.
+
+   The structural reason is cleaner than either arithmetic. The trace of
+   a tensor product factorizes, $\mathrm{Tr}(A\otimes B)=\mathrm{Tr}A\cdot
+   \mathrm{Tr}B$, and every angular-momentum component is traceless, since
+   its eigenvalues $m$ run symmetrically from $-j$ to $j$. So
+
+   $$
+   \mathrm{Tr}(\vec L\cdot\vec S)=\sum_{i}\mathrm{Tr}(L_i)\,\mathrm{Tr}(S_i)=0
+   $$
+
+   for any $l$ and any $s$, not just this case. The vanishing is forced,
+   not arithmetic luck.
+
+   Why a basis change cannot touch it: the trace is invariant under
+   similarity, $\mathrm{Tr}(S^{-1}AS)=\mathrm{Tr}(AS S^{-1})=\mathrm{Tr}(A)$,
+   by cyclicity of the trace. Note that this needs only *invertibility* of
+   $S$, not unitarity; $U^\dagger(\vec L\cdot\vec S)U$ qualifies because
+   $U^\dagger=U^{-1}$. Equivalently, the trace is the sum of the
+   eigenvalues, and eigenvalues are properties of the operator rather than
+   of the coordinates chosen to write it down.
+
+   Physically this is the statement that spin-orbit coupling has no
+   center of gravity to move. It redistributes the six states about the
+   unperturbed $2p$ energy without shifting their weighted mean, which is
+   why $2p_{3/2}$ rises by $1.5\times10^{-5}$ eV while $2p_{1/2}$ falls by
+   twice that: four states up one unit, two states down two units.
+
+   The wrong turn is adding the two *distinct* eigenvalues,
+   $\tfrac12+(-1)=-\tfrac12$, and concluding the trace is nonzero. The
+   trace runs over all six basis vectors, so each eigenvalue enters with
+   its multiplicity; "two eigenvalues" is not "two diagonal entries."
+   That slip is the same one that produces a nonzero center of gravity and
+   therefore predicts a spurious overall shift of the $2p$ level, which
+   spectroscopy would have caught immediately.
+
+   </details>
 3. Why does $2s$ ($l=0$) hydrogen have no spin-orbit splitting at all,
    directly from $\vec L\cdot\vec S$'s definition (not from the boxed
    formula's $l(l+\tfrac12)(l+1)$ denominator, which is undefined at
    $l=0$ for a different reason)?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because at $l=0$ the operator $\vec L$ is not small, it is *zero*. The
+   $l=0$ representation of the rotation group is one-dimensional, so
+   $L_x$, $L_y$ and $L_z$ are all the zero operator on that subspace, and
+   therefore
+
+   $$
+   \vec L\cdot\vec S=L_xS_x+L_yS_y+L_zS_z=0
+   $$
+
+   identically, as an operator on the two-dimensional $|m_S=\pm\tfrac12\rangle$
+   space. Every matrix element vanishes, not merely the diagonal ones, so
+   $H'_{SO}=\xi(r)\,\vec L\cdot\vec S$ is the zero perturbation and the
+   $2s$ doublet stays exactly degenerate at every order in *this*
+   interaction. No diagonalization is required or even meaningful: the
+   matrix to diagonalize is the $2\times2$ zero matrix.
+
+   The question's parenthetical is pointing at a real trap, so it is worth
+   spelling out why the formula cannot be used here. At $l=0$ the
+   denominator $l(l+\tfrac12)(l+1)$ vanishes, and so does the numerator's
+   bracket, since $l=0$ forces $j=\tfrac12$ and
+   $\tfrac34-0-\tfrac34=0$. The boxed expression is genuinely $0/0$: an
+   indeterminate form, from which no limit can be read off honestly.
+
+   Underneath the indeterminacy is a real divergence, which is the part
+   most treatments skip. $\langle1/r^3\rangle_{nl}=\int|R_{nl}|^2r^{-1}dr$
+   converges for $l\ge1$ because $R_{nl}\sim r^l$ kills the integrand at
+   the origin, but $R_{n0}(0)$ is finite and nonzero, so the $l=0$
+   integrand behaves like $|R_{n0}(0)|^2/r$ and the integral diverges
+   logarithmically. The honest description of the $l=0$ case is therefore
+   $\infty\times0$, and only the fact that the angular factor is exactly
+   the zero *operator*, independent of whatever $\xi(r)$ does, settles it.
+   Taking a limit in $l$ would be reasoning about a product where one
+   factor is unbounded.
+
+   Worth adding for completeness: the $2s$ level does still receive a
+   relativistic correction of the same order, but it comes from the Darwin
+   term, which is nonzero precisely where the wavefunction is nonzero at
+   the nucleus and so acts only on $l=0$. Spin-orbit and Darwin are
+   complementary; "no spin-orbit splitting" is not "no fine structure."
+
+   The wrong turn is answering that $\langle\vec L\cdot\vec S\rangle=0$
+   "by symmetry," as an expectation value that happens to cancel. The
+   claim here is much stronger and needs to be, because a vanishing
+   expectation value in one state says nothing about the off-diagonal
+   elements that degenerate perturbation theory lives on. A perturbation
+   with zero diagonal and nonzero off-diagonal entries still splits a
+   degenerate level, as the $\vec L\cdot\vec S$ block in the next answer
+   shows: its $|0,+\tfrac12\rangle$ diagonal entry is $0$ and it splits
+   the level anyway.
+
+   </details>
+
 4. Explain, using this lesson's derivation, why "diagonalize $H'$ within
    the degenerate subspace" is a strictly necessary first step and not
    just good practice: what specifically goes wrong in the boxed
    first-order formula, $\sum_\alpha\langle\beta|H'|\alpha\rangle
    c_\alpha=E^{(1)}c_\beta$, if a non-eigenvector combination is used
    instead?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   What goes wrong is that the equation has no solution at all. The boxed
+   expression is not a formula you evaluate on a state of your choosing;
+   it is $H'_{\text{sub}}\vec c=E^{(1)}\vec c$, an eigenvalue equation,
+   and it is a *condition* the coefficients must satisfy. Feed it a
+   $\vec c$ that is not an eigenvector and $H'_{\text{sub}}\vec c$ fails
+   to be proportional to $\vec c$, so no scalar $E^{(1)}$ exists making
+   both sides agree. Component $\beta$ demands
+   $E^{(1)}=(H'_{\text{sub}}\vec c)_\beta/c_\beta$, and different $\beta$
+   return different numbers. The system is inconsistent, not merely
+   inaccurate.
+
+   Watch it fail on this lesson's own operator. Take the uncoupled state
+   $|m_L=1,m_S=-\tfrac12\rangle$, which looks like a perfectly respectable
+   zeroth-order state. Naive first-order perturbation theory would offer
+   its diagonal element, $m_Lm_S=-\tfrac12$. But $\vec L\cdot\vec S$
+   connects it to $|m_L=0,m_S=+\tfrac12\rangle$ with matrix element
+   $\tfrac{1}{\sqrt2}=0.7071$, so within that two-dimensional block
+
+   $$
+   H'_{\text{sub}}=\begin{pmatrix}-\tfrac12 & \tfrac{1}{\sqrt2}\\[2pt] \tfrac{1}{\sqrt2} & 0\end{pmatrix},
+   \qquad \text{eigenvalues } -1 \text{ and } +\tfrac12 .
+   $$
+
+   A rebuilt matrix returns exactly $-1.000000$ and $+0.500000$. The naive
+   answer $-\tfrac12$ is neither of them; it sits strictly between the two
+   true shifts. This is not a small error to be improved at second order,
+   it is a value the exact answer never takes.
+
+   The deeper reason is a solvability condition, and it explains why the
+   requirement is structural rather than stylistic. The first-order
+   equation is
+   $(H_0-E^{(0)})|\psi^{(1)}\rangle=(E^{(1)}-H')|\psi^{(0)}\rangle$, and
+   $H_0-E^{(0)}$ annihilates the entire degenerate subspace. An equation
+   of the form (singular operator) times unknown equals known is solvable
+   only when the right-hand side is orthogonal to that kernel, and
+   projecting onto $\langle\beta|$ is precisely the act of imposing that
+   orthogonality. In the derivation above, this is why
+   $\langle\beta|H_0|\psi^{(1)}\rangle$ cancels against
+   $E^{(0)}\langle\beta|\psi^{(1)}\rangle$ and the unknown
+   $|\psi^{(1)}\rangle$ drops out. Choose a non-eigenvector and the
+   condition is violated, which shows up downstream as $|\psi^{(1)}\rangle$
+   acquiring a component inside the degenerate subspace with a zero
+   energy denominator: the same $0/0$ that broke the non-degenerate
+   formula in the first place, reappearing one step later.
+
+   The wrong turn is treating the diagonalization as a convenience that
+   makes the algebra tidier, and reasoning that any basis of the subspace
+   ought to give the same physics since the subspace itself is
+   basis-independent. The subspace is; the split states are not. $H'$
+   selects a preferred basis inside it, and which combinations survive as
+   the correct zeroth-order states is exactly the physical content
+   perturbation theory is being asked for. A second wrong turn is trusting
+   diagonal elements because the off-diagonal ones "look small": $0.7071$
+   here is larger than either diagonal entry in that block, and even a
+   small off-diagonal element dominates when the diagonal splitting it
+   competes against is zero, which is what degeneracy means.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -356,15 +605,15 @@ $H'_{SO}$ turns on.
   zeroth-order states are the eigenvectors of $H'$ restricted to
   (projected onto) the degenerate subspace, derived directly from the
   first-order Schrödinger equation, not assumed.
-- Applied to hydrogen's $2p$ level, $\vec L\cdot\vec S$ is actually
+- Applied to hydrogen's $2p$ level, $\vec L\cdot\vec S$ is
   non-diagonal in the uncoupled $|m_L,m_S\rangle$ basis but exactly
   diagonal in the coupled $|j,m_j\rangle$ basis, checked directly via this
   platform's own angular-momentum operators, not asserted by symmetry.
-- The resulting $2p_{3/2}$/$2p_{1/2}$ spin-orbit splitting is a real,
+- The resulting $2p_{3/2}$/$2p_{1/2}$ spin-orbit splitting is a
   computed number ($\approx4.5\times10^{-5}\text{ eV}$), the specific
   calculation Fine Structure (Introduction) named and explicitly withheld.
 
-## Further Exploration
+## The Coupled Basis, Systematically
 
 <NextDiscovery>
   [Clebsch-Gordan Coefficients and the Wigner-Eckart Theorem](/lessons/quantum-mastery/symmetry-scattering-and-semiclassical-methods/clebsch-gordan-coefficients-and-the-wigner-eckart-theorem)

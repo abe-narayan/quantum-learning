@@ -20,28 +20,40 @@ export const whySpinHasNoPositionWavefunction: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["no position", "not a function of", "no angle dependence", "no phi"],
-      ["doesn't apply", "argument requires", "nothing to be single-valued"],
+      {
+        phrases: ["no position", "not a function of", "not functions of", "aren't functions of", "are not functions of", "not a function of angle", "no angle dependence", "no angular coordinate", "no dependence on angle", "there is no angle", "no phi", "no spatial wavefunction", "no position-space wavefunction", "not defined on space", "no such wavefunction", "has no wavefunction", "no wavefunction at all", "no wavefunction in space", "not a wavefunction in space", "nothing to rotate through"],
+        missingFeedback:
+          "The argument was about a particular kind of object. Say what spin states are not, in terms of the variable that argument leaned on.",
+      },
+      {
+        phrases: ["doesn't apply", "argument requires", "nothing to be single-valued"],
+        missingFeedback:
+          "You have said what spin states are not. Now finish the sentence about the argument itself: say what it needs in order to bite, and what follows when that thing is absent.",
+      },
     ],
-    incorrectFeedback: "Recall exactly what object the single-valuedness argument was checking — a function of the angle φ.",
-    partialFeedback: "Good — now be explicit that spin states simply have no such angular function to check.",
+    incorrectFeedback: "You answered that spin is 'intrinsic' or 'not orbital', which names the conclusion. The argument that excluded half-integers had a specific object in its hands; identify that object, then ask whether a spin state supplies one.",
+    partialFeedback: "Now say explicitly that spin states have no such angular function to check.",
+    modelAnswers: [
+      "The single-valuedness argument is about functions of the angle phi: it says the function has to come back to itself after a 2pi turn. Spin states are not functions of position or angle at all, there is no phi in them, so there is nothing for the argument to be single-valued in and it doesn't apply.",
+      "That argument requires a position-space wavefunction with an angular coordinate. Spin has no such wavefunction, so nothing has to be single-valued and j=1/2 is allowed.",
+    ],
   },
   hints: [
-    { text: "The single-valuedness argument applied to a function Φ(φ) of the azimuthal angle." },
-    { text: "Spin states like |↑⟩,|↓⟩ are not functions of position or angle at all." },
-    { text: "Without an angular function, there's nothing for the single-valuedness condition to apply to." },
+    { text: "The single-valuedness argument was a statement about one particular object: a function of the azimuthal angle." },
+    { text: "Spin states such as up and down are labels on a two-dimensional space; they are attached to no coordinate at all." },
+    { text: "Ask what the argument would even be applied to in the spin case. If there is no such object, the restriction it produced has no reach here." },
   ],
   solution: {
     steps: [
       { description: "The single-valuedness argument specifically concerns a wavefunction's dependence on the angle φ." },
-      { description: "Spin states carry no position or angle dependence whatsoever — they're abstract 2-level states, not functions on space." },
-      { description: "With no φ-dependence to check, the argument simply has nothing to apply to, leaving j=1/2 unrestricted for spin." },
+      { description: "Spin states carry no position or angle dependence whatsoever; they are abstract 2-level states, not functions on space." },
+      { description: "With no φ-dependence to check, the argument has nothing to apply to, leaving j=1/2 unrestricted for spin." },
     ],
     finalAnswer: "Spin states aren't functions of angle at all, so the single-valuedness-under-2π-rotation argument (which only concerns functions of angle) doesn't apply to them.",
   },
   explanation: {
-    correctIdea: "The integer restriction was never a general angular-momentum fact — it was specific to position-space wavefunctions.",
-    whyCorrect: "This is exactly the distinction the lesson draws between orbital and spin angular momentum.",
-    whyWrong: ["Saying spin is 'just different' without identifying the specific missing ingredient (a position/angle-dependent wavefunction) doesn't explain the actual mechanism."],
+    correctIdea: "The integer restriction was never a general angular-momentum fact; it was specific to position-space wavefunctions.",
+    whyCorrect: "This is the distinction the lesson draws between orbital and spin angular momentum.",
+    whyWrong: ["Saying spin is 'just different' without identifying the missing ingredient (a position- or angle-dependent wavefunction) does not explain the mechanism."],
   },
 };

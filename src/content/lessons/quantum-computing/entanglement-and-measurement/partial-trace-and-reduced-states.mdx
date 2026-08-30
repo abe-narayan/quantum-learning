@@ -57,11 +57,11 @@ export const partialTracePresets = [
   { label: "ψ(θ) = cosθ|00⟩ + sinθ|11⟩", frames: psiThetaFrames, sliderLabel: "θ" },
 ];
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The payoff this course was built toward">
 This is the payoff lesson for a question this course has been building toward since its very first paragraph: for a 2-qubit state, what is the state of qubit 0 alone?
 </LessonHook>
 
-## Motivation
+## The question a state vector cannot answer
 
 Multi-Qubit State Vectors showed that a state vector has no answer
 whenever the qubits are <Term id="entanglement">entangled</Term>. The density matrix does, through an
@@ -79,10 +79,10 @@ solution, which is the formula.
   caption="A single trapped ion on a NIST microchip. Partial trace answers the question this photo poses physically: what is the state of this one ion, considered on its own, when it is entangled with others nearby?"
   credit="NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Ion_Trap_(6099414213).jpg"
-  license="Public domain (U.S. government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Mathematical Development
+## One requirement, and the formula it forces
 
 ### The requirement that pins down the definition
 
@@ -113,14 +113,23 @@ $$
 
 The bracketed sum depends only on $i,i'$; call it $(\rho_A)_{i'i}$.
 Then the whole expression is $\sum_{i,i'}(A_{\text{op}})_{ii'}(\rho_A)_{i'i}=\text{Tr}(A_{\text{op}}\rho_A)$,
-exactly the right side, for *any* $A_{\text{op}}$. This proves the
-defining requirement is satisfied *if and only if*
+exactly the right side, for *any* $A_{\text{op}}$. So the matrix
 
 $$
 (\rho_A)_{i'i} = \sum_j (\rho_{AB})_{i'j,\,ij}
 $$
 
-This sums over the traced-out qubit's index, keeping it matched between bra
+satisfies the requirement. It is also the only matrix that does, and that
+second half takes one more line. Suppose $\sigma$ satisfied the
+requirement too. Then $\text{Tr}[A_{\text{op}}(\rho_A-\sigma)]=0$ for
+every $A_{\text{op}}$. Choose $A_{\text{op}}$ to be the matrix with a
+single 1 in row $i$, column $i'$, and zeros elsewhere; the trace then
+picks out exactly the $(i',i)$ entry of $\rho_A-\sigma$, forcing it to
+vanish. Running over all $i,i'$ forces every entry to vanish, so
+$\sigma=\rho_A$. This is why the requirement has one solution rather
+than a family of them.
+
+The formula sums over the traced-out qubit's index, keeping it matched between bra
 and ket, while the kept qubit's indices stay free. This is the
 **partial trace**, $\rho_A=\text{Tr}_B(\rho_{AB})$. It is not one
 reasonable choice among several. It is the *unique* operation making local
@@ -130,7 +139,7 @@ index sum (generalized to any number of qubits via bitmask indexing, not
 hardcoded to 2), following the qubit-0-is-MSB convention `gates.ts`
 established for every other multi-qubit operation on this platform.
 
-<InteractiveSection title="Click through the index-sum formula" description="Select a cell of the reduced matrix on the right to see which ρ_AB entries the sum (ρ_A)_{i'i} = Σ_j (ρ_AB)_{i'j,ij} adds together. Every dimmed ρ_AB entry has mismatched traced-out-qubit indices, so it is excluded from every reduced entry, not only the one you did not select. Toggle which qubit is traced out, and switch between the product state, the Bell state, and the ψ(θ) family used throughout this lesson.">
+<InteractiveSection title="Click through the index-sum formula" description="Select a cell of the reduced matrix on the right to see which ρ_AB entries the index sum adds together: for the reduced entry at row i′ and column i, it sums the ρ_AB entries at row i′j and column ij over every value of j. Every dimmed ρ_AB entry has mismatched traced-out-qubit indices, so it is excluded from every reduced entry, not only the one you did not select. Toggle which qubit is traced out, and switch between the product state, the Bell state, and the ψ(θ) family used throughout this lesson.">
   <PartialTraceHighlight presets={partialTracePresets} ariaLabel="Interactive partial trace: click a reduced-matrix cell to highlight the joint density matrix entries summed into it" />
 </InteractiveSection>
 
@@ -176,14 +185,15 @@ $\text{Tr}(\rho_A(\theta)Z)=\cos^2\theta-\sin^2\theta=\cos2\theta$:
 identical, for every $\theta$, exactly as the derivation guarantees.
 
 <PredictBeforeReveal
-  question="As θ sweeps from 0 to π/2 in |ψ(θ)⟩=cosθ|00⟩+sinθ|11⟩, do the off-diagonal entries of ρ_A(θ) ever become nonzero?"
+  question="ρ_A(θ) = diag(cos²θ, sin²θ). As θ sweeps from 0 to π/2, what does qubit 0's purity Tr(ρ_A²) do?"
   options={[
-    { label: "Yes, they peak somewhere in the middle", value: "peak" },
-    { label: "Yes, but only very close to θ=π/4", value: "near-pi4" },
-    { label: "No, they stay exactly zero for every θ", value: "zero" },
+    { label: "It falls steadily from 1 at θ=0 all the way down to 0 at θ=π/2", value: "falls-to-zero" },
+    { label: "It stays pinned at 0.5 for every θ in the family", value: "constant-half" },
+    { label: "It stays at 1, since ρ_A is diagonal at every θ", value: "constant-one" },
+    { label: "It dips to 0.5 at θ=π/4, then climbs back to 1", value: "dips" },
   ]}
-  correctValue="zero"
-  explanation="ρ_A(θ) is diag(cos²θ, sin²θ) for every θ, not only at special angles. The ρ_AB entry that would have to survive, the cosθ sinθ cross term between |00⟩ and |11⟩, has mismatched indices on the traced-out qubit and is dropped by the index sum itself, term by term, whatever θ is. The plot below is built from the real reducedDensityMatrixQubit0 output rather than the closed-form formula, and shows only two curves because there is nothing off-diagonal to plot."
+  correctValue="dips"
+  explanation="Tr(ρ_A²) = cos⁴θ + sin⁴θ = 1 − ½sin²(2θ). At θ=0 the state is |00⟩, a product state, so qubit 0 is the pure state |0⟩ and the purity is 1; at θ=π/2 the state is |11⟩ and qubit 0 is the pure state |1⟩, purity 1 again. Only in between is the pair entangled, and the purity bottoms out at 0.5 at θ=π/4, where the two diagonal entries cross. Purity 0 is not reachable at all: 0.5 is the floor for a single qubit."
 />
 
 <InteractiveSection title="Diagonal entries crossing at θ=π/4" description="Plotted directly from the real reducedDensityMatrixQubit0 output at each θ, not from the closed-form formula.">
@@ -197,6 +207,8 @@ identical, for every $\theta$, exactly as the derivation guarantees.
         ]
       }
     ]}
+    xAxisLabel="theta (radians)"
+    yAxisLabel="Diagonal entry of rho_A"
     ariaLabel="Diagonal entries of the reduced density matrix rho_A as a function of theta, showing cos squared theta and sin squared theta crossing at theta = pi/4"
   />
 </InteractiveSection>
@@ -207,7 +219,7 @@ mixed*, even though the full 2-qubit state $|\Phi^+\rangle$ is pure and
 completely specified. Knowing everything about the pair leaves you knowing
 nothing about either member. The next lesson takes that apart.
 
-## Physical Interpretation
+## What earlier lessons could only gesture at
 
 The partial trace answers what earlier lessons could only gesture at.
 Measuring qubit 0 of an entangled pair, with qubit 1 never touched,
@@ -215,7 +227,7 @@ behaves as if qubit 0 were described by $\rho_A=\text{Tr}_B(\rho_{AB})$,
 and it does so by construction rather than by luck: $\rho_A$ was defined
 as the unique object that makes it true.
 
-## Worked Example
+## Reducing the other qubit, for a change
 
 **Compute the reduced state of qubit 1 (not qubit 0) for the Bell state
 $|\Psi^+\rangle=\frac{1}{\sqrt2}(|01\rangle+|10\rangle)$.**
@@ -236,7 +248,7 @@ off-diagonal $(\rho_B)_{jj'}$, $j\neq j'$, receiving no contribution at
 all. Result: $\rho_B=\begin{pmatrix}0.5&0\\0&0.5\end{pmatrix}=I/2$,
 maximally mixed, same as $|\Phi^+\rangle$'s reduced states.
 
-## Common Mistakes
+## The argument names which qubit disappears
 
 <Callout type="warning">
 **Tracing out the wrong qubit.** `partialTrace(rho, 2, [1])` traces out
@@ -256,18 +268,167 @@ artifact.
 
 1. Compute $\text{Tr}_B(\rho_{|01\rangle})$ and $\text{Tr}_A(\rho_{|01\rangle})$
    for the computational basis state $|01\rangle$ (a product state).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \text{Tr}_B(\rho_{|01\rangle}) = \begin{pmatrix}1&0\\0&0\end{pmatrix} = |0\rangle\langle0|, \qquad \text{Tr}_A(\rho_{|01\rangle}) = \begin{pmatrix}0&0\\0&1\end{pmatrix} = |1\rangle\langle1|
+   $$
+
+   The engine's `reducedDensityMatrixQubit0` and
+   `reducedDensityMatrixQubit1` return exactly these.
+
+   The index sum makes it quick.
+   $\rho_{|01\rangle}=|01\rangle\langle01|$ has a single nonzero entry, a
+   $1$ in the row and column labelled $01$. Tracing out qubit 1 means
+   summing entries $(\rho)_{i'j,\,ij}$ over $j$ with $i,i'$ free, and the
+   only surviving term has $i=i'=0$ and $j=1$, giving a $1$ in the
+   reduced matrix's $(0,0)$ slot and zeros elsewhere. Tracing out qubit 0
+   is the mirror image and lands the $1$ in the $(1,1)$ slot.
+
+   The result is the sanity check the lesson demands of the definition.
+   $|01\rangle$ is a product state, $|0\rangle\otimes|1\rangle$, so each
+   qubit has a perfectly good state of its own, and the partial trace
+   returns those states unchanged. Both are pure, with purity $1$ and
+   entropy $0$: no information was lost by describing the qubits
+   separately, because there was none stored in the relationship. Contrast
+   with a Bell state, where the same operation returns $I/2$ for both
+   qubits and every bit of the description has moved into the correlation.
+
+   The wrong turn is expecting the two answers to be equal, or to be the
+   same matrix in some basis. They are different because the two qubits are
+   in different states here. What *is* general is the pair of purities:
+   for a pure global state the two reduced states always have equal purity
+   and equal entropy, and that is the theorem the next lessons rest on,
+   not an accident of this example.
+
+   </details>
+
 2. For $|\psi(\theta)\rangle=\cos\theta|00\rangle+\sin\theta|11\rangle$,
    verify the defining requirement using $A_{\text{op}}=X$ instead of $Z$.
    ($\rho_A(\theta)$ is diagonal and $X$ has zero diagonal entries, so both
    sides should come out to exactly $0$, for every $\theta$, unlike the
    $Z$ case above.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Both sides are $0$ for every $\theta$, and the engine confirms it at
+   $\theta = 0$, $0.3$ and $\pi/4$.
+
+   The reduced side is immediate. $\rho_A(\theta)=\mathrm{diag}(\cos^2\theta,\sin^2\theta)$
+   and $X=\begin{pmatrix}0&1\\1&0\end{pmatrix}$, so $\rho_A X$ has zeros on
+   its diagonal, giving $\text{Tr}(\rho_A X)=0$.
+
+   The global side takes one more step but says something more interesting.
+   $X\otimes I$ maps $|00\rangle\mapsto|10\rangle$ and $|11\rangle\mapsto|01\rangle$,
+   so
+
+   $$
+   \langle\psi(\theta)|X\otimes I|\psi(\theta)\rangle = \cos\theta\sin\theta\big(\langle00|01\rangle + \langle11|10\rangle\big) + \cos^2\theta\,\langle00|10\rangle + \sin^2\theta\,\langle11|01\rangle = 0
+   $$
+
+   because every one of those four basis overlaps is zero. $X\otimes I$
+   flips qubit 0 only, and the state has no term that differs from another
+   term in qubit 0 alone: $|00\rangle$ and $|11\rangle$ differ in *both*
+   labels. There is nothing for the flipped ket to overlap with.
+
+   That is the real content, and it is the same mechanism as the lesson's
+   remark about the excluded $|00\rangle\langle11|$ cross term. The
+   $\theta$-dependence of this state lives entirely in a coherence whose
+   bra and ket disagree on both qubits, and any observable acting on one
+   qubit alone is blind to it. It is why $\rho_A$ comes out diagonal, why
+   $\langle X\rangle$ and $\langle Y\rangle$ both vanish on qubit 0, and
+   ultimately why the reduced state loses track of the entanglement while
+   the global state has not lost anything at all.
+
+   The wrong turn is concluding that the answer is $0$ because the state is
+   entangled, and expecting $\langle X\otimes I\rangle$ to be nonzero for a
+   product state. It is zero for $|00\rangle$ too, which is $\theta=0$ and
+   perfectly unentangled. What makes it vanish is the absence of
+   single-qubit-flip coherences, which this whole family lacks whether
+   entangled or not. Take $|{+}0\rangle$ instead and
+   $\langle X\otimes I\rangle=1$.
+
+   </details>
+
 3. Explain in one sentence why $\text{Tr}_B(\rho_A\otimes\rho_B)=\rho_A$
    must hold for *any* valid $\rho_A,\rho_B$, using this lesson's
    defining requirement (not just by trusting the formula).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   For any single-qubit observable $A_{\text{op}}$,
+   $\text{Tr}[(A_{\text{op}}\otimes I)(\rho_A\otimes\rho_B)] = \text{Tr}(A_{\text{op}}\rho_A)\,\text{Tr}(I\rho_B) = \text{Tr}(A_{\text{op}}\rho_A)$,
+   since the trace of a tensor product factorizes and $\text{Tr}(\rho_B)=1$;
+   so $\rho_A$ satisfies the defining requirement, and the lesson's
+   uniqueness argument says it is therefore the answer.
+
+   That uniqueness half is the part worth not skipping. Showing that
+   $\rho_A$ *works* leaves open whether something else might work too, and
+   the lesson closes it by choosing $A_{\text{op}}$ to be the matrix with a
+   single $1$ in position $(i,i')$, which forces the corresponding entry of
+   any competing $\sigma$ to match $\rho_A$'s. Run over all $i,i'$ and every
+   entry is pinned. So "satisfies the requirement" upgrades to "is the
+   reduced state".
+
+   Note what the argument did not need: nothing about $\rho_B$ except that
+   its trace is $1$. Qubit B could be pure, maximally mixed, or anything in
+   between, and qubit A's description is unaffected. That is exactly the
+   physical content of "independent", and a definition of partial trace
+   that failed here would be broken for reasons having nothing to do with
+   entanglement.
+
+   The wrong turn is verifying the claim by multiplying out the index sum
+   for a couple of specific matrices. That confirms the formula on those
+   examples and gives no reason it holds in general, whereas the argument
+   above uses only $\text{Tr}(\rho_B)=1$ and the factorization of the trace,
+   and so covers every pair at once.
+
+   </details>
+
 4. `partialTrace` throws an error if asked to trace out every qubit of a
    system. Using the defining requirement, explain why "the reduced state
    of zero qubits" isn't a meaningful object to compute in the first
-   place.
+   place. Then say what value the formula *would* return if it were
+   allowed to run, and why a function returning that value would be worse
+   than one that throws.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The defining requirement is a statement quantified over observables on
+   the kept subsystem: $\rho_A$ is whatever matrix makes
+   $\text{Tr}(A_{\text{op}}\rho_A)$ agree with the global expectation for
+   every $A_{\text{op}}$. Keep nothing, and there are no observables to
+   quantify over. The requirement that was supposed to pin the answer down
+   says nothing at all, because there is no local measurement whose
+   statistics the answer has to reproduce.
+
+   What the formula would return if allowed to run is $\text{Tr}(\rho)=1$,
+   a $1\times1$ matrix holding the number one. It is the same answer for
+   every input. A Bell state, a product state, a maximally mixed state and
+   any $\rho$ you care to invent all reduce to $[1]$, because that is what
+   normalization guarantees and nothing else survives.
+
+   That is precisely why returning it would be worse than throwing. A
+   function whose output is constant cannot be doing the job its caller
+   thinks it is doing, so any call that reaches it is a bug: a wrong qubit
+   index, an off-by-one in a list, a loop that traced out one subsystem too
+   many. Returning $[1]$ lets that bug travel downstream, where it becomes
+   a purity of $1$ and an entropy of $0$ and a confident, wrong conclusion
+   that some state was pure. Throwing turns a silent wrong answer into a
+   stack trace at the point of the mistake.
+
+   The wrong turn is reading the error as a limitation of the
+   implementation, something a more general version could support. Nothing
+   is missing. The object is well defined and carries zero information, and
+   the engine's refusal encodes the difference between "cannot be computed"
+   and "can be computed and is never what you wanted".
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -284,7 +445,7 @@ artifact.
   used everywhere else, generalized to any number of qubits via bitmask
   indexing.
 
-## Further Exploration
+## Pure globally, mixed locally
 
 <NextDiscovery>
 [Why Entangled Subsystems Are Mixed](/lessons/quantum-computing/entanglement-and-measurement/why-entangled-subsystems-are-mixed) takes the fact

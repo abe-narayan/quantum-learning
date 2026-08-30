@@ -82,8 +82,11 @@ export function TheoremBox({
             <TheoremGlyph />
             <TechLabel className="text-brand">Theorem</TechLabel>
           </span>
+          {/* `text-lg sm:text-xl`, up one step from `text-base sm:text-lg`.
+              Paired with the body's move to `text-lg` below; the reasoning for
+              both is in the note above that `<div>`. */}
           {title && (
-            <span className="font-display text-base font-semibold text-foreground sm:text-lg">
+            <span className="font-display text-lg font-semibold text-foreground sm:text-xl">
               {title}
             </span>
           )}
@@ -91,7 +94,7 @@ export function TheoremBox({
         {provenance && (
           <span
             className={cn(
-              "shrink-0 rounded-full border px-2.5 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-wide",
+              "shrink-0 rounded-full border px-2.5 py-0.5 text-meta font-semibold uppercase tracking-wide",
               PROVENANCE_STYLES[provenance]
             )}
           >
@@ -99,7 +102,38 @@ export function TheoremBox({
           </span>
         )}
       </div>
-      <div className="space-y-3 px-5 py-4 text-sm leading-relaxed text-foreground">
+      {/* `text-lg`, not `text-base` (and long ago not `text-sm`). `not-prose`
+          above excludes this subtree from the typography plugin's descendant
+          selectors; it does not reset an inherited `font-size`, so an absolute
+          size here is measured against `.prose`'s 18px. `text-sm` put a
+          theorem statement at 0.78x the paragraph that introduced it;
+          `text-base` still left it at 0.89x. `text-lg` is 1.125rem, which is
+          `.prose`'s own size exactly, so the statement now reads at 1.00x the
+          prose around it. That is the right ratio because a boxed theorem in a
+          lesson is the payload, not an aside: the paragraph above it exists to
+          set the statement up.
+
+          The header title moved with it, to `text-lg sm:text-xl`, so the two
+          keep a real step at `sm` (20px title over an 18px body) instead of
+          the 2px one they had. On a phone they land on the same 18px, which is
+          exactly the relationship `ResearchConnection` already has at that
+          width: the separation there is carried by the header strip's own
+          background, its bottom rule, the display face, the semibold weight,
+          the caps `.tech-label`, and the glyph. Six channels, none of them
+          size, and none of them hue.
+
+          Nothing about the shape-not-hue taxonomy moves: panel, header strip,
+          solid border, pillar-edge left rail, and the drawn `∎` are all
+          untouched, so the seven devices are still told apart in grayscale and
+          in print by the same marks as before. */}
+      {/* `data-math-plain` opts this subtree out of `.katex-display`'s own
+          frame (globals.css §6). This panel is already a bordered device with
+          a pillar-edge left rail, and 22 of the 48 TheoremBoxes in the corpus
+          hold display math, so without it a reader got two pillar rails at the
+          same radius with the inner one thicker. The attribute drops the
+          frame only: the scroll box, its focus stop and its overflow
+          indicator all still come from the base rule. */}
+      <div data-math-plain className="space-y-3 px-5 py-4 text-lg leading-relaxed text-foreground">
         {children}
       </div>
     </div>

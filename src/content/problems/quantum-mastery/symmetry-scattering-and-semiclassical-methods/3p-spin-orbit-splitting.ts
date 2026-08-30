@@ -26,7 +26,7 @@ export const threePSpinOrbitSplitting: NumericProblem = {
     type: "numeric",
     prompt:
       "Using E_SO(n,l,j) = (13.6 eV)·α²·[j(j+1)−l(l+1)−3/4] / (2n³l(l+½)(l+1)), compute the 3p spin-orbit splitting ΔE = E_SO(j=3/2) − E_SO(j=1/2) for n=3, l=1, in eV.",
-    inputHint: "in eV, scientific notation is fine, e.g. 1.34e-5",
+    inputHint: "in eV, to 3 significant figures; scientific notation is fine, e.g. 2.5e-4",
   },
   answer: {
     type: "numeric",
@@ -36,7 +36,7 @@ export const threePSpinOrbitSplitting: NumericProblem = {
     incorrectFeedback: "Compute E_SO at j=3/2 and j=1/2 separately for n=3, l=1 using the boxed formula, then subtract.",
   },
   hints: [
-    { text: "j(j+1)−l(l+1)−3/4 equals +1 at j=3/2 and −2 at j=1/2, for any l=1 level — the same brackets as the 2p worked example, only n changes." },
+    { text: "j(j+1)−l(l+1)−3/4 equals +1 at j=3/2 and −2 at j=1/2, for any l=1 level: the same brackets as the 2p worked example, with only n changing." },
     { text: "The shared denominator is 2n³l(l+½)(l+1) = 2·27·1·1.5·2 = 162 at n=3." },
     { text: "ΔE(n=3) = (13.6 eV)·α²·[1−(−2)]/162 = (13.6 eV)·α²/54." },
   ],
@@ -50,7 +50,7 @@ export const threePSpinOrbitSplitting: NumericProblem = {
   },
   explanation: {
     correctIdea: "The 3p splitting is smaller than the 2p splitting by exactly the 1/n³ scaling (both share l=1, j=3/2 and 1/2), a direct consequence of ⟨1/r³⟩∝1/n³.",
-    whyCorrect: "Matches the boxed formula from Degenerate Perturbation Theory and Fine Structure evaluated at n=3 instead of n=2.",
-    whyWrong: ["Reusing the n=2 denominator (48, not 162) is a common slip — the n³ factor must be recomputed for n=3."],
+    whyCorrect: "The bracket evaluates to 1 at j=3/2 and −2 at j=1/2, so the splitting is proportional to their difference, 3. Dividing by 2n³l(l+½)(l+1) = 162 leaves (13.6 eV)α²/54, and it is the α² that puts the answer five orders of magnitude below the gross structure.",
+    whyWrong: ["Reusing the n=2 denominator (48, not 162) is a common slip. The n³ factor has to be recomputed for n=3."],
   },
 };

@@ -8,6 +8,7 @@ import { FilterChips, type FilterOption } from "@/components/curriculum/FilterCh
 import { CourseList } from "@/components/curriculum/CourseList";
 import { CourseTimeline } from "@/components/curriculum/CourseTimeline";
 import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
+import { TIER_COPY, TIER_OF_PILLAR, TIER_ORDER, pillarsInTier } from "@/components/pillar/tiers";
 import { COURSES, PILLARS, getCoursesByPillar } from "@/lib/content/curriculum";
 import { PILLAR_ORDER, pillarVisual } from "@/lib/design/pillars";
 import { DIFFICULTY_LABEL, type Course, type Difficulty, type LessonMetaWithSlug } from "@/lib/content/types";
@@ -26,9 +27,15 @@ type FilterValue = "all" | Difficulty;
 
 /** The chips, in ramp order, each carrying how many courses it would leave —
  *  so a reader can see that "Master" holds four courses *before* clicking it,
- *  rather than clicking and then interpreting five empty pillars. */
+ *  rather than clicking and then interpreting five empty pillars.
+ *
+ *  The reset chip is "All", the one word every filter on the site now uses.
+ *  It read "All levels" here, "Any level" on /lessons and "All" on /problems
+ *  and /current-quantum: four names for one control. The row is already
+ *  labelled "Difficulty" above the chips, so the noun was never carrying
+ *  anything the reader could not see. */
 const FILTER_OPTIONS: FilterOption<FilterValue>[] = [
-  { id: "all", label: "All levels", count: COURSES.length },
+  { id: "all", label: "All", count: COURSES.length },
   ...(Object.entries(DIFFICULTY_LABEL) as [Difficulty, string][])
     .sort(([a], [b]) => DIFFICULTY_RANK[a] - DIFFICULTY_RANK[b])
     .map(([id, label]) => ({
@@ -68,11 +75,12 @@ function pillarStats(courses: Course[], lessons: LessonMetaWithSlug[]) {
  * per-pillar "Courses" readout reports "N of TOTAL" once filtered rather
  * than a bare count that could read as the curriculum having shrunk.
  *
- * A "Jump to a pillar" nav sits in the same instrument as the difficulty
- * filter, grouped Core (Mechanics–Software) / Advanced (Mastery, Apex) —
+ * A "Jump down to a track" nav sits in the same instrument as the difficulty
+ * filter, grouped by the four curriculum tiers (`components/pillar/tiers`) —
  * a one-click way for a reader who already knows the basics to skip the
- * beginner scaffolding, and a plain-language restatement of the six-pillar
- * order for a reader who doesn't yet know the word "pillar." Only the first
+ * beginner scaffolding, and a restatement of the same four-rung structure
+ * `TierLadder` draws on every track and course page, so the two screens teach
+ * one shape rather than two. Only the first
  * pillar section renders `CourseTimeline`; the rest go straight to
  * `CourseList`, so Mastery and Apex read denser and more direct rather than
  * Mechanics with a different tint.
@@ -100,8 +108,16 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
           {/* `aria-live` so a filter change is *announced*, not left as a
               silent number swap beside a chip that only changed color. The
               sentence is written to stand alone out of context, because that
-              is exactly how a screen reader will deliver it. */}
-          <span aria-live="polite" className="tech-value text-xs text-muted-foreground">
+              is exactly how a screen reader will deliver it.
+
+              `aria-atomic` is what actually lets it stand alone. This element
+              has no role, so its implicit `aria-atomic` is `false` and a screen
+              reader announces only the nodes that changed — which for a filter
+              switch is the count on its own: "5", with no unit, no total, and
+              no mention of the filter that produced it. The sentence was
+              written to be self-contained and was then delivered one word at a
+              time. `aria-atomic="true"` re-reads the whole of it. */}
+          <span aria-live="polite" aria-atomic="true" className="tech-value text-xs text-muted-foreground">
             <TechValue>{visibleCount}</TechValue> of {COURSES.length} courses
             {filter === "all" ? "" : ` · ${DIFFICULTY_LABEL[filter].toLowerCase()} only`}
           </span>
@@ -112,7 +128,8 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
             options={FILTER_OPTIONS}
             selected={filter}
             onChange={setFilter}
-            // The one-click way back. "All levels" is already the first chip,
+            countNoun="courses"
+            // The one-click way back. "All" is already the first chip,
             // but a reader who has scrolled into the pillars and is looking at
             // an empty section should not have to work out *which* control put
             // them there — so the escape is spelled out, in words, next to the
@@ -131,45 +148,66 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
           />
 
           {/* One-click jump for a reader who already knows the basics and
-              wants Mastery or Apex without scrolling past four pillars of
+              wants Mastery or Apex without scrolling past four tracks of
               beginner scaffolding first — mission brief's "skip past ... in
-              one action." Grouped by plain-language weight ("Core" /
-              "Advanced"), not just pillar name, so the six-pillar
-              progression reads as an order even to someone who doesn't
-              know what a "pillar" is. */}
+              one action."
+
+              Grouped by the four curriculum tiers (`components/pillar/tiers`),
+              which is the site's only vocabulary for curriculum depth and the
+              one `TierLadder` prints on every track and course page. It used
+              to be a private two-way split, "Core" = the first four tracks and
+              "Advanced" = the last two, which gave "Core" a second, smaller
+              meaning: a reader who read "Core: Mechanics, Computing, Hardware,
+              Software" here and then clicked the Hardware chip landed on a
+              page whose ladder says "Tier 2 of 4, Core" about Hardware and
+              Software alone. Two screens, one word, two structures, and the
+              ladder was the one a reader could not read correctly. Four rungs
+              here means both screens teach the same shape. */}
+          {/* These are *links down the page*, and until this pass they were
+              `rounded-full` chips with a `min-h-11` box and a hairline border:
+              pixel-for-pixel the difficulty filter sitting directly above
+              them. Two rows of identical pills in one instrument, one
+              filtering and one navigating, is the exact "what am I supposed to
+              click, and what will it do?" failure this surface exists to
+              avoid. They now take the tight control radius instead of the
+              filter's pill, and each carries a "↓" so the move it makes reads
+              off the control itself. */}
           <div>
-            <p className="tech-label">Jump to a track</p>
+            <p className="tech-label">Jump down to a track</p>
             <nav aria-label="Jump to a track" className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-2">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="mr-0.5 font-tech text-[0.65rem] uppercase tracking-wide text-subtle-foreground">
-                  Core
-                </span>
-                {PILLAR_ORDER.slice(0, 4).map((slug, i) => (
-                  <a
-                    key={slug}
-                    href={`#${slug}`}
-                    data-pillar={slug}
-                    className="inline-flex min-h-11 items-center rounded-full border border-border px-3 font-tech text-[0.7rem] uppercase tracking-wide text-muted-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:text-pillar-text"
-                  >
-                    {i + 1}. {pillarVisual(slug).short}
-                  </a>
-                ))}
-              </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="mr-0.5 font-tech text-[0.65rem] uppercase tracking-wide text-subtle-foreground">
-                  Advanced
-                </span>
-                {PILLAR_ORDER.slice(4).map((slug, i) => (
-                  <a
-                    key={slug}
-                    href={`#${slug}`}
-                    data-pillar={slug}
-                    className="inline-flex min-h-11 items-center rounded-full border border-border-strong px-3 font-tech text-[0.7rem] font-medium uppercase tracking-wide text-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:text-pillar-text"
-                  >
-                    {i + 5}. {pillarVisual(slug).short}
-                  </a>
-                ))}
-              </div>
+              {TIER_ORDER.map((tier, tierIndex) => {
+                const tracks = pillarsInTier(tier);
+                if (tracks.length === 0) return null;
+                // The last two rungs are the ones a returning reader is
+                // skipping ahead to, so they keep the heavier border and
+                // foreground text the old "Advanced" group carried. Derived
+                // from the rung's own position, not from a slice index.
+                const emphasised = tierIndex >= TIER_ORDER.indexOf("mastery");
+                return (
+                  <div key={tier} className="flex flex-wrap items-center gap-1.5">
+                    <span className="mr-0.5 tech-label text-subtle-foreground">
+                      {TIER_COPY[tier].label}
+                    </span>
+                    {tracks.map((slug) => (
+                      <a
+                        key={slug}
+                        href={`#${slug}`}
+                        data-pillar={slug}
+                        className={
+                          emphasised
+                            ? "inline-flex min-h-11 items-center gap-1.5 rounded-(--radius-tight) border border-border-strong px-3 tech-label text-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:text-pillar-text"
+                            : "inline-flex min-h-11 items-center gap-1.5 rounded-(--radius-tight) border border-border px-3 tech-label text-muted-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:text-pillar-text"
+                        }
+                      >
+                        <span aria-hidden="true" data-decorative="">
+                          ↓
+                        </span>
+                        {PILLAR_ORDER.indexOf(slug) + 1}. {pillarVisual(slug).short}
+                      </a>
+                    ))}
+                  </div>
+                );
+              })}
             </nav>
           </div>
         </div>
@@ -188,19 +226,26 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
           // Mastery and Apex go straight to `CourseList`, which reads
           // denser and more direct, matching their place in the escalation.
           const showTimeline = index === 0;
-          // A chapter break before Mastery: four "core" pillars, then a
-          // named seam into the two advanced ones — the same escalation the
-          // "Jump to a pillar" nav above groups as Core/Advanced, restated
-          // here in the reading flow for anyone scrolling instead of
-          // jumping.
-          const isAdvancedTrackStart = index === 4;
+          // A named chapter break wherever the tier changes, restating in the
+          // reading flow the same four rungs the jump nav above groups by and
+          // `TierLadder` draws on every track page. It used to be a single
+          // seam before Mastery reading "Beyond the core curriculum", which
+          // named a "core" that stopped at Software here and means Hardware
+          // plus Software one click away.
+          const tier = TIER_OF_PILLAR[pillar.slug];
+          const previousTier = index > 0 ? TIER_OF_PILLAR[PILLARS[index - 1].slug] : undefined;
+          // True for the first track too, so the catalog opens on rung 1 and
+          // the reader meets all four in order rather than starting at "Tier 2
+          // of 4" with no rung 1 anywhere above it.
+          const startsTier = tier !== previousTier;
 
           return (
             <section key={pillar.slug} id={pillar.slug} data-pillar={pillar.slug}>
-              {isAdvancedTrackStart ? (
+              {startsTier ? (
                 <div className="mb-16 flex items-center gap-4">
-                  <span className="whitespace-nowrap font-tech text-xs font-medium uppercase tracking-[0.14em] text-subtle-foreground">
-                    Beyond the core curriculum
+                  <span className="whitespace-nowrap font-tech text-xs font-medium uppercase tracking-meta text-subtle-foreground">
+                    Tier {TIER_ORDER.indexOf(tier) + 1} of {TIER_ORDER.length} ·{" "}
+                    {TIER_COPY[tier].label}
                   </span>
                   <FadeRule className="flex-1" />
                 </div>
@@ -215,9 +260,33 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
                 <SectionTitle level={2} size="md">
                   {pillar.title}
                 </SectionTitle>
+                {/* Six of these render on this page with byte-identical link
+                    text, so the accessible name has to carry the track or a
+                    screen reader's link list is six entries called "Full track
+                    page". The visible text stays short because the heading it
+                    sits beside already names the track for a sighted reader.
+
+                    The track name goes *after* the visible words, not inside
+                    them. `"Full ${pillar.title} track page"` disambiguated
+                    correctly and broke WCAG 2.5.3 Label in Name doing it: the
+                    visible label "Full track page" was no longer a contiguous
+                    run inside the accessible name, so a speech-input user
+                    saying "click Full track page" matched nothing. Appending
+                    keeps the visible string intact at the front of the name and
+                    disambiguates just as well.
+
+                    `-my-3 py-3` is the touch target: the visible box is one
+                    14px line (a 20px line box), which is over WCAG 2.5.8's
+                    24px floor only by the spacing exception and well under the
+                    44px this site holds itself to. 12px of padding each way
+                    makes it 44px; the negative margin hands the layout its
+                    original box back, which matters because this link is
+                    baseline-aligned with the `<h2>` beside it and a real 44px
+                    content box would drop it off that baseline. */}
                 <Link
                   href={visual.route}
-                  className="text-sm font-medium text-pillar-text underline-offset-4 hover:underline"
+                  aria-label={`Full track page: ${pillar.title}`}
+                  className="-my-3 py-3 text-sm font-medium text-pillar-text underline-offset-4 hover:underline"
                 >
                   Full track page →
                 </Link>
@@ -238,13 +307,22 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
                     value: isFiltered ? `${filteredCourses.length} of ${allCourses.length}` : filteredCourses.length,
                   },
                   { label: "Modules", value: stats.totalModules },
-                  { label: "Lessons authored", value: stats.authoredLessons },
-                  { label: "Curriculum length", value: stats.totalHours, unit: "h" },
+                  // Same rule as `pillarReadoutItems` and /learn's hero strip:
+                  // the "authored" hedge only appears while there is a gap to
+                  // hedge against. Today every declared module has a lesson.
+                  stats.authoredLessons === stats.totalModules
+                    ? { label: "Lessons", value: stats.authoredLessons }
+                    : { label: "Lessons authored", value: stats.authoredLessons },
+                  // "Est. time", matching this page's own hero strip, the
+                  // homepage hero and every `PillarFooter`. Study hours have
+                  // one name on the site now; the scope is whatever block the
+                  // readout sits in.
+                  { label: "Est. time", value: stats.totalHours, unit: "h" },
                   {
                     label: "Range",
                     value:
                       stats.difficulties.length === 0 ? (
-                        "—"
+                        "None yet"
                       ) : (
                         <span className="flex flex-wrap items-center gap-2">
                           <DifficultyMark difficulty={stats.difficulties[0]} />

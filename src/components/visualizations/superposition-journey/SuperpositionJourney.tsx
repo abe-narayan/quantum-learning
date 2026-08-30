@@ -142,7 +142,7 @@ export function SuperpositionJourney() {
           What we&rsquo;re studying
         </Badge>
         <p className="text-sm text-muted-foreground">
-          Choose a superposition with the slider, then hit Measure — watch the amplitudes above turn into
+          Choose a superposition with the slider, then hit Measure and watch the amplitudes above turn into
           probabilities, and the probabilities turn into one random, definite outcome.
         </p>
       </div>
@@ -213,6 +213,7 @@ export function SuperpositionJourney() {
 
           <div
             aria-live="polite"
+            aria-atomic="true"
             className="mt-4 rounded-panel border border-brand/25 bg-brand/5 px-4 py-3 text-sm text-foreground"
           >
             {narration}
@@ -238,12 +239,12 @@ export function SuperpositionJourney() {
         <p className="text-xs font-semibold uppercase tracking-wide text-accent">Try this</p>
         <ul className="mt-2 list-disc space-y-1.5 pl-4 text-sm text-foreground">
           <li>
-            Set α all the way to 0 (or 1) and measure a few times — with no superposition left, every
+            Set α all the way to 0 (or 1) and measure a few times. With no superposition left, every
             measurement gives the same outcome, every time.
           </li>
           <li>
             Set α to about 0.71 (equal superposition) and measure ten times. You&rsquo;ll rarely get an
-            exact 5/5 split — that randomness is real, not a rounding error.
+            exact 5/5 split, and that randomness is real, not a rounding error.
           </li>
           <li>
             Slide α to a negative value like −0.71, keeping β at 0.71. The state itself changed, but

@@ -29,8 +29,9 @@ export const matrixProductEntry: NumericProblem = {
     ],
   },
   hints: [
-    { text: "(AB)_11 = A_11·B_11 + A_12·B_21." },
-    { text: "Read off the first row of A and the first column of B: each holds a single nonzero entry, but in mismatched positions. Multiply matching positions and add." },
+    { text: "The $(1,1)$ entry of a product is not built from the $(1,1)$ entries of the factors. It comes from one whole row of $A$ meeting one whole column of $B$." },
+    { text: "Write down $A$'s first row and $B$'s first column as two lists, then pair them position by position and add the products." },
+    { text: "Each of those two lists has exactly one nonzero entry, and the two sit in different positions. Consider what that leaves in every term of the sum." },
   ],
   solution: {
     steps: [

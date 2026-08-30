@@ -44,7 +44,7 @@ export const ghzExactProbability: NumericProblem = {
   },
   explanation: {
     correctIdea: "This is the exact result from runCircuit, distinct from the sampled counts sampleMeasurements would produce with statistical noise around this exact value.",
-    whyCorrect: "Matches the test suite's confirmed GHZ state probabilities.",
+    whyCorrect: "The Hadamard splits the amplitude evenly, and the two CNOTs copy that choice onto the other wires without changing its size. |000⟩ keeps amplitude 1/√2, so its probability is exactly one half, with the other half sitting on |111⟩.",
     whyWrong: ["Answering anything other than exactly 0.5 confuses the exact simulation result with a sampled (noisy) result."],
   },
 };

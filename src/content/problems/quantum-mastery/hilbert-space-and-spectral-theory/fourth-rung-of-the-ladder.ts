@@ -18,7 +18,7 @@ export const fourthRungOfTheLadder: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "For the infinite well with half-width a=1 (natural units), compute E₃=n²π²/(8a²) at n=3 — the same number this course's four independent derivations (direct solution, spectral theorem, resolvent poles, Sturm-Liouville) all agree on.",
+      "For the infinite well with half-width a=1 (natural units), compute E₃=n²π²/(8a²) at n=3, the same number this course's four independent derivations (direct solution, spectral theorem, resolvent poles, Sturm-Liouville) all agree on.",
     inputHint: "as a decimal",
   },
   answer: {
@@ -46,10 +46,10 @@ export const fourthRungOfTheLadder: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "This is exactly the value this platform's real infiniteSquareWellEnergyLevel(3,2) returns, and exactly the value each of this course's four independent derivations (direct ODE solution, spectral-theorem staircase sum, Green's function pole, Sturm-Liouville eigenvalue) converges to.",
+      "Each of this course's four independent derivations (direct ODE solution, spectral-theorem staircase sum, Green's function pole, Sturm-Liouville eigenvalue) converges to this same value, and so does the platform's own energy-level engine.",
     whyCorrect: "Direct substitution into the closed-form infinite-well energy formula, matching the platform's own engine.",
     whyWrong: [
-      "Using the full width (2a) in place of the half-width a in the formula gives a different (smaller) number — the boxed formula throughout this course uses the half-width consistently.",
+      "Using the full width (2a) in place of the half-width a in the formula gives a different, smaller number. The boxed formula throughout this course uses the half-width consistently.",
     ],
   },
 };

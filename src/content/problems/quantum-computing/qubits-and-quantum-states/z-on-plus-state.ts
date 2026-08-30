@@ -40,9 +40,9 @@ export const zOnPlusState: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Z leaves |0⟩ alone but |+⟩ is a superposition of |0⟩ and |1⟩ — Z acts on the |1⟩ term too, flipping its sign.",
+      b: "Z leaves |0⟩ alone, but |+⟩ is a superposition of |0⟩ and |1⟩, and Z flips the sign of the |1⟩ term.",
       c: "|+i⟩ comes from applying S, not Z. Z multiplies the |1⟩ coefficient by −1 (a real number), not by i.",
-      d: "This is |+⟩ itself, unchanged — but Z does act nontrivially here, since Z only fixes |0⟩ and |1⟩, and |+⟩ is neither.",
+      d: "This is |+⟩ itself, unchanged. Z fixes only |0⟩ and |1⟩, and |+⟩ is neither of those.",
     },
     defaultIncorrectFeedback: "Write |+⟩ as a column vector and multiply by Z's matrix directly: Z flips the sign of the second entry only.",
   },

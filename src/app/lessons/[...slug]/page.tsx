@@ -9,6 +9,7 @@ import {
   buildLessonSchema,
   pillarUrl,
 } from "@/lib/structuredData";
+import { pageOpenGraph } from "@/lib/pageMetadata";
 
 export async function generateStaticParams() {
   const slugs = await getAllLessonSlugs();
@@ -30,13 +31,19 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
 
   const { title, description } = meta;
   const url = `${BASE_URL}/lessons/${slug.join("/")}`;
-  const fullTitle = `${title} · QuantumLearn`;
+  const fullTitle = `${title} · StudyQuantum`;
 
   return {
     title,
     description,
     alternates: { canonical: url },
-    openGraph: { title: fullTitle, description, url, type: "article" },
+    // `pageOpenGraph`, not an object literal: this route's own `openGraph`
+    // replaces the root layout's, which is where the file-convention social
+    // card was attached — so every one of the 219 lesson pages was shipping
+    // with no `og:image`. The helper carries the card and `og:site_name` for
+    // all four metadata families. `twitter.images` is filled from
+    // `openGraph.images` automatically.
+    openGraph: pageOpenGraph({ title: fullTitle, description, url, type: "article" }),
     twitter: { card: "summary_large_image", title: fullTitle, description },
   };
 }
@@ -50,7 +57,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const course = getCourse(lesson.lessonMeta.course);
   const pillar = course ? getPillar(course.pillar) : undefined;
   // Fetched globally (not per-course) so prerequisites can resolve across
-  // course boundaries — see LessonLayout for how course-local nav is
+  // course boundaries, see LessonLayout for how course-local nav is
   // derived from this same list.
   const allLessons = await getAllLessonsMeta();
   const LessonBody = lesson.default;
@@ -66,8 +73,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const breadcrumbSchema = buildBreadcrumbSchema([
     { name: "Learn", url: `${BASE_URL}/learn` },
     ...(pillar ? [{ name: pillar.title, url: pillarUrl(pillar.slug) }] : []),
-    // The course crumb must point at the course's own page — the same URL the
-    // visible breadcrumb links to via getCourseHref — not the pillar URL
+    // The course crumb must point at the course's own page, the same URL the
+    // visible breadcrumb links to via getCourseHref, not the pillar URL
     // (which the previous crumb already used; duplicating it produced two
     // BreadcrumbList items with different names but the same URL).
     ...(course ? [{ name: course.title, url: `${BASE_URL}/courses/${course.slug}` }] : []),

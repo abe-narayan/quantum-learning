@@ -19,19 +19,19 @@ const COPY_CONFIRMATION_MS = 1500;
 /**
  * The three ways to draw the same evolving state. Hoisted out of the JSX so
  * the roving-tabindex handler can index into the same array the buttons are
- * rendered from — an inline literal would rebuild on every render and the
+ * rendered from; an inline literal would rebuild on every render and the
  * handler would have no stable list to walk.
  */
 const VIEW_MODE_OPTIONS: { id: CanvasMode; label: string; hint: string }[] = [
   { id: "density", label: "|ψ(x)|²", hint: "Where it is: chance of finding the particle at each point." },
-  { id: "real-imaginary", label: "Re / Im", hint: "The wave itself, both parts — this is what carries the phase." },
+  { id: "real-imaginary", label: "Re / Im", hint: "The wave itself, both parts: this is what carries the phase." },
   { id: "momentum", label: "|φ(k)|²", hint: "How fast it's going: the same state, as a spread of momenta." },
 ];
 
 /**
  * Plain-English glosses for the parameter symbols the presets expose, keyed by
  * `ParamSpec.key` so only the ones the *current* preset actually shows get
- * rendered — a reader adjusting the tunneling barrier shouldn't have to read
+ * rendered; a reader adjusting the tunneling barrier shouldn't have to read
  * past a definition of ω. Keys with no entry (plain-language labels like
  * "Starting position" or "Barrier height") need no gloss and deliberately
  * have none.
@@ -41,7 +41,7 @@ const PARAMETER_GLOSSES: Record<string, { symbol: string; name: string; means: s
     symbol: "σ",
     name: "packet width",
     means:
-      "how spread out the particle starts. A narrow packet knows its position well and its momentum badly — that trade is Heisenberg's uncertainty principle, and you can watch it play out.",
+      "how spread out the particle starts. A narrow packet knows its position well and its momentum badly; that trade is Heisenberg's uncertainty principle, and you can watch it play out.",
     glossaryId: "heisenberg-uncertainty-principle",
   },
   momentum: {
@@ -74,7 +74,7 @@ const PARAMETER_GLOSSES: Record<string, { symbol: string; name: string; means: s
     symbol: "V₀",
     name: "barrier height",
     means:
-      "the energy wall the packet is thrown at. Classically nothing gets past a wall taller than its own energy — here some of it does anyway.",
+      "the energy wall the packet is thrown at. Classically nothing gets past a wall taller than its own energy; here some of it does anyway.",
     glossaryId: "quantum-tunneling",
   },
 };
@@ -82,7 +82,7 @@ const PARAMETER_GLOSSES: Record<string, { symbol: string; name: string; means: s
 // Minimal shareable state is the configuration layer this component itself
 // already isolates in its doc comment below: which preset, which parameter
 // values, which view mode. The actual time-evolving simulation (psi, t,
-// play/pause) is deliberately excluded — it's a running process, not a
+// play/pause) is deliberately excluded; it's a running process, not a
 // fixed point, so there's nothing meaningful to freeze into a URL for it;
 // a shared link reproduces the same starting setup, not a paused frame.
 // Params are prefixed (`wave_`) because this simulator shares `/simulators`
@@ -131,8 +131,8 @@ function parseWavefunctionParams(
 /**
  * The configuration layer: which preset, which parameter values, which
  * view mode. All of the actual time-evolving state (psi, t, play/pause)
- * lives in `WavefunctionSimulation`, mounted below with `key={configKey}`
- * — see that file's doc comment for why a remount, not an effect, is what
+ * lives in `WavefunctionSimulation`, mounted below with `key={configKey}`.
+ * See that file's doc comment for why a remount, not an effect, is what
  * keeps a preset switch from ever rendering an old wavefunction next to a
  * new grid.
  */
@@ -141,7 +141,7 @@ export function WavefunctionExplorer({
   showMeanSpreadOverlay = false,
 }: {
   initialPresetId?: PresetId;
-  /** Forwarded to WavefunctionCanvas via WavefunctionSimulation — see its doc comment. */
+  /** Forwarded to WavefunctionCanvas via WavefunctionSimulation; see its doc comment. */
   showMeanSpreadOverlay?: boolean;
 } = {}) {
   const searchParams = useSearchParams();
@@ -152,7 +152,7 @@ export function WavefunctionExplorer({
   const initialPreset = getPreset(initialPresetId ?? "free-gaussian");
   const initialFromUrl = parseWavefunctionParams(searchParams);
   // presetId and paramValues are held as ONE state object, updated together
-  // in a single setState call — never two separate calls a preset switch
+  // in a single setState call, never two separate calls a preset switch
   // would otherwise need to keep in sync. That atomicity is deliberate:
   // this pair drives `setup` and thus `WavefunctionSimulation`'s remount
   // key below, and there must be no render where one has updated and the
@@ -182,7 +182,7 @@ export function WavefunctionExplorer({
 
   // Keep the URL in sync with the settled configuration so the page is always
   // shareable. Debounced so a parameter slider drag doesn't spam
-  // `history.replaceState` — only the value it settles on after a short pause
+  // `history.replaceState`; only the value it settles on after a short pause
   // gets written. Skips the very first run so mounting doesn't immediately
   // rewrite the URL we just read from.
   useEffect(() => {
@@ -215,7 +215,7 @@ export function WavefunctionExplorer({
       if (copyTimeoutRef.current !== null) clearTimeout(copyTimeoutRef.current);
       copyTimeoutRef.current = setTimeout(() => setCopied(false), COPY_CONFIRMATION_MS);
     } catch {
-      // Clipboard access can be denied in some browser security contexts — no crash, no link copied.
+      // Clipboard access can be denied in some browser security contexts, so no crash and no link copied.
     }
   }, []);
 
@@ -256,8 +256,8 @@ export function WavefunctionExplorer({
 
   return (
     <SimulatorInstrument
-      label="Wavefunction — time-dependent Schrödinger equation"
-      footnote="Next: the harmonic oscillator's energy ladder was derived algebraically with operators earlier in the course — here it's the same states as real wavefunctions."
+      label="Wavefunction: time-dependent Schrödinger equation"
+      footnote="Next: the harmonic oscillator's energy ladder was derived algebraically with operators earlier in the course; here it's the same states as real wavefunctions."
       stageClassName="space-y-3"
       stage={
         <>
@@ -273,7 +273,7 @@ export function WavefunctionExplorer({
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">
-            A quantum particle has no single position — it has a wave, and this solves the equation that
+            A quantum particle has no single position: it has a wave, and this solves the equation that
             wave really obeys, numerically, frame by frame. Nothing below is a scripted animation.
           </p>
           <p className="text-sm text-muted-foreground">{preset.description}</p>
@@ -281,7 +281,7 @@ export function WavefunctionExplorer({
           {/*
             `role="radiogroup"`, not the `role="tablist"` this used to claim.
             The ARIA tabs pattern promises a set of tabpanels the tabs own via
-            `aria-controls`, plus arrow-key navigation with a roving tabindex —
+            `aria-controls`, plus arrow-key navigation with a roving tabindex,
             none of which existed here, and none of which fits: there is one
             canvas below, redrawn in a different view, not three panels. A
             radiogroup is what this control actually is, and the keyboard
@@ -304,7 +304,7 @@ export function WavefunctionExplorer({
                 role="radio"
                 aria-checked={mode === option.id}
                 tabIndex={mode === option.id ? 0 : -1}
-                aria-label={`${option.label} — ${option.hint}`}
+                aria-label={`${option.label}: ${option.hint}`}
                 title={option.hint}
                 onClick={() => setMode(option.id)}
                 onKeyDown={handleViewModeKeyDown}
@@ -313,8 +313,21 @@ export function WavefunctionExplorer({
                   // three buttons sit flush inside one `overflow-hidden`
                   // pill, so an offset ring would be clipped away by the
                   // parent and leave the focused segment unmarked.
-                  "min-h-11 px-4 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pillar " +
-                  (mode === option.id ? "bg-pillar text-brand-foreground" : "bg-surface text-muted-foreground hover:bg-surface-muted")
+                  //
+                  // Its colour moves with the segment's own text colour, and
+                  // that is load-bearing rather than tidy. A single
+                  // `ring-pillar` painted the ring in `--pillar-accent` on a
+                  // `bg-pillar` fill: the same colour on itself, contrast 1:1,
+                  // no indicator at all. And this is a roving-tabindex
+                  // radiogroup, so the selected segment is precisely the one
+                  // that receives focus when a keyboard user Tabs in, meaning
+                  // the control had no focus indicator in its normal state.
+                  // Tying the ring to the label colour makes it readable on
+                  // that fill by construction, because the label already is.
+                  "min-h-11 px-4 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset " +
+                  (mode === option.id
+                    ? "bg-pillar text-brand-foreground focus-visible:ring-brand-foreground"
+                    : "bg-surface text-muted-foreground hover:bg-surface-muted focus-visible:ring-pillar")
                 }
               >
                 {option.label}
@@ -323,10 +336,10 @@ export function WavefunctionExplorer({
           </div>
           <p className="text-xs text-muted-foreground">
             {mode === "density"
-              ? "|ψ(x)|² — where it is. The height at each point is the chance of finding the particle there."
+              ? "|ψ(x)|²: where it is. The height at each point is the chance of finding the particle there."
               : mode === "real-imaginary"
-                ? "Re / Im — the wave itself. These two parts can be moving even when |ψ(x)|² sits perfectly still."
-                : "|φ(k)|² — how fast it is going. The same state re-expressed as a spread of momenta rather than positions."}
+                ? "Re / Im: the wave itself. These two parts can be moving even when |ψ(x)|² sits perfectly still."
+                : "|φ(k)|²: how fast it is going. The same state re-expressed as a spread of momenta rather than positions."}
           </p>
 
           <WavefunctionSimulation
@@ -340,18 +353,18 @@ export function WavefunctionExplorer({
           />
 
           <SimulatorFraming
-            shows="A real numerical solution to the time-dependent Schrödinger equation — watch which states stay frozen in shape and which ones move, spread, or leak through barriers."
-            watchFor="The norm readout below the plot should stay pinned at 1.0000 the whole time. That's the simulation proving it hasn't lost any of the particle to numerical error — the same check you'd run on real physics code."
+            shows="A real numerical solution to the time-dependent Schrödinger equation. Watch which states stay frozen in shape and which ones move, spread, or leak through barriers."
+            watchFor="The norm readout below the plot should stay pinned at 1.0000 the whole time. That's the simulation proving it hasn't lost any of the particle to numerical error, the same check you'd run on real physics code."
             tryThis={
               <ul>
                 <li>
-                  Load Infinite Well — Ground State, confirm |ψ(x)|² never changes shape, then switch to
+                  Load Infinite Well: Ground State, confirm |ψ(x)|² never changes shape, then switch to
                   Superposition of Two Eigenstates and watch it visibly &quot;beat&quot; at a rate set by the
                   energy gap.
                 </li>
                 <li>
                   Tunneling loads with the packet&apos;s momentum-derived energy already below the barrier
-                  height — confirm a small but nonzero probability still leaks through, then raise momentum
+                  height. Confirm a small but nonzero probability still leaks through, then raise momentum
                   (or lower barrier height) until energy exceeds it and watch ordinary classical transmission
                   take over instead.
                 </li>

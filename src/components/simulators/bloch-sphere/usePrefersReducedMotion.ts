@@ -1,4 +1,4 @@
-// Moved to src/components/motion/usePrefersReducedMotion.ts — the hook is no
+// Moved to src/components/motion/usePrefersReducedMotion.ts. The hook is no
 // longer simulator-specific (the background field, the scroll-reveal system
 // and the narrative components all need it), and nothing outside the
 // simulators should be importing from a sibling simulator's folder.

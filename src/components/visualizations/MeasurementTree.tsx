@@ -19,7 +19,7 @@ function Branch({ node }: { node: MeasurementTreeNode }) {
       >
         {node.label}
         {node.probability !== undefined && (
-          <span className="ml-1.5 font-mono text-[10px] text-muted-foreground">{(node.probability * 100).toFixed(0)}%</span>
+          <span className="ml-1.5 font-mono text-micro text-muted-foreground">{(node.probability * 100).toFixed(0)}%</span>
         )}
       </div>
       {node.children && node.children.length > 0 && (

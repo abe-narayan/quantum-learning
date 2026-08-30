@@ -21,7 +21,7 @@ export const czAmplitudeOnEleven: NumericProblem = {
     type: "numeric",
     prompt:
       "Using the same $|0\\rangle\\langle0|\\otimes I + |1\\rangle\\langle1|\\otimes U$ construction with $U=Z$, apply controlled-$Z$ (control = qubit 0, target = qubit 1) to $|11\\rangle$. What is the resulting (real) amplitude on $|11\\rangle$?",
-    inputHint: "as a signed number, e.g. 1 or -1",
+    inputHint: "as a signed number",
   },
   answer: {
     type: "numeric",

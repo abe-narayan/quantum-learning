@@ -34,7 +34,7 @@ export const pvmOutcomeProbability: NumericProblem = {
     type: "numeric",
     value: probability,
     tolerance: 0.01,
-    incorrectFeedback: "E(1.5)=P₁ projects onto span{|0⟩,|1⟩} only — sum the squared amplitudes on just those two basis states.",
+    incorrectFeedback: "E(1.5)=P₁ projects onto span{|0⟩,|1⟩} only. Sum the squared amplitudes on just those two basis states.",
     nearMisses: [
       { value: 1, feedback: "1 includes the λ = 2 eigenspace. E(1.5) collects only eigenvalues at or below 1.5, and 2 is above it." },
       { value: 1 / 3, tolerance: 0.005, feedback: "1/3 counts one basis state. The λ = 1 eigenspace is two-dimensional here, spanning |0⟩ and |1⟩." },
@@ -57,10 +57,10 @@ export const pvmOutcomeProbability: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "E(1.5) is the staircase PVM evaluated just past the first eigenvalue and before the second, so it equals P₁ exactly — the general P(outcome∈Δ)=⟨ψ|E(Δ)|ψ⟩ formula reduces to summing the squared amplitudes on the eigenspaces with eigenvalue ≤ 1.5.",
-    whyCorrect: "Directly verified using this platform's real projectorOntoSubspace-built P₁ applied to the state vector.",
+      "E(1.5) is the staircase PVM evaluated just past the first eigenvalue and before the second, so it equals P₁ exactly. The general P(outcome∈Δ)=⟨ψ|E(Δ)|ψ⟩ formula then reduces to summing the squared amplitudes on the eigenspaces with eigenvalue ≤ 1.5.",
+    whyCorrect: "Verified against the platform's own projector construction, applying P₁ to the state vector and taking the squared norm.",
     whyWrong: [
-      "Including the λ=2 eigenspace would give P(outcome≤1.5)=1, which is wrong — λ=2 is strictly greater than 1.5, so E(1.5) must exclude P₂.",
+      "Including the λ=2 eigenspace would give P(outcome≤1.5)=1, which is wrong: λ=2 is strictly greater than 1.5, so E(1.5) must exclude P₂.",
     ],
   },
 };

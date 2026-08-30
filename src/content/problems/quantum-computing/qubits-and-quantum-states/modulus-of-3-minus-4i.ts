@@ -47,7 +47,7 @@ export const modulusOf3Minus4i: NumericProblem = {
   },
   explanation: {
     correctIdea: "The modulus is the distance from the origin to the point (3, -4) in the complex plane, computed the same way as an ordinary 2D distance.",
-    whyCorrect: "|z|² = zz* = (3-4i)(3+4i) = 9 - (4i)(-4i)... equivalently, a² + b² = 9 + 16 = 25, so |z| = √25 = 5.",
+    whyCorrect: "|z|² = zz* = (3−4i)(3+4i) = 9 + 12i − 12i − 16i² = 9 + 16 = 25, so |z| = √25 = 5.",
     whyWrong: [
       "Forgetting to square before adding (using 3 + (-4) = -1 directly) skips the modulus formula's actual structure.",
       "Reporting a negative modulus is impossible: |z| is always ≥ 0 by definition, a length.",

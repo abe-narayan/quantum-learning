@@ -82,7 +82,7 @@ export function LessonMetaStrip({
     .join(" · ");
 
   return (
-    // `max-w-[46rem]`, not `max-w-3xl`. 3xl is 48rem — 32px wider than the
+    // `max-w-reading`, not `max-w-3xl`. 3xl is 48rem — 32px wider than the
     // reading column every other block on a lesson page is measured to
     // (docs/DESIGN_SYSTEM.md §"the reading column is ~46rem", and
     // LessonLayout's prose, pre-content stack, FadeRule and complete-toggle
@@ -90,7 +90,7 @@ export function LessonMetaStrip({
     // down its right edge — Lineage 48rem, rule 46rem, Status 46rem, What's
     // next 48rem — on all 219 lesson pages. Nothing looked broken enough to
     // name, which is exactly why it survived three passes.
-    <details className="group mt-10 max-w-[46rem]">
+    <details className="group mt-10 max-w-reading">
       <summary
         className={cn(
           "flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-(--radius-tight)",
@@ -98,8 +98,14 @@ export function LessonMetaStrip({
           "[&::-webkit-details-marker]:hidden"
         )}
       >
+        {/* Was "Lineage", which is unglossed jargon in the one piece of
+            chrome that repeats on all 219 lesson pages: a reader has to open
+            the disclosure to find out what the word meant, which is exactly
+            backwards for a summary line whose job is to let them decide
+            without opening it. The panel's dominant content is the "Requires"
+            list, and the summary line beneath already names the other two. */}
         <span className="flex flex-col gap-0.5">
-          <TechLabel>Lineage</TechLabel>
+          <TechLabel>What this builds on</TechLabel>
           <span className="text-sm text-muted-foreground">{summary}</span>
         </span>
         <svg
@@ -152,7 +158,7 @@ export function LessonMetaStrip({
                     ) : null}
                     {note ? (
                       <>
-                        {" — "}
+                        {": "}
                         {note}
                       </>
                     ) : null}
@@ -195,7 +201,7 @@ export function LessonMetaStrip({
                   <Link href={`/lessons/${lesson.slug}`} className="text-pillar-text hover:underline">
                     {lesson.title}
                   </Link>
-                  {" — "}
+                  {": "}
                   {note}
                 </li>
               ))}

@@ -1,9 +1,26 @@
 @import "tailwindcss";
+/* This brings in 20 `@font-face` rules, every one of them `font-display:
+   block`, which is KaTeX's own choice and not one this file makes. `block`
+   paints nothing for those glyphs for up to about 3 seconds, so on a slow
+   connection a lesson's prose can render while its equations are still
+   blank. Geist and Fraunces are `swap` and unaffected; the 20 KaTeX woff2
+   faces total 259.8 KB, of which a page uses a subset.
+
+   Deliberately NOT overridden to `swap` yet. `swap` on maths is not the
+   obvious win it is on prose: the fallback is Arial, which lacks most of the
+   glyphs involved, so a reader could get tofu and then a reflow instead of a
+   short blank. Which is worse is a question about what it looks like, and
+   nothing in this sprint could render a pixel (the browser tooling was not
+   connected), so changing it would be guessing. Measured, unresolved, and
+   flagged as a pre-launch browser check: load a maths-heavy lesson on a cold
+   cache over a throttled connection and watch the equations. If the blank
+   period reads as broken, the fix is a `@font-face` block re-declaring the
+   KaTeX families with `font-display: swap`. */
 @import "katex/dist/katex.min.css";
 @plugin "@tailwindcss/typography";
 
 /* ============================================================================
-   QuantumLearn design language — "The Instrument"
+   StudyQuantum design language — "The Instrument"
    ============================================================================
    The site is styled as a research console rather than a document: a deep,
    layered laboratory ground; hairline-edged instrument panels; a persistent
@@ -142,7 +159,7 @@
 
   /* Default pillar channel (see section 2). Matches --brand's family so any
      surface that opts into pillar tokens without declaring a pillar still
-     looks like QuantumLearn rather than like nothing. */
+     looks like StudyQuantum rather than like nothing. */
   --pillar-hue: 268;
   --pillar-chroma: 0.14;
   --pillar-l-accent: 0.78;
@@ -158,6 +175,40 @@
      because "atmospheric haze" over black and over paper are different
      effects, not the same color at two opacities. */
   --atmosphere-strength: 1;
+
+  /* Field: a per-theme multiplier on the animated canvas above the atmosphere
+     (src/components/field/QuantumField.tsx reads it in `readColors`). It is a
+     token rather than a constant in that file because the two themes have
+     wildly different amounts of room, and the number is measured rather than
+     chosen.
+
+     The rule is DESIGN_SYSTEM §7's: the field may never take text under AA.
+     What differs is the headroom. On this ground (`--depth-0`, luminance
+     0.002) `--subtle-foreground` still clears 4.5:1 against anything up to
+     luminance 0.022, which in 8-bit terms is most of the way from black to a
+     mid grey. On paper (luminance 0.966) the same voice is dark ink, so the
+     field darkens the ground *toward* it, and the floor is 0.870 — about a
+     4% drop in luminance and nothing like the same room. Measured with
+     `node scripts/audit/field.mjs --theme light`, every regime overshot it,
+     at 3.75-4.25:1, by a near-identical factor, which is why this is one
+     number per theme rather than a second per-regime table: on paper the
+     darkest mark is the same dim ink everywhere.
+
+     0.3 is low, and the reason is worth knowing before anyone raises it: on
+     paper `--subtle-foreground` (#656e7e) starts at **4.98:1** against
+     `--depth-0`, which is 0.48 of margin over the AA floor before anything
+     is drawn behind it at all. Almost any texture spends that. The
+     alternative was darkening the token, and it is not available: the next
+     step down collides with `--muted-foreground` (#566072), and
+     `contrast.test.ts` holds those two apart on purpose, because a contrast
+     fix that pushes one voice onto the other passes AA individually while
+     silently collapsing the hierarchy. So the field yields instead. That
+     also happens to be right for the theme: this is the notebook, and a
+     printed page does not glow.
+
+     Dark is 1 because `REGIME_COMPOSITE_CEILING` in regimes.ts is already
+     tuned against the dark ground. */
+  --field-strength: 1;
 }
 
 /* ----------------------------------------------------------------------------
@@ -226,7 +277,14 @@
   --foreground: #f1f5fb;
   --border: #232c3c;
   --border-strong: #3b4759;
-  --atmosphere-strength: 1.35;
+  /* Deliberately left at the `:root` default of 1. This token is consumed in
+     exactly one place, `.atmosphere { opacity: var(--atmosphere-strength) }`,
+     and `opacity` clamps to 1, so the 1.35 that sat here was silently
+     identical to 1: whoever tuned dark upward got no change and no warning.
+     Dark genuinely does want a heavier atmosphere than light (which runs at
+     0.55), but opacity is the wrong lever now that the base is already
+     saturated. Raising it has to happen in the layer's own gradient stops. */
+  --atmosphere-strength: 1;
 }
 
 :root,
@@ -245,8 +303,17 @@
   --pillar-glow: oklch(
     var(--pillar-l-accent) var(--pillar-chroma) var(--pillar-hue) / var(--pillar-glow-alpha)
   );
-  /* Text-safe variant: on the dark ground the accent lightness is already
-     high enough to read as body-size text; light mode overrides it below. */
+  /* Intention alias for accent-used-as-text. It resolves to `--pillar-accent`
+     in BOTH themes and always has: the light theme makes the accent itself
+     text-safe by re-aiming `--pillar-l-accent` to 0.51 rather than by
+     overriding this token, so there is no light-mode override and the comment
+     that used to promise one was wrong. `text-pillar` and `text-pillar-text`
+     are therefore the same colour today, and the codebase uses both heavily.
+     Kept, rather than deleted and normalised onto `text-pillar`, because the
+     two names still record different intent at the call site: `--pillar-accent`
+     for a mark, `--pillar-text` for a run of type. If a future theme ever needs
+     the two to diverge, this is the seam that makes it a one-line change
+     instead of a 188-site sweep. */
   --pillar-text: var(--pillar-accent);
 }
 
@@ -272,10 +339,23 @@
   --radius-panel: 14px;
   --radius-slab: 20px;
 
-  /* Vertical rhythm for full-page sections. Sections are big — this is an
-     atlas, not a dashboard — but not arbitrary. */
+  /* Vertical rhythm for full-page sections. Sections are big, because this is
+     an atlas and not a dashboard, but not arbitrary. */
   --rhythm-section: clamp(4.5rem, 9vw, 8.5rem);
   --rhythm-block: clamp(2rem, 4vw, 3.5rem);
+
+  /* Rhythm INSIDE a section. The two tokens above only ever governed a
+     `<Section>`'s outer padding, so everything between a heading and the next
+     one was improvised per component: a census found 18 distinct `mt-*` steps
+     across app/, home/, lessons/ and pillar/, four of which (`mt-7`, `mt-9`,
+     `mt-2.5`, `mt-0.5`) are used exactly once each next to a heavily used
+     neighbour, which is a difference that encodes nothing. Three steps is
+     enough for the three real relationships: a label to the thing it labels,
+     a paragraph to the next paragraph, and a subsection to the next
+     subsection. */
+  --rhythm-tight: 1.25rem;
+  --rhythm-close: 2rem;
+  --rhythm-open: 3rem;
 }
 
 @theme inline {
@@ -329,6 +409,40 @@
 
   --ease-instrument: var(--ease-instrument);
   --ease-mech: var(--ease-mech);
+
+  /* A real scale below `text-xs`, because there was not one and the codebase
+     invented 21 arbitrary sizes to fill the gap: 30 uses of `text-[0.65rem]`,
+     22 of `text-[0.6875rem]`, 11 of `text-[0.625rem]`, 10 of `text-[10px]`,
+     plus one-offs at 0.5625, 0.6, 0.7 and 0.95rem. The metadata voice alone
+     had six competing definitions of the same idea. Three steps, and nothing
+     between them:
+       micro  dense tabular chrome only, where a digit column has to fit
+       meta   THE tech-label size; this is what `.tech-label` sets
+       xs     the smallest size any running text may take
+     `--text-xs` is redeclared at Tailwind's own value so the three sit
+     together and read as one ramp. */
+  --text-micro: 0.625rem;
+  --text-meta: 0.6875rem;
+  --text-xs: 0.75rem;
+
+  /* Two tracking values for the uppercase-mono voice, not five. The census
+     found 0.08em, 0.1em, 0.12em, 0.14em and 0.18em in use; at 11px the
+     difference between 0.1 and 0.12 is 0.3px, which no reader can cash in.
+     `.tech-label` is the metadata voice, `.eyebrow` is the louder section
+     marker, and those are the only two distinctions that mean anything. */
+  --tracking-meta: 0.14em;
+  --tracking-eyebrow: 0.18em;
+
+  /* The reading measure, which docs/DESIGN_SYSTEM.md section 3 calls "the
+     site's stated reading measure" while it existed nowhere as a token: it was
+     the literal `max-w-[46rem]`, repeated 39 times, with `max-w-[42rem]` (the
+     Lede measure) repeated 17 more. That is exactly why the fix for the
+     too-long line was to raise the type rather than narrow the column, since
+     narrowing would have been a 39-site edit. As tokens they are
+     `max-w-reading` and `max-w-lede`, and the column becomes adjustable
+     again. */
+  --container-reading: 46rem;
+  --container-lede: 42rem;
 }
 
 /* ----------------------------------------------------------------------------
@@ -397,6 +511,10 @@
     --pillar-edge-alpha: 0.4;
     --pillar-glow-alpha: 0.1;
     --atmosphere-strength: 0.55;
+    /* See --field-strength in section 1: paper has about a twentieth of
+       the dark ground's luminance headroom before the field takes
+       --subtle-foreground under AA. Measured, not chosen. */
+    --field-strength: 0.3;
   }
 
   /* Apex in light mode: still the most severe pillar, but expressed as a
@@ -491,6 +609,9 @@
   --pillar-edge-alpha: 0.4;
   --pillar-glow-alpha: 0.1;
   --atmosphere-strength: 0.55;
+  /* Verbatim-identical to the system-light block above, as the whole light
+     ramp must be. */
+  --field-strength: 0.3;
 }
 
 :root[data-theme="light"] [data-pillar="apex"] {
@@ -546,15 +667,34 @@
   --tw-prose-td-borders: var(--border);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  /* Every scroll-linked effect in the app (the field environment, section
-     reveals, the reading-progress bar) assumes a normally-scrolling document.
-     Declaring the behavior here keeps in-page anchor jumps — the lesson ToC,
-     heading permalinks — from teleporting, while the reduced-motion section
-     turns it off outright. */
-  scroll-behavior: smooth;
+/* In `@layer base`, for the same reason as `[id]` above and `:focus-visible`
+   below: these are page *defaults*, not policy that must beat a utility.
+   `<body className="flex min-h-full flex-col font-sans">` sets no colour
+   today, so unlayered this was latent rather than live, but it is exactly the
+   shape that has already shipped as a bug twice in this file. The
+   reduced-motion override of `scroll-behavior` deliberately stays unlayered
+   and still wins, which is the difference between a default and a policy. */
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  /* On `html`, not `body`, and that distinction is the whole point. CSSOM View
+     propagates `overflow` from body to the viewport when the root does not set
+     it, which is why the full-bleed clip below deliberately names both. It does
+     NOT do the same for `scroll-behavior`: that is taken from the root element
+     only. So while this sat on `body` alone it was inert, and every in-page
+     anchor jump the comment claimed to smooth (the lesson ToC, heading
+     permalinks, `#term` links into the glossary) was in fact teleporting.
+
+     Every scroll-linked effect in the app, the field environment, the section
+     reveals and the reading-progress bar, assumes a normally-scrolling
+     document, so this is the right default. The reduced-motion section already
+     overrides `html, body` together and still wins. */
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* In-page anchors land under the sticky navbar without this.
@@ -615,15 +755,40 @@ body {
    component-specific ring. Uses the pillar channel so the focus ring is
    *also* part of the identity: a keyboard user in Hardware sees amber, in
    Mechanics cyan. Always paired with an offset so it stays visible on top of
-   a busy background field. */
-:focus-visible {
-  outline: 2px solid var(--pillar-accent);
-  outline-offset: 2px;
+   a busy background field.
+
+   In `@layer base`, and that placement is load-bearing rather than tidiness.
+   Unlayered, this rule outranked every Tailwind utility regardless of
+   specificity, which made all 59 `focus-visible:outline-none` call sites in
+   the codebase dead code: each of them writes `outline-none ring-2
+   ring-offset-2` to *replace* the outline with a ring, and instead rendered
+   both, a 2px pillar outline at a 2px offset plus a pillar ring separated by
+   an opaque `ring-offset-background` band cutting through the translucent
+   field. That is on the two shared recipes in Navbar and Footer, so it was
+   every nav and footer link on all 821 routes. Layered, the default still
+   reaches everything that asks for nothing, and a control that deliberately
+   substitutes its own indicator can now actually do so. This is the same
+   treatment `[id] { scroll-margin-top }` already needed twelve lines up, for
+   the same reason. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--pillar-accent);
+    outline-offset: 2px;
+  }
 }
 
-::selection {
-  background: var(--pillar-glow);
-  color: var(--foreground);
+/* In `@layer base`. Tailwind v4 emits the `selection:` variant into
+   `@layer utilities`, so while this sat unlayered it defeated every
+   `selection:bg-*` and `selection:text-*` in the codebase, regardless of
+   specificity. No call site uses that variant yet, which is the only reason
+   this had not already become the fourth instance of the bug documented
+   above. A site-wide selection colour is a default; the first component that
+   wants its own should be able to say so. */
+@layer base {
+  ::selection {
+    background: var(--pillar-glow);
+    color: var(--foreground);
+  }
 }
 
 /* ----------------------------------------------------------------------------
@@ -685,10 +850,22 @@ body {
 }
 
 /* The focus ring alone says "this is focused"; it does not say *why* a static
-   block of maths took focus. The added inset edge and cursor make the
-   scrollability itself visible at the moment a keyboard user lands on it. */
+   block of maths took focus. The inset edge makes the scrollability itself
+   visible at the moment a keyboard user lands on it.
+   `outline: none` is load-bearing, not a suppression to be tidied away. The
+   base `:focus-visible` rule paints a 2px `--pillar-accent` outline at
+   `outline-offset: 2px`, i.e. 2px *outside* the box; this rule paints
+   `--pillar-accent` 1px *inside* it. Together they rendered as two rings of
+   one hue 3px apart on every display equation (17 of them in Complex Numbers
+   for Physics alone), which reads as a doubled or blurred border rather than
+   as a focus state. The inset ring is the one to keep: this element is an
+   `overflow-x: auto` scroll container inside `.prose`, and an outward-offset
+   outline on a scroll container is the shape that gets clipped by an
+   ancestor. Widened to 2px so the surviving indicator still meets the
+   thickness the rest of the system uses. */
 .katex-display:focus-visible {
-  box-shadow: inset 0 0 0 1px var(--pillar-accent);
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--pillar-accent);
 }
 
 /* ----------------------------------------------------------------------------
@@ -715,9 +892,9 @@ body {
      Tailwind chains repeated across simulator panels, badges and captions. */
   .tech-label {
     font-family: var(--font-tech);
-    font-size: 0.6875rem;
+    font-size: var(--text-meta);
     line-height: 1.2;
-    letter-spacing: 0.14em;
+    letter-spacing: var(--tracking-meta);
     text-transform: uppercase;
     color: var(--muted-foreground);
     font-weight: 500;
@@ -738,8 +915,8 @@ body {
     align-items: center;
     gap: 0.6rem;
     font-family: var(--font-tech);
-    font-size: 0.6875rem;
-    letter-spacing: 0.18em;
+    font-size: var(--text-meta);
+    letter-spacing: var(--tracking-eyebrow);
     text-transform: uppercase;
     font-weight: 600;
     color: var(--pillar-text);
@@ -789,40 +966,131 @@ body {
 
 /* Callout severity labels (Callout.tsx: "Note" / "Careful" / "Common
    mistake"), keyed off `data-callout` (set by Callout.tsx to its `type`
-   prop) rather than an exact Tailwind class combination — a restyle of the
-   component's borders/backgrounds can't silently break this the way a
-   class-string selector could. Mirrors Callout's own escalation: note/
-   warning get the technical voice; mistake — the one students most need to
-   notice — additionally switches to the display face. */
-[data-callout="note"] > p:first-child,
-[data-callout="warning"] > p:first-child {
-  font-family: var(--font-tech);
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
-}
+   prop) rather than an exact Tailwind class combination, so a restyle of the
+   component's borders or backgrounds cannot silently break this the way a
+   class-string selector could. Mirrors Callout's own escalation: note and
+   warning get the technical voice, while mistake, the one students most need
+   to notice, additionally switches to the display face.
 
-[data-callout="mistake"] > p:first-child {
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: none;
+   On `--text-meta` and `--tracking-meta`, not literals. This rule was the
+   sixth competing definition of the one metadata voice, at a size (0.7rem)
+   0.2px from `.tech-label`'s 0.6875rem, which no reader could ever cash in
+   and which existed only because there was no token to reach for.
+
+   LAYERED, and it has to be. Unlayered CSS beats every layer regardless of
+   specificity, so while these three rules sat at the top level, any Tailwind
+   utility an author put on a callout's first paragraph lost silently to them:
+   `font-sans`, `normal-case`, `text-lg` and `tracking-normal` would all have
+   compiled, shipped, and done nothing. That is the same defect class as the
+   `.tech-label` bug `cascadeLayers.test.ts` was written to prevent and the
+   `[data-difficulty="master"]` one found on master lessons; this instance
+   survived because that guard extracts class selectors only and an attribute
+   selector is invisible to it. */
+@layer components {
+  [data-callout="note"] > p:first-child,
+  [data-callout="warning"] > p:first-child {
+    font-family: var(--font-tech);
+    text-transform: uppercase;
+    font-size: var(--text-meta);
+    letter-spacing: var(--tracking-meta);
+  }
+
+  [data-callout="mistake"] > p:first-child {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: none;
+  }
 }
 
 /* Simulator control-panel section labels. Every controls component wires an
    h3 to its <section> via `aria-labelledby` pointing at an id ending in
-   "-heading" — a pre-existing, load-bearing (accessibility) convention that
+   "-heading", a pre-existing, load-bearing (accessibility) convention that
    doubles as a free CSS hook, giving every control-panel label the
    instrument voice with no component edits. Some of these headings
    interpolate math; letter-spacing and case changes leave those glyphs
-   untouched. */
-h3[id$="-heading"] {
-  font-family: var(--font-tech);
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted-foreground);
+   untouched.
+
+   In `@layer base`, which is the whole point. Unlayered, an id-suffix
+   selector meant for simulator chrome outranked every explicit class on the
+   element, and the convention had escaped the simulators: it was beating
+   `text-sm font-semibold text-foreground` on the two-qubit explorer's
+   measurement panel and on NestedCodeDiagram twice, and beating
+   `.tech-label` (which lives in `@layer components`) on the homepage's
+   curriculum strip and StabilizerTable, rendering them at 0.75rem/0.12em
+   instead of the class's 0.6875rem/0.14em. Nobody could see that difference,
+   which is exactly what made it dangerous. As a base-layer rule it is what
+   it always claimed to be: the default for a heading that asks for nothing,
+   which any class or utility on the element can override. */
+@layer base {
+  h3[id$="-heading"] {
+    font-family: var(--font-tech);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+}
+
+/* Display math that is ALREADY inside a framed device: keep every behaviour,
+   drop the second frame.
+
+   `.katex-display` above is a full panel in its own right: a border, a 3px
+   pillar-edge left rail, a panel radius and a muted fill. That is right when
+   an equation sits alone in the prose column. It is wrong the moment the
+   equation is inside something that is already a panel, and it is inside one
+   a lot: 22 of the 48 TheoremBoxes in the corpus contain display math, 4 of
+   23 DefinitionBoxes, and DerivationSteps wraps 193 steps across 55
+   instances. In a TheoremBox the reader was getting two pillar-edged left
+   rails at the same radius twenty pixels apart, with the inner rail THICKER
+   than the outer one, so the subordinate element was the louder frame, and
+   with the inner fill identical to the outer panel's header strip. That is
+   the nested-bordering case DESIGN_SYSTEM section 4 exists to prevent.
+
+   Unlayered and specificity 0-2-0 against `.katex-display`'s 0-1-0, so it
+   wins without `!important`. It touches the frame only: `overflow-x: auto`,
+   `overscroll-behavior`, the `tabindex` focus stop injected by
+   rehypeKatexHtml.mjs, and the scroll-gradient overflow indicator all still
+   come from the base rule, so nothing about keyboard access or the
+   there-is-more-to-the-right affordance changes. Inside a TheoremBox the
+   outer rail becomes the only rail; inside DerivationSteps the numbered
+   badges become the only repeating structure, which is what that component
+   is for.
+
+   Applied by the components themselves via `data-math-plain` on the element
+   wrapping the math, not by a descendant selector on the boxes, so a device
+   that WANTS the framed treatment keeps it by simply not opting in. */
+[data-math-plain] .katex-display {
+  border: 0;
+  border-left: 2px solid var(--pillar-edge);
+  border-radius: 0;
+  padding: 0.4rem 0 0.4rem 1rem;
+  /* The frame goes; the overflow indicator stays. `background-image: none`
+     would have taken it with the fill, because the indicator IS layers 3 and
+     4 above: two `scroll`-attached edge glows revealed as the two `local`
+     covers scroll away from them. Dropping it would leave a wide equation
+     inside a TheoremBox or a derivation step ending at the box edge with
+     nothing but a thin scrollbar to say there is more, and truncated notation
+     reads as a complete statement rather than a clipped one. So the four
+     layers are restated here minus the pillar wash, with the covers painted in
+     `--surface` rather than `--surface-muted`: all three components that opt
+     in sit on `bg-surface`, and a cover only works when it matches the ground
+     behind it. */
+  background-color: transparent;
+  background-image:
+    linear-gradient(to right, var(--surface), transparent),
+    linear-gradient(to left, var(--surface), transparent),
+    radial-gradient(farthest-side at 0 50%, var(--pillar-edge), transparent),
+    radial-gradient(farthest-side at 100% 50%, var(--pillar-edge), transparent);
+  background-repeat: no-repeat;
+  background-position: left center, right center, left center, right center;
+  background-size:
+    1.75rem 100%,
+    1.75rem 100%,
+    0.9rem 100%,
+    0.9rem 100%;
+  background-attachment: local, local, scroll, scroll;
 }
 
 /* ----------------------------------------------------------------------------
@@ -997,18 +1265,202 @@ h3[id$="-heading"] {
   }
 }
 
+/* ----------------------------------------------------------------------------
+   Reading size
+   ----------------------------------------------------------------------------
+   The reading column is 46rem (736px), a deliberate choice documented in
+   docs/DESIGN_SYSTEM.md and matched by every sibling block on a lesson page.
+   The typography plugin's default 16px against that column puts running text at
+   roughly 92 characters a line. The comfortable band for prose read at length
+   is 66 to 75, and while technical text with inline math tolerates a slightly
+   longer measure (an equation should not have to break), 92 is past what
+   tolerance buys.
+
+   The fix is the type, not the column. Raising the base to 18px takes the same
+   736px to about 82 characters, and 18px is independently the better size for
+   material read for thirty minutes at a stretch with KaTeX set inline, which
+   scales with it. Nothing moves: no sibling has to be re-measured, no figure is
+   resized, and the ragged right edge that comes from narrowing prose alone
+   never appears.
+
+   Leading drops from the plugin's 1.75 to 1.7 in step. 1.75 is tuned for 16px;
+   at 18px the same ratio opens the lines further than the longer measure wants,
+   and the two together start to feel airy rather than readable.
+
+   Unlayered on purpose, like the density rule below: the plugin's `.prose`
+   styles live in the utilities layer and only unlayered rules outrank them. */
+.prose {
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
+
 /* Earned variation, not decoration (docs/DESIGN_SYSTEM.md): LessonLayout
    stamps `data-difficulty` on the lesson root, and master-difficulty lessons
-   read one notch denser — tighter leading, paragraphs pulled a little closer
-   — so the page itself signals "reference instrument, not guided walk".
-   Unlayered on purpose: the typography plugin's `.prose` styles live in the
-   utilities layer, and only unlayered rules outrank them. Deliberately two
-   declarations and only for `master`; anything louder reads as a bug. */
-[data-difficulty="master"] .prose {
-  line-height: 1.65;
+   read one notch denser, with tighter leading and paragraphs pulled a little
+   closer, so the page itself signals "reference instrument, not guided walk".
+   In `@layer components`, and that placement is the fix for a live bug rather
+   than tidiness. Unlayered, these two rules outranked every Tailwind utility
+   regardless of specificity, and the second one was killing real margins on
+   master-difficulty lessons: a rendered-DOM sweep found `mt-3`, `mt-2.5`,
+   `mt-2`, `mt-1.5` and `mt-1` dead on nine paragraphs and lists, and a
+   DerivationSteps `<ol class="not-prose my-8">` getting `margin-block: 1.1em`
+   instead of its authored 2rem. `not-prose` does not rescue it: that class only
+   excludes an element from the typography plugin's own `:where()` rules, and
+   this is a hand-written selector carrying no such exclusion.
+
+   The guard could not see it. `src/lib/design/__tests__/cascadeLayers.test.ts`
+   scans CLASS rules only, so an attribute selector like this one is invisible
+   to it, which is the same blind spot that let the `:focus-visible` and
+   `h3[id$="-heading"]` bugs survive. Layered, these stay the default they were
+   always meant to be and any utility on the element wins.
+
+   Deliberately two declarations and only for `master`; anything louder reads
+   as a bug.
+
+   1.6 is a literal, chosen as one notch under the 1.7 base above, and it does
+   NOT track that base: `calc()` on a unitless line-height is not worth the
+   indirection for a single 0.1 step. So the two numbers are coupled by this
+   comment and nothing else. If the base moves, move this one with it, and
+   keep the gap at 0.1. (An earlier version of this comment claimed the value
+   was derived; it never was.) */
+@layer components {
+  [data-difficulty="master"] .prose {
+    line-height: 1.6;
+  }
+  /* `:not(.not-prose *)` restores a contract this rule was quietly breaking.
+     `not-prose` means "typography rules do not reach here", and the
+     typography plugin honours it because its own rules are written as
+     `:where()` selectors it can exclude. This one is hand-written, so
+     `not-prose` never excluded it, and every paragraph inside a figure panel,
+     caption or instrument frame on a master lesson picked up 1.1em of block
+     margin its author had not asked for.
+
+     What surfaced it: fourteen sites across Apex and Mastery had a
+     `<p className="mt-1 ...">` whose children began on the next line, which
+     MDX wraps in a second `<p>` and the parser then splits, leaving the
+     styling on an empty element. Fixing those to `<div>` left the inner
+     paragraph correctly sized at 11 to 14px, and this rule was then adding
+     ~13px of margin above and below a caption authored with `mt-1` (4px). It
+     had been doing the same thing before the fix, only worse, at the inherited
+     18px prose size. So this is not a regression from that work; it is the
+     defect that work made visible.
+
+     Scoped rather than deleted: the 1.1em is right for master *prose*, which
+     is what the rule is for, and none of that sits inside `not-prose`. */
+  [data-difficulty="master"] .prose :where(p, ul, ol):not(.not-prose *) {
+    margin-block: 1.1em;
+  }
 }
-[data-difficulty="master"] .prose :where(p, ul, ol) {
-  margin-block: 1.1em;
+
+/* ----------------------------------------------------------------------------
+   8b. Practice-question answers
+   ----------------------------------------------------------------------------
+   Every "## Practice Questions" item carries a worked answer the reader can
+   open *after* attempting it. The mechanism is a native `<details>` authored
+   directly in the MDX, not a component, for three reasons: a closed
+   `<details>` hides its content via the UA's `display: none`, so the answer is
+   out of the accessibility tree entirely and cannot be read ahead by a screen
+   reader working the question; `<summary>` is focusable, Enter/Space operable
+   and picks up the global `:focus-visible` pillar ring for free; and section
+   12's `details:not([open])` rule already forces it open on paper, so a
+   printed lesson carries its answers with no extra work. It also costs nothing
+   against the =<30-entry budget in
+   src/lib/design/__tests__/mdxMapping.test.ts.
+
+   Styled as a margin-rule, not a panel. The answer sits *inside* an `<li>` of
+   an ordered list that is already indented under a heading; a bordered box
+   there would read as a third level of nesting and fight the question it
+   belongs to. A hairline rule plus a small uppercase label is the same
+   "aside within the reading column" treatment `Question` and `HistoricalMoment`
+   use, one step quieter.
+
+   The rule and the label both take the pillar channel only when open, so a
+   scanning eye can tell at a glance which answers it has already looked at
+   without any of them shouting while still closed. */
+@layer components {
+  .prose .answer-reveal {
+    margin-block: 0.9em 1.3em;
+    border-inline-start: 2px solid var(--border);
+    padding-inline-start: 1rem;
+    transition: border-color var(--dur-fast) var(--ease-mech);
+  }
+
+  .prose .answer-reveal[open] {
+    border-inline-start-color: var(--pillar-edge);
+  }
+
+  .prose .answer-reveal > summary {
+    /* Both, because the two engines disagree about which one suppresses the
+       default twisty: `list-style` covers Firefox and current Chromium,
+       `::-webkit-details-marker` covers older WebKit/Safari. */
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    cursor: pointer;
+    /* `.prose` sets an 18px body; this label is a marker, not reading, so it
+       is sized absolutely like every other `Eyebrow`-weight label on the
+       site. */
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    transition: color var(--dur-fast) var(--ease-mech);
+  }
+
+  .prose .answer-reveal > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .prose .answer-reveal > summary:hover,
+  .prose .answer-reveal[open] > summary {
+    color: var(--pillar-text);
+  }
+
+  /* A border-built chevron rather than an inline SVG: this is decoration on an
+     element authored ~89 times across the corpus, and a pseudo-element costs
+     no markup in any of them. `aria-hidden` is moot, because generated
+     content is already outside the accessibility tree. */
+  .prose .answer-reveal > summary::before {
+    content: "";
+    flex: none;
+    width: 0.42em;
+    height: 0.42em;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform var(--dur-fast) var(--ease-mech);
+  }
+
+  .prose .answer-reveal[open] > summary::before {
+    transform: rotate(45deg);
+  }
+
+  /* The first paragraph of an answer sits directly under the label, so its
+     `.prose` top margin would open a gap wider than the label itself. */
+  .prose .answer-reveal > summary + * {
+    margin-top: 0.5em;
+  }
+
+  .prose .answer-reveal > :last-child {
+    margin-bottom: 0;
+  }
+
+  @media print {
+    /* Section 12 forces every closed `<details>` open on paper, which leaves
+       this chevron pointing at a disclosure that is already disclosed: a
+       control that cannot be operated, indicating a state that is not true.
+       The label itself reads correctly either way ("Answer", not "Show
+       answer"), so only the affordance goes. */
+    .prose .answer-reveal > summary::before {
+      display: none;
+    }
+
+    .prose .answer-reveal > summary {
+      color: inherit;
+    }
+  }
 }
 
 /* ----------------------------------------------------------------------------
@@ -1034,18 +1486,6 @@ h3[id$="-heading"] {
   transform: none;
 }
 
-/* Slow atmospheric breathe for decorative glow layers. */
-@keyframes field-breathe {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.78;
-    transform: scale(1.045);
-  }
-}
 
 /* The arrival of a panel that appears in response to a deliberate action —
    PredictBeforeReveal's answer panel is the canonical case. Written as a
@@ -1086,11 +1526,35 @@ h3[id$="-heading"] {
   }
 }
 
+/* Gated on intent, not left running. This is the site's only ambient loop
+   next to prose, and it sits directly under the "next discovery" heading at
+   the end of a lesson: a reader who has just finished four thousand words of
+   quantum field theory does not need something moving in their periphery
+   while they decide where to go next. "Signal flowing" is a mood, and a mood
+   is not information about what the next lesson is. On hover or focus-within
+   it becomes what it should always have been, a response to the reader
+   pointing at the card. Everything else in the motion system is already
+   purposeful this way: `Reveal` is a one-shot entrance, `panel-arrive` fires
+   on a deliberate action, `animate-pulse` is confined to skeletons, and the
+   `animate-ping` markers are measurement feedback inside simulators.
+
+   `.field-breathe` was removed entirely rather than gated. It was a pulsing
+   dot beside a citation in ResearchConnection, deleted from that component on
+   the same grounds, after which the keyframe, the class and its
+   `cascadeLayers` allowlist entry were all dead. */
+/* The gradient lives here rather than in a class attribute. It was two
+   arbitrary-value utilities at the single call site, which meant the visual
+   and the motion that animates it were defined in two different files and
+   neither one said what it was for. No `background-repeat`: the keyframe runs
+   `background-position` from -40% to 140% against a tiling background, which
+   is what makes the highlight travel. */
+.trace-sweep {
+  background-image: linear-gradient(90deg, transparent, var(--pillar-accent), transparent);
+  background-size: 200% 100%;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .field-breathe {
-    animation: field-breathe 14s ease-in-out infinite;
-  }
-  .trace-sweep {
+  :where(:hover, :focus-within) > .trace-sweep {
     animation: trace-sweep 4.5s linear infinite;
   }
 }
@@ -1335,7 +1799,7 @@ h3[id$="-heading"] {
     display: none !important;
   }
   [data-mdx="instrument-mount"]::after {
-    content: "Interactive figure — view online to try it.";
+    content: "Interactive figure. View online to try it.";
     display: block;
     margin-top: 0.75rem;
     font-size: 0.8em;
@@ -1360,7 +1824,7 @@ h3[id$="-heading"] {
     padding: 0.75rem !important;
   }
   [data-simulator-skeleton]::after {
-    content: "Interactive simulator — view online to run it.";
+    content: "Interactive simulator. View online to run it.";
     display: block;
     font-size: 0.8em;
     font-style: italic;

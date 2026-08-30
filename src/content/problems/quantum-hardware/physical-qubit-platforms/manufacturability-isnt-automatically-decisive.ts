@@ -20,28 +20,40 @@ export const manufacturabilityIsntAutomaticallyDecisive: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["uniformity", "reliable", "consistent fabrication"],
-      ["individual addressing", "neighboring", "without disturbing"],
+      {
+        phrases: ["uniformity", "reliable", "consistent fabrication"],
+        missingFeedback:
+          "One of the named challenges is about the fabrication itself. Say what has to be true of a large array of dots coming off the line.",
+      },
+      {
+        phrases: ["individual addressing", "neighboring", "without disturbing"],
+        missingFeedback:
+          "You have the fabrication challenge. The lesson names a second one, about control rather than manufacture: say what you have to be able to do to one dot, and what must not happen to the ones next to it.",
+      },
     ],
     incorrectFeedback: "Name both specific open challenges the lesson identifies, not just a general statement that 'more work is needed.'",
-    partialFeedback: "Good — make sure both named challenges (uniformity and individual addressing) appear explicitly.",
+    partialFeedback: "Good. Both of the lesson's named challenges have to appear, not one of them plus a general remark. One is about making many dots come out the same; the other is about touching one spin without touching the ones beside it.",
+    modelAnswers: [
+      "Two challenges are named: reliable, consistent fabrication of many dots so they come out uniform, and addressing each one individually without disturbing its neighboring dots. Compatible tooling solves neither.",
+      "Even with standard fabrication tooling you still have to get uniformity across a large array, and you need individual addressing that leaves the neighboring dots alone.",
+    ],
   },
   hints: [
     { text: "One challenge concerns making many quantum dots consistently, not just one." },
     { text: "Another challenge concerns controlling a single spin without accidentally affecting its neighbors." },
-    { text: "Both are named explicitly in the lesson's Physical Interpretation and Common Mistakes sections." },
+    { text: "Both are problems that only appear once you want many dots working together, rather than one dot working at all." },
   ],
   solution: {
     steps: [
-      { description: "Uniform, reliable fabrication of many quantum dots — small variations in dot properties across a chip can cause inconsistent qubit behavior." },
-      { description: "Individually addressing single spins without disturbing neighboring qubits — a real control challenge distinct from the fabrication question." },
+      { description: "Uniform, reliable fabrication of many quantum dots. Small variations in dot properties across a chip cause inconsistent qubit behavior." },
+      { description: "Individually addressing single spins without disturbing neighboring qubits, a control challenge distinct from the fabrication question." },
       { description: "Both remain open engineering problems even though the underlying device size favors existing manufacturing infrastructure." },
     ],
-    finalAnswer: "Reliable, uniform fabrication of many dots, and precise individual addressing without disturbing neighbors — both open challenges named explicitly in the lesson.",
+    finalAnswer: "Reliable, uniform fabrication of many dots, and precise individual addressing without disturbing neighbors: both open challenges named explicitly in the lesson.",
   },
   explanation: {
     correctIdea: "This tests whether the reader absorbed the lesson's explicit caveat, not just its headline manufacturability claim.",
-    whyCorrect: "Matches the lesson's Common Mistakes section directly.",
-    whyWrong: ["A vague answer like 'more research is needed' doesn't demonstrate having read the SPECIFIC challenges the lesson names."],
+    whyCorrect: "Both remaining obstacles only appear in the plural. One dot works; a thousand dots behaving identically is a fabrication problem, and touching one spin while its neighbours stay put is a control problem. Borrowing a mature fabrication line solves neither.",
+    whyWrong: ["A vague answer like 'more research is needed' does not demonstrate having read the specific challenges the lesson names."],
   },
 };

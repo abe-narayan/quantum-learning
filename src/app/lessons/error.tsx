@@ -5,13 +5,13 @@ import { Container } from "@/components/ui/Container";
 import { SectionTitle, Lede, TechLabel } from "@/components/ui/Typography";
 import { Button } from "@/components/ui/Button";
 
-// Scoped to /lessons and every /lessons/[...slug] page — the routes most
+// Scoped to /lessons and every /lessons/[...slug] page, the routes most
 // likely to embed a numeric simulator inline in lesson content. Catching the
 // error here (rather than only at the root) keeps the Navbar/Footer chrome
 // and lets the fallback point back to the lesson library instead of home.
 // No lesson/course is reliably known here (the error may have fired before
-// content resolved), so this stays outside any `PillarScope` — the default,
-// pillar-less token ramp — rather than guessing an identity.
+// content resolved), so this stays outside any `PillarScope`, the default,
+// pillar-less token ramp, rather than guessing an identity.
 export default function LessonsError({
   error,
   retry,
@@ -34,12 +34,12 @@ export default function LessonsError({
         This lesson hit a snag
       </SectionTitle>
       <Lede className="mt-5">
-        An unexpected error interrupted this lesson — most likely a bug in one of its interactive
+        An unexpected error interrupted this lesson, most likely a bug in one of its interactive
         simulators, not something you did. You can try again, or head back to the lesson library.
       </Lede>
 
       {/* `/lessons`, not `/learn`. The label says "all lessons" and `/lessons`
-          is the page titled exactly that — the flat index of every written
+          is the page titled exactly that, the flat index of every written
           lesson. `/learn` is the curriculum explorer: the recommended order,
           grouped by track, which is a different page answering a different
           question. Sending a reader whose lesson just crashed to an index

@@ -20,24 +20,36 @@ export const pigeonholeOddCycleArgument: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["alternat", "go around", "around the cycle", "return to start", "back to the start", "wraps around", "every other"],
-      ["odd number", "odd length", "odd cycle", "odd count", "odd n", "parity", "contradict", "mismatch", "two different colors", "both colors", "wrong color", "can't return", "cannot return", "inconsistent"],
+      {
+        phrases: ["alternat", "go around", "around the cycle", "return to start", "back to the start", "wraps around", "every other"],
+        missingFeedback:
+          "Describe the colouring you would need. Walk the cycle edge by edge and say what colour each vertex has to be relative to the last one.",
+      },
+      {
+        phrases: ["odd number", "odd length", "odd cycle", "odd count", "odd n", "parity", "contradict", "mismatch", "two different colors", "both colors", "wrong color", "can't return", "cannot return", "inconsistent"],
+        missingFeedback:
+          "You have the colouring pattern. Now close the loop and say what goes wrong at the final edge, and what it is about the length of the cycle that forces it.",
+      },
     ],
-    incorrectFeedback: "Try to two-color the cycle so every edge is cut, working vertex by vertex, and pay attention to the moment the loop closes on itself.",
-    partialFeedback: "Good. Now be explicit about the clash at the final vertex and why the cycle's length is what causes it.",
+    incorrectFeedback: "You restated the triangle case rather than generalizing it. Try to two-colour the whole cycle so that every edge is cut, working vertex by vertex, and watch what happens at the moment the loop closes on itself.",
+    partialFeedback: "Now describe the clash at the last vertex, and say which property of the loop's size is responsible for it.",
+    modelAnswers: [
+      "To cut every edge the colours have to alternate as you go around the cycle. Around an odd cycle that alternation cannot close up: when you return to the start you need the first vertex to be both colours at once, which is a contradiction.",
+      "Every other vertex gets the opposite colour, so going around an odd length loop you come back to the starting vertex with the wrong color. The parity does not work out, so at least one edge must join two vertices of the same colour.",
+    ],
   },
   hints: [
-    { text: "To cut an edge, what must be true of its two endpoint colors? Walk vertex by vertex around the cycle imposing that condition." },
+    { text: "To cut an edge, what must be true of its two endpoint colors? Walk vertex by vertex around the loop imposing that condition." },
     { text: "Track which color you are forced to give vertex k. What determines it?" },
-    { text: "The walk eventually arrives back where it began. Compare the color demanded there with the color you gave that vertex at the start." },
+    { text: "The walk eventually arrives back where it began. Compare the color demanded there with the color you gave that vertex at the outset." },
   ],
   solution: {
     steps: [
       { description: "Cutting every edge of a cycle requires adjacent vertices to always differ, i.e. colors must strictly alternate around the cycle." },
       { description: "Starting at vertex 0 with color A, alternating gives vertex k color A if k is even, B if k is odd." },
-      { description: "For an odd cycle of length n, vertex n (which equals vertex 0) would need color B (since n is odd) — contradicting vertex 0's actual color, A." },
+      { description: "For an odd cycle of length n, vertex n (which equals vertex 0) would need color B, since n is odd, contradicting vertex 0's own color A." },
     ],
-    finalAnswer: "Alternating colors around an odd cycle forces a contradiction at the point where it closes back on itself — so no odd cycle can have every edge cut.",
+    finalAnswer: "Alternating colors around an odd cycle forces a contradiction at the point where it closes back on itself, so no odd cycle can have every edge cut.",
   },
   explanation: {
     correctIdea: "This is the standard fact that odd cycles are not bipartite, generalizing the triangle's specific pigeonhole argument to any odd length.",

@@ -31,7 +31,7 @@ export const cauchySchwarzCheck: NumericProblem = {
   hints: [
     { text: "⟨u,v⟩ = u1*·v1 + u2*·v2, with u=(1,0) and v=(1/√2, 1/√2)." },
     { text: "Since u2 = 0, only the first term contributes." },
-    { text: "⟨u,v⟩ = 1/√2 — now square it." },
+    { text: "⟨u,v⟩ = 1/√2. Now square it." },
   ],
   solution: {
     steps: [
@@ -45,7 +45,7 @@ export const cauchySchwarzCheck: NumericProblem = {
   },
   explanation: {
     correctIdea: "Cauchy-Schwarz says this squared overlap can never exceed ‖u‖²‖v‖² = 1·1 = 1, and 0.5 respects that bound.",
-    whyCorrect: "Direct computation of the inner product, then squaring its magnitude, gives exactly 0.5.",
-    whyWrong: ["Squaring u and v's norms instead of the inner product itself would give 1, not the actual overlap of 0.5."],
+    whyCorrect: "Direct computation of the inner product, then squaring its magnitude, gives 0.5.",
+    whyWrong: ["Squaring u and v's norms instead of the inner product itself would give 1, the bound rather than the overlap of 0.5."],
   },
 };

@@ -28,7 +28,7 @@ export const bellStateOutcomeProbability: NumericProblem = {
     value: probabilityOf11,
     tolerance: 0.01,
     incorrectFeedback:
-      "Only basis terms with nonzero amplitude in the state can be measured — check the amplitude on |11⟩ specifically.",
+      "Only basis terms with nonzero amplitude can be measured. Check the amplitude on |11⟩.",
     nearMisses: [
       { value: 0.25, feedback: "0.25 spreads probability across all four two-qubit outcomes. |01⟩ and |10⟩ have zero amplitude here, so only two outcomes share the total." },
       { value: Math.SQRT1_2, tolerance: 0.01, feedback: "1/√2 is the amplitude. The Born rule squares it to get a probability." },
@@ -36,7 +36,7 @@ export const bellStateOutcomeProbability: NumericProblem = {
   },
   hints: [
     { text: "Which basis terms appear in |Φ+⟩ with nonzero amplitude?" },
-    { text: "The amplitude on |11⟩ is 1/√2 — the same as on |00⟩." },
+    { text: "The amplitude on |11⟩ is 1/√2, the same as on |00⟩." },
     { text: "Apply the Born rule to that amplitude: P = |amplitude|²." },
   ],
   solution: {
@@ -52,7 +52,7 @@ export const bellStateOutcomeProbability: NumericProblem = {
   explanation: {
     correctIdea: "Only the |00⟩ and |11⟩ terms have nonzero amplitude in |Φ+⟩, and they're equal in magnitude.",
     whyCorrect:
-      "The Born rule applies to a multi-qubit state exactly the way it does to a single qubit — square the amplitude of the outcome in question.",
+      "The Born rule applies to a multi-qubit state the way it does to a single qubit: square the amplitude of the outcome in question.",
     whyWrong: [
       "Assuming all four two-qubit outcomes (00, 01, 10, 11) are equally likely (25% each) ignores that |01⟩ and |10⟩ have zero amplitude in this particular state.",
     ],

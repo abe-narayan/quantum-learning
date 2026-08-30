@@ -17,9 +17,9 @@ export const whyTheMaslovHalfMatters: MultipleChoiceProblem = {
     prompt: "If the quantization condition were mistakenly used as ∫p dx=nπℏ (dropping the +1/2), what would happen to the predicted harmonic-oscillator ground-state energy (n=0)?",
     options: [
       { id: "a", text: "It would predict E=0 for the ground state, instead of the correct E=0.5ℏω" },
-      { id: "b", text: "Nothing would change — the +1/2 only matters for large n" },
-      { id: "c", text: "It would predict a negative energy, which is unphysical" },
-      { id: "d", text: "The action integral itself would become undefined" },
+      { id: "b", text: "Nothing would change, since the +1/2 only matters for large n" },
+      { id: "c", text: "It would predict a negative energy, unphysical for a bound state" },
+      { id: "d", text: "The action integral between the turning points would become undefined" },
     ],
   },
   answer: {
@@ -27,10 +27,10 @@ export const whyTheMaslovHalfMatters: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "The +1/2 shifts every predicted level by the same fixed amount, including (very visibly) the n=0 ground state.",
-      c: "∫p dx=0 has the trivial solution of zero turning-point separation, i.e. E=V_min=0 in this potential's units — not negative, just wrong (missing the real zero-point energy).",
+      c: "∫p dx=0 has the trivial solution of zero turning-point separation, that is E=V_min=0 in this potential's units. Not negative, but wrong: it misses the zero-point energy.",
       d: "The action integral is still perfectly well-defined; only the target value on the right-hand side of the quantization condition changes.",
     },
-    defaultIncorrectFeedback: "Setting n=0 in ∫p dx=nπℏ requires the action integral to be exactly 0, which happens only at E=0 (the bottom of the potential) — missing the true zero-point energy entirely.",
+    defaultIncorrectFeedback: "Setting n=0 in ∫p dx=nπℏ requires the action integral to be exactly 0, which happens only at E=0, the bottom of the potential. That misses the zero-point energy entirely.",
   },
   hints: [
     { text: "Substitute n = 0 into the modified condition and read off what it demands of the action integral." },

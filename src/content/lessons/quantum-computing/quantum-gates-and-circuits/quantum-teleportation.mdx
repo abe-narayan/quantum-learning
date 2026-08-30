@@ -93,7 +93,7 @@ export const protocolFrames = fullProtocolInstructions.map((_, i) => ({
 Alice can put Bob in possession of a qubit in exactly the state she started with, without that qubit traveling between them, without either of them learning its amplitudes, and without violating no-cloning.
 </LessonHook>
 
-## Motivation
+## Not a trick, an approximation, or a loophole
 
 Moving a qubit's state to Bob without the qubit traveling, and without
 anyone learning its amplitudes, sounds like it has to be a trick, an
@@ -113,10 +113,10 @@ the message all along.
   caption="The ion trap NIST used for its 2004 demonstration of teleporting an atomic qubit's state; the trap area is the horizontal opening near the centre. This protocol has been run, not only derived."
   credit="NIST"
   creditUrl="https://www.nist.gov/news-events/news/2004/06/nist-demonstrates-teleportation-atomic-states-quantum-computing"
-  license="Public Domain (U.S. Government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Intuition
+## Measurement gives one bit; the state has two numbers
 
 Alice has a qubit in an unknown state and wants Bob, far away, to end up
 holding a qubit in that same state. She can't just measure her qubit and
@@ -128,7 +128,7 @@ more powerful: entangle her unknown qubit with a shared resource, measure
 to Bob's qubit, up to a small, fully-known correction Alice tells him
 how to apply.
 
-## Mathematical Development
+## Four branches, and which one Alice is in
 
 ### The setup
 
@@ -193,7 +193,7 @@ will tell her.
 Bob's qubit is |ψ⟩ itself, or a fixed transformation of it, in every branch. Which branch Alice is in is exactly what her two measurement outcomes tell her.
 </InsightBlock>
 
-<InteractiveSection title="Build the pre-measurement circuit yourself" description="Build the pre-measurement part of this exact protocol yourself, in 3-qubit mode: H on qubit 1 and CNOT(1,2) to prepare the shared Bell pair, then CNOT(0,1) and H on qubit 0, the two steps just derived above. Inspect the resulting state's amplitudes and check them against the four-branch formula above: all 8 basis states end up populated, with magnitude 0.3 wherever the formula has an α term and 0.4 wherever it has a β term, since α=0.6 and β=0.8i here.">
+<InteractiveSection title="Build the pre-measurement circuit yourself" description="Build the pre-measurement part of this exact protocol yourself, in 3-qubit mode: H on qubit 1 and CNOT(1,2) to prepare the shared Bell pair, then CNOT(0,1) and H on qubit 0, the two steps just derived above. The builder always starts from |000⟩ and has no gate that prepares an arbitrary α, β, so what you get is the α=1, β=0 case of the four-branch formula: |000⟩, |011⟩, |100⟩ and |111⟩ at magnitude 0.5 each, and the other four amplitudes zero because every β term has vanished. Read Bob's qubit off each branch in turn and check it against the formula, which predicts |0⟩, |1⟩, |0⟩, |1⟩ once α=1 and β=0 are substituted in.">
   <LazyCircuitBuilder />
 </InteractiveSection>
 
@@ -253,25 +253,25 @@ branches they land in.
   ariaLabel="Alice's two-bit measurement outcome tree: four equally-likely branches (00, 01, 10, 11), each requiring a different fixed correction on Bob's qubit"
 />
 
+<PredictBeforeReveal
+  question="Bob is holding his half of the pair. Alice has measured and sent her two bits, but they have not arrived yet. What can Bob learn about |ψ⟩ from his own qubit in the meantime?"
+  options={[
+    { label: "Its measurement probabilities, though not the relative phase between α and β", value: "probs" },
+    { label: "α exactly, but nothing about β", value: "alpha" },
+    { label: "Nothing: all four rows of the table are still equally likely to be his", value: "nothing" },
+    { label: "Everything but a global phase, since each correction only relabels basis states", value: "almost" },
+  ]}
+  correctValue="nothing"
+  explanation="Nothing. Whatever α and β were, Bob's qubit is equally likely to be |ψ⟩, X|ψ⟩, Z|ψ⟩ or XZ|ψ⟩, and any measurement he makes on that even mixture of four comes out 50/50 for every |ψ⟩ Alice could have started with. So there is no experiment he can run that distinguishes one message from another until the bits arrive. The two classical bits are not paperwork that tidies the answer up afterwards; they are the whole of what Bob was missing, which is exactly why teleportation cannot outrun a classical message."
+/>
+
 Alice sends her two classical bits to Bob (at ordinary, light-speed-limited
 communication speed, nothing here is instantaneous). Bob applies the
 matching correction:
 
-<PredictBeforeReveal
-  question="Once Bob applies the correction his two classical bits tell him to, does his qubit end up in Alice's exact original state |ψ⟩ (α=0.6, β=0.8i), or just something close to it?"
-  options={[
-    { label: "Exactly |ψ⟩", value: "exact" },
-    { label: "Close, but with some error", value: "approx" },
-    { label: "Only matching measurement probabilities", value: "probs-only" },
-    { label: "A completely different state", value: "different" },
-  ]}
-  correctValue="exact"
-  explanation="The correction table is exact, not probabilistic. Each of the four branches is a fixed, known transformation of |ψ⟩ (identity, X, Z, or XZ), so undoing it with the matching gate recovers α=0.6 and β=0.8i, amplitudes and all, not merely the right measurement odds. The panels below show the branch computed here: Bob's qubit before correction, after X, and after Z, landing back on |ψ⟩."
-/>
-
-<QuantumStateDisplay state={bobUncorrected} label="Bob's qubit, before correction" showProbabilities={false} />
-<QuantumStateDisplay state={bobAfterX} label="After applying X" showProbabilities={false} />
-<QuantumStateDisplay state={bobFinal} label="After applying Z: recovers |ψ⟩ exactly" showProbabilities={false} />
+<QuantumStateDisplay state={bobUncorrected} label="All three qubits after both measurements; Bob's is the last label" showProbabilities={false} />
+<QuantumStateDisplay state={bobAfterX} label="After Bob applies X to qubit 2" showProbabilities={false} />
+<QuantumStateDisplay state={bobFinal} label="After Bob applies Z to qubit 2: qubit 2 is |ψ⟩ exactly" showProbabilities={false} />
 
 For the branch shown here (outcome $11$), Bob applies $X$ then $Z$ and
 recovers $\alpha|0\rangle+\beta|1\rangle$ exactly, the *original*
@@ -279,7 +279,7 @@ $\alpha=0.6$, $\beta=0.8i$, with no approximation. This holds for every
 one of the four branches: the correction table above is exact, not
 probabilistic.
 
-## Physical Interpretation
+## Exactly one copy exists at any moment
 
 Nothing here violates no-cloning: Alice's message qubit is *destroyed* by
 her measurements (its amplitudes are gone the moment she measures);
@@ -290,7 +290,7 @@ no-signaling either: without Alice's two classical bits, Bob's qubit
 which of) carries no usable information about $\psi$ at all. The
 classical message is doing indispensable work, at ordinary speed.
 
-## Common Mistakes
+## Faster than light, and other things this is not
 
 <Callout type="mistake">
 **"Teleportation sends information faster than light."** It doesn't.
@@ -308,14 +308,173 @@ consumed by her measurement; it does not survive alongside Bob's copy.
 
 1. Verify the $01$ row of the correction table: show that
    $X(\beta|0\rangle+\alpha|1\rangle)$ recovers $\alpha|0\rangle+\beta|1\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $X$ swaps the two amplitudes, so it swaps $\beta$ and $\alpha$ back into
+   their original slots:
+
+   $$
+   X\begin{pmatrix}\beta\\\alpha\end{pmatrix} = \begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}\beta\\\alpha\end{pmatrix} = \begin{pmatrix}\alpha\\\beta\end{pmatrix} = \alpha|0\rangle+\beta|1\rangle = |\psi\rangle \checkmark
+   $$
+
+   Checked on the lesson's concrete message, $\alpha = 0.6$ and
+   $\beta = 0.8i$: Bob's qubit in this branch is
+   $0.8i\,|0\rangle + 0.6\,|1\rangle$, and applying $X$ returns
+   $0.6\,|0\rangle + 0.8i\,|1\rangle$, the original, which the engine
+   confirms exactly rather than to within a tolerance.
+
+   The reason the correction is a single fixed gate is worth saying out
+   loud, because it is the whole trick. Bob's qubit in this branch is
+   $X|\psi\rangle$, and $X^2 = I$, so $X$ is its own undo. The same holds
+   for $Z$ in the $10$ branch. Bob does not need to know $\alpha$ or
+   $\beta$ to apply $X$; nobody in the protocol ever learns them, which is
+   what keeps no-cloning intact.
+
+   The wrong turn is checking the correction only on probabilities. In this
+   branch $|\psi\rangle$ has $P(1) = 0.64$ and Bob's uncorrected qubit has
+   $P(1) = 0.36$, so probabilities do flag the error here. Try the same
+   check on the $10$ branch and it fails silently: $Z|\psi\rangle$ has
+   exactly the same probabilities as $|\psi\rangle$, and only the relative
+   phase differs. Teleportation has to move the phase too, so the
+   verification has to be at the level of amplitudes.
+
+   </details>
+
 2. Verify the $11$ row: show that applying $X$ then $Z$ to
    $-\beta|0\rangle+\alpha|1\rangle$ recovers $\alpha|0\rangle+\beta|1\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Apply $X$ first, swapping the amplitudes:
+
+   $$
+   X\begin{pmatrix}-\beta\\\alpha\end{pmatrix} = \begin{pmatrix}\alpha\\-\beta\end{pmatrix}
+   $$
+
+   Then $Z$, which leaves the top entry alone and negates the bottom one:
+
+   $$
+   Z\begin{pmatrix}\alpha\\-\beta\end{pmatrix} = \begin{pmatrix}\alpha\\\beta\end{pmatrix} = |\psi\rangle \checkmark
+   $$
+
+   With the lesson's numbers, the engine collapses the full three-qubit
+   state on Alice's outcome $(1,1)$ and leaves Bob holding
+   $-0.8i\,|0\rangle + 0.6\,|1\rangle$; after $X$ then $Z$ on qubit 2 it
+   returns $0.6\,|0\rangle + 0.8i\,|1\rangle$, the original message
+   exactly.
+
+   The order is the part that actually needs verifying, and it is the part
+   students get wrong. Bob is holding $XZ|\psi\rangle$, so the undo is
+   $(XZ)^{-1} = Z^{-1}X^{-1} = ZX$: apply $X$ first, then $Z$. Doing it the
+   other way, $Z$ then $X$, computes $XZ(XZ|\psi\rangle)$, and since
+   $XZ = -ZX$ that equals $-XXZZ|\psi\rangle = -|\psi\rangle$. In this one
+   case the damage is only a global phase, so Bob would in fact still be
+   fine, which is exactly what makes the habit dangerous: it works here and
+   fails as soon as the same reflex is applied where the leftover phase is
+   relative rather than global, for instance inside a controlled operation
+   or on one branch of a larger superposition. Inverting a product reverses
+   the order, and it is worth getting right where the cost of being wrong
+   is invisible.
+
+   </details>
+
 3. Suppose Alice's classical message is lost in transit. Describe what
    Bob's qubit looks like to him (hint: he does not know which of the four
    branches he is in).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It looks like a fair coin, in every basis, and it looks that way no
+   matter what $|\psi\rangle$ Alice was sending.
+
+   Bob holds one of $|\psi\rangle$, $X|\psi\rangle$, $Z|\psi\rangle$,
+   $XZ|\psi\rangle$, each with probability $\tfrac14$ and no way to tell
+   which. Averaging those four possibilities gives his reduced description,
+   and the engine computes it directly by tracing Alice's two qubits out of
+   the full pre-measurement state:
+
+   $$
+   \rho_{\text{Bob}} = \frac{1}{4}\sum_{P \in \{I, X, Z, XZ\}} P|\psi\rangle\langle\psi|P^\dagger = \frac{1}{2}I
+   $$
+
+   The maximally mixed state. Every measurement he can make returns $50/50$,
+   the Z basis and the X basis and every basis in between alike, and
+   crucially the answer $\tfrac12 I$ contains no $\alpha$ or $\beta$ at
+   all: the same matrix comes out for every possible message. So the loss
+   is total. Bob has not received a degraded or noisy version of
+   $|\psi\rangle$; he has received a qubit statistically independent of it.
+
+   This is not a flaw in the protocol, it is the property that makes it
+   consistent. If Bob's qubit carried any trace of $\psi$ before the
+   classical bits arrived, Alice could modulate $\psi$ and signal to him
+   instantly. The two classical bits are not paperwork appended to a
+   transfer that has already happened. They are, quantitatively, the whole
+   of what Bob is missing, and they travel at ordinary speed.
+
+   The wrong turn is answering "his qubit is in one of four states, so he
+   has a one-in-four chance of being right if he guesses no correction".
+   That is true and it is not an information channel. Guessing gives him
+   the right qubit a quarter of the time with no way to know which quarter,
+   so his outcome statistics are exactly what they would be for any other
+   message, and averaged over the run he learns nothing. Also worth
+   avoiding: calling his qubit "a superposition of the four". It is not a
+   superposition, which would be a definite pure state with definite
+   relative phases. It is a mixture, which is why the correct object is a
+   density matrix and not a state vector.
+
+   </details>
+
 4. Why does the protocol need a *pre-shared* Bell pair? Could Alice and
    Bob instead just send an unentangled pair of qubits and get the same
    result?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. The entanglement is the only thing connecting Bob's qubit to
+   Alice's, and without it his qubit is untouched by anything she does.
+
+   Run the protocol with $|00\rangle$ in place of the Bell pair and follow
+   the algebra. Alice's $\text{CNOT}(0,1)$ and $H$ act only on qubits 0 and
+   1, so the three-qubit state stays a product with qubit 2 as a separate
+   factor, and qubit 2 stays $|0\rangle$ throughout. Tracing out Alice's
+   two qubits, the engine returns $\rho_{\text{Bob}} = |0\rangle\langle0|$,
+   with no dependence on $\alpha$ or $\beta$ anywhere. Alice's measurement
+   destroys the message, Bob's qubit is unchanged, and no correction chosen
+   from any table can repair it, since a fixed single-qubit gate applied to
+   $|0\rangle$ produces one fixed state and cannot reproduce an arbitrary
+   $|\psi\rangle$.
+
+   Compare with the real protocol, where the same trace gives $\tfrac12 I$.
+   That difference is the entire point. $\tfrac12 I$ is what a state looks
+   like when it is entangled with something you cannot see, and it is the
+   raw material the two classical bits then convert into $|\psi\rangle$.
+   $|0\rangle\langle0|$ is a qubit that was never in the conversation.
+
+   The "pre-shared" part answers a natural follow-up: if a qubit can travel
+   from Alice to Bob to establish the pair, why not send the message qubit
+   itself? Because the two shipments happen at different times and under
+   different conditions. Entanglement can be distributed in advance, in
+   bulk, at a convenient moment, and stored; the message may not exist yet,
+   may be produced by a computation that has not run, or may need to move
+   at a moment when no quantum channel is available. Teleportation converts
+   a quantum channel used earlier into a quantum channel used now, paid for
+   with two classical bits. That is a scheduling win, not a bandwidth one.
+
+   Two wrong turns are worth naming. The first is thinking any shared
+   randomness would do, a pair of correlated classical bits instead of a
+   Bell pair. It would not: the four-branch regrouping in the derivation
+   depends on interference between amplitudes, which classical correlation
+   has none of. The second is imagining the Bell pair somehow carries
+   $|\psi\rangle$ on its own. It cannot, since it was created before
+   $|\psi\rangle$ was involved and is completely independent of it, which is
+   precisely why sending it in advance is legitimate.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -330,7 +489,7 @@ consumed by her measurement; it does not survive alongside Bob's copy.
   consistent with no-cloning; it requires two classical bits of
   communication, consistent with no faster-than-light signaling.
 
-## Further Exploration
+## From correlating to arranging phases
 
 <NextDiscovery>
 [Interference in Quantum Circuits](/lessons/quantum-computing/quantum-gates-and-circuits/interference-in-quantum-circuits)

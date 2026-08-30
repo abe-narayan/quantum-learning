@@ -23,7 +23,7 @@ import { Predict } from "../shared/Predict";
 const SQRT1_2 = Math.SQRT1_2;
 
 /**
- * |Φ+⟩ = (|00⟩+|11⟩)/√2 — the maximally entangled Bell pair shared between
+ * |Φ+⟩ = (|00⟩+|11⟩)/√2, the maximally entangled Bell pair shared between
  * Alice and Bob for this experiment. Same construction `chsh.test.ts` uses
  * to verify `chshValue` reaches the Tsirelson bound exactly.
  */
@@ -67,14 +67,14 @@ function anglesEqual(x: ChshAngles, y: ChshAngles, tolerance = 1e-6): boolean {
  * A real CHSH Bell-inequality experiment: pick four measurement angles on a
  * shared entangled pair and watch the actual computed CHSH S statistic
  * update live, straight from `chshValue`/`correlationExpectation` in
- * `lib/quantum/chsh.ts` — nothing here is hardcoded or approximated. The
+ * `lib/quantum/chsh.ts`; nothing here is hardcoded or approximated. The
  * point is the number itself: every local hidden-variable theory is capped
  * at |S| ≤ 2 (`CHSH_CLASSICAL_BOUND`); genuine quantum correlations reach
  * up to |S| = 2√2 (`CHSH_QUANTUM_BOUND`, Tsirelson's bound). This is the
  * actual experiment that ruled local realism out.
  */
 export function CHSHBellTestExplorer() {
-  // First contact opens at the quantum-optimal angles, S = 2√2 ≈ 2.828 —
+  // First contact opens at the quantum-optimal angles, S = 2√2 ≈ 2.828,
   // the violation itself is on screen immediately, with the all-zero
   // classical reference configuration (S = 2 exactly) one preset click away.
   const [angles, setAngles] = useState<ChshAngles>(OPTIMAL_ANGLES);
@@ -90,7 +90,7 @@ export function CHSHBellTestExplorer() {
     return {
       sValue: chshValue(rho, { a, aPrime, b, bPrime }),
       // The four correlations S is assembled from, each straight from
-      // `correlationExpectation` — shown live so the reader can see *where*
+      // `correlationExpectation`, shown live so the reader can see *where*
       // the violation comes from, not just that it happened.
       terms: {
         ab: correlationExpectation(rho, a, b),
@@ -107,7 +107,7 @@ export function CHSHBellTestExplorer() {
 
   return (
     <SimulatorInstrument
-      label="CHSH Bell test — entangled pair"
+      label="CHSH Bell test: entangled pair"
       readout={<Readout label="S" value={sValue.toFixed(3)} />}
       footnote="S > 2 rules out every local hidden-variable theory; 2√2 ≈ 2.83 (Tsirelson's bound) is the quantum limit."
       stageClassName="space-y-6"
@@ -116,7 +116,7 @@ export function CHSHBellTestExplorer() {
         <p className="text-sm text-muted-foreground">
           Two particles are prepared together, then carried far apart. Alice measures one, Bob measures the
           other, each choosing between two angles. If each particle had simply been carrying its answer
-          all along — the way a pair of sealed envelopes would — then a certain combination of their
+          all along, the way a pair of sealed envelopes would, then a certain combination of their
           results, called S, could never exceed 2. Real entangled particles exceed it. This computes S
           from your angles, exactly.
         </p>
@@ -130,12 +130,12 @@ export function CHSHBellTestExplorer() {
         >
           {exceedsClassical ? (
             <>
-              S = {sValue.toFixed(3)} — this exceeds the classical bound of 2. No theory where each particle
+              S = {sValue.toFixed(3)}. This exceeds the classical bound of 2. No theory where each particle
               secretly &ldquo;knows&rdquo; its outcome in advance could ever produce this correlation.
             </>
           ) : (
             <>
-              S = {sValue.toFixed(3)} — within reach of any local hidden-variable theory (|S| ≤ 2). Try the
+              S = {sValue.toFixed(3)}, within reach of any local hidden-variable theory (|S| ≤ 2). Try the
               quantum-optimal preset to see it cross the line.
             </>
           )}
@@ -150,7 +150,7 @@ export function CHSHBellTestExplorer() {
 
         <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
           <p className="text-xs font-medium text-muted-foreground">
-            The four correlations S is built from — note the last one is <em>subtracted</em>
+            The four correlations S is built from. Note the last one is <em>subtracted</em>
           </p>
           <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
             {[
@@ -160,7 +160,7 @@ export function CHSHBellTestExplorer() {
               { label: "E(a′,b′)", value: terms.aPrimeBPrime, subtracted: true },
             ].map((term) => (
               <div key={term.label}>
-                <dt className={cn("font-mono text-[11px]", term.subtracted ? "text-accent" : "text-muted-foreground")}>
+                <dt className={cn("font-mono text-meta", term.subtracted ? "text-accent" : "text-muted-foreground")}>
                   {term.subtracted ? "− " : "+ "}
                   {term.label}
                 </dt>
@@ -173,7 +173,7 @@ export function CHSHBellTestExplorer() {
         {/* No `overflow-x-auto` here: the only child is a block-level
             `.katex-display`, which fills this content box and carries its own
             horizontal scroll (globals.css §6), so this box never had anything to
-            scroll — and `overflow-x: auto` with `overflow-y: visible` computes the
+            scroll, and `overflow-x: auto` with `overflow-y: visible` computes the
             y axis to `auto` too, which would silently clip a tall equation. The tab
             stop the slab needs now lives on `.katex-display` itself; see
             `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
@@ -189,7 +189,7 @@ export function CHSHBellTestExplorer() {
             type="button"
             onClick={() => setShowComparison((current) => !current)}
             aria-expanded={showComparison}
-            // Named only while the panel exists — it is unmounted when
+            // Named only while the panel exists; it is unmounted when
             // collapsed, and an `aria-controls` IDREF that resolves to nothing
             // is invalid. `aria-expanded` carries the state on its own.
             aria-controls={showComparison ? "chsh-comparison-panel" : undefined}
@@ -208,19 +208,19 @@ export function CHSHBellTestExplorer() {
         </div>
 
         <Predict
-          question="You open at the quantum-optimal angles: S = 2√2 ≈ 2.83, past anything classical. Load the all-angles-0° classical preset — where does S land?"
+          question="You open at the quantum-optimal angles: S = 2√2 ≈ 2.83, past anything classical. Load the all-angles-0° classical preset. Where does S land?"
           options={[
             { id: "above", label: "Still above 2" },
-            { id: "exactly", label: "Exactly at 2 — right on the classical limit" },
+            { id: "exactly", label: "Exactly at 2, right on the classical limit" },
             { id: "below", label: "Well below 2" },
           ]}
           outcomeId={!isZeroPreset ? null : exceedsClassical ? "above" : atClassicalBound ? "exactly" : "below"}
         />
 
         <SimulatorFraming
-          shows="Whether any theory where each particle secretly “knows” its measurement outcome in advance (local hidden variables) can match what entangled qubits actually do. It can't — and this experiment shows you the number that proves it."
+          shows="Whether any theory where each particle secretly “knows” its measurement outcome in advance (local hidden variables) can match what entangled qubits actually do. It can't, and this experiment shows you the number that proves it."
           watchFor="Every angle combination a real classical theory could ever produce is capped at S=2. Only genuine quantum correlations can cross that line."
-          tryThis="You open at the quantum-optimal angles, S ≈ 2.83 — already past any classical explanation. Load the all-angles-0° classical preset and watch S drop to exactly 2, then come back via the quantum-optimal preset and watch it cross the line again."
+          tryThis="You open at the quantum-optimal angles, S ≈ 2.83, already past any classical explanation. Load the all-angles-0° classical preset and watch S drop to exactly 2, then come back via the quantum-optimal preset and watch it cross the line again."
         />
         </>
       }
@@ -258,9 +258,21 @@ function CHSHGauge({ sValue }: { sValue: number }) {
 
   return (
     <div>
+      {/* THE CHART CHANNEL, ON A GAUGE.
+          The two ±2 ticks are where this instrument's whole claim lives: "S
+          crossed that line" is the result. They were `bg-foreground/50`, an
+          alpha rather than a token, and the shaded classical zone behind them
+          was `bg-border/70`, which is 1.41:1 decorative panel chrome faded a
+          further 30%. You could see the fill and not see the line it was
+          supposed to have crossed, the same defect the two decay charts on
+          this bench were fixed for.
+          Now: `--axis` (4.5:1) for the two bound ticks, the reference marks a
+          reader must perceive; `--axis-grid` (deliberately under 3:1) for the
+          zone shading and the S = 0 tick, which are optional ruling once the
+          boundary itself is drawn properly. */}
       <div className="relative h-4 overflow-hidden rounded-full bg-surface-muted">
         <div
-          className="absolute inset-y-0 bg-border/70"
+          className="absolute inset-y-0 bg-axis-grid/50"
           style={{ left: `${classicalLowPct}%`, width: `${classicalHighPct - classicalLowPct}%` }}
           aria-hidden="true"
         />
@@ -273,17 +285,17 @@ function CHSHGauge({ sValue }: { sValue: number }) {
           aria-hidden="true"
         />
         <div
-          className="absolute inset-y-0 w-px bg-foreground/50"
+          className="absolute inset-y-0 w-px bg-axis"
           style={{ left: `${classicalLowPct}%` }}
           aria-hidden="true"
         />
         <div
-          className="absolute inset-y-0 w-px bg-foreground/50"
+          className="absolute inset-y-0 w-px bg-axis"
           style={{ left: `${classicalHighPct}%` }}
           aria-hidden="true"
         />
         <div
-          className="absolute inset-y-0 w-px bg-foreground/20"
+          className="absolute inset-y-0 w-px bg-axis-grid"
           style={{ left: `${centerPct}%` }}
           aria-hidden="true"
         />
@@ -291,8 +303,8 @@ function CHSHGauge({ sValue }: { sValue: number }) {
       {/* `flex-wrap`: these three labels total ~40 monospace characters, which
           overflows the stage at 320px and would push a horizontal scrollbar
           onto the whole page. Wrapping drops the middle label to its own line
-          instead — the gauge above still lines up, and nothing is cut off. */}
-      <div className="mt-1 flex flex-wrap justify-between gap-x-2 gap-y-1 font-mono text-[11px] text-muted-foreground">
+          instead; the gauge above still lines up, and nothing is cut off. */}
+      <div className="mt-1 flex flex-wrap justify-between gap-x-2 gap-y-1 font-mono text-meta text-muted-foreground">
         <span>−2√2 ≈ {(-quantumBound).toFixed(2)}</span>
         <span>classical bound ±2</span>
         <span>2√2 ≈ {quantumBound.toFixed(2)}</span>

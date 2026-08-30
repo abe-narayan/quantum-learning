@@ -27,7 +27,11 @@ export const trotterErrorOrder: NumericProblem = {
       { value: 1, feedback: "Order 1 would be worse than the naive split. Symmetrizing improves the accuracy, it does not degrade it." },
     ],
   },
-  hints: [{ text: "If the O(Delta t^2) term cancels by symmetry, what's the next power of Delta t in the Taylor expansion?" }],
+  hints: [
+    { text: "The error terms come out of a Taylor expansion in $\\Delta t$, so they arrive as consecutive integer powers rather than arbitrary ones." },
+    { text: "The naive split's leading survivor is the $\\Delta t^2$ term. Symmetrizing makes one step palindromic in time, and a palindromic step cancels a whole parity class of terms." },
+    { text: "With the $\\Delta t^2$ term gone, the leading survivor is whatever power the expansion supplies next. Nothing further about the commutator enters." },
+  ],
   solution: {
     steps: [
       { description: "The naive split's leading error is $O(\\Delta t^2)$, proportional to the commutator $[\\hat T,\\hat V]$." },
@@ -37,7 +41,7 @@ export const trotterErrorOrder: NumericProblem = {
   },
   explanation: {
     correctIdea: "Symmetric (Strang) splitting is a standard technique for cancelling the leading-order error in operator splitting.",
-    whyCorrect: "This is exactly why the platform's SplitOperatorEvolver uses the half-step/full-step/half-step structure rather than a naive single ordering.",
+    whyCorrect: "This is why the platform's SplitOperatorEvolver uses the half-step/full-step/half-step structure rather than a naive single ordering.",
     whyWrong: ["Reporting order 2 (the naive split's error) ignores that symmetrizing specifically cancels that term."],
   },
 };

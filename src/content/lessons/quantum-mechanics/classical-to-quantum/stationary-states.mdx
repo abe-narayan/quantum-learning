@@ -24,11 +24,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="One note, with nowhere to leak">
 A superposition of energy eigenstates precesses: its measurement statistics visibly change over time. A state that starts as a single energy eigenstate never does, and the reason is worth deriving rather than assuming.
 </LessonHook>
 
-## Motivation
+## The complementary half of the last result
 
 The last lesson's worked example showed a superposition's statistics
 precessing in real time. This lesson proves the complementary fact: a
@@ -38,7 +38,7 @@ formula, $U(t)=e^{-iHt/\hbar}$, and comparing them is what reveals which
 feature of a state actually drives the motion. It turns out not to be
 energy, but energy *differences*.
 
-## Intuition
+## A single note against a chord
 
 If a state starts out as one exact "note" of the Hamiltonian (a single
 energy eigenstate), time evolution can only ever produce that same note,
@@ -56,7 +56,7 @@ notes, which is what determines the chord's character, does change.
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## One phase, and every probability frozen
 
 ### Energy eigenstates evolve by a single phase
 
@@ -103,17 +103,17 @@ precesses" are a difference you can watch rather than only derive:
 <PredictBeforeReveal
   question="Prepare |0⟩ (a Z-eigenstate) and repeatedly apply a Z-axis rotation gate. Does the point on the Bloch sphere move?"
   options={[
-    { label: "It sweeps around the equator", value: "sweeps" },
     { label: "It stays fixed at the pole", value: "fixed" },
+    { label: "It sweeps around the equator", value: "sweeps" },
     { label: "It spirals toward the equator", value: "spirals" },
   ]}
   correctValue="fixed"
-  explanation="|0⟩ is an eigenstate of H (for a Z-axis Hamiltonian), so it picks up only an overall phase e^{-iE_nt/ħ}, and the Bloch sphere does not display overall phase at all. The point sits at the pole no matter how many rotations you apply. |+⟩, tried next, is a superposition of two different Z-eigenstates; its relative phase is physical, and the point sweeps."
+  explanation="|0⟩ is an eigenstate of H (for a Z-axis Hamiltonian), so it picks up only an overall phase e^(-iEt/ħ), and the Bloch sphere does not display overall phase at all. The point sits at the pole no matter how many rotations you apply. |+⟩, tried next, is a superposition of two different Z-eigenstates; its relative phase is physical, and the point sweeps."
 />
 
 <InteractiveSection
-  title="Fix |0⟩ at the pole, then set |+⟩ sweeping"
-  description="Prepare |0⟩ and apply a Z-axis rotation gate repeatedly. Watch the point stay fixed at the pole, even though it's picking up phase with each application. Then prepare |+⟩ and repeat. This time the point visibly sweeps around the equator, because |+⟩ is a superposition of two different Z-eigenstates, not a single stationary one.">
+  title="Same gate, two starting states"
+  description="Prepare |0⟩ and apply a Z-axis rotation gate repeatedly, watching the point on the sphere while the state picks up phase with each application. Then prepare |+⟩ and run the identical sequence. Both runs apply exactly the same gate, so if the two look different, the explanation has to come from the states: |+⟩ is a superposition of two different Z-eigenstates, and |0⟩ is not.">
   <LazyBlochSphereExplorer />
 </InteractiveSection>
 
@@ -166,7 +166,7 @@ evolution. This is the quantum form of energy conservation, and the
 argument used only that $U(t)$ is built from $H$, so it covers every
 state rather than the eigenstates alone.
 
-## Physical Interpretation
+## Why chemists call an orbital stationary
 
 "Stationary state" is standard language throughout chemistry and atomic
 physics: an electron in a definite energy eigenstate of an atom (an
@@ -181,7 +181,7 @@ atomic transitions and Rabi oscillations alike, and it is why an atom
 sitting in a single eigenstate is stable: with nothing oscillating, there
 is nothing to radiate.
 
-## Worked Example
+## Stationarity checked on an explicit Hamiltonian
 
 **Verify stationarity directly for $H=\tfrac{\hbar\omega}{2}Z$,
 $|\psi(0)\rangle=|0\rangle$ (an eigenstate, with $H|0\rangle =
@@ -200,7 +200,7 @@ reproduces the $\cos^2(\omega t/2)$ revival curve from the previous
 lesson without redoing the algebra: one energy gap, one oscillation
 frequency.
 
-## Common Mistakes
+## The vector does change; the predictions do not
 
 <Callout type="mistake">
 **Believing "stationary" means the <Term id="quantum-state">state vector</Term> doesn't change at all.**
@@ -225,11 +225,164 @@ $\langle H\rangle$ is not a frozen system.
 1. Is a state that starts as a 50/50 superposition of two *different*
    $H$-eigenstates a stationary state? Justify your answer using the
    definition above, not just intuition.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No, provided the two eigenstates carry *different energies*. If they
+   happen to be degenerate, the answer flips to yes, and that exception is
+   worth keeping in view.
+
+   Take the main case first. Write $|\psi(0)\rangle =
+   \tfrac{1}{\sqrt2}(|1\rangle+|2\rangle)$ with $H|n\rangle=E_n|n\rangle$
+   and $E_1\ne E_2$. The derivation above gives
+
+   $$
+   |\psi(t)\rangle = e^{-iE_1t/\hbar}\,\frac{1}{\sqrt2}\left(|1\rangle + e^{-i(E_2-E_1)t/\hbar}|2\rangle\right)
+   $$
+
+   The definition of stationary is that *every* measurement probability is
+   constant in time, so to answer no it is enough to exhibit one
+   observable whose probability moves. Choose the observable whose
+   eigenbasis mixes the two levels, with eigenvector $|e\rangle =
+   \tfrac{1}{\sqrt2}(|1\rangle+|2\rangle)$. Dropping the global prefactor,
+   which does nothing:
+
+   $$
+   \langle e|\psi(t)\rangle = \frac12\left(1+e^{-i\omega_{21}t}\right), \qquad P(e,t) = \frac{1+\cos\omega_{21}t}{2}
+   $$
+
+   with $\omega_{21}=(E_2-E_1)/\hbar$. That runs from $1$ down to $0$ and
+   back, so the state is not stationary. The concrete instance is the
+   previous lesson's worked example: $|+\rangle$ under
+   $H=\tfrac{\hbar\omega}{2}Z$ is a 50/50 mix of the two $H$-eigenstates
+   $|0\rangle$ and $|1\rangle$, and $P(+)=\cos^2(\omega t/2)$ visibly
+   oscillates.
+
+   The wrong turn is to test the wrong observable and conclude the state
+   *is* stationary. Measure the energy itself and you get
+   $P(E_1)=P(E_2)=\tfrac12$ forever, because each component's phase has
+   magnitude $1$. Measure anything else diagonal in the energy basis and
+   the same thing happens. Those probabilities really are frozen, and
+   they are frozen for every state, as the callout above notes. Concluding
+   from them that nothing moves is testing only the observables that were
+   never going to reveal the motion. Stationarity is a claim about all
+   observables, so it takes one counterexample to refute and no finite
+   number of confirmations to establish.
+
+   Now the exception. If $E_1=E_2$, the two eigenstates are degenerate and
+   $\omega_{21}=0$; the relative phase never turns, the superposition is
+   itself an eigenstate of $H$, and it is stationary. So "two different
+   eigenstates" is not the right hypothesis on its own. What drives the
+   motion is two different *eigenvalues*, which is the same lesson the
+   Bohr condition teaches: gaps, not labels.
+
+   </details>
+
 2. For $H=\tfrac{\hbar\omega}{2}Z$ and $|\psi(0)\rangle=|1\rangle$, find
    $|\psi(t)\rangle$ and verify $P(1,t)=1$ for all $t$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $|\psi(t)\rangle = e^{+i\omega t/2}|1\rangle$, and $P(1,t)=1$ for every
+   $t$.
+
+   First read off the energy. $Z|1\rangle = -|1\rangle$, so
+
+   $$
+   H|1\rangle = \frac{\hbar\omega}{2}Z|1\rangle = -\frac{\hbar\omega}{2}|1\rangle, \qquad E_1 = -\frac{\hbar\omega}{2}
+   $$
+
+   The sign is the whole content of this question, and it is where the
+   mistake lives. Then the eigenstate result applies directly:
+
+   $$
+   |\psi(t)\rangle = e^{-iE_1t/\hbar}|1\rangle = e^{-i(-\hbar\omega/2)t/\hbar}|1\rangle = e^{+i\omega t/2}|1\rangle
+   $$
+
+   The phase turns the *other way* from the $|0\rangle$ case in the
+   previous lesson, which picked up $e^{-i\omega t/2}$. Two counter-
+   rotating phases, one per level, differing by $\omega t$ in total: that
+   difference is what drove the worked example's oscillation, and it is
+   why the gap and not the individual energies sets the frequency.
+
+   The probability check is one line, and it does not need the sign at
+   all:
+
+   $$
+   P(1,t) = \left|\langle1|\psi(t)\rangle\right|^2 = \left|e^{+i\omega t/2}\right|^2\left|\langle1|1\rangle\right|^2 = 1\cdot1 = 1
+   $$
+
+   using $|e^{i\alpha}|=1$ for real $\alpha$. So the state is certain to
+   be found in $|1\rangle$ at every instant, and by the same argument
+   every other observable's probabilities are frozen too.
+
+   The instructive contrast is with what the *vector* did. It moved
+   continuously the whole time, all the way around the unit circle in the
+   complex plane once every $t=4\pi/\omega$. Stationary never meant
+   motionless. It means the motion is entirely in a direction no
+   measurement can see, which is precisely Postulate 1's phase-invariance
+   clause doing physical work rather than sitting there as a technicality.
+
+   </details>
+
 3. Explain why $\langle H\rangle$ being exactly conserved for every state
    is a *stronger* statement than "energy eigenstates are stationary,"
    and what extra case that covers.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because stationarity only ever speaks about eigenstates, and almost no
+   state is one. The extra case is every superposition of two or more
+   energies, which is where all the interesting physics happens.
+
+   Be precise about what each statement quantifies over. Stationarity
+   says: *for eigenstates of $H$*, all observables have frozen
+   statistics. Conservation of $\langle H\rangle$ says: *for every state
+   whatsoever*, one particular number is frozen. So the comparison worth
+   making is over which states each result licenses a claim about
+   $\langle H\rangle$, and there stationarity covers a vanishingly small
+   set while the conservation theorem covers all of them.
+
+   The proof is what makes this visible. It never mentioned eigenstates:
+
+   $$
+   \langle H\rangle_t = \langle\psi(0)|U^\dagger(t)HU(t)|\psi(0)\rangle = \langle\psi(0)|H|\psi(0)\rangle
+   $$
+
+   because $U(t)=e^{-iHt/\hbar}$ is a power series in $H$ and therefore
+   commutes with $H$. Nothing was assumed about $|\psi(0)\rangle$ beyond
+   its being a state, so the argument applies unchanged to the wildest
+   superposition.
+
+   The extra case in concrete terms: take $|+\rangle$ under
+   $H=\tfrac{\hbar\omega}{2}Z$. It is not an eigenstate of $H$, its
+   $X$-basis probabilities swing between $0$ and $1$, and stationarity has
+   nothing to say about it. Yet $\langle H\rangle =
+   \tfrac{\hbar\omega}{2}\langle Z\rangle = 0$ at every instant, because
+   the state stays an equal mix of $+\tfrac{\hbar\omega}{2}$ and
+   $-\tfrac{\hbar\omega}{2}$ forever. Energy is conserved in a system that
+   is emphatically not standing still.
+
+   Two guardrails on this answer.
+
+   First, the conservation theorem is not simply a superset of
+   stationarity. Stationarity freezes *every* observable in an eigenstate,
+   while conservation freezes only $\langle H\rangle$ across all states.
+   Neither statement contains the other outright; what is stronger is
+   specifically the claim about $\langle H\rangle$, and specifically in
+   the range of states it applies to.
+
+   Second, do not slide from "$\langle H\rangle$ is conserved" to "nothing
+   changes." The warning callout above makes the point: the energy
+   *distribution* is frozen too, for the same reason, but every other
+   observable is free to oscillate and in a two-energy superposition
+   generally does. A conserved energy is a constraint on the motion, not
+   an absence of it.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -245,7 +398,7 @@ $\langle H\rangle$ is not a frozen system.
 - $\langle H\rangle$ is conserved for *any* state, which follows from
   $U(t)$ commuting with $H$.
 
-## Further Exploration
+## Shifting every eigenvalue at once
 
 <ChallengePrompt prompt="Add a constant to the Hamiltonian: H' = (ħω/2)Z + 5ħω·I, so every energy shifts up by 5ħω. Recompute |ψ(t)⟩ for |ψ(0)⟩ = |+⟩ and find P(+, t).">
   Every eigenvalue moves, so both phase factors change. Pull out the

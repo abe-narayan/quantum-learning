@@ -5,6 +5,7 @@ import { Complex } from "@/lib/quantum/complex";
 import { Matrix } from "@/lib/quantum/matrix";
 import { StateVector } from "@/lib/quantum/state";
 import { PAULI_X, PAULI_Z, HADAMARD, applySingleQubitGate, applyCNOT, applyCZ } from "@/lib/quantum/gates";
+import { formatAmplitudeLatex } from "@/lib/quantum/format";
 
 export const practiceProblems = getProblemMetaForLesson(
   "apex/algorithmic-frontiers/block-encodings-and-linear-combinations-of-unitaries"
@@ -72,6 +73,13 @@ export function maxEntryDifference(M1, M2) {
 
 export const blockVsAMaxDiff = maxEntryDifference(topLeftBlock, matrixA);
 
+export const halfIdentity = new Matrix([
+  [new Complex(0.5, 0), Complex.ZERO],
+  [Complex.ZERO, new Complex(0.5, 0)],
+]);
+
+export const matrixASquaredMaxDiff = maxEntryDifference(matrixASquared, halfIdentity);
+
 export const psiSystem = [new Complex(Math.SQRT1_2, 0), new Complex(0, Math.SQRT1_2)];
 
 export const inputState = new StateVector([psiSystem[0], psiSystem[1], Complex.ZERO, Complex.ZERO]);
@@ -91,6 +99,8 @@ export const postSelectionMaxDiff = Math.max(
 );
 
 export const aPsiNormSquared = aPsiDirect[0].magnitudeSquared() + aPsiDirect[1].magnitudeSquared();
+
+export const successProbabilityRouteDiff = Math.abs(successProbability - aPsiNormSquared);
 
 export const extraTestStates = [
   { label: "|0⟩", amplitudes: [Complex.ONE, Complex.ZERO] },
@@ -123,23 +133,23 @@ export const lessonMeta = {
   related: [
     {
       slug: "quantum-mastery/advanced-algorithms-and-complexity/hamiltonian-simulation-and-trotterization",
-      note: "Trotterization simulates e^{-iHt} for one specific, already-unitary operator by chopping time into small commuting-ish steps; block encodings instead take an arbitrary, not-necessarily-unitary A and embed the whole thing, unapproximated, as a sub-block of a single bigger unitary, which is what lets Hamiltonian simulation itself later be re-derived as a special case (via quantum signal processing) rather than needing its own bespoke product-formula argument.",
+      note: "Trotterization simulates e^(-iHt) for one specific, already-unitary operator by chopping time into small commuting-ish steps; block encodings instead take an arbitrary, not-necessarily-unitary A and embed the whole thing, unapproximated, as a sub-block of a single bigger unitary, which is what lets Hamiltonian simulation itself later be re-derived as a special case (via quantum signal processing) rather than needing its own bespoke product-formula argument.",
     },
   ],
 };
 
 <LessonHook eyebrow="Welcome to Apex">
-  A quantum computer can only ever run unitary operations natively — yet
-  the algorithms that matter most want to apply projectors, inverses, and
+  A quantum computer can only ever run unitary operations natively. The
+  algorithms that matter most want to apply projectors, inverses, and
   Green's functions, none of which are unitary. One idea, from roughly
-  2016–2019, dissolves that entire obstruction at once.
+  2016–2019, dissolves that obstruction at once.
 </LessonHook>
 
-## Motivation
+## The Idea That Reorganized the Field
 
-Every earlier pillar built toward a specific competence: Quantum Mechanics gave the postulates, Quantum Computing gave the gate model and its headline algorithms, Quantum Hardware and Quantum Software gave the physical and compilation realities underneath them, and Quantum Mastery gave the graduate mathematics — spectral theory, information theory, and, in the lesson directly before this one, a fully derived error bound for Trotterized Hamiltonian simulation. APEX is the summit: the research-frontier techniques that everything below it was actually building toward, starting with the single idea that has reorganized quantum algorithms research since roughly 2016–2019.
+APEX starts from the one idea that has reorganized quantum-algorithms research since roughly 2016–2019. Everything in the tracks below was building toward it: the postulates, the gate model and its headline algorithms, the hardware and compilation realities those algorithms run into, and the spectral and information theory of Quantum Mastery.
 
-The immediately preceding lesson simulated $e^{-iHt}$ by chopping time into $n$ small steps and applying each local piece of $H$ in sequence, paying a quantified $O(1/n)$ price in accuracy for every noncommuting pair of terms. That construction is powerful, but narrow in a specific sense: it only ever produces a *unitary* — a time-evolution operator — because $e^{-iHt}$ is always unitary for Hermitian $H$. Enormous swaths of quantum algorithms, though, want to apply something that *isn't* unitary at all: a projector, a non-Hermitian matrix, a Green's function, a covariance matrix, the inverse $H^{-1}$ that a linear-systems solver needs. A quantum computer's native operations are all unitary, so none of these can be applied directly.
+The immediately preceding lesson simulated $e^{-iHt}$ by chopping time into $n$ small steps and applying each local piece of $H$ in sequence, paying a quantified $O(1/n)$ price in accuracy for every noncommuting pair of terms. That construction is narrow in one specific way: it only ever produces a *unitary*, a time-evolution operator, because $e^{-iHt}$ is always unitary for Hermitian $H$. Enormous swaths of quantum algorithms, though, want to apply something that *isn't* unitary at all: a projector, a non-Hermitian matrix, a Green's function, a covariance matrix, the inverse $H^{-1}$ that a linear-systems solver needs. A quantum computer's native operations are all unitary, so none of these can be applied directly.
 
 Block encoding is the general answer: embed an *arbitrary* matrix $A$ (not necessarily unitary, not necessarily Hermitian, not necessarily square in the fully general version) as a small corner of some bigger unitary $U$ that a quantum computer can actually run. Everything downstream (Hamiltonian simulation via quantum signal processing, quantum linear-systems solvers, amplitude-based algorithms, Gibbs-state preparation) is then just algebra performed *on the block encoding itself*, without ever needing $A$ to be unitary in the first place. This lesson builds the construction from scratch and verifies, numerically and exactly, that it does what it claims.
 
@@ -147,23 +157,23 @@ Block encoding is the general answer: embed an *arbitrary* matrix $A$ (not neces
   src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Professor_Andrew_Childs.jpg"
   alt="Portrait photograph of quantum algorithms researcher Andrew Childs"
   caption="Andrew Childs, whose work on linear combinations of unitaries (with Wiebe and others) turned 'embed a non-unitary matrix inside a bigger unitary' from a niche trick into the general block-encoding framework this lesson builds from scratch."
-  credit="University of Maryland / Wikimedia Commons"
+  credit="SebastosOctavian / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Professor_Andrew_Childs.jpg"
   license="CC BY-SA 4.0"
 />
 
-## Mathematical Development
+## Burying a Matrix Inside a Unitary
 
 ### What a block encoding is
 
-Let $A$ be an $s\times s$ matrix with operator norm $\|A\|\leq1$ (a normalization requirement explained below — it can always be arranged by rescaling $A$). A unitary $U$ acting on a "system" register (holding $A$'s $s$ dimensions) plus an "ancilla" register is a **block encoding of $A$** if
+Let $A$ be an $s\times s$ matrix with operator norm $\|A\|\leq1$ (a normalization requirement explained below; it can always be arranged by rescaling $A$). A unitary $U$ acting on a "system" register (holding $A$'s $s$ dimensions) plus an "ancilla" register is a **block encoding of $A$** if
 
 <EquationReveal
   terms={[
-    { id: "U", symbol: "U", gloss: "The unitary a quantum computer can actually run — acting on both the system register and an ancilla register." },
+    { id: "U", symbol: "U", gloss: "The unitary a quantum computer can actually run, acting on both the system register and an ancilla register." },
     { id: "A", symbol: "A", gloss: "The target matrix, not necessarily unitary, being embedded inside U." },
-    { id: "anc", symbol: "|0⟩_anc", gloss: "The ancilla register, post-selected on the all-zero state — the condition under which U's action reduces to A." },
-    { id: "I", symbol: "I_sys", gloss: "The identity on the system register — A acts there, untouched by the ancilla projection." },
+    { id: "anc", symbol: "|0⟩_anc", gloss: "The ancilla register, post-selected on the all-zero state; that is the condition under which U's action reduces to A." },
+    { id: "I", symbol: "I_sys", gloss: "The identity on the system register. A acts there, untouched by the ancilla projection." },
   ]}
 >
 $$
@@ -177,7 +187,7 @@ $$
 U = \begin{pmatrix} A & * \\ * & * \end{pmatrix},
 $$
 
-where the three $*$ blocks are whatever they need to be to make $U$ unitary overall (their exact values are never used — only their existence, guaranteeing $U$ is a valid unitary, matters). The $\|A\|\leq1$ requirement is exactly the constraint that makes this possible: a unitary matrix's every entry, and more strongly every block's operator norm, is bounded by $1$, so a matrix with $\|A\|>1$ could never appear as a literal sub-block of *any* unitary.
+where the three $*$ blocks are whatever they need to be to make $U$ unitary overall (their exact values are never used; only their existence, which guarantees $U$ is a valid unitary, matters). The $\|A\|\leq1$ requirement is exactly the constraint that makes this possible: a unitary matrix's every entry, and more strongly every block's operator norm, is bounded by $1$, so a matrix with $\|A\|>1$ could never appear as a literal sub-block of *any* unitary.
 
 ### The post-selection interpretation
 
@@ -190,7 +200,7 @@ $$
 for whatever operators $B_k$ the other blocks of $U$ happen to implement. Measuring the ancilla register: with probability $\|A|\psi\rangle\|^2$, the outcome is $0\cdots0$, and the system register is left, post-measurement, in the *exactly normalized* state $A|\psi\rangle/\|A|\psi\rangle\|$. This is the entire operational meaning of a block encoding: **it applies $A$ to $|\psi\rangle$ probabilistically**, succeeding with probability $\|A|\psi\rangle\|^2$ and failing (leaving the system in some other, generally useless state) otherwise.
 
 <Callout type="note">
-That success probability can be small — for a generic $A$ and $\psi$, nothing guarantees $\|A|\psi\rangle\|^2$ is anywhere near $1$. This is precisely the regime the *[Grover's Algorithm: Amplitude Amplification](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification)* lesson's technique was built for: boosting a small "good outcome" probability toward $1$ using $O(1/\sqrt{p})$ repetitions instead of $O(1/p)$, by amplifying the same reflection structure. Applied to a block encoding specifically, this quadratic speedup in overcoming a small success probability is one of the main reasons block encodings, rather than some other input model, became the field's standard.
+That success probability can be small: for a generic $A$ and $\psi$, nothing guarantees $\|A|\psi\rangle\|^2$ is anywhere near $1$. This is precisely the regime the *[Grover's Algorithm: Amplitude Amplification](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification)* lesson's technique was built for: boosting a small "good outcome" probability toward $1$ using $O(1/\sqrt{p})$ repetitions instead of $O(1/p)$, by amplifying the same reflection structure. Applied to a block encoding specifically, this quadratic speedup in overcoming a small success probability is one of the main reasons block encodings, rather than some other input model, became the field's standard.
 </Callout>
 
 ### Linear combinations of unitaries (LCU)
@@ -201,7 +211,7 @@ $$
 A = \sum_{i=0}^{m-1}\alpha_iU_i, \qquad \alpha_i>0,\ U_i\text{ unitary}, \qquad \|\alpha\|_1=\sum_i\alpha_i.
 $$
 
-(Every Hermitian matrix admits such a decomposition, e.g. as a sum of Pauli strings with real coefficients — a fact used throughout quantum chemistry and condensed-matter Hamiltonian encodings — so this covers an enormous class of operators in practice, not just a special case.)
+(Every Hermitian matrix admits such a decomposition, e.g. as a sum of Pauli strings with real coefficients, a fact used throughout quantum chemistry and condensed-matter Hamiltonian encodings. This covers an enormous class of operators in practice, not just a special case.)
 
 LCU implements a block encoding of $A/\|\alpha\|_1$ with a three-part circuit on a system register plus a $\lceil\log_2m\rceil$-qubit ancilla register:
 
@@ -231,19 +241,19 @@ $$
 |0\rangle_{\text{anc}}|\psi\rangle \xrightarrow{\ \text{PREPARE}\otimes I\ } \sum_i\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}|i\rangle|\psi\rangle \xrightarrow{\ \text{SELECT}\ } \sum_i\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}|i\rangle\big(U_i|\psi\rangle\big)
 $$
 </DerivationStep>
-<DerivationStep annotation="Apply PREPARE†⊗I and project onto ⟨0|_anc. Since PREPARE|0⟩ = Σⱼ√(αⱼ/‖α‖₁)|j⟩, the adjoint gives ⟨0|PREPARE† = Σⱼ√(αⱼ/‖α‖₁)⟨j|, so orthonormality of the computational basis picks out ⟨0|PREPARE†|i⟩ = √(αᵢ/‖α‖₁) — exactly one term per i, nothing mixed in from the others.">
+<DerivationStep annotation="Apply PREPARE†⊗I and project onto ⟨0|_anc. Since PREPARE|0⟩ = Σⱼ√(αⱼ/‖α‖₁)|j⟩, the adjoint gives ⟨0|PREPARE† = Σⱼ√(αⱼ/‖α‖₁)⟨j|, so orthonormality of the computational basis picks out ⟨0|PREPARE†|i⟩ = √(αᵢ/‖α‖₁): exactly one term per i, with nothing mixed in from the others.">
 $$
 \langle0|\text{PREPARE}^\dagger|i\rangle=\sqrt{\alpha_i/\|\alpha\|_1}
 $$
 </DerivationStep>
-<DerivationStep annotation="Multiply the two square-root factors — one from PREPARE, one from PREPARE† — and sum over i. The result is exactly A/‖α‖₁ applied to |ψ⟩.">
+<DerivationStep annotation="Multiply the two square-root factors (one from PREPARE, one from PREPARE†) and sum over i. The result is exactly A/‖α‖₁ applied to |ψ⟩.">
 $$
 \sum_i\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}\cdot\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}\,U_i|\psi\rangle = \sum_i\frac{\alpha_i}{\|\alpha\|_1}U_i|\psi\rangle = \frac{A}{\|\alpha\|_1}|\psi\rangle
 $$
 </DerivationStep>
 </DerivationSteps>
 
-This is not merely close to a block encoding: it is one, exactly, by the definition above, of $A/\|\alpha\|_1$. When $\|\alpha\|_1=1$ (as in the worked example below), $U$ block-encodes $A$ itself with no extra rescaling.
+That is a block encoding of $A/\|\alpha\|_1$, exactly, by the definition above. When $\|\alpha\|_1=1$ (as in the worked example below), $U$ block-encodes $A$ itself with no extra rescaling.
 
 <ResearchConnection
   title="Where PREPARE–SELECT–PREPARE† comes from"
@@ -251,9 +261,11 @@ This is not merely close to a block encoding: it is one, exactly, by the definit
   url="https://arxiv.org/abs/1202.5822"
 >
   The paper that introduced the linear-combination-of-unitaries
-  construction, in its original setting: simulating $e^{-iHt}$ by summing
-  the terms of a Taylor or Chebyshev series, each of which is a unitary,
-  rather than by a product formula. Read it for the $\|\alpha\|_1$
+  construction, in its original setting: simulating $e^{-iHt}$ with a
+  multi-product formula, a weighted sum of several Trotter-Suzuki
+  product formulas whose leading error terms cancel, rather than a
+  single product. Summing a truncated Taylor series or a Chebyshev
+  series with the same primitive came a few years later. Read it for the $\|\alpha\|_1$
   normalization specifically. That factor is the whole cost of the
   technique, and the paper is direct about it: the success probability
   degrades as $1/\|\alpha\|_1^2$, so an $A$ whose decomposition has many
@@ -266,18 +278,23 @@ This is not merely close to a block encoding: it is one, exactly, by the definit
 block-encodes $A/\|\alpha\|_1$, not $A$, and every downstream algorithm
 pays for that rescaling: a matrix written as a sum of $m$ Pauli terms
 with comparable coefficients has $\|\alpha\|_1$ growing with $m$, which
-shrinks the encoded block and therefore the success probability by the
-same factor. For a molecular Hamiltonian with $O(n^4)$ terms this is not
+shrinks the encoded block by that factor and the success probability by
+its *square*: post-selection succeeds with probability
+$\|A|\psi\rangle\|^2/\|\alpha\|_1^2$, because $\|\alpha\|_1$ divides an
+amplitude and the probability is that amplitude squared. Doubling the
+number of comparable terms therefore costs a factor of four, not two,
+and it is why the paper above states the degradation as
+$1/\|\alpha\|_1^2$. For a molecular Hamiltonian with $O(n^4)$ terms this is not
 a rounding error, and reducing $\|\alpha\|_1$ by finding a better
 decomposition (factorized, tensor-hypercontracted, or otherwise) is an
 active research problem in its own right, not a preprocessing detail.
 </Callout>
 
-## Physical Interpretation
+## SELECT and PREPARE Know Nothing About Physics
 
 Nothing about SELECT or PREPARE "knows" what $A$ means physically: the whole construction is pure linear algebra, indexing a menu of unitaries by an ancilla and taking a coherent, not classical, weighted combination of running them. The coherence is the entire point: SELECT is applied to a *superposition* of ancilla values, so the system register actually ends up in a superposition of $U_0|\psi\rangle,U_1|\psi\rangle,\dots$ with relative phases and amplitudes intact, which is exactly what lets PREPARE$^\dagger$ interfere those branches back together into $A|\psi\rangle$ on the $|0\rangle_{\text{anc}}$ branch. Measuring the ancilla in the computational basis at the end is what forces a choice between "the interference worked" ($|0\rangle$, system left with $A|\psi\rangle$) and "it didn't" (any other outcome, system left with some other combination the derivation above doesn't determine and doesn't need to).
 
-## Why This Matters
+## From "I Have a Matrix" to "I Have a Circuit"
 
 <InsightBlock>
   Block encodings turn "I have a matrix" into "I have a circuit": the
@@ -285,11 +302,11 @@ Nothing about SELECT or PREPARE "knows" what $A$ means physically: the whole con
   amplitude estimation, linear-systems solving) is built on top of.
 </InsightBlock>
 
-Block encodings are now the standard *input model* underlying essentially the entire modern quantum-algorithms literature for linear-algebra-flavored problems. Rather than each paper inventing its own bespoke circuit for its own specific matrix, the field has converged on a two-step separation of concerns: (1) show that a block encoding of whatever operator you care about can be built (LCU is one way; there are others, like sparse-access oracles), then (2) invoke a *generic* algorithm — most importantly Quantum Signal Processing and its generalization, the Quantum Singular Value Transformation (QSVT) — that takes any block encoding as a black box and applies an essentially arbitrary polynomial transformation to the singular values of the encoded matrix. Hamiltonian simulation, quantum linear-systems solvers (HHL and its more modern QSVT-based successors), several quantum-machine-learning proposals, and Gibbs-state preparation are all, as of the mid-2020s, phrased as "assume a block encoding of $X$, then apply QSVT with polynomial $p$" rather than as separately engineered circuits. This lesson's PREPARE–SELECT–PREPARE$^\dagger$ construction is the concrete mechanism that step (1) most often reduces to, and is the direct prerequisite for this course's own upcoming *Quantum Signal Processing* lesson, which is step (2).
+Block encodings are now the standard *input model* underlying essentially the entire modern quantum-algorithms literature for linear-algebra-flavored problems. Rather than each paper inventing its own bespoke circuit for its own specific matrix, the field has converged on a two-step separation of concerns: (1) show that a block encoding of whatever operator you care about can be built (LCU is one way; there are others, like sparse-access oracles), then (2) invoke a *generic* algorithm (most importantly Quantum Signal Processing and its generalization, the Quantum Singular Value Transformation, QSVT) that takes any block encoding as a black box and applies an essentially arbitrary polynomial transformation to the singular values of the encoded matrix. Hamiltonian simulation, quantum linear-systems solvers (HHL and its more modern QSVT-based successors), several quantum-machine-learning proposals, and Gibbs-state preparation are all, as of the mid-2020s, phrased as "assume a block encoding of $X$, then apply QSVT with polynomial $p$" rather than as separately engineered circuits. This lesson's PREPARE–SELECT–PREPARE$^\dagger$ construction is the concrete mechanism that step (1) most often reduces to, and is the direct prerequisite for this course's own upcoming *Quantum Signal Processing* lesson, which is step (2).
 
-## Worked Example
+## Block-Encoding (X+Z)/2 by Hand
 
-**A genuine, fully worked case: $A=\dfrac{X+Z}{2}$, a real, Hermitian, non-unitary $2\times2$ matrix, block-encoded via LCU with $U_0=X,\ U_1=Z,\ \alpha_0=\alpha_1=\tfrac12$ (so $\|\alpha\|_1=1$), built and checked using this platform's actual `Matrix`, `Complex`, `StateVector`, and gate-application functions — not asserted, computed.**
+**A fully worked case: $A=\dfrac{X+Z}{2}$, a real, Hermitian, non-unitary $2\times2$ matrix, block-encoded via LCU with $U_0=X,\ U_1=Z,\ \alpha_0=\alpha_1=\tfrac12$ (so $\|\alpha\|_1=1$), built and checked with this platform's own `Matrix`, `Complex`, `StateVector`, and gate-application functions.**
 
 <MatrixGrid matrix={matrixA} label="A = (X + Z) / 2" ariaLabel="The 2x2 matrix A = (X+Z)/2, with entries 0.5, 0.5, 0.5, -0.5" />
 
@@ -299,7 +316,7 @@ $$
 \lambda_\pm = \frac{a+d}{2}\pm\sqrt{\Big(\frac{a-d}{2}\Big)^2+b^2} = 0\pm\sqrt{0.5^2+0.5^2} = \pm\frac{1}{\sqrt2}\approx\pm0.707107,
 $$
 
-computed directly from $A$'s actual entries ($a=0.5,\,d=-0.5,\,b=0.5$ read off the matrix above), giving $\lambda_\pm\approx\pm0.707107$, both within $[-1,1]$, confirming $\|A\|=\max|\lambda_\pm|\approx0.707107\leq1$ as required.
+computed directly from $A$'s actual entries ($a=0.5,\,d=-0.5,\,b=0.5$, read off the matrix above). The `eigenvaluesOfRealSymmetric2x2` helper returns $\lambda_+=$ {matrixAEigenvalues[0].toFixed(6)} and $\lambda_-=$ {matrixAEigenvalues[1].toFixed(6)} (`matrixAEigenvalues`), both inside $[-1,1]$, so $\|A\|=\max|\lambda_\pm|\leq1$ as required.
 
 **PREPARE.** With $\alpha_0=\alpha_1=\tfrac12$, $\sqrt{\alpha_i/\|\alpha\|_1}=\sqrt{1/2}$ for both $i$, so PREPARE is exactly a single Hadamard on the one ancilla qubit ($\lceil\log_22\rceil=1$ qubit suffices): $H|0\rangle=\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$, matching the required amplitudes exactly.
 
@@ -317,42 +334,145 @@ The full circuit is six gates on two qubits (qubit $0$ = ancilla, qubit $1$ = sy
 
 <MatrixGrid matrix={topLeftBlock} label="Top-left block of U (computed from the circuit)" compareTo={matrixA} compareLabel="A (target)" ariaLabel="The top-left 2x2 block of the circuit's full 4x4 unitary, shown next to the target matrix A, to compare entry by entry" />
 
-with every entry matching to within {blockVsAMaxDiff.toExponential(2)} — floating-point-exact agreement, not an approximation. This circuit is a block encoding of $A$.
+The largest entrywise difference between that block and $A$ is {blockVsAMaxDiff.toExponential(2)}, which is one unit in the last place of a double at this magnitude, so the two agree as closely as double-precision arithmetic permits. This circuit is a block encoding of $A$.
 
 **Verifying the post-selection claim on a specific state.** Feeding the circuit $|0\rangle_{\text{anc}}|\psi\rangle_{\text{sys}}$ for $|\psi\rangle=\tfrac{1}{\sqrt2}(|0\rangle+i|1\rangle)$ and running the actual instruction sequence gives a full 2-qubit output state; reading off just the ancilla-$|0\rangle$ amplitudes (rows $00,01$) against $A|\psi\rangle$ computed directly by matrix application:
 
 | | ancilla-$|0\rangle$ branch of circuit output | $A|\psi\rangle$ (direct) |
 |---|---|---|
-| amplitude of $|0\rangle_{\text{sys}}$ | $0.353553+0.353553i$ | $0.353553+0.353553i$ |
-| amplitude of $|1\rangle_{\text{sys}}$ | $0.353553-0.353553i$ | $0.353553-0.353553i$ |
+| amplitude of $|0\rangle_{\text{sys}}$ | {formatAmplitudeLatex(postSelectedAmplitudes[0], 6)} | {formatAmplitudeLatex(aPsiDirect[0], 6)} |
+| amplitude of $|1\rangle_{\text{sys}}$ | {formatAmplitudeLatex(postSelectedAmplitudes[1], 6)} | {formatAmplitudeLatex(aPsiDirect[1], 6)} |
 
-identical to machine precision (max entrywise difference ≈ {postSelectionMaxDiff.toExponential(2)}). The ancilla-$|0\rangle$ branch of the six-gate circuit **is** $A|\psi\rangle$, exactly as the LCU derivation promised, with success probability $\|A|\psi\rangle\|^2=0.5$ (computed both by summing amplitude-squared over the post-selected branch and, independently, directly from $A|\psi\rangle$ — both give exactly {successProbability.toFixed(4)}).
+The two columns agree to {postSelectionMaxDiff.toExponential(2)} entrywise. The ancilla-$|0\rangle$ branch of the six-gate circuit **is** $A|\psi\rangle$, as the LCU derivation promised, with success probability $\|A|\psi\rangle\|^2=1/2$. That probability was computed twice, once by summing amplitude-squared over the post-selected branch and once directly from $A|\psi\rangle$; the two routes differ by {successProbabilityRouteDiff.toExponential(1)} and both round to {successProbability.toFixed(4)}.
 
-**A further check: is $0.5$ a coincidence of this one input state?** Testing three more system inputs through the same circuit:
+**Is $0.5$ a coincidence of this one input state?** Three more system inputs through the same circuit (`extraSuccessProbabilities`):
 
 | input $|\psi\rangle$ | success probability |
 |---|---|
-| $|0\rangle$ | $0.5$ |
-| $|1\rangle$ | $0.5$ |
-| $|+\rangle=\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$ | $0.5$ |
+| $|0\rangle$ | {extraSuccessProbabilities[0].probability.toFixed(6)} |
+| $|1\rangle$ | {extraSuccessProbabilities[1].probability.toFixed(6)} |
+| $|+\rangle=\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$ | {extraSuccessProbabilities[2].probability.toFixed(6)} |
 
-Every input gives exactly $0.5$ — not a coincidence, but a consequence of this specific $A$: since $X$ and $Z$ anticommute, $A^2=\tfrac14(X+Z)^2=\tfrac14(X^2+XZ+ZX+Z^2)=\tfrac14(I+0+I)=\tfrac{I}{2}$ (computed directly via `matrixA.mul(matrixA)`, confirming $A^2=\tfrac12I$ to machine precision), so $\|A|\psi\rangle\|^2=\langle\psi|A^2|\psi\rangle=\tfrac12$ for *every* normalized $|\psi\rangle$. This is a special feature of this particular $A$, not a general property of block encodings — see the Common Mistakes callout below.
+Every input returns $1/2$ to within double-precision rounding, and the reason is algebraic. Since $X$ and $Z$ anticommute, $XZ+ZX=0$, so
 
-## Common Mistakes
+$$
+A^2=\tfrac14(X+Z)^2=\tfrac14\big(X^2+XZ+ZX+Z^2\big)=\tfrac14(I+0+I)=\tfrac{I}{2}.
+$$
+
+`matrixA.mul(matrixA)` returns that matrix with largest entrywise deviation from $\tfrac12I$ equal to {matrixASquaredMaxDiff}. Now $\|A|\psi\rangle\|^2=\langle\psi|A^\dagger A|\psi\rangle$, and $A$ is Hermitian, so $A^\dagger A=A^2=\tfrac12I$ and the norm is $\tfrac12$ for *every* normalized $|\psi\rangle$. That constancy belongs to this particular $A$, not to block encodings in general; see the warning callout below.
+
+Before the callouts spell out the caveat, price a different matrix.
+
+<PredictBeforeReveal
+  question="Suppose you have an exact block encoding (no rescaling) of a different Hermitian 2x2 matrix A', whose two eigenvalues are +0.9 and +0.3. Is its post-selection success probability also the same for every input state?"
+  options={[
+    { label: "Yes, unchanged: A' is Hermitian too, so A'†A' = A'² and the argument above carries over", value: "hermitian" },
+    { label: "Yes, pinned at 0.81, the square of the larger eigenvalue", value: "max" },
+    { label: "Yes, pinned at 0.09, since post-selection is limited by the weakest direction", value: "min" },
+    { label: "No: it runs over the whole range 0.09 to 0.81 depending on the input", value: "varies" },
+  ]}
+  correctValue="varies"
+  explanation="It varies, and the hypothesis that failed is worth naming precisely. The load-bearing fact above was never Hermiticity, and never the anticommutation of X and Z by itself: it was that A² came out proportional to the identity, which happens exactly when all of A's singular values are equal. Here the success probability is ⟨ψ|A'²|ψ⟩, and A'² has eigenvalues 0.81 and 0.09, so that expectation is a convex combination of those two numbers and sweeps the full interval as |ψ⟩ rotates from one eigenvector to the other. The worked example's flat 0.5 is the degenerate-spectrum special case: (X+Z)/2 has both singular values equal to 1/√2. Hermiticity genuinely was used in the derivation, which is what makes it such an easy hypothesis to promote into the cause."
+/>
+
+## Normalization and Post-Selection Slips
 
 <Callout type="warning">
-**Thinking the success probability of a block encoding is generically $1/2$, because that's what this lesson's worked example gave.** It isn't. This example's constant $0.5$ success probability, for *every* input state, is a direct consequence of the specific algebraic fact $A^2=\tfrac12I$ (since $X$ and $Z$ anticommute) — verified directly above, not assumed. A generic block-encoded $A$ has a success probability $\|A|\psi\rangle\|^2$ that depends on $|\psi\rangle$ and can be arbitrarily close to $0$, which is exactly why amplitude amplification is a standard companion technique to block encodings in practice, not an optional add-on.
+**Thinking the success probability of a block encoding is generically $1/2$, because that's what this lesson's worked example gave.** It isn't. This example's constant $0.5$ success probability, for *every* input state, is a direct consequence of the specific algebraic fact $A^2=\tfrac12I$ (since $X$ and $Z$ anticommute), verified above, not assumed. A generic block-encoded $A$ has a success probability $\|A|\psi\rangle\|^2$ that depends on $|\psi\rangle$ and can be arbitrarily close to $0$, which is exactly why amplitude amplification is a standard companion technique to block encodings in practice, not an optional add-on.
 </Callout>
 
 <Callout type="warning">
-**Confusing the normalization $\|A\|\leq1$ requirement with $A$ needing to be a probability, a density matrix, or otherwise "already normalized" in some physical sense.** It's purely a linear-algebra requirement: a matrix can only sit as a sub-block of a unitary if its operator norm doesn't exceed $1$, since every entry (and more strongly every singular value) of a unitary matrix is bounded by $1$. If a matrix of interest has $\|A\|=c>1$, block-encode $A/c$ instead and remember to multiply results by $c$ afterward — a bookkeeping step, not evidence the technique doesn't apply.
+**Confusing the normalization $\|A\|\leq1$ requirement with $A$ needing to be a probability, a density matrix, or otherwise "already normalized" in some physical sense.** It's purely a linear-algebra requirement: a matrix can only sit as a sub-block of a unitary if its operator norm doesn't exceed $1$, since every entry (and more strongly every singular value) of a unitary matrix is bounded by $1$. If a matrix of interest has $\|A\|=c>1$, block-encode $A/c$ instead and remember to multiply results by $c$ afterward. That is bookkeeping, not evidence the technique doesn't apply.
 </Callout>
 
 ## Practice Questions
 
 1. In the LCU derivation's proof, the step $\langle0|\text{PREPARE}^\dagger|i\rangle=\sqrt{\alpha_i/\|\alpha\|_1}$ relies on orthonormality of the ancilla's computational basis. Explain, in your own words, why that specific inner product picks out only the $i$-th term of the sum rather than mixing in the others.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Start by locating where the sums actually are. After SELECT the joint register holds
+
+   $$
+   \sum_{i}\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}\,|i\rangle_{\text{anc}}\big(U_i|\psi\rangle\big),
+   $$
+
+   and PREPARE$^\dagger$ acts on the ancilla alone, so the system-register operator that survives the final $\langle0|_{\text{anc}}$ projection is
+
+   $$
+   \sum_{i}\Big(\langle0|\text{PREPARE}^\dagger|i\rangle\Big)\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}\;U_i .
+   $$
+
+   Now evaluate the bracket. Taking the adjoint of $\text{PREPARE}|0\rangle=\sum_j\sqrt{\alpha_j/\|\alpha\|_1}\,|j\rangle$ turns that ket into a bra, $\langle0|\text{PREPARE}^\dagger=\sum_j\sqrt{\alpha_j/\|\alpha\|_1}\,\langle j|$, and applying it to $|i\rangle$ leaves $\sum_j\sqrt{\alpha_j/\|\alpha\|_1}\,\langle j|i\rangle$. Orthonormality says $\langle j|i\rangle=\delta_{ji}$: every $j\neq i$ contributes exactly zero, and what is left is the single weight $\sqrt{\alpha_i/\|\alpha\|_1}$ belonging to the branch you are standing on.
+
+   **Name which sum collapses.** The wrong turn here is to read the argument as "orthonormality kills all but one term, so only $U_0$ survives." Nothing of the kind happens. The sum over $i$ survives completely intact, all $m$ terms of it, and that survival is precisely what makes the output a linear *combination* rather than one unitary. There are two nested sums, and the one that collapses is the inner sum over $j$ hidden inside each coefficient $\langle0|\text{PREPARE}^\dagger|i\rangle$. One sum is killed, the other is kept, and confusing them turns a correct derivation into a claim the circuit does not make.
+
+   That distinction is also what makes the two square roots multiply into something linear. PREPARE deposits $\sqrt{\alpha_i/\|\alpha\|_1}$ on the way in and PREPARE$^\dagger$ deposits a second copy of the *same* factor on the way out, and they are the same factor only because orthonormality forced the outgoing bra to select index $i$ rather than a blend. Their product is $\alpha_i/\|\alpha\|_1$, linear in $\alpha_i$, which is why the block comes out as $A/\|\alpha\|_1$ and not as something built from $\sqrt{\alpha_i}$ or $\alpha_i^2$.
+
+   To see what orthonormality is buying, suppose the ancilla "basis" were overcomplete, so $\langle j|i\rangle=G_{ji}$ for some Gram matrix with off-diagonal entries. Then the coefficient multiplying $U_i$ would be $\sum_j\sqrt{\alpha_j/\|\alpha\|_1}\,G_{ji}$: each term contaminated by a weighted average of every other coefficient. The surviving block would be some other operator entirely, and no single scalar rescaling would repair it.
+
+   One hypothesis worth not losing on the way past: $\alpha_i>0$. In general $\langle0|\text{PREPARE}^\dagger|i\rangle$ is the complex *conjugate* of $\langle i|\text{PREPARE}|0\rangle$, so the two stages multiply to $|\text{amplitude}|^2=|\alpha_i|/\|\alpha\|_1$ and the phase of $\alpha_i$ is destroyed. The construction does not get to keep phases by luck; it keeps them by convention, absorbing any phase into $U_i$ (legitimate, since $e^{i\theta}U_i$ is still unitary) so that what remains in $\alpha_i$ is positive and real.
+
+   </details>
+
 2. This lesson's worked example needed only $1$ ancilla qubit because $m=2$. If instead $A$ were written as a sum of $m=6$ unitaries with distinct positive coefficients, how many ancilla qubits would PREPARE need to act on, and would every computational basis state of that register necessarily get used?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Three qubits, and no: two of the eight basis states go unused.
+
+   The register has to give each of the $m=6$ terms its own basis state, so the requirement is $2^k\geq6$. Two qubits offer only $4$, two short. Three offer $8$, so $k=\lceil\log_26\rceil=3$, and PREPARE produces
+
+   $$
+   \text{PREPARE}|000\rangle=\sum_{i=0}^{5}\sqrt{\tfrac{\alpha_i}{\|\alpha\|_1}}\,|i\rangle + 0\cdot|6\rangle + 0\cdot|7\rangle .
+   $$
+
+   The part that is easy to wave past is what happens on those two padded branches. SELECT still has to be a unitary on the *entire* register, all eight ancilla values included, so $U_6$ and $U_7$ need some definition; the conventional choice is the identity. They contribute nothing to the encoded block, because they are entered with amplitude exactly zero, but "contributes nothing" and "may be left undefined" are different statements and only the first one is true. Padding is a real design step in the circuit, not an accounting fiction.
+
+   Nothing about the padding disturbs the normalization either. A term carrying $\alpha=0$ adds nothing to $\|\alpha\|_1=\sum_{i=0}^{5}\alpha_i$, so the subnormalization factor and the post-selection success probability are exactly what they would be for a hypothetical register sized exactly to six.
+
+   The wrong turn is answering $6$, one qubit per term. A $k$-qubit register indexes $2^k$ branches rather than $k$ of them, so the ancilla width is *logarithmic* in $m$. That is not a technicality; it is why LCU stays affordable at all for a molecular Hamiltonian with $O(n^4)$ Pauli terms, where the ancilla register is only about $4\log_2n$ qubits wide. A second wrong turn is answering $8$, which is the number of basis states the register provides, not the number of qubits providing them.
+
+   What the ancilla count conceals is where the cost genuinely lives. SELECT contains $m$ controlled unitaries, linear in $m$. And with *distinct* coefficients PREPARE is no longer the single Hadamard of the worked example but a general state preparation over six prescribed amplitudes, generically $O(m)$ gates as well. The $m=2$ equal-coefficient example hides both of those, which is exactly why it is a safe example and a misleading one to generalize from.
+
+   </details>
+
 3. Explain why the "anti-control" $X$–(controlled-$X$)–$X$ trick used for the $i=0$ SELECT branch works, in terms of what conjugating the control qubit with $X$ does to which physical ancilla value the controlled gate reacts to.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Write the gate as an operator. On this platform a controlled gate fires when the control reads $|1\rangle$, so
+
+   $$
+   \text{CNOT}_{0\to1}=|0\rangle\langle0|_{\text{anc}}\otimes I+|1\rangle\langle1|_{\text{anc}}\otimes X .
+   $$
+
+   Conjugating the *control* qubit with $X$ leaves the target factors alone and acts only on the two projectors:
+
+   $$
+   (X\otimes I)\,\text{CNOT}\,(X\otimes I)=X|0\rangle\langle0|X\otimes I+X|1\rangle\langle1|X\otimes X=|1\rangle\langle1|\otimes I+|0\rangle\langle0|\otimes X ,
+   $$
+
+   using $X|0\rangle=|1\rangle$ and $X|1\rangle=|0\rangle$, so $X|0\rangle\langle0|X=|1\rangle\langle1|$ and vice versa. The projector labels have swapped while the target operators stayed put. The gate now applies $X$ to the system exactly when the ancilla is $|0\rangle$, which is the $i=0$ SELECT branch. Building that operator from this platform's own `applySingleQubitGate` and `applyCNOT` and reading off the resulting $4\times4$ matrix confirms it: rows $00$ and $01$ are exchanged (an $X$ on the system inside the ancilla-$|0\rangle$ block) while rows $10$ and $11$ are left as the identity.
+
+   Read dynamically rather than algebraically: the first $X$ relabels the ancilla so that the value you *want* to trigger on is presented to the gate as the value it *does* trigger on, and the second $X$ puts the label back.
+
+   **The second $X$ is not decoration, and dropping it fails silently.** Without it the ancilla leaves SELECT still flipped, so the subsequent CZ fires on the wrong branch and PREPARE$^\dagger$ acts on the wrong ancilla state. Running the five-gate sequence $H$, $X$, CNOT, CZ, $H$ through the same engine gives a top-left block of
+
+   $$
+   \frac{I+ZX}{2}=\begin{pmatrix}0.5&0.5\\-0.5&0.5\end{pmatrix},
+   $$
+
+   which is not $A=(X+Z)/2$ and is not even Hermitian. What makes this worth dwelling on is that the usual sanity check does not catch it: that block satisfies $B^\dagger B=\tfrac12I$ just as $A$ does, so the success probability is still a flat $0.5$ for every input state. A circuit with the second $X$ deleted looks completely healthy on the probability diagnostic and encodes the wrong operator.
+
+   A different wrong turn is conjugating the *target* instead of the control. That does nothing at all: $(I\otimes X)\,\text{CNOT}\,(I\otimes X)=|0\rangle\langle0|\otimes XIX+|1\rangle\langle1|\otimes XXX=\text{CNOT}$, since $X^2=I$ and $XXX=X$. Reconstructing both matrices numerically returns literally the same $4\times4$ array. The asymmetry is the point: conjugation on the control relabels *when* the gate fires, conjugation on the target relabels *what* it does, and only the first is what an anti-control needs.
+
+   Finally, why conjugate at all rather than ask for a control-on-zero gate? Because control-on-one is the primitive this platform (and most hardware gate sets) actually provides. Conjugation is the standard, and cheapest, way to synthesize the other polarity from it: two single-qubit gates, no extra ancilla, no approximation.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -361,9 +481,9 @@ Every input gives exactly $0.5$ — not a coincidence, but a consequence of this
 - A **block encoding** of a matrix $A$ (with $\|A\|\leq1$) is a unitary $U$ whose ancilla-$|0\rangle$ sub-block equals $A$ exactly; operationally, running $U$ on $|0\rangle_{\text{anc}}|\psi\rangle$ and post-selecting the ancilla on $|0\rangle$ leaves the system in $A|\psi\rangle$ (normalized), with success probability $\|A|\psi\rangle\|^2$.
 - **LCU** (linear combination of unitaries) builds a block encoding of $A/\|\alpha\|_1$ for any $A=\sum_i\alpha_iU_i$ via PREPARE (an ancilla superposition weighted by $\sqrt{\alpha_i/\|\alpha\|_1}$), SELECT (apply $U_i$ conditioned on ancilla $=|i\rangle$), and PREPARE$^\dagger$, derived exactly above, not merely asserted.
 - Verified numerically and exactly on $A=(X+Z)/2$: a real six-gate, two-qubit circuit built from this platform's actual gate-application functions reproduces $A$ as its top-left block to machine precision, and reproduces $A|\psi\rangle$ on the post-selected branch for a genuine complex-amplitude input state, with success probability confirmed to be a constant $0.5$ for this specific $A$ (traced to $A^2=\tfrac12I$), not a general property of block encodings.
-- Block encodings are now the field's standard input model for linear-algebra-flavored quantum algorithms — Hamiltonian simulation, linear-systems solving, and more are phrased as "given a block encoding, apply QSVT," which is exactly where this course goes next.
+- Block encodings are now the field's standard input model for linear-algebra-flavored quantum algorithms. Hamiltonian simulation, linear-systems solving, and more are phrased as "given a block encoding, apply QSVT," which is exactly where this course goes next.
 
-## Further Exploration
+## What a Block Encoding Still Owes You
 
 <NextDiscovery>
   [Quantum Signal Processing](/lessons/apex/algorithmic-frontiers/quantum-signal-processing)

@@ -83,7 +83,7 @@ function isStringArray(value) {
  */
 function validateMeta(meta, filePath) {
   const fail = (message) => {
-    throw new Error(`${filePath}: invalid meta — ${message}`);
+    throw new Error(`${filePath}: invalid meta. ${message}`);
   };
 
   if (typeof meta !== "object" || meta === null || Array.isArray(meta)) {
@@ -114,7 +114,7 @@ async function main() {
   const slugs = (await walk(ROOT, ".ts")).sort(compareSlugs);
 
   if (slugs.length === 0) {
-    throw new Error(`No problem files found under ${ROOT} — refusing to generate an empty registry.`);
+    throw new Error(`No problem files found under ${ROOT}, so refusing to generate an empty registry.`);
   }
 
   const entries = [];
@@ -128,7 +128,7 @@ async function main() {
     const exportMatches = [...source.matchAll(EXPORT_RE)];
     if (exportMatches.length === 0) {
       throw new Error(
-        `${filePath} has no top-level "export const <name>: ..." — every problem file must have exactly ` +
+        `${filePath} has no top-level "export const <name>: ...". Every problem file must have exactly ` +
           `one such export for auto-discovery to find it. (Found something else, or the export isn't ` +
           `typed inline.)`
       );
@@ -136,7 +136,7 @@ async function main() {
     if (exportMatches.length > 1) {
       throw new Error(
         `${filePath} has ${exportMatches.length} top-level "export const <name>: ..." exports ` +
-          `(${exportMatches.map((m) => m[1]).join(", ")}) — every problem file must have exactly one, ` +
+          `(${exportMatches.map((m) => m[1]).join(", ")}). Every problem file must have exactly one, ` +
           `so the registry can't silently pick the wrong one.`
       );
     }
@@ -147,7 +147,7 @@ async function main() {
     const prior = metaSlugSeenIn.get(meta.slug);
     if (prior) {
       throw new Error(
-        `Duplicate problem slug "${meta.slug}" in both "${prior}.ts" and "${slug}.ts" — slugs are the ` +
+        `Duplicate problem slug "${meta.slug}" in both "${prior}.ts" and "${slug}.ts". Slugs are the ` +
           `/problems/[slug] route segments and must be globally unique.`
       );
     }
@@ -163,7 +163,7 @@ async function main() {
     const prior = seenBy.get(identifier);
     if (prior) {
       throw new Error(
-        `Duplicate export identifier "${identifier}" in both "${prior}.ts" and "${slug}.ts" — rename one ` +
+        `Duplicate export identifier "${identifier}" in both "${prior}.ts" and "${slug}.ts". Rename one ` +
           `so PROBLEMS doesn't silently drop a problem.`
       );
     }

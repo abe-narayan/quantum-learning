@@ -24,7 +24,7 @@ export const lessonMeta = {
   objectives: [
     "Derive the Bell state (|00⟩+|11⟩)/√2 from H then CNOT applied to |00⟩",
     "Prove this state cannot be written as any single-qubit product state",
-    "Explain, with a calculation, why this is not the same as classical shared randomness",
+    "Explain, with a calculation, how far a two-basis check gets toward ruling out classical shared randomness, and where Bell's theorem has to take over",
   ],
   related: [
     {
@@ -40,10 +40,10 @@ export const bellState = applyCNOT(afterH, 0, 1);
 export const afterHBoth = applySingleQubitGate(applySingleQubitGate(bellState, HADAMARD, 0), HADAMARD, 1);
 
 <LessonHook eyebrow="The most famous state in quantum computing">
-Two entangled qubits keep agreeing with each other even when you change how you measure them. No predetermined pair of classical coins can do that.
+Two coins glued so they always land the same way reproduce everything a Bell pair does, as long as you only ever check one way. Change how you check and the two stop being interchangeable.
 </LessonHook>
 
-## Motivation
+## Easy to write down, easy to mistake
 
 The last lesson ended with a promise: put CNOT's control qubit into
 <Term id="superposition">superposition</Term> first, and something new happens. Two columns of circuit
@@ -68,17 +68,17 @@ one calculation you can do by hand.
 Alain Aspect's team measures entangled photon pairs and finds correlations that survive a change of measurement basis, just as this lesson's H⊗H calculation predicts. Four decades later, this series of experiments earned Aspect a share of the 2022 Nobel Prize in Physics.
 </HistoricalMoment>
 
-## Intuition
+## Two coins glued together
 
 Imagine two coins prepared so that they always land the same way, but you
 don't know which way until you look: heads-heads or tails-tails, 50/50,
 decided the moment they were set up. That's *classical* correlation:
 shared, but predetermined. A Bell pair is indistinguishable from this if
-you only ever measure one way. Change the measurement, though, and the
-Bell pair keeps agreeing while the coins stop. That is the calculation
-below.
+you only ever measure one way. Change the measurement and the two stories
+come apart. Working out how they come apart is the calculation below, and
+it is short enough to do by hand.
 
-## Mathematical Development
+## Deriving it, then proving it cannot factor
 
 ### The derivation
 
@@ -160,7 +160,22 @@ Measuring each qubit of $|\Phi^+\rangle$ in the <Term id="computational-basis">c
 0 or 1 with 50/50 probability individually, and the two outcomes always
 match, which is what a pair of classically-correlated coins would give
 too. So far, no difference. The gap shows up when you measure in a
-*different* basis. Apply $H$ to **both** qubits of $|\Phi^+\rangle$:
+*different* basis. Applying $H$ to **both** qubits, then measuring, is how
+you measure both in the X basis, so $(H\otimes H)|\Phi^+\rangle$ is the
+state whose amplitudes decide the answer. It is a four-term expansion you
+can do on paper; commit to a guess first.
+
+<PredictBeforeReveal
+  question="Expand (H⊗H)|Φ+⟩. Which of these does it come out as?"
+  options={[
+    { label: "|++⟩ = (|00⟩+|01⟩+|10⟩+|11⟩)/2, all four outcomes equally likely", value: "uniform" },
+    { label: "|Φ+⟩ itself, unchanged", value: "same" },
+    { label: "|Ψ+⟩ = (|01⟩+|10⟩)/√2, now perfectly anti-correlated", value: "anti" },
+    { label: "|Φ−⟩ = (|00⟩−|11⟩)/√2, still matching but with a sign", value: "minus" },
+  ]}
+  correctValue="same"
+  explanation="H⊗H maps |Φ+⟩ to itself. H⊗H|00⟩ = |++⟩ and H⊗H|11⟩ = |−−⟩; adding those two and dividing by √2, the |01⟩ and |10⟩ terms appear with opposite signs and cancel while |00⟩ and |11⟩ reinforce, leaving (|00⟩+|11⟩)/√2 again. So the X-basis measurement produces the same perfect agreement, at the same 50/50 odds, as the Z-basis one. Two coins rigged to always match in the Z basis give the uniform 25-each pattern of the first option here instead: they agree half the time and disagree half the time, which is where the two stories come apart."
+/>
 
 <QuantumStateDisplay state={afterHBoth} label="H on both qubits of |Φ+⟩" />
 
@@ -168,19 +183,30 @@ $$
 (H\otimes H)|\Phi^+\rangle = \frac{|00\rangle+|11\rangle}{\sqrt2} = |\Phi^+\rangle
 $$
 
+<PredictBeforeReveal
+  question="You have now seen |Φ+⟩ agree perfectly in the Z basis and perfectly in the X basis. Could a pair of classical coins, each carrying a hidden predetermined answer for every question you might ask, reproduce both of those results?"
+  options={[
+    { label: "No. Agreeing in two different bases is already impossible classically", value: "no" },
+    { label: "Yes, and two bases is as far as any test can go", value: "yes-max" },
+    { label: "Yes. Two bases can be faked; ruling hidden variables out needs more of them", value: "yes-more" },
+    { label: "Only if the coins are allowed to signal each other", value: "signal" },
+  ]}
+  correctValue="yes-more"
+  explanation="Yes, and this is the honest limit of what you have computed. Give each coin a shared slip of paper listing an answer for Z and an answer for X, with the two slips identical: that model agrees perfectly in both bases, with the right 50/50 marginals, and no signalling. Two bases are not enough to convict. What defeats every such model is checking correlations across several intermediate measurement angles at once and comparing them to a bound any predetermined assignment must obey. That bound is Bell's inequality, and the fact that entangled pairs violate it is the theorem this lesson's calculation is evidence for rather than a proof of."
+/>
+
 Applying $H$ to both qubits (which, recall, is how you measure in
 the X-basis) reproduces the *same* perfectly-correlated pattern:
 $|00\rangle$ or $|11\rangle$ only, still 50/50, still perfectly matching.
-A classical hidden-variable model, two coins with some fixed, if hidden,
-predetermined outcome for *every* possible way of checking them, cannot
-reproduce this. A predetermined pair can be rigged to match in one
-specific basis, or shown (with more work than this course covers) to
-fail some combination of bases when checked in several at once; a full,
-airtight version of this argument is Bell's theorem, covered in the
-Quantum Mechanics pillar's "EPR & Bell Inequalities." What you've just
-computed is the concrete phenomenon that theorem is built to explain:
-correlation that survives a change of measurement basis in a way no
-predetermined classical description can match.
+A classical hidden-variable model, two coins carrying a fixed, if hidden,
+predetermined outcome for *every* possible way of checking them, can still
+reproduce this much, which is why Bell's theorem needs more than two bases.
+Perfect agreement in a pair of bases stays within reach of a predetermined
+pair; the airtight version of the argument has to compare correlations
+across several intermediate measurement angles at once, and it is covered
+in the Quantum Mechanics track's "EPR & Bell Inequalities." What you've just
+computed is the concrete phenomenon that theorem is built to sharpen into a
+proof: correlation that survives a change of measurement basis.
 
 **What entanglement is not:** it does not let the two qubit-holders send
 information to each other faster than light. Whoever holds qubit 1, on
@@ -188,7 +214,7 @@ their own, sees only a random 50/50 sequence no matter what the other
 person does to their qubit. The correlation is only visible by later
 comparing notes over an ordinary (light-speed-limited) classical channel.
 
-## Physical Interpretation
+## Structure in the state, not in your ignorance
 
 Entanglement is structure in the state itself, not a statement about
 anyone's ignorance. Two entangled qubits behave as one system with no
@@ -199,23 +225,11 @@ course (measurement, teleportation, no-cloning) is built on.
 Entanglement is structure in the state itself, not a statement about anyone's ignorance. There is no fact about qubit 1 alone that the pair is keeping from you.
 </InsightBlock>
 
-<PredictBeforeReveal
-  question="If you measure both qubits of |Φ+⟩ in the computational basis, many times, how often will the two outcomes agree (both 0 or both 1)?"
-  options={[
-    { label: "0% of the time", value: "0" },
-    { label: "25% of the time", value: "25" },
-    { label: "50% of the time", value: "50" },
-    { label: "100% of the time", value: "100" },
-  ]}
-  correctValue="100"
-  explanation="|Φ+⟩ = (|00⟩+|11⟩)/√2 has zero amplitude on |01⟩ and |10⟩, so measurement can only ever land on 00 or 11, never a mismatch. Each outcome is 50/50 individually, but the two qubits agree 100% of the time. That is what the Correlation table below shows for the Bell state (only the diagonal nonzero), in contrast to |++⟩, where all four outcomes are equally likely and the qubits agree only half the time."
-/>
-
 <InteractiveSection title="Watch the indicator flip" description='Try it yourself. Click Initialize → |++⟩ and check the entanglement indicator: a product state, as expected. Then click the Create a Bell state guided walkthrough and watch the indicator flip to "Entangled" the moment CNOT is applied. Open the Correlation table for both states: for |++⟩ the four outcomes are independent (25% each); for the Bell state, only the diagonal is nonzero: the perfect correlation this lesson just derived.'>
   <LazyTwoQubitExplorer />
 </InteractiveSection>
 
-## Worked Example
+## The same recipe from a different start
 
 **Run the same recipe starting from $|10\rangle$ instead of $|00\rangle$.
 Which Bell state comes out?**
@@ -232,7 +246,7 @@ $|00\rangle,|11\rangle$-type Bell states; the other two give the
 $|01\rangle,|10\rangle$-type states, one of which is $|\Psi^+\rangle$,
 worked out in the practice questions below.
 
-## Common Mistakes
+## Correlated and entangled are different words
 
 <Callout type="warning">
 **"Entangled" and "correlated" used as synonyms.** Classical variables can
@@ -253,15 +267,167 @@ correlation.
 1. Derive $|\Psi^+\rangle=\frac{1}{\sqrt2}(|01\rangle+|10\rangle)$ using
    the H-then-CNOT recipe, starting from the correct one of
    $|00\rangle,|01\rangle,|10\rangle,|11\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Start from $|01\rangle$.
+
+   $H$ acts on qubit 0, which is $|0\rangle$, so $H|0\rangle = |+\rangle$
+   while qubit 1 stays $|1\rangle$:
+
+   $$
+   (H\otimes I)|01\rangle = \frac{|01\rangle+|11\rangle}{\sqrt2}
+   $$
+
+   Then $\text{CNOT}(0,1)$ term by term. The $|01\rangle$ term has control
+   0 and is left alone; the $|11\rangle$ term has control 1, so its target
+   flips from 1 to 0:
+
+   $$
+   \text{CNOT}(0,1)\frac{|01\rangle+|11\rangle}{\sqrt2} = \frac{|01\rangle+|10\rangle}{\sqrt2} = |\Psi^+\rangle
+   $$
+
+   Two features of the input pick it out, and you can read both off before
+   doing any algebra. Qubit 0 must start at $|0\rangle$, because starting
+   at $|1\rangle$ makes $H$ produce $|-\rangle$ and leaves a minus sign in
+   the answer, which $|\Psi^+\rangle$ does not have. Qubit 1 must start at
+   $|1\rangle$, because CNOT flips it in exactly one of the two branches,
+   so the branch labels end up disagreeing, which is what "$\Psi$" means as
+   against "$\Phi$". Running the recipe on all four inputs gives
+   $|\Phi^+\rangle, |\Psi^+\rangle, |\Phi^-\rangle, |\Psi^-\rangle$ in the
+   order $|00\rangle, |01\rangle, |10\rangle, |11\rangle$, and the engine
+   confirms all four, each one entangled.
+
+   The wrong turn is starting from $|10\rangle$ on the grounds that
+   $|\Psi^+\rangle$'s first term is $|01\rangle$ and "the qubits should
+   start out disagreeing". Qubit 1 is what the input specifies and CNOT is
+   what changes it, so the input's second digit says nothing directly about
+   the output's second digit. $|10\rangle$ in fact yields $|\Phi^-\rangle$,
+   a state whose two branches agree, which is the exact opposite of the
+   guess.
+
+   </details>
+
 2. Prove $|\Psi^+\rangle$ is entangled, using the same coefficient-matching
    contradiction method as the $|\Phi^+\rangle$ proof above.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Suppose $|\Psi^+\rangle = |a\rangle\otimes|b\rangle$. Matching against
+   $0|00\rangle + \tfrac{1}{\sqrt2}|01\rangle + \tfrac{1}{\sqrt2}|10\rangle + 0|11\rangle$:
+
+   $$
+   a_0b_0 = 0, \qquad a_0b_1=\frac{1}{\sqrt2}, \qquad a_1b_0=\frac{1}{\sqrt2}, \qquad a_1b_1=0
+   $$
+
+   From $a_0b_0 = 0$, either $a_0 = 0$ or $b_0 = 0$. If $a_0 = 0$ then
+   $a_0b_1 = 0 \neq \tfrac{1}{\sqrt2}$, a contradiction. If $b_0 = 0$ then
+   $a_1b_0 = 0 \neq \tfrac{1}{\sqrt2}$, also a contradiction. Every branch
+   fails, so no product state equals $|\Psi^+\rangle$.
+
+   Notice the structure is the $|\Phi^+\rangle$ proof with the two
+   diagonals exchanged. There, the zeros sat on $|01\rangle$ and
+   $|10\rangle$; here they sit on $|00\rangle$ and $|11\rangle$. The
+   argument never cared which diagonal was which, only that two amplitudes
+   on one diagonal vanish while both on the other do not. That is the same
+   thing the determinant test says in one line:
+   $c_{00}c_{11} - c_{01}c_{10} = 0 - \tfrac12 = -\tfrac12$, nonzero, so
+   the amplitude array does not factor as row times column. The engine's
+   separability routine returns exactly $\tfrac12$ for the magnitude, with
+   entanglement entropy $1$ bit, the maximum.
+
+   The wrong turn here is a proof that stops at "I tried several
+   $|a\rangle,|b\rangle$ and none worked". Failing to find a factorization
+   is not the same as there being none, and the contradiction structure is
+   what upgrades a search into a theorem: it starts by *granting* that a
+   factorization exists and then derives something false, which rules out
+   every candidate at once rather than one at a time.
+
+   </details>
+
 3. What are $P(0)$ and $P(1)$ for measuring *just* qubit 0 of
    $|\Phi^+\rangle$, on its own? (You computed this kind of quantity
    before; reconcile it with the claim that the pair is still perfectly
    correlated.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $P(0) = P(1) = \tfrac12$. Sum $|c_i|^2$ over the terms whose qubit-0
+   digit is 0, which is just $|00\rangle$, giving $\tfrac12$; likewise for
+   the terms whose qubit-0 digit is 1, which is just $|11\rangle$. The
+   engine returns $[0.5, 0.5]$ for qubit 0 and the identical pair for
+   qubit 1.
+
+   The reconciliation is that "perfectly correlated" is a statement about
+   the *pair*, and $P(0)$ and $P(1)$ for one qubit are deliberately blind
+   to the pair. Correlation lives in the joint distribution: $P(00) = P(11) = \tfrac12$
+   and $P(01) = P(10) = 0$. Each qubit's own marginal is obtained by
+   summing that joint distribution over the other qubit's outcomes, and
+   summing is exactly the operation that throws correlation away. Two
+   different states can have identical marginals and completely different
+   joint behaviour, which is why the marginals cannot possibly show you the
+   correlation.
+
+   The sharpest way to say it is with the reduced description of qubit 0
+   alone, which the engine computes as $\tfrac12 I$, the maximally mixed
+   state. Qubit 0 on its own is not in *some* pure state you have yet to
+   determine. It is in no pure state at all, which is what "the pair has no
+   independently well-defined parts" means concretely, and it is exactly
+   why no local experiment on qubit 0 can reveal anything at all about what
+   was done to qubit 1. That is the no-signaling guarantee, in one matrix.
+
+   The wrong turn is reading $\tfrac12$ each as "qubit 0 is secretly in
+   $|+\rangle$", since $|+\rangle$ also gives $\tfrac12$ each. It is not:
+   $|+\rangle$ would give $P(+) = 1$ in the X basis, while qubit 0 of
+   $|\Phi^+\rangle$ gives $\tfrac12$ there too. A maximally mixed qubit is
+   $50/50$ in *every* basis, and a superposition is $50/50$ in only one.
+
+   </details>
+
 4. A friend argues that since each qubit alone looks perfectly random,
    entanglement can't be "doing" anything physical. What's the flaw in
    this reasoning?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The flaw is that "look at each qubit alone" is not a complete experiment
+   on a two-qubit system, so it cannot be the test of whether anything
+   physical is happening. The randomness the friend observes is real, and
+   it is not the whole of what there is to observe.
+
+   Make the point with two states that pass the friend's test identically.
+   In $|\Phi^+\rangle$ each qubit alone is $50/50$; in $|\Psi^+\rangle$
+   each qubit alone is $50/50$; in the product state $|+\rangle\otimes|+\rangle$
+   each qubit alone is $50/50$. Three states, indistinguishable by the
+   friend's method, wildly different in every joint measurement: the first
+   always agrees, the second always disagrees, the third agrees exactly
+   half the time. The information is entirely in the correlations, and the
+   friend's procedure discards precisely that.
+
+   There is a second layer, and it is the one this lesson was built to
+   show. Even the joint measurement in a single basis is not enough,
+   because two classically correlated coins reproduce $|\Phi^+\rangle$'s
+   computational-basis statistics exactly. What the coins cannot reproduce
+   is agreement that *survives changing the basis on both sides at once*,
+   which is what $(H\otimes H)|\Phi^+\rangle = |\Phi^+\rangle$ says, and
+   Bell's theorem turns into a bound no predetermined model can meet.
+
+   The reasoning does contain one true and important thing, worth keeping
+   rather than correcting. Local randomness really is complete, in the
+   sense that nothing you do to your half changes the statistics on the
+   other half by even a little. That is not a limitation of your equipment;
+   it is what forbids faster-than-light signaling, and it is the same fact
+   as qubit 0's reduced description being $\tfrac12 I$ no matter what
+   happens to qubit 1. So the correct conclusion is not "entanglement does
+   nothing", but "entanglement does nothing *locally*", which is a much
+   sharper and much stranger claim: the effect is entirely in the
+   relationship, and reading it out requires bringing both halves together.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -272,12 +438,13 @@ correlation.
 - $|\Phi^+\rangle$ provably cannot be written as any
   $|a\rangle\otimes|b\rangle$, a direct proof by contradiction.
 - The correlation survives a change of measurement basis
-  ($(H\otimes H)|\Phi^+\rangle=|\Phi^+\rangle$), which distinguishes it
-  from any classical predetermined (hidden-variable) correlation.
+  ($(H\otimes H)|\Phi^+\rangle=|\Phi^+\rangle$), the phenomenon Bell's
+  theorem sharpens into a proof; two bases alone do not yet rule out
+  hidden variables.
 - No signal is transmitted by entanglement alone: each qubit's local
   statistics are always uniformly random.
 
-## Further Exploration
+## What happens when you measure only half
 
 <NextDiscovery>
 [Multi-Qubit Measurement](/lessons/quantum-computing/quantum-gates-and-circuits/multi-qubit-measurement) makes precise what

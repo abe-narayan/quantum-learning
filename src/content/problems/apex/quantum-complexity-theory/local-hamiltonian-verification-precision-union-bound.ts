@@ -20,7 +20,7 @@ export const localHamiltonianVerificationPrecisionUnionBound: NumericProblem = {
     type: "numeric",
     prompt:
       "A Local Hamiltonian instance has m=50 local terms and promise gap b-a=0.02. Following the lesson's QMA-membership argument, Arthur needs the sum of his m per-term estimation errors to stay below (b-a)/3 in the worst case, so he budgets each term the same slice of that error: epsilon = (b-a)/(3m). What value of epsilon (per-term additive precision) does this give?",
-    inputHint: "as a decimal, e.g. 0.000123",
+    inputHint: "as a decimal, to 6 decimal places, e.g. 0.000123",
   },
   answer: {
     type: "numeric",

@@ -26,7 +26,7 @@ export const qaoaApproximationRatio: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "The lesson states QAOA achieves approximately 1.999 out of a true maximum of 2 — divide the two.",
+    incorrectFeedback: "QAOA reaches an expected cut of about 1.999 here, against a true maximum of 2. Divide the first by the second.",
     nearMisses: [
       {
         value: achieved,
@@ -48,6 +48,6 @@ export const qaoaApproximationRatio: NumericProblem = {
   explanation: {
     correctIdea: "The approximation ratio is the standard way to measure how close a heuristic optimization algorithm gets to the true optimum.",
     whyCorrect: "This matches the engine's own direct computation of both the achieved and true optimal cut sizes.",
-    whyWrong: ["A ratio noticeably below 1 would indicate the chosen parameters are far from optimal — this example specifically used grid-searched, near-optimal parameters."],
+    whyWrong: ["A ratio noticeably below 1 would mean the chosen angles are far from optimal, and these came from a grid search."],
   },
 };

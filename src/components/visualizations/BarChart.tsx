@@ -23,6 +23,7 @@ export function BarChart({
   bars,
   ariaLabel,
   maxValue,
+  signed,
   height = 160,
   formatCaption,
 }: {
@@ -30,12 +31,66 @@ export function BarChart({
   ariaLabel: string;
   /** Defaults to the largest bar value (or 1 if all values are 0). */
   maxValue?: number;
+  /**
+   * Forces the two-sided layout (zero line at the vertical midpoint, negative
+   * bars hanging below it) even on a frame whose own values are all
+   * non-negative. Left unset, the chart decides from `bars`.
+   *
+   * The vertical twin of `maxValue`: both name a piece of the axis, and both
+   * have to be settled over a whole frame *set* rather than the frame on
+   * screen, or a bar of the same value moves between frames.
+   * `BarChartExplorer` passes it for exactly that reason; see the note there.
+   *
+   * Only ever forces the split on. `signed={false}` cannot make a negative
+   * value draw upward as its own absolute value, which is the bug the split
+   * exists to fix.
+   */
+  signed?: boolean;
   height?: number;
   /** Defaults to a plain 2-decimal number. Ignored when `caption` is set on an entry. */
   formatCaption?: (value: number) => string;
 }) {
   const effectiveMax = maxValue ?? Math.max(0.001, ...bars.map((b) => Math.abs(b.value)));
-  const defaultFormat = formatCaption ?? ((v: number) => v.toFixed(2));
+  // `-0.00` was reaching the caption row. `quantumFourierTransform` returns
+  // amplitudes whose "zero" components are floating-point residue on the order
+  // of 1e-17, and `(-1e-17).toFixed(2)` is the string "-0.00": a minus sign in
+  // front of a bar the geometry correctly draws at zero height. Anything that
+  // rounds to zero at two decimals prints as an unsigned zero.
+  const defaultFormat = formatCaption ?? ((v: number) => (Math.abs(v) < 5e-3 ? (0).toFixed(2) : v.toFixed(2)));
+
+  // Sign has to live in the geometry, not only in the caption. Every bar used
+  // to be drawn upward from the baseline at `Math.abs(value)` height and merely
+  // tinted `muted-foreground` when negative, so in `bells-theorem-and-local-
+  // hidden-variables` a correlation term of +1 and one of -1 were the same
+  // height, and in `the-quantum-fourier-transform`'s real/imaginary charts
+  // +0.5 and -0.5 were the same height. The one thing those two figures exist
+  // to show (which terms carry which sign, which quadrant of the phase fan an
+  // amplitude landed in) survived only as text under the picture.
+  //
+  // When any value is negative the plot area splits into two equal halves with
+  // the zero line between them: positive bars grow up off it, negative bars
+  // hang down from it. When every value is non-negative (which is every other
+  // caller in the repo: probability distributions, log-scaled platform
+  // comparisons, shot counts) the layout is byte-for-byte what it was, zero
+  // line along the bottom, so nothing regresses.
+  //
+  // The `muted-foreground` tint is gone with it. Position now carries the sign,
+  // and the tint was reading as "this bar matters less" on bars that matter
+  // exactly as much as their positive neighbours.
+  //
+  // Deciding the split from *these* bars is only correct for a chart that is
+  // the whole figure. Inside an explorer it silently rescales the axis between
+  // frames: the split halves the height a bar can use, so a frame that happens
+  // to be all-positive drew every bar at twice the height of the identical
+  // value in a frame that contained a negative. `the-quantum-fourier-transform`
+  // is the live case — the real-part sweep's j = 0 frame is four amplitudes of
+  // +0.5 with no negative anywhere, while j = 1, 2 and 3 all carry one, so the
+  // same 0.5 rendered at two different heights across one slider drag. That is
+  // the one thing an axis exists to prevent, so the decision is liftable: the
+  // `signed` prop settles it over the frame set (`BarChartExplorer` does this
+  // for every explorer at once), and only when it is absent does the chart fall
+  // back to reading its own bars.
+  const hasNegative = signed === true || bars.some((b) => b.value < 0);
 
   return (
     // `role="group"`, not `role="img"`. This is the hardest call in the
@@ -88,33 +143,50 @@ export function BarChart({
     >
       {bars.map((bar, index) => {
         const barHeightPct = Math.min(100, (Math.abs(bar.value) / effectiveMax) * 90);
+        const fill = bar.highlight ? "bg-accent" : "bg-brand/70";
+        const barBase = "w-6 transition-[height] duration-500 ease-out motion-reduce:transition-none";
+        // Both halves always render their bar, at zero height on the side the
+        // value is not on, so a bar that flips sign between frames animates its
+        // height down to the line and back out the other way instead of
+        // unmounting and reappearing at full size.
+        const upPct = bar.value > 0 ? barHeightPct : 0;
+        const downPct = bar.value < 0 ? barHeightPct : 0;
         return (
           <div key={index} className="flex min-w-[2.25rem] flex-1 flex-col items-center justify-end gap-1">
-            <span className="font-mono text-[11px] text-muted-foreground">{bar.caption ?? defaultFormat(bar.value)}</span>
+            <span className="font-mono text-meta text-muted-foreground">{bar.caption ?? defaultFormat(bar.value)}</span>
             {/* `border-b border-axis` gives the chart the zero line it never had. Bar
                 heights were readable only relative to each other, with nothing marking
-                where a probability of 0 sits — and for the negative-amplitude case this
-                component explicitly supports (`bar.value < 0`), a bar drawn downward
-                from an invisible origin is unreadable. `--axis` rather than `--border`
-                because a bar chart's baseline is the canonical "mark a reader must
-                perceive to read the figure" and `--border` measures 1.41:1 on
-                `--surface-muted`, under WCAG 2.1 SC 1.4.11's 3:1. */}
-            <div className="relative flex w-full flex-1 items-end justify-center border-b border-axis">
-              <div
-                className={cn(
-                  "w-6 rounded-t-sm transition-[height] duration-500 ease-out motion-reduce:transition-none",
-                  bar.highlight ? "bg-accent" : bar.value < 0 ? "bg-muted-foreground/60" : "bg-brand/70"
-                )}
-                style={{ height: `${barHeightPct}%` }}
-              />
-            </div>
-            {/* Both the value caption above and this basis-state label are 10 -> 11px.
+                where a probability of 0 sits. `--axis` rather than `--border` because a
+                bar chart's baseline is the canonical "mark a reader must perceive to
+                read the figure" and `--border` measures 1.41:1 on `--surface-muted`,
+                under WCAG 2.1 SC 1.4.11's 3:1. */}
+            {hasNegative ? (
+              <div className="relative flex w-full flex-1 flex-col">
+                {/* Two `flex-1` halves over a `flex-col` parent split the plot area
+                    exactly 50/50, so the zero line sits at the midpoint of the column
+                    and a bar's distance from it is directly comparable up or down. */}
+                <div className="flex flex-1 items-end justify-center border-b border-axis">
+                  <div className={cn(barBase, "rounded-t-sm", fill)} style={{ height: `${upPct}%` }} />
+                </div>
+                <div className="flex flex-1 items-start justify-center">
+                  <div className={cn(barBase, "rounded-b-sm", fill)} style={{ height: `${downPct}%` }} />
+                </div>
+              </div>
+            ) : (
+              <div className="relative flex w-full flex-1 items-end justify-center border-b border-axis">
+                <div className={cn(barBase, "rounded-t-sm", fill)} style={{ height: `${barHeightPct}%` }} />
+              </div>
+            )}
+            {/* Both the value caption above and this basis-state label are 10 -> 11px,
+                now spelled `text-meta` (`--text-meta: 0.6875rem` = exactly the 11px
+                they already were) rather than an arbitrary literal, so they sit on
+                the same named step as every other piece of chart metadata.
                 Unlike this directory's SVG figures these are real CSS pixels, not
                 viewBox units, so 10px was legible rather than broken — but these are
                 the numbers a reader compares bar against bar (and the outcome labels
                 that say which bar is which), so they get the extra pixel rather than
                 sitting exactly on the floor. */}
-            <span className={cn("font-mono text-[11px] text-center", bar.highlight ? "font-semibold text-accent" : "text-muted-foreground")}>
+            <span className={cn("font-mono text-meta text-center", bar.highlight ? "font-semibold text-accent" : "text-muted-foreground")}>
               {bar.label}
             </span>
           </div>

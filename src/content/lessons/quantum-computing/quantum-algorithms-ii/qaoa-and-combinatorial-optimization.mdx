@@ -36,7 +36,7 @@ export const lessonMeta = {
   prerequisites: ["quantum-computing/quantum-algorithms-ii/vqe-a-worked-toy-example"],
   objectives: [
     "Formulate Max-Cut as a cost Hamiltonian C=Σ(1-Z_iZ_j)/2 over graph edges",
-    "Derive the cost unitary's action as a pure phase e^{-iγ·(cut count)} on each basis state",
+    "Derive the cost unitary's action as a pure phase e^(-iγ × cut count) on each basis state",
     "Explain the mixer's role and verify the uniform superposition gives exactly half of every edge cut in expectation",
   ],
 };
@@ -45,7 +45,7 @@ export const lessonMeta = {
 Max-Cut asks you to split a graph's vertices into two groups so that as many edges as possible cross between them. It is NP-hard, and QAOA attacks it with the same hybrid loop VQE uses for ground energies.
 </LessonHook>
 
-## Motivation
+## VQE's loop, aimed at a graph
 
 **<Term id="qaoa">QAOA</Term>** (the quantum approximate optimization algorithm) is VQE's hybrid
 loop, a parameterized circuit with a classically-optimized cost, pointed at
@@ -66,7 +66,7 @@ Max-Cut is the standard first example, and the encoding takes two lines.
   license="CC BY 2.0"
 />
 
-## Mathematical Development
+## A cost Hamiltonian, a phase, and a mixer
 
 ### Max-Cut as a Hamiltonian
 
@@ -106,6 +106,30 @@ Edges 0-1 and 0-2 cross between groups (dashed, cut); edge 1-2 sits
 entirely inside one group (solid, not cut). $\langle z|C|z\rangle=2$ for
 this particular coloring, read directly off the picture by counting
 dashed edges.
+
+### A checkable baseline
+
+<PredictBeforeReveal
+  question="On the plain uniform superposition, before any circuit layer is applied, what's the expected cut size for the 3-edge triangle graph?"
+  options={[
+    { label: "0, since there is no bias toward any coloring yet", value: "zero" },
+    { label: "1.5, half of the 3 edges on average", value: "half" },
+    { label: "2, the true maximum, by symmetry", value: "max" },
+    { label: "3, every edge cut on average", value: "all" },
+  ]}
+  correctValue="half"
+  explanation="Every basis state is equally likely at probability 1/8, and for any single edge exactly half of all colorings cut it. Summed over the triangle's 3 edges the expected cut size is 3 × 0.5 = 1.5, matching expectedCutSize's output on the uniform superposition below. Note that this baseline is also what random guessing achieves, so it is the number every QAOA result in this lesson and the next has to beat before it has shown anything."
+/>
+
+Before building any circuit at all, check the *starting point* QAOA begins
+from: the uniform superposition gives every basis state equal probability
+$1/2^n$, so the expected cut size is just the average of $C$ over *all*
+$2^n$ colorings. For any single edge, exactly half of all colorings cut it
+(matching the endpoints' bits differently) and half don't, so the expected
+cut count from the uniform superposition alone is exactly $|E|/2$, half
+the edge count, for *any* graph. For a 3-edge triangle: `expectedCutSize`
+on the plain uniform superposition gives exactly $1.5$, confirmed
+directly, not just argued.
 
 ### The cost unitary is a pure phase
 
@@ -148,31 +172,7 @@ nontrivial case this course's worked example uses.
   />
 </InteractiveSection>
 
-### A checkable baseline
-
-<PredictBeforeReveal
-  question="Before any cost or mixer layers run, on the plain uniform superposition, what's the expected cut size for the 3-edge triangle graph?"
-  options={[
-    { label: "0, since there is no bias toward any coloring yet", value: "zero" },
-    { label: "1.5, half of the 3 edges on average", value: "half" },
-    { label: "2, the true maximum, by symmetry", value: "max" },
-    { label: "3, every edge cut on average", value: "all" },
-  ]}
-  correctValue="half"
-  explanation="Every basis state is equally likely at probability 1/8, and for any single edge exactly half of all colorings cut it. Summed over the triangle's 3 edges the expected cut size is 3 × 0.5 = 1.5, matching expectedCutSize's output on the uniform superposition below. Note that this baseline is also what random guessing achieves, so it is the number every QAOA result in this lesson and the next has to beat before it has shown anything."
-/>
-
-Before running any optimization, check the *starting point*: the uniform
-superposition itself, with no cost/mixer layers applied at all, gives
-every basis state equal probability $1/2^n$, so the expected cut size is
-just the average over *all* $2^n$ colorings. For any single edge, exactly
-half of all colorings cut it (matching the endpoints' bits differently)
-and half don't, so the expected cut count from the uniform superposition
-alone is exactly $|E|/2$, half the edge count, for *any* graph. For a
-3-edge triangle: `expectedCutSize` on the plain uniform superposition
-gives exactly $1.5$, confirmed directly, not just argued.
-
-## Physical Interpretation
+## Tagging colorings, then letting them interfere
 
 QAOA's cost unitary "tags" each candidate coloring with a phase
 proportional to its quality, and the mixer lets those phases <Term id="phase-interference">interfere</Term>.
@@ -181,7 +181,7 @@ pattern, now applied to a continuous-valued cost instead of a single
 marked item, and tuned by a classical optimizer choosing $\gamma,\beta$
 rather than a fixed formula.
 
-## Worked Example
+## The baseline for a single edge
 
 **Confirm the uniform-superposition baseline for a single edge (2 nodes,
 1 edge): expected cut size should be exactly $0.5$.**
@@ -192,7 +192,7 @@ superposition. Expected cut size
 $=0.25(0)+0.25(1)+0.25(1)+0.25(0)=0.5$, exactly half of the single edge,
 matching the general $|E|/2$ rule and the engine's direct output.
 
-## Common Mistakes
+## A pure phase changes no probability
 
 <Callout type="warning">
 **Expecting the cost unitary alone to improve the measured cut size.**
@@ -211,15 +211,177 @@ maximum, and adding layers ($p>1$) usually helps without promising to.
 ## Practice Questions
 
 1. Compute the expected cut size of the uniform superposition for a
-   4-edge graph, using the $|E|/2$ rule.
+   4-edge graph, using the $|E|/2$ rule. Then say what the rule does and
+   does not depend on about the graph, and give one 4-edge graph whose
+   true Max-Cut is $4$ and one whose true Max-Cut is $3$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $|E|/2 = 4/2 = 2$. The engine's `expectedCutSize` on
+   `uniformSuperposition(4)` for the 4-cycle returns $2.0000000000000004$.
+
+   The rule depends on the edge count and on nothing else. The derivation
+   is one line of linearity of expectation: for any single edge, the two
+   endpoint bits are independent and uniform under the uniform
+   superposition, so they differ with probability exactly $\tfrac12$, and
+   the edge contributes $\tfrac12$ to the expected cut. Summing over $|E|$
+   edges gives $|E|/2$. Nothing in that argument mentions how the edges
+   are arranged, whether the graph is connected, or how many vertices
+   there are.
+
+   The true Max-Cut is a completely different story, and the two examples
+   show it. The 4-cycle with edges $(0,1),(1,2),(2,3),(3,0)$ has Max-Cut
+   $4$: colour it alternately, $z=0101$, and every edge crosses.
+   `bruteForceMaxCut(4, square)` returns $4$. A triangle with a pendant
+   edge, $(0,1),(1,2),(0,2),(2,3)$, also has four edges and the same
+   baseline of $2$, but its Max-Cut is $3$: the triangle can never give up
+   more than $2$ of its edges, and the pendant edge is always cuttable.
+   `bruteForceMaxCut` returns $3$.
+
+   That gap is exactly what QAOA is being asked to close, and its size
+   varies by graph even at fixed edge count. The baseline is free and
+   uninformative; the ceiling requires knowing the graph's structure, and
+   finding it is the NP-hard part.
+
+   The wrong turn is reading $|E|/2$ as a property of the *algorithm*
+   rather than of random guessing. It is what you get with no circuit at
+   all, which is why the lesson insists it is the number every QAOA result
+   has to beat before it has shown anything. A run reporting an expected
+   cut of $2$ on a four-edge graph has demonstrated precisely nothing.
+
+   </details>
+
 2. Explain why $U_C(\gamma)$'s action can be computed directly from a
    basis state's index alone (no matrix multiplication needed), using its
    diagonal structure.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $C$ is built entirely out of $Z$ operators, and $Z$ is diagonal in the
+   computational basis, so products and sums of $Z$'s are diagonal too.
+   A diagonal $C$ has every computational basis state as an eigenstate,
+   with eigenvalue equal to that state's cut count. Exponentiating a
+   diagonal matrix exponentiates its entries, so
+
+   $$
+   U_C(\gamma)|z\rangle = e^{-i\gamma\,C}|z\rangle = e^{-i\gamma\,\mathrm{cut}(z)}|z\rangle .
+   $$
+
+   Computationally that means: take the basis index $z$, read its bits,
+   count the edges whose two endpoint bits differ, and multiply that one
+   amplitude by a phase. No row of a matrix is ever touched, and no
+   amplitude is ever mixed with another. `applyCostUnitary` does exactly
+   this, one index at a time.
+
+   The cost saving is the reason it matters. A general $2^n\times2^n$
+   matrix-vector product is $O(4^n)$ multiply-adds. Here the work is
+   $O(2^n\cdot|E|)$: one pass over the amplitudes, counting edges for
+   each. And on real hardware the same structure means $U_C$ compiles into
+   one two-qubit $R_{zz}$ rotation per edge, a circuit whose depth grows
+   with the graph rather than with the state space.
+
+   The consequence worth carrying to the next question is that $U_C$
+   changes no measurement probability at all, since multiplying an
+   amplitude by a unit-modulus phase leaves $|c_z|^2$ alone. The engine
+   confirms this directly: probabilities before and after
+   `applyCostUnitary` match to machine precision. All $U_C$ does is write
+   information into phases, and something else has to convert it into
+   amplitude.
+
+   The wrong turn is expecting a "cost" operator to make good colourings
+   more likely by itself. It cannot, for the reason just given, and a QAOA
+   circuit consisting of cost layers alone would return the uniform
+   distribution however many layers you stacked. The mixer is not a
+   refinement; it is the half that does anything visible.
+
+   </details>
+
 3. For a single edge, write out $U_C(\gamma)$'s phase on each of the 4
    basis states explicitly ($|00\rangle,|01\rangle,|10\rangle,|11\rangle$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The cut count of a single edge $(0,1)$ is $1$ when the two bits differ
+   and $0$ when they match:
+
+   $|00\rangle \to e^{0} = 1$, unchanged.
+   $|01\rangle \to e^{-i\gamma}$.
+   $|10\rangle \to e^{-i\gamma}$.
+   $|11\rangle \to e^{0} = 1$, unchanged.
+
+   So $U_C(\gamma)=\mathrm{diag}\left(1,\ e^{-i\gamma},\ e^{-i\gamma},\ 1\right)$.
+   The engine bears this out at $\gamma=0.7$ on the uniform superposition:
+   the $|00\rangle$ and $|11\rangle$ amplitudes stay at $0.5$, while
+   $|01\rangle$ and $|10\rangle$ become $0.382421-0.322109i$, which is
+   exactly $0.5\,e^{-0.7i}$ since $e^{-0.7i}=0.764842-0.644218i$.
+
+   Two features are worth reading off. The phase pattern is symmetric
+   under flipping both bits, because $z$ and its complement cut the same
+   edges, so QAOA can never distinguish a colouring from its mirror image.
+   That degeneracy is harmless for Max-Cut, where both are equally good
+   answers, and it means the measured distribution always comes in
+   complementary pairs. And the two cut colourings receive the *same*
+   phase as each other, so no coloring is singled out: what the cost layer
+   creates is a phase *difference* between the cut group and the uncut
+   group, of size $\gamma$.
+
+   That difference is the raw material for interference, and $\gamma$ is
+   the dial controlling how much of it there is. At $\gamma=0$ there is
+   none and QAOA reduces to random guessing; at $\gamma=2\pi$ the phases
+   wrap around to identical again, which is why the parameter is periodic
+   rather than monotonic and why the grid search in the next lesson
+   searches over a bounded interval.
+
+   The wrong turn is writing $e^{-i\gamma}$ on $|11\rangle$ on the
+   reasoning that both bits are set so "something happens". The cut count
+   asks whether the endpoints *differ*, not whether they are $1$, and
+   $|11\rangle$ leaves the edge entirely inside one group.
+
+   </details>
+
 4. Why is $B=\sum_iX_i$ (independent single-qubit rotations) a reasonable
    choice of mixer, given that the goal is to explore *different*
    colorings rather than stay fixed at one?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because $X$ is precisely the operator that flips a bit, so $e^{-i\beta X_i}$
+   partially flips vertex $i$'s colour: it moves amplitude between
+   $|{\ldots}0_i{\ldots}\rangle$ and $|{\ldots}1_i{\ldots}\rangle$ in a
+   controlled amount set by $\beta$. Summed over all vertices, $B$
+   generates moves between every colouring and each of its
+   single-vertex-flip neighbours, which is exactly the local-search
+   neighbourhood a classical heuristic for Max-Cut would use.
+
+   Three properties make it a good choice rather than merely a workable
+   one. It is off-diagonal, so unlike $U_C$ it genuinely redistributes
+   probability rather than only phases. Its terms act on different qubits
+   and therefore commute, so $e^{-i\beta B}$ factorizes into a tensor
+   product of single-qubit exponentials with no Trotter error, and
+   compiles to one $R_x(2\beta)$ per qubit: depth one, whatever the graph
+   looks like. And the uniform superposition QAOA starts from is $B$'s
+   own highest eigenstate, which is what makes the standard adiabatic
+   story about interpolating from $B$ to $C$ available as motivation.
+
+   The interference is what turns local moves into optimization. $U_C$ has
+   already stamped each colouring with a phase proportional to its
+   quality, so when the mixer brings neighbouring colourings' amplitudes
+   together they add or cancel according to those phases, and good
+   colourings accumulate weight. This is the oracle-then-diffusion pattern
+   from Grover with a continuous score in place of a single marked item.
+
+   The wrong turn is treating $\beta$ as a dial where more is better. The
+   lesson's own sweep shows the expected cut climbing to $1.875$ at
+   $\beta=\pi/8$, then falling to $0.375$ at $\beta=3\pi/8$, below the
+   $1.5$ baseline, and returning to the baseline at $\pi/2$. It is a
+   rotation angle, so overshooting undoes the work, exactly as running
+   Grover past its optimum does.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -232,7 +394,7 @@ maximum, and adding layers ($p>1$) usually helps without promising to.
 - The uniform superposition's expected cut size is exactly $|E|/2$ for
   any graph, a checkable baseline before any optimization runs.
 
-## Further Exploration
+## Running it on an actual graph
 
 <NextDiscovery>
 [QAOA: A Worked Max-Cut Example](/lessons/quantum-computing/quantum-algorithms-ii/qaoa-a-worked-max-cut-example) runs $p=1$ QAOA on a

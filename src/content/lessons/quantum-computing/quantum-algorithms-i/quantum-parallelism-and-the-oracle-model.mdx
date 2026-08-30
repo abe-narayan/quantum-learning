@@ -50,11 +50,11 @@ export const parallelismFrames = parallelismQubitCounts.map((n, i) => ({
   })),
 }));
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="The half of the story that makes headlines">
 Every algorithm in this course starts from the same trick: put a register into superposition over every possible input, apply some computation once, and somehow get useful information out at the end. Quantum parallelism sounds like it should give free exponential speedups. It does not.
 </LessonHook>
 
-## Motivation
+## The 'somehow' in the middle
 
 Put a register into superposition, apply a computation once, then read
 something useful out at the end. That "somehow" in the middle is the whole
@@ -63,12 +63,11 @@ overcome before building anything on top of it.
 
 The popular version of the story stops one step early. Yes, one query to
 $f$ on a superposition of $2^n$ inputs produces a state containing every
-value of $f$ at once. No, you cannot read them. This lesson works out
-exactly how much a measurement of that state gives you (one value, chosen
-at random), and that disappointing answer is what every algorithm in the
-rest of the course is designed to route around.
+value of $f$ at once. What a measurement of that state actually hands
+back is the question this lesson settles, and the answer is what every
+algorithm in the rest of the course is designed to route around.
 
-## Mathematical Development
+## Uniform superposition, the oracle, and the catch
 
 ### H^⊗n creates the uniform superposition
 
@@ -159,7 +158,7 @@ earlier, are gone the instant you look.
 The $n=2$ case above is just one point on a pattern that holds for any
 register size: $H^{\otimes n}|0\rangle^{\otimes n}$ always spreads equally
 over $2^n$ branches, each with probability exactly $1/2^n$, real numbers
-from `applySingleQubitGate` applied $n$ times in a row, not just algebra:
+from `applySingleQubitGate` applied $n$ times in a row, with the algebra above as the check:
 
 <InteractiveSection
   title="2ⁿ branches, each shrinking as n grows"
@@ -173,7 +172,7 @@ from `applySingleQubitGate` applied $n$ times in a row, not just algebra:
   />
 </InteractiveSection>
 
-Every bar in every frame sits at exactly $1/2^n$: doubling $n$ halves each
+Every bar in every frame sits at exactly $1/2^n$: adding a qubit halves each
 branch's share of the total probability, even as the number of branches
 doubles. Total probability always sums to $1$; only its distribution across
 an exponentially larger set of branches changes.
@@ -186,7 +185,7 @@ that no single query (classical or quantum) could reveal on its own. That
 constructive/destructive interference step, not the superposition step, is
 where the real work happens.
 
-## Physical Interpretation
+## A superposition is not a stack of computers
 
 "Quantum computers try every input at once" is the half of the story that
 makes headlines, and on its own it is useless. A superposition over $2^n$
@@ -196,7 +195,7 @@ information, the same as any other. Every algorithm in this course earns
 its speedup by arranging interference on purpose, never by superposition
 alone.
 
-## Worked Example
+## One query on four inputs, and what it yields
 
 **A classical algorithm queries $f:\{0,1\}^2\to\{0,1\}$ on all 4 inputs to
 learn the full truth table. Show that querying $U_f$ once on a uniform
@@ -210,7 +209,7 @@ correct $f(x)$, exactly one $(x,f(x))$ pair, the same information a single
 classical query $f(x)$ would give for a chosen $x$. The other three values of
 $f$ remain unknown after this one query, quantum or classical.
 
-## Common Mistakes
+## Measurement still collapses to one branch
 
 <Callout type="mistake">
 **Believing one query to $U_f$ on a superposition reveals the full truth
@@ -230,14 +229,162 @@ what these algorithms bound, not the cost of constructing $U_f$ itself.
 
 1. Write out $H^{\otimes 3}|000\rangle$ as a sum over all 3-bit strings, and
    confirm every amplitude has the same magnitude.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   H^{\otimes 3}|000\rangle = \frac{1}{\sqrt8}\big(|000\rangle+|001\rangle+|010\rangle+|011\rangle+|100\rangle+|101\rangle+|110\rangle+|111\rangle\big)
+   $$
+
+   The engine's `uniformSuperposition(3)` returns $0.353553$ on all eight
+   basis states, which is $1/\sqrt8$ to six decimals, and probabilities
+   $0.125$ each.
+
+   The reason every amplitude is equal, rather than this being a happy
+   accident of small $n$, is in the tensor product. Each factor is
+   $\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$, and distributing the product
+   over the three sums produces one term for every way of picking $0$ or
+   $1$ from each factor. That is exactly one term per 3-bit string, each
+   carrying the same coefficient $\left(\tfrac{1}{\sqrt2}\right)^3$, with
+   no term appearing twice and none missing. The same argument runs for any
+   $n$ and gives $1/\sqrt{2^n}$ on all $2^n$ strings.
+
+   Normalization is worth checking too: $8 \times \left(1/\sqrt8\right)^2 = 8 \times \tfrac18 = 1$.
+
+   The slip to avoid is reading the $\tfrac{1}{\sqrt8}$ as small and
+   concluding that a large register's state is somehow faint. Each
+   amplitude shrinks as $2^{-n/2}$ precisely because there are $2^n$ of
+   them, and the total probability is always $1$. What is genuinely true,
+   and is the next question's subject, is that a single measurement of this
+   state is a uniform random draw, and the draw gets no better as $n$
+   grows.
+
+   </details>
+
 2. Explain, using $U_f$'s definition, why $U_f$ applied twice in a row always
-   returns the original state, for *any* function $f$, not just invertible
-   ones.
+   returns the original state, for *any* function $f$, including non-invertible
+   ones. Then name the two properties this forces on $U_f$ as an operator,
+   and say why two consecutive queries therefore buy nothing.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Apply the definition twice and let XOR cancel itself:
+
+   $$
+   U_f U_f|x\rangle|y\rangle = U_f|x\rangle|y\oplus f(x)\rangle = |x\rangle|y\oplus f(x)\oplus f(x)\rangle = |x\rangle|y\rangle
+   $$
+
+   using $b \oplus b = 0$ for any bit $b$. Nothing about $f$ was needed
+   beyond its being a function, so the argument covers AND, or a constant,
+   or any lookup table you like. The engine confirms it on a genuinely
+   non-invertible $f$, the AND of two input bits, applied to a full
+   superposition: the state after two oracle calls matches the input
+   amplitude for amplitude.
+
+   Two properties follow. $U_f^2 = I$ makes $U_f$ **its own inverse**, so it
+   is invertible, which is what a unitary must be. And since $U_f$ is a
+   permutation of basis states with real entries, it is also **Hermitian**,
+   $U_f^\dagger = U_f$, so it is simultaneously a legal gate and a legal
+   observable, the same coincidence CNOT enjoys. That is not accidental:
+   for $f(x)=x$ on one input bit, $U_f$ *is* CNOT.
+
+   The consequence for querying is blunt. If two calls in a row give back
+   exactly what you started with, then a circuit is only ever paying for
+   $U_f$ calls that have something else between them. This is why query
+   counts in this course count *interleaved* calls, and why the way to
+   spend a query well is to arrange the state carefully before it and
+   interfere carefully after it, which is the next lesson's subject.
+
+   The wrong turn is expecting reversibility to fail for a many-to-one $f$,
+   on the grounds that AND destroys information. It does destroy
+   information in the classical setting, where you keep only the output.
+   $U_f$ keeps the input register untouched, and it is that retained copy
+   of $x$ that makes the whole map invertible: from $|x\rangle|y\oplus f(x)\rangle$
+   you can recompute $f(x)$ and undo the XOR. Reversibility was bought by
+   carrying the input along, not by making $f$ invertible.
+
+   </details>
+
 3. A function $f:\{0,1\}^3\to\{0,1\}$ is queried once via $U_f$ on a uniform
    superposition, then measured immediately. What is the probability the
    measured $x$ equals a specific value you care about in advance?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $1/8$, the same as guessing.
+
+   The pre-measurement state is
+   $\tfrac{1}{\sqrt8}\sum_x|x\rangle|f(x)\rangle$. Each of the eight terms
+   carries amplitude $1/\sqrt8$, so each has probability $\tfrac18$, and
+   the engine's probability array confirms $0.125$ eight times over. The
+   oracle did not change those probabilities: it wrote $f(x)$ into the
+   second register without touching the first register's amplitudes at all.
+
+   So the query bought exactly one input-output pair, at an input you did
+   not choose. A classical computer spends one query and learns one pair
+   too, at an input it *did* choose, which is strictly better. After one
+   query the quantum version is behind.
+
+   The scaling makes it worse rather than better. At $n$ qubits the
+   probability of landing on the value you wanted is $1/2^n$, so the
+   larger the superposition, the more thoroughly the interesting answer is
+   diluted. Every extra branch you create is another branch the measurement
+   might collapse onto instead.
+
+   This is the exact reason the next four lessons exist. Superposition
+   spreads amplitude; measurement samples it. Between those two steps
+   something has to *move* amplitude onto the answers you want, and that
+   something is interference, driven by phases the oracle can be made to
+   write. The wrong turn is concluding that quantum computers cannot help
+   with function evaluation. The conclusion is narrower: they cannot help
+   if you measure immediately, and the entire art is in what happens
+   before you do.
+
+   </details>
+
 4. Explain in one or two sentences why "quantum parallelism" is a misleading
    name if taken to mean "computes every output simultaneously and readably."
+
+   <details className="answer-reveal">
+   <summary>A defensible answer</summary>
+
+   Marked on the argument rather than the wording. One version in full,
+   then alternatives, then the failure modes.
+
+   A worked version: the first half of the name is fair, since the state
+   $\tfrac{1}{\sqrt{2^n}}\sum_x|x\rangle|f(x)\rangle$ genuinely contains a
+   term for every input; the second half is not, because reading a quantum
+   state is a measurement, and a measurement returns one basis state, so
+   the accessible output is a single random $(x, f(x))$ pair and every
+   other value is destroyed. "Computes" and "reads" are different verbs
+   here, and the parallelism lives entirely in the first.
+
+   Equally defensible routes. You can argue from information: Holevo's
+   bound caps what $n$ qubits can deliver at $n$ classical bits, so no
+   amount of superposition can hand over $2^n$ function values, and any
+   reading of the name that implies otherwise contradicts a theorem. You
+   can argue by comparison: a classical randomized algorithm that picks one
+   random $x$ and computes $f(x)$ produces the same output distribution as
+   measuring this state, so if parallelism were the source of the power,
+   the classical sampler would already have it. You can also argue from
+   where the power actually is: every algorithm in this course spends its
+   effort after the query, arranging phases so that wrong answers cancel,
+   and the superposition is the raw material rather than the mechanism.
+
+   What a bad answer looks like: "it is misleading because the computer
+   only simulates doing them in parallel". That is a claim about
+   implementation and it is not the issue; the state really does contain
+   all the terms. Also wrong is any version of "the many-worlds picture is
+   controversial", which swaps a physical question for an interpretive one
+   and predicts nothing. And it is not enough to say "measurement collapses
+   the state" without saying what that costs: the point that has to land is
+   that one measurement yields one pair, no better than the one query a
+   classical machine would have spent.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -255,7 +402,7 @@ what these algorithms bound, not the cost of constructing $U_f$ itself.
   designed to extract a *global* property of $f$ that a single query
   otherwise couldn't reveal.
 
-## Further Exploration
+## The trick that makes the rest work
 
 <NextDiscovery>
 [Phase Kickback](/lessons/quantum-computing/quantum-algorithms-i/phase-kickback) is the single algebraic trick (encoding $f(x)$'s

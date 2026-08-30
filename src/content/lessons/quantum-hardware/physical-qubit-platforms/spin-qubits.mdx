@@ -76,7 +76,7 @@ export const exchangePresets = [
 export const lessonMeta = {
   title: "Spin Qubits",
   description:
-    "A qubit encoded directly in a single electron's (or nucleus's) spin, confined in a semiconductor quantum dot: Angular Momentum & Spin's spin-1/2 two-level system itself, built into solid-state hardware small enough that fabrication tooling from the existing semiconductor industry applies almost directly.",
+    "A qubit encoded directly in a single electron's (or nucleus's) spin, confined in a semiconductor quantum dot: Angular Momentum & Spin's spin-1/2 two-level system itself, built into solid-state hardware small enough that fabrication tooling from the existing semiconductor industry applies almost directly, though registers are still on the order of ten qubits.",
   course: "physical-qubit-platforms",
   module: "spin-qubits",
   order: 1,
@@ -85,7 +85,7 @@ export const lessonMeta = {
   prerequisites: ["quantum-hardware/physical-qubit-platforms/photonic-qubits"],
   objectives: [
     "Explain how a quantum dot confines a single electron whose spin serves as the qubit",
-    "State why spin qubits' small physical size is a genuine scalability advantage",
+    "State why spin qubits' small physical size is a scalability advantage, and where that advantage has not yet paid off",
     "Compare spin qubits' coherence/gate-speed regime to superconducting qubits and trapped ions",
   ],
   related: [
@@ -97,10 +97,10 @@ export const lessonMeta = {
 };
 
 <LessonHook eyebrow="As literal as a qubit gets">
-Spin qubits are the platform that uses spin-1/2's two-level structure as literally as possible: a single electron's actual spin, confined in a tiny region of semiconductor, encoding one qubit with no additional artificial circuit or atomic transition needed.
+Spin qubits are the platform that uses spin-1/2's two-level structure as literally as possible: a single electron's actual spin, confined in a tiny region of semiconductor, encoding one qubit with no additional artificial circuit or atomic transition needed. The two-level system is the one you already know.
 </LessonHook>
 
-## Motivation
+## Spin One-Half, Placed in Silicon
 
 Angular Momentum & Spin built spin-1/2's two-level structure
 mathematically; <Term id="spin-qubits">spin qubits</Term> are the platform that uses it as literally
@@ -109,19 +109,20 @@ as possible.
 <AnnotatedFigure
   src="https://upload.wikimedia.org/wikipedia/commons/f/fc/Quantum_Bus_Device_%288116044085%29.jpg"
   alt="A micrograph of a real spin-qubit quantum bus device, showing seven gate electrodes converging on the quantum dots at its center, with a Princeton tiger logo shown for scale at 1 millimeter"
-  caption="A real spin-qubit device: gate electrodes patterned on a chip converge to define the quantum dots at the center, exactly this lesson's confinement mechanism, fabricated with lithographic tooling much closer to a transistor's scale than a superconducting circuit's."
+  caption="A real spin-qubit device: gate electrodes patterned on a chip converge to define the quantum dots at the center, this lesson's confinement mechanism, fabricated with lithographic tooling much closer to a transistor's scale than a superconducting circuit's."
+  aspect="aspect-[638/480]"
   pins={[
-    { id: "dot", x: 22, y: 42, label: "The gate-defined quantum dot, wire-bonded to the seven electrode lines fanning out below — the electron confined here is the qubit." },
+    { id: "dot", x: 22, y: 42, label: "The gate-defined quantum dot, wire-bonded to the seven electrode lines fanning out below. The electron confined here is the qubit." },
     { id: "electrodes", x: 35, y: 58, label: "Seven separate gate electrodes, each independently voltage-tunable, whose combined field defines and confines the dot above." },
     { id: "pad", x: 20, y: 73, label: "One of the seven macroscopic bond pads wired to the chip's fine gate electrodes." },
-    { id: "tiger", x: 84, y: 65, label: "Princeton tiger logo, included in the original micrograph for scale — about 1 millimeter across." },
+    { id: "tiger", x: 84, y: 65, label: "Princeton tiger logo, included in the original micrograph for scale, about 1 millimeter across." },
   ]}
   credit="K. Petersson / Princeton University, NIST"
   creditUrl="https://commons.wikimedia.org/wiki/File:Quantum_Bus_Device_(8116044085).jpg"
-  license="Public Domain (U.S. Government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
-## Engineering Development
+## Quantum Dots and Exchange Coupling
 
 ### The quantum dot
 
@@ -131,7 +132,7 @@ single electron:
 
 <HardwarePlatformSchematic variant="spin-qubit" ariaLabel="An electron confined in a gate-defined quantum dot, patterned electrodes forming the confining potential" />
 
-This confinement uses essentially the same physics as
+This confinement uses the same physics as
 this platform's Wave Mechanics course's infinite/finite square well
 (spatial confinement forcing discrete energy levels), applied here in a
 real fabricated device rather than an idealized 1D model. The confined
@@ -154,7 +155,7 @@ makes that parallel visual rather than only verbal:
 
 The dashed line marks the confined electron's ground-state energy, and
 the overlaid curve its ground-state wavefunction: peaked inside the dot,
-decaying into the classically forbidden region outside it, exactly the
+decaying into the classically forbidden region outside it, the
 finite-well physics Wave Mechanics' Finite Square Well lesson already
 derived (the same $A\cos(kx)$ inside, $Be^{-\kappa|x|}$ outside
 construction, continuity-matched at the dot's edge), just now applied to
@@ -162,30 +163,32 @@ a lithographically patterned confining region instead of an idealized 1D
 box. Like any finite well, a real dot supports more than one bound level;
 sketching the lowest three shows the same qualitative ladder (only the
 ground state's energy above is solved exactly, the way the Finite Square
-Well lesson does in full — the second and third levels below are
+Well lesson does in full; the second and third levels below are
 illustrative spacings, not an exact excited-state calculation, since
 finding those requires the numerical eigensolver this platform
 deliberately doesn't implement, see the Wave Mechanics course):
 
-<PotentialDiagram
-  xValues={[...dotGrid.x]}
-  potential={dotWellShape}
-  energyLine={dotSchematicLevels[1].energy}
-  ariaLabel="The quantum dot's confining well with an illustrative second confined energy level, n=2, marked"
+<EnergyLevelDiagram
+  ariaLabel="An energy-level ladder for the same depth-8 well: the exactly solved ground state near -7.60, and illustrative second and third levels near -6.39 and -4.38, drawn at their true relative heights so the widening gaps are visible"
+  unit="natural units"
+  levels={dotSchematicLevels.map(({ n, energy }) => ({
+    label: `n=${n}`,
+    energy,
+    highlight: n === 1,
+  }))}
 />
 
-<PotentialDiagram
-  xValues={[...dotGrid.x]}
-  potential={dotWellShape}
-  energyLine={dotSchematicLevels[2].energy}
-  ariaLabel="The quantum dot's confining well with an illustrative third confined energy level, n=3, marked"
-/>
+Read the gaps, not the absolute heights: they widen going up, the
+signature of a box-like confining region rather than the evenly spaced
+ladder a harmonic well would give. A transmon's ladder, by contrast,
+narrows going up, which is the anharmonicity Superconducting Qubits
+depends on. Same picture, opposite trend, different qubit.
 
 ### Why small size matters
 
 A gate-defined quantum dot is tens of nanometers across. A transmon's
-circuit is hundreds of micrometers — four orders of magnitude larger in
-linear size — and a trapped ion's confinement region larger still. A
+circuit is hundreds of micrometers (four orders of magnitude larger in
+linear size), and a trapped ion's confinement region larger still. A
 spin qubit is therefore built at roughly the scale existing transistors
 are built at, which means spin-qubit fabrication can, in principle,
 lean on the same lithographic tooling and manufacturing infrastructure
@@ -198,8 +201,8 @@ the largest published spin-qubit registers hold on the order of ten
 qubits, against hundreds for superconducting chips and thousands of
 atoms in a tweezer array. Nor does small mean warm: most spin-qubit
 devices still run in a dilution refrigerator, though silicon "hot qubit"
-work has pushed operation up toward 1 K, where cooling power is orders
-of magnitude cheaper than at 10 mK. And the dominant noise source is
+work has demonstrated operation at around 1 K and above, where cooling
+power is orders of magnitude cheaper than at 10 mK. And the dominant noise source is
 electrical: the same gate electrodes that define the dot couple it to
 charge fluctuations in the surrounding material, which is why
 isotopically purified silicon-28 (removing the nuclear-spin bath) has
@@ -208,14 +211,17 @@ coherence a real device achieves.
 
 ### Coherence and gate speed
 
-Spin qubits sit in an intermediate regime: <Term id="coherence">coherence times</Term> generally
-longer than superconducting qubits' microseconds (particularly for
-nuclear-spin-based qubits, which are extremely well isolated from
-charge noise) but gate operations are typically driven electrically or
-magnetically at speeds closer to superconducting qubits' nanosecond
-scale than trapped ions' microsecond scale — landing in a stretch of the
-coherence/speed tradeoff space neither platform already covered quite
-occupies.
+Spin qubits sit in an intermediate regime, with one condition attached.
+The long <Term id="coherence">coherence times</Term> this platform is quoted for, milliseconds and
+beyond, are measured in isotopically purified silicon-28 with dynamical
+decoupling applied; on unpurified material the raw dephasing time is
+microseconds or less, no better than a transmon. Nuclear-spin qubits do
+better again, being extremely well isolated from charge noise. Gate
+operations, meanwhile, are driven electrically or magnetically at
+speeds closer to superconducting qubits' nanosecond scale than to
+trapped ions' microseconds. That combination lands them in a stretch of
+the coherence/speed tradeoff space neither platform already covered
+quite occupies, provided the material is purified.
 
 Driving a spin electrically or magnetically is, physically, the
 original context the two-level Rabi problem was built for (electron/
@@ -224,7 +230,7 @@ $|\!\uparrow\rangle$-$|\!\downarrow\rangle$ energy gap rotates the spin
 the same way a microwave tone rotates a superconducting qubit or a laser
 rotates a trapped ion's internal state.
 
-<InteractiveSection title="Drive a spin at resonance" description="Set detuning to zero and vary the coupling strength V, playing the role of the driving field's Rabi frequency: watch the population sweep from spin-down to spin-up and back at t_π=π/(2V), the same spin-resonance physics that gives this platform its gates. Move detuning away from zero and see the achievable population drop below 1, exactly what happens when the drive frequency misses the spin's actual resonance.">
+<InteractiveSection title="Drive a spin at resonance" description="This is the Rabi problem in its original home. Electron and nuclear spin resonance is where the driven two-level solution was worked out decades before anyone called it a qubit gate, and V here stands for a real oscillating field resonant with the up/down splitting. Vary V and read the peak time off the plot against t_π=π/(2V), then detune and read the ceiling. Then note what the explorer holds fixed and a real dot does not: the splitting the drive has to stay resonant with is set by the local field those gate electrodes produce, and charge noise moves it while you are driving.">
   <LazyRabiExplorer />
 </InteractiveSection>
 
@@ -234,7 +240,7 @@ A single confined spin is only half the story: two-qubit gates need two
 spins to interact. Placing two quantum dots close together lets their
 electrons' wavefunctions overlap slightly, and that overlap produces an
 **exchange interaction** (Heisenberg exchange, strength $J$) that couples
-the two spins' states to each other. Critically, $J$ isn't fixed: raising
+the two spins' states to each other. $J$ isn't fixed: raising
 or lowering the potential barrier between the dots, typically with a gate
 voltage, tunes the wavefunction overlap and switches the exchange
 coupling on or off on demand, which is what implements a two-qubit gate
@@ -245,6 +251,17 @@ That's why spin-qubit devices are laid out with nearest-neighbor,
 dot-to-dot connectivity rather than the all-to-all coupling a trapped-ion
 chain enjoys.
 
+<PredictBeforeReveal
+  question="Two electrons' spins are prepared symmetric under exchange (a triplet state). Given that electrons are fermions, what does this force about the spatial part of their combined wavefunction?"
+  options={[
+    { label: "It must be antisymmetric", value: "antisymmetric" },
+    { label: "It must also be symmetric", value: "symmetric" },
+    { label: "Nothing; spin and space are independent", value: "independent" },
+  ]}
+  correctValue="antisymmetric"
+  explanation="The total wavefunction (spatial × spin) must be antisymmetric for identical fermions. A symmetric spin part forces an antisymmetric spatial part to make the product come out antisymmetric overall. That spin-space locking is why the singlet and triplet spin states end up at different energies, the splitting J a two-qubit exchange gate switches on and off."
+/>
+
 Exchange works *because of* <Term id="pauli-exclusion-principle">Pauli exclusion</Term>, not despite it. Two
 electrons are identical fermions, so their full two-particle wavefunction
 (spatial part times spin part) has to come out antisymmetric under
@@ -254,21 +271,10 @@ together: pair the electrons' spins into the antisymmetric combination
 the spins into any symmetric combination (a **triplet**) and the spatial
 wavefunction is forced antisymmetric instead. A symmetric spatial
 wavefunction overlaps the confining potential differently than an
-antisymmetric one, so singlet and triplet sit at different energies —
-that splitting *is* $J$. Identical Particles already built exactly this
+antisymmetric one, so singlet and triplet sit at different energies.
+That splitting *is* $J$. Identical Particles already built this
 antisymmetrize/symmetrize machinery for two electrons in two spatial
 orbitals; here it's the same operator, applied to two spins instead:
-
-<PredictBeforeReveal
-  question="Two electrons' spins are prepared symmetric under exchange (a triplet state). Given that electrons are fermions, what does this force about the spatial part of their combined wavefunction?"
-  options={[
-    { label: "It must also be symmetric", value: "symmetric" },
-    { label: "It must be antisymmetric", value: "antisymmetric" },
-    { label: "No constraint — spin and spatial parts are independent", value: "independent" },
-  ]}
-  correctValue="antisymmetric"
-  explanation="The total wavefunction (spatial × spin) must be antisymmetric for identical fermions. A symmetric spin part forces an antisymmetric spatial part to make the product come out antisymmetric overall — this spin-space locking is exactly why the singlet and triplet spin states end up at different energies, the splitting J a two-qubit exchange gate switches on and off."
-/>
 
 <ExchangeDiagramExplorer
   presets={exchangePresets}
@@ -282,7 +288,7 @@ exchange gate is, physically, a controlled rotation between these two
 energy-split combinations, not a new piece of two-qubit-gate machinery
 invented from scratch for this platform.
 
-## Physical Interpretation
+## Manufacturability as the Pitch
 
 Spin qubits' central engineering pitch isn't raw coherence time or gate
 speed individually. It's *manufacturability at scale*, riding on
@@ -308,11 +314,11 @@ Whether "the same fab line as classical chips" beats "atoms and photons
 that are identical by nature" is the question the rest of this course's
 comparison turns on.
 
-## Worked Example
+## A Particle in a Box, at Nanometre Scale
 
 **Why is confining a single electron in a quantum dot conceptually the
-same problem as Wave Mechanics' particle-in-a-box, even though the
-physical device looks nothing like one?**
+same problem as Wave Mechanics' particle-in-a-box, when the physical
+device in front of you looks nothing like one?**
 
 Both are the same underlying physics: a particle (there, idealized; here,
 a real electron) confined by a potential energy barrier to a finite
@@ -323,12 +329,12 @@ infinite wall, but the qualitative consequence, quantized energy levels
 from spatial confinement, is the identical physical mechanism Wave
 Mechanics already derived.
 
-## Common Mistakes
+## Assuming Small Means Easy
 
 <Callout type="note">
 **Thinking "smaller" automatically means "easier to build at scale."**
-Small size gives a manufacturing-compatibility advantage, but
-spin qubits still face real, unresolved engineering challenges
+Small size buys you a manufacturing-compatibility advantage and nothing
+else on its own; spin qubits still face unresolved engineering challenges
 (uniformity across many fabricated dots, precise individual addressing)
 before that advantage translates into a working large-scale device.
 </Callout>
@@ -345,13 +351,218 @@ coherence and control.
 
 1. What physical mechanism confines an electron in a quantum dot, and
    how does it parallel Wave Mechanics' particle-in-a-box?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Voltages on lithographically patterned gate electrodes shape an
+   electrostatic potential landscape in the semiconductor, and that
+   landscape has a local minimum a few tens of nanometres across. An
+   electron that falls into it has nowhere lower to go, so it stays. That
+   is the whole mechanism: no walls, no box, just a dip in the potential
+   energy made out of applied voltages.
+
+   The parallel with the particle in a box is that both are the same
+   statement of quantum mechanics: confine a particle to a finite region
+   and its wavefunction has to satisfy boundary conditions there, and
+   only a discrete set of energies admits a solution that does. The
+   quantization is a consequence of confinement, not of anything special
+   about idealized walls. Modelled as a finite square well of half-width
+   1.5 and depth 8 in the natural units Wave Mechanics uses, this
+   lesson's dot has a ground state at $E_0\approx-7.598$, with the same
+   $A\cos(kx)$ inside and $Be^{-\kappa|x|}$ outside construction, matched
+   for continuity at the edge.
+
+   The one genuinely different thing is that the dot's well has **finite
+   depth**. Three things follow that the infinite box does not have. The
+   wavefunction does not vanish at the boundary; it leaks into the
+   classically forbidden region and decays as $e^{-\kappa|x|}$, with
+   $\kappa\approx3.90$ here. There are only finitely many bound states
+   rather than an infinite ladder. And an electron can leave: lower the
+   barrier with a gate voltage and it tunnels out, which is not a defect
+   but the mechanism by which dots are loaded and emptied in the first
+   place. The spacing pattern differs too. Read the lesson's ladder and
+   the gaps *widen* going up, which is the box-like signature, in
+   contrast with a transmon's ladder, whose gaps narrow.
+
+   The wrong turn here is the one that quietly changes what the qubit is.
+   It is tempting, having drawn a ladder of confined energy levels, to
+   read the bottom two rungs as $|0\rangle$ and $|1\rangle$. They are
+   not. Those are *orbital* levels, and their spacing in a real dot is
+   large, in the millielectronvolt range. The qubit is the confined
+   electron's **spin**, up or down along a chosen axis, and the splitting
+   between those two states is set by an applied magnetic field through
+   the Zeeman effect. The confinement's job is to hold exactly one
+   electron in one place so that its spin can be addressed and coupled to
+   a neighbour. It is the packaging, not the two-level system.
+
+   </details>
+
 2. Name the specific manufacturing advantage spin qubits claim over
    superconducting qubits or trapped ions.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   They are built at roughly the size and with roughly the tooling of a
+   transistor, so the semiconductor industry's existing fabrication
+   infrastructure applies to them almost directly.
+
+   The size gap is the concrete part. A gate-defined quantum dot is tens
+   of nanometres across. A transmon's circuit is hundreds of micrometres,
+   about four orders of magnitude larger in linear dimension, and a
+   trapped ion's confinement region is larger still. Whatever else is
+   true, a spin qubit is a nanoscale feature patterned on silicon, which
+   is the thing the industry has spent five decades learning to do
+   repeatably and at volume. Intel's Tunnel Falls chips are fabricated on
+   the same 300 mm production line and with the same tooling as its
+   commercial transistors, which is the clearest statement of the claim
+   anyone has made.
+
+   Notice what kind of argument this is. Every other platform in the
+   course pitches a *physical* property: superconducting qubits pitch
+   gate speed, trapped ions pitch coherence and connectivity, neutral
+   atoms pitch reconfigurable geometry, photons pitch flight. Spin qubits
+   pitch **manufacturing infrastructure**. It is an economic and
+   industrial argument about how a large machine would get built, not a
+   claim about how any individual qubit performs.
+
+   Two wrong turns, both of which promote the claim into something the
+   lesson does not say.
+
+   The first is reading it as "smaller, so more qubits fit." The lesson
+   is blunt that small has not yet meant many: published spin-qubit
+   registers are on the order of ten qubits, against hundreds of
+   superconducting qubits on a chip and thousands of atoms in a tweezer
+   array. Areal density is not the advantage today; tooling is.
+
+   The second is reading "manufacturable" as any claim about coherence or
+   speed. Longest coherence in this course belongs to trapped ions and
+   neutral atoms, fastest gates to superconducting circuits, and
+   all-to-all connectivity through a shared mode to ions. Spin qubits
+   claim none of those. Attaching one of them to this platform is the
+   most common way this question goes wrong.
+
+   </details>
+
 3. Where does spin qubits' coherence/speed regime sit relative to
    superconducting qubits and trapped ions, per this lesson?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Intermediate on both axes, and closer to superconducting qubits on
+   speed than to ions.
+
+   Gates run at roughly 10 to 100 nanoseconds, driven electrically or
+   magnetically. That is within an order of magnitude of a
+   superconducting gate's ~10 ns, and two to three orders faster than a
+   trapped ion's ~10 μs entangling gate depending on where in that range
+   a given device lands. Coherence reaches milliseconds, which sits between a transmon's
+   ~10 μs and an ion's ~1 s, a hundred times better than the first and a
+   thousand times short of the second. The gate budget lands where you
+   would expect from those two:
+
+   $$
+   \frac{1\text{ ms}}{100\text{ ns}} = 10^4 \text{ gates},
+   $$
+
+   against $10^3$ for a representative superconducting device and $10^5$
+   for a trapped ion. Squarely in between, which is the point: this is a
+   stretch of the tradeoff space neither of the other two platforms
+   occupies.
+
+   **The condition attached to that answer is not optional.** The
+   millisecond figure is measured in isotopically purified silicon-28,
+   with dynamical decoupling applied. Strip either away and the claim
+   collapses: on ordinary silicon, whose natural isotopes carry nuclear
+   spins that form a fluctuating magnetic bath around the electron, raw
+   dephasing times are microseconds or less, which is no better than a
+   transmon. Purification is the reason the intermediate regime exists,
+   which is why Si-28 has become standard rather than being an optional
+   refinement.
+
+   The wrong turn is quoting "milliseconds" as a property of the
+   platform. It is a property of the platform *plus* a specific material
+   and a specific pulse sequence, and a real device that skipped either
+   would not show it. There is a related trap in the other direction:
+   the dominant noise source in a purified device is not the nuclear
+   spins any more but electrical charge fluctuation, coupling in through
+   the very gate electrodes that define the dot. Purifying the isotopes
+   removes one bath and leaves another, so the coherence a real device
+   achieves is set by charge noise rather than by the spin itself.
+
+   Nuclear-spin qubits, where the qubit lives in the nucleus rather than
+   the electron, do better again, being far better isolated from that
+   charge noise. They are correspondingly harder to drive quickly, which
+   is the same isolation-versus-coupling tradeoff the capstone draws as
+   the pattern behind every row of the table.
+
+   </details>
+
 4. Is spin qubits' "manufacturability" advantage automatically decisive
    for building a large-scale quantum computer? What open challenges
-   does this lesson name?
+   does this lesson name? Then say why a modern fab's tolerance for
+   parameter spread does not transfer to qubits.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   No. It is a real advantage that has not yet been converted into a
+   large machine, and the lesson names what stands in the way.
+
+   The challenges it identifies:
+
+   **Uniform, reliable dot fabrication.** The dot's confining potential,
+   and therefore the electron's environment, depends on nanometre-scale
+   geometry and on the local disorder in the material. Nominally
+   identical dots do not come out identical.
+
+   **Addressing individual spins without disturbing neighbours.** Dots
+   sit close together by design, since exchange coupling requires
+   wavefunction overlap. A field aimed at one spin is not far from the
+   next one.
+
+   **Registers still on the order of ten qubits**, as of the mid-2020s,
+   against hundreds of superconducting qubits and thousands of trapped
+   atoms.
+
+   **Charge noise**, coupling in through the same gate electrodes that
+   create the dot, which is what sets a real device's coherence even
+   after isotopic purification has dealt with the nuclear-spin bath.
+
+   **Still cold.** Most spin-qubit devices run in a dilution
+   refrigerator. Silicon "hot qubit" work has demonstrated operation
+   around 1 K and above, where cooling power is orders of magnitude
+   cheaper than at 10 mK, but that is a demonstration rather than the
+   standard operating point.
+
+   To that list the lesson's own physics adds one more: exchange coupling
+   comes from direct wavefunction overlap, so it is inherently
+   short-range and the connectivity is nearest-neighbour, dot to dot. A
+   spin-qubit chip inherits the routing and SWAP overhead a
+   superconducting chip has, and gets none of a trapped-ion chain's
+   all-to-all relief.
+
+   The seductive wrong turn is "the fab already exists, so scaling is a
+   solved problem." A modern fab is extraordinarily good at making
+   billions of transistors whose parameters vary by a few percent, in a
+   context where that variation is absorbed by binning, redundancy and
+   error-correcting logic that has been refined for decades. A qubit is
+   not that kind of device. Its operating frequency depends sensitively
+   on nanometre-scale details, and there is no equivalent of binning: a
+   qubit that came out at the wrong frequency is a qubit you have to
+   calibrate around, not one you sell as a slower part.
+
+   There is a second, quieter version of the same overreach. The 300 mm
+   line makes the dots. It does not make the wiring, and a large
+   spin-qubit register faces the same control-line bottleneck a large
+   superconducting chip does, since every qubit still needs its lines
+   routed out of a cold environment. Intel's Horse Ridge cryogenic
+   control chips exist precisely because that problem is separate from
+   the fabrication one and has to be solved on its own.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -361,20 +572,21 @@ coherence and control.
   encoding the qubit directly in its spin: the same physics as Wave
   Mechanics' confinement problems and Angular Momentum & Spin's
   spin-1/2 system, built into real hardware.
-- Small device size offers a genuine, distinct scalability argument:
+- Small device size offers a distinct scalability argument:
   compatibility with existing semiconductor fabrication tooling.
-- Sits in an intermediate coherence/speed regime, longer coherence than
-  superconducting qubits, faster gates than trapped ions, with its own
-  unresolved fabrication-uniformity challenges.
+- Sits in an intermediate coherence/speed regime: faster gates than
+  trapped ions, and longer coherence than superconducting qubits once
+  the silicon is isotopically purified, with its own unresolved
+  fabrication-uniformity challenges.
 - Register sizes are still on the order of ten qubits, charge noise from
   the defining electrodes dominates coherence, and most devices still
-  need a dilution refrigerator — small has not yet delivered many.
+  need a dilution refrigerator. Small has not yet delivered many.
 - Two-qubit exchange gates are a direct consequence of Pauli exclusion:
   the singlet/triplet energy splitting $J$ comes from the same
   antisymmetrization requirement Identical Particles derived for any
   two electrons, applied here to spin instead of spatial orbitals.
 
-## Further Exploration
+## All Five, Side by Side
 
 <NextDiscovery>
 The [capstone](/lessons/quantum-hardware/physical-qubit-platforms/capstone-comparing-qubit-platforms) puts all five

@@ -28,8 +28,9 @@ export const meanPositionTophat: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The density |psi(x)|^2 is constant (uniform) across [2,8]." },
-    { text: "For a uniform density, <x> is exactly the midpoint of the interval." },
+    { text: "The mean position is the density-weighted average of x, and here the density has the same value everywhere the particle can be found." },
+    { text: "With a constant density the weighting contributes nothing beyond the interval's shape, so the answer is fixed by geometry alone." },
+    { text: "The distribution is symmetric about one particular point, and that point is the mean. Note that the interval does not start at zero." },
   ],
   solution: {
     steps: [

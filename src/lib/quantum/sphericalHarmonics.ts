@@ -33,7 +33,7 @@ export function sphericalHarmonic({ l, m }: SphericalHarmonicIndex, theta: numbe
     if (m === -2) return Complex.fromPolar(Math.sqrt(15 / (32 * Math.PI)) * sinT * sinT, -2 * phi);
   }
 
-  throw new Error(`sphericalHarmonic: unsupported (l,m)=(${l},${m}) — this platform implements l=0,1,2 only.`);
+  throw new Error(`sphericalHarmonic: unsupported (l,m)=(${l},${m}). This platform implements l=0,1,2 only.`);
 }
 
 /**

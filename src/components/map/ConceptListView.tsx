@@ -10,7 +10,7 @@ import type { Difficulty } from "@/lib/content/types";
  * A drag-to-pan canvas is a poor fit for keyboard and screen-reader use even
  * when every node is technically focusable (finding "where" a focused node
  * sits, or discovering it at all without scanning absolute positions, is the
- * real barrier) — this is the equivalent required by docs/DESIGN_SYSTEM.md
+ * real barrier), this is the equivalent required by docs/DESIGN_SYSTEM.md
  * §9: the same graph, same prerequisite structure, as a real list.
  */
 export function ConceptListView({
@@ -24,9 +24,9 @@ export function ConceptListView({
   nodes: ConceptGraph["nodes"];
   completedLessonSlugs: ReadonlySet<string>;
   /** concept id -> resolved difficulty. Empty when the caller hasn't wired
-   *  lesson difficulty data up yet — see `ConceptMapExplorer`'s prop doc. */
+   *  lesson difficulty data up yet, see `ConceptMapExplorer`'s prop doc. */
   nodeDifficulty: Map<string, Difficulty>;
-  /** Concepts with no prerequisites — the map's genuine entry point(s). */
+  /** Concepts with no prerequisites, the map's genuine entry point(s). */
   rootIds: Set<string>;
   selectedId: string | null;
   onSelect: (id: string) => void;
@@ -44,7 +44,7 @@ export function ConceptListView({
         return (
           <section key={pillar.slug} data-pillar={pillar.slug} aria-labelledby={`map-list-${pillar.slug}`} className="mb-6 last:mb-0">
             {/* `h2`, not `h3`. These six pillar headings are the top-level
-                grouping of /map's main content — nothing on that page sits
+                grouping of /map's main content, nothing on that page sits
                 between them and its single `h1` ("The concept map", emitted by
                 app/map/page.tsx). As `h3` the default state of the page (list
                 view, nothing selected) produced an outline of h1 → h3 × 6 with
@@ -54,7 +54,7 @@ export function ConceptListView({
                 exist. Selecting a concept made it worse rather than better:
                 ConceptDetailPanel's own `h2` (the concept title) is a sibling
                 region in the grid, so it arrives *after* these in DOM order,
-                giving h1 → h3 × 6 → h2 — a level jump forwards and then
+                giving h1 → h3 × 6 → h2, a level jump forwards and then
                 backwards. At h2 both readings are correct: the pillar groups
                 and the detail panel are peers, which is exactly what they are
                 on screen.
@@ -96,13 +96,13 @@ export function ConceptListView({
                         <span className="text-sm font-medium text-foreground">{node.title}</span>
                         <span className="flex shrink-0 items-center gap-2">
                           {difficulty ? <DifficultyMark difficulty={difficulty} /> : null}
-                          <span className="tech-label text-[0.625rem]">Step {node.depth + 1}</span>
+                          <span className="tech-label text-micro">Step {node.depth + 1}</span>
                           {isCompleted ? (
                             // "Completed" as a real `sr-only` text node, not an
                             // `aria-label` on this span: a `<span>` with no
                             // `role` is `generic`, ARIA prohibits naming a
                             // generic element, and every major screen reader
-                            // drops the attribute — so the label was invisible
+                            // drops the attribute, so the label was invisible
                             // to assistive tech while the only other child was
                             // an `aria-hidden` tick. In list view that is the
                             // *only* completion signal on the row, so without
@@ -122,8 +122,8 @@ export function ConceptListView({
                         </span>
                       </span>
                       {isRoot ? (
-                        <span className="w-fit rounded-full border border-pillar-edge bg-pillar-wash px-1.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-pillar-text">
-                          Start here — no prerequisites
+                        <span className="w-fit rounded-full border border-pillar-edge bg-pillar-wash px-1.5 py-0.5 text-micro font-semibold uppercase tracking-meta text-pillar-text">
+                          Start here: no prerequisites
                         </span>
                       ) : prereqTitles.length > 0 ? (
                         <span className="text-xs text-muted-foreground">Requires: {prereqTitles.join(", ")}</span>

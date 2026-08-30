@@ -51,7 +51,7 @@ export function partialTrace(rho: Matrix, totalQubits: number, tracedOutQubits: 
   }
   const kept = Array.from({ length: totalQubits }, (_, qubit) => qubit).filter((qubit) => !traced.includes(qubit));
   if (kept.length === 0) {
-    throw new Error("partialTrace: cannot trace out every qubit — at least one must remain.");
+    throw new Error("partialTrace: cannot trace out every qubit. At least one must remain.");
   }
 
   const reducedDimension = 2 ** kept.length;

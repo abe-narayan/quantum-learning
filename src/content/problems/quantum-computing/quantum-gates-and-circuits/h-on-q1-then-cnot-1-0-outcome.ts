@@ -28,10 +28,14 @@ export const hOnQ1ThenCnot10Outcome: NumericProblem = {
     type: "numeric",
     value: probabilityOf11,
     tolerance: 0.01,
+    nearMisses: [
+      { value: 0.25, tolerance: 0.01, feedback: "0.25 multiplies two independent halves. The CNOT correlates the two qubits, so the weight collects on two of the four outcomes rather than spreading evenly over all four." },
+      { value: 1, tolerance: 0.005, feedback: "1 would make |11⟩ certain. The H leaves qubit 1 in an even superposition and the CNOT does not disturb that split; it only decides which partner each branch gets." },
+    ],
     incorrectFeedback: "Work through the circuit column by column: first apply H to qubit 1 only, then apply CNOT with the roles this problem specifies.",
   },
   hints: [
-    { text: "Column 1 only touches qubit 1 — qubit 0 stays exactly |0⟩ through that step." },
+    { text: "Column 1 touches qubit 1 only, so qubit 0 stays at |0⟩ through that step." },
     { text: "After H on qubit 1, the state is (|00⟩+|01⟩)/√2." },
     { text: "In column 2, the |00⟩ term (qubit 1 = 0) is left alone; the |01⟩ term (qubit 1 = 1) has qubit 0, the target, flipped." },
   ],

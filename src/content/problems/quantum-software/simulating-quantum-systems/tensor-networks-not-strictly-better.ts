@@ -14,34 +14,46 @@ export const tensorNetworksNotStrictlyBetter: ConceptualProblem = {
   },
   question: {
     type: "conceptual",
-    prompt: "Explain why state-vector simulation remains the RIGHT choice in many situations, even though tensor networks are a more sophisticated technique.",
+    prompt: "Explain why state-vector simulation remains the right choice in many situations, even though tensor networks are a more sophisticated technique.",
     placeholder: "Tensor networks trade generality for efficiency, which means...",
   },
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["trade generality", "only helps when", "specific structure"],
-      ["unknown entanglement", "generic state", "no advantage", "simpler"],
+      {
+        phrases: ["trade generality", "only helps when", "only help", "only helps", "only under", "conditional", "specific structure"],
+        missingFeedback:
+          "Say what tensor networks give up in exchange for their speed. Their advantage is not unconditional, so name what it hangs on.",
+      },
+      {
+        phrases: ["unknown entanglement", "generic state", "no advantage", "simpler"],
+        missingFeedback:
+          "You have the condition. Now say what happens when it fails, and why the plainer method wins there.",
+      },
     ],
-    incorrectFeedback: "Address why tensor networks' benefit is conditional (on limited entanglement), and what that implies for cases where this condition isn't known to hold.",
-    partialFeedback: "Good — now be explicit that state-vector simulation remains preferable specifically when entanglement structure is unknown or high.",
+    incorrectFeedback: "The claim treats a specialised tool as a general upgrade. Say what condition a tensor network needs before it pays off, then ask what happens when you cannot establish that condition in advance. The answer should end with a recommendation about which method to reach for in that situation, and why.",
+    partialFeedback: "Good. Now be explicit that state-vector simulation remains preferable when the entanglement structure is unknown or high.",
+    modelAnswers: [
+      "Tensor networks trade generality for efficiency: they only help when the state has limited entanglement. If the entanglement is unknown, or the state is generic, there is no advantage at all, and state-vector simulation is simpler and just as efficient, which makes it the better choice rather than the more basic one.",
+      "Their advantage is conditional, not universal. For a generic state you get no advantage, and the state vector is simpler to reason about and to implement.",
+    ],
   },
   hints: [
-    { text: "Tensor networks only help when the state's entanglement is known (or expected) to be limited." },
-    { text: "For a generic state, or one with unknown/high entanglement, tensor networks offer no advantage and add unnecessary complexity." },
-    { text: "In that case, plain state-vector simulation is both simpler AND no less efficient." },
+    { text: "Tensor networks only help when the state's entanglement is known, or expected, to be limited." },
+    { text: "For a state whose entanglement you cannot bound in advance, ask what the machinery buys you, and what it costs in complexity." },
+    { text: "Then say which method you would reach for, and why 'more advanced' is not the same thing as 'better here'." },
   ],
   solution: {
     steps: [
-      { description: "Tensor networks trade GENERALITY for efficiency: they only provide an advantage when the state's entanglement is known (or strongly expected) to be limited." },
-      { description: "For a generic state, or a circuit designed to generate entanglement (or simply one whose entanglement structure isn't known in advance), tensor networks offer no real efficiency advantage." },
-      { description: "In that situation, state-vector simulation is both simpler to implement/reason about AND no less efficient than a tensor network attempt would be — making it the objectively better choice, not just the 'default' one." },
+      { description: "Tensor networks trade generality for efficiency. They only provide an advantage when the state's entanglement is known, or strongly expected, to be limited." },
+      { description: "For a generic state, a circuit designed to generate entanglement, or one whose entanglement structure is not known in advance, tensor networks offer no real efficiency advantage." },
+      { description: "In that situation, state-vector simulation is both simpler to implement and reason about, and no less efficient than a tensor-network attempt would be, which makes it the better choice rather than merely the default one." },
     ],
-    finalAnswer: "Tensor networks only help under limited entanglement; for generic or unknown-entanglement states, state-vector simulation is simpler and equally efficient, making it the better choice, not merely 'more basic.'",
+    finalAnswer: "Tensor networks only help under limited entanglement. For generic or unknown-entanglement states, state-vector simulation is simpler and equally efficient, which makes it the better choice, not merely the more basic one.",
   },
   explanation: {
     correctIdea: "This resists the natural but wrong assumption that a more sophisticated tool is always preferable, grounding the choice in the actual conditional nature of tensor networks' advantage.",
-    whyCorrect: "Matches the lesson's explicit Common Mistakes section.",
+    whyCorrect: "The compression is conditional on bounded entanglement, so on a state with no such guarantee the tensor network pays for machinery it cannot use. Where the condition fails, a plain state vector is easier to reason about and no more expensive, which makes it the right tool rather than the fallback.",
     whyWrong: ["Assuming tensor networks are simply 'the upgrade' from state-vector simulation misses that their advantage is strictly conditional, not universal."],
   },
 };

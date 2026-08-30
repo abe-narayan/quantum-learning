@@ -26,11 +26,11 @@ export const generatorMustBeHermitian: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "H itself isn't unitary — H is what gets exponentiated (with a factor of i) to produce the unitary U(t).",
-      c: "It's the opposite: Hermitian H combined with the factor of -i in the exponent is exactly what produces a unitary U(t).",
+      b: "H itself is not unitary. H is what gets exponentiated (with a factor of i) to produce the unitary U(t).",
+      c: "It is the opposite: a Hermitian H combined with the factor of -i in the exponent is what produces a unitary U(t).",
       d: "H can have complex off-diagonal entries (like Pauli-Y) and still be perfectly valid, as long as it's Hermitian.",
     },
-    defaultIncorrectFeedback: "Expand U(dt)=I-iHdt/ℏ and impose U†U=I to first order — what condition on H falls out?",
+    defaultIncorrectFeedback: "Expand U(dt)=I-iHdt/ℏ and impose U†U=I to first order. What condition on H falls out?",
   },
   hints: [
     { text: "The requirement on U is unitarity, U†U = I. Start there and work backwards to H." },

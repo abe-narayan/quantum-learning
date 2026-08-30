@@ -4,27 +4,61 @@ Author-facing reference for every component available inside lesson MDX for
 building a lesson as an *experience* rather than a styled document — see
 `docs/DESIGN_SYSTEM.md` for the visual language these compose from.
 
+> **This file is a guide, not a log.** Everything in it is a rule that binds
+> now. Where a rule carries the story of a past failure, the story is kept
+> deliberately, because those explanations are why the rules survive contact
+> with the next author. But no *finding* lives here: if something was found and
+> fixed, it belongs in one of the dated audit logs listed in
+> [`docs/README.md`](README.md), not in this file. If you read a sentence
+> here that describes a state of the corpus rather than an instruction to
+> you, it has rotted; correct it.
+>
+> **Recount before quoting any number below.** Corpus figures here are dated
+> snapshots and have been badly wrong at least once. The callout
+> distribution in the `Callout` section had inverted completely, so a doc
+> that meant to warn about overuse of one tier was warning about the wrong
+> one.
+
 ---
 
-## ⚠️ Two MDX hazards — read before authoring
+## ⚠️ MDX hazards: read before authoring
 
-Both of these produce **no build error, no type error and no warning**. The
-page simply breaks, and the only way to find out is to open it. Each has
-already shipped at least once.
+Every one of these produces **no build error, no type error and no warning**
+in the shape that matters. The page simply breaks, or renders wrongly, and
+the only way to find out is to open it. Each has already shipped at least
+once.
 
-**1. Never put a `//` comment inside a top-level `export` block.**
+**1. Never write a comment, of either style, anywhere in the export
+prologue** (the code above your first `##` heading).
 
 ```mdx
 export const lessonMeta = {
   title: "…",
-  // ← this silently terminates the export early
+  // ← banned, in every position, in both comment styles
   difficulty: "advanced",
 };
 ```
 
-Every *subsequent* export in the file is swallowed, so the lesson ends up
-with no `lessonMeta`, the route resolves to nothing, and the page 404s.
-Block comments (`/* … */`) are fine.
+Two lessons shipped this way. Both 404'd: an `export const` after the comment
+was never bound, `loadLesson()` caught the `ReferenceError` and returned
+`null`, and `next build` reported success throughout. Removing every `//` in
+the prologue fixed both; nobody isolated a narrower rule, so the rule is the
+broad one.
+
+**This document used to say block comments were fine. They are not**, and the
+mechanism is worth knowing because it explains all of this. MDX cuts the
+prologue into chunks at blank lines and hands each chunk to acorn. A chunk
+that *starts* with a comment does not survive the trip. Compiled against this
+repo's own pipeline:
+
+- A single-line `/** … */` or `//` above an `export`: the whole chunk stops
+  being code and is emitted as a **paragraph of literal source text** in the
+  finished lesson. The export silently ceases to exist.
+- A multi-line `/** … */` above an `export`: `Could not parse expression with
+  acorn`. Loud, at least.
+
+If a value needs explanation, give it a descriptive name, or explain it in
+markdown prose below the block.
 
 **2. Never let `$$` share a line with formula content inside a JSX
 component.**
@@ -44,10 +78,62 @@ expression *anywhere*, including ordinary paragraphs. Writing `e^{iφ}` as
 plain text makes MDX evaluate `iφ` and the page dies with "iφ is not
 defined". Use inline math — `$e^{i\varphi}$` — or escape the brace.
 
-All three are checked mechanically by
+**4. A JSX expression inside `$…$` is not evaluated, and does not fail.**
+This is the quiet cousin of hazard 3. Writing
+
+```mdx
+… so $\sigma \approx {SIGMA.toFixed(3)}$ at this coupling.
+```
+
+typesets the literal characters `{SIGMA.toFixed(3)}` as math. The reader sees
+an italic identifier where a number should be. Nothing errors, the source
+reads correctly, and more than twenty of these survived several review passes
+before anyone opened the pages. Close the math and reopen it around the
+expression instead. **No test covers this one yet**: grep a file you have
+edited for a `$` followed by a `{` before calling it done.
+
+**5. `<p className="…">` with its children on the next line styles nothing.**
+MDX wraps those children in a second `<p>`, and the browser's HTML parser
+closes the outer paragraph as soon as it meets the nested open tag. The class
+you wrote ends up on an empty element. Keep the children on the same line as
+the tag, or use a `<div>`.
+
+**6. Math in a JSX string prop, or in `lessonMeta`, is never typeset.**
+The remark/rehype math pipeline runs over MDX **text nodes**. A JSX attribute
+value is not one, and neither is anything inside the `lessonMeta` export. So
+
+```mdx
+<AnnotatedFigure caption="The probability density |\psi(x)|^{2} at t = 0" … />
+```
+
+reaches the reader as literal `|\psi(x)|^{2}`, backslash, braces, caret and
+all. Wrapping it in `$…$` does not help: the dollars render literally too.
+There is no error, no type error, and no failing test, and the source looks
+correct to anyone who does not know the rule.
+
+The same applies to every `lessonMeta` field a page prints, which is
+`title`, `description`, `objectives` and `related[].note`, and to the string
+props on every component in this document: `caption`, `ariaLabel`,
+`description`, `question`, `label`, `summary`, `note`.
+
+Write those in plain-text-safe form instead, using Unicode where it reads
+cleanly: `⟨x⟩`, `|ψ(x)|²`, `e^iφ`, `√2`, `ρ_AB`, `Δx`. A 2026-08-30 audit
+found **16 of these in the quantum-mechanics pillar alone**, several of them
+in figure captions sitting directly under the equation they were trying to
+restate.
+
+Hazards 1 (the `//` form), 2 and 3 are checked mechanically by
 `npx vitest run src/lib/content/__tests__/mdxHazards.test.ts`, and
 `lessonRender.test.ts` renders all 219 lessons to catch anything that only
 fails at render time. **Run both after editing lesson content.**
+
+**And a hazard about editing rather than authoring: do not write lesson MDX
+through a shell heredoc.** Backslash escapes are interpreted on the way in
+even with a quoted delimiter, so `\alpha` lands as a BEL byte, `\rangle` as a
+lone CR and `\to` as a TAB. It has damaged this corpus more than once, the
+control characters are invisible when you read the file back, and a lone CR
+makes git report a whole-file rewrite that buries the real change. Use a
+literal-replacement edit.
 
 ---
 
@@ -62,10 +148,23 @@ Not every lesson uses every beat. Use only what the content genuinely calls
 for — a lesson that boxes every paragraph is worse than one that mostly uses
 prose and reaches for these at the moments that earn them.
 
-All components below are registered globally (`src/mdx-components.tsx`), so
-they're available in any `.mdx` file with no import needed. Math inside
-`children` (`$...$` / `$$...$$`) renders through the site's normal KaTeX
-pipeline, same as anywhere else in a lesson.
+**Most, but not all, components below are registered globally in
+`src/mdx-components.tsx`**, and those are available in any `.mdx` file with no
+import. Three are not: `Question`, `AnnotatedFigure`
+and `ToggleView`. Each is used by fewer than ten lessons, and that mapping is
+capped at 30 entries because every entry in it is eagerly imported into all
+219 compiled lesson graphs, paid for by every lesson page's client bundle and
+by every static-generation worker (ARCHITECTURE.md §5). Using one of those
+three means adding its `import` to the lesson file. Getting that wrong fails
+loudly rather than silently: an unresolved tag throws at render, which
+`lessonRender.test.ts` catches.
+
+Math inside `children` (`$...$` / `$$...$$`) renders through the site's
+normal KaTeX pipeline, same as anywhere else in a lesson. Where that math is
+a `$$` display block inside `TheoremBox`, `DefinitionBox` or
+`DerivationSteps`, the surrounding device drops the equation slab's own frame
+while keeping its scroll, its tab stop and its overflow indicator, so you do
+not get two nested pillar rails; see DESIGN_SYSTEM.md §4.
 
 ---
 
@@ -102,8 +201,8 @@ it.
 immediately by `lessonRender.test.ts` (which renders all 219 lessons) — the
 same "fail loudly, not silently" bar the two MDX hazards above are held to.
 A term genuinely missing from the glossary is a gap to fix in
-`src/lib/content/glossary.ts` first (a file this pass does not own), not a
-reason for this component to quietly render the bare phrase with no gloss.
+`src/lib/content/glossary.ts` first, not a reason for this component to
+quietly render the bare phrase with no gloss.
 
 **Definitions are never authored here.** The panel always shows the live
 `definition` (and `title`) from `GLOSSARY_TERMS`, so a `Term` call site can
@@ -158,8 +257,9 @@ hatch to the fuller treatment — with no new component to learn:
 ```
 
 A component whose only job is to restate that pattern under a new name would
-add API surface without adding capability — the same trap `ObservePredictExplain`
-fell into below.
+add API surface without adding capability. That is the trap
+`ObservePredictExplain` fell into, and it is why that component was removed;
+see the note further down.
 
 ---
 
@@ -184,10 +284,21 @@ both border weight and typographic voice — `mistake` switches to the display
 face, the one thing on the page most likely to catch a scanning eye.
 
 **Pick the tier deliberately — this only works if `mistake` stays rare.**
-Measured across the corpus, `mistake` is used for ~95% of all callouts,
-`warning` for under 1% (docs/UX_REVIEW.md P2-2) — the three-tier system has
-collapsed to "mistake" vs. nothing, so the one component built to signal
-severity currently doesn't. Concretely:
+Recounted 2026-08-30: `warning` 271, `note` 184, `mistake` 49, for 504 uses
+across all 219 lessons, every one passing an explicit `type`. That is a
+healthy distribution, with `mistake` at under 10%.
+
+It has not always been. This paragraph previously read "`mistake` is used
+for ~95% of all callouts, `warning` for under 1%," which was true when it
+was written and is now *backwards*: an authoring pass fixed the imbalance,
+and anyone reading the old figures would have concluded the exact opposite
+of what the corpus says. Recount before trusting these numbers again: they
+are a snapshot, not an invariant, and `Callout.tsx`'s own docstring carries
+the same warning.
+
+The vocabulary is what actually binds, and it has not changed. Reaching for
+`mistake` because it is the loudest option is the drift that produced the
+old imbalance:
 - `note` — background/context, a definition reminder, a forward reference.
   Not urgent, just useful.
 - `warning` — a lower-stakes caution the reader should keep in mind while
@@ -260,8 +371,7 @@ simulator," with a concrete instruction before the embed.
 
 (Copied verbatim from the component's own docstring, which names a
 `LazyWavePacketSimulator` that has never existed — corrected here to a real
-one, as is the `LazyDoubleSlitSimulator` in `ObservePredictExplain`'s
-example further down. Check any name against the real `Lazy*.tsx` files
+one. Check any name against the real `Lazy*.tsx` files
 under `src/components/simulators/` and `src/components/visualizations/`
 before pasting an example: an unresolved JSX tag in a lesson is a
 *render*-time failure, not a compile one.)
@@ -269,11 +379,15 @@ before pasting an example: an unresolved JSX tag in a lesson is a
 `title` defaults to `"Try it yourself"`. `mode` (optional): `"observe"` |
 `"predict"` | `"run"` | `"compare"` — names the label strip badge.
 
-**`mode` has no default.** It used to default to `"run"`, so every one of
-the 161 pre-existing call sites (none of which pass `mode`) was badged "RUN
+**`mode` has no default.** It used to default to `"run"`, so every call site
+that omitted it, which at the time was all of them, was badged "RUN
 EXPERIMENT" regardless of what the embed actually did (docs/UX_REVIEW.md
 P1-9). An embed with no `mode` now gets the neutral "Interact" badge instead
-— honest for any kind of embed, rather than specific and often wrong. Pass
+(honest for any kind of embed, rather than specific and often wrong). Only
+7 of 215 call sites pass `mode` as of 2026-08-29, so the neutral badge is
+still what almost every embed shows; that is correct-but-uninformative, and
+narrowing it is a genuine, cheap improvement available to anyone editing a
+lesson. Pass
 `mode` explicitly whenever a sharper label is true of this particular embed:
 `"observe"` for a slider-and-watch demo with no real decision to make,
 `"predict"` when it's paired with (or is) a commit-then-reveal moment,
@@ -448,12 +562,12 @@ reader to find *more than one* specific labeled feature — an apparatus
 photo, an instrument cutaway, a schematic with several named stages — reach
 for `AnnotatedFigure`. If the image only needs one caption describing the
 whole thing, `ExternalFigure` is simpler and correct; converting only pays
-off once you're naming individual parts. Concretely: Quantum Hardware's
-platform/dilution-fridge lessons have exactly this kind of figure (this
-component's own docstring example *is* a dilution-refrigerator cutaway) and
-are the first place to reach for it — as of this pass they instead use a
-flat, single-caption `ExternalFigure`, which is the gap this component was
-built to close (docs/UX_REVIEW.md P1-7).
+off once you're naming individual parts. Quantum Hardware's platform and
+cryogenics lessons are the canonical case (this component's own docstring
+example *is* a dilution-refrigerator cutaway), and all six of them now use
+it. If you are adding an apparatus photo to a hardware lesson and reaching
+for a flat single-caption `ExternalFigure`, look at
+`physical-qubit-platforms/trapped-ions.mdx` first.
 
 ### `ResearchConnection` — RESEARCH CONNECTION
 
@@ -515,73 +629,34 @@ The forward hook — a teaser for what's next, usually right after
 </NextDiscovery>
 ```
 
-### `ObservePredictExplain` — OBSERVE / PREDICT / EXPLAIN sequence
+### `ObservePredictExplain` — removed 2026-08-30
 
-**Recommendation: remove this component.** It is used in exactly 1 of 219
-lessons (`quantum-hardware/control-and-readout/qubit-readout-techniques.mdx`),
-and four independent prior review passes (docs/UX_REVIEW.md) judged it a
-poor fit for this corpus: the site's one established, load-bearing pattern
-is predict-*then*-observe (`PredictBeforeReveal`, "the single best
-interaction pattern on the site"), and this component is that pattern's
-mirror image, asking a reader to observe a result before committing to a
-guess about it — which gives away the answer the guess is supposed to test.
-Nothing here disagrees with that read; a fifth pass reaches the same
-conclusion for the same reason.
+**This component no longer exists.** The section that stood here documented
+it while recommending its removal, which is a state a doc should not stay in;
+both the component and the recommendation are now resolved.
 
-**Not deleted in this pass.** Removing the export (and its
-`mdx-components.tsx` registration) would immediately break the one lesson
-above the next time it renders — `<ObservePredictExplain>` would resolve to
-nothing and the page would throw — and that `.mdx` file is out of scope
-here (owned by the content agents currently editing lesson prose, not by
-this pass's file ownership). The correct sequence is: migrate that one
-lesson's usage to plain sequential components (an `InteractiveSection`, a
-`PredictBeforeReveal`, then prose — exactly the "sequencing directly"
-alternative described below, which is what that lesson's own content
-actually calls for), *then* delete `ObservePredictExplain.tsx` and its
-registration in the same change. Whoever picks this up next: do not add a
-sixth call site in the meantime.
+Kept as a short note because the reasoning generalises. The site's one
+established, load-bearing interaction is predict-*then*-observe
+(`PredictBeforeReveal`, which appears in 218 of the 219 lessons).
+`ObservePredictExplain` was that pattern's mirror image: it showed the reader
+a result before asking them to commit to a guess about it, which gives away
+the answer the guess exists to test. Five independent review passes reached
+that conclusion, and its single call site
+(`quantum-hardware/control-and-readout/qubit-readout-techniques.mdx`)
+demonstrated the failure exactly: its `observe` slot told the reader to watch
+the live fidelity readout, and the `predict` slot then asked what happens to
+the fidelity.
 
-A three-beat wrapper: show something happening, ask for a prediction, then
-explain the mechanism. Three named slots, so content can't end up in the
-wrong beat by accident — each slot holds ordinary MDX/JSX and composes with
-the rest of this vocabulary (a simulator, a `PredictBeforeReveal`, prose).
+That lesson was migrated to the sequence the component's own "when not to use
+this" advice described: an `InteractiveSection`, then a `PredictBeforeReveal`
+with its question reworded to stand alone, then prose. The component and the
+lesson's import were deleted in the same change, which is the order that
+matters: deleting the component first would have left a tag resolving to
+nothing, and `lessonRender.test.ts` catches that only after the fact.
 
-```mdx
-<ObservePredictExplain
-  observe={<LazyWaveInterference />}
-  predict={
-    <PredictBeforeReveal
-      question="What happens to the pattern if you close one slit?"
-      options={[
-        { label: "Fringes disappear", value: "gone" },
-        { label: "Fringes stay", value: "stay" },
-      ]}
-      correctValue="gone"
-      explanation="With one slit open there's nothing left to interfere with — the fringes vanish."
-    />
-  }
-  explain={<p>Interference needs two paths. Close one, and there's only one amplitude left to square.</p>}
-/>
-```
-
-**When to use this vs. sequencing components directly:** a lesson can always
-place an `InteractiveSection`, then a `PredictBeforeReveal`, then a
-paragraph, one after another with no wrapper — for a lesson where that
-sequence is one beat among several (interleaved with `Callout`s, more
-derivation, etc.), that's the right call. Reach for `ObservePredictExplain`
-specifically when those three beats should read as *one visually grouped
-unit* (numbered 01/02/03) rather than three separately-styled components
-that happen to be adjacent — a real demonstrated result, a specific
-follow-up prediction, then the mechanism. Concrete fits: the double-slit
-pattern, Stern–Gerlach outcomes, Bell-test correlations — anywhere a lesson
-shows something happen, asks for a guess about a specific variation, then
-explains why.
-
-**What this is not:** a preset/multi-way switcher between several worked
-examples (e.g. a "Product state / Bell state / Worked example" toggle) is a
-different pattern — alternative *states* of one figure, not sequential
-narrative beats — and doesn't belong in these three slots. That pattern
-doesn't have a reusable primitive yet; don't force it into this one.
+**The generalisable rule: never show any part of an answer before the
+commitment that answer is meant to test.** When adding or reviewing a reveal
+component, check the ordering of its slots as rendered, not as named.
 
 ---
 
@@ -603,10 +678,10 @@ doesn't have a reusable primitive yet; don't force it into this one.
 - **A photo/diagram needing full attribution** → `ExternalFigure`.
 - **The same, but pointing at several specific labeled features of it (an
   apparatus photo, an instrument cutaway)** → `AnnotatedFigure`.
-- **A demonstrated result + a specific prediction + the mechanism, grouped
-  as one visual unit** → `ObservePredictExplain`. If the three beats are
-  spread across a longer stretch of lesson rather than meant to read as one
-  block, just sequence `InteractiveSection` → `PredictBeforeReveal` → prose
-  directly instead.
+- **A demonstrated result + a specific prediction + the mechanism** →
+  sequence `InteractiveSection` → `PredictBeforeReveal` → prose directly.
+  There is no wrapper for this and there should not be: the wrapper that
+  existed put the demonstration before the prediction, which gave away the
+  answer the prediction was there to test. Predict first, then show.
 - **A formal named result** → `TheoremBox` (a claim) or `DefinitionBox` (a
   name).

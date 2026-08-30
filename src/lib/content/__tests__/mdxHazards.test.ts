@@ -243,7 +243,7 @@ describe("MDX corpus hazards", () => {
       for (const match of source.matchAll(/^import\s+(?:\{([^}]*)\}|([A-Za-z0-9_]+))\s+from/gm)) {
         if (match[1]) {
           for (const name of match[1].split(",")) {
-            const cleaned = name.replace(/as.*$/, "").replace(/type/, "").trim();
+            const cleaned = name.replace(/\bas\b.*$/, "").replace(/\btype\b/, "").trim();
             if (cleaned) localImports.add(cleaned);
           }
         } else if (match[2]) {

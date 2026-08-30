@@ -27,10 +27,10 @@ export const phaseOracleVsDiffusionRole: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "Reflecting about the marked item is the oracle's job, not diffusion's.",
-      c: "Diffusion is built from H^⊗n(2|0⟩⟨0|−I)H^⊗n — the Hadamards are essential, converting the |0⟩-reflection into an |s⟩-reflection.",
-      d: "There's no single operator that reflects about 'the whole basis' — diffusion reflects about one specific state, |s⟩.",
+      c: "Diffusion is built from H^⊗n(2|0⟩⟨0|−I)H^⊗n. The Hadamards are what convert the |0⟩-reflection into an |s⟩-reflection.",
+      d: "No single operator reflects about 'the whole basis'. Diffusion reflects about one state, |s⟩.",
     },
-    defaultIncorrectFeedback: "Recall D=2|s⟩⟨s|−I by definition — what state does that formula name directly?",
+    defaultIncorrectFeedback: "Diffusion is defined as D=2|s⟩⟨s|−I. Which state does that formula name?",
   },
   hints: [
     { text: "Diffusion is defined as D=2|s⟩⟨s|−I." },
@@ -42,7 +42,7 @@ export const phaseOracleVsDiffusionRole: MultipleChoiceProblem = {
     finalAnswer: "The diffusion operator reflects about |s⟩, the uniform superposition.",
   },
   explanation: {
-    correctIdea: "Oracle and diffusion are two different reflections, about two different states — that's exactly what makes composing them a nontrivial rotation.",
+    correctIdea: "Oracle and diffusion are two reflections about two different states, which is what makes their composition a rotation rather than the identity.",
     whyCorrect: "This distinction is the entire geometric picture the next lesson builds the closed-form success probability from.",
     whyWrong: [
       { optionId: "b", text: "Assigns the oracle's job to diffusion. Marking the target is the oracle's reflection, not this one." },

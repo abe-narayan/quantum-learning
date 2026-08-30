@@ -151,6 +151,7 @@ const PINNED_QUERIES: Array<[query: string, firstResult: string]> = [
   ["hardware", "lesson: Simulators vs. Real Hardware"],
   ["what is a qubit", "lesson: What Is a Qubit?"],
   ["bra-ket", "term: Dirac Notation (Bra-Ket)"],
+  ["bra", "term: Dirac Notation (Bra-Ket)"],
   ["Dirac", "term: Dirac Notation (Bra-Ket)"],
   ["teleportation", "term: Quantum Teleportation"],
   ["error correction", "term: Quantum Error Correction"],
@@ -183,6 +184,76 @@ describe("the queries that already worked still work", () => {
     for (const [query] of PINNED_QUERIES) {
       expect(rankResults(INDEX, query).interpretedAs, `"${query}" was rewritten`).toBeNull();
     }
+  });
+});
+
+/**
+ * ============================================================
+ * `bra` — the query that proved substring matching was too generous
+ * ============================================================
+ * A short word is a beginner's word, and before `containsToken` the matcher
+ * answered one with every longer word it hides inside. `bra` returned 80
+ * entries: the Glossary's second row was "Calibration Drift", the Lessons'
+ * second and third were "Capstone: From Abstract Algebra…" and "Calibration",
+ * the whole visible top of Problems was Rabi-calibration noise, and Courses
+ * and Tracks offered four more rows of which not one contained a bra.
+ *
+ * Pinned by group rather than by first result, because the first result was
+ * never the broken part — every group already led with the right entry, and
+ * everything under it was wrong.
+ */
+describe("`bra` finds bras, not the longer words that contain those letters", () => {
+  const groupsOf = (query: string) => rankResults(INDEX, query).groups;
+  const titlesOf = (query: string) =>
+    groupsOf(query).flatMap((group) => group.matches.map((match) => match.entry.title));
+
+  it("offers no kind of answer that has nothing to offer", () => {
+    // Courses matched only through "algebra" and "calibration": a whole group
+    // of the reader's screen spent on rows that cannot answer the query.
+    expect(groupsOf("bra").map((group) => group.type)).toEqual(["term", "lesson", "problem"]);
+  });
+
+  it("puts a real bra in the first two rows of the Glossary and the Lessons", () => {
+    const top = (type: string) =>
+      groupsOf("bra")
+        .find((group) => group.type === type)!
+        .matches.slice(0, 2)
+        .map((match) => match.entry.title);
+    expect(top("term")).toEqual(["Dirac Notation (Bra-Ket)", "Adjoint (Conjugate Transpose, †)"]);
+    expect(top("lesson")).toEqual(["The Bra-Ket Formalism", "Dirac Notation"]);
+  });
+
+  it("returns no calibration and no algebra at all", () => {
+    const noise = titlesOf("bra").filter((title) => /calibration|algebra/i.test(title));
+    expect(noise, "`bra` is matching inside a longer word again").toEqual([]);
+  });
+
+  it("answers the question form identically", () => {
+    // `what is a bra` reaches this through stripQuestionStem, so the two must
+    // stay in step: whatever `bra` returns is what the question returns.
+    const asked = rankResults(INDEX, "what is a bra");
+    expect(asked.interpretedAs).toBe("bra");
+    expect(asked.groups.map((group) => group.matches.map((match) => match.entry.href))).toEqual(
+      groupsOf("bra").map((group) => group.matches.map((match) => match.entry.href)),
+    );
+  });
+
+  it("still holds the two problems that are about bras, in a group of three", () => {
+    // The one thing this fix does *not* buy: "Where the First Tangent Branch
+    // Diverges" still leads Problems, because "branch" starts with "bra" and a
+    // token is deliberately allowed to match the start of a longer word (it is
+    // how `state` reaches "Bell States"). Separating "branch" from "states"
+    // needs morphology, not a boundary rule. Three rows, two of them right, is
+    // the state of it — pinned so that a future stemmer can be measured
+    // against a number rather than a memory.
+    const problems = groupsOf("bra").find((group) => group.type === "problem")!;
+    expect(problems.matches).toHaveLength(3);
+    expect(problems.matches.map((match) => match.entry.title)).toContain(
+      "What Kind of Object Is |0⟩⟨1|?",
+    );
+    expect(problems.matches.map((match) => match.entry.title)).toContain(
+      "Sandwiching the Completeness Relation",
+    );
   });
 });
 
@@ -233,6 +304,55 @@ describe("a body match never outranks a match on what an entry calls itself", ()
       { type: "lesson", title: "Power Series", description: "Unrelated.", href: "/lessons/x" },
     ])[0];
     expect(matchScore(titled, tokens)).toBeLessThan(matchScore(body!, tokens));
+  });
+});
+
+/**
+ * ============================================================
+ * The spellings a reader types, against the spelling the corpus chose
+ * ============================================================
+ * Three ways the same word can be written, each of which was a live gap
+ * between what the index holds and what a reader puts in the box:
+ *
+ *  - The dash. Two glossary titles carried an en dash ("Eastin–Knill") while
+ *    every lesson, problem and other definition in the corpus writes those
+ *    names with a hyphen. `eastin-knill` therefore reached three entries that
+ *    *mention* the theorem and not the entry for the theorem itself, and
+ *    `gottesman-knill` led with the Classical Simulability Boundary. Both
+ *    titles are hyphens now and `foldForSearch` folds every typographic dash,
+ *    so neither half of the fix can rot without this failing.
+ *  - The space. `wavefunction` is written that way 319 times in the lesson
+ *    corpus and `wave function` twice, but the two-word form is what the
+ *    standard undergraduate texts use, so it is what a reader arrives with.
+ *    It used to land on "Orbital Angular Momentum and Spherical Harmonics".
+ *  - The hyphen a reader leaves out. `no cloning` has to reach the same entry
+ *    `no-cloning` does.
+ */
+const SPELLING_QUERIES: Array<[query: string, firstResult: string]> = [
+  ["eastin-knill", "term: Eastin-Knill Theorem"],
+  ["eastin knill", "term: Eastin-Knill Theorem"],
+  ["gottesman-knill", "term: Gottesman-Knill Theorem"],
+  ["gottesman knill", "term: Gottesman-Knill Theorem"],
+  ["wave function", "term: Wavefunction"],
+  ["wavefunction", "term: Wavefunction"],
+  ["no-cloning", "term: No-Cloning Theorem"],
+  ["no cloning", "term: No-Cloning Theorem"],
+];
+
+describe("one term, however the reader spells it", () => {
+  it.each(SPELLING_QUERIES)("%s leads with %s", (query, expected) => {
+    const first = topResult(query);
+    expect(first ? `${first.type}: ${first.title}` : "—").toBe(expected);
+  });
+
+  it("has no en or em dash left in any title, where a keyboard cannot reach it", () => {
+    // The fold covers this at match time; the titles themselves are checked
+    // because a name spelled one way in the glossary and another way in every
+    // lesson that cites it is a defect the fold only hides.
+    const dashed = ENTRIES.filter((entry) => /[–—]/.test(entry.title)).map(
+      (entry) => `${entry.type}: ${entry.title}`,
+    );
+    expect(dashed, "these titles use a dash no keyboard produces").toEqual([]);
   });
 });
 

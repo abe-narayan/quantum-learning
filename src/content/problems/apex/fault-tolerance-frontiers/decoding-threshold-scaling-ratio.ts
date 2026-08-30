@@ -47,7 +47,7 @@ export const decodingThresholdScalingRatio: NumericProblem = {
     ],
   },
   hints: [
-    { text: "The exponent is (d+1)/2, not d itself — for d=9 that's 5, and for d=5 that's 3." },
+    { text: "The exponent is (d+1)/2, not d itself. For d=9 that is 5, and for d=5 that is 3." },
     { text: "p_L(d) ∝ (p/p_th)^{(d+1)/2}, so p_L(9) ∝ 0.5^5 and p_L(5) ∝ 0.5^3." },
     { text: "The prefactor A is the same for both distances here, so it cancels exactly in the ratio." },
   ],
@@ -61,9 +61,9 @@ export const decodingThresholdScalingRatio: NumericProblem = {
   },
   explanation: {
     correctIdea:
-      "Every two steps of code distance add one full extra power of (p/p_th) to the suppression — below threshold, that's an exponentially shrinking logical error rate for a linear cost in qubits.",
+      "Every two steps of code distance add one full extra power of (p/p_th) to the suppression. Below threshold that is an exponentially shrinking logical error rate for a linear cost in qubits.",
     whyCorrect:
-      "The distance-9 patch's logical error rate is a quarter of the distance-5 patch's, at the identical physical error rate — exactly the exponential-suppression-with-distance behavior the threshold theorem promises, and the entire reason larger surface-code patches are worth their extra qubit cost below threshold.",
+      "The distance-9 patch's logical error rate is a quarter of the distance-5 patch's at the same physical error rate. That is the exponential-suppression-with-distance behavior the threshold theorem promises, and the reason larger surface-code patches are worth their extra qubit cost below threshold.",
     whyWrong: [
       "A ratio of 0.5 (linear scaling) ignores that the exponent itself grows with d, not just the base.",
       "A ratio of 1 would imply distance has no effect on logical error rate, contradicting the exponential suppression this lesson establishes.",

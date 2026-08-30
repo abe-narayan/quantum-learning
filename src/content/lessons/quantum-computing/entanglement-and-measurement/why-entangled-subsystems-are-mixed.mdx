@@ -49,11 +49,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Definite whole, undefined halves">
 Here is the fact the last lesson left on the table. The 2-qubit state |Φ+⟩ is pure: fully specified, with no uncertainty about it at all. Yet each of its two qubits, taken alone, is in the most uncertain single-qubit state there is.
 </LessonHook>
 
-## Motivation
+## A sentence worth reading slowly
 
 The Bell state's <Term id="partial-trace">reduced density matrix</Term> works out to $\rho_A=I/2$. The whole
 is perfectly well-defined; either half alone is maximally undefined. Read
@@ -72,7 +72,7 @@ connects to the separability determinant this platform already computes.
   caption="Trapped, laser-cooled ions glowing under UV illumination at NIST. Entangle two of these and neither one has a pure state of its own any more, by the identity this lesson derives."
   credit="NIST"
   creditUrl="https://www.nist.gov/image/quantumphysicsquantumcomputingfouriertransformberylliumionsjpg"
-  license="Public domain (U.S. government work)"
+  license="Public domain (U.S. federal government work)"
 />
 
 <PredictBeforeReveal
@@ -86,15 +86,29 @@ connects to the separability determinant this platform already computes.
   explanation="Tr(ρ_A²) = 1 − 2|ad−bc|² (the identity derived below), and here ad−bc = √0.99·√0.01 ≈ 0.0995, so Tr(ρ_A²) ≈ 1 − 2(0.0995)² ≈ 0.980. Barely mixed, nowhere near the 0.5 a Bell state reaches. Mixedness is not an on/off consequence of being entangled. It is a continuous quantity, tracking |ad−bc| and nothing else."
 />
 
-## Mathematical Development
+## One identity, proven by direct expansion
 
 ### Setting up the general 2-qubit case
 
 Let $|\psi\rangle=a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$ be any
-normalized 2-qubit state. Quantum Gates & Circuits already established
-(and this course's Concurrence lesson will lean on again) that
-$|\psi\rangle$ is a product state exactly when $ad-bc=0$: that's
-precisely `testSeparability`'s determinant test.
+normalized 2-qubit state. The whole lesson turns on one criterion:
+$|\psi\rangle$ is a product state exactly when $ad-bc=0$. Multi-Qubit
+State Vectors tested factorability by matching coefficients one at a
+time; the determinant packages that same test into a single number, and
+the two-line argument for it is worth having in front of you.
+
+If $|\psi\rangle=(a_0|0\rangle+a_1|1\rangle)\otimes(b_0|0\rangle+b_1|1\rangle)$,
+then matching coefficients gives $a=a_0b_0$, $b=a_0b_1$, $c=a_1b_0$ and
+$d=a_1b_1$, so $ad=a_0b_0a_1b_1=bc$ and the determinant vanishes.
+Conversely, suppose $ad=bc$. If $a\neq0$, set
+$|\alpha\rangle\propto a|0\rangle+c|1\rangle$ and
+$|\beta\rangle\propto a|0\rangle+b|1\rangle$; their tensor product has
+amplitudes proportional to $(a^2,\,ab,\,ac,\,cb)$, and $cb=ad$ turns the
+last one into $ad$, so after dividing through by $a$ the four amplitudes
+are $(a,b,c,d)$ as required. If $a=0$ then $bc=0$, and whichever of $b,c$
+vanishes leaves a two-term state that factors by inspection. So
+$ad-bc=0$ is exactly the condition, and it is what `testSeparability`
+computes, returning $|ad-bc|$ as `determinantMagnitude`.
 
 The partial trace (last lesson) gives qubit 0's reduced state:
 
@@ -155,7 +169,7 @@ For each state below, all three presets have the same amplitude pattern
 ($a|00\rangle+d|11\rangle$), so $\rho_A$ stays exactly diagonal
 throughout; what changes is how far that diagonal sits from $1{:}0$:
 
-<InteractiveSection title="Watch the excluded cross term grow with entanglement" description="The dimmed |00⟩⟨11| corner of ρ_AB (top-right) is permanently excluded, because its indices are mismatched on both qubits, so it never reaches ρ_A no matter which reduced cell you select. Switch presets and watch that dimmed corner grow from 0 (product |00⟩) to ≈0.0995 (weakly entangled) to 0.5 (|Φ+⟩), while ρ_A's diagonal is dragged from 1:0 toward the 0.5:0.5 the boxed identity predicts at maximum mixedness. Click ρ_A's diagonal cells to confirm which ρ_AB entries build each one.">
+<InteractiveSection title="Watch the excluded cross term grow with entanglement" description="The dimmed |00⟩⟨11| corner of ρ_AB (top-right) is permanently excluded, because its indices are mismatched on both qubits, so it never reaches ρ_A no matter which reduced cell you select. Switch presets and read that dimmed corner at each of the three (product |00⟩, weakly entangled, |Φ+⟩), then read ρ_A's diagonal beside it each time. The boxed identity above commits to a particular diagonal at maximum mixedness, and this is where that commitment can be checked. Click ρ_A's diagonal cells to confirm which ρ_AB entries build each one.">
   <PartialTraceHighlight presets={survivalPresets} ariaLabel="The excluded off-diagonal cross term of the joint density matrix growing as the global state becomes more entangled, from a product state through a weakly entangled state to a maximally entangled Bell state, dragging the reduced state's diagonal toward 0.5/0.5" />
 </InteractiveSection>
 
@@ -167,8 +181,26 @@ exactly `testSeparability`'s condition for a product state. This proves,
 for 2-qubit pure states:
 
 $$
-\rho_A \text{ is pure} \iff |\psi\rangle_{AB} \text{ is a product state} \iff \rho_A \text{ is not mixed}
+\rho_A \text{ is pure} \iff |\psi\rangle_{AB} \text{ is a product state} \iff \rho_B \text{ is pure}
 $$
+
+The $\rho_B$ end of that chain comes free: repeating the expansion with
+the roles of $b$ and $c$ swapped gives $1-\text{Tr}(\rho_B^2)=2|ad-cb|^2$,
+the same number. The two qubits of a pure pair are always exactly as
+mixed as each other.
+
+The identity also bounds how far this can go. Normalization caps the
+determinant at $\tfrac12$:
+
+$$
+|ad-bc| \leq |a||d| + |b||c| \leq \frac{|a|^2+|d|^2}{2} + \frac{|b|^2+|c|^2}{2} = \frac12
+$$
+
+using the triangle inequality, then $xy\leq(x^2+y^2)/2$ on each pair, then
+$|a|^2+|b|^2+|c|^2+|d|^2=1$. So $1-\text{Tr}(\rho_A^2)$ never exceeds
+$2(\tfrac12)^2=\tfrac12$, and $\text{Tr}(\rho_A^2)$ never falls below
+$0.5$: the reduced state of one qubit cannot be more mixed than $I/2$,
+which is the floor the Bell states already sit on.
 
 Equivalently: **a 2-qubit pure state's reduced state is mixed if and only
 if the state is entangled.** Not "mixed states are associated with
@@ -187,7 +219,7 @@ general proof needs a general eigendecomposition, which this platform does
 not implement (see `docs/ARCHITECTURE.md`). The boxed identity is airtight
 for the case this course uses: two qubits, one cut.
 
-## Physical Interpretation
+## Mixedness that is not uncertainty leaking in
 
 A reduced state's mixedness is not uncertainty leaking in, the way it was
 for the classical mixtures two lessons ago. The global state
@@ -198,12 +230,20 @@ described*.
 This is the sharpest sense in which entanglement is not classical
 correlation. Complete knowledge of the whole gives incomplete knowledge of
 each part, whenever the parts are entangled. Nothing in classical physics
-works that way: there, knowing the joint distribution exactly always
-determines each marginal exactly, and the marginals stay as sharp as the
-joint.
+works that way, and it is worth being precise about why, because the
+obvious objection nearly works. Two coins glued to always match have the
+joint distribution $\tfrac12$ for 00 and $\tfrac12$ for 11, whose two
+marginals are both uniform: a known joint, maximally uncertain parts. But
+that distribution is *itself* a statement of ignorance, the classical
+counterpart of a mixed state, not of a pure one. A classical state of
+complete knowledge is a definite assignment of values, and a definite
+assignment for the pair is automatically a definite assignment for each
+member. There is no classical state of maximal knowledge whose parts are
+uncertain. $|\Phi^+\rangle$ is exactly that, with no ignorance anywhere
+left to appeal to.
 
-Seeing that phrase as a real correlation, rather than an algebraic
-byproduct of the <Term id="von-neumann-entropy-purity">purity</Term> identity, is easiest in the maximally entangled case:
+That correlation is easiest to see as a physical thing, rather than as an
+algebraic byproduct of the <Term id="von-neumann-entropy-purity">purity</Term> identity, in the maximally entangled case:
 $|\Phi^+\rangle=\frac{1}{\sqrt2}(|00\rangle+|11\rangle)$. Alice and Bob
 each hold one qubit, and alone each holds the maximally mixed
 $\rho_A=\rho_B=I/2$ derived above. The interactive below samples one real
@@ -212,11 +252,11 @@ then `applyCNOT`, the construction the CHSH lesson uses) rather than a
 hand-written coin flip. Watch both glyphs, held far apart, land on the
 same outcome every time:
 
-<InteractiveSection title="Measure a shared entangled pair" description="Alice and Bob each hold one qubit of the same |Φ+⟩ state. Press Measure both to sample one real joint outcome and watch the running tally: only 00 and 11 ever occur, never 01 or 10, for this specific Bell state.">
+<InteractiveSection title="Measure a shared entangled pair" description="Alice and Bob each hold one qubit of the same |Φ+⟩ state. Press Measure both to sample one real joint outcome, and keep sampling. The running tally has four slots; how many of them ever fill up is what this specific Bell state is here to tell you.">
   <LazyEntanglementCorrelation />
 </InteractiveSection>
 
-## Worked Example
+## Purity without computing a partial trace
 
 **Use the boxed identity to find $\text{Tr}(\rho_A^2)$ for
 $|\psi\rangle=\sqrt{0.9}\,|00\rangle+\sqrt{0.1}\,|11\rangle$ without
@@ -237,7 +277,7 @@ the density matrix explorer builds directly:
   <LazyDensityMatrixExplorer />
 </InteractiveSection>
 
-## Common Mistakes
+## Nonzero loss is not maximal entanglement
 
 <Callout type="note">
 **Thinking any nonzero purity loss means "maximal" entanglement.**
@@ -258,19 +298,194 @@ the moment there is a third qubit.
 
 1. Using the boxed identity, find $\text{Tr}(\rho_A^2)$ for
    $|\Psi^-\rangle=\frac{1}{\sqrt2}(|01\rangle-|10\rangle)$ without
-   computing the partial trace directly.
+   computing the partial trace directly. Then state what the same identity
+   gives for the *other* qubit, $\text{Tr}(\rho_B^2)$, and say why that
+   needs no second calculation.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Read the amplitudes off: $a=0$, $b=\tfrac{1}{\sqrt2}$,
+   $c=-\tfrac{1}{\sqrt2}$, $d=0$. So
+
+   $$
+   ad-bc = 0 - \left(\tfrac{1}{\sqrt2}\right)\left(-\tfrac{1}{\sqrt2}\right) = \tfrac12,
+   $$
+
+   and the identity gives
+   $\text{Tr}(\rho_A^2) = 1 - 2\left(\tfrac12\right)^2 = 1 - \tfrac12 = 0.5$.
+   Maximally mixed. Computing the partial trace directly confirms it:
+   the engine returns $\rho_A = \mathrm{diag}(0.5,0.5) = I/2$ with purity
+   $0.5$, and `testSeparability` reports determinant magnitude $0.5$.
+
+   $\text{Tr}(\rho_B^2)$ is $0.5$ as well, and no second calculation is
+   needed because the identity is symmetric in the two qubits: the lesson
+   states it as $1-\text{Tr}(\rho_A^2)=1-\text{Tr}(\rho_B^2)=2|ad-bc|^2$,
+   one determinant governing both reduced states at once. That symmetry is
+   not decoration. It is what makes "the entanglement of a pure bipartite
+   state" a property of the state rather than a property of which half you
+   happen to hold, and it is what lets the next lesson define entanglement
+   entropy as $S(\rho_A)$ without having to say which qubit.
+
+   The value $\tfrac12$ for $|ad-bc|$ is the maximum a normalized state
+   allows, which question 3 proves, so $|\Psi^-\rangle$ is maximally
+   entangled and its halves are maximally mixed. The minus sign played no
+   part: it cancelled against $c$'s own sign in the product $bc$, and even
+   if it had not, the identity uses $|ad-bc|$, a magnitude.
+
+   The slip to watch for is putting the amplitudes in the wrong slots. The
+   ordering is $a,b,c,d$ for $|00\rangle,|01\rangle,|10\rangle,|11\rangle$,
+   so for $|\Psi^-\rangle$ the two nonzero amplitudes are $b$ and $c$, not
+   $a$ and $d$. Getting that backwards gives $ad-bc = \tfrac12 - 0$, the
+   same magnitude here by luck of the symmetric arrangement, and a wrong
+   answer on any state where the two diagonals differ.
+
+   </details>
+
 2. For $|\psi(\theta)\rangle=\cos\theta|00\rangle+\sin\theta|11\rangle$,
    express $\text{Tr}(\rho_A^2)$ as a function of $\theta$ using the
    identity, and confirm it matches $\cos^4\theta+\sin^4\theta$ (which
    you can get directly from $\rho_A(\theta)=\text{diag}(\cos^2\theta,\sin^2\theta)$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Here $a=\cos\theta$, $b=c=0$, $d=\sin\theta$, so
+   $ad-bc=\cos\theta\sin\theta$ and
+
+   $$
+   \text{Tr}(\rho_A^2) = 1 - 2\cos^2\theta\sin^2\theta .
+   $$
+
+   The direct route squares the diagonal matrix:
+   $\text{Tr}(\rho_A^2)=\cos^4\theta+\sin^4\theta$. The two agree because
+
+   $$
+   \cos^4\theta+\sin^4\theta = (\cos^2\theta+\sin^2\theta)^2 - 2\cos^2\theta\sin^2\theta = 1 - 2\cos^2\theta\sin^2\theta ,
+   $$
+
+   which is completing the square on $x^2+y^2$ with $x+y=1$. The engine
+   evaluates both at $\theta=0.2$, $0.6$ and $\pi/4$ and they agree to
+   eight decimal places, coming out as $0.92417668$, $0.56565157$ and
+   $0.50000000$.
+
+   A third form is worth having, since $2\cos\theta\sin\theta=\sin 2\theta$:
+
+   $$
+   \text{Tr}(\rho_A^2) = 1 - \tfrac12\sin^2 2\theta .
+   $$
+
+   That version makes the behaviour obvious at a glance. Purity is $1$
+   whenever $\sin 2\theta = 0$, at $\theta=0$ and $\theta=\pi/2$, where the
+   state is $|00\rangle$ or $|11\rangle$ and there is no entanglement. It
+   bottoms out at $0.5$ where $|\sin2\theta|=1$, at $\theta=\pi/4$, the
+   Bell state. And $\sin^2 2\theta$ never exceeds $1$, so purity never
+   drops below $0.5$: a single qubit cannot be more mixed than maximally
+   mixed, and the algebra enforces it without being told.
+
+   The wrong turn is expecting $\cos^4\theta+\sin^4\theta$ to equal $1$ by
+   analogy with $\cos^2+\sin^2$. It does not; the cross term is exactly
+   what is missing, and that missing cross term *is* the mixedness. A
+   student who writes $1$ here concludes every state in the family is pure,
+   including the Bell state.
+
+   </details>
+
 3. Confirm algebraically that $|ad-bc|$ reaches its maximum possible
    value, $0.5$, for a Bell state, and explain why normalization
    $|a|^2+|b|^2+|c|^2+|d|^2=1$ prevents it from ever exceeding $0.5$ for
    a state of the form $a|00\rangle+d|11\rangle$ ($b=c=0$).
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   With $b=c=0$ the determinant is just $|ad| = |a||d|$, and normalization
+   reads $|a|^2+|d|^2=1$. The bound is the arithmetic-geometric mean
+   inequality in the form that follows from $(|a|-|d|)^2\geq0$:
+
+   $$
+   |a|^2 + |d|^2 \geq 2|a||d| \quad\Longrightarrow\quad |a||d| \leq \tfrac{|a|^2+|d|^2}{2} = \tfrac12
+   $$
+
+   Equality holds exactly when $|a|=|d|$, which with normalization forces
+   $|a|=|d|=\tfrac{1}{\sqrt2}$: the Bell states. Substituting,
+   $|ad-bc| = \tfrac{1}{\sqrt2}\cdot\tfrac{1}{\sqrt2} = \tfrac12$,
+   confirmed by the engine on $|\Phi^+\rangle$ and $|\Psi^-\rangle$ alike.
+
+   Chaining it through the identity closes the loop with the previous
+   lesson. $|ad-bc|\leq\tfrac12$ gives
+   $1-\text{Tr}(\rho_A^2) = 2|ad-bc|^2 \leq \tfrac12$, so
+   $\text{Tr}(\rho_A^2)\geq0.5$. The floor on purity and the ceiling on the
+   determinant are the same fact seen from two sides, and both are
+   consequences of normalization rather than separate assumptions.
+
+   The bound survives the general case, with $b$ and $c$ nonzero, though
+   the argument needs one more step:
+   $|ad-bc| \leq |a||d|+|b||c| \leq \tfrac{|a|^2+|d|^2}{2}+\tfrac{|b|^2+|c|^2}{2} = \tfrac12$
+   by the triangle inequality followed by the same mean inequality on each
+   pair. So $\tfrac12$ is the ceiling for every normalized two-qubit state,
+   which is what makes $C=2|ad-bc|$ a sensible measure running from $0$ to
+   $1$ two lessons from now.
+
+   The wrong turn is trying to push $|a||d|$ higher by making one amplitude
+   large. It backfires: $|a|=0.9$ forces $|d|=\sqrt{1-0.81}\approx0.436$
+   and the product falls to $0.392$. The product of two numbers with a
+   fixed sum of squares is maximized by balance, not by extremes, and
+   maximal entanglement is exactly the balanced case.
+
+   </details>
+
 4. Why does this lesson's proof break down immediately for a 3-qubit
    pure state, even before reaching the question of a general
    eigensolver? (Hint: what does $\rho_A$ even look like, and what is its
    dimension, once "the rest of the system" is two qubits instead of one?)
+   Name one thing from this lesson that *does* carry over to three qubits,
+   and one that does not.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The proof is built on four amplitudes $a,b,c,d$ arranged as a $2\times2$
+   array whose determinant $ad-bc$ is a single number. A 3-qubit pure state
+   has eight amplitudes. There is no $2\times2$ array to take a determinant
+   of, so the quantity on the right-hand side of the identity does not
+   exist, and the derivation has nothing to start from. That happens
+   before any question of diagonalizing anything.
+
+   The dimensions make the same point from the other side. Split the three
+   qubits as A (qubit 0) against B (qubits 1 and 2). Then $\rho_A$ is still
+   $2\times2$, but $\rho_B$ is $4\times4$, so the lesson's symmetric claim
+   that the two reduced states share a purity is now a statement relating
+   matrices of different sizes, and the closed-form $2\times2$ eigensolver
+   this course uses cannot touch $\rho_B$ at all. (The purities do still
+   agree, by the Schmidt decomposition, but that is a theorem this course
+   does not prove and it is certainly not what the four-amplitude algebra
+   establishes.)
+
+   What carries over: the qualitative theorem. For a pure global state and
+   any bipartite cut, $\rho_A$ is mixed exactly when the two sides are
+   entangled across that cut, and $S(\rho_A)$ still quantifies how much.
+   Applied to the cut "qubit 0 against the other two", every step of that
+   reasoning survives, and it is what makes entanglement entropy usable on
+   large systems.
+
+   What does not carry over: the idea that one number measures the
+   entanglement of the state. With three qubits there are three different
+   cuts and they need not agree, and worse, states can be inequivalent even
+   when every cut matches. The GHZ state
+   $\tfrac{1}{\sqrt2}(|000\rangle+|111\rangle)$ and the W state
+   $\tfrac{1}{\sqrt3}(|001\rangle+|010\rangle+|100\rangle)$ are both
+   entangled across every cut, and neither can be converted into the other
+   by any local operations, so "how entangled is it" stops having a single
+   answer.
+
+   The wrong turn is answering that the proof fails because $\rho_A$
+   becomes too big to diagonalize by hand. $\rho_A$ for one qubit is
+   $2\times2$ no matter how many qubits it is entangled with, and the
+   engine handles it fine. The obstruction is on the amplitude side, in the
+   determinant, not on the reduced-state side.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -289,7 +504,7 @@ the moment there is a third qubit.
   via the Schmidt decomposition, which this platform does not implement
   in general.
 
-## Further Exploration
+## A more complete footing for the same reasoning
 
 <NextDiscovery>
 [Purity, von Neumann Entropy, and Information](/lessons/quantum-computing/entanglement-and-measurement/purity-entropy-and-information) puts

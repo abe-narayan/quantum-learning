@@ -5,17 +5,17 @@ import { CurrentQuantumCard } from "./CurrentQuantumCard";
 
 /**
  * Reverse link from a lesson to the "Current Quantum" entries that cite it
- * (see `getEntriesForLesson`) — the moment a lesson stops being a closed
+ * (see `getEntriesForLesson`), the moment a lesson stops being a closed
  * document and becomes "here's what's happening with this, right now."
  *
  * Deliberately self-contained: this is embedded at the bottom of every
  * lesson by `LessonLayout` (owned by another agent, currently mid-redesign
  * itself), so it makes no assumptions about its surroundings beyond sitting
- * in a normal content column — it renders nothing for the lessons with no
+ * in a normal content column, it renders nothing for the lessons with no
  * matching entry, and doesn't wrap itself in `PillarScope` (that would paint
  * a second atmosphere layer inside a page that already has one from the
- * lesson's own pillar). Each entry still gets its own `data-pillar` — via
- * the shared `CurrentQuantumCard` — for the curriculum area *that entry*
+ * lesson's own pillar). Each entry still gets its own `data-pillar`, via
+ * the shared `CurrentQuantumCard`, for the curriculum area *that entry*
  * connects to, which is usually but not always this lesson's own pillar.
  *
  * `lessonTitle` is passed as `undefined` to `CurrentQuantumCard`: every

@@ -29,8 +29,9 @@ export const postulateProbabilityCalculation: NumericProblem = {
     ],
   },
   hints: [
-    { text: "cos(π/3) = 0.5." },
-    { text: "By the Born rule, P(+1) = |cos(π/3)|²." },
+    { text: "The number multiplying $|e_+\\rangle$ is an amplitude, not a probability. The Born rule is what converts one into the other." },
+    { text: "Pick out the coefficient sitting on $|e_+\\rangle$, then apply the Born rule to that coefficient alone." },
+    { text: "Evaluate the cosine first, then square it. Squaring a number smaller than 1 makes it smaller still, which is a useful check on the result." },
   ],
   solution: {
     steps: [

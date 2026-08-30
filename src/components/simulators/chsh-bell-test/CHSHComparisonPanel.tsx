@@ -5,18 +5,18 @@ import { CHSH_CLASSICAL_BOUND, CHSH_QUANTUM_BOUND } from "@/lib/quantum/chsh";
 import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
 
 /**
- * Side-by-side "classical vs quantum" comparison for the CHSH statistic —
+ * Side-by-side "classical vs quantum" comparison for the CHSH statistic.
  * three honest reference points, each labeled for what it actually is:
  *
  *  1. The classical (local hidden-variable) bound |S| ≤ 2. This is a
  *     *proven mathematical ceiling* (Bell's theorem: no local
- *     hidden-variable strategy, however tuned, can ever push S above 2) —
+ *     hidden-variable strategy, however tuned, can ever push S above 2);
  *     it is presented here as the labeled constant `CHSH_CLASSICAL_BOUND`
  *     from lib/quantum/chsh.ts, not as a simulated classical experiment.
  *  2. The actual quantum S at the student's chosen measurement angles,
- *     computed live by `chshValue()` — the same number the default view
+ *     computed live by `chshValue()`, the same number the default view
  *     already narrates.
- *  3. Tsirelson's bound 2√2 (`CHSH_QUANTUM_BOUND`) — quantum mechanics'
+ *  3. Tsirelson's bound 2√2 (`CHSH_QUANTUM_BOUND`), quantum mechanics'
  *     own absolute ceiling, unreachable by any state or observable choice.
  *
  * Every value is rendered as plain text/numbers first; the bars beneath
@@ -39,7 +39,7 @@ export function CHSHComparisonPanel({ sValue }: { sValue: number }) {
   }[] = [
     {
       key: "classical",
-      label: "Classical bound — any local hidden-variable strategy",
+      label: "Classical bound: any local hidden-variable strategy",
       sublabel: "Proven ceiling (Bell's theorem), not a simulated result",
       display: `≤ ${CHSH_CLASSICAL_BOUND.toFixed(3)}`,
       barValue: CHSH_CLASSICAL_BOUND,
@@ -55,7 +55,7 @@ export function CHSHComparisonPanel({ sValue }: { sValue: number }) {
     },
     {
       key: "tsirelson",
-      label: "Tsirelson's bound — quantum mechanics' own ceiling",
+      label: "Tsirelson's bound: quantum mechanics' own ceiling",
       sublabel: "The maximum |S| any state or observables can reach",
       display: `${CHSH_QUANTUM_BOUND.toFixed(3)} (2√2)`,
       barValue: CHSH_QUANTUM_BOUND,
@@ -80,13 +80,18 @@ export function CHSHComparisonPanel({ sValue }: { sValue: number }) {
                 {row.display}
               </dd>
             </div>
-            <p className="text-[11px] text-muted-foreground">{row.sublabel}</p>
+            <p className="text-xs text-muted-foreground">{row.sublabel}</p>
             <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-surface" aria-hidden="true">
               <div
                 className={cn(
                   "h-full rounded-full",
                   !prefersReducedMotion && "transition-[width] duration-200 ease-out",
-                  row.tone === "classical" && "bg-border",
+                  // `--axis`, not `--border`. This is the reference bar the
+                  // other two are compared against, so it has to be visible
+                  // even though the numbers beside it carry the reading;
+                  // `--border` is 1.41:1 chrome and drew it at the edge of
+                  // nothing on `bg-surface`.
+                  row.tone === "classical" && "bg-axis",
                   row.tone === "tsirelson" && "bg-pillar/60",
                   row.tone === "quantum" && (exceedsClassical ? "bg-accent" : "bg-pillar")
                 )}
@@ -102,8 +107,8 @@ export function CHSHComparisonPanel({ sValue }: { sValue: number }) {
             At these angles, quantum mechanics beats the classical ceiling by{" "}
             <span className="font-mono font-semibold text-foreground">
               {(magnitude - CHSH_CLASSICAL_BOUND).toFixed(3)}
-            </span>{" "}
-            — a gap no local hidden-variable strategy, however tuned, could ever close.
+            </span>
+            , a gap no local hidden-variable strategy, however tuned, could ever close.
           </>
         ) : (
           <>

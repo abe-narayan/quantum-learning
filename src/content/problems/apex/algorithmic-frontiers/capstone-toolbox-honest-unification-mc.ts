@@ -22,19 +22,19 @@ export const capstoneToolboxHonestUnificationMc: MultipleChoiceProblem = {
     options: [
       {
         id: "a",
-        text: "QSVT explains each algorithm as one instance of a shared construction, and for some (like Hamiltonian simulation) matches or improves the original's asymptotic scaling — but finding a good block encoding or a good polynomial for a new problem can each still be genuinely hard, unsolved research questions",
+        text: "QSVT explains each algorithm as an instance of one construction and sometimes improves its scaling, while block encodings stay research problems",
       },
       {
         id: "b",
-        text: "QSVT proves the original diffusion-operator Grover circuit, first-order Trotter-Suzuki formulas, and the original HHL circuit were all incorrect and should no longer be used",
+        text: "QSVT unifies the constructions, and because the construction they share is identical, each ends up with the same query complexity once implemented",
       },
       {
         id: "c",
-        text: "Once a block encoding of any matrix is available, QSVT automatically finds the optimal polynomial for any target function with no further research needed",
+        text: "QSVT usually supplies the polynomial for a target function automatically; what remains hard is building a block encoding of the matrix",
       },
       {
         id: "d",
-        text: "Because all four algorithms reduce to the same construction, they must all now share exactly the same query complexity",
+        text: "QSVT re-derives the three algorithms but improves on none of them, since a unification generally cannot outperform what it unifies",
       },
     ],
   },
@@ -42,15 +42,15 @@ export const capstoneToolboxHonestUnificationMc: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "Nothing in the older constructions was wrong; the capstone is explicit that QSVT explains them as instances of one framework rather than invalidating any of them.",
-      c: "QSVT guarantees a feasible polynomial *can* be realized as a circuit once you have one — it doesn't hand you the polynomial itself; finding a good approximation to a new target function is still real approximation-theory work.",
-      d: "The capstone's own comparison shows the opposite: Grover-via-QSVT exactly reproduces Θ(√N) (no improvement, since it was already optimal), while QSVT-based Hamiltonian simulation provably beats naive first-order Trotter's scaling — the framework unifies the construction, not the cost.",
+      b: "The capstone's own comparison shows otherwise. Grover-via-QSVT reproduces Θ(√N), which was already optimal, while QSVT-based Hamiltonian simulation beats first-order Trotter. The construction is shared; the costs are not.",
+      c: "This has the two halves the wrong way round. Once you hold a feasible polynomial, QSVT realises it as a circuit; producing that polynomial for a new target function is approximation-theory work nothing here automates.",
+      d: "Too modest in one direction. QSVT-based Hamiltonian simulation genuinely improves on first-order Trotter's scaling, so the framework does more than restate what it absorbs, even though it does not improve everything it touches.",
     },
     defaultIncorrectFeedback:
-      "Recall the capstone's explicit distinction between 'QSVT organizes and often improves on these algorithms' and overclaims like 'QSVT makes them identical or makes algorithm design solved'.",
+      "The calibrated claim sits between two overclaims: that the framework flattens these algorithms into one cost, and that it makes designing a new algorithm automatic. Say what it does deliver, and what it leaves open.",
   },
   hints: [
-    { text: "The capstone repeatedly warns against two specific overclaims: that older algorithms are now 'wrong', and that QSVT makes new algorithm design automatic." },
+    { text: "The capstone warns against overclaiming in two directions at once: that the framework flattens the algorithms into a single cost, and that it makes designing a new one automatic." },
     { text: "Two things QSVT does not hand you for free are named directly in the lesson: a good block encoding, and a good polynomial approximation." },
     { text: "Check the query-complexity comparison: does every unified algorithm end up with the same cost, or does the framework unify the construction while costs still differ?" },
   ],
@@ -66,9 +66,9 @@ export const capstoneToolboxHonestUnificationMc: MultipleChoiceProblem = {
     correctIdea: "QSVT is a genuine, powerful organizing/design framework, evaluated honestly: it explains and sometimes improves on older constructions, without making block-encoding or polynomial-approximation research obsolete.",
     whyCorrect: "This mirrors the capstone's explicit 'what remains genuinely open' section and its worked query-complexity comparison.",
     whyWrong: [
-      { optionId: "b", text: "Declares the older constructions incorrect. Nothing in them was wrong; QSVT re-derives them as instances of one framework." },
-      { optionId: "c", text: "Treats polynomial design as solved. A block encoding buys you circuit realizability once you have a feasible polynomial; it does not hand you the approximation." },
-      { optionId: "d", text: "Equalizes the costs. Grover-via-QSVT reproduces Θ(√N) while QSVT-based Hamiltonian simulation beats first-order Trotter: the construction unifies, the query complexities do not." },
+      { optionId: "b", text: "Flattens the costs. Grover-via-QSVT reproduces Θ(√N) while QSVT-based Hamiltonian simulation beats first-order Trotter: the construction unifies, the query complexities do not." },
+      { optionId: "c", text: "Treats polynomial design as solved. A block encoding buys circuit realizability once a feasible polynomial is in hand; it does not hand you the approximation." },
+      { optionId: "d", text: "Understates the result. The framework is not merely a restatement: for Hamiltonian simulation it delivers a genuinely better asymptotic cost than the construction it absorbs." },
     ],
   },
 };

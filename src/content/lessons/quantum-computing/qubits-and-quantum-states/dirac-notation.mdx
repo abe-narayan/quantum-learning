@@ -44,12 +44,13 @@ export const lessonMeta = {
   module: "dirac-notation",
   order: 1,
   difficulty: "foundational",
-  estimatedMinutes: 20,
+  estimatedMinutes: 26,
   prerequisites: ["quantum-computing/qubits-and-quantum-states/complex-numbers-for-quantum-mechanics"],
   objectives: [
     "Explain what a bra is and how it relates to a ket",
     "Compute inner products between qubit states",
     "Use orthonormality to simplify bra-ket expressions",
+    "Apply a 2x2 matrix to a ket, read the Pauli matrices X, Y and Z off their columns, and multiply two 2x2 matrices in the right order",
   ],
   related: [
     {
@@ -63,7 +64,7 @@ export const lessonMeta = {
 $\langle\phi|\psi\rangle$ looks like decoration. It is a single number, and it plays the role for quantum states that the dot product plays for ordinary vectors.
 </LessonHook>
 
-## Motivation
+## A symbol used since lesson one, unexamined
 
 We've been writing $|0\rangle$, $|1\rangle$, and
 $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$ since the first lesson
@@ -72,7 +73,7 @@ follows. The notation is not deep, and this is a short lesson. But every
 calculation from here on is written in it, and the half-hour spent now is
 repaid in every derivation that follows.
 
-## Intuition
+## Why physicists write vectors this way
 
 $|\psi\rangle$ is called a **ket**, and it's just a name for "the vector
 $\psi$." Physicists write vectors this way instead of with an arrow
@@ -87,25 +88,25 @@ ordinary dot products play for real vectors.
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/5/50/Paul_Dirac%2C_1933.jpg"
   alt="Paul Dirac in 1933, framed from the chest up and facing the camera, wearing a dark suit jacket over a white dress shirt against a plain, unadorned background"
-  caption="Paul Dirac (1902–1984), who invented the bra–ket notation this lesson is built around, photographed the year he shared the Nobel Prize in Physics for his foundational work in quantum mechanics."
+  caption="Paul Dirac (1902–1984), who invented the bra-ket notation this lesson is built around, photographed the year he shared the Nobel Prize in Physics for his foundational work in quantum mechanics."
   credit="Nobel Foundation / Wikimedia Commons"
   creditUrl="https://commons.wikimedia.org/wiki/File:Paul_Dirac,_1933.jpg"
   license="Public domain"
 />
 
 <HistoricalMoment date="1933">
-Paul Dirac, who invented the bra–ket notation this lesson is built around, shares the Nobel Prize in Physics for his foundational work in quantum mechanics.
+Paul Dirac, who invented the bra-ket notation this lesson is built around, shares the Nobel Prize in Physics for his foundational work in quantum mechanics.
 </HistoricalMoment>
 
-## Mathematical Development
+## Kets, bras, and the number between them
 
 ### From column vectors to kets
 
 So far the two <Term id="computational-basis">computational basis</Term>
 states have been names, $|0\rangle$ and $|1\rangle$, with amplitudes
-attached to them. Written out as **column vectors** — a column vector
-being nothing more than a list of numbers stacked vertically, one slot
-per basis state — they are:
+attached to them. A **column vector** is nothing more than a list of
+numbers stacked vertically, one slot per basis state. Written out that
+way, the two basis states are:
 
 $$
 |0\rangle = \begin{pmatrix}1\\0\end{pmatrix}, \qquad |1\rangle = \begin{pmatrix}0\\1\end{pmatrix}
@@ -157,6 +158,7 @@ state that blends both.
     { label: "⟨0|1⟩", value: 0 },
     { label: "⟨+|0⟩", value: plusZeroOverlap, highlight: true }
   ]}
+  maxValue={1}
   ariaLabel="Inner products: basis states give 1 or 0, while a superposition state like plus gives a value in between"
 />
 
@@ -214,6 +216,54 @@ $|\psi\rangle$ in the basis, apply $A$ to each basis ket separately, and
 let orthonormality kill the cross terms, exactly as in the distributed
 inner product above. That is the method the next few lessons use.
 
+### Three matrices worth naming now
+
+The swap matrix above has a name, and so do two close relatives. These three
+appear constantly from here on, and the very next lessons need nothing about
+them beyond what each does to $|0\rangle$ and $|1\rangle$:
+
+$$
+X = \begin{pmatrix}0&1\\1&0\end{pmatrix}, \qquad Y = \begin{pmatrix}0&-i\\i&0\end{pmatrix}, \qquad Z = \begin{pmatrix}1&0\\0&-1\end{pmatrix}
+$$
+
+They are the **Pauli matrices**. Their action on the basis states is read
+straight off the columns by the rule just given, because $|0\rangle$ selects
+the first column and $|1\rangle$ selects the second:
+
+$$
+X|0\rangle = |1\rangle, \quad X|1\rangle = |0\rangle, \qquad Y|0\rangle = i|1\rangle, \quad Y|1\rangle = -i|0\rangle, \qquad Z|0\rangle = |0\rangle, \quad Z|1\rangle = -|1\rangle
+$$
+
+So $X$ swaps the two basis states, $Z$ leaves $|0\rangle$ alone and flips the
+sign of $|1\rangle$, and $Y$ does both at once with a factor of $i$. That is
+the whole of what the next few lessons ask of them. *Why* these three in
+particular, and what makes a matrix a legal quantum gate at all, is the
+Quantum Gates lesson's subject; nothing between here and there depends on
+the answer.
+
+### Multiplying two matrices
+
+One last case of the same arithmetic, needed once gates start arriving in
+sequences. Applying $A$ and then $B$ to a ket is $B\bigl(A|\psi\rangle\bigr)$,
+and the two matrices can be combined into a single matrix $BA$ first. The
+rule is the matrix-times-ket rule run once per column: entry $(i,j)$ of $BA$
+is row $i$ of $B$ paired against column $j$ of $A$.
+
+$$
+BA = \begin{pmatrix}B_{00}&B_{01}\\B_{10}&B_{11}\end{pmatrix}\begin{pmatrix}A_{00}&A_{01}\\A_{10}&A_{11}\end{pmatrix} = \begin{pmatrix}B_{00}A_{00}+B_{01}A_{10} & B_{00}A_{01}+B_{01}A_{11}\\B_{10}A_{00}+B_{11}A_{10} & B_{10}A_{01}+B_{11}A_{11}\end{pmatrix}
+$$
+
+Order matters here exactly as it did for bras and kets. Run it on $X$ and
+$Z$ from just above:
+
+$$
+XZ = \begin{pmatrix}0&-1\\1&0\end{pmatrix}, \qquad ZX = \begin{pmatrix}0&1\\-1&0\end{pmatrix}
+$$
+
+Same two matrices, opposite order, different answer. The rightmost matrix in
+a product is the one that acts first, which is why gate sequences get read
+right to left in the lessons that build circuits out of them.
+
 ### Norm, revisited
 
 Set $\langle\phi|=\langle\psi|$ (i.e. take the inner product of
@@ -232,7 +282,7 @@ $\langle\psi|\phi\rangle$ are **not** generally equal. They're complex
 conjugates of each other, $\langle\psi|\phi\rangle = \langle\phi|\psi\rangle^*$.
 Order matters.
 
-## Physical Interpretation
+## Overlap, as a complex-valued cosine
 
 $\langle\phi|\psi\rangle$ measures how much $|\psi\rangle$ "overlaps" with
 $|\phi\rangle$, geometrically something like a (complex-valued) cosine of
@@ -244,13 +294,13 @@ makes every other calculation in this course tractable: whenever a term
 like $\langle0|1\rangle$ appears, it's zero, and whenever $\langle0|0\rangle$
 appears, it's one.
 
-## Interactive Experiment
+## Sweep between the poles and watch the overlap
 
 The bar chart above showed four fixed overlap values. Sweep continuously
 between $|0\rangle$ and $|1\rangle$ and watch the "something in between"
 case fill in the whole range, not just one example of it.
 
-<InteractiveSection title="Sweep the overlap continuously" description="Drag the slider to sweep ψ = cos(θ)|0⟩ + sin(θ)|1⟩ from θ = 0 (exactly |0⟩) to θ = 90° (exactly |1⟩). Watch ⟨0|ψ⟩ shrink smoothly from 1 to 0 while ⟨1|ψ⟩ grows from 0 to 1, the full continuum of overlap values orthonormality only showed you the two endpoints of.">
+<InteractiveSection title="Sweep the overlap continuously" description="Drag the slider to sweep ψ = cos(θ)|0⟩ + sin(θ)|1⟩ from θ = 0 (exactly |0⟩) to θ = 90° (exactly |1⟩). Read ⟨0|ψ⟩ and ⟨1|ψ⟩ at both ends of the sweep and at a few places in between. Orthonormality handed you only the two endpoints; this is the continuum of overlap values lying between them.">
   <BarChartExplorer
     frames={mixingFrames}
     sliderLabel="Mixing angle θ"
@@ -270,17 +320,18 @@ The bar heights above are what "cosine of the angle between them" means once you
 </InteractiveSection>
 
 <PredictBeforeReveal
-  question="⟨+|0⟩, where |+⟩ = (|0⟩+|1⟩)/√2: closer to the ⟨0|0⟩ = 1 case, the ⟨0|1⟩ = 0 case, or somewhere strictly between?"
+  question="The highlighted bar is strictly between 0 and 1, but what number is it exactly? Compute ⟨+|0⟩, where |+⟩ = (|0⟩+|1⟩)/√2."
   options={[
-    { label: "Exactly 1, like ⟨0|0⟩", value: "one" },
-    { label: "Exactly 0, like ⟨0|1⟩", value: "zero" },
-    { label: "Strictly between 0 and 1", value: "between" },
+    { label: "0, the value orthogonal states give", value: "zero" },
+    { label: "1/2, half of the ⟨0|0⟩ = 1 case", value: "half" },
+    { label: "1/√2, about 0.71", value: "invsqrt2" },
+    { label: "1, since |+⟩ contains a full |0⟩ term", value: "one" },
   ]}
-  correctValue="between"
-  explanation="⟨+|0⟩ = 1/√2 ≈ 0.71, strictly between the two extremes, because |+⟩ is neither aligned with nor orthogonal to |0⟩: it blends both basis states equally. That's the same number the bar chart above already highlighted, and the worked example below derives it from scratch."
+  correctValue="invsqrt2"
+  explanation="⟨+| = (⟨0|+⟨1|)/√2, so ⟨+|0⟩ = (⟨0|0⟩ + ⟨1|0⟩)/√2 = (1+0)/√2 = 1/√2 ≈ 0.71. The tempting wrong answer is 1/2: that is the *probability* you get by squaring this overlap, which the Measurement lesson will need, but the overlap itself is the amplitude, one square root away. The worked example below runs the same two lines in full."
 />
 
-## Worked Example
+## One overlap, computed term by term
 
 **Compute $\langle+|0\rangle$, where $|+\rangle = \frac{1}{\sqrt2}(|0\rangle+|1\rangle)$.**
 
@@ -302,7 +353,7 @@ Measurement lesson: it is the probability *amplitude* for measuring
 $|+\rangle$ and finding "0," and squaring it gives the probability,
 $\tfrac12$.
 
-## Common Mistakes
+## The conjugation the bra requires
 
 <Callout type="warning">
 **Forgetting to conjugate the bra's coefficients.** If $|\phi\rangle$ has a
@@ -320,14 +371,123 @@ product happens to be real.
 ## Practice Questions
 
 1. Compute $\langle-|1\rangle$, where $|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \langle-|1\rangle = -\frac{1}{\sqrt2} \approx -0.707.
+   $$
+
+   Turning the ket into a bra conjugates every coefficient, so
+   $\langle-| = \frac{1}{\sqrt2}(\langle0| - \langle1|)$ (the coefficients here
+   are real, so conjugation leaves them alone, but form the habit anyway).
+   Then
+
+   $$
+   \langle-|1\rangle = \tfrac{1}{\sqrt2}\left(\langle0|1\rangle - \langle1|1\rangle\right) = \tfrac{1}{\sqrt2}(0 - 1) = -\tfrac{1}{\sqrt2}.
+   $$
+
+   Two things worth noticing. The answer is negative, which is fine: an inner
+   product is an amplitude, not a probability. The probability of getting
+   outcome $-$ when measuring $|1\rangle$ in the X basis is
+   $|{-1}/\sqrt2|^2 = \tfrac12$, and *that* is what has to be non-negative.
+
+   And the answer is not zero, which is the reflex if you are pattern-matching
+   on "different labels must be orthogonal". Orthogonality holds within one
+   basis: $\langle0|1\rangle = 0$ because $|0\rangle$ and $|1\rangle$ belong to
+   the same orthonormal set. $|-\rangle$ and $|1\rangle$ come from different
+   bases and have no reason to be orthogonal.
+
+   </details>
+
 2. Let $|\psi\rangle = \frac{3}{5}|0\rangle + \frac{4i}{5}|1\rangle$. Verify
    $\langle\psi|\psi\rangle=1$ directly from the inner-product formula.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The bra conjugates both coefficients:
+   $\langle\psi| = \tfrac35\langle0| - \tfrac{4i}{5}\langle1|$. Now use
+   orthonormality to kill the cross terms:
+
+   $$
+   \langle\psi|\psi\rangle = \left(\tfrac35\right)\left(\tfrac35\right) + \left(-\tfrac{4i}{5}\right)\left(\tfrac{4i}{5}\right) = \tfrac{9}{25} - \tfrac{16i^2}{25} = \tfrac{9}{25} + \tfrac{16}{25} = 1 \checkmark
+   $$
+
+   The conjugation in the bra is the entire reason this works. Skip it and you
+   get $\left(\tfrac35\right)^2 + \left(\tfrac{4i}{5}\right)^2 = \tfrac{9}{25} - \tfrac{16}{25} = -\tfrac{7}{25}$,
+   a negative "length squared", which should be an immediate alarm: no
+   sensible notion of length can come out negative. The conjugate is what turns
+   $\alpha^*\alpha$ into $|\alpha|^2 \ge 0$ for every complex $\alpha$, and it
+   is why the inner product on $\mathbb{C}^2$ has to be defined with a
+   conjugate on the left slot rather than as a plain dot product.
+
+   </details>
+
 3. Show that $\langle+i|-i\rangle = 0$, where
    $|{+i}\rangle=\frac{1}{\sqrt2}(|0\rangle+i|1\rangle)$ and
    $|{-i}\rangle=\frac{1}{\sqrt2}(|0\rangle-i|1\rangle)$. (These two states
    are orthogonal, just like $|0\rangle$ and $|1\rangle$: there's more than
    one orthonormal basis for a qubit.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Conjugating $|{+i}\rangle$ turns $+i$ into $-i$, giving
+   $\langle+i| = \tfrac{1}{\sqrt2}(\langle0| - i\langle1|)$. Pair it against
+   $|{-i}\rangle$ term by term:
+
+   $$
+   \langle+i|-i\rangle = \tfrac12\left[(1)(1) + (-i)(-i)\right] = \tfrac12\left[1 + i^2\right] = \tfrac12[1-1] = 0 \checkmark
+   $$
+
+   The $\langle0|1\rangle$ and $\langle1|0\rangle$ cross terms vanish by
+   orthonormality, so only the two "diagonal" products survive.
+
+   Forget to conjugate and the $|1\rangle$ terms give $(i)(-i) = -i^2 = +1$
+   instead, so the total comes to $\tfrac12[1+1] = 1$: the answer says these
+   are the *same* state rather than orthogonal ones, off by as much as it is
+   possible to be. Two conjugations, both wrong in the same direction, is the
+   easiest way to lose a whole basis.
+
+   Worth stepping back: $|{+i}\rangle$ and $|{-i}\rangle$ are the Y-basis, the
+   third of the three natural qubit bases alongside
+   $\{|0\rangle,|1\rangle\}$ and $\{|+\rangle,|-\rangle\}$. Nothing privileges
+   the computational basis mathematically; it is a choice of which question to
+   ask the qubit.
+
+   </details>
+
 4. If $\langle\phi|\psi\rangle = 3-4i$, what is $\langle\psi|\phi\rangle$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $$
+   \langle\psi|\phi\rangle = \langle\phi|\psi\rangle^* = 3+4i.
+   $$
+
+   This is conjugate symmetry, and it is forced rather than conventional.
+   Setting $|\phi\rangle = |\psi\rangle$ gives
+   $\langle\psi|\psi\rangle = \langle\psi|\psi\rangle^*$, so a state's own
+   inner product with itself must be real, which is what lets
+   $\langle\psi|\psi\rangle = 1$ be a sensible normalization condition at all.
+   Without the conjugate, "length squared" could come out complex.
+
+   Two wrong answers to name. Swapping the arguments does *not* just flip the
+   sign of the whole thing, so $-3+4i$ is wrong: only the imaginary part
+   changes sign, the real part is untouched. And it is not simply $3-4i$
+   unchanged either; the inner product is symmetric only when it happens to be
+   real, which is the special case that makes real vector spaces feel simpler
+   than they are.
+
+   The physically important consequence: the two orderings always have the same
+   modulus, $|\langle\phi|\psi\rangle| = |\langle\psi|\phi\rangle| = 5$ here, so
+   the *probability* built from an overlap does not care which state you call
+   the measurement outcome and which you call the prepared state.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -341,8 +501,14 @@ product happens to be real.
   the computational basis is orthonormal.
 - $\langle\psi|\psi\rangle=1$ is the normalization condition, restated.
 - $\langle\phi|\psi\rangle=\langle\psi|\phi\rangle^*$: order matters.
+- A matrix on a ket pairs each row against the whole column;
+  $\langle\phi|A|\psi\rangle$ is that ket, then an ordinary inner product.
+- The Pauli matrices $X$, $Y$, $Z$, with $X|0\rangle=|1\rangle$,
+  $Z|1\rangle=-|1\rangle$, and $Y$ doing both with a factor of $i$.
+- Two matrices multiply by the same rule, one column at a time, and $BA$ is
+  not $AB$: the rightmost factor acts first.
 
-## Further Exploration
+## Which vectors count as physical states
 
 <NextDiscovery>
 Up next, [Quantum States and State Vectors](/lessons/quantum-computing/qubits-and-quantum-states/quantum-states-and-state-vectors) uses this notation to

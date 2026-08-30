@@ -50,6 +50,8 @@ export const petStateCorrectionFrames = [
   { paramLabel: "λ = 0.01", bars: petStateCorrectionBars }
 ];
 
+export const petMaxStateCoefficient = Math.max(...petStateCorrectionBars.map((bar) => bar.value));
+
 export const petCurveLambdas = Array.from({ length: 51 }, (_, i) => (i / 50) * 0.12);
 
 export const petOrderCurveFrames = [
@@ -98,11 +100,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Nudge a solvable system and solvability dies">
 Exactly solvable quantum systems are rare, and nudging one destroys its solvability outright. Perturbation theory asks a smaller question instead: if the easy version is fully understood, can the almost-easy version be reached by correcting it, one order at a time?
 </LessonHook>
 
-## Motivation
+## A list of solved systems short enough to write out
 
 The list of quantum systems with closed-form solutions is short enough to
 write out: the free particle, the infinite well, the <Term id="quantum-harmonic-oscillator">harmonic
@@ -124,7 +126,7 @@ Schrödinger set it out in his 1926 papers, and Lord Rayleigh had worked
 the analogous problem for coupled classical oscillators decades earlier.
 The algebra transferred to quantum mechanics essentially unchanged.
 
-## Intuition
+## Fixed reference points, and a small push
 
 Treat $H_0$'s eigenstates as fixed reference points you already
 understand completely, and $H'$ as a small push away from each one. To
@@ -136,7 +138,7 @@ state $m$ contributes a tug proportional to how strongly $H'$ couples $n$
 to $m$, and inversely to how far apart their unperturbed energies sit:
 close, easily-perturbed neighbors matter far more than distant ones.
 
-## Mathematical Development
+## Corrections, order by order
 
 ### Setup: H₀'s eigenbasis
 
@@ -199,32 +201,34 @@ exact same $H_0$ and $H'=\lambda x^4$ matrices as the worked example
 above, makes that concrete: every coefficient $c_m$ for odd $m$, and for
 $m=6$, comes back exactly 0.
 
-Only $|2^{(0)}\rangle$ and $|4^{(0)}\rangle$ can mix in at all, so the
-question is just which one dominates:
+Only $|2^{(0)}\rangle$ and $|4^{(0)}\rangle$ can mix in at all, and
+$|c_2|$ is the larger of the two: the $1/(E_0^{(0)}-E_m^{(0)})$ weight
+alone says so, since $|4^{(0)}\rangle$ sits twice as far away. What that
+weight does not settle is by how much.
 
 <PredictBeforeReveal
-  question="The first-order state correction weights each allowed neighbor by 1/(E₀⁽⁰⁾−Eₘ⁽⁰⁾), so a bigger energy gap means a smaller coefficient. |4⁽⁰⁾⟩ sits twice as far from the ground state as |2⁽⁰⁾⟩. Which mixing coefficient comes out larger, |c₂| or |c₄|?"
+  question="The energy gaps alone would make |c₂| exactly twice |c₄|. What is the actual ratio |c₂|/|c₄|?"
   options={[
-    { label: "|c₂| (the closer neighbor)", value: "c2" },
-    { label: "|c₄| (the farther neighbor)", value: "c4" },
-    { label: "They should be equal", value: "equal" },
+    { label: "About 1.2: the matrix elements pull the other way", value: "less" },
+    { label: "Exactly 2: the gaps really are the whole story here", value: "two" },
+    { label: "About 3.5: the matrix elements pull the same way", value: "more" },
   ]}
-  correctValue="c2"
-  explanation="|c₂|≈0.0106 against |c₄|≈0.0031 in the chart below: the closer neighbor wins by more than a factor of 3, not the factor of 2 the energy gaps alone would give. The 1/gap weighting supplies part of it, and the matrix element H'_{mn}=⟨m|λx⁴|n⟩ is itself larger for the nearer transition, so the two effects compound rather than compete."
+  correctValue="more"
+  explanation="The ratio is 2√3 ≈ 3.46. Half of it is the energy gaps, 4 against 2. The rest is the matrix element itself: ⟨2|x⁴|0⟩ = 3√2/2 ≈ 2.121 while ⟨4|x⁴|0⟩ = √6/2 ≈ 1.225, so x⁴ already prefers the nearer transition before any denominator is applied. The two effects compound."
 />
 
 <BarChartExplorer
   frames={petStateCorrectionFrames}
-  ariaLabel="Magnitude of the first-order state correction mixing coefficient |c_m| for each basis state m=1 through 7 mixed into the perturbed ground state, for the quartic anharmonic oscillator at lambda=0.01"
+  maxValue={petMaxStateCoefficient}
+  ariaLabel="Magnitude of the first-order state correction mixing coefficient |c_m| for each basis state m=1 through 7 mixed into the perturbed ground state, at lambda=0.01. Only two bars are off the axis: |c_2| at 0.0106 and |c_4| at 0.0031. The odd-m bars and |c_6| are all exactly zero."
 />
 
-Only $|c_2|\approx0.0106$ and $|c_4|\approx0.0031$ survive, and the closer
-neighbour wins by more than a factor of three. Both are small compared
-with the unperturbed state's own coefficient of $1$, which is what makes
-the series trustworthy here: the perturbed ground state is still
-overwhelmingly the unperturbed one.
+Only $|c_2|\approx0.0106$ and $|c_4|\approx0.0031$ survive, a ratio of
+$2\sqrt3$. Both are small compared with the unperturbed state's own
+coefficient of $1$, which is what makes the series trustworthy here: the
+perturbed ground state is still overwhelmingly the unperturbed one.
 
-## Physical Interpretation
+## How to tell whether small was small enough
 
 Perturbation theory is only as good as "$H'$ small" turns out to be, and
 that assumption is easy to accept when nothing is available to check it
@@ -237,16 +241,23 @@ quietly using. Relativistic kinetic corrections and spin-orbit coupling
 were both handled there as a small $H'$ on top of the solved Coulomb
 $H_0$, and $E_n^{(1)}=H'_{nn}$ is the statement that licensed it.
 
-## Worked Example
+## The quartic oscillator's first-order shift
 
 **The quartic anharmonic oscillator, $H=H_0+\lambda x^4$ ($H_0$ the
 ordinary harmonic oscillator, $m=\omega=\hbar=1$). Find the first-order
 ground-state energy shift.**
 
-Using $x=\sqrt{1/2}(a+a^\dagger)$ (Harmonic Oscillator's ladder
-operators), a closed-form identity for the harmonic oscillator gives
-$\langle0|x^4|0\rangle=\frac34$ exactly, independent of perturbation
-theory, a fact about $H_0$'s own ground state alone. So:
+The matrix element $\langle0|x^4|0\rangle$ can be had in two lines from
+the Harmonic Oscillator's ladder operators, with no perturbation theory
+anywhere in it. With $x=\tfrac1{\sqrt2}(a+a^\dagger)$ and $a|0\rangle=0$,
+
+$$
+x^2|0\rangle = \tfrac12\left(a^2+aa^\dagger+a^\dagger a+a^{\dagger2}\right)|0\rangle = \tfrac12|0\rangle + \tfrac{1}{\sqrt2}|2\rangle
+$$
+
+and since $x^2$ is Hermitian, $\langle0|x^4|0\rangle$ is just the squared
+norm of that vector: $\left(\tfrac12\right)^2+\left(\tfrac1{\sqrt2}\right)^2=\tfrac14+\tfrac12=\tfrac34$,
+exactly. That is a fact about $H_0$'s own ground state alone. So:
 
 $$
 E_0^{(1)} = \lambda\langle0|x^4|0\rangle = \frac{3\lambda}{4}
@@ -290,7 +301,7 @@ perturbation strength:
   <BarChartExplorer
     frames={petLambdaFrames}
     sliderLabel="Coupling strength λ"
-    ariaLabel="First- and second-order ground-state energy corrections for the quartic anharmonic oscillator, as the coupling strength λ varies"
+    ariaLabel="Two bars, the first- and second-order ground-state energy corrections for the quartic anharmonic oscillator, as the coupling strength λ slides from 0.002 to 0.1. The first-order bar is positive and grows in proportion to λ, from 0.0015 to 0.0750. The second-order bar is negative throughout and grows as λ², from -0.00001 to -0.0263, so it climbs from well under one percent of the first-order bar to about a third of it. Each bar's printed caption carries its sign; the bar heights show magnitude only."
     maxValue={petMaxAbsCorrection}
   />
 </InteractiveSection>
@@ -311,7 +322,7 @@ telling you something; once it stops shrinking, the next order would be
 no better and the method has run out. Nothing in the formulas announces
 this, which is why the check has to be made by hand.
 
-## Common Mistakes
+## The basis these formulas require
 
 <Callout type="warning">
 **Using H′ in the wrong basis.** These formulas require $H'_{mn}$
@@ -331,17 +342,197 @@ deliberately throws rather than silently returning $\pm\infty$ or NaN).
 
 1. Explain in words why $E_n^{(1)}=H'_{nn}$ requires no sum over other
    states, while $E_n^{(2)}$ does.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because at first order the unknown state correction drops out of the
+   equation, and at second order it does not.
+
+   Follow the algebra once and the asymmetry stops looking arbitrary.
+   Write $H=H_0+\lambda H'$ and expand both the state and the energy in
+   powers of $\lambda$. Collecting the $O(\lambda)$ terms of
+   $H|\psi_n\rangle=E_n|\psi_n\rangle$ gives
+
+   $$
+   H_0|n^{(1)}\rangle + H'|n^{(0)}\rangle = E_n^{(0)}|n^{(1)}\rangle + E_n^{(1)}|n^{(0)}\rangle
+   $$
+
+   which still contains the unknown $|n^{(1)}\rangle$. Project it onto
+   $\langle n^{(0)}|$ and watch that unknown leave. Because $H_0$ is
+   Hermitian it can act leftward on $\langle n^{(0)}|$, giving
+   $\langle n^{(0)}|H_0|n^{(1)}\rangle=E_n^{(0)}\langle n^{(0)}|n^{(1)}\rangle$,
+   which is identical to the first term on the right. The two cancel, and
+   what is left is
+
+   $$
+   E_n^{(1)} = \langle n^{(0)}|H'|n^{(0)}\rangle
+   $$
+
+   with no reference to how the state moved. Hermiticity of $H_0$ is the
+   load-bearing hypothesis; without it the cancellation does not happen.
+
+   At second order the same projection gives
+   $E_n^{(2)}=\langle n^{(0)}|H'|n^{(1)}\rangle$, which needs
+   $|n^{(1)}\rangle$ explicitly, and $|n^{(1)}\rangle$ is a sum over every
+   other state. So the sum in $E_n^{(2)}$ is not a new ingredient. It is
+   the first-order *state* correction, arriving one order late in the
+   energy.
+
+   The physical reading of the same fact: to first order the state has not
+   yet moved anywhere that matters, so the energy shift is just the
+   average of $H'$ over the state you already had. Only at second order
+   does the system get credit for rearranging itself in response to the
+   perturbation, and rearranging means consulting the states it can
+   rearrange into.
+
+   This pattern continues, and the general result is worth knowing about:
+   the state correct to order $k$ determines the energy to order $2k+1$.
+   Knowing $|n^{(1)}\rangle$ is enough for the energy through third order.
+
+   </details>
+
 2. For the quartic oscillator worked example, is $E_0^{(2)}$ (this
    course's engine gives a small negative number) consistent with the
    general expectation that a repulsive perturbation ($\lambda x^4>0$
    everywhere) still gives a negative second-order correction? (Hint:
    second-order corrections to the *ground* state are always
    $\leq0$. Why?)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Yes, and the negativity is guaranteed rather than observed. Look at the
+   formula for $n=0$:
+
+   $$
+   E_0^{(2)} = \sum_{m\neq0}\frac{|H'_{m0}|^2}{E_0^{(0)}-E_m^{(0)}}
+   $$
+
+   Every numerator is a squared magnitude, so $\ge0$. Every denominator
+   has $E_0^{(0)}$ as the smallest unperturbed energy in the spectrum, so
+   every denominator is negative. Each term is therefore $\le0$ and so is
+   the sum. The sign of $H'$ never entered: a repulsive perturbation, an
+   attractive one, or a wildly oscillating one all give a non-positive
+   second-order shift to the ground state.
+
+   No contradiction with $\lambda x^4>0$ raising the energy, because the
+   two orders are answering different questions. First order is
+   $+3\lambda/4$, positive and linear in $\lambda$; second order is
+   negative and quadratic. For small $\lambda$ the first dominates, the
+   net shift is up, and the second-order term is a modest walk-back, as
+   the energy-level diagram above shows.
+
+   The reason behind the sign is worth having, because it is not really
+   about perturbation theory. Take the unperturbed ground state
+   $|0^{(0)}\rangle$ as a trial state for the full $H$. The variational
+   principle, which the next lesson develops, says the true ground energy
+   cannot exceed the expectation value of $H$ in any trial state:
+
+   $$
+   E_0^{\text{exact}} \le \langle 0^{(0)}|H|0^{(0)}\rangle = E_0^{(0)} + E_0^{(1)}
+   $$
+
+   So the sum of all corrections beyond first order has to be
+   non-positive, and $E_0^{(2)}$ is the leading one. The negativity is the
+   variational bound showing up inside a perturbation series.
+
+   Physically this is level repulsion. Coupling pushes pairs of levels
+   apart, and the ground state has no level below it to be pushed up by,
+   so it can only go down. Excited states have neighbours on both sides
+   and their second-order shifts can go either way, which is why the
+   guarantee is specific to $n=0$.
+
+   </details>
+
 3. If $H'_{mn}=0$ for all $m\neq n$ at a particular $n$, what does this
    imply about $E_n^{(2)}$ and $|n^{(1)}\rangle$ at that $n$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Both vanish, term by term: every summand in $E_n^{(2)}$ carries a
+   factor $|H'_{mn}|^2=0$, and every coefficient in $|n^{(1)}\rangle$
+   carries a factor $H'_{mn}=0$. The state does not mix, and the
+   second-order energy shift is zero.
+
+   The stronger conclusion is available and is the real answer. Expand
+   $H'|n^{(0)}\rangle$ in the $H_0$ basis:
+
+   $$
+   H'|n^{(0)}\rangle = \sum_m |m^{(0)}\rangle\,H'_{mn} = H'_{nn}\,|n^{(0)}\rangle
+   $$
+
+   since every term but $m=n$ is zero. So $|n^{(0)}\rangle$ is an exact
+   eigenvector of $H'$, and therefore of $H=H_0+H'$:
+
+   $$
+   H|n^{(0)}\rangle = \left(E_n^{(0)} + H'_{nn}\right)|n^{(0)}\rangle
+   $$
+
+   This is not "the corrections happen to vanish at second order." It is
+   an exact result at every order. The first-order answer is the whole
+   answer, the perturbation series terminates, and $H'$ was never a
+   perturbation for this state in the first place, however large
+   $H'_{nn}$ may be. Note that "small" was not used anywhere in the
+   argument.
+
+   A concrete case from the previous course: a hydrogen atom in a uniform
+   magnetic field along $z$ acquires $H'\propto L_z$, which is diagonal in
+   the $|n,l,m\rangle$ basis. Every off-diagonal element vanishes, so the
+   Zeeman shift proportional to $m$ is exact within that model rather than
+   a first-order estimate. Compare an electric field, where
+   $H'\propto z$ has the opposite structure: parity forces every diagonal
+   element to zero, so the ground state gets no first-order shift at all
+   and the leading Stark effect on it is second order. Which entries of
+   $H'$ vanish decides everything about how the series behaves.
+
+   </details>
+
 4. Why does the first-order state correction conventionally set its own
    $|n^{(0)}\rangle$ coefficient to exactly 0, rather than leaving it
    undetermined?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the equations genuinely do not determine it, so something has
+   to, and zero is the choice that costs nothing and simplifies
+   everything.
+
+   The undetermination is structural. The first-order equation can be
+   rearranged to
+
+   $$
+   \left(H_0 - E_n^{(0)}\right)|n^{(1)}\rangle = \left(E_n^{(1)} - H'\right)|n^{(0)}\rangle
+   $$
+
+   and the operator on the left annihilates $|n^{(0)}\rangle$. So if
+   $|n^{(1)}\rangle$ is a solution, then $|n^{(1)}\rangle+c|n^{(0)}\rangle$
+   is an equally valid solution for any $c$. The component along
+   $|n^{(0)}\rangle$ is invisible to the equation. Leaving it undetermined
+   would make every downstream formula ambiguous with nothing gained.
+
+   Zero is the right choice because the freedom is not physical. Adding
+   $c|n^{(0)}\rangle$ produces
+   $(1+\lambda c)|n^{(0)}\rangle+\lambda(\text{rest})$, so a real $c$
+   rescales the state and an imaginary $c$ rotates its overall phase.
+   Neither changes any probability or expectation value. What the choice
+   does change is bookkeeping, and $c=0$ makes the bookkeeping clean: with
+   $|n^{(1)}\rangle$ orthogonal to $|n^{(0)}\rangle$, the perturbed state
+   satisfies $\langle n|n\rangle=1+\lambda^2\langle n^{(1)}|n^{(1)}\rangle
+   +\cdots$, with no first-order norm error to correct for, and every
+   correction beyond the zeroth is orthogonal to the state it corrects.
+
+   This is called intermediate normalization, $\langle n^{(0)}|n\rangle=1$,
+   and the thing to be clear about is its status. It is a convention, not
+   a result. Nothing physical follows from it, and nothing physical would
+   break under a different choice. It is worth recognizing that class of
+   step when it appears, because mistaking a convention for a derived fact
+   is how people end up trying to prove things that are simply true by
+   agreement.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -358,7 +549,7 @@ deliberately throws rather than silently returning $\pm\infty$ or NaN).
 - The series carries no built-in warning when it stops working. Comparing
   consecutive orders, as the curve above does, is the available substitute.
 
-## Further Exploration
+## An approximation that needs no small parameter
 
 <NextDiscovery>
 [The Variational Method](/lessons/quantum-mechanics/approximation-methods/the-variational-method) is a completely different approximation

@@ -21,19 +21,51 @@ export const symmetricVersusSelfAdjoint: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["domain", "D(A)", "D(A†)", "domain of the adjoint"],
-      ["equal", "match", "same", "exactly"],
-      ["finite", "matrix", "automatic", "whole space"],
+      {
+        phrases: [
+          "domain of the adjoint",
+          "adjoint's domain",
+          "domain of A dagger",
+          "adjoint has its own domain",
+          "where the adjoint lives",
+        ],
+        missingFeedback:
+          "Symmetry is checked on the vectors A itself is defined on, and nothing more. Self-adjointness compares that collection with a second one belonging to A†. Name the standard word for such a collection; it is the word your answer is missing.",
+      },
+      {
+        phrases: [
+          "domains are equal",
+          "domains must be equal",
+          "domains coincide",
+          "same domain",
+          "equal domain",
+          "domains match",
+          "both domains",
+          "domains agree",
+          "the same set of vectors",
+        ],
+        missingFeedback:
+          "You have named the two collections but not the relation required between them. Containment one way round is what symmetry already gives you. Self-adjointness demands more than that; say exactly how much more.",
+      },
+      {
+        phrases: ["finite", "matrix", "automatic", "whole space", "entire space"],
+        missingFeedback:
+          "You have the extra condition. Now say why nobody ever meets it in a linear algebra course: on what set of vectors is an operator in n dimensions defined, and on what set is its adjoint?",
+      },
     ],
     incorrectFeedback:
-      "Address all three pieces: what domain condition self-adjointness adds, that the domains must match exactly (not just D(A)⊆D(A†)), and why finite dimensions never has to distinguish this.",
+      "Symmetry and self-adjointness are checked against different things, and the answer has to say what. Symmetry asks only that ⟨Aψ,φ⟩ = ⟨ψ,Aφ⟩ hold for vectors A is already defined on. Self-adjointness asks something further about where A† is defined, and 'contained in' is too weak. Then explain why the distinction never came up in the earlier curriculum's setting, where every operator is defined everywhere.",
     partialFeedback:
-      "Good start — now be explicit that D(A)=D(A†) must hold exactly, and connect this to why every finite matrix already satisfies it trivially.",
+      "Good start. Two things still need stating exactly: that 'contained in' is too weak a relation between the two collections of vectors involved, and why the earlier curriculum never had to notice, because there every operator is defined everywhere.",
+    modelAnswers: [
+      "Symmetry only checks the identity on D(A). Self-adjointness additionally requires that the domain of the adjoint is not bigger: the two domains must be equal, not merely nested. In finite dimensions every matrix is defined on the whole space and so is its adjoint, so the domains coincide automatically and the distinction never shows up.",
+      "The extra condition is an equality of domains. The adjoint has its own domain, and self-adjointness demands the same set of vectors. For a matrix both are the entire space, so it holds automatically.",
+    ],
   },
   hints: [
-    { text: "Symmetry is a statement about D(A) only. Self-adjointness compares D(A) to D(A†), a possibly different (larger) set." },
-    { text: "It's not enough for D(A) to be contained in D(A†); self-adjointness needs D(A)=D(A†) exactly." },
-    { text: "In finite dimensions, every linear operator is automatically defined on the entire space, so D(A)=D(A†)=the whole space trivially — there's no room for the two to differ." },
+    { text: "Symmetry is a statement about the vectors A is defined on, and only those. Self-adjointness compares that collection with a possibly larger one belonging to A†." },
+    { text: "Containment one way round is not enough. Say what the stronger requirement is." },
+    { text: "In the setting the earlier curriculum worked in, every operator is defined on every vector, and so is its adjoint, so there is no room for the two collections to differ." },
   ],
   solution: {
     steps: [
@@ -43,17 +75,17 @@ export const symmetricVersusSelfAdjoint: ConceptualProblem = {
       },
       {
         description:
-          "In finite dimensions every linear operator's domain is automatically the whole space ℂⁿ, and so is its adjoint's — so D(A)=D(A†)=ℂⁿ is forced trivially, and symmetric and self-adjoint collapse into the same single condition A=A†.",
+          "In finite dimensions every linear operator's domain is the whole space ℂⁿ, and so is its adjoint's, so D(A)=D(A†)=ℂⁿ is forced trivially and symmetric and self-adjoint collapse into the same single condition A=A†.",
       },
     ],
     finalAnswer:
-      "Self-adjointness requires D(A)=D(A†) exactly (not just D(A)⊆D(A†)); this is automatic in finite dimensions (both domains are the whole space) but a genuine extra condition on a function space, where an operator like p̂ on a half-line can be symmetric yet admit no self-adjoint extension at all.",
+      "Self-adjointness requires the adjoint's domain to equal D(A) exactly, not merely to contain it. In finite dimensions both domains are the whole space, so the requirement holds automatically and the distinction never surfaces; on a function space it is a genuine extra condition, and p̂ on a half-line is symmetric while admitting no self-adjoint extension at all.",
   },
   explanation: {
     correctIdea:
       "The lesson's central distinction: symmetry is a one-domain boundary-term calculation, self-adjointness is a two-domain equality, and only the latter guarantees the physics (real spectrum, unitary time evolution) that Hermitian Operators proved for matrices.",
     whyCorrect:
-      "Matches the lesson's explicit definitions and the half-line worked example, where the operator is symmetric on a natural domain but has unequal deficiency indices, so no self-adjoint extension exists.",
+      "Symmetry constrains A only on the vectors it is defined for; self-adjointness additionally pins down where A† is defined, and containment one way round is not enough. The half-line momentum operator shows the gap is real: it is symmetric, its deficiency indices are unequal, and no choice of domain repairs it.",
     whyWrong: [
       "Saying self-adjoint 'just means A=A†' without addressing domains restates the finite-dimensional shortcut without explaining why it stops being sufficient on a function space.",
     ],

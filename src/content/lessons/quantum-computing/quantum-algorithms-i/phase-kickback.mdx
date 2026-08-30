@@ -36,6 +36,10 @@ export const kickbackFrames = kickbackAncillaPresets.map((preset, i) => ({
   })),
 }));
 
+export const kickbackMaxAmplitude = Math.max(
+  ...kickbackFrames.flatMap((frame) => frame.bars.map((bar) => Math.abs(bar.value)))
+);
+
 export const kickbackAncillaPrepGates = [
   [],
   [{ gate: "X", targets: [1] }],
@@ -71,11 +75,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Putting the answer where algorithms want it">
 The last lesson's oracle writes f(x) into a second qubit. Every algorithm from here on wants it somewhere else: as a phase multiplying |x⟩ directly, with the second qubit left over and unchanged.
 </LessonHook>
 
-## Motivation
+## The right value, in the wrong place
 
 The last lesson's <Term id="oracle">oracle</Term>, $U_f|x\rangle|y\rangle=|x\rangle|y\oplus f(x)\rangle$,
 is the honest definition, and it puts $f(x)$ in the wrong place. A value
@@ -91,7 +95,7 @@ queries.
 It can, and the whole trick is choosing what to put in the output register
 before you call $U_f$. One line of algebra below does it.
 
-## Mathematical Development
+## Prepare the ancilla differently and watch the sign move
 
 ### The derivation
 
@@ -175,14 +179,14 @@ matches `applyPhaseOracle` applied directly, to floating-point precision.
 
 Prepare the input register in $|+\rangle$ and apply the same oracle
 $f(x)=x$ used throughout this lesson (`balancedFunction(1)` on one input
-qubit), but scrub through four different ancilla preparations. Only one of
-them produces the clean phase pattern this lesson derived:
+qubit), but scrub through four different ancilla preparations and compare
+what each one does to the output amplitudes:
 
 <PredictBeforeReveal
   question="Same oracle U_f (f(x)=x), same input register |+⟩, but the ancilla is prepared in |0⟩ instead of |−⟩. What happens to the output?"
   options={[
     { label: "Same phase pattern as |−⟩, since it's the same oracle", value: "same-phase" },
-    { label: "No phase at all: the ancilla gets bit-flipped for some x", value: "bit-flip" },
+    { label: "No phase: the ancilla just gets bit-flipped", value: "bit-flip" },
     { label: "A random, unpredictable mix of amplitudes", value: "random" },
     { label: "The whole state stays |+⟩|0⟩, unchanged", value: "unchanged" },
   ]}
@@ -200,21 +204,25 @@ them produces the clean phase pattern this lesson derived:
       frames={kickbackFrames}
       sliderLabel="Ancilla preparation"
       ariaLabel="Real part of each output amplitude of the bit oracle applied to |+⟩ on the input register, for four different ancilla preparations: 0, 1, plus, and minus"
-      maxValue={0.75}
+      maxValue={kickbackMaxAmplitude}
     />
   </div>
 </InteractiveSection>
 
 Only the $|-\rangle$ frame shows the alternating $+,-,-,+$ sign pattern
-(magnitude $0.5$ on every bar, sign flipped exactly on the two basis states
-where $x=1$): the actual, computed signature of phase kickback, not merely
-asserted. The $|0\rangle$ and $|1\rangle$ frames instead show an ordinary
+(magnitude $0.5$ on every bar, the two bars carrying a minus being
+$|01\rangle$ and $|10\rangle$): the actual, computed signature of phase
+kickback, not merely asserted. Compare it against the input
+$|+\rangle|-\rangle$, whose four amplitudes run $+,-,+,-$, and what the
+oracle flipped is the whole $x=1$ block, $|10\rangle$ and $|11\rangle$, by
+exactly the $(-1)^{f(1)}=-1$ the boxed identity predicts. The $|0\rangle$
+and $|1\rangle$ frames instead show an ordinary
 bit flip (amplitude moves to a different basis state entirely, no sign
 change), and the $|+\rangle$ frame is left unchanged, since
 $|+\rangle$ is the *other* eigenstate of the bit-flip-conditioned-on-$f(x)$
 operation, with eigenvalue $+1$ instead of $-1$.
 
-## Physical Interpretation
+## A property of the whole superposition
 
 Phase kickback turns "compute $f$" into "multiply each branch of a
 superposition by a sign depending on $f$." The second form is a property of
@@ -227,7 +235,7 @@ is the first step inside both Deutsch-Jozsa and Grover's algorithm, and why
 the previous lesson's dead end (one query, one random sample) does not
 apply to them.
 
-## Worked Example
+## The identity checked on one input
 
 **Confirm the kickback identity directly for $x$ such that $f(x)=1$, using
 $|-\rangle=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)$ and the oracle's action on
@@ -243,7 +251,7 @@ $$
 Exactly $(-1)^1|x\rangle|-\rangle = -|x\rangle|-\rangle$, matching the boxed
 formula for $f(x)=1$.
 
-## Common Mistakes
+## The ancilla really does come back unchanged
 
 <Callout type="mistake">
 **Thinking the ancilla's state changes.** It doesn't: $|-\rangle$ is an
@@ -265,14 +273,173 @@ $-1$, which is what this derivation needs.
 
 1. Redo the worked-example derivation for $f(x)=0$ directly (rather than
    citing the boxed formula), confirming the sign comes out $+1$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Start from the oracle's definition and distribute over the ancilla's two
+   terms:
+
+   $$
+   U_f|x\rangle|-\rangle = \frac{U_f|x\rangle|0\rangle - U_f|x\rangle|1\rangle}{\sqrt2} = \frac{|x\rangle|0\oplus f(x)\rangle - |x\rangle|1\oplus f(x)\rangle}{\sqrt2}
+   $$
+
+   Now substitute $f(x)=0$. XOR with $0$ leaves a bit alone, so
+   $0\oplus0=0$ and $1\oplus0=1$:
+
+   $$
+   \frac{|x\rangle|0\rangle - |x\rangle|1\rangle}{\sqrt2} = |x\rangle|-\rangle = (+1)\,|x\rangle|-\rangle
+   $$
+
+   The sign is $+1$: the state is returned untouched. The engine agrees.
+   Running `applyBitOracle` with the constant-$0$ function on
+   $|+\rangle|-\rangle$ returns amplitudes $0.5, -0.5, 0.5, -0.5$, which is
+   $|+\rangle\otimes|-\rangle$ unchanged, while the constant-$1$ function
+   returns $-0.5, 0.5, -0.5, 0.5$, the same state with every sign flipped.
+
+   The two cases are worth holding side by side because they are the whole
+   mechanism. When $f(x)=0$ the ancilla's two branches keep their labels
+   and the minus sign stays where it was. When $f(x)=1$ the labels swap,
+   which moves the minus sign from the second branch to the first, and
+   pulling it back out front is exactly the factor of $-1$. Nothing else
+   happens, and in particular the ancilla is in $|-\rangle$ in both cases.
+
+   The wrong turn is expecting a constant-$0$ oracle to be a no-op that is
+   somehow uninteresting. It is a no-op, and that is precisely what makes
+   the algorithm work: Deutsch-Jozsa distinguishes constant from balanced
+   by whether the phases it writes are all the same, and "all the same"
+   includes all $+1$. A gate that does nothing on every input is
+   information, not the absence of it.
+
+   </details>
+
 2. Explain why $\frac{1}{\sqrt2}\sum_x(-1)^{f(x)}|x\rangle$, obtained after
    discarding the ancilla, is still a valid normalized state on its own.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the phases have magnitude $1$ and normalization only sees
+   magnitudes. For each $x$, $\left|(-1)^{f(x)}c_x\right|^2 = \left|(-1)^{f(x)}\right|^2|c_x|^2 = |c_x|^2$,
+   so the sum of squared magnitudes is unchanged by the sign flips
+   whatever $f$ does. Here every $|c_x|$ is $\tfrac{1}{\sqrt2}$ and there
+   are two terms, giving $\tfrac12+\tfrac12=1$.
+
+   The deeper reason the *discarding* is legitimate is the one the lesson's
+   derivation supplies: the post-oracle state factorizes as
+   $\left(\sum_x(-1)^{f(x)}c_x|x\rangle\right)\otimes|-\rangle$, a genuine
+   product state. The ancilla is not entangled with the input register, so
+   dropping it is not tracing away part of a correlated whole; the input
+   register already has a state vector of its own, and it is normalized
+   because a tensor factor of a normalized product state always is.
+
+   That distinction matters, and it is where the answer earns its keep. If
+   the ancilla had come out entangled with the input register, discarding
+   it would leave the input register in a *mixed* state with no state
+   vector at all, and the algorithm's later Hadamard interference step
+   would have nothing coherent to act on. Preparing the ancilla in
+   $|-\rangle$ is exactly what avoids that: $|-\rangle$ is an eigenstate of
+   the operation the oracle performs on the ancilla, and applying an
+   operator to its own eigenstate cannot entangle it with anything.
+
+   The wrong turn is checking normalization and stopping there. A
+   normalized vector for the input register would also exist if you
+   measured the ancilla and conditioned on the outcome, and that route
+   would destroy the superposition the algorithm needs. What makes this
+   discard free is separability, not arithmetic.
+
+   </details>
+
 3. Suppose $f$ is the constant-1 function. What does phase kickback do to
    $\sum_x c_x|x\rangle$ as a whole? (Compare to a global phase on the
    entire register.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   It multiplies every term by $-1$, giving $-\sum_x c_x|x\rangle$, which
+   is a global phase and therefore physically no change at all.
+
+   Every $x$ has $f(x)=1$, so every amplitude picks up the same factor
+   $(-1)^1$, and a factor common to all terms comes out front. The engine
+   shows it directly: the constant-$1$ oracle turns $|+\rangle|-\rangle$
+   into $-|+\rangle|-\rangle$, with every amplitude negated and every
+   measurement probability identical.
+
+   The comparison the question asks for is the useful part. A *relative*
+   phase, where some amplitudes are flipped and others are not, is
+   physical and is what interference acts on. A *global* phase is a
+   redundancy in the state-vector description, invisible to every
+   measurement in every basis. Phase kickback writes the pattern
+   $(-1)^{f(x)}$, and whether that pattern is physical depends entirely on
+   whether $f$ is constant across the register.
+
+   This is why the constant case is not a failure of the mechanism but the
+   thing Deutsch-Jozsa is built to detect. Constant $f$ leaves the uniform
+   superposition unchanged up to global phase, so the second layer of
+   Hadamards returns it to $|0\rangle^{\otimes n}$ exactly, and the
+   measurement is certain. Balanced $f$ flips exactly half the signs,
+   producing a genuinely different state whose amplitude on
+   $|0\rangle^{\otimes n}$ cancels to zero. The algorithm distinguishes
+   "phase pattern is trivial" from "phase pattern is not", and constant-$1$
+   is the case where it is trivial while still being $-1$ everywhere.
+
+   The wrong turn is expecting constant-$1$ and constant-$0$ to be
+   distinguishable by this circuit. They are not, and they should not be:
+   they differ by a global sign, so no experiment separates their outputs.
+   Deutsch-Jozsa reports "constant" for both and cannot say which, which is
+   an honest limit of what it was asked to decide.
+
+   </details>
+
 4. Phase kickback is sometimes demonstrated with the control qubit of a
    controlled-$U$ gate, not an oracle. Explain the structural similarity:
    what plays the role of "$|-\rangle$" in that more general setting?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   An eigenstate of $U$ plays the role of $|-\rangle$, and the general
+   phase $e^{2\pi i\varphi}$ plays the role of $-1$.
+
+   Line the two up. In the oracle case, $U_f$ acts on the ancilla as
+   $X^{f(x)}$ for each fixed $x$, and $|-\rangle$ is $X$'s eigenstate with
+   eigenvalue $-1$, so the ancilla comes back unchanged and the eigenvalue
+   appears as a factor multiplying $|x\rangle$. In the controlled-$U$ case,
+   put the target register in an eigenstate $|u\rangle$ with
+   $U|u\rangle = e^{2\pi i\varphi}|u\rangle$, and the controlled gate acts
+   as $U$ on the branch where the control is $|1\rangle$ and does nothing
+   on the branch where it is $|0\rangle$:
+
+   $$
+   \text{C-}U\,\frac{|0\rangle+|1\rangle}{\sqrt2}|u\rangle = \frac{|0\rangle + e^{2\pi i\varphi}|1\rangle}{\sqrt2}\,|u\rangle
+   $$
+
+   The target is unchanged and the control has acquired a relative phase.
+   Same mechanism, more general phase: $(-1)$ is the $\varphi=1/2$ case.
+
+   The single sentence covering both: **applying an operator to its own
+   eigenstate multiplies by a number, and in a controlled setting that
+   number lands on the control**. The eigenstate is what makes the target
+   factor out, and the factoring out is what leaves the phase nowhere to go
+   except onto the other register.
+
+   This is not a curiosity, it is the next-but-one lesson's engine. Quantum
+   phase estimation is nothing but this identity repeated with
+   $U^{2^k}$ for a ladder of $k$, writing successive binary digits of
+   $\varphi$ onto successive control qubits, and it is why phase estimation
+   insists on being handed a genuine eigenstate rather than an arbitrary
+   input.
+
+   The wrong turn is answering "$|-\rangle$ generalizes to $|+\rangle$ or
+   to some other fixed state". There is no fixed state that works, because
+   which state is left alone depends on $U$. What generalizes is the
+   *property* of being an eigenstate, and a target prepared in a
+   non-eigenstate gets genuinely changed and entangled with the control
+   instead, which is exactly the failure mode phase estimation's type
+   signature is written to prevent.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -286,7 +453,7 @@ $-1$, which is what this derivation needs.
   exactly `applyPhaseOracle`'s action, verified directly against
   `applyBitOracle`, not just defined to match.
 
-## Further Exploration
+## The first full algorithm built on it
 
 <NextDiscovery>
 [The Deutsch-Jozsa Algorithm](/lessons/quantum-computing/quantum-algorithms-i/the-deutsch-jozsa-algorithm) is the first full algorithm built from

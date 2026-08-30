@@ -182,7 +182,11 @@ export function LossVsDecoherence({
           initial content is not announced, only subsequent changes), and
           nothing on a timer rewrites it — there is no rAF loop or autoplay in
           this component — so it speaks once per press, paced by the reader. */}
-      <p aria-live="polite" className="text-sm text-foreground">
+      {/* `aria-atomic="true"` alongside it: every word here is static except
+          the `<span>` holding `lossTime`, so without atomic a re-roll
+          announced one bare number ("0.43") and nothing that says what it is
+          the time of. */}
+      <p aria-live="polite" aria-atomic="true" className="text-sm text-foreground">
         The accent curve fades continuously, there&rsquo;s no single moment it
         &ldquo;happens.&rdquo; The brand curve stays exactly at 1 and then, at one
         random moment (dashed line, currently t ={" "}

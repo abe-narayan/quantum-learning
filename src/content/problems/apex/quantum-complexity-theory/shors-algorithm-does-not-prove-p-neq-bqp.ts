@@ -15,7 +15,7 @@ export const shorsAlgorithmDoesNotProvePNeqBqp: ConceptualProblem = {
   question: {
     type: "conceptual",
     prompt:
-      "Shor's algorithm places integer factoring in BQP, and no classical polynomial-time factoring algorithm is known. Explain precisely why this does NOT constitute a proof that P != BQP, identifying the two separate facts such a proof would additionally require.",
+      "Shor's algorithm places integer factoring in BQP, and no classical polynomial-time factoring algorithm is known. Explain precisely why this does not constitute a proof that P != BQP, identifying the two separate facts such a proof would additionally require.",
     placeholder:
       "Think about what kind of complexity class factoring actually belongs to, and what 'no known classical algorithm' would need to become in order to prove anything unconditional...",
   },
@@ -34,34 +34,27 @@ export const shorsAlgorithmDoesNotProvePNeqBqp: ConceptualProblem = {
           "believed easier",
         ],
         missingFeedback:
-          "You have the missing hardness proof. The second gap is about where factoring sits: it is not known to be NP-complete, and is believed to lie in NP ∩ coNP, strictly easier. So even a proof of factoring's classical hardness would say nothing about NP-complete problems.",
+          "The missing mathematical claim is covered. The second gap is about placement: even a full account of factoring's classical difficulty would only be an account of factoring. Say where that problem sits relative to the hardest problems in NP, and why that placement blocks the generalisation.",
       },
-      [
-        "unproven",
-        "not proven",
-        "conjecture",
-        "widely believed but not proven",
-        "no proof that factoring is classically hard",
-        "assumption",
-      ],
-      [
-        "unconditional",
-        "lower bound",
-        "prove factoring is not in p",
-        "no classical polynomial-time algorithm has been proven impossible",
-        "nobody has proven",
-        "no one has proven",
-        "never been proven",
-        "not been proven",
-        "no proof",
-        "open problem",
-        "has not been ruled out",
-      ],
+      {
+        phrases: ["unproven", "not proven", "conjecture", "widely believed", "assumption", "believed hard", "assumed hard"],
+        missingFeedback:
+          "You have located factoring in the class landscape. Now be honest about the other leg: what is the actual status of 'nobody has found a fast classical method', as a claim?",
+      },
+      {
+        phrases: ["unconditional", "lower bound", "circuit lower bound", "prove factoring is not in p", "no classical polynomial-time algorithm", "rule out a classical polynomial-time algorithm", "open problem"],
+        missingFeedback:
+          "You have said which parts rest on belief. Say what kind of result would have to replace them, and note that nobody has it.",
+      },
     ],
     incorrectFeedback:
-      "A proof of P != BQP from Shor's algorithm would need two separate things nobody has: (1) an unconditional proof that factoring has no classical polynomial-time algorithm (currently just a widely-believed, unproven conjecture -- the RSA security assumption), and (2) even setting that aside, factoring is not known to be NP-complete (it sits in NP intersect coNP, believed strictly easier), so a hardness result about factoring specifically wouldn't generalize to NP-complete problems anyway. All that's unconditionally proven is: factoring is in BQP, and no classical polynomial algorithm for it is currently known.",
+      "Two separate gaps get skipped here, and both are easy to miss because the algorithm really is a landmark. The first confuses 'nobody has found a fast classical method' with 'no fast classical method exists'. One is a fact about the last fifty years of effort; the other is a mathematical claim that has never been established. The second gap is about placement: factoring is widely thought to be easier than the hardest problems in NP, so even closing the first gap would say nothing about those.",
     partialFeedback:
-      "You have part of the picture -- make sure you name both missing pieces: the unproven classical-hardness assumption AND the fact that factoring isn't known to be NP-complete.",
+      "Half of it is there. There are two separate gaps, not one: the missing mathematical claim about classical difficulty, and the question of where factoring sits relative to the hardest problems in NP. Name both.",
+    modelAnswers: [
+      "Shor puts factoring in BQP, but 'no known classical algorithm' is not a proof. That factoring is classically hard is a widely believed conjecture, not a theorem, and you would need an unconditional lower bound ruling out any classical polynomial-time algorithm to close it. Factoring also is not known to be NP-complete; it sits in NP intersect coNP and is believed easier.",
+      "Two things are missing. First, factoring is not NP-complete, it lives in NP and coNP, so it is believed easier than the hard cases. Second, the claim that it has no classical polynomial-time algorithm is unproven; proving P != BQP would need an unconditional circuit lower bound, which is an open problem.",
+    ],
   },
   hints: [
     {
@@ -82,7 +75,7 @@ export const shorsAlgorithmDoesNotProvePNeqBqp: ConceptualProblem = {
       },
       {
         description:
-          "A proof of $\\mathsf{P}\\neq\\mathsf{BQP}$ via factoring would need factoring $\\notin\\mathsf{P}$ proven unconditionally. This is not proven -- it is the RSA security conjecture, believed but unproven.",
+          "A proof of $\\mathsf{P}\\neq\\mathsf{BQP}$ via factoring would need factoring $\\notin\\mathsf{P}$ proven unconditionally. That has not been proven; it is the RSA security conjecture, believed but open.",
       },
       {
         description:
@@ -94,13 +87,13 @@ export const shorsAlgorithmDoesNotProvePNeqBqp: ConceptualProblem = {
       },
     ],
     finalAnswer:
-      "Shor's algorithm proves factoring is in BQP, but proving P != BQP would additionally require an unconditional proof that factoring has no classical polynomial-time algorithm (currently just a widely-believed, unproven conjecture), and factoring is not even known to be NP-complete (it's in NP ∩ coNP, believed strictly easier) -- so neither piece needed for an unconditional separation theorem exists.",
+      "Shor's algorithm proves factoring is in BQP, but proving P != BQP would additionally require an unconditional proof that factoring has no classical polynomial-time algorithm (currently a widely believed, unproven conjecture). Factoring is also not known to be NP-complete; it sits in NP ∩ coNP, believed strictly easier. Neither piece needed for an unconditional separation theorem exists.",
   },
   explanation: {
     correctIdea:
       "Shor's algorithm is a real, unconditional theorem about where factoring sits (in BQP), but the popular leap to 'quantum computers are proven more powerful' skips over two separate unproven claims.",
     whyCorrect:
-      "Distinguishing 'proven theorem' from 'strong conditional evidence resting on an unproven, widely-believed assumption' is exactly the precision complexity theory is built to provide, and exactly the mistake this lesson's mandated Callout warns against.",
+      "Distinguishing 'proven theorem' from 'strong conditional evidence resting on an unproven, widely believed assumption' is the precision complexity theory is built to provide, and collapsing the two is the mistake this lesson warns against.",
     whyWrong: [
       "Assuming 'no known classical algorithm' is the same as 'no classical algorithm exists' collapses a historical fact (decades of failed attempts) into an unconditional lower bound, which is a categorically different, much stronger kind of statement.",
       "Assuming factoring's hardness would settle P vs. BQP in general: even a proof of factoring's classical hardness would only witness one specific problem separating the classes, and would say nothing about NP-complete problems since factoring isn't known to be NP-complete.",

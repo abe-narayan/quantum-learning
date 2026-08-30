@@ -31,7 +31,7 @@ export const rabiProbabilityAtTime: NumericProblem = {
   hints: [
     { text: "The formula from the lesson is P(t) = cos²(ωt/2)." },
     { text: "With ωt = π/3, the argument of cosine is π/6." },
-    { text: "cos(π/6) = √3/2 — square it." },
+    { text: "cos(π/6) = √3/2. Square it." },
   ],
   solution: {
     steps: [

@@ -6,16 +6,21 @@ import { Section } from "@/components/ui/Section";
 // the graph and its rendering are entirely client-side), so this is purely a
 // perceived-performance nicety.
 //
-// Shape mirrors MapPage + ConceptMapExplorer. The three stacked header rows
-// below are not padding for its own sake: the explorer grew an orientation
-// block ("Every box is one idea…" plus the Graph/List switch, the "Start at
-// the beginning" button and the "Show me the path to" picker), a
-// legend/zoom-controls row, and a status line — roughly 220px of chrome —
-// while this skeleton still drew the single 57px toolbar it had before any of
-// that existed. The whole point of a skeleton is that nothing moves when the
-// real thing arrives, and this one shifted the graph viewport up the page by
-// most of its own height on every /map navigation. When the explorer's header
-// changes, this has to change with it.
+// Shape mirrors MapPage + ConceptOutline, NOT ConceptMapExplorer. That is the
+// change: the explorer is no longer what arrives at the end of a /map
+// navigation. `ConceptMapSurface` now renders the server-rendered
+// `ConceptOutline` first and hands over to the explorer only once its chunk
+// has loaded, so the thing this skeleton stands in for is a single panel with
+// an intro line and a running list of concepts, not a graph viewport with a
+// legend row, a zoom row and a side detail panel. Mirroring the explorer's
+// ~220px of chrome here would put a wall of controls on screen that the next
+// paint does not contain, which is the same defect this file was last edited
+// to fix, pointed the other way.
+//
+// The panel below is deliberately one plain block rather than a guess at the
+// outline's real height: the outline runs its natural length (59 concepts) and
+// no fixed skeleton can match that, so it matches the first screenful and
+// stops. When ConceptOutline's header changes, this has to change with it.
 export default function MapLoading() {
   return (
     <Section className="animate-pulse">
@@ -34,44 +39,22 @@ export default function MapLoading() {
       <div className="mt-3 h-4 w-full max-w-prose rounded bg-surface-muted" />
       <div className="mt-2 h-4 w-2/3 max-w-prose rounded bg-surface-muted" />
 
-      <div className="mt-10 grid gap-4 lg:grid-cols-[1fr_360px]">
-        <div className="overflow-hidden rounded-panel border border-border bg-surface">
-          {/* Orientation block: the explanatory sentence and the view switch
-              on one wrapping row, then the two entry-point controls. */}
-          <div className="border-b border-border px-4 py-4">
-            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
-              <div className="flex-1 space-y-2">
-                <div className="h-4 w-full max-w-prose rounded bg-surface-muted" />
-                <div className="h-4 w-2/3 max-w-prose rounded bg-surface-muted" />
-              </div>
-              <div className="h-11 w-[8.5rem] shrink-0 rounded-(--radius-tight) bg-surface-muted" />
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <div className="h-11 w-52 rounded-(--radius-tight) bg-surface-muted" />
-              <div className="h-11 w-64 rounded-(--radius-tight) bg-surface-muted" />
-            </div>
-          </div>
-
-          {/* Pillar legend on the left, zoom and path controls on the right. */}
-          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border px-4 py-2">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-3 w-24 rounded bg-surface-muted" />
-              ))}
-            </div>
-            <div className="h-11 w-64 rounded-full bg-surface-muted" />
-          </div>
-
-          {/* The "what is selected" status line. */}
-          <div className="border-b border-border px-4 py-2">
-            <div className="h-4 w-full max-w-md rounded bg-surface-muted" />
-          </div>
-
-          <div className="h-[420px] bg-surface-muted/30 sm:h-[560px]" />
+      <div className="mt-10 overflow-hidden rounded-panel border border-border bg-surface">
+        {/* ConceptOutline's intro line, above its own border. */}
+        <div className="border-b border-border px-4 py-3 sm:px-5">
+          <div className="h-4 w-full max-w-prose rounded bg-surface-muted" />
+          <div className="mt-2 h-4 w-2/3 max-w-prose rounded bg-surface-muted" />
         </div>
-        <div className="flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-panel border border-border bg-surface p-6 lg:max-h-[652px]">
-          <div className="h-4 w-48 rounded bg-surface-muted" />
-          <div className="h-4 w-56 rounded bg-surface-muted" />
+        {/* One pillar heading and a few concept rows: the shape of the first
+            screenful of the outline. Row height matches a concept row's title,
+            definition and lesson-link lines. */}
+        <div className="p-4 sm:p-5">
+          <div className="h-3 w-40 rounded bg-surface-muted" />
+          <div className="mt-2 space-y-1.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-24 rounded-(--radius-tight) bg-surface-muted/40" />
+            ))}
+          </div>
         </div>
       </div>
     </Section>

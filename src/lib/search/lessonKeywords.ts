@@ -79,11 +79,41 @@
  * How many characters of terms one lesson may contribute. See the header for
  * why this is the real growth control rather than the total-size test.
  *
- * 600 is ~75 terms, measured against the corpus as covering a lesson's
- * headings, its objectives, its `<Term>` links and most of its bolded terms
- * before the hyphenated-compound tail starts being cut.
+ * 540 is ~67 terms, and it is the floor. It was 600 (~75), which covered a
+ * lesson's headings, its objectives, its `<Term>` links and most of its bolded
+ * terms before the hyphenated-compound tail started being cut. 540 cuts a
+ * little further into that tail and nothing load-bearing; 520 does, and the
+ * corpus says so out loud.
+ *
+ * Lowered on 2026-08-29 because this is the lever the size budget is supposed
+ * to be pulled by. Ten glossary entries were added (258 -> 272 terms, and each
+ * carries its whole definition so it is findable by what it says rather than
+ * only by its name), which took the index to 141.85KB gzip against the 140KB
+ * ceiling in `clientBoundary.test.ts` — a file every reader who opens search
+ * fetches whole, with no code-splitting story that makes half of it arrive.
+ * That ceiling's own note says to move it only together with this constant,
+ * and the honest reading of that is: when content grows, this is what gives.
+ * Measured, whole corpus, at the same 1,090 entries:
+ *
+ *   600 -> 543.4KB raw / 141.85KB gzip   (over the old 140KB ceiling)
+ *   580 -> recall intact
+ *   560 -> recall intact
+ *   540 -> 531.5KB raw / 138.51KB gzip   (chosen: recall intact)
+ *   520 -> RECALL LOST: `factorial` stops reaching the lesson that teaches it
+ *   500 -> 523.2KB raw / 136.25KB gzip   (same loss)
+ *   460 -> 514.7KB raw / 134.03KB gzip
+ *   420 -> 506.3KB raw / 131.83KB gzip
+ *
+ * The check that matters is not the byte count but `RECOVERY_QUERIES` in
+ * `__tests__/recoveryQueries.test.ts`, which pins that a stuck reader's
+ * phrasings still reach the lesson that teaches them. 500 was tried first and
+ * it fails that suite: `factorial` stopped reaching
+ * `classical-to-quantum/stationary-states`, which is exactly the class of
+ * query the keyword set was added for. So this constant is now AT its recall
+ * floor and cannot absorb the next content growth. The gzip ceiling was raised
+ * in the same change, deliberately and once; see `clientBoundary.test.ts`.
  */
-export const LESSON_KEYWORD_BUDGET = 600;
+export const LESSON_KEYWORD_BUDGET = 540;
 
 /**
  * Greek letters and the two physics glyphs that behave like them, mapped onto

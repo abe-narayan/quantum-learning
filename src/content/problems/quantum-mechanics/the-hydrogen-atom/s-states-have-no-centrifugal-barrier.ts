@@ -14,30 +14,42 @@ export const sStatesHaveNoCentrifugalBarrier: ConceptualProblem = {
   },
   question: {
     type: "conceptual",
-    prompt: "Explain why V_eff(r) reduces to exactly V(r), with no centrifugal contribution at all, for l=0 states — and what this implies about whether an s-state electron can be found at r=0.",
+    prompt: "Explain why V_eff(r) reduces to exactly V(r), with no centrifugal contribution at all, for l=0 states, and what this implies about whether an s-state electron can be found at r=0.",
     placeholder: "The centrifugal term is l(l+1)ħ²/2mr². For l=0...",
   },
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["l(l+1)", "l=0", "zero", "vanishes"],
-      ["r=0", "at the nucleus", "origin"],
+      {
+        phrases: ["l(l+1)=0", "l(l+1) = 0", "0(0+1)", "coefficient vanishes", "coefficient is zero", "term vanishes", "vanishes identically", "vanishes entirely", "centrifugal term vanishes", "centrifugal term disappears", "drops out", "becomes zero", "evaluates to zero", "zero times one"],
+        missingFeedback:
+          "Evaluate the centrifugal term's coefficient at l=0 before anything else. Say what number it comes to, and what that does to the term it multiplies.",
+      },
+      {
+        phrases: ["nonzero density at r=0", "nonzero probability at r=0", "nonzero at r=0", "nonzero at the origin", "nonzero amplitude there", "can be found at the nucleus", "can reach the nucleus", "reaches the origin", "found at the origin", "nothing keeps it away", "no barrier keeping", "only s states", "only s-states"],
+        missingFeedback:
+          "You have the effective potential. Now say what its shape near the origin allows, and what that means for whether an s state has any presence at the nucleus.",
+      },
     ],
-    incorrectFeedback: "Substitute l=0 into the centrifugal coefficient l(l+1) and note what value it gives.",
-    partialFeedback: "Good — now connect this to whether an s-state electron can have nonzero probability density at the nucleus.",
+    incorrectFeedback: "You quoted the shape of V_eff without evaluating it. Put the s-state's angular quantum number into the centrifugal coefficient and compute the number it gives, then say what a potential with nothing extra added to it permits at the very centre.",
+    partialFeedback: "You have the coefficient's value. Now draw the physical consequence: with nothing pushing the electron outward, is there anything stopping it from being found at the very centre of the atom?",
+    modelAnswers: [
+      "With l=0 the coefficient is 0(0+1)=0, so the centrifugal term vanishes identically and V_eff is exactly V(r). Since nothing keeps the electron away from the origin, an s state can have nonzero density at r=0, which a p state cannot.",
+      "The centrifugal term's coefficient is zero when l=0, so that term drops out entirely. There is no barrier keeping the electron out, so it can be found at the nucleus.",
+    ],
   },
   hints: [
-    { text: "The centrifugal coefficient is l(l+1)." },
-    { text: "For l=0: 0(0+1)=0 — the entire centrifugal term vanishes identically." },
-    { text: "With no repulsive barrier, s states are the only states with nonzero probability density exactly at the nucleus." },
+    { text: "The centrifugal term carries a coefficient that depends on the angular quantum number. Write that coefficient down." },
+    { text: "Now evaluate it for an s state. What number comes out, and what does the whole centrifugal term become?" },
+    { text: "Compare V_eff with V. With nothing added, ask what stops the electron reaching the very centre, and then check whether the 1s and 2p radial functions agree with your answer there." },
   ],
   solution: {
     steps: [
       { description: "l(l+1)ħ²/2mr² with l=0 gives 0×1×ħ²/2mr²=0 for any r>0." },
-      { description: "So V_eff(r)=V(r) exactly for l=0 — no effective repulsion pushes the electron away from r=0." },
+      { description: "So V_eff(r)=V(r) exactly for l=0, and no effective repulsion pushes the electron away from r=0." },
       { description: "This is why only s states (l=0) have nonzero probability density exactly at the nucleus; every l>0 state is forced away from r=0 by its centrifugal barrier." },
     ],
-    finalAnswer: "l(l+1)=0 for l=0, so the centrifugal term vanishes identically and V_eff=V — s states alone can have nonzero density at r=0.",
+    finalAnswer: "l(l+1)=0 for l=0, so the centrifugal term vanishes identically and V_eff=V. Only s states can have nonzero density at r=0.",
   },
   explanation: {
     correctIdea: "This directly explains a real, checkable feature of the radial wavefunctions built in this course: radial1s(0)=2 (nonzero), while radial2p(0)=0.",

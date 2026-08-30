@@ -21,7 +21,11 @@ export const whyOneObservableMayNotSuffice: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["same eigenvalue", "multiple eigenvectors", "more than one state"],
+      {
+        phrases: ["same eigenvalue", "equal eigenvalues", "identical eigenvalue", "repeated eigenvalue", "multiple eigenvectors", "multiple states", "more than one state", "more than one eigenvector", "more than one basis", "several states", "two or more states", "shared by multiple", "shared by more than one", "whole eigenspace", "eigenspace", "spans a subspace"],
+        missingFeedback:
+          "Say what a degenerate eigenvalue means about how many states carry it.",
+      },
       {
         phrases: [
           "can't distinguish",
@@ -40,12 +44,20 @@ export const whyOneObservableMayNotSuffice: ConceptualProblem = {
           "still unresolved",
         ],
         missingFeedback:
-          "You have identified the degeneracy. Draw the consequence: the measured eigenvalue does not pick out a single state within that eigenspace, so one observable leaves the system's state ambiguous and a second, commuting observable is needed to resolve it.",
+          "You have identified the degeneracy. Draw the consequence: with the number in hand, list what you now know about the state and what you still do not, and say what would have to be measured next to close the gap.",
       },
     ],
-    incorrectFeedback: "Name both pieces: that a degenerate eigenvalue has more than one eigenvector, and that knowing only the eigenvalue can't tell you which of those eigenvectors (or superposition within that subspace) you actually have.",
+    incorrectFeedback: "You restated the definition of degeneracy without drawing a consequence. Take a concrete case: two basis vectors carrying equal eigenvalues, and a reader holding only the measured number. Say precisely what that reader is entitled to conclude, and what remains open.",
+    modelAnswers: [
+      "A degenerate eigenvalue is shared by more than one basis state, so the number you measure only locates the state somewhere in that whole eigenspace. It cannot tell you which of those states you actually have.",
+      "Several states carry the same eigenvalue, so the result is ambiguous: it does not tell you which one, only that you are somewhere inside the eigenspace they span.",
+    ],
   },
-  hints: [{ text: "If two different basis states share the same eigenvalue, does measuring that eigenvalue distinguish between them?" }],
+  hints: [
+    { text: "Write down two distinct basis vectors that the observable assigns equal numbers to. Such a pair exists precisely because the eigenvalue is degenerate." },
+    { text: "Now imagine you are handed only the measured number. Which of your two vectors does it point to?" },
+    { text: "The same holds for every superposition of those two. Say what has to be measured next, and what property it must have relative to the first observable." },
+  ],
   solution: {
     steps: [
       { description: "A degenerate eigenvalue has more than one eigenvector spanning its eigenspace." },
@@ -54,8 +66,8 @@ export const whyOneObservableMayNotSuffice: ConceptualProblem = {
     finalAnswer: "A degenerate eigenvalue is shared by multiple states, so measuring it alone can't distinguish which of those states (or which combination) you actually have.",
   },
   explanation: {
-    correctIdea: "This is exactly the motivation for needing a complete set of commuting observables rather than relying on one.",
-    whyCorrect: "Matches the lesson's own N=diag(1,1,2) example directly.",
-    whyWrong: ["Saying 'because the observable isn't Hermitian' is wrong — degeneracy has nothing to do with Hermiticity; even a perfectly valid Hermitian observable can have repeated eigenvalues."],
+    correctIdea: "A degenerate eigenvalue is shared by more than one basis state, so the measured number cannot tell you which of them the system is in. It locates the state somewhere inside that eigenspace and no further.",
+    whyCorrect: "The lesson's N=diag(1,1,2) is the smallest case that shows it: the first two basis vectors both return 1, so the number 1 on its own is compatible with either of them and with every superposition of the two.",
+    whyWrong: ["Saying 'because the observable isn't Hermitian' is wrong: degeneracy has nothing to do with Hermiticity. Even a perfectly valid Hermitian observable can have repeated eigenvalues."],
   },
 };

@@ -21,13 +21,13 @@ export const weaklyEntangledStateEntropy: NumericProblem = {
   question: {
     type: "numeric",
     prompt: "Find the entanglement entropy of $|\\psi\\rangle=\\sqrt{0.99}|00\\rangle+\\sqrt{0.01}|11\\rangle$.",
-    inputHint: "in bits, as a decimal — should be well under 1",
+    inputHint: "in bits, as a decimal; well under 1",
   },
   answer: {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "The reduced state here is diag(0.99, 0.01) — apply Shannon entropy directly to that highly unbalanced pair.",
+    incorrectFeedback: "The reduced state here is diag(0.99, 0.01). Apply Shannon entropy directly to that lopsided pair.",
     nearMisses: [
       { value: 0, tolerance: 0.005, feedback: "Zero entropy means a product state. The |11⟩ term has small but nonzero amplitude, so a little entanglement survives." },
       { value: 1, feedback: "1 bit is the Bell-state maximum, reached only by a balanced 50/50 split. A 99/1 split sits near the bottom of the range." },
@@ -48,7 +48,7 @@ export const weaklyEntangledStateEntropy: NumericProblem = {
       { description: "ρ_A = diag(0.99, 0.01)." },
       { description: "$S = -0.99\\log_2(0.99) - 0.01\\log_2(0.01) \\approx 0.0144+0.0664$", latex: "S \\approx 0.081 \\text{ bits}" },
     ],
-    finalAnswer: "S ≈ 0.081 bits — weakly entangled, far from the Bell-state maximum of 1 bit.",
+    finalAnswer: "S ≈ 0.081 bits: weakly entangled, far from the Bell-state maximum of 1 bit.",
   },
   explanation: {
     correctIdea: "A 99/1 amplitude split gives a nearly-pure reduced state, hence low but nonzero entanglement entropy.",

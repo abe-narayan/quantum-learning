@@ -14,49 +14,46 @@ export const whyNoiseConfoundsDebugging: ConceptualProblem = {
   },
   question: {
     type: "conceptual",
-    prompt: "For the worked example's 4-qubit debugging scenario, explain specifically why running on real hardware would make it HARDER, not easier, to isolate a genuine circuit-logic bug.",
+    prompt: "For the worked example's 4-qubit debugging scenario, explain specifically why running on real hardware would make it harder, not easier, to isolate a genuine circuit-logic bug.",
     placeholder: "If results look wrong on real hardware, this could be caused by...",
   },
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      [
-        "two possible causes",
-        "two explanations",
-        "two causes",
-        "logic bug OR hardware",
-        "bug or noise",
-        "code or noise",
-        "or hardware",
-        "or noise",
-        "can't tell which",
-        "cannot tell",
-        "can't tell",
-        "ambiguous",
-        "which one",
-        "either",
-      ],
-      ["simulator", "isolates", "zero physical error", "eliminates one cause"],
+      {
+        phrases: ["two possible causes", "two explanations", "two causes", "logic bug OR hardware", "bug or noise", "code or noise", "or hardware", "or noise", "can't tell which", "cannot tell", "can't tell", "ambiguous", "which one", "either"],
+        missingFeedback:
+          "Say what a wrong-looking result on hardware could be blamed on. There is more than one candidate, and that is the whole difficulty.",
+      },
+      {
+        phrases: ["simulator", "isolates", "zero physical error", "eliminates one cause"],
+        missingFeedback:
+          "You have the ambiguity. Now say what running the same circuit locally does about it, in terms of how many of those candidate causes survive.",
+      },
     ],
-    incorrectFeedback: "Address the specific ambiguity real hardware introduces (two possible causes for a wrong result) and how a simulator eliminates one of them.",
-    partialFeedback: "Good — now be explicit that a simulator's ZERO physical error is what isolates the logic-bug possibility specifically.",
+    incorrectFeedback: "Two things. First, describe the position a debugger is in when a run on real hardware comes back wrong: how many candidate accounts are on the table, and can the result itself distinguish them? Second, describe what running the identical circuit somewhere with no physical faults does to that set of candidates.",
+    partialFeedback: "Good. Now name what a noiseless run buys you specifically: it removes one of the candidate accounts by construction, so a wrong answer there can only mean one thing.",
+    modelAnswers: [
+      "On hardware a wrong result has two possible causes: a genuine logic bug in your circuit, or hardware noise. You cannot tell which one you are looking at, so the observation is ambiguous. A noiseless simulator has zero physical error, which eliminates one cause entirely and isolates the logic.",
+      "If the counts look wrong you can't tell whether it is the code or noise. The simulator removes noise as an explanation, so anything still wrong there has to be a bug.",
+    ],
   },
   hints: [
-    { text: "On real hardware, a wrong-looking result could be caused by either a circuit-logic bug OR genuine hardware noise — you can't immediately tell which." },
-    { text: "A noiseless simulator has zero physical error by construction." },
-    { text: "So if a simulator gives a wrong result, it MUST be a logic bug — eliminating the ambiguity entirely." },
+    { text: "On real hardware a wrong-looking result has more than one possible source, and the result on its own does not tell you which." },
+    { text: "A noiseless run has no physical faults by construction." },
+    { text: "So a wrong answer from that run leaves exactly one account standing. Ask what that buys a debugger." },
   ],
   solution: {
     steps: [
-      { description: "On real hardware, a wrong-looking result has two possible explanations: a genuine circuit-logic bug, OR ordinary hardware noise/error (Noise, Decoherence & Scaling) — and there's no easy way to tell which from the result alone." },
-      { description: "A noiseless simulator has zero physical error by construction — if it gives a wrong result, the ONLY possible explanation is a genuine circuit-logic bug." },
-      { description: "This is why debugging circuit logic is strictly easier on a simulator: it eliminates one of the two possible causes entirely, isolating the question to exactly what's being debugged." },
+      { description: "On real hardware, a wrong-looking result has two possible explanations: a genuine circuit-logic bug, or ordinary hardware noise (Noise, Decoherence & Scaling). There is no easy way to tell which from the result alone." },
+      { description: "A noiseless simulator has zero physical error by construction, so if it gives a wrong result the only possible explanation is a genuine circuit-logic bug." },
+      { description: "That is why debugging circuit logic is strictly easier on a simulator. It eliminates one of the two possible causes entirely, isolating the question to what is being debugged." },
     ],
     finalAnswer: "Real hardware leaves two possible causes for a wrong result (logic bug or hardware noise); a noiseless simulator eliminates the hardware-noise possibility entirely, isolating logic bugs specifically.",
   },
   explanation: {
-    correctIdea: "This makes the lesson's 'simulator is strictly more useful for debugging logic' claim concrete via a specific causal mechanism (eliminating an ambiguity), not just an assertion.",
-    whyCorrect: "Matches the lesson's explicit Worked Example and Common Mistakes sections.",
-    whyWrong: ["Saying hardware is 'just less reliable' without identifying the SPECIFIC ambiguity (can't distinguish bug from noise) misses the actual debugging-methodology point."],
+    correctIdea: "This makes the lesson's 'simulator is strictly more useful for debugging logic' claim concrete through a causal mechanism, eliminating an ambiguity, rather than an assertion.",
+    whyCorrect: "Debugging is elimination, and hardware supplies two live explanations for every wrong result. A noiseless run removes one of them by construction, so a wrong answer there points at the code with no ambiguity left to resolve.",
+    whyWrong: ["Saying hardware is 'just less reliable' without identifying the specific ambiguity, that a bug cannot be distinguished from noise, misses the debugging-methodology point."],
   },
 };

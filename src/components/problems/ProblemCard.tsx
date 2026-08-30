@@ -64,7 +64,7 @@ function cardLabel(problem: ProblemMeta, solved: boolean, ready: boolean): strin
  *  relying on the two hues being told apart. */
 function CapstoneTag() {
   return (
-    <span className="tech-label !text-[0.625rem] rounded-full border border-pillar-edge px-2 py-0.5 text-pillar-text">
+    <span className="tech-label text-micro rounded-full border border-pillar-edge px-2 py-0.5 text-pillar-text">
       Capstone
     </span>
   );
@@ -85,7 +85,7 @@ function CapstoneTag() {
  */
 function ReadyTag() {
   return (
-    <span className="tech-label !text-[0.625rem] rounded-full border border-pillar-edge bg-pillar-wash px-2 py-0.5 text-pillar-text">
+    <span className="tech-label text-micro rounded-full border border-pillar-edge bg-pillar-wash px-2 py-0.5 text-pillar-text">
       Ready
     </span>
   );
@@ -134,9 +134,10 @@ function LessonArrow() {
  * of the lower half of the problem title, silently stealing taps from the
  * card's own destination. So the dense variant is a fixed-width chip on the
  * row's trailing edge, full row height, horizontally clear of the title. It
- * drops to just the word "Lesson" below `sm` — at 320px there is no room for
- * a title beside it, and the link's `aria-label` carries the full name for
- * assistive tech and speech input regardless of what is painted.
+ * drops to just the word "Lesson" below `md` — below that the chip's budget
+ * leaves under ten characters of a lesson title, which is noise rather than
+ * scent — and the link's `aria-label` carries the full name for assistive
+ * tech and speech input regardless of what is painted.
  */
 function LessonLink({
   lessonSlug,
@@ -148,18 +149,36 @@ function LessonLink({
   dense?: boolean;
 }) {
   if (!lessonSlug) return null;
-  const label = lessonTitle ? `Open the lesson “${lessonTitle}”` : "Open the lesson this problem comes from";
+  // Named by its destination, not by the act of clicking: "Open the lesson X"
+  // spends the first and most-heard word of a spoken name on a verb every link
+  // shares. The visible chip reads "LESSON", so the name still opens on the
+  // same word (WCAG 2.5.3 Label in Name, and speech input still matches).
+  const label = lessonTitle ? `Lesson: ${lessonTitle}` : "The lesson this problem comes from";
 
   if (dense) {
     return (
       <Link
         href={`/lessons/${lessonSlug}`}
         aria-label={label}
-        className="relative z-[1] inline-flex min-h-11 max-w-[9rem] shrink-0 items-center gap-1.5 rounded-(--radius-tight) border border-border bg-surface px-2.5 text-[0.6875rem] text-subtle-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:bg-surface-raised hover:text-pillar-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
+        className="relative z-[1] inline-flex min-h-11 max-w-[9rem] shrink-0 items-center gap-1.5 rounded-(--radius-tight) border border-border bg-surface px-2.5 text-meta text-subtle-foreground transition-colors duration-(--dur-fast) hover:border-pillar-edge hover:bg-surface-raised hover:text-pillar-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2 md:max-w-[14rem]"
       >
-        <span className="font-tech shrink-0 uppercase tracking-[0.1em]">Lesson</span>
+        <span className="font-tech shrink-0 uppercase tracking-meta">Lesson</span>
+        {/*
+          `md:`, not `sm:`, and `min-w-0` on the truncating span, because the
+          previous pair did neither of the two things it looked like it did.
+          A flex item's `min-width` is `auto`, so this span could not shrink
+          below its longest word: `truncate` never fired and the chip simply
+          grew past its own `max-w-[9rem]`, stealing width from the problem
+          title beside it. With `min-w-0` it truncates as intended — and once
+          it truncates, 9rem is the wrong budget: 144px less the 46px "LESSON"
+          mark, 20px of padding and the gap leaves ~72px, about ten characters
+          of a lesson title, which is noise rather than scent. At `md` the row
+          has room for 14rem, which leaves ~166px (roughly 23 characters).
+          Below that the chip is the word alone and the full title still
+          reaches assistive tech and speech input through `aria-label`.
+        */}
         {lessonTitle ? (
-          <span aria-hidden="true" className="hidden truncate sm:inline">
+          <span aria-hidden="true" className="hidden min-w-0 truncate md:inline">
             {lessonTitle}
           </span>
         ) : null}
@@ -173,10 +192,22 @@ function LessonLink({
       aria-label={label}
       className="relative z-[1] inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-(--radius-tight) text-xs text-subtle-foreground underline-offset-4 transition-colors duration-(--dur-fast) hover:text-pillar-text hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-pillar focus-visible:outline-offset-2"
     >
-      <span className="font-tech shrink-0 uppercase tracking-[0.1em]">Lesson</span>
-      <span aria-hidden="true" className="truncate">
-        {lessonTitle ?? "open the source lesson"}
-      </span>
+      <span className="font-tech shrink-0 uppercase tracking-meta">Lesson</span>
+      {/* `min-w-0` so `truncate` can actually fire — see the dense branch.
+          Truncating is right *here* and wrong on a row title: this is a
+          secondary reference whose full text is in the link's `aria-label`,
+          and the card would otherwise spend two or three lines on it, whereas
+          a problem's title is the thing the reader is choosing between.
+
+          With no resolvable title the chip is the word and the arrow alone:
+          the old fallback ("open the source lesson") named the click rather
+          than the destination, and the `aria-label` already says where it
+          goes. */}
+      {lessonTitle ? (
+        <span aria-hidden="true" className="min-w-0 truncate">
+          {lessonTitle}
+        </span>
+      ) : null}
       <LessonArrow />
     </Link>
   );
@@ -248,13 +279,17 @@ export function ProblemCard({
     // `Panel` takes an explicit prop list rather than spreading rest props, so
     // the pillar identity is declared on a wrapper around it — the same place
     // it used to sit when the wrapper was the card's `<a>`.
-    <div data-pillar={course?.pillar} className="h-full">
+    // `min-w-0`: this is a grid item in `ProblemGroupBody`, and a grid item's
+    // `min-width` is `auto` (= min-content), so without it the track is floored
+    // at the card's widest unbreakable run rather than at the column it was
+    // given, and a long tag or lesson word widens the whole grid at 320px.
+    <div data-pillar={course?.pillar} className="h-full min-w-0">
       <Panel
         interactive
         className="group relative flex h-full flex-col gap-3 p-5 has-[a:focus-visible]:border-pillar-edge"
       >
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-base font-semibold leading-snug tracking-tight text-foreground group-hover:text-pillar-text">
+        <h3 className="min-w-0 break-words text-base font-semibold leading-snug tracking-tight text-foreground group-hover:text-pillar-text">
           {/* The stretched link: the whole panel is this problem's target,
               with no separate "View"/"Solve" button competing with it. */}
           <Link
@@ -286,7 +321,7 @@ export function ProblemCard({
           {problem.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="rounded-full border border-border px-2 py-0.5 text-[0.6875rem] text-subtle-foreground"
+              className="rounded-full border border-border px-2 py-0.5 text-meta text-subtle-foreground"
             >
               {tag}
             </span>
@@ -302,12 +337,19 @@ export function ProblemCard({
             announces itself once the pointer is already on it is invisible
             to a keyboard user, a touch user, and anyone scanning the page —
             the affordance has to be legible before the interaction, so
-            hover only strengthens it rather than creating it. */}
+            hover only strengthens it rather than creating it.
+
+            "Solve", not "Open": the card is already one target with the title
+            as its accessible name, so this line's only job is to say what the
+            destination is *for*. "Open" said nothing a link does not already
+            say, and named the click instead of the thing at the end of it.
+            `aria-hidden` because the title link's own name carries the whole
+            card; this must not become a second phrase in the same sentence. */}
         <span
           aria-hidden="true"
           className="text-subtle-foreground transition-colors duration-(--dur-fast) group-hover:text-pillar-text"
         >
-          Open &rarr;
+          Solve &rarr;
         </span>
       </div>
       </Panel>
@@ -363,12 +405,33 @@ export function ProblemRow({
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          {/* The truncation lives on the wrapper, never on the stretched link
-              itself: `truncate` sets `overflow: hidden`, and an overflow
-              container clips absolutely-positioned descendants — which would
-              silently shrink the card-wide `::after` overlay back to the width
-              of the title text and undo the whole-row target. */}
-          <span className="min-w-0 truncate">
+          {/*
+            No `truncate` here, on the wrapper or anywhere else, for two
+            separate reasons.
+
+            The one that is a defect: `truncate` sets `overflow: hidden`, and
+            an overflow container clips a descendant's *outline*. The site's
+            `:focus-visible` is an outline at a 2px offset, so it paints from
+            2px to 4px outside the link's border box — and the link fills this
+            wrapper exactly. Tabbing to a row title therefore drew a ring that
+            was clipped away on every side, on ~500 of the 547 rows, with
+            nothing scrollable to recover it: no visible focus indicator at
+            all (WCAG 2.4.7, and 2.4.11 Focus Appearance). The `::after`
+            overlay was never at risk — its containing block is the row, which
+            is an ancestor *of* this wrapper, so the clip does not apply to it.
+
+            The one that is a judgement: at 320px the row's 288px of content
+            is spent on the 20px status mark, two 12px gaps and the ~68px
+            lesson chip, leaving about 176px for the title (the trailing arrow
+            is hidden at this width, below). Titles here run 13 to 76
+            characters, median 43, so a
+            single truncated line showed roughly the first 24 — under half of
+            a typical title, on every row, forever. A title that never has
+            room to finish should wrap, not be cut. `break-words` covers the
+            one case wrapping cannot: the corpus's longest single token
+            ("concurrenceOfPureState", 22 characters) is ~154px at this size.
+          */}
+          <span className="min-w-0 break-words">
             <Link
               href={`/problems/${problem.slug}`}
               aria-label={cardLabel(problem, solved, ready)}
@@ -385,23 +448,31 @@ export function ProblemRow({
           <TypeMark type={problem.problemType} />
           <span className="tech-value">
             {problem.estimatedMinutes}
-            <span className="ml-0.5 text-[0.65rem] text-subtle-foreground">min</span>
+            <span className="ml-0.5 text-micro text-subtle-foreground">min</span>
           </span>
           {/* Below `sm` the course name is the first thing to go: every row is
               already inside a section headed by its pillar or its course, so
               it is the one fact here that is redundant at the width where
-              width is scarcest. */}
-          {course ? <span className="hidden truncate sm:inline">{course.title}</span> : null}
+              width is scarcest. No `truncate`: this is a flex item in a
+              wrapping row, so `min-width: auto` means it can never be squeezed
+              into eliding anything — the class set `overflow: hidden` and
+              nothing else, which reads as a safety net that was never wired
+              up. When the row runs out of width the name wraps to its own
+              line, which is the right outcome anyway. */}
+          {course ? <span className="hidden sm:inline">{course.title}</span> : null}
         </div>
       </div>
 
       <LessonLink lessonSlug={problem.lesson} lessonTitle={lessonTitle} dense />
 
-      {/* Same rule as the card's "Open →": always visible, hover only
-          intensifies it. */}
+      {/* Always visible where it is visible at all, hover only intensifies it.
+          Hidden below `sm`: it is decoration (`aria-hidden`, and the row is
+          already one link with a real name), and at 320px the 14px glyph plus
+          its 12px gap is 26px the title needs more — the difference between
+          about 21 and about 25 characters on the first wrapped line. */}
       <span
         aria-hidden="true"
-        className="shrink-0 text-sm text-subtle-foreground transition-colors duration-(--dur-fast) group-hover:text-pillar-text"
+        className="hidden shrink-0 text-sm text-subtle-foreground transition-colors duration-(--dur-fast) group-hover:text-pillar-text sm:inline"
       >
         &rarr;
       </span>

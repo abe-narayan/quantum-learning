@@ -41,15 +41,15 @@ export const cnotReversedControlTarget: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "This assumes nothing happens — but qubit 1 (the control here) is 1, so the target really is flipped.",
-      c: "This reverses the bit order of the label. Qubit 0 is always the left digit and qubit 1 the right digit — only qubit 0 (the target) actually changes here.",
+      b: "This assumes nothing happens. Qubit 1 is the control here and it equals 1, so the target does flip.",
+      c: "This reverses the bit order of the label. Qubit 0 is the left digit and qubit 1 the right digit, and only qubit 0, the target, changes here.",
       d: "Both qubits changing at once isn't how CNOT works; only the target qubit ever flips, and only when the control is 1.",
     },
     defaultIncorrectFeedback: "Identify qubit 1's value first (it's the control here), then decide whether qubit 0 (the target) flips.",
   },
   hints: [
     { text: "In |01⟩, qubit 0 = 0 and qubit 1 = 1." },
-    { text: "The control here is qubit 1, which equals 1 — so the target does flip." },
+    { text: "The control here is qubit 1, and in |01⟩ that qubit equals 1, so the target does flip." },
     { text: "The target is qubit 0: it flips from 0 to 1." },
   ],
   solution: {
@@ -60,7 +60,7 @@ export const cnotReversedControlTarget: MultipleChoiceProblem = {
     finalAnswer: `$${ketLatex(correct)}$`,
   },
   explanation: {
-    correctIdea: "Which qubit is the control and which is the target is a choice you make explicitly — swapping them changes the gate's action.",
+    correctIdea: "Which qubit is the control and which is the target is an explicit choice, and swapping them changes the gate's action.",
     whyCorrect: "With qubit 1 as control (value 1), the target qubit 0 flips, turning |01⟩ into |11⟩.",
     whyWrong: [
       { optionId: "b", text: "Leaves the state untouched, which ignores that qubit 1, the control here, is 1: the flip does occur." },

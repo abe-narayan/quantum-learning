@@ -17,19 +17,19 @@ export const whyEntanglementIsGeneric: MultipleChoiceProblem = {
     prompt:
       "Which best explains why not every vector in a tensor product space $V\\otimes W$ can be written as a simple product $|v\\rangle\\otimes|w\\rangle$?",
     options: [
-      { id: "a", text: "$V\\otimes W$ has more dimensions than a simple product has free parameters, once both factors have dimension at least 2" },
-      { id: "b", text: "Tensor products are only defined for equal-dimensional spaces" },
-      { id: "c", text: "Vectors in $V\\otimes W$ must always be normalized" },
-      { id: "d", text: "$V\\otimes W$ is not actually a vector space" },
+      { id: "a", text: "$V\\otimes W$ has more dimensions than a simple product has free parameters" },
+      { id: "b", text: "Tensor products are only defined when $V$ and $W$ have equal dimension" },
+      { id: "c", text: "Vectors in $V\\otimes W$ must be normalized, and products rarely are" },
+      { id: "d", text: "$V\\otimes W$ is not actually a vector space, so it has no basis" },
     ],
   },
   answer: {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "The tensor product is defined for spaces of any dimensions, not just equal ones — see the worked example with a 2-dimensional and a 3-dimensional space.",
+      b: "The tensor product is defined for spaces of any dimensions, not just equal ones. See the worked example with a 2-dimensional and a 3-dimensional space.",
       c: "Normalization is a separate condition (relevant to physical states) and has nothing to do with whether a vector factors as a simple product.",
-      d: "V⊗W is a genuine vector space — it has a basis, supports linear combinations, and everything else from the Vector Spaces lesson.",
+      d: "V⊗W is a vector space: it has a basis, supports linear combinations, and everything else from the Vector Spaces lesson.",
     },
     defaultIncorrectFeedback: "Think about counting free parameters: how many are needed to specify a simple product, versus a general vector in V⊗W?",
   },
@@ -40,14 +40,14 @@ export const whyEntanglementIsGeneric: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [
-      { description: "A simple tensor is determined by a direction in V and a direction in W, plus an overall scale — roughly dim(V)+dim(W)-1 parameters." },
+      { description: "A simple tensor is determined by a direction in V and a direction in W, plus an overall scale, which is roughly dim(V)+dim(W)-1 parameters." },
       { description: "V⊗W has dimension dim(V)·dim(W), which grows much faster than dim(V)+dim(W)-1 once both dimensions are at least 2." },
     ],
-    finalAnswer: "Simple products form only a small slice of $V\\otimes W$ — most vectors there don't factor, which is exactly what entanglement is.",
+    finalAnswer: "Simple products form only a small slice of $V\\otimes W$: most vectors there do not factor, and that is what entanglement is.",
   },
   explanation: {
     correctIdea: "Entanglement is a dimension-counting inevitability, not a special quirk of particular states.",
-    whyCorrect: "For two qubits, nm=4 against n+m-1=3 — already a gap, which widens fast for larger systems.",
+    whyCorrect: "For two qubits, nm=4 against n+m-1=3 is already a gap, and it widens fast for larger systems.",
     whyWrong: [
       { optionId: "b", text: "Adds a restriction the definition does not have. The lesson's worked example tensors a 2-dimensional space with a 3-dimensional one." },
       { optionId: "c", text: "Brings in a physical condition on states. Normalization is orthogonal to whether a vector factors; scaling a simple product leaves it simple." },

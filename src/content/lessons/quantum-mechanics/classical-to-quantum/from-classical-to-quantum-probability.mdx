@@ -25,14 +25,14 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="Open both slits, and they stop arriving">
   Open a second slit and, at some spots on the screen, particles stop
   arriving. Either slit alone would have put them there; opening both
   sends the count to zero. No story about a hidden definite path
   survives that.
 </LessonHook>
 
-## Motivation
+## The phenomenon Feynman called impossible
 
 Richard Feynman once called the <Term id="double-slit-experiment">double-slit experiment</Term> "a phenomenon
 which is impossible, absolutely impossible, to explain in any classical
@@ -56,7 +56,7 @@ measured numbers themselves.
   license="CC BY-SA 4.0"
 />
 
-## Intuition
+## One particle at a time, and still a fringe
 
 Fire particles, electrons, photons, even large molecules, one at a
 time at a screen with two narrow slits, and record where each one lands.
@@ -69,7 +69,7 @@ or less often than either single-slit pattern alone would predict, some
 spots going almost completely dark even though *both* slits are open and
 either one alone would have put particles there.
 
-## Mathematical Development
+## Add the amplitudes first, then square
 
 ### The classical prediction
 
@@ -149,12 +149,12 @@ and bottoms out.
 <InteractiveSection
   title="What path 1 and path 2 physically look like"
   description="This is the literal physical picture behind ψ₁ and ψ₂ above: S₁ and S₂ are the two slits, each emitting a coherent wave toward the screen. The screen intensity at each point is the squared magnitude of the sum of the two waves there, exactly |ψ₁+ψ₂|², not the sum of the two individual intensities. Watch how the fringe pattern on the screen builds up from these two overlapping waves before moving to the abstract amplitude picture below.">
-  <LazyWaveInterference tryThisHint="Stop at φ = π/3 ≈ 1.047: the readout should show I/4A² = 0.750, the same partial constructive interference this lesson's worked example finds at θ = π/3 (ψ₁ = 0.6, ψ₂ = 0.6e^{iπ/3}), where the quantum probability (1.08) exceeds the classical prediction (0.72)." />
+  <LazyWaveInterference tryThisHint="Stop at φ = π/3 ≈ 1.047: the readout should show I/4A² = 0.750, the same partial constructive interference this lesson's worked example finds at θ = π/3, where two amplitudes of magnitude 0.6 held a third of a half-turn apart give a quantum probability (1.08) that exceeds the classical prediction (0.72)." />
 </InteractiveSection>
 
 <InteractiveSection
-  title="Sweep the phase, watch interference kill the signal"
-  description="Set the relative phase to π (opposite phase). Watch the combined probability drop to zero even though both individual amplitudes are nonzero. That's the θ=π row above, live. Now sweep the phase slowly from 0 to π and watch the combined probability fall continuously from double the classical value down to zero.">
+  title="Sweep the phase, and read the combined probability"
+  description="Set the relative phase to π (opposite phase), read the combined probability, and compare it against the two individual amplitudes, neither of which is zero. That's the θ=π row above, live. Now sweep the phase slowly back from π to 0, watching where the combined probability sits relative to the classical value at each step.">
   <LazyComplexAmplitudeExplorer />
 </InteractiveSection>
 
@@ -172,7 +172,7 @@ positive probability. No redistribution of hidden ignorance changes that
 row's arithmetic. The amplitude-based rule isn't an alternative
 description of the same physics. It's required by the actual numbers.
 
-## Physical Interpretation
+## Run with molecules, not just electrons
 
 The experiment has been run, not merely imagined, with electrons,
 neutrons, whole atoms, and molecules built from hundreds of atoms, fired
@@ -200,7 +200,7 @@ process. Learning the path changes what the screen shows. That is a claim
 about what measurement is, not about how good detectors are, and the
 lessons on the postulates return to it.
 
-## Worked Example
+## Two amplitudes sixty degrees apart
 
 **Two paths contribute amplitudes $\psi_1 = 0.6$ and $\psi_2 =
 0.6e^{i\pi/3}$. Find the quantum probability and compare to the classical
@@ -220,7 +220,7 @@ partial constructive interference, consistent with $\theta=\pi/3$ sitting
 between the fully-constructive ($\theta=0$) and neutral ($\theta=\pi/2$)
 cases from the table above.
 
-## Common Mistakes
+## Exact and reproducible, one particle at a time
 
 <Callout type="note">
 **Assuming interference is just "small effects averaging out weirdly."**
@@ -242,12 +242,127 @@ variable might be.
 
 1. For $\psi_1=0.4$ and $\psi_2=0.4e^{i\pi}$, compute the quantum
    probability and compare it to the classical prediction.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Quantum: $0$. Classical: $0.32$.
+
+   Start by turning the phase factor into a number. $e^{i\pi} = -1$
+   (Euler's formula at half a turn), so $\psi_2 = -0.4$ exactly, with no
+   imaginary part at all.
+
+   Quantum rule, amplitudes first:
+
+   $$
+   |\psi_1+\psi_2|^2 = |0.4 + (-0.4)|^2 = |0|^2 = 0
+   $$
+
+   Classical rule, probabilities first:
+
+   $$
+   |\psi_1|^2+|\psi_2|^2 = 0.16+0.16 = 0.32
+   $$
+
+   This is the $\theta=\pi$ row of the lesson's table, run with magnitude
+   $0.4$ instead of $0.5$. It is the row that does the arguing. Each path
+   alone would land particles here $16\%$ of the time. Open both and the
+   count goes to zero. There is no assignment of probabilities to "used
+   slit 1" and "used slit 2" that produces $0$ from two positive numbers,
+   because $P_1+P_2 = 0$ forces $P_1=P_2=0$, contradicting the
+   single-slit measurements.
+
+   The specific wrong turn to watch for is computing
+   $|\psi_1|^2 + |\psi_2 e^{i\pi}|^2$ and announcing that the phase
+   "cancels out" because $|e^{i\pi}|=1$. That is true, and it is exactly
+   why the classical answer is stuck at $0.32$ regardless of $\theta$.
+   The magnitude of $\psi_2$ never changed. What changed is the direction
+   $\psi_2$ points when it is added to $\psi_1$, and addition happens
+   before the magnitude is taken, not after.
+
+   </details>
+
 2. For $\psi_1=0.3$ and $\psi_2=0.3e^{i\pi/2}$, compute both predictions.
    Is this constructive, destructive, or neither?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Both predictions are $0.18$. Neither constructive nor destructive.
+
+   $e^{i\pi/2} = i$, so $\psi_2 = 0.3i$ and
+
+   $$
+   \psi_1+\psi_2 = 0.3+0.3i, \qquad |\psi_1+\psi_2|^2 = 0.3^2+0.3^2 = 0.18
+   $$
+
+   The classical prediction is $|\psi_1|^2+|\psi_2|^2 = 0.09+0.09 = 0.18$
+   as well. They agree.
+
+   Do not read that agreement as "no interference happened here." The
+   cross terms are still there in the algebra; they are
+   $\psi_1^*\psi_2+\psi_2^*\psi_1 = (0.3)(0.3i) + (-0.3i)(0.3) =
+   0.09i - 0.09i = 0$. Two nonzero contributions cancelled each other
+   because they are complex conjugates and a purely imaginary number plus
+   its conjugate is zero. Interference is present and its net effect is
+   nil, which is a different statement from interference being absent.
+
+   Geometrically this is the right angle. Adding two perpendicular
+   vectors of length $0.3$ gives a hypotenuse whose squared length is the
+   sum of the squared legs, and Pythagoras is precisely the statement that
+   the cross term vanishes. Every other angle breaks the right triangle
+   and the two predictions separate again.
+
+   This is the $\theta=\pi/2$ row of the table, and it is the row students
+   most often use to conclude that the quantum and classical rules "mostly
+   agree and differ only in edge cases." The parametric sweep in the next
+   lesson shows the opposite: agreement happens at two isolated angles out
+   of a full turn, and everywhere else the two curves are apart.
+
+   </details>
+
 3. Explain, in your own words, why $P(\text{land at }x) =
    \lvert\psi_1+\psi_2\rvert^2$ reducing to
    $\lvert\psi_1\rvert^2+\lvert\psi_2\rvert^2$ at $\theta=\pi/2$ is
    consistent with the cross-term formula derived above.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because the cross-term formula does not say the cross terms are always
+   nonzero. It says they are proportional to $\cos\theta$, and $\cos\theta$
+   has zeros.
+
+   Expanding the square gave
+
+   $$
+   |\psi_1+\psi_2|^2 = |\psi_1|^2+|\psi_2|^2+\left(\psi_1^*\psi_2+\psi_2^*\psi_1\right)
+   $$
+
+   A number plus its own conjugate is twice its real part, so the bracket
+   is $2\,\mathrm{Re}(\psi_1^*\psi_2)$. With $\psi_1$ real and positive
+   and $\psi_2 = |\psi_2|e^{i\theta}$, that is
+   $2|\psi_1||\psi_2|\cos\theta$. At $\theta=\pi/2$, $\cos\theta = 0$ and
+   the entire bracket vanishes, leaving exactly the classical expression.
+
+   So the quantum rule does not contradict the classical rule at every
+   angle. It contains it as the special case where the relative phase
+   happens to sit at a quarter turn. The lesson's claim is stronger and
+   narrower than "the classical rule is wrong": the classical rule is a
+   fixed number, the quantum rule is a curve, and the curve passes through
+   that number twice per turn.
+
+   The wrong version of this answer is "the cross terms cancel because
+   $\psi_1$ and $\psi_2$ have equal magnitudes." Equal magnitudes have
+   nothing to do with it. Run the same expansion with $\psi_1=0.6$ and
+   $\psi_2=0.2e^{i\pi/2}$: the cross term is $2(0.6)(0.2)\cos(\pi/2)=0$
+   again, and the predictions agree again, at $0.40$ this time. What
+   makes the term vanish is the angle, and only the angle. Equal
+   magnitudes matter for a different question, whether destructive
+   interference can reach exactly zero, which is what the challenge below
+   is about.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -265,7 +380,7 @@ variable might be.
   classical rule, a genuine physical effect, not a limitation of
   detectors.
 
-## Further Exploration
+## Does cancellation need matching magnitudes?
 
 <ChallengePrompt prompt="Every example above uses equal-magnitude amplitudes. For ψ1=0.6 and ψ2=0.3 (different magnitudes this time) at θ=π (opposite phase), does the combined probability still drop all the way to zero?">
   Redo the same $|\psi_1+\psi_2|^2$ calculation. Does perfect

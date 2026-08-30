@@ -20,11 +20,23 @@ export const encodingCircuitTrace: ConceptualProblem = {
   answer: {
     type: "conceptual",
     requiredConceptGroups: [
-      ["110", "1,1,0", "one one zero", "first cnot"],
-      ["111", "1,1,1", "one one one", "second cnot", "all three"],
+      {
+        phrases: ["110", "1,1,0", "one one zero", "first cnot"],
+        missingFeedback:
+          "Take it one gate at a time. Write the state immediately after the first gate, and say which term of the superposition it touched.",
+      },
+      {
+        phrases: ["111", "1,1,1", "one one one", "second cnot", "all three"],
+        missingFeedback:
+          "You have the state after one gate. Apply the next one to it and write the result out in full.",
+      },
     ],
     incorrectFeedback: "Write the starting state as a sum of two terms, then let each gate act on one term at a time, tracking which target qubit flips.",
     partialFeedback: "You have the state after the first gate. Now let the remaining gate act and write out what the β term becomes.",
+    modelAnswers: [
+      "After the first CNOT the state is a|000> + b|110>, because CNOT(0,1) only flips qubit 1 on the term where the control is 1. Then CNOT(0,2) flips qubit 2 on that same term, giving a|000> + b|111>.",
+      "Start from a|000>+b|100>. The first CNOT makes it a|000>+b|110>. The second CNOT makes it a|000>+b|111>, so all three qubits agree within each term.",
+    ],
   },
   hints: [
     { text: "Write the initial three-qubit state as a sum of two terms. Which qubit is the control for both gates?" },

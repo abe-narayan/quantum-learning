@@ -75,7 +75,11 @@ export type FigurePin = {
  *    `width`/`height`, no `aspect-ratio`, external so no build-time size), so
  *    the box was 0px tall until the bytes landed — and every pin is placed at
  *    `top: <percent>%` of that box, so all of them stacked on one line at the
- *    top edge before snapping into place. Four call sites omit `aspect`.
+ *    top edge before snapping into place. All eight call sites pass `aspect`
+ *    today, so this one is latent rather than live — but `aspect` is optional
+ *    and nothing enforces it, so the next call site to leave it off gets the
+ *    stacked pins straight back, and the fallback is what keeps that a
+ *    cosmetic first paint instead of a broken one.
  *
  * The cost is bounded: unlike `ExternalFigure`, this component is not in
  * `src/mdx-components.tsx`, so it is only in the client graph of the eight
@@ -215,7 +219,7 @@ export function AnnotatedFigure({
               ? pins.map((pin, index) => (
                   <span
                     key={pin.id}
-                    className="absolute flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-pillar-edge bg-pillar text-[0.6875rem] font-semibold text-background shadow-[0_1px_4px_rgb(0_0_0_/_0.35)]"
+                    className="absolute flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-pillar-edge bg-pillar text-meta font-semibold text-background shadow-[0_1px_4px_rgb(0_0_0_/_0.35)]"
                     style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
                   >
                     <span aria-hidden="true">{index + 1}</span>

@@ -1,47 +1,67 @@
 import type { Course, PillarInfo, Pillar } from "./types";
 
+/**
+ * The six blurbs a reader meets first: on `/learn`, under every `PillarNext`
+ * panel, and in the nav's own short forms.
+ *
+ * The first four used to be generic one-liners ("The simulators, compilers,
+ * and SDKs used to program, test, and run quantum algorithms" — a tricolon of
+ * nouns inside a tricolon of verbs, saying nothing a reader could not guess
+ * from the track's name) while `quantum-mastery` and `apex` were specific and
+ * authored. Six blurbs read together, so that was a visible seam in the one
+ * place the site introduces itself. All six now name something particular the
+ * track actually contains, and every particular below is checkable against the
+ * course list underneath it: the five platforms are Physical Qubit Platforms'
+ * five modules, the 16×2ⁿ bytes are Simulating Quantum Systems' own figure.
+ *
+ * Length is capped by more than taste: this module has a 12KB gzip client
+ * budget (`src/lib/design/__tests__/clientBoundary.test.ts`) because it is
+ * imported by client components, and these six strings are payload. Comments
+ * like this one are stripped before measurement, so the explanation is free
+ * and the prose is not.
+ */
 export const PILLARS: PillarInfo[] = [
   {
     slug: "quantum-mechanics",
     title: "Quantum Mechanics",
     description:
-      "The mathematical and physical foundation, from the failure of classical physics through the hydrogen atom and beyond.",
+      "Where the mathematics comes from and what it is a statement about: linear algebra built from scratch, then the postulates, the Schrödinger equation and the hydrogen atom, derived here rather than quoted.",
   },
   {
     slug: "quantum-computing",
     title: "Quantum Computing",
     description:
-      "Qubits, gates, and circuits, and the algorithms that give quantum computers their power.",
+      "One qubit, then many, then the interference that makes a quantum algorithm different in kind and not merely faster: Deutsch-Jozsa, Grover and Shor, and the error correction real hardware would need to run any of them.",
   },
   {
     slug: "quantum-hardware",
     title: "Quantum Hardware",
     description:
-      "How qubits are physically built, controlled, read out, and scaled into real devices.",
+      "The five competing ways to make a qubit out of actual matter, the microwave pulses and millikelvin refrigerators that drive and read one, and the noise budget that decides how many can be wired together.",
   },
   {
     slug: "quantum-software",
     title: "Quantum Software",
     description:
-      "The simulators, compilers, and SDKs used to program, test, and run quantum algorithms.",
+      "The layer between an algorithm on paper and a machine that runs it: a circuit represented as data, the 16×2ⁿ bytes simulating one costs, and what a compiler must do to fit it onto hardware whose qubits are not all connected.",
   },
   {
     slug: "quantum-mastery",
     title: "Quantum Mastery",
     description:
-      "Graduate-level mathematical physics and rigorous quantum information theory for those who've completed the core curriculum — proofs, not just results, drawing on and extending every earlier pillar.",
+      "Graduate-level mathematical physics and rigorous quantum information theory for those who've completed the core curriculum: proofs, not just results, drawing on and extending every earlier track.",
   },
   {
     slug: "apex",
     title: "Apex",
     description:
-      "The summit of QuantumLearn: research-depth algorithms, fault tolerance, complexity theory, large-scale simulation and compilation, and a final course in reading and evaluating real quantum-computing research — the point where a motivated student can approach the literature without being lost.",
+      "The summit of StudyQuantum: research-depth algorithms, fault tolerance, complexity theory, large-scale simulation and compilation, and a final course in reading and evaluating real quantum-computing research. It is the point where a motivated student can approach the literature without being lost.",
   },
 ];
 
 /**
  * ============================================================
- * `estimatedHours` — what the number means, and how it is derived
+ * `estimatedHours`: what the number means, and how it is derived
  * ============================================================
  * Every value below is the sum of that course's authored lesson
  * `estimatedMinutes`, rounded to the nearest half hour. Nothing else goes in:
@@ -56,7 +76,7 @@ export const PILLARS: PillarInfo[] = [
  * minutes; Approximation Methods said "10h" above 105 minutes. The overstatement
  * ran from 1.1x (Mathematical Foundations, which was very nearly right) to 4.1x,
  * with no consistent factor, so it could not even be read as "hours including
- * exercises" — it was just noise. A reader who budgets ten hours for a
+ * exercises": it was just noise. A reader who budgets ten hours for a
  * two-hour course notices on the first sitting, and from then on discounts
  * every number on the site.
  *
@@ -65,7 +85,7 @@ export const PILLARS: PillarInfo[] = [
  * adding a lesson without updating its course's hours is caught at test time
  * rather than by a reader with a stopwatch.
  *
- * Half-hour granularity (so non-integers appear here) is deliberate — every
+ * Half-hour granularity (so non-integers appear here) is deliberate: every
  * consumer either renders the value directly next to an "h"/"hrs" unit or sums
  * it, and "1.5h" is a truthful readout where rounding to "1h" or "2h" would
  * throw away a third of the answer on the shortest courses.
@@ -79,17 +99,17 @@ export const COURSES: Course[] = [
     pillar: "quantum-mechanics",
     title: "Mathematical Foundations for Quantum Mechanics",
     description:
-      "The linear algebra, complex numbers, and probability you need before the physics makes sense. Starts from algebra and trigonometry and builds every tool it uses — no calculus assumed in this course — but it is a mathematics course from the first page: derivations and proofs rather than analogies. From the next course on, single-variable calculus (derivatives, integrals, and first-order Taylor expansion) is assumed rather than taught.",
+      "The linear algebra, complex numbers, and probability you need before the physics makes sense. Starts from algebra and trigonometry and builds every tool it uses, with no calculus assumed anywhere in it, but it is a mathematics course from the first page: derivations and proofs rather than analogies. From the next course on, single-variable calculus (derivatives, integrals, and first-order Taylor expansion) is assumed rather than taught.",
     // Stays "foundational" deliberately. This is one of the curriculum's two
     // zero-prerequisite courses (the other is "Qubits & Quantum States", the
-    // intuition-first way in — see the note on its own `prerequisites`), and
+    // intuition-first way in; see the note on its own `prerequisites`), and
     // it is the rigorous one. `CurriculumExplorer`'s difficulty filter
-    // is an exact-match filter — promoting it to "intermediate" would hide
+    // is an exact-match filter, so promoting it to "intermediate" would hide
     // the one true entry point from a beginner filtering for "Foundational,"
     // and would make `DIFFICULTY_HINT.intermediate` ("Builds directly on
     // earlier courses") false for a course that builds on nothing. The real
-    // signal a reader needs — this is rigorous from page one, unlike the
-    // intuition-first route through "What Is a Qubit?" — is carried by the
+    // signal a reader needs, that this is rigorous from page one unlike the
+    // intuition-first route through "What Is a Qubit?", is carried by the
     // description above instead, which renders directly beside the
     // `DifficultyMark` on every course card. See docs/BEGINNER_REVIEW.md
     // blocker 4.
@@ -115,7 +135,7 @@ export const COURSES: Course[] = [
     pillar: "quantum-mechanics",
     title: "From Classical to Quantum",
     description:
-      "Turning the linear algebra of Mathematical Foundations into physics: states, observables, measurement, time evolution, and the postulates that connect them all, built from the ground up.",
+      "Turning the linear algebra of Mathematical Foundations into physics: states, observables, measurement, time evolution, and the postulates that connect them all, built from the ground up. Single-variable calculus (derivatives, integrals, and first-order Taylor expansion) is assumed rather than taught from this course on.",
     difficulty: "intermediate",
     estimatedHours: 5,
     prerequisites: ["mathematical-foundations"],
@@ -168,7 +188,7 @@ export const COURSES: Course[] = [
     estimatedHours: 3,
     // `quantum-gates-and-circuits` is not decoration here. The course's final
     // worked lesson ("Degeneracy in Practice") is built end to end on a Bell
-    // state and says so in its own opening line — "The target is a Bell state,
+    // state and says so in its own opening line: "The target is a Bell state,
     // built originally in the Quantum Gates & Circuits course… a system you
     // already know." A reader who took the rigor-first route through
     // Mathematical Foundations → Classical to Quantum → Wave Mechanics has
@@ -178,11 +198,25 @@ export const COURSES: Course[] = [
     // card was hiding it. Declaring it here is what makes the two agree.
     //
     // The cost of admitting it is that this course now sits downstream of the
-    // Computing pillar — which is exactly why `one-dimensional-systems` below
+    // Computing pillar, which is why `one-dimensional-systems` below
     // no longer depends on this course. Left alone, this one edge would have
     // dragged every remaining Mechanics course (1D systems, angular momentum,
     // hydrogen, approximation methods, identical particles) behind the whole
     // Computing pillar, which is not what any of those courses actually need.
+    //
+    // Re-examined and KEPT. The edge was challenged as a possible authoring
+    // artefact, on the reasonable ground that a Foundations-tier track
+    // requiring a mid-Computing course looks like a curriculum bug. The
+    // lesson corpus says otherwise: `degeneracy-in-practice.mdx` declares
+    // `quantum-computing/quantum-gates-and-circuits/bell-states-and-entanglement`
+    // in its own `prerequisites`, builds its entire worked CSCO on Z⊗I and
+    // I⊗Z over a Bell state, and closes on that state's known perfect
+    // correlation. There is nothing to remove without rewriting the lesson,
+    // and `curriculumCoverage.test.ts` enforces that a lesson's cross-course
+    // prerequisites lie inside its course's closure, so deleting the edge here
+    // would fail a test rather than fix anything. What changed instead was the
+    // copy that denied it: the Foundations tier blurb, /mechanics' lede and
+    // curriculum line, and the homepage's Act I premise.
     prerequisites: ["wave-mechanics", "quantum-gates-and-circuits"],
     modules: [
       { slug: "spectral-decomposition-and-degeneracy", title: "Spectral Decomposition and Degeneracy" },
@@ -210,7 +244,7 @@ export const COURSES: Course[] = [
     // built from Wave Mechanics' infinite well and tunneling lessons, and the
     // scattering lessons from its free-particle wave packets. Nothing here uses
     // spectral decomposition, a complete set of commuting observables, or the
-    // generalized measurement postulate — the three things that course exists
+    // generalized measurement postulate, the three things that course exists
     // to supply.
     //
     // Demoting it from a prerequisite to plain curriculum order matters more
@@ -218,7 +252,7 @@ export const COURSES: Course[] = [
     // & Measurement genuinely needs the Computing pillar's Bell states, so
     // leaving this edge in place would have made every later Mechanics course
     // unreachable until a rigor-first reader had also finished Qubits and
-    // Quantum Gates & Circuits — a wall none of them earn.
+    // Quantum Gates & Circuits, a wall none of them earn.
     prerequisites: ["wave-mechanics"],
     modules: [
       { slug: "the-finite-square-well-setting-up-the-equation", title: "The Finite Square Well: Setting Up the Equation" },
@@ -233,7 +267,7 @@ export const COURSES: Course[] = [
     pillar: "quantum-mechanics",
     title: "Angular Momentum & Spin",
     description:
-      "From [Lx,Ly]=iħLz to the full quantized spectrum, spherical harmonics, and spin, including a genuine surprise: the spin-0 singlet of two combined spin-1/2 particles turns out to be exactly the Bell state |Ψ⁻⟩ already built for quantum computing, verified directly.",
+      "Builds the entire quantized angular-momentum spectrum out of one commutation relation, [Lx,Ly]=iħLz, then spherical harmonics and spin. You finish able to add two angular momenta and to check for yourself that the spin-0 singlet of two spin-1/2 particles is exactly the Bell state |Ψ⁻⟩ the computing track already built.",
     difficulty: "advanced",
     estimatedHours: 3,
     prerequisites: ["one-dimensional-systems"],
@@ -251,7 +285,8 @@ export const COURSES: Course[] = [
     slug: "the-hydrogen-atom",
     pillar: "quantum-mechanics",
     title: "The Hydrogen Atom",
-    description: "Solving a real three-dimensional atom, and where quantum numbers actually come from.",
+    description:
+      "Assumes angular momentum and spherical harmonics and spends them on the first fully three-dimensional system in the curriculum. Separating the Coulomb problem into a radial and an angular equation is what produces n, ℓ and mₗ, so you leave able to derive the quantum numbers rather than memorize them.",
     difficulty: "advanced",
     estimatedHours: 2,
     prerequisites: ["angular-momentum-and-spin"],
@@ -267,7 +302,8 @@ export const COURSES: Course[] = [
     slug: "approximation-methods",
     pillar: "quantum-mechanics",
     title: "Approximation Methods",
-    description: "What to do when a system can't be solved exactly, which is almost always.",
+    description:
+      "Almost no real system has a closed-form solution, so this course covers the four standard ways round that: perturbation theory when the Hamiltonian is close to one you can solve, the variational method for a rigorous upper bound on a ground-state energy, WKB for slowly varying potentials, and time-dependent perturbation theory for transition rates. Assumes you can already solve the hydrogen atom.",
     difficulty: "advanced",
     estimatedHours: 2,
     prerequisites: ["the-hydrogen-atom"],
@@ -282,7 +318,8 @@ export const COURSES: Course[] = [
     slug: "identical-particles",
     pillar: "quantum-mechanics",
     title: "Identical Particles & Many-Body Systems",
-    description: "Why identical particles aren't just alike: they're fundamentally indistinguishable.",
+    description:
+      "Identical particles are not merely alike; indistinguishability is a constraint on the state itself. From that one requirement you derive the boson/fermion split, the Pauli exclusion principle, and why multi-electron atoms have the shell structure they do.",
     difficulty: "advanced",
     estimatedHours: 1.5,
     prerequisites: ["approximation-methods"],
@@ -298,7 +335,7 @@ export const COURSES: Course[] = [
     pillar: "quantum-mechanics",
     title: "Advanced Topics in Quantum Mechanics",
     description:
-      "Beyond closed, unitary systems: open quantum systems and Kraus-operator decoherence channels, why macroscopic superpositions don't survive contact with an environment, and Feynman's path integral, a genuinely different formulation from every operator-based lesson so far. Builds on, and deliberately does not repeat, the Entanglement, Mixed States & Bell Tests course's density-matrix foundations.",
+      "Beyond closed, unitary systems: open quantum systems and Kraus-operator decoherence channels, why macroscopic superpositions don't survive contact with an environment, and Feynman's path integral, a formulation built on different foundations from every operator-based lesson so far. Builds on, and deliberately does not repeat, the Entanglement, Mixed States & Bell Tests course's density-matrix foundations.",
     difficulty: "advanced",
     estimatedHours: 2,
     // Two corrections in one line, both of which the course's own description
@@ -306,23 +343,33 @@ export const COURSES: Course[] = [
     //
     // ADDED `entanglement-and-measurement`: "Builds on, and deliberately does
     // not repeat, the Entanglement, Mixed States & Bell Tests course's
-    // density-matrix foundations" — and the first lesson here does exactly
+    // density-matrix foundations", and the first lesson here does exactly
     // that, listing that course's "Unitary Evolution and Measurement of
     // Density Matrices" as its only prerequisite. ρ→Σ Kₖ ρ Kₖ† is unreadable
     // without ρ. The claim was in the prose and missing from the data.
     //
     // ADDED `wave-mechanics` and REMOVED `identical-particles`: the swap keeps
     // the honest half of the old edge and drops the rest. The Path Integral
-    // lesson works entirely in position space — it computes the propagator
+    // lesson works entirely in position space: it computes the propagator
     // K(x_f,t_f;x_i,t_i) and checks Chapman-Kolmogorov by integrating over an
-    // intermediate position — so Wave Mechanics is genuinely required. Nothing
+    // intermediate position, so Wave Mechanics is genuinely required. Nothing
     // in these four lessons touches indistinguishability, exchange symmetry,
     // bosons, fermions, or the Pauli principle, so Identical Particles was
     // sequence, not dependency, and blocking on it cost a reader three whole
     // courses (hydrogen, approximation methods, identical particles) for
     // material none of these lessons use. `wave-mechanics` is strictly weaker
-    // than the edge it replaces — it was already inside the old prerequisite's
-    // closure — so no reader who could start this course before can't now.
+    // than the edge it replaces (it was already inside the old prerequisite's
+    // closure), so no reader who could start this course before can't now.
+    //
+    // `entanglement-and-measurement` re-examined and KEPT, for the same reason
+    // as the edge on `operators-observables-measurement` above and with less
+    // room for doubt: this is the course's *first* lesson, not its seventh.
+    // `open-quantum-systems-and-kraus-operators.mdx` lists
+    // `quantum-computing/entanglement-and-measurement/evolution-and-measurement-of-density-matrices`
+    // as its only prerequisite and opens on ρ → Σ Kₖ ρ Kₖ†, which is not
+    // readable by someone who has never met ρ. Removing the edge would leave
+    // the course's opening page unreadable and fail
+    // `curriculumCoverage.test.ts` besides.
     prerequisites: ["wave-mechanics", "entanglement-and-measurement"],
     modules: [
       { slug: "open-quantum-systems-and-kraus-operators", title: "Open Quantum Systems & Kraus Operators" },
@@ -356,7 +403,7 @@ export const COURSES: Course[] = [
     // than an ordering: intuition-first starts here, rigour-first starts at
     // Mathematical Foundations. /learn derives which card is which by
     // *excluding* the intuition lesson's course from the root set, not by
-    // taking `rootCourses[0]` — so declaration order in this file does not
+    // taking `rootCourses[0]`, so declaration order in this file does not
     // decide which one is offered as the rigorous path.
     prerequisites: [],
     modules: [
@@ -525,7 +572,7 @@ export const COURSES: Course[] = [
     pillar: "quantum-hardware",
     title: "Noise, Decoherence & Scaling",
     description:
-      "Why quantum devices are so fragile, made quantitative: coherent vs. incoherent noise sources, T1/T2 connected exactly to Advanced Topics in Quantum Mechanics' Kraus channels, crosstalk's computed fidelity loss, why per-gate error compounds multiplicatively across a circuit, and the real physical-to-logical qubit overhead fault tolerance requires.",
+      "Why quantum devices are so fragile, made quantitative: coherent vs. incoherent noise sources, T1/T2 tied directly to Advanced Topics in Quantum Mechanics' Kraus channels, crosstalk's computed fidelity loss, why per-gate error compounds multiplicatively across a circuit, and the real physical-to-logical qubit overhead fault tolerance requires.",
     difficulty: "advanced",
     estimatedHours: 2,
     prerequisites: ["control-and-readout"],
@@ -546,9 +593,9 @@ export const COURSES: Course[] = [
     pillar: "quantum-software",
     title: "Programming Quantum Computers",
     description:
-      "How real quantum software is actually structured: building a circuit as data before running it (this platform's own QuantumCircuit class), how major SDKs (Qiskit, Cirq, PennyLane) share that same pattern, a full build-run-sample walkthrough, and the genuinely opposite ways simulators and real hardware fail.",
+      "How real quantum software is structured: building a circuit as data before running it (this platform's own QuantumCircuit class), how major SDKs (Qiskit, Cirq, PennyLane) share that same pattern, a full build-run-sample walkthrough, and the opposite ways simulators and real hardware fail.",
     // Was "foundational", which `DifficultyMark` renders as the visible gloss
-    // "no prior background needed" — directly above this same card's
+    // "no prior background needed", directly above this same card's
     // "Requires Quantum Gates & Circuits" line, which is two courses and
     // roughly ten hours of prior background. A reader who believes the badge
     // starts here and hits tensor products and CNOT in lesson one. The course
@@ -576,7 +623,7 @@ export const COURSES: Course[] = [
     // of this course's four lessons (Tensor Network Methods, Noise Simulation)
     // are authored at `advanced`, and with Advanced Topics in Quantum
     // Mechanics now declared as a prerequisite this was the only course in the
-    // whole graph advertised as *easier* than something it requires — the
+    // whole graph advertised as *easier* than something it requires: the
     // inversion `curriculum.test.ts` now forbids outright, because a reader
     // who picks courses off the difficulty ladder has no way to see it.
     difficulty: "advanced",
@@ -584,7 +631,7 @@ export const COURSES: Course[] = [
     // `advanced-quantum-mechanics` added: the description above promises "a
     // real noisy-circuit simulator reusing Advanced Topics in Quantum
     // Mechanics' Kraus channels directly", and the Noise Simulation lesson
-    // does literally that — it lists that course's "Open Quantum Systems &
+    // does literally that: it lists that course's "Open Quantum Systems &
     // Kraus Operators" as a prerequisite and imports the same channel
     // constructors. Without it a quarter of this course is a wall of
     // unexplained Kraus notation. The added weight is smaller than it looks:
@@ -618,7 +665,7 @@ export const COURSES: Course[] = [
   // ---------------------------------------------------------------------
   // Quantum Mastery (graduate-level mathematical physics and rigorous
   // quantum information theory, extending both the Mechanics and Computing
-  // pillars — each course below genuinely needs prerequisites from both,
+  // pillars, because each course below genuinely needs prerequisites from both,
   // which is why this is its own pillar rather than folded into one of
   // the four existing ones. See the per-lesson design notes embedded in
   // each course's description for what makes each module genuinely
@@ -634,7 +681,7 @@ export const COURSES: Course[] = [
     estimatedHours: 3,
     // `the-hydrogen-atom` added: Sturm-Liouville Theory's whole argument is
     // that the infinite square well and the hydrogen radial equation are the
-    // *same* eigenvalue problem with different (p, q, w) — it tabulates them
+    // *same* eigenvalue problem with different (p, q, w): it tabulates them
     // side by side, plots the radial effective potential, and uses hydrogen as
     // the example of where the regular theorem stops and the singular case
     // begins. A reader who has not met the radial equation cannot follow the
@@ -685,7 +732,7 @@ export const COURSES: Course[] = [
     estimatedHours: 3.5,
     // `noise-decoherence-and-scaling` added: the description above sells the
     // Lindblad master equation as "the genuine continuous-time origin of
-    // T1/T2 decay", and the lesson delivers exactly that — it derives the
+    // T1/T2 decay", and the lesson delivers exactly that: it derives the
     // T2 ≤ 2T1 bound that the Hardware pillar's "T1 & T2 Decoherence" stated
     // as an empirical datasheet fact, and quotes that lesson's own numbers
     // back. The payoff is "the thing you were told is now proved", which is
@@ -721,7 +768,7 @@ export const COURSES: Course[] = [
     // is about approximating e^{-iHt}, and lists that course's "Time Evolution
     // and the Schrödinger Equation" as a prerequisite. Neither the Computing
     // nor the Software chain this course otherwise sits on ever introduces a
-    // Hamiltonian or a time-evolution operator — they work in gates. Cheap to
+    // Hamiltonian or a time-evolution operator; they work in gates. Cheap to
     // satisfy (Classical to Quantum is the second course in the curriculum)
     // and impossible to do without.
     prerequisites: ["quantum-algorithms-ii", "compilation-and-hybrid-algorithms", "classical-to-quantum"],
@@ -753,11 +800,11 @@ export const COURSES: Course[] = [
     ],
   },
   // ---------------------------------------------------------------------
-  // Apex — the summit of the curriculum. Five courses, each extending a
+  // Apex, the summit of the curriculum. Five courses, each extending a
   // specific Quantum Mastery / Quantum Software thread to research depth:
   // algorithms (QSVT), fault tolerance (surface codes to resource counts),
   // complexity theory (QMA, Local Hamiltonian), simulation & compilation at
-  // scale, and finally research methods — reading and evaluating real
+  // scale, and finally research methods: reading and evaluating real
   // quantum-computing claims. Every prerequisite below is a real course
   // slug defined above in this same file.
   // ---------------------------------------------------------------------
@@ -784,7 +831,7 @@ export const COURSES: Course[] = [
     pillar: "apex",
     title: "Fault Tolerance Frontiers",
     description:
-      "What Error Correction & Fault Tolerance's conceptual surface-code introduction and this pillar's own general stabilizer formalism build toward: the real 2D surface-code lattice and its logical operators, how a decoder actually turns a syndrome into a correction and why logical error rate falls exponentially with code distance below threshold, lattice surgery as the real mechanism for logical two-qubit gates, magic-state distillation as the unavoidable cost of a universal gate set, the threshold theorem's proof strategy, and a full worked resource estimate for running one real algorithm fault-tolerantly.",
+      "What Error Correction & Fault Tolerance's conceptual surface-code introduction and this track's own general stabilizer formalism build toward: the real 2D surface-code lattice and its logical operators, how a decoder turns a syndrome into a correction and why logical error rate falls exponentially with code distance below threshold, lattice surgery as the real mechanism for logical two-qubit gates, magic-state distillation as the unavoidable cost of a universal gate set, the threshold theorem's proof strategy, and a full worked resource estimate for running one real algorithm fault-tolerantly.",
     difficulty: "master",
     estimatedHours: 7,
     prerequisites: ["quantum-information-theory"],
@@ -819,15 +866,15 @@ export const COURSES: Course[] = [
     pillar: "apex",
     title: "Simulation & Compilation Frontiers",
     description:
-      "Tensor-Network Methods and Quantum Compilation & Transpilation extended to the questions that decide whether a quantum computer is worth building for a given task: matrix product states and how bond dimension quantifies entanglement, exactly which circuits a classical computer can simulate efficiently (and why that boundary is the real definition of quantum advantage), Clifford+T synthesis and T-count as the currency fault-tolerant algorithms actually spend, noise-aware compilation and resource estimation for real hardware graphs, and quantum chemistry as the flagship application connecting a real molecule to a qubit count.",
+      "Tensor-Network Methods and Quantum Compilation & Transpilation extended to the questions that decide whether a quantum computer is worth building for a given task: matrix product states and how bond dimension quantifies entanglement, exactly which circuits a classical computer can simulate efficiently (and why that boundary is the real definition of quantum advantage), Clifford+T synthesis and T-count as the currency fault-tolerant algorithms spend, noise-aware compilation and resource estimation for real hardware graphs, and quantum chemistry as the flagship application connecting a real molecule to a qubit count.",
     difficulty: "master",
     estimatedHours: 5.5,
     // `fault-tolerance-frontiers` added, and it is the one Apex→Apex edge in
     // the pillar, so it is worth saying why it earns the serialization. Two of
     // this course's lessons reach into fault tolerance and neither can be
     // rewritten around it: Clifford+T Synthesis exists *because* every T gate
-    // spends one distilled magic state — its opening line is "every T gate in
-    // a compiled circuit is a purchase from the magic-state factory" — and
+    // spends one distilled magic state (its opening line is "every T gate in
+    // a compiled circuit is a purchase from the magic-state factory"), and
     // When Classical Simulation Works is Gottesman-Knill, which is a statement
     // about the stabilizer group. Naming this course also covers the second
     // one for free: Fault Tolerance Frontiers reaches Error Correction & Fault
@@ -852,7 +899,7 @@ export const COURSES: Course[] = [
     pillar: "apex",
     title: "Research Methods and Synthesis",
     description:
-      "The final course of QuantumLearn: not new physics, but the skill of reading, evaluating, and designing real quantum-computing research after having built the machinery to actually check it — how to read a paper's claims against its assumptions, how to tell a theorem from a heuristic from a numerical experiment, how to catch a misleading 'quantum advantage' claim against a weak classical baseline, what a reproducible benchmark actually requires, and a capstone synthesis of the entire QuantumLearn journey from 'what is a qubit' to the present research frontier.",
+      "The final course of StudyQuantum: not new physics, but the skill of reading, evaluating, and designing real quantum-computing research after having built the machinery to check it: how to read a paper's claims against its assumptions, how to tell a theorem from a heuristic from a numerical experiment, how to catch a misleading 'quantum advantage' claim against a weak classical baseline, what a reproducible benchmark requires, and a capstone synthesis of the entire StudyQuantum journey from 'what is a qubit' to the present research frontier.",
     difficulty: "master",
     estimatedHours: 6,
     prerequisites: ["algorithmic-frontiers", "fault-tolerance-frontiers", "quantum-complexity-theory", "simulation-and-compilation-frontiers"],
@@ -865,6 +912,33 @@ export const COURSES: Course[] = [
     ],
   },
 ];
+
+/**
+ * How long the whole curriculum is, in hours: the one figure the site quotes
+ * when a reader asks "how big is this".
+ *
+ * It existed three times under three labels and in two values. The homepage
+ * hero said "Est. time 118 hrs", `/learn` said "Curriculum length 118h", and
+ * `/lessons` said "Reading time 117h" — the last one because it summed raw
+ * lesson `estimatedMinutes` (7,034 minutes, 117.2h) while the other two summed
+ * `estimatedHours`, each of which is that same total rounded to the nearest
+ * half hour *per course* first (see the long note above `COURSES`). Thirty-two
+ * such roundings accumulate about three quarters of an hour, so neither number
+ * was wrong; they were two derivations of one quantity, and the site printed
+ * both.
+ *
+ * The course-hours sum is the one that survives, because it is the number a
+ * reader actually gets by adding the site up: every course card prints its own
+ * `estimatedHours`, every pillar footer prints its track's sum of them, and a
+ * total that disagreed with its own parts would be the same defect at a
+ * different scale. `/lessons`' minute-level sum was more precise about a
+ * quantity nothing else on the site reports.
+ *
+ * `curriculumCoverage.test.ts` already re-derives every `estimatedHours` from
+ * `LESSON_METAS`, so this figure is corpus-derived twice over and cannot go
+ * stale when a lesson is added.
+ */
+export const CURRICULUM_HOURS = COURSES.reduce((sum, course) => sum + course.estimatedHours, 0);
 
 export function getPillar(slug: string): PillarInfo | undefined {
   return PILLARS.find((pillar) => pillar.slug === slug);

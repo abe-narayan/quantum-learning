@@ -19,19 +19,19 @@ export const classifyingTheOracleSpeedupAbstractMc: MultipleChoiceProblem = {
     options: [
       {
         id: "a",
-        text: "The abstract is accurate but incomplete: Theorem 4.2 proves a real exponential separation in the black-box query model, and the unqualified wording invites a reader to take it as a result about explicitly given Hamiltonians, which it never claims.",
+        text: "The abstract is accurate but incomplete: Theorem 4.2 proves a real separation in the query model, and its wording invites over-reading",
       },
       {
         id: "b",
-        text: "The abstract and the theorem contradict each other, so the paper contains an error that should be corrected before publication.",
+        text: "The abstract and the theorem describe different settings, so the paper's framing is an error that review should have caught before publication",
       },
       {
         id: "c",
-        text: "Since the numerical experiments (up to 20 qubits) support the exponential speedup, the oracle-model restriction in Theorem 4.2 is just a technicality that the numerics already resolve for the explicit-Hamiltonian setting.",
+        text: "The numerical experiments up to 20 qubits already cover the explicit-Hamiltonian setting, so the oracle restriction is a formality in practice",
       },
       {
         id: "d",
-        text: "Because local Hamiltonian verification is QMA-complete, Theorem 4.2 must be false as stated, since no exponential quantum speedup can exist for a QMA-complete problem.",
+        text: "Local Hamiltonian verification is QMA-complete, so no exponential speedup can exist for it and Theorem 4.2 must be misstated as written",
       },
     ],
   },
@@ -39,9 +39,9 @@ export const classifyingTheOracleSpeedupAbstractMc: MultipleChoiceProblem = {
     type: "multiple-choice",
     correctOptionId: "a",
     optionFeedback: {
-      b: "There is no contradiction: the theorem is narrower in scope than the abstract's wording suggests, not inconsistent with it. Precise oracle-model theorems narrower than their abstract's framing are extremely common and not, by themselves, errors.",
-      c: "This is exactly the numerical-vs-proven misreading the lesson warns about. Numerics at n<=20 are evidence for the oracle-model theorem already proven, not independent evidence that the result extends to a different setting (explicitly-given Hamiltonians) that the theorem does not address at all.",
-      d: "QMA-completeness is a statement about the explicitly-given-Hamiltonian setting; it says nothing about the black-box query model, where classical algorithms are handicapped to oracle access only. An oracle-model exponential separation is fully consistent with QMA-completeness of the real, explicitly-given problem.",
+      b: "Reads a difference in scope as an inconsistency. The theorem is narrower than the abstract's wording suggests, and a narrow theorem under a broad abstract is the ordinary shape of a paper, not a defect review should have blocked.",
+      c: "This is the numerical-versus-proven misreading the lesson warns about. Numerics at n<=20 are evidence for the oracle-model theorem already proven, not independent evidence that the result extends to a different setting (explicitly-given Hamiltonians) the theorem does not address.",
+      d: "Applies a statement about one setting to another. QMA-completeness concerns the explicitly-given Hamiltonian; Theorem 4.2 concerns a classical algorithm restricted to oracle access, which is a handicap QMA-completeness says nothing about. The two claims sit side by side without conflict.",
     },
     defaultIncorrectFeedback:
       "Reread the model/assumptions language in Theorem 4.2 ('black-box query access,' 'no explicit description of H's local terms') and ask specifically what setting the abstract's unqualified 'exponential speedup' would lead a reader to assume, versus what setting the theorem actually covers.",
@@ -53,15 +53,15 @@ export const classifyingTheOracleSpeedupAbstractMc: MultipleChoiceProblem = {
   ],
   solution: {
     steps: [
-      { description: "Theorem 4.2's classical lower bound holds only for algorithms restricted to black-box query access to O_H -- this is an oracle/query-model separation, not a statement about algorithms with an explicit description of H." },
-      { description: "The abstract's 'exponential speedup,' stated without this qualification, would naturally be read as applying more broadly -- including to the explicit-Hamiltonian setting, where the problem is QMA-complete and no such unconditional result is proven or claimed." },
+      { description: "Theorem 4.2's classical lower bound holds only for algorithms restricted to black-box query access to O_H. That is an oracle/query-model separation, not a statement about algorithms with an explicit description of H." },
+      { description: "The abstract's 'exponential speedup', stated without this qualification, would naturally be read as applying more broadly, including to the explicit-Hamiltonian setting, where the problem is QMA-complete and no such unconditional result is proven or claimed." },
       { description: "The numerical experiments (n<=20) test instances within the same oracle-access construction the theorem already covers; they are corroborating evidence for that proven claim, not independent evidence for a broader, unproven one." },
     ],
     finalAnswer: "The abstract is accurate but incomplete: Theorem 4.2 is a real separation in the black-box query model, and the unqualified wording invites a broader reading the theorem never claims.",
   },
   explanation: {
     correctIdea:
-      "A correctly proved oracle-model separation can still be described by an abstract in language broad enough to mislead a reader who never finds the numbered theorem -- the fix is reading the model/assumptions section, not doubting the theorem itself.",
+      "A correctly proved oracle-model separation can still be described by an abstract in language broad enough to mislead a reader who never finds the numbered theorem. The fix is reading the model/assumptions section, not doubting the theorem itself.",
     whyCorrect:
       "This locates the gap where the lesson's anatomy predicts it: between an unqualified abstract sentence and a theorem whose black-box restriction sits in its own hypotheses, without accusing the paper of error or dismissing the result.",
     whyWrong: [

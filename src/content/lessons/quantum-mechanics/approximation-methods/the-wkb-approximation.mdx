@@ -49,11 +49,11 @@ export const lessonMeta = {
   ],
 };
 
-<LessonHook eyebrow="Why this matters">
+<LessonHook eyebrow="A third route, and it is geometric">
 Perturbation theory needs a small parameter; the variational method needs a good guessed shape. WKB takes a third, geometric route entirely: treat the wavefunction as a classical wave and demand it close consistently on itself.
 </LessonHook>
 
-## Motivation
+## Treat the wavefunction as a classical wave
 
 WKB (Wentzel-Kramers-Brillouin) treats the <Term id="wavefunction">wavefunction</Term> as a classical wave
 whose local wavelength is set by the local classical momentum
@@ -78,7 +78,7 @@ points, where $p(x)\to0$ and the wavelength diverges.
   license="Public domain"
 />
 
-## Mathematical Development
+## Turning points, and the closing condition
 
 ### The classically allowed region
 
@@ -98,7 +98,7 @@ directly:
   energyLine={wkbEnergy}
   markers={[{ x: -wkbTurningPoint, label: "x₁" }, { x: wkbTurningPoint, label: "x₂" }]}
   shadedRegion={{ from: -wkbTurningPoint, to: wkbTurningPoint }}
-  ariaLabel="Harmonic oscillator potential with the n=1 energy line and classically allowed region shaded"
+  ariaLabel="The harmonic oscillator parabola V(x) = x²/2 with a horizontal energy line at E = 1.5, the n=1 level. The line cuts the parabola at x = -1.732 and x = +1.732, marked x₁ and x₂, and the band between them is shaded: that is the classically allowed region, where E exceeds V(x). Outside those two points the parabola rises above the line."
 />
 
 The shaded band is where $E>V(x)$, and it is the region the action
@@ -151,7 +151,7 @@ integral for a quadratic potential happens to be exactly linear in $E$,
 and a linear condition has an exact solution. Any residual disagreement
 in the table below is therefore the grid's fault and not the method's.
 
-## Physical Interpretation
+## Semiclassical in a literal sense
 
 WKB is a semiclassical method in a literal sense: it is built from the
 classical momentum $p(x)$, and quantum mechanics enters only through the
@@ -167,7 +167,7 @@ two claims: WKB is *asymptotically* good for generic potentials at large
 $n$, and *exactly* right for this one at every $n$, for a reason that has
 nothing to do with the asymptotics.
 
-## Worked Example
+## Four WKB levels against four exact ones
 
 **Compute the WKB-quantized energies for the harmonic oscillator
 ($m=\omega=1$) at $n=0,1,2,3$, and compare to the exact
@@ -208,9 +208,9 @@ again:
 <PredictBeforeReveal
   question="WKB is a semiclassical approximation, expected to improve as the quantum number grows. Given that, which row of the table above should show the largest error against the exact spectrum?"
   options={[
-    { label: "n = 0 (smallest quantum number)", value: "n0" },
-    { label: "n = 3 (largest quantum number)", value: "n3" },
-    { label: "None in particular: all four errors should be about the same tiny size", value: "same" },
+    { label: "n = 0, where the semiclassical picture is weakest", value: "n0" },
+    { label: "None in particular: the four errors are the same size", value: "same" },
+    { label: "n = 3, where the Riemann sum spans the widest region", value: "n3" },
   ]}
   correctValue="same"
   explanation="The 'large n is more accurate' rule of thumb is real for a generic potential, but it doesn't show up here. The errors run 0.00026, 0.00008, 0.00031, 0.00038 for n=0 through 3: no downward trend at all, just grid-resolution noise scattered near zero. That's because the harmonic oscillator is one of the rare potentials where WKB is exact at every n, not just asymptotically, so there's no large-n convergence to see. The usual rule of thumb applies to potentials where WKB is only approximately right, which this one isn't."
@@ -218,16 +218,16 @@ again:
 
 <InteractiveSection
   title="Step through n, watch the action integral grow"
-  description="Step through the energy level n = 0 to 3, the same four levels as the table above. Each curve is the local classical momentum p(x), computed from the same harmonic oscillator potential, but shown only across the classically allowed region. Watch the turning points spread apart and the peak momentum grow as n increases. That growing area under the curve is the action integral the quantization condition sets equal to (n+½)πħ."
+  description="Step through the energy level n = 0 to 3, the same four levels as the table above. Each curve is the local classical momentum p(x), computed from the same harmonic oscillator potential, but shown only across the classically allowed region. Watch what the turning points and the peak momentum each do as n increases. Whatever area that leaves under the curve is the action integral the quantization condition sets equal to (n+½)πħ."
 >
   <ParametricCurve
     frames={wkbMomentumFrames}
     sliderLabel="Energy level n"
-    ariaLabel="Classical momentum p(x) across the classically allowed region, for the harmonic oscillator's n=0 through n=3 energy levels"
+    ariaLabel="The classical momentum p(x) = sqrt(2(E-V(x))) plotted only across the classically allowed region, stepping through the harmonic oscillator's n=0 to n=3 levels. Each frame is a dome that meets the axis at the turning points and peaks at the centre. Both the half-width and the peak height are sqrt(2E), so they grow together: 1.00 at n=0, then 1.73, 2.24 and 2.65 at n=3. The area under each dome is pi times E, which is 1.57, 4.71, 7.85 and 11.00, exactly the (n+1/2)pi the quantization condition demands."
   />
 </InteractiveSection>
 
-## Common Mistakes
+## The oscillator's exactness is special
 
 <Callout type="note">
 **Thinking WKB is always this accurate.** The harmonic oscillator's
@@ -250,17 +250,162 @@ points is not optional bookkeeping.
 
 1. Where exactly does the classically allowed region's boundary sit, in
    terms of $E$ and $V(x)$?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   At the turning points, where $E=V(x)$: the solutions of that equation
+   bound the region $E>V(x)$ where a classical particle of energy $E$
+   could be found.
+
+   For the harmonic oscillator at $E=1.5$ with $m=\omega=1$, solving
+   $1.5=x^2/2$ gives $x=\pm\sqrt{2E}\approx\pm1.732$, the two markers on
+   the potential diagram above.
+
+   The single-well picture with two turning points is the case the
+   quantization condition as written assumes, and it is not universal.
+   A double well at low energy has *four* turning points and a
+   disconnected allowed region, so $\int_{x_1}^{x_2}$ is ambiguous and the
+   condition has to be restated (each well gets its own action integral,
+   with a tunneling correction coupling them). A potential with one wall
+   and one open side has only one turning point and no bound states at all
+   above it. Counting the turning points is the first thing to do with a
+   new potential, before writing anything down.
+
+   </details>
+
 2. Explain in words why $p(x)=\sqrt{2m(E-V(x))}$ becomes imaginary
    outside the classically allowed region, and why the action integral
    only sums over the region where it's real.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Outside the allowed region $V(x)>E$, so $E-V(x)$ is negative and its
+   square root is imaginary. Read through the physics, $E-V$ is the
+   classical kinetic energy, so an imaginary $p$ is the algebra reporting
+   that a classical particle would need negative kinetic energy to be
+   there. It cannot be, and it stops at the turning point.
+
+   The quantum wavefunction does not stop, and the distinction matters.
+   Substituting an imaginary $p=i\hbar\kappa$ into $e^{ipx/\hbar}$ turns
+   the oscillation into $e^{-\kappa x}$: not a wave but a decaying
+   exponential, which is the tunneling tail from Wave Mechanics arriving
+   here in semiclassical clothing. So the forbidden region is not empty.
+   It just holds no oscillation.
+
+   That is why the action integral stops at the turning points. The
+   condition being imposed is that a *wave* fit consistently between two
+   walls, and it counts accumulated phase. A decaying exponential
+   accumulates no phase and contributes no nodes, so there is nothing for
+   it to add to the count.
+
+   The forbidden region is not ignored entirely, though, and this is where
+   the $\tfrac12$ comes from. Matching the oscillating solution onto the
+   decaying one at a soft turning point costs a phase of $\pi/4$, and
+   there are two turning points, so the total is $\pi/2$. Divide through
+   by $\pi$ and that is the $\tfrac12$ in $(n+\tfrac12)\pi\hbar$. The
+   number is a record of how the wave connects to the tails it is not
+   integrating over, which is exactly why it changes if the turning points
+   are hard walls instead of soft ones.
+
+   </details>
+
 3. If a potential's turning points move further apart as $E$ increases,
    what does this imply about how the action integral $\int p\,dx$
    behaves as $E$ grows? (Hint: this behavior is exactly what
    `wkbQuantizedEnergy`'s bisection search relies on.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   The action integral increases strictly and monotonically with $E$, and
+   for two independent reasons that push the same way.
+
+   The integrand grows. At every fixed $x$ already inside the region,
+   $p(x)=\sqrt{2m(E-V(x))}$ is an increasing function of $E$, so the whole
+   curve lifts.
+
+   The interval grows. The turning points move apart, so the integral
+   covers more $x$, and the newly included stretch contributes a positive
+   amount rather than cancelling anything.
+
+   Both effects are visible in the momentum explorer above: each frame's
+   dome is both taller and wider than the last, and its area, $\pi E$ for
+   this potential, rises accordingly.
+
+   Monotonicity is precisely the property bisection needs, and it is worth
+   being explicit that it is a hypothesis rather than a convenience. The
+   solver is looking for the $E$ where a continuous function
+   $A(E)=\int p\,dx$ crosses the target $(n+\tfrac12)\pi\hbar$. Continuous
+   and strictly increasing means that crossing exists once and only once,
+   so bracketing it and halving the bracket converges to the one right
+   answer. If $A(E)$ could rise and fall, bisection could bracket one root
+   while a second sat elsewhere, and which one it returned would depend on
+   where the search happened to start.
+
+   There is a nice reading behind the monotonicity. $\oint p\,dx$ is the
+   phase-space area enclosed by the classical orbit, and the quantization
+   condition says each quantum state takes up an area of $2\pi\hbar$. So
+   "the action grows with energy" is "higher-energy orbits enclose more
+   phase space and therefore fit more states underneath them," and the
+   number of levels below $E$ is about the enclosed area divided by
+   Planck's constant.
+
+   </details>
+
 4. The closed-form action integral above gave $\pi E/\omega$, linear in
    $E$. Explain how that linearity is what makes the WKB condition exact
    here, and what would have to be true of a potential for the same
    argument to fail.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Because a linear action makes the quantization condition a linear
+   equation, whose solution is evenly spaced levels, and the harmonic
+   oscillator's true spectrum is evenly spaced. Both sides are linear in
+   $n$ with the same slope and the same intercept, so they do not merely
+   agree asymptotically. They are the same formula.
+
+   Trace where each piece of the exact answer comes from:
+
+   $$
+   \frac{\pi E}{\omega} = \left(n+\tfrac12\right)\pi\hbar \implies E_n = \left(n+\tfrac12\right)\hbar\omega
+   $$
+
+   The linear dependence on $E$ produces the uniform spacing $\hbar\omega$;
+   the coefficient $\pi/\omega$ fixes its size; and the Maslov $\tfrac12$
+   becomes the zero-point energy. Change any one of them and the match
+   fails somewhere.
+
+   For the argument to fail, the action integral has to be nonlinear in
+   $E$. That is the generic situation, since linearity came from the
+   turning-point width and the peak momentum both scaling as $\sqrt{E}$,
+   which is a property of a quadratic potential and not of potentials in
+   general. Take $V(x)=|x|$: the turning points sit at $\pm E$ and
+
+   $$
+   \int_{-E}^{E}\sqrt{2m\left(E-|x|\right)}\,dx = \frac{4\sqrt{2m}}{3}\,E^{3/2}
+   $$
+
+   so WKB predicts $E_n\propto(n+\tfrac12)^{2/3}$, levels that crowd
+   together as $n$ rises rather than staying evenly spaced. The exact
+   spectrum for that potential is set by zeros of the Airy function and is
+   not of that form. WKB is noticeably off for the lowest state and
+   improves steadily as $n$ grows, which is the ordinary semiclassical
+   behaviour the harmonic oscillator hides.
+
+   A second, independent way to break it, worth separating because it is
+   not about linearity at all. The $\tfrac12$ assumes two *soft* turning
+   points, where $V$ crosses $E$ at a finite slope. An infinite square
+   well has hard walls instead, the connection formulas are different, and
+   using $(n+\tfrac12)$ there gives the wrong spectrum even though the
+   action integral $L\sqrt{2mE}$ is perfectly tractable. Getting the
+   Maslov index right is a separate question from getting the action
+   right.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -277,7 +422,7 @@ points is not optional bookkeeping.
   within grid-resolution numerical error at every $n$ tested, a special
   exactness of this potential, not a general WKB guarantee.
 
-## Further Exploration
+## Leaving stationary states behind
 
 <NextDiscovery>
 [Time-Dependent Perturbation Theory](/lessons/quantum-mechanics/approximation-methods/time-dependent-perturbation-theory) leaves stationary states behind entirely and asks about

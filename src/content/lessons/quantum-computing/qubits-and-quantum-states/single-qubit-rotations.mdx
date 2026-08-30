@@ -47,7 +47,7 @@ export const lessonMeta = {
 Nothing physical distinguishes a rotation by π/4 from a rotation by 17°. The six named gates you've met so far are convenient cases of one continuous family, and hardware has always been able to run the rest of it.
 </LessonHook>
 
-## Motivation
+## A strange place to stop
 
 Six named gates is a start, but it's a strange place to stop. Nothing
 physical distinguishes a rotation by $\pi/4$ from a rotation by $17°$, and
@@ -57,7 +57,7 @@ six operations; only our vocabulary was. This lesson replaces the six fixed
 gates with one continuous family parametrized by any angle, and shows the
 six were special cases of it all along.
 
-## Intuition
+## What the general rotation would have to look like
 
 If every gate is a rotation of the Bloch vector (last lesson's closing
 claim), then the next question is: what is the *general* rotation, by any
@@ -71,7 +71,7 @@ spectroscopists have been rotating nuclear spins by arbitrary angles with
 radiofrequency pulses since the 1940s, and $R_x$, $R_y$, $R_z$ are the
 names for what those pulses do.
 
-## Mathematical Development
+## The axis-angle formula, and its special cases
 
 ### The general rotation formula
 
@@ -184,7 +184,7 @@ $Z=iR_z(\pi)$, and so on. "Six special gates" and "one continuous family
 of rotations" are the same physics, described at two different levels of
 generality.
 
-## Physical Interpretation
+## There is no gate the formula cannot describe
 
 This is the payoff of the whole geometric picture: **every possible
 single-qubit operation is a rotation of the Bloch sphere**, full stop.
@@ -194,19 +194,38 @@ covers every physically distinct single-qubit <Term id="unitary-operator">unitar
 phase that was never physical anyway). Six gates were a convenient,
 standard vocabulary; the rotation formula is the whole language.
 
+Two facts make that true, and neither needs new machinery. First, an
+overall phase is not physical, so any single-qubit gate can be written as
+$e^{i\lambda}U$ with $\det U = 1$. Second, every $2\times2$ matrix
+satisfying both $U^\dagger U = I$ and $\det U = 1$ has the form
+
+$$
+U = aI - i(bX+cY+dZ) = \begin{pmatrix}a-id & -c-ib\\ c-ib & a+id\end{pmatrix}, \qquad a^2+b^2+c^2+d^2 = 1
+$$
+
+for real $a,b,c,d$. Unitarity makes $U$'s two rows an orthonormal pair,
+and $\det U = 1$ then forces the second row to be $(-v^*, w^*)$ whenever
+the first is $(w,v)$; writing $w = a-id$ and $v = -c-ib$ puts that in the
+form above, with $a^2+b^2+c^2+d^2=1$ saying exactly that the rows are
+unit vectors. Since $a$ then lies in
+$[-1,1]$, write $a=\cos(\theta/2)$; the remaining three numbers have
+$b^2+c^2+d^2 = \sin^2(\theta/2)$, so they are $\sin(\theta/2)$ times a
+unit vector $\hat n$. Substituting both gives $R_{\hat n}(\theta)$
+exactly, with nothing left over.
+
 <InsightBlock>
 Every possible single-qubit operation is a rotation of the Bloch sphere. There is no single-qubit gate that does something the rotation formula cannot describe.
 </InsightBlock>
 
-## Interactive Experiment
+## Checking which angles each rotation moves
 
 <PredictBeforeReveal
   question="R_z(2π) is a full 2π turn about the z-axis, so R_z(2π) = −I, not I (you'll show this in the practice questions). Apply R_z(2π) to |+⟩. What state comes out?"
   options={[
-    { label: "|+⟩ again, exactly", value: "plus" },
-    { label: "−|+⟩, physically the same state as |+⟩", value: "negplus" },
-    { label: "|−⟩, the opposite equatorial point", value: "minus" },
-    { label: "|0⟩, back at the north pole", value: "zero" },
+    { label: "|+⟩ again: a full turn is exactly the identity", value: "plus" },
+    { label: "−|+⟩, differing from |+⟩ by a factor of −1", value: "negplus" },
+    { label: "|−⟩, the opposite point on the equator", value: "minus" },
+    { label: "|0⟩, dragged back up to the north pole", value: "zero" },
   ]}
   correctValue="negplus"
   explanation="−I|+⟩ = −|+⟩. That's a different vector on paper, but an overall factor of −1 is a global phase, and global phase is never observable: −|+⟩ and |+⟩ give identical measurement probabilities and identical behavior in every experiment. Geometrically this matches the Bloch picture too: a full 2π rotation about any axis brings every point back to exactly where it started, so |+⟩ has to return to the same point on the sphere. The minus sign is the amplitude-level trace of a rotation that, physically, changed nothing at all."
@@ -224,7 +243,7 @@ come back to it any time you want to check a rotation, a gate sequence, or
 a measurement probability against your own hand computation, for any
 lesson in this course, not just this one.
 
-## Worked Example
+## A quarter turn about z, applied to plus
 
 **Apply $R_z(\pi/2)$ to $|+\rangle$ and identify the result.**
 
@@ -233,7 +252,7 @@ $\varphi$, giving $\theta=\pi/2$, $\varphi=\pi/2$, exactly $|{+i}\rangle$.
 This matches the $S$ gate's known action ($S$ and $R_z(\pi/2)$ differ only
 by global phase, so they must agree on where the state lands): $S|+\rangle=|{+i}\rangle$.
 
-## Common Mistakes
+## Rz never touches theta
 
 <Callout type="note">
 **Assuming any rotation changes both $\theta$ and $\varphi$.** Only true
@@ -256,12 +275,135 @@ check the convention before assuming an arithmetic error.
    geometrically why (is $|1\rangle$ on the $x$-axis, or perpendicular to
    it?), then find the smallest positive $\theta$ for which
    $R_x(\theta)|1\rangle$ returns to the same Bloch point as $|1\rangle$.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $|1\rangle$ has Bloch vector $(0,0,-1)$, which is *perpendicular* to the
+   $x$-axis, not on it. Their dot product is zero.
+
+   That settles both halves. $R_z$ rotates about the $z$-axis, and
+   $(0,0,-1)$ lies along that axis, so $R_z$ leaves it fixed for every angle: a
+   point on the spin axis of a globe does not move. $R_x$ rotates about an axis
+   the state is at right angles to, which is the worst case, so it sweeps
+   $|1\rangle$ along the largest circle available, the great circle in the
+   $y$-$z$ plane.
+
+   Tracking the Bloch vector through that sweep, $R_x(\theta)$ carries
+   $(0,0,-1)$ to $(0,\ \sin\theta,\ -\cos\theta)$. At $\theta = \pi/2$ that is
+   $(0,1,0)$, the state $|{+i}\rangle$; at $\theta = \pi$ it is $(0,0,1)$, the
+   north pole $|0\rangle$; at $\theta = 3\pi/2$ it is $(0,-1,0)$, the state
+   $|{-i}\rangle$; and only at $\theta = 2\pi$ does it come back to
+   $(0,0,-1)$.
+
+   So the smallest positive angle that returns it is $\theta = 2\pi$. Nothing
+   shorter works, because the state travels the whole circle and visits every
+   point on it exactly once: a great circle offers no shortcut home.
+
+   The tempting wrong answer is $\pi$, on the grounds that $\pi$ is a half turn
+   and half turns usually undo themselves. At $\theta = \pi$ the state is at the
+   *north* pole, as far from where it started as the sphere allows. Half a turn
+   about $x$ is the thing that takes $|1\rangle$ to $|0\rangle$, not the thing
+   that brings it back.
+
+   </details>
+
 2. Show that $R_z(2\pi) = -I$, not $I$. What does the extra minus sign
    mean physically? (Hint: it's a global phase.)
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   Put $\hat n = (0,0,1)$ and $\theta = 2\pi$ into the axis-angle formula:
+
+   $$
+   R_z(2\pi) = \cos(\pi)\,I - i\sin(\pi)\,Z = (-1)I - i(0)Z = -I.
+   $$
+
+   The half-angle is doing all the work. The rotation angle is $2\pi$, but the
+   formula evaluates its trigonometry at $\theta/2 = \pi$, and $\cos\pi = -1$.
+
+   Physically, $-I$ applies a global phase of $e^{i\pi}$ to whatever state it
+   meets, so every measurement probability, in every basis, is unchanged, and
+   the Bloch vector does not move at all. As far as a single isolated qubit is
+   concerned, $R_z(2\pi)$ and doing nothing are the same operation.
+
+   Two qualifications keep this from being a piece of trivia. First, the sign is
+   unobservable *on its own*, but it becomes observable the moment this qubit is
+   one branch of a superposition of something else: put $R_z(2\pi)$ inside a
+   controlled gate and the $-1$ is a relative phase between the control's two
+   branches, which interference will happily turn into a probability. Second,
+   the same half-angle is why the amplitudes need $\theta = 4\pi$ to return
+   exactly while the Bloch vector needs only $2\pi$, the two curves plotted
+   earlier in this lesson. The state vector runs at half the speed of the
+   picture of it.
+
+   The wrong reading is that a full turn "should" be the identity, so the
+   formula must be misbehaving. Both statements are true at once: the
+   *rotation* is the identity, and the *matrix representing it* is $-I$. Global
+   phase is exactly the gap between those two.
+
+   </details>
+
 3. Predict the Bloch coordinates after applying $R_y(\pi/2)$ to $|0\rangle$,
    then check using the simulator.
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $(x,y,z) = (1,0,0)$, which is $|+\rangle$.
+
+   $|0\rangle$ sits at the north pole $(0,0,1)$. $R_y(\pi/2)$ is a quarter turn
+   about the $y$-axis, and $(0,0,1)$ is perpendicular to $y$, so it moves along
+   the great circle in the $x$-$z$ plane: a quarter of the way round takes it
+   from the north pole to the $+x$ point on the equator.
+
+   Confirming with the matrix,
+   $R_y(\pi/2) = \cos(\pi/4)I - i\sin(\pi/4)Y$ applied to $(1,0)^\mathsf{T}$
+   gives $\tfrac{1}{\sqrt2}(1,1)^\mathsf{T} = |+\rangle$, Bloch point $(1,0,0)$
+   as predicted.
+
+   Worth one caution, because this is a landmark that invites overreach.
+   $R_y(\pi/2)$ and $H$ both send $|0\rangle$ to $|+\rangle$, and both send
+   $|1\rangle$ to $|-\rangle$ (differing only by a global sign there), so on the
+   computational basis they look interchangeable. They are not the same gate.
+   Feed them $|+\rangle$ and they part company completely: $H|+\rangle = |0\rangle$,
+   the north pole, while $R_y(\pi/2)|+\rangle = |1\rangle$, the south pole.
+   $H$ is a half turn about the diagonal $(x+z)/\sqrt2$ axis; $R_y(\pi/2)$ is a
+   quarter turn about $y$. Agreeing on two states is a long way from being the
+   same operation, which is why this lesson identifies gates by axis and angle
+   rather than by a couple of input-output pairs.
+
+   </details>
+
 4. Two rotations, $R_z(\pi/3)$ and $R_z(\pi/6)$, are applied one after
    another to some state. What single rotation has the same net effect?
+
+   <details className="answer-reveal">
+   <summary>Answer</summary>
+
+   $R_z(\pi/2)$, since $\tfrac{\pi}{3} + \tfrac{\pi}{6} = \tfrac{2\pi}{6} + \tfrac{\pi}{6} = \tfrac{\pi}{2}$.
+
+   Rotations about a *shared* axis compose by adding angles, and the matrices
+   make it obvious: $R_z(\theta) = \mathrm{diag}(e^{-i\theta/2}, e^{i\theta/2})$
+   is diagonal, and multiplying two diagonal matrices multiplies their entries,
+   which adds the exponents. The result is $R_z(\pi/2)$ on the nose, not merely
+   up to a phase.
+
+   Two things this does *not* generalize to.
+
+   Order would not matter here even if you swapped the two rotations, because
+   everything in sight is diagonal, so $R_z$ gates commute with each other.
+   That is special to a common axis. $R_x(\pi/2)$ followed by $R_z(\pi/2)$ is a
+   genuinely different operation from the same two in the other order, which is
+   the observation the next lesson opens with.
+
+   And "add the angles" fails across different axes. $R_x(\alpha)$ then
+   $R_y(\beta)$ is still *some* rotation, because composing two rotations of a
+   sphere always gives a rotation, but its axis is neither $x$ nor $y$ and its
+   angle is not $\alpha+\beta$. Only the same-axis case is this easy.
+
+   </details>
 
 <PracticeLinks problems={practiceProblems} />
 
@@ -277,7 +419,7 @@ check the convention before assuming an arithmetic error.
 - Every single-qubit gate is, physically, some rotation of the Bloch
   sphere. There's nothing else a single-qubit gate could be.
 
-## Further Exploration
+## Proving what has so far been asserted
 
 <NextDiscovery>
 [Global Phase vs. Relative Phase](/lessons/quantum-computing/qubits-and-quantum-states/global-and-relative-phase) finally proves, rather

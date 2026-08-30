@@ -51,7 +51,7 @@ export function OperationControls({
 
   const handlePresetKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     // While a walkthrough animates, every option is `disabled` and selecting a
-    // new one is refused by `runPreset` anyway — moving focus-and-selection
+    // new one is refused by `runPreset` anyway; moving focus-and-selection
     // here would lie about what the panel is doing, so bail out entirely.
     if (disabled) return;
     const count = GUIDED_PRESETS.length;
@@ -79,7 +79,7 @@ export function OperationControls({
           disables the whole panel step-by-step. PillGroup has no notion of a
           disabled/in-progress option, so it can't represent "this preset is currently
           animating" or block re-selection while one runs. The keyboard behaviour is
-          still PillGroup's, ported above — hand-rolling the styling is not a licence
+          still PillGroup's, ported above; hand-rolling the styling is not a licence
           to hand-roll the ARIA pattern.
         */}
         <div role="radiogroup" aria-label="Guided walkthrough" className="flex flex-col gap-2">
@@ -148,7 +148,7 @@ export function OperationControls({
             disabled={disabled}
           />
         </div>
-        {/* `@sm:` — container query on the controls rail's own box, not the
+        {/* `@sm:` is a container query on the controls rail's own box, not the
             viewport; see SimulatorInstrument.tsx. */}
         <div className="mt-3 grid grid-cols-4 gap-2 @sm:grid-cols-6">
           {SINGLE_QUBIT_GATES.map((gate) => (
@@ -181,21 +181,21 @@ export function OperationControls({
               symbol: "|00⟩",
               name: "ket notation",
               means:
-                "just a label for a state — |01⟩ means “qubit 0 is 0 and qubit 1 is 1”. The bracket carries no maths of its own; it only says “this is a quantum state”.",
+                "just a label for a state: |01⟩ means “qubit 0 is 0 and qubit 1 is 1”. The bracket carries no maths of its own; it only says “this is a quantum state”.",
               glossaryId: "dirac-notation",
             },
             {
               symbol: "H",
               name: "Hadamard",
               means:
-                "puts one qubit into an even superposition of 0 and 1. On its own it cannot entangle anything — it only ever touches the one qubit you aim it at.",
+                "puts one qubit into an even superposition of 0 and 1. On its own it cannot entangle anything; it only ever touches the one qubit you aim it at.",
               glossaryId: "hadamard-gate",
             },
             {
               symbol: "CNOT",
               name: "controlled-NOT",
               means:
-                "flips qubit 1, but only where qubit 0 is 1. Apply it after H and the two qubits become entangled — this is the gate that does it.",
+                "flips qubit 1, but only where qubit 0 is 1. Apply it after H and the two qubits become entangled. This is the gate that does it.",
               glossaryId: "cnot-controlled-gates",
             },
           ]}

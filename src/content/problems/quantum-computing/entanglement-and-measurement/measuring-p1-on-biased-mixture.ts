@@ -37,7 +37,7 @@ export const measuringP1OnBiasedMixture: NumericProblem = {
     ],
   },
   hints: [
-    { text: "P₁ projects onto |1⟩ — it's diag(0,1)." },
+    { text: "P₁ projects onto |1⟩, so it is diag(0,1)." },
     { text: "ρP₁ zeroes out ρ's first row/column contribution, leaving only the (1,1) entry." },
     { text: "Tr(ρP₁) = ρ's own (1,1) entry, directly." },
   ],

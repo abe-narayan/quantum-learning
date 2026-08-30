@@ -41,7 +41,7 @@ export const hxhIdentity: MultipleChoiceProblem = {
     correctOptionId: "a",
     optionFeedback: {
       b: "That would mean HXH acts as the identity on |1⟩. Retrace the middle step: check what X does to |−⟩ before the second H is applied.",
-      c: "H alone would send |1⟩ to |−⟩, not to |0⟩ — you may be skipping the X and second H steps.",
+      c: "H alone sends |1⟩ to |−⟩, not to |0⟩. Check that the X and the second H are both being applied.",
       d: "The sign is right, but the basis state is not. Recheck the last step: apply H to whatever X|−⟩ came out to be, and read off which basis state that lands on.",
     },
     defaultIncorrectFeedback: "Track the state through each gate individually: |1⟩ → (H) → (X) → (H), the same method the lesson uses for HZH=X.",
@@ -60,7 +60,7 @@ export const hxhIdentity: MultipleChoiceProblem = {
     finalAnswer: `$${ketLatex(result)}$`,
   },
   explanation: {
-    correctIdea: "HXH = Z (up to how you track it): applying the identity to |1⟩ specifically gives −|1⟩, matching Z|1⟩=−|1⟩ exactly.",
+    correctIdea: "HXH = Z, exactly and with no phase caveat, so applying it to |1⟩ gives −|1⟩, which is what Z|1⟩ gives.",
     whyCorrect: "This is a genuine identity, checkable the same step-by-step way the lesson verifies HZH=X, just with the roles of X and Z swapped.",
     whyWrong: [
       { optionId: "b", text: "Drops the sign X produces when it acts on |−⟩. That −1 is the entire difference between this and the right answer." },

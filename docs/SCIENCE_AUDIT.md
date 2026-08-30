@@ -1,4 +1,21 @@
-# Scientific-Integrity Audit — QuantumLearn Restructuring Sprint
+# Scientific-Integrity Audit — StudyQuantum Restructuring Sprint
+
+> **This file is a findings log, not a guide.** It is a one-time verification
+> of one specific diff, the visual-restructuring sprint's uncommitted
+> working tree on top of `80eab57`, and it answers exactly one question:
+> did the restructuring corrupt any science? **Nothing in it is a rule**, and
+> nothing in it should be read as covering any change made after 2026-08-26.
+> The corpus has moved substantially since.
+>
+> Its lasting value is the **Method** section at the end: a repeatable
+> mechanical procedure (a LaTeX-span multiset comparison across a whole diff)
+> for asking the same question of the next content-restructuring sprint. Use
+> that; do not assume this verdict still holds over later work.
+>
+> The one live thread out of this audit is its two risk findings (citation
+> detail added without lesson-internal sourcing), which
+> [`CITATION_AUDIT.md`](CITATION_AUDIT.md) picked up and confirmed as
+> factually accurate.
 
 Audit date: 2026-08-26
 Scope: uncommitted working-tree changes at the time of this audit (`git status` clean commit history at `80eab57`; this audit covers everything currently uncommitted under `src/content/`).

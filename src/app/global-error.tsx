@@ -33,7 +33,30 @@ export default function GlobalError({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>Something went wrong · QuantumLearn</title>
+        {/* A deliberately bare head, and the only one on the site: this is
+            the single built page with no `og:image` and no `og:site_name`,
+            because it renders its own document and so inherits nothing from
+            `layout.tsx`'s `metadata` export. That was checked rather than
+            assumed, and left as it is on purpose.
+
+            Open Graph tags exist to make a *URL* preview well when someone
+            pastes it. There is no URL here. `global-error.tsx` is not a
+            route: it has no path, it is never in `sitemap.ts`, nothing links
+            to it, and it renders only as the client-side replacement for a
+            document whose own layout threw. A crawler or an unfurler
+            requesting any real path gets that path's own metadata from the
+            root layout; the only way to see this markup is to already be in
+            a browser that has crashed. So the tags would decorate something
+            that cannot be shared, and the cost of adding them is real: every
+            import this file makes is an import that can be part of what
+            crashed, which is the same reason the buttons below are
+            hand-rolled instead of using `Button.tsx`.
+
+            The `<title>` stays, because that one is not for sharing: it is
+            what the reader's own tab and history say while the site is
+            broken. Anything added here must be a literal, self-contained tag
+            for the same reason. */}
+        <title>Something went wrong · StudyQuantum</title>
         {/* Same no-flash theme script as the root layout, so an explicit
             theme choice still applies even when the layout itself is what
             crashed. `"system"` has to be in the accepted list alongside
@@ -44,11 +67,18 @@ export default function GlobalError({
             their OS. Without the attribute, a reader who explicitly chose
             "follow my system" and is on a light OS is indistinguishable from
             an undecided one and got a dark crash page. Keep this list in sync
-            with src/app/layout.tsx and ThemeToggle.tsx. */}
+            with src/app/layout.tsx and ThemeToggle.tsx.
+
+            That includes the `quantumlearn:theme` fallback: this page can be
+            the *first* thing a returning visitor sees after the rename, in
+            which case nothing has copied their choice forward yet, and a
+            crash page that silently ignores it is exactly where a reader is
+            least forgiving of the site looking wrong. Same shape as the
+            layout's copy, comment and all. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              '(function(){try{var t=localStorage.getItem("quantumlearn:theme");if(t==="light"||t==="dark"||t==="system")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()',
+              '(function(){try{var k="studyquantum:theme",t=localStorage.getItem(k);if(t===null){var o=localStorage.getItem("quantumlearn:theme");if(o!==null){t=o;try{localStorage.setItem(k,o)}catch(e){}}}if(t==="light"||t==="dark"||t==="system")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()',
           }}
         />
       </head>
@@ -56,16 +86,23 @@ export default function GlobalError({
         className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-foreground antialiased"
         style={{ fontFamily: "ui-sans-serif, system-ui, sans-serif" }}
       >
-        <div className="w-full max-w-lg">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-pillar-text">
+        {/* A landmark, not a bare div. This page replaces the whole
+            document, so it does not inherit the root layout's `<main>`:
+            without one, every word on the crash page sits outside any
+            region, and a screen-reader user navigating by landmark (the
+            usual first move on an unfamiliar page) finds nothing at all to
+            jump to. `<main>` costs one tag and is the same landmark the
+            rest of the site puts its content in. */}
+        <main className="w-full max-w-lg">
+          <p className="text-xs font-semibold uppercase tracking-eyebrow text-pillar-text">
             Root-level fault
           </p>
           <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
             The instrument itself failed
           </h1>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            Something broke below the site&rsquo;s own shell, not just this page — reloading
-            usually resolves it.
+            Something broke below the site&rsquo;s own shell, not just this page. Reloading
+            usually fixes it.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -98,7 +135,7 @@ export default function GlobalError({
               </code>
             </p>
           ) : null}
-        </div>
+        </main>
       </body>
     </html>
   );
