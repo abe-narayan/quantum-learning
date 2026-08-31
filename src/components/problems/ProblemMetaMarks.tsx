@@ -20,11 +20,24 @@ import { TYPE_LABEL } from "./problemDisplay";
 export function DifficultyScale({
   difficulty,
   className,
+  withHint = false,
 }: {
   difficulty: ProblemDifficulty;
   className?: string;
+  /** Render `DIFFICULTY_HINT` as visible text rather than leaving it in the
+   *  hover-only `title`. Passed by `ProblemLayout`'s context panel, where the
+   *  reader has deliberately opened a disclosure to ask what the rung means —
+   *  and where a tooltip would be useless anyway, since the panel's other
+   *  reason for existing is that this page is read on a phone. */
+  withHint?: boolean;
 }) {
-  return <DifficultyMark difficulty={PROBLEM_TO_DIFFICULTY[difficulty]} className={className} />;
+  return (
+    <DifficultyMark
+      difficulty={PROBLEM_TO_DIFFICULTY[difficulty]}
+      className={className}
+      withHint={withHint}
+    />
+  );
 }
 
 /** A small instrument glyph per problem type — paired with `TYPE_LABEL` text

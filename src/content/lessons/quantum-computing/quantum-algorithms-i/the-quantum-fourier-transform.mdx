@@ -85,7 +85,7 @@ Deutsch-Jozsa used $H^{\otimes n}$ as an interference step: turn phases into
 measurable amplitudes. The **<Term id="quantum-fourier-transform">quantum Fourier transform (QFT)</Term>** is the
 natural generalization of that idea, the same "Hadamard trick," but general
 enough to extract not just a single yes/no bit but an entire *periodic
-pattern* out of a phase, which is exactly what phase estimation (next
+pattern* out of a phase, which is what phase estimation (next
 lesson) and, eventually, Shor's algorithm need.
 
 <ExternalFigure
@@ -126,7 +126,7 @@ For $n=1$ ($N=2$): $\text{QFT}|0\rangle =
 \frac{1}{\sqrt2}\left(e^{0}|0\rangle+e^{0}|1\rangle\right)=\frac{1}{\sqrt2}(|0\rangle+|1\rangle)=H|0\rangle$,
 and $\text{QFT}|1\rangle=\frac{1}{\sqrt2}\left(|0\rangle+e^{i\pi}|1\rangle\right)=\frac{1}{\sqrt2}(|0\rangle-|1\rangle)=H|1\rangle$.
 So the QFT *is* $H$ for a single qubit, and `quantumFourierTransform`
-reduces to exactly that one Hadamard at $n=1$: its controlled-rotation
+reduces to that one Hadamard at $n=1$: its controlled-rotation
 loop and its final swap layer both have nothing left to do on a
 one-qubit register. That is not a coincidence of small numbers.
 $H^{\otimes n}$, Deutsch-Jozsa's tool, and the QFT are the same
@@ -154,7 +154,7 @@ $$
 e^{2\pi ijk/N} = \prod_{l=1}^{n} e^{2\pi i j k_l/2^{l}}
 $$
   </DerivationStep>
-  <DerivationStep annotation="Summing over all k means summing each bit k_l over {0,1} independently. A sum of products over independent indices is a product of sums, which is exactly a tensor product of one-qubit states: the k_l=0 term contributes |0⟩ with no phase, the k_l=1 term contributes |1⟩ with its phase.">
+  <DerivationStep annotation="Summing over all k means summing each bit k_l over {0,1} independently. A sum of products over independent indices is a product of sums, which is a tensor product of one-qubit states: the k_l=0 term contributes |0⟩ with no phase, the k_l=1 term contributes |1⟩ with its phase.">
 $$
 \text{QFT}|j\rangle = \frac{1}{\sqrt{N}}\bigotimes_{l=1}^{n}\left(|0\rangle + e^{2\pi i j/2^{l}}|1\rangle\right)
 $$
@@ -173,7 +173,7 @@ amplitudes. That is the fact that makes an efficient circuit possible.
 Two features of the circuit fall straight out of this form. First, output
 qubit $l$ carries the phase $0.j_{n-l+1}\ldots j_n$, whose leading digit
 is the single bit $j_{n-l+1}$. One Hadamard on that input qubit produces
-$|0\rangle+e^{i\pi j_{n-l+1}}|1\rangle$, exactly the leading-digit part of
+$|0\rangle+e^{i\pi j_{n-l+1}}|1\rangle$, the leading-digit part of
 the phase, and one controlled rotation is then needed for each further bit
 $j_{n-l+2},\ldots,j_n$ that contributes a finer correction. Hence the
 $H$-then-rotation-chain pattern.
@@ -200,7 +200,7 @@ order, since this construction naturally produces the output qubits in
 reverse, a bookkeeping step, not new physics. Every rotation is a single
 `applyControlledGate(phaseGate(angle), control, target)` call; no
 multi-qubit or multi-controlled gate is needed anywhere in the circuit.
-`quantumFourierTransform` implements exactly this, and its output is
+`quantumFourierTransform` implements this, and its output is
 checked directly against the closed-form DFT sum above for *every* basis
 state, $n=2$ through $n=4$: not spot-checked, exhaustively checked.
 
@@ -288,7 +288,7 @@ the $O(N^2)$ cost of the direct $N\times N$ DFT matrix derived above.
 />
 
 Getting the transformed values back out of that quantum state still
-requires a specific measurement strategy, not a printout, exactly what
+requires a specific measurement strategy, not a printout, which is what
 phase estimation (next lesson) builds. The point of the next several
 lessons is what this change of basis buys you when a phase already
 encodes something you want to know.
@@ -325,7 +325,7 @@ it lands on cycles through all four possibilities exactly once:
 Every amplitude has magnitude exactly $0.5$ (so $|{\pm0.5}|=|{\pm0.5i}|=0.5$
 in every one of the eight bars above, only four of which are nonzero at a
 time), but the phase steps by exactly $90°$ from one basis state to the
-next, precisely $e^{2\pi i(1)k/4}$ for $k=0,1,2,3$.
+next, which is $e^{2\pi i(1)k/4}$ for $k=0,1,2,3$.
 
 ### Sweeping which basis state gets transformed
 
@@ -373,7 +373,7 @@ $e^{2\pi ijk/4}$, evaluated at a different $j$, not four separate facts.
 discrete Fourier transform, but the QFT acts on $\log_2N$ qubits via
 $O(n^2)$ gates and outputs a *quantum state* you cannot read off:
 extracting the transformed values back out requires a specific measurement
-strategy (exactly what phase estimation builds next), not a printout.
+strategy (what phase estimation builds next), not a printout.
 </Callout>
 
 <Callout type="warning">
@@ -406,7 +406,7 @@ this lesson's worked example relies on.
    Two checks are worth making. Normalization:
    $4\times\left(\tfrac12\right)^2 = 1$. And the state factorizes:
    $\tfrac12(|00\rangle-|01\rangle+|10\rangle-|11\rangle) = |+\rangle\otimes|-\rangle$,
-   a product state with no entanglement, exactly as the lesson's product
+   a product state with no entanglement, as the lesson's product
    form guarantees for any basis-state input. Reading the product form off
    directly, with $j = j_1j_2 = 10$: the first output qubit carries phase
    $0.j_2 = 0.0 = 0$, giving $|+\rangle$, and the second carries
@@ -537,7 +537,7 @@ this lesson's worked example relies on.
    useful only when a single sampled $k$, or a property visible in one
    sample, is what you actually needed.
 
-   That condition is exactly what the next two lessons arrange. Phase
+   That condition is what the next two lessons arrange. Phase
    estimation applies the inverse transform to a state whose amplitudes are
    a pure phase ramp, so the transform concentrates nearly all the
    probability onto one $k$, and one sample is enough. Shor's algorithm

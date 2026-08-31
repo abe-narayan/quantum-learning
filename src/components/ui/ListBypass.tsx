@@ -5,18 +5,29 @@ import type { ReactNode } from "react";
  * A way out of a very long list, for a keyboard
  * ============================================================
  * Three pages on this site are single lists long enough that Tab stops being
- * navigation and becomes an obstacle. Counted from the served HTML on
- * localhost:3000, not from the source:
+ * navigation and becomes an obstacle. These are a dated snapshot, not a
+ * derived constant: re-measured 2026-08-30 against localhost:3000 by driving
+ * headless Chrome (scripts/audit/), counting only the anchors, buttons and
+ * inputs inside `<main>` that are actually reachable (`offsetParent !==
+ * null`) at 375px and 1280px. /glossary carries two copies of its A-Z rail
+ * (one `hidden lg:flex`, one `lg:hidden`) so the raw DOM count is higher than
+ * this; only the copy visible at a given width is a real tab stop, and
+ * exactly one of the two is visible at either width measured:
  *
- *   /glossary   1,471 anchors + 4 buttons + 1 input   = 1,476 tab stops
- *   /problems   1,138 anchors + 21 buttons            = 1,159 tab stops
- *   /lessons      278 anchors + 16 buttons + 1 input  =   295 tab stops
+ *   /glossary   1,706 anchors + 0 buttons + 1 input   = 1,707 tab stops
+ *   /problems      99 anchors + 19 buttons            =   118 tab stops
+ *   /lessons      256 anchors + 12 buttons + 1 input  =   269 tab stops
+ *
+ * /problems dropped from four figures to under 120 because it now renders in
+ * batches of 48 with progressive disclosure rather than the whole catalog at
+ * once (see ProblemsCatalog). If these numbers matter again, re-measure; do
+ * not hand-type a replacement.
  *
  * Each of them has exactly one skip link (`layout.tsx`'s "Skip to content"),
  * and it lands *before* the list. So the two things a keyboard-only reader
  * most often wants from a catalog page, the footer and the filter they were
  * just using, are both on the far side of every row. On /glossary that is
- * 1,471 presses to reach a footer link, and there is no way back to the
+ * over 1,700 presses to reach a footer link, and there is no way back to the
  * filter field at all short of Shift+Tab through the same wall.
  *
  * The A-Z rails on /glossary look like the answer and are not: they are

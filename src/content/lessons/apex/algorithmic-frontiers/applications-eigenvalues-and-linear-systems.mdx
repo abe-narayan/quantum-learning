@@ -238,7 +238,7 @@ constructions, cited here, not rederived) give a polynomial of degree
 $O(\kappa\log(1/\epsilon))$ achieving accuracy $\epsilon$ on exactly that
 truncated interval. A worse-conditioned $A$ (smaller $1/\kappa$, i.e.
 larger $\kappa$) pushes the approximation domain closer to the
-unbounded singularity, which is precisely why every version of this
+unbounded singularity, which is why every version of this
 algorithm's cost scales with $\kappa$, not just with $N$.
 
 ### Query complexity
@@ -554,7 +554,7 @@ ask what $\kappa$ does as the problem scales, not just what $N$ does.
 
    The first is treating $\kappa$ as a constant of the matrix rather than a function of the problem size. In this example $\kappa$ is what carries the size dependence, and the $N$ that appears in $\log N$ and the $N$ hidden inside $\kappa$ are the *same* $N$. Reading the complexity as "polylog in the dimension, times some condition-number factor" invites you to think of the two as independent knobs. They very often are not, and discretized differential operators, the most commonly cited application, are exactly the case where they are not.
 
-   The second is concluding that the algorithm is therefore useless. It is not; it is *conditional*, and condition (1) of the four-condition list is precisely the condition this example fails. Preconditioning, or a problem whose $\kappa$ genuinely stays bounded as $N$ grows, puts you back on the good side of it. The point of running the number is to see that "well-conditioned" is a hypothesis with teeth, not a footnote: between $\kappa=2$ and $\kappa=4.5\times10^{11}$ lies the difference between $14$ queries and $3\times10^{12}$.
+   The second is concluding that the algorithm is therefore useless. It is not; it is *conditional*, and condition (1) of the four-condition list is the condition this example fails. Preconditioning, or a problem whose $\kappa$ genuinely stays bounded as $N$ grows, puts you back on the good side of it. The point of running the number is to see that "well-conditioned" is a hypothesis with teeth, not a footnote: between $\kappa=2$ and $\kappa=4.5\times10^{11}$ lies the difference between $14$ queries and $3\times10^{12}$.
 
    </details>
 

@@ -63,7 +63,7 @@ export const equatorStatesSameThetaDifferentPhi: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "θ (latitude) controls measurement statistics; φ (longitude) is the relative phase, a real physical difference invisible only to a plain computational-basis measurement.",
-    whyCorrect: "This is exactly why |+⟩ and |-⟩ (both equator, φ differing by π) give identical 50/50 outcomes when measured directly, yet behave completely differently once a Hadamard gate is applied to them.",
+    whyCorrect: "This is why |+⟩ and |-⟩ (both equator, φ differing by π) give identical 50/50 outcomes when measured directly, yet behave completely differently once a Hadamard gate is applied to them.",
     whyWrong: [
       "Claiming two equator states are 'the same state' because they give the same measurement probabilities ignores that φ is still a real, physically distinguishable difference, just not one a computational-basis measurement alone reveals.",
     ],

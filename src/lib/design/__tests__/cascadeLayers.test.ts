@@ -109,6 +109,8 @@ const INTENTIONALLY_UNLAYERED: Record<string, string> = {
     "must beat the typography plugin's blockquote rules, which are more specific than a layered override would be",
   ".prose h2::before":
     "the section marker; a pseudo-element the plugin also styles, so it must outrank the plugin's unlayered output",
+  ".prose :where(code):not(:where(pre code))":
+    "must beat the typography plugin's own unlayered `code` rule, which sets no wrapping behavior and left long identifiers (`optimalGroverIterations(6)`) overflowing at 320px with no scrollbar (`body` is `overflow-x: clip`)",
 
   // --- Scroll reveal -----------------------------------------------------
   "[data-reveal]":

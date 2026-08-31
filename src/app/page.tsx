@@ -1,13 +1,14 @@
 import { PillarScope } from "@/components/field/PillarScope";
 import { Hero } from "@/components/home/Hero";
+import { EntryChooser } from "@/components/home/EntryChooser";
 import { PredictSection } from "@/components/home/PredictSection";
 import { HowItWorks } from "@/components/home/HowItWorks";
+import { SiteContents } from "@/components/home/SiteContents";
 import { ActPlate } from "@/components/home/ActPlate";
 import { MechanicsSection } from "@/components/home/MechanicsSection";
 import { ComputingSection } from "@/components/home/ComputingSection";
 import { HardwareSection } from "@/components/home/HardwareSection";
 import { SoftwareSection } from "@/components/home/SoftwareSection";
-import { ExploreSection } from "@/components/home/ExploreSection";
 import { MasterySection } from "@/components/home/MasterySection";
 import { ApexSection } from "@/components/home/ApexSection";
 
@@ -15,33 +16,59 @@ import { ApexSection } from "@/components/home/ApexSection";
  * ============================================================
  * The homepage
  * ============================================================
- * A descent into a laboratory, not a table of contents.
+ * An orientation layer, then a descent into a laboratory.
  *
- * The page used to be the hero plus the six tracks, in order, each announcing
- * itself the same way. Everything in it was true and specific, and it still
- * read as a list, because a reader arriving cold was given six equally-weighted
- * subjects and no reason why one followed another. The arc below replaces the
- * list with a sequence that has somewhere to go:
+ * The page was a three-act narrative descent and nothing else, and the descent
+ * is good: it is what makes this read as a laboratory rather than a product
+ * page, and it is kept below. What it could not do was orient anybody. The
+ * first screen was measured at both widths this site promises to work at:
  *
- *   Curiosity   `Hero`           a real solver, running, beside a claim about
- *                                what this site is and who is allowed to use it.
- *   Experiment  `PredictSection` the page asks for something before it gives
- *                                anything: commit to a number, then go run the
- *                                simulation that settles it. This is also the
- *                                only honest preview of the product, since
- *                                `PredictBeforeReveal` is what nearly every
- *                                lesson does (`PREDICTION_LESSON_COUNT`).
- *                                The literal "213" that stood here was the
- *                                same stale figure PredictSection.tsx records
- *                                having shipped on the page itself; a count
- *                                is no safer to hand-type in a comment.
- *   Orientation `HowItWorks`     what is actually behind a link, which door is
- *                                yours, and in what order the six tracks come.
- *   Understand  Act I            Mechanics, then Computing.
- *   Build       Act II           Hardware, then Software.
- *   Explore     `ExploreSection` the one section that is not a step: the order
- *                                is a recommendation, and here is how to leave it.
- *   Research    Act III          Mastery, then Apex, and the closing action.
+ *   1440x900  the only actions on screen were the hero simulator's own preset
+ *             buttons. "Start learning" was below the fold everywhere except a
+ *             small button in the navbar.
+ *   375x812   zero actions on screen. Three paragraphs of prose.
+ *
+ * So the four questions a first-time visitor actually has (what is this, does
+ * it cost anything, where do I begin, what else is in here) were answered
+ * either late, quietly, or not at all, on a page that answered every question
+ * about the *subject* beautifully. The first four sections below are the fix,
+ * and they are ordered as those questions are asked:
+ *
+ *   What is this   `Hero`            the hook, the price, and the primary
+ *                                    action, all inside the first screen at
+ *                                    375px and 1440px, with the live solver
+ *                                    beside them as support rather than as the
+ *                                    whole screen.
+ *   Which am I     `EntryChooser`    four self-descriptions, each a link
+ *                                    straight to the right page. No account,
+ *                                    no modal, no wizard. This is the single
+ *                                    highest-value section on the page: it
+ *                                    turns "what do I click" into "which of
+ *                                    these am I".
+ *   Experiment     `PredictSection`  the page asks for something before it
+ *                                    gives anything: commit to a number, then
+ *                                    go run the simulation that settles it.
+ *                                    It stays directly under the chooser
+ *                                    because it is about the hero's own panel
+ *                                    and refers to it by name. It is also the
+ *                                    only honest preview of the product, since
+ *                                    `PredictBeforeReveal` is what nearly
+ *                                    every lesson does.
+ *   What is a      `HowItWorks`      the four beats of a lesson, one real
+ *   lesson                           lesson section running live, and the six
+ *                                    tracks in curriculum order with the rung
+ *                                    each starts at.
+ *   What else      `SiteContents`    every major destination in one click,
+ *                                    with a derived figure for each. This
+ *                                    supersedes `ExploreSection`, which
+ *                                    covered five of them from a slot between
+ *                                    Act II and Act III.
+ *
+ * Then the descent, unchanged:
+ *
+ *   Understand  Act I    Mechanics, then Computing.
+ *   Build       Act II   Hardware, then Software.
+ *   Research    Act III  Mastery, then Apex, and the closing action.
  *
  * The three `ActPlate`s are what turn six sections into three movements. They
  * also carry the background's caption, once per act at the point the
@@ -57,22 +84,26 @@ import { ApexSection } from "@/components/home/ApexSection";
  * Individual track sections tint themselves via `PillarBand` (a bare
  * `data-pillar` wrapper) rather than nesting another `PillarScope`, which would
  * fight over which regime the canvas field renders. Each band also stamps
- * `data-journey-stop`, which is how the crossfade now tracks *this* order
- * rather than the raw fraction of the document scrolled: with three sections
- * ahead of the first track and a detour in the middle, those two stopped being
- * the same thing. See PillarBand and `measureStops` in QuantumField.
+ * `data-journey-stop`, which is how the crossfade tracks *this* order rather
+ * than the raw fraction of the document scrolled; `measureStops` in
+ * `QuantumField` reads those from the DOM, so the orientation sections in front
+ * of the first band shift where the stops sit and nothing has to be told about
+ * it.
  *
  * Every section here is a Server Component, and the only client code the page
- * adds over the previous version is `PredictBeforeReveal`, which imports
- * nothing but React. The registries stay on the server: see
- * `src/lib/design/__tests__/clientBoundary.test.ts` and docs/DEPLOYMENT.md.
+ * adds over a static document is `PredictBeforeReveal`, which imports nothing
+ * but React, plus the deferred hero simulator. The registries stay on the
+ * server: see `src/lib/design/__tests__/clientBoundary.test.ts` and
+ * docs/DEPLOYMENT.md.
  */
 export default function Home() {
   return (
     <PillarScope regime="journey">
       <Hero />
+      <EntryChooser />
       <PredictSection />
       <HowItWorks />
+      <SiteContents />
 
       <ActPlate
         id="act-understand"
@@ -101,8 +132,6 @@ export default function Home() {
       />
       <HardwareSection />
       <SoftwareSection />
-
-      <ExploreSection />
 
       <ActPlate
         id="act-research"

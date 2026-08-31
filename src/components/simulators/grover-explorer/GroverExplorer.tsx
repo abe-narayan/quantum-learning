@@ -5,7 +5,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { uniformSuperposition, groverIteration, optimalGroverIterations } from "@/lib/quantum/grover";
 import { AmplitudeBars } from "./AmplitudeBars";
 import { GroverControls } from "./GroverControls";
-import { KatexMath } from "@/components/ui/KatexMath";
 import { Button } from "@/components/ui/Button";
 import { Readout } from "@/components/ui/Typography";
 import { SimulatorInstrument } from "../shared/SimulatorInstrument";
@@ -187,17 +186,25 @@ export function GroverExplorer() {
   return (
     <SimulatorInstrument
       label="Grover&rsquo;s algorithm: amplitude amplification"
-      readout={<Readout label="P(marked)" value={(successProbability * 100).toFixed(1)} unit="%" />}
+      // "P(marked)" named the quantity for someone who already reads that
+      // notation and named nothing for anyone else, which on a bench that
+      // promises "no lesson to finish first" is the wrong half of the
+      // audience. The words are the label; the notation lives in the prose
+      // and the framing, where there is room to introduce it.
+      readout={<Readout label="Chance of the marked item" value={(successProbability * 100).toFixed(1)} unit="%" />}
       footnote="Next: see how the same-size search space collapses instantly in the Two-Qubit Explorer&rsquo;s measurement panel; no amplification needed classically."
       stageClassName="space-y-6"
       stage={
         <>
+          {/* Trimmed: "pushes probability onto the right answer" is now said
+              once, not twice, since `SimulatorFraming`'s "What this shows"
+              below already makes that claim. The black-box setup and how to
+              read the bars stay, since neither appears anywhere else. */}
           <p className="text-sm text-muted-foreground">
-            Somewhere in a list of {2 ** numQubits} items, exactly one is the one you want, and the only thing
-            you can do is ask a black box &ldquo;is this it?&rdquo; Classically you check them one at a time.
-            Grover&rsquo;s algorithm instead pushes probability onto the right answer a little more with every
-            round, so that when you finally measure, you are overwhelmingly likely to get it. Each bar below
-            is one item; its height is the chance of measuring that item right now.
+            Somewhere in a list of {2 ** numQubits} items, exactly one is the answer, and all you can do is
+            ask a black box &ldquo;is this it?&rdquo; one at a time. Grover&rsquo;s algorithm instead pushes
+            probability onto the right answer with every round. Each bar below is one item; its height is
+            the chance of measuring it right now.
           </p>
 
           <div
@@ -225,21 +232,10 @@ export function GroverExplorer() {
           </div>
 
           <AmplitudeBars state={state} markedIndices={[markedIndex]} />
-
-          {/* No `overflow-x-auto` here: the only child is a block-level
-              `.katex-display`, which fills this content box and carries its own
-              horizontal scroll (globals.css §6), so this box never had anything to
-              scroll, and `overflow-x: auto` with `overflow-y: visible` computes the
-              y axis to `auto` too, which would silently clip a tall equation. The tab
-              stop the slab needs now lives on `.katex-display` itself; see
-              `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
-          <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
-            <KatexMath
-              tex={`P(\\text{marked}) = ${successProbability.toFixed(4)}`}
-              display
-            />
-          </div>
-
+        </>
+      }
+      stageAfter={
+        <>
           {iteration >= optimal && optimal > 0 ? (
             <Predict
               key={`${numQubits}-${markedIndex}`}
@@ -259,6 +255,7 @@ export function GroverExplorer() {
           ) : null}
 
           <SimulatorFraming
+            flush
             shows="Grover's algorithm concentrates probability onto a marked item faster than any classical search, but only up to a point."
             watchFor="Success probability doesn't climb forever; past the optimal iteration count it overshoots and starts falling back down."
             tryThis={
@@ -275,23 +272,26 @@ export function GroverExplorer() {
       }
       controls={
         <>
-          <div className="flex justify-end">
+          <GroverControls
+            numQubits={numQubits}
+            onNumQubitsChange={handleNumQubitsChange}
+            markedIndex={markedIndex}
+            onMarkedIndexChange={handleMarkedIndexChange}
+            iteration={iteration}
+            optimalIteration={optimal}
+            onStep={handleStep}
+            onReset={handleReset}
+            disabled={false}
+          />
+          {/* Last, not first. When the split collapses this rail is what the
+              reader meets directly under the picture, and "Copy link" is
+              chrome: it was the first thing under the visualization on nine
+              instruments, i.e. the first control a phone reader could reach
+              on any of them. The primary control goes first. */}
+          <div className="mt-6 flex justify-end">
             <Button size="sm" variant="secondary" onClick={handleCopyLink}>
               {copied ? "Copied!" : "Copy link"}
             </Button>
-          </div>
-          <div className="mt-4">
-            <GroverControls
-              numQubits={numQubits}
-              onNumQubitsChange={handleNumQubitsChange}
-              markedIndex={markedIndex}
-              onMarkedIndexChange={handleMarkedIndexChange}
-              iteration={iteration}
-              optimalIteration={optimal}
-              onStep={handleStep}
-              onReset={handleReset}
-              disabled={false}
-            />
           </div>
         </>
       }

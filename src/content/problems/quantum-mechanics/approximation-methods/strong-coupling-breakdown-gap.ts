@@ -43,7 +43,7 @@ export const strongCouplingBreakdownGap: NumericProblem = {
     finalAnswer: "≈0.63",
   },
   explanation: {
-    correctIdea: "The SIZE of this gap (over half a probability unit) is itself the point: it is not a small correction to distrust slightly, it is a qualitative failure of the approximation.",
+    correctIdea: "The size of this gap (over half a probability unit) is itself the point: it is not a small correction to distrust slightly, it is a qualitative failure of the approximation.",
     whyCorrect: "Matches the difference between the engine's firstOrderTransitionProbability and exactTwoLevelTransitionProbability for this (V,t) pair.",
     whyWrong: ["A small computed gap here would be inconsistent with the lesson's own worked-example table, which documents this as the strong-coupling breakdown case."],
   },

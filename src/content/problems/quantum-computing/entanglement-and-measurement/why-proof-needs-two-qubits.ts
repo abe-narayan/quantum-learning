@@ -24,7 +24,7 @@ export const whyProofNeedsTwoQubits: ConceptualProblem = {
       {
         phrases: ["four amplitudes", "4 amplitudes", "four-amplitude", "a,b,c,d", "only four", "exactly four", "four coefficients", "just four numbers"],
         missingFeedback:
-          "Say how many numbers the two-qubit pure state the proof starts from actually has. The whole identity is built around that count.",
+          "Say how many numbers the two-qubit pure state the proof starts from has. The whole identity is built around that count.",
       },
       {
         phrases: ["eight amplitude", "8 amplitude", "eight coefficients", "different formula", "different derivation", "more terms", "bigger sum", "larger sum", "more than four", "no longer four", "four is not enough"],

@@ -113,7 +113,19 @@ export function CurrentQuantumCatalog({
     const base = entries.filter((entry) => category === "all" || entry.category === category);
     return [
       { id: "all" as PillarFilter, label: "All", count: base.length },
-      ...PILLAR_ORDER.map((slug) => ({
+      // Only tracks that have an entry *in the whole corpus*. Two of the six
+      // (Mechanics and Apex) have none, and both rendered as a chip reading
+      // "0 developments" in the page's first screen at 1440 — a control whose
+      // only possible outcome is the empty state, offered before the reader
+      // has done anything wrong. The test is against `entries`, deliberately,
+      // not against `base`: computing it from the filtered set would make
+      // chips appear and vanish as the *other* row is used, which is a worse
+      // failure than a dead chip. The per-chip `count` below still reads from
+      // `base`, so the numbers keep answering "how many if I pick this, given
+      // what else you have picked".
+      ...PILLAR_ORDER.filter((slug) =>
+        entries.some((entry) => entryPillar(entry) === slug),
+      ).map((slug) => ({
         id: slug as PillarFilter,
         // The short pillar name, from the site's one source for it. This row
         // was already the short form by hand (`p.title.replace(/^Quantum /,

@@ -43,7 +43,7 @@ export const whichPrecisionQubitControlsLargestPower: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Precision qubit 0 (first Hadamard'd, this platform's MSB) always controls the largest power of U.",
-    whyCorrect: "This is exactly why qubit 0 ends up as the most significant bit of the recovered phase after the inverse QFT.",
+    whyCorrect: "This is why qubit 0 ends up as the most significant bit of the recovered phase after the inverse QFT.",
     whyWrong: [
       { optionId: "b", text: "Controls U^4: one step down the ladder from the largest power." },
       { optionId: "c", text: "Controls U^2: two steps down." },

@@ -115,10 +115,14 @@ export async function Footer() {
 
         <nav aria-label="Reference and tools">
           <p className="tech-label text-subtle-foreground">Reference</p>
-          {/* `gap-y-0.5`, not `gap-y-2`: each link below now carries its own
-              44px box, so the row pitch comes from the targets themselves
-              rather than from a gap sized for 20px line boxes. */}
-          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-0.5 text-sm sm:block sm:space-y-0.5">
+          {/* The row pitch comes from the 44px targets themselves rather than
+              from a gap sized for 20px line boxes — but not from the targets
+              *alone*. `gap-y-0.5` (2px) left two 44px-tall rows two pixels
+              apart, which `responsive.mjs --widths 375` reports as "36x44,
+              2px to the nearest other target": tall enough, but a thumb aimed
+              at "Learn" lands as easily on "All lessons". `gap-y-1.5` (6px)
+              costs 4px per row in a footer that has room for it. */}
+          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm sm:block sm:space-y-1.5">
             {FOOTER_REFERENCE_ITEMS.map((item) => (
               <li key={item.href}>
                 <Link
@@ -128,12 +132,24 @@ export async function Footer() {
                   // intersecting) but well under the 44px floor this site
                   // applies everywhere else, and this is the one place a
                   // reader who scrolled past the whole page can still reach
-                  // every section. `inline-flex min-h-11` rather than the
+                  // every section. `min-h-11` rather than the
                   // padding-and-negative-margin trick used on baseline-aligned
                   // links elsewhere: at a 28px row pitch that trick would have
                   // made adjacent targets overlap by 16px, which mis-taps
                   // worse than an undersized target does.
-                  className={cn("inline-flex min-h-11 items-center rounded-sm text-muted-foreground hover:text-foreground", INTERACTIVE_CLASSES)}
+                  //
+                  // `flex w-full`, not `inline-flex`. The box used to hug its
+                  // label, on the stated grounds that a full-width target in a
+                  // two-column phone layout would put the two columns' boxes
+                  // against each other — which the 24px `gap-x-6` between
+                  // those columns already prevents. What hugging actually
+                  // produced was a 36x44 and a 38x44 target ("Learn",
+                  // "About"), reported by `responsive.mjs` on every route:
+                  // tall enough and half as wide as the floor, in the corner
+                  // of the screen where a thumb is least accurate. Filling the
+                  // grid cell makes every one of them at least 44 wide, and
+                  // the columns stay 24px apart.
+                  className={cn("flex min-h-11 w-full items-center rounded-sm text-muted-foreground hover:text-foreground", INTERACTIVE_CLASSES)}
                 >
                   {item.label}
                 </Link>

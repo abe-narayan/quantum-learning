@@ -96,7 +96,15 @@ export function FilterChips<T extends string>({
               onClick={() => onChange(option.id)}
               aria-pressed={isSelected}
               className={cn(
-                "inline-flex min-h-11 items-center gap-2 rounded-full border px-3.5 text-sm transition-colors duration-(--dur-fast)",
+                // `flex-wrap`: at 200% text zoom a chip's own content — the
+                // shape dot, an option label that can run to two words, and
+                // a count — no longer always fits one line (WCAG 1.4.4), and
+                // unlike the row above (already `flex-wrap`), a single chip
+                // wide enough to overflow on its own gets no relief from the
+                // row wrapping around it. Letting the chip itself wrap keeps
+                // the count on screen instead of past `.instrument`'s
+                // `overflow-hidden`.
+                "inline-flex min-h-11 flex-wrap items-center gap-2 rounded-full border px-3.5 text-sm transition-colors duration-(--dur-fast)",
                 isSelected
                   ? "border-pillar bg-pillar-wash font-medium text-pillar-text"
                   : "border-border bg-surface text-muted-foreground hover:border-border-strong hover:text-foreground",

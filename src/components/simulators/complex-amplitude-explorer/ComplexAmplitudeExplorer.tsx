@@ -243,21 +243,20 @@ export function ComplexAmplitudeExplorer({
           onChange={(index) => setMode(index === 0 ? "single" : "two-amplitude")}
           ariaLabel="Explorer mode"
         />
-        <div className="flex gap-2">
-          <Button variant="secondary" size="sm" onClick={handleCopyLink}>
-            {copied ? "Copied!" : "Copy link"}
-          </Button>
-          <Button variant="secondary" size="sm" onClick={reset}>
-            Reset
-          </Button>
-        </div>
+        <Button variant="secondary" size="sm" onClick={reset}>
+          Reset
+        </Button>
       </div>
 
+      {/* Trimmed: `SimulatorFraming`'s "What this shows" below already
+          defines z as a complex number and says only |z|² is a probability.
+          What it does not say, and this keeps, is the one line that makes the
+          definition matter: the direction is invisible in one measurement and
+          decisive whenever two paths meet. */}
       <p className="mt-4 text-sm text-muted-foreground">
-        Quantum mechanics does not hand you probabilities directly. It hands you an{" "}
-        <span className="font-medium text-foreground">amplitude</span>: an arrow with a length and a
-        direction, drawn below. Square its length and you get the probability. The direction never shows
-        up in that answer at all, and yet it is the reason two possibilities can cancel each other out.
+        An <span className="font-medium text-foreground">amplitude</span> has a length and a direction.
+        Square the length for a probability, and the direction vanishes, and yet it is the reason two
+        possibilities can cancel each other out.
       </p>
 
       <div
@@ -310,6 +309,15 @@ export function ComplexAmplitudeExplorer({
           />
         </div>
       )}
+
+      {/* Last, not first. This was the leftmost of two buttons in the header
+          row, i.e. one of the first two controls a reader could reach on the
+          instrument, above the prose that says what the instrument is. */}
+      <div className="mt-6 flex justify-end">
+        <Button variant="secondary" size="sm" onClick={handleCopyLink}>
+          {copied ? "Copied!" : "Copy link"}
+        </Button>
+      </div>
 
       <SimulatorFraming
         shows={

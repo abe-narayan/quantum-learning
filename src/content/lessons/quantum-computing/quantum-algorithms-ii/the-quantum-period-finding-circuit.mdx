@@ -72,10 +72,10 @@ A real circuit builds this via $H^{\otimes t}$ on the counting register
 followed by a sequence of controlled modular multiplications (each
 counting qubit $q$ conditionally multiplying the second register by
 $a^{2^{t-1-q}}\bmod N$, mirroring phase estimation's controlled-$U^{2^k}$
-structure exactly). **This platform constructs this exact state directly
+structure). **This platform constructs this exact state directly
 from its closed-form amplitudes instead of building that gate sequence.**
 `periodFindingState` places <Term id="amplitude">amplitude</Term> $1/\sqrt{2^t}$ at index $(x,\,a^x\bmod
-N)$ for every $x$, which is precisely what the real circuit outputs, just
+N)$ for every $x$, which is what the real circuit outputs, just
 without implementing the controlled-modular-multiplication circuitry
 itself. That circuitry is substantial engineering, a quantum-arithmetic
 subroutine in its own right, beyond this course's scope and explicitly not
@@ -94,7 +94,7 @@ use $t=6$.)*
 This schematic shows the *shape* of that circuit rather than a running one: each
 counting qubit $q$ starts with an $H$, then controls one
 $U_a^{2^{t-1-q}}$ box that conditionally multiplies the target register
-by a power of $a$, exactly mirroring phase estimation's controlled-$U^{2^k}$
+by a power of $a$, mirroring phase estimation's controlled-$U^{2^k}$
 staircase. The final box is the QFT from the section below, applied only
 to the counting register. As above, this platform builds the *state*
 that staircase would output directly from its closed-form amplitudes,
@@ -145,7 +145,7 @@ a flat floor of zeros, with nothing decaying away between them.
   ariaLabel="Measurement probability at every fourth outcome of the period-finding distribution for a=7, N=15, t=6 counting qubits"
 />
 
-<InteractiveSection title="Peak count tracks the order r" description="Slide through every base a coprime to 15 (a=1 excluded as trivial). The peak count and spacing change with r=classicalOrder(a,15): a=4, a=11, and a=14 all have order r=2, so probability concentrates into exactly 2 peaks (0 and 32) at 1/2 each; a=2, a=7, a=8, and a=13 all have order r=4, giving 4 peaks at 1/4 each, exactly the 'splits evenly across r peaks' claim above, now checked for seven different bases, not just a=7.">
+<InteractiveSection title="Peak count tracks the order r" description="Slide through every base a coprime to 15 (a=1 excluded as trivial). The peak count and spacing change with r=classicalOrder(a,15): a=4, a=11, and a=14 all have order r=2, so probability concentrates into exactly 2 peaks (0 and 32) at 1/2 each; a=2, a=7, a=8, and a=13 all have order r=4, giving 4 peaks at 1/4 each, the 'splits evenly across r peaks' claim above now checked for seven different bases, not just a=7.">
   <BarChartExplorer
     frames={periodFrames}
     sliderLabel="base a (coprime to 15)"
@@ -243,7 +243,7 @@ clean picture the sharp case suggests.
    The course's own example is $a=2$, $N=21$, where $r=6$ and
    $2^6/6 = 10.667$. The engine's distribution has all $64$ outcomes
    nonzero, but the six largest sit at $0, 11, 21, 32, 43, 53$, which are
-   precisely the nearest integers to $0, 10.67, 21.33, 32, 42.67, 53.33$.
+   the nearest integers to $0$, $10.67$, $21.33$, $32$, $42.67$, $53.33$.
    Their probabilities are $0.167$ at $0$ and $32$ (where the multiple is
    exact) and $0.114$ at the four rounded ones, totalling about $79\%$;
    the remaining $21\%$ is spread thinly over the other $58$ outcomes.
@@ -339,7 +339,7 @@ clean picture the sharp case suggests.
    The wrong turn is to assume the missing piece is somehow the quantum
    part, or that simulating it would show something new about
    interference. It would not: the state is identical either way, which is
-   exactly why building it directly is an honest shortcut rather than a
+   why building it directly is an honest shortcut rather than a
    fudge.
 
    </details>
@@ -394,7 +394,7 @@ clean picture the sharp case suggests.
   explicit, documented substitute for a real controlled-modular-arithmetic
   circuit this platform doesn't implement.
 - Applying the QFT to the counting register concentrates probability at
-  exact multiples of $2^t/r$, verified exactly for the $a=7,N=15$ case.
+  exact multiples of $2^t/r$, verified to six decimals for the $a=7,N=15$ case.
 - Recovering $r$ from an observed peak needs the classical continued
   fractions algorithm, also not implemented here: an honestly scoped
   limitation, not a hidden gap.

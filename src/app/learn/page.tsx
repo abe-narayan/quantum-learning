@@ -184,18 +184,42 @@ export default async function LearnPage() {
               parse and no button until a section down. Anchor, not lesson
               link, so the choice of entry point (the fork below) stays a
               real choice. */}
-          {rootCourse || intuitionLesson ? (
-            // The label has to name where the click lands, and this one lands
-            // on the fork, not in a lesson. It used to read "New here? Start
-            // with a 30-minute lesson" and then scroll the reader to a choice
-            // between two lessons, neither of which it had named — the loudest
-            // control on the page promising one thing and delivering another.
-            // The durations it was carrying now sit on the two cards
-            // themselves, where they are actually comparable.
-            <Button href="#ways-in" size="lg" className="mt-(--rhythm-close)">
-              New here? Pick a starting point
-            </Button>
-          ) : null}
+          {/* Two actions, because this page has two readers and only ever
+              answered one of them. The first screen carried exactly one
+              control — "New here? Pick a starting point" — which is the right
+              answer for a first-time visitor and no answer at all for the far
+              more common arrival, someone who came from "Browse the
+              curriculum" and wants the catalog. That reader's only route was
+              to scroll past the fork and the pillar strip, on a page that is
+              tens of thousands of pixels long. The second link is a jump, not
+              a page change, and says so with the arrow and the count. */}
+          <div className="mt-(--rhythm-close) flex flex-wrap items-center gap-x-6 gap-y-3">
+            {rootCourse || intuitionLesson ? (
+              // The label has to name where the click lands, and this one lands
+              // on the fork, not in a lesson. It used to read "New here? Start
+              // with a 30-minute lesson" and then scroll the reader to a choice
+              // between two lessons, neither of which it had named — the loudest
+              // control on the page promising one thing and delivering another.
+              // The durations it was carrying now sit on the two cards
+              // themselves, where they are actually comparable.
+              <Button href="#ways-in" size="lg">
+                New here? Pick a starting point
+              </Button>
+            ) : null}
+            {/* `inline-flex min-h-11 items-center` for the 44px target at no
+                layout cost: the row is `items-center` beside a `size="lg"`
+                Button that is already 44px tall. Same recipe as the "See all
+                N modules" link on the fork card below. */}
+            <Link
+              href="#catalog"
+              className="inline-flex min-h-11 items-center text-sm font-medium text-pillar-text underline-offset-4 hover:underline"
+            >
+              Browse all {COURSES.length} courses{" "}
+              <span aria-hidden="true" data-decorative="" className="ml-1">
+                ↓
+              </span>
+            </Link>
+          </div>
         </Reveal>
         <Reveal delay={90}>
           <Readouts
@@ -492,7 +516,7 @@ export default async function LearnPage() {
           sooner rather than crossing another full section's worth of
           padding to get here.
           ------------------------------------------------------------- */}
-      <Section width="wide" tight>
+      <Section width="wide" tight id="catalog">
         <Reveal>
           <LessonSearch lessons={lessons}>
             <CurriculumExplorer lessons={lessons} />

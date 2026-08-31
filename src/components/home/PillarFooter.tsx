@@ -39,7 +39,7 @@ export function PillarFooter({ pillar }: { pillar: Pillar }) {
   return (
     <Reveal
       delay={140}
-      className="mt-12 flex flex-wrap items-end justify-between gap-6 border-t border-border pt-8"
+      className="mt-10 flex flex-wrap items-end justify-between gap-6 border-t border-border pt-6"
     >
       <Readouts
         items={[

@@ -19,6 +19,14 @@ export function StatePanel({ z, label }: { z: Complex; label?: string }) {
       <div className="mt-2 text-lg">
         <KatexMath tex={`z = ${formatAmplitudeLatex(z, 3)}`} />
       </div>
+      {/* `grid-cols-3` already gives every track `minmax(0, 1fr)`, so the
+          column itself shrinks fine, but "|z|²" and "(probability)"/"(exceeds
+          1, not a valid probability)" are each one unbreakable run with no
+          internal space to wrap at. At 200% text zoom a track can end up
+          narrower than that single word, and without `[overflow-wrap:anywhere]`
+          on the `dt` the excess spills sideways past the column into
+          `.instrument`'s `overflow-hidden` (WCAG 1.4.4) instead of wrapping
+          onto a second line within the column it already has. */}
       <dl className="mt-3 grid grid-cols-3 gap-3 text-sm">
         <div>
           <dt className="text-xs text-muted-foreground">Magnitude |z|</dt>
@@ -29,7 +37,7 @@ export function StatePanel({ z, label }: { z: Complex; label?: string }) {
           <dd className="font-mono text-foreground">{phaseDeg.toFixed(1)}°</dd>
         </div>
         <div>
-          <dt className="text-xs text-muted-foreground">
+          <dt className="text-xs text-muted-foreground [overflow-wrap:anywhere]">
             {isValidProbability ? "|z|² (probability)" : "|z|² (exceeds 1, not a valid probability)"}
           </dt>
           <dd className={cn("font-mono", isValidProbability ? "text-foreground" : "text-danger")}>

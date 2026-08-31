@@ -52,7 +52,7 @@ export const whyMeasurementWouldCollapseSuperposition: ConceptualProblem = {
     finalAnswer: "Measurement forces the qubit into one definite outcome, destroying the exact α,β values that were the actual information being protected.",
   },
   explanation: {
-    correctIdea: "Any error-checking strategy for quantum information must avoid direct measurement of the protected amplitudes. This is exactly why syndrome measurement is designed around that constraint.",
+    correctIdea: "Any error-checking strategy for quantum information must avoid direct measurement of the protected amplitudes. This is why syndrome measurement is designed around that constraint.",
     whyCorrect: "This is precisely the obstacle syndrome extraction (measuring only parity, not individual qubit values) is built to avoid.",
     whyWrong: ["Saying 'it just gives the wrong answer' misses the deeper point: the issue isn't inaccuracy, it's that the protected information is destroyed outright."],
   },

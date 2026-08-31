@@ -95,7 +95,7 @@ export async function PredictSection() {
       </Marginalia>
 
       <p className="mt-8 text-muted-foreground">
-        Now go back to the panel and press{" "}
+        Now scroll back to the panel and press{" "}
         <span className="font-tech text-foreground">Tunnel through a barrier</span>. Watch the
         packet hit the wall, split, and leave a small piece of itself on the far side. Then read
         the derivation of why the number is what it is, in{" "}

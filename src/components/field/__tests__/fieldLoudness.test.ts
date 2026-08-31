@@ -8,6 +8,8 @@ import {
   REGIME_COMPOSITE_CEILING,
   REGIME_RENDERERS,
 } from "@/components/field/regimes";
+import { hexToRgb, luminance } from "@/lib/design/__tests__/color";
+import { readGlobalsCss, tokensIn } from "@/lib/design/__tests__/cssTokens";
 
 /**
  * ============================================================
@@ -121,13 +123,18 @@ describe("the field's per-theme strength", () => {
   /**
    * The third factor, and the one that is a token rather than a constant.
    *
-   * Paper has a fraction of the dark ground's headroom: light
-   * `--subtle-foreground` starts at 4.98:1 against `--depth-0`, which is half
-   * a point of margin over AA before anything is painted behind it, while on
-   * the dark ground the same voice has room to spare. So the field yields by
+   * Paper has a fraction of the dark ground's headroom, so the field yields by
    * a different amount per theme. It lives in CSS because it is a property of
    * the palette, and `QuantumField` reads it through the same probe as the
    * colour ramp so it re-resolves when the theme changes.
+   *
+   * The assertions below are two-sided on purpose, and the lower bound is the
+   * one that is new. A ceiling alone is what produced the state this pair of
+   * describes exists to prevent: light `--subtle-foreground` was #656e7e,
+   * 4.98:1 on `--depth-0`, so `--field-strength` was driven down to 0.3 to fit
+   * under it and the light theme's peak alpha reached 11/255 — measurably
+   * safe, invisible, and passing every check that existed. `field.mjs` reports
+   * peak alpha next to the contrast lines for the same reason.
    */
   it("is declared for the dark root and for both light blocks", () => {
     const declarations = GLOBALS.match(/--field-strength:\s*[\d.]+/g) ?? [];
@@ -151,6 +158,20 @@ describe("the field's per-theme strength", () => {
     }
   });
 
+  it("keeps the light theme above the threshold where the field stops reading", () => {
+    // A floor, not a style preference. `docs/DESIGN_SYSTEM.md` §7 asks two
+    // things of this layer and only one of them had a number: it may never
+    // compete with text, *and* the site is supposed to have a living
+    // scientific environment. At 0.3 the second was gone — 11/255 of peak
+    // alpha, which measures as a comfortable AA pass and looks like a blank
+    // page. Anything that wants to go below this should raise the light
+    // theme's contrast headroom first (see the assertion below), because
+    // that, not this multiplier, is the constraint that binds.
+    for (const declaration of GLOBALS.match(/--field-strength:\s*([\d.]+)/g) ?? []) {
+      expect(Number(declaration.split(":")[1]), declaration).toBeGreaterThanOrEqual(0.5);
+    }
+  });
+
   it("is read by QuantumField and applied to the frame", () => {
     expect(QUANTUM_FIELD_SOURCE).toContain('getPropertyValue("--field-strength")');
     expect(QUANTUM_FIELD_SOURCE).toContain("colors.strength");
@@ -158,5 +179,60 @@ describe("the field's per-theme strength", () => {
     // than to `NaN`, which would multiply every alpha to nothing and blank
     // the field with no error anywhere.
     expect(QUANTUM_FIELD_SOURCE).toContain("Number.isFinite(strength)");
+  });
+});
+
+describe("the light theme's headroom for a background at all", () => {
+  /**
+   * The root cause behind everything above, asserted where it lives.
+   *
+   * The field composites onto `--depth-0` and the three neutral voices sit on
+   * the result, so the *quietest* voice's margin over AA on the bare ground is
+   * the entire budget the environment has to work in. On paper that voice is
+   * `--subtle-foreground`, and it darkens the ground toward its own ink, so
+   * the budget is a luminance floor rather than a ceiling.
+   *
+   * At #656e7e that budget was 0.097 of relative luminance — about 4.0 points
+   * of CIE L*, against roughly 10.8 for the dark theme's measured peak. That
+   * is why paper looked empty at a strength the audit called safe. Moving the
+   * pair of secondary voices one step darker (#5d6678 / #505867, which
+   * `contrast.test.ts` still holds 1.15:1 apart) doubles it.
+   *
+   * WCAG's ratio is far stingier near white than near black, so this is not a
+   * number that can be carried over from the dark ramp by symmetry — it has to
+   * be asserted on the light palette itself.
+   */
+  const GLOBALS = readGlobalsCss();
+  const AA = 4.5;
+
+  it.each([
+    ["light (explicit)", ':root[data-theme="light"] {'],
+    ["light (system)", ':root[data-theme="system"] {'],
+  ])("%s leaves the field room to be seen in", (_label, selector) => {
+    const tokens = tokensIn(GLOBALS, selector);
+    const ground = luminance(hexToRgb(tokens["--depth-0"]));
+    const quietest = Math.max(
+      ...["--foreground", "--muted-foreground", "--subtle-foreground"].map((token) =>
+        luminance(hexToRgb(tokens[token]))
+      )
+    );
+    // The lowest ground luminance that still clears AA for that voice, and so
+    // the darkest pixel the field is ever allowed to paint.
+    const floor = AA * (quietest + 0.05) - 0.05;
+    expect(ground - floor, "light-theme field headroom").toBeGreaterThanOrEqual(0.18);
+  });
+
+  it("declares the same two secondary voices in both light blocks", () => {
+    // The headroom assertion above runs against each block separately, so a
+    // value retuned in one and forgotten in the other passes it twice while
+    // giving a reader who never touched the theme toggle a different palette
+    // and a differently-loud background. `contrast.test.ts` holds the pillar
+    // ramp and the chart channel to this; these two are on the list now
+    // because the field's whole budget is derived from them.
+    const explicit = tokensIn(GLOBALS, ':root[data-theme="light"] {');
+    const system = tokensIn(GLOBALS, ':root[data-theme="system"] {');
+    for (const token of ["--muted-foreground", "--subtle-foreground", "--depth-0"]) {
+      expect(system[token], token).toBe(explicit[token]);
+    }
   });
 });

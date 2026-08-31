@@ -127,12 +127,14 @@ export function CircuitBuilder() {
       stageClassName="space-y-6"
       stage={
         <>
+          {/* Trimmed: how to read the diagram is unique to this paragraph and
+              stays; the walkthrough of every button below it (Clear, Load
+              Bell circuit) is visible on the controls themselves and does not
+              need restating here. */}
           <p className="text-sm text-muted-foreground">
-            A quantum circuit is read left to right: each horizontal line is one qubit, and each box is an
-            operation applied to it. Loaded here is the two-gate circuit that produces a Bell pair, the
-            standard way to entangle two qubits. Drag the step slider to run it forwards and backwards, add
-            your own gates from the controls, or Clear and start from nothing. Load Bell circuit brings this
-            example back whenever you want it.
+            A quantum circuit reads left to right: each line is a qubit, each box a gate. Loaded here is the
+            two-gate circuit that produces a Bell pair. Drag the step slider to run it forward and backward,
+            or add your own gates from the controls.
           </p>
 
           <CircuitDiagram numQubits={numQubits} instructions={instructions} step={step} onSelectStep={setStep} />
@@ -155,6 +157,10 @@ export function CircuitBuilder() {
             {entanglementNote ?? DEFAULT_WHAT_TO_NOTICE}
           </div>
 
+        </>
+      }
+      stageAfter={
+        <>
           <StateInspector state={state} />
 
           <SimulatorFraming

@@ -79,7 +79,12 @@ export function DifficultyMark({
           />
         ))}
       </span>
-      <span className="tech-label text-muted-foreground">
+      {/* `[overflow-wrap:anywhere]`: "Foundational" is the longest label and,
+          in a narrow enough column at 200% text zoom, can be wider than the
+          space this mark is given (WCAG 1.4.4) — the word has no internal
+          space to wrap at otherwise, so the excess spills past whatever
+          ancestor is clipping it instead of breaking within itself. */}
+      <span className="tech-label text-muted-foreground [overflow-wrap:anywhere]">
         {DIFFICULTY_LABEL[difficulty]}
       </span>
       {withHint ? (

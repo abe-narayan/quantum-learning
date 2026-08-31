@@ -26,7 +26,7 @@ export const statingTheMeasurementOverclaim: ConceptualProblem = {
       {
         phrases: ["solves", "measurement problem", "explains definite outcome", "explains why one outcome", "explains why a definite"],
         missingFeedback:
-          "The question asks for two statements. State the one this course says goes too far, in the form somebody would actually say it.",
+          "The question asks for two statements. State the one this course says goes too far, in the form somebody would say it.",
       },
       {
         phrases: ["coherence loss", "loss of coherence", "loses coherence", "lose coherence", "explains why superpositions", "does not explain outcome", "becomes a mixture", "into a mixture"],

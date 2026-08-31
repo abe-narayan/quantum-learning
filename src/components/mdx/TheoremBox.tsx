@@ -85,8 +85,18 @@ export function TheoremBox({
           {/* `text-lg sm:text-xl`, up one step from `text-base sm:text-lg`.
               Paired with the body's move to `text-lg` below; the reasoning for
               both is in the note above that `<div>`. */}
+          {/* `min-w-0` alone shrinks the flex item to the row's available
+              width, but at 200% text zoom (WCAG 1.4.4) the panel is narrow
+              enough that a single long word in the title ("nondeterministic")
+              is wider than that whole available width, and normal wrapping
+              only breaks at spaces. `[overflow-wrap:anywhere]` is the part
+              that lets the word itself break, so the title stays inside the
+              panel's `overflow-hidden` clip instead of losing its tail with
+              no scrollbar to say so. Measured with `scripts/audit/a11y.mjs
+              --checks resize` on a DefinitionBox/TheoremBox title long enough
+              to have a 16-letter word in it. */}
           {title && (
-            <span className="font-display text-lg font-semibold text-foreground sm:text-xl">
+            <span className="min-w-0 font-display text-lg font-semibold text-foreground [overflow-wrap:anywhere] sm:text-xl">
               {title}
             </span>
           )}
@@ -94,7 +104,16 @@ export function TheoremBox({
         {provenance && (
           <span
             className={cn(
-              "shrink-0 rounded-full border px-2.5 py-0.5 text-meta font-semibold uppercase tracking-wide",
+              // Not `shrink-0` any more: at 200% zoom this badge alone
+              // (wrapped onto its own line by `flex-wrap` above) can still be
+              // wider than the panel, and `shrink-0` refused to let it
+              // narrow at all, so its text ran past the clip with nothing to
+              // scroll it back into view. `min-w-0` lets the box actually
+              // shrink; `[overflow-wrap:anywhere]` lets its text wrap across
+              // more than one line once it does. Ordinary layouts are
+              // unaffected: the badge already had a full row to itself
+              // whenever the title didn't fit beside it.
+              "min-w-0 rounded-full border px-2.5 py-0.5 text-meta font-semibold uppercase tracking-wide [overflow-wrap:anywhere]",
               PROVENANCE_STYLES[provenance]
             )}
           >

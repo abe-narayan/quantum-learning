@@ -362,6 +362,13 @@ No stale description found.
 
 ## `src/components/layout/` — Navbar, ThemeToggle, SearchTrigger
 
+> **Naming note, 2026-08-30.** Everything below refers to `TracksDropdown`.
+> That component was generalised into **`NavDropdown`** when the navbar went
+> from eight top-level slots to six and gained a second **Reference** dropdown
+> alongside Tracks. Same file, same contract, same accessibility behaviour, now
+> two instances. The findings and the reasoning are unchanged; only the name
+> is. Line numbers in this section are from the audit date and have moved.
+
 ### Polish — `Navbar.tsx:303-372` — the mobile menu disclosure doesn't close on Escape
 
 `TracksDropdown` (same file, lines 71-189) is the documented "standard to

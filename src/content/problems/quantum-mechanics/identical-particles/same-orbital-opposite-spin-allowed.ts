@@ -30,7 +30,7 @@ export const sameOrbitalOppositeSpinAllowed: MultipleChoiceProblem = {
       c: "Different spatial orbitals (1s versus 2s) already make these different single-particle states, whatever the spins, so this is always allowed.",
       d: "Different spatial orbitals again (2s versus 2p), so these are different single-particle states and the configuration is allowed.",
     },
-    defaultIncorrectFeedback: "Exclusion forbids two electrons sharing the EXACT SAME complete single-particle state: same spatial orbital AND same spin.",
+    defaultIncorrectFeedback: "Exclusion forbids two electrons sharing the exact same complete single-particle state: same spatial orbital and same spin.",
   },
   hints: [
     { text: "Exclusion is violated only when both the spatial orbital AND the spin are identical." },

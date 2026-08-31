@@ -35,7 +35,7 @@ export const latticeSurgeryTransversalGateFailure: MultipleChoiceProblem = {
       d: "Confining a fault to one qubit per block is what transversality achieves, not what defeats it. The obstruction here is geometric: away from the shared boundary there is no partner qubit to act on.",
     },
     defaultIncorrectFeedback:
-      "Ask what a transversal gate demands of every single data qubit, then look at where on the chip the two patches actually touch.",
+      "Ask what a transversal gate demands of every single data qubit, then look at where on the chip the two patches touch.",
   },
   hints: [
     { text: "A transversal gate needs a partner qubit, for every qubit, in the other code block." },

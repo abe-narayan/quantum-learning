@@ -156,16 +156,7 @@ export function CompareStatesExplorer() {
       stageClassName="@container"
       stage={
         <>
-      <div className="flex flex-wrap justify-end gap-2">
-        <Button size="sm" variant="secondary" onClick={handleCopyLink} aria-live="polite">
-          {copied ? "Copied!" : "Copy link"}
-        </Button>
-        <Button size="sm" variant="secondary" onClick={() => setAngles(DEFAULT_ANGLES)}>
-          Reset
-        </Button>
-      </div>
-
-      <p className="mt-4 text-sm text-muted-foreground">
+      <p className="text-sm text-muted-foreground">
         A qubit&rsquo;s state is a single thing, but it gets drawn three completely different ways depending
         on what a course is trying to show you. All three below are driven by the same two numbers. Move
         either slider and watch every panel move together, because they were never separate to begin with.
@@ -189,6 +180,9 @@ export function CompareStatesExplorer() {
           index={STATE_PRESETS.findIndex((preset) => preset.id === activePresetId)}
           onChange={(i) => setAngles(STATE_PRESETS[i].angles)}
         />
+        <Button size="sm" variant="secondary" onClick={() => setAngles(DEFAULT_ANGLES)}>
+          Reset
+        </Button>
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2 sm:gap-6">
@@ -213,25 +207,6 @@ export function CompareStatesExplorer() {
           onChange={(phi) => setAngles({ theta: angles.theta, phi })}
         />
       </div>
-
-      <SymbolGloss
-        items={[
-          {
-            symbol: "θ",
-            name: "polar angle",
-            means:
-              "how far the state is tilted from |0⟩ at the top of the sphere. This is the slider that changes the odds: 0° is certain 0, 180° certain 1, 90° an even split.",
-            glossaryId: "bloch-sphere-term",
-          },
-          {
-            symbol: "φ",
-            name: "azimuthal angle",
-            means:
-              "which way it points once tilted: the relative phase. Drag it and the bar chart does not move at all, but the complex-plane panel spins. That difference is the whole reason phase matters.",
-            glossaryId: "global-relative-phase",
-          },
-        ]}
-      />
 
       {/* Container query, not viewport: three ~200px-minimum panels need
           real stage width to read well, which a wide desktop *viewport* does
@@ -261,8 +236,31 @@ export function CompareStatesExplorer() {
           rather than a hairline pass — the column is (832 − 64)/3 = 256px
           there, so 10.88px and 11.27px — and three ~200px-minimum panels need
           that width to read well whatever their type is doing. */}
-      <div className="mt-8 grid gap-8 @min-[52rem]:grid-cols-3">
-        <div className="flex flex-col items-center">
+      {/* A row, not a column, below the 52rem threshold that switches this to
+          a real grid. Stacked, the three panels ran about 1100px tall at
+          375px, so a reader had to scroll past all three before reaching the
+          sliders below or could never hold "these move together" in view at
+          once. Scroll-snapped side by side, only one panel's height counts
+          toward the page at a time (roughly the height a single stacked panel
+          already was), and swiping between them is the same gesture a phone
+          reader already uses everywhere else on the page. Nothing about the
+          panels themselves changes width: each stays exactly the stage-width
+          box it was in the stacked layout (still `w-full` inside), so none of
+          the label-legibility arithmetic in `BlochSphereCanvas` or
+          `ComplexPlaneCanvas`'s own captions above is affected, only whether
+          all three sit in view at once or one at a time. `tabIndex`+`role`
+          because an `overflow-x-auto` container is not focusable by default
+          outside Firefox (see `scrollRegions.test.ts`). */}
+      <p className="mt-8 text-xs text-subtle-foreground @min-[52rem]:hidden">
+        Swipe to see the other two views. All three are driven by the same slider, so they never disagree.
+      </p>
+      <div
+        tabIndex={0}
+        role="group"
+        aria-label="Three views of the same qubit state: the Bloch sphere, the complex amplitude plane, and the measurement probabilities"
+        className="mt-3 flex snap-x snap-mandatory gap-8 overflow-x-auto pb-1 @min-[52rem]:mt-8 @min-[52rem]:grid @min-[52rem]:grid-cols-3 @min-[52rem]:overflow-visible @min-[52rem]:pb-0"
+      >
+        <div className="flex w-full shrink-0 snap-center flex-col items-center @min-[52rem]:w-auto @min-[52rem]:shrink">
           <h3 className="text-sm font-semibold text-foreground">Bloch sphere</h3>
           {/* `max-w-[280px]`, not 220px. A cap is a hard ceiling on the box, so
               at a 220px cap the sphere's labels would paint at 17 × 220 ÷ 400 =
@@ -280,7 +278,7 @@ export function CompareStatesExplorer() {
           </p>
         </div>
 
-        <div className="@container flex flex-col items-center">
+        <div className="@container flex w-full shrink-0 snap-center flex-col items-center @min-[52rem]:w-auto @min-[52rem]:shrink">
           <h3 className="text-sm font-semibold text-foreground">Complex amplitude plane</h3>
           {/* α and β stack until this panel is genuinely wide enough for two.
               They used to sit side by side at every width, splitting whatever
@@ -322,7 +320,7 @@ export function CompareStatesExplorer() {
           </p>
         </div>
 
-        <div className="flex flex-col items-center">
+        <div className="flex w-full shrink-0 snap-center flex-col items-center @min-[52rem]:w-auto @min-[52rem]:shrink">
           <h3 className="text-sm font-semibold text-foreground">Measurement probabilities</h3>
           <div className="mt-3 w-full max-w-xs">
             <BarChart bars={bars} ariaLabel="Measurement probabilities P(0) and P(1)" maxValue={1} />
@@ -331,6 +329,39 @@ export function CompareStatesExplorer() {
             |α|² and |β|²: what you&rsquo;d actually see across many measurements.
           </p>
         </div>
+      </div>
+
+      {/* The θ/φ glosses and the share row both used to sit between the
+          sliders and the three panels: at 375px that put 224px of prose and
+          chrome between the control and the thing it moves, on the one
+          instrument here whose entire claim is that you can watch all three
+          pictures move together. The glosses are still one scroll from the
+          sliders they explain, and now the topmost panel is what a reader
+          meets directly under the last slider instead. */}
+      <SymbolGloss
+        className="mt-8"
+        items={[
+          {
+            symbol: "θ",
+            name: "polar angle",
+            means:
+              "how far the state is tilted from |0⟩ at the top of the sphere. This is the slider that changes the odds: 0° is certain 0, 180° certain 1, 90° an even split.",
+            glossaryId: "bloch-sphere-term",
+          },
+          {
+            symbol: "φ",
+            name: "azimuthal angle",
+            means:
+              "which way it points once tilted: the relative phase. Drag it and the bar chart does not move at all, but the complex-plane panel spins. That difference is the whole reason phase matters.",
+            glossaryId: "global-relative-phase",
+          },
+        ]}
+      />
+
+      <div className="mt-6 flex flex-wrap justify-end gap-2">
+        <Button size="sm" variant="secondary" onClick={handleCopyLink} aria-live="polite">
+          {copied ? "Copied!" : "Copy link"}
+        </Button>
       </div>
 
       <SimulatorFraming

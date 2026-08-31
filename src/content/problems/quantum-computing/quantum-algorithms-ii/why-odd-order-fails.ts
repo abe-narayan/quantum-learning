@@ -53,7 +53,7 @@ export const whyOddOrderFails: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "The reduction's applicability, not just its success, depends on r's parity.",
-    whyCorrect: "This is exactly why the algorithm's random-restart strategy checks r's parity before attempting the gcd step at all.",
+    whyCorrect: "This is why the algorithm's random-restart strategy checks r's parity before attempting the gcd step at all.",
     whyWrong: ["Saying 'it doesn't work as well' understates the issue: for odd r the reduction has no defined quantity to compute, not merely a worse one."],
   },
 };

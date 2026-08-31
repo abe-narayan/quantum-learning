@@ -7,16 +7,33 @@
  * previous pass raised labels to 11-13 units against a "~256px" column and
  * recorded that as fixed; 13 x 0.6048 = 7.86px and 11 x 0.6048 = 6.65px, both
  * under the ~9px legibility floor. 15 units is the first size that clears it
- * (15 x 0.6048 = **9.07px**), and this figure is *entirely* labels.
+ * (15 x 0.6048 = **9.07px**), and every remaining in-SVG label is written to
+ * that size.
  *
  * At 15 units monospace advance is ~9 units per character, so a full-width
  * line holds 420 / 9 = **46 characters**, and a label anchored at x must fit
  * (420 - x) / 9. Every string below is counted against that, not eyeballed:
  * SVG clips a viewBox overrun silently, with no scrollbar and no error.
+ *
+ * The title ("dispersive readout: the resonator is probed") and the closing
+ * two-line conclusion ("the qubit state is inferred indirectly." / "it is
+ * never on the measured feedline path.") used to be drawn at this same
+ * 15-unit, 9.07px size, which clears the ~9px guard this file's own comments
+ * are written against but not the 12px floor
+ * `scripts/audit/responsive.mjs` holds *running text* to - and two of those
+ * three strings are running text over 40 characters by that check's own
+ * definition. Neither one points at a specific part of the drawing the way
+ * "readout resonator" or "coupling C" do, so both now render as real HTML at
+ * `text-xs` (12px) beside the `<svg>` instead, the same fix
+ * `HardwarePlatformSchematic` made for its own former in-SVG caption.
  */
 
 const WIDTH = 420;
-const HEIGHT = 272;
+// 236, not 272: the closing two-line conclusion that used to occupy
+// y=240..260 now renders as HTML below the figure, so the viewBox's lowest
+// content is the qubit box's bottom edge at QUBIT_BOX_Y + QUBIT_BOX_H = 216,
+// plus 20 units of padding.
+const HEIGHT = 236;
 
 const FEEDLINE_Y = 56;
 const RESONATOR_X = 190;
@@ -40,15 +57,12 @@ const QUBIT_BOX_Y = FEEDLINE_Y + 112;
  */
 export function DispersiveReadoutDiagram({ ariaLabel }: { ariaLabel: string }) {
   return (
-    <div className="not-prose overflow-x-auto panel-inset p-4">
-      <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
-        {/* 42 characters = 378 units at 15, centred on 210, so 21..399. The old
-            wording ("...is what gets probed") is 52 characters = 468 units, wider
-            than the whole viewBox. */}
-        <text x={WIDTH / 2} y={18} textAnchor="middle" fontSize={15} className="fill-muted-foreground font-mono">
-          dispersive readout: the resonator is probed
-        </text>
-
+    // Title and closing conclusion moved to real HTML at `text-xs` (12px):
+    // see the SIZING comment above this component.
+    <div className="not-prose space-y-1.5">
+      <p className="text-xs text-muted-foreground">dispersive readout: the resonator is probed</p>
+      <div className="overflow-x-auto panel-inset p-4">
+        <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" role="img" aria-label={ariaLabel}>
         {/* feedline: the actual measured signal path */}
         <line x1={20} y1={FEEDLINE_Y} x2={400} y2={FEEDLINE_Y} className="stroke-brand" strokeWidth={2.5} markerEnd="url(#dr-arrow)" />
         <text x={20} y={42} fontSize={15} className="fill-muted-foreground font-mono">
@@ -130,21 +144,16 @@ export function DispersiveReadoutDiagram({ ariaLabel }: { ariaLabel: string }) {
           |0&#10217; or |1&#10217;
         </text>
 
-        {/* The conclusion, left-anchored at x = 20: 38 and 41 characters = 342 and
-            369 units at 15, so 20..362 and 20..389. */}
-        <text x={20} y={QUBIT_BOX_Y + QUBIT_BOX_H + 24} fontSize={15} className="fill-muted-foreground font-mono">
-          the qubit state is inferred indirectly.
-        </text>
-        <text x={20} y={QUBIT_BOX_Y + QUBIT_BOX_H + 44} fontSize={15} className="fill-muted-foreground font-mono">
-          it is never on the measured feedline path.
-        </text>
-
         <defs>
           <marker id="dr-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
             <path d="M0,0 L8,4 L0,8 Z" className="fill-brand" />
           </marker>
         </defs>
-      </svg>
+        </svg>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        The qubit state is inferred indirectly. It is never on the measured feedline path.
+      </p>
     </div>
   );
 }

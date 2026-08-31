@@ -135,6 +135,33 @@ const PROBE = String.raw`(() => {
     return false;
   };
 
+  // Content inside a closed <details> is not on the page yet.
+  //
+  // It does not look hidden to any of the tests above, which is the problem.
+  // Measured in this harness's own headless Chrome, a span inside a closed
+  // disclosure reports display:block, visibility:visible and a box of 1x1 —
+  // non-zero, so the width/height guards pass it through — while
+  // elementFromPoint at its centre returns an ancestor rather than the element.
+  //
+  // Both failure directions follow. A real control folded away is measured as
+  // a 1x1 tap target and reported as a blocker nobody can act on, and a
+  // checker that cries wolf is worse than none. And any probe that treats
+  // "has a box" as "the reader can reach this" counts a control that cannot be
+  // clicked as one that can. This became load-bearing when three templates
+  // (the lesson header's objectives, the course card's module manifest, the
+  // problem page's context summary) all moved to closed disclosures on the
+  // same day.
+  const collapsed = (el) => {
+    for (let p = el.parentElement; p; p = p.parentElement) {
+      if (p.tagName === 'DETAILS' && !p.open) {
+        // A <summary> is the visible part of a closed disclosure, so it and
+        // its contents stay in scope.
+        return !el.closest('summary');
+      }
+    }
+    return false;
+  };
+
   // ---- overflow -----------------------------------------------------------
   for (const el of document.querySelectorAll('body *')) {
     const r = el.getBoundingClientRect();
@@ -144,6 +171,19 @@ const PROBE = String.raw`(() => {
     if (r.right > vw + 1 || r.left < -1) {
       if (containedSideways(el)) continue;
       if (srOnly(el)) continue;
+      // Deliberately NOT skipping collapsed(el) here, unlike the tap-target
+      // and contrast walkers below. (No backticks in this comment: it lives
+      // inside a String.raw template literal, where one ends the string.)
+      //
+      // A reader cannot tap or read what is folded away, so measuring it there
+      // is noise. Overflow is different: it is a property of the layout, not of
+      // the current disclosure state, and it becomes visible the instant the
+      // reader opens the fold. This lesson is the proof. Adding the guard here
+      // dropped optimalGroverIterations(6) from the findings, and that span
+      // measures 265px wide reaching x=335 in a 320px viewport, inside a closed
+      // details element. Suppressing it would have reported the page clean
+      // while the reader who opens that disclosure loses the right-hand end of
+      // the code, with no scrollbar to say so, because body has overflow-x: clip.
       // An ancestor already reported is the real offender; skip descendants.
       if (overflow.some((o) => o.el === el.parentElement)) { continue; }
       overflow.push({
@@ -163,7 +203,7 @@ const PROBE = String.raw`(() => {
   // stays small and wraps only the title, and an
   // 'after:absolute after:inset-0' fills the nearest positioned ancestor.
   // That is a considered answer to a real conflict rather than an oversight
-  // (see ExploreSection.tsx): putting the description inside the anchor
+  // (see SiteContents.tsx): putting the description inside the anchor
   // would make the link's accessible name a whole paragraph, and naming it
   // with aria-label would push that description out of the accessibility
   // tree altogether. So the anchor is named "Simulators", the sentence stays
@@ -188,7 +228,7 @@ const PROBE = String.raw`(() => {
   // both are deliberate:
   //
   //  1. 'after:absolute after:inset-0' on a small anchor inside a positioned
-  //     row (ExploreSection, CourseList) — the whole row is the target while
+  //     row (SiteContents, CourseList) — the whole row is the target while
   //     the link's accessible name stays the destination alone.
   //  2. A 44x44 pseudo centred on a 40px painted face
   //     (IconButton's TOUCH_TARGET_CLASSES) — the hit area grows without the
@@ -235,6 +275,7 @@ const PROBE = String.raw`(() => {
     const cs = getComputedStyle(el);
     if (cs.visibility === 'hidden' || cs.display === 'none') continue;
     if (srOnly(el)) continue;
+    if (collapsed(el)) continue;
     // A link inside a paragraph is inline text, not a tap target with a box.
     if (cs.display === 'inline' && el.tagName === 'A') continue;
 
@@ -397,6 +438,7 @@ const PROBE = String.raw`(() => {
     const cs = getComputedStyle(el);
     if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) continue;
     if (srOnly(el)) continue;
+    if (collapsed(el)) continue;
 
     // ---- text too small to read ------------------------------------------
     // The decision this encodes, made once rather than re-argued 926 times:

@@ -148,7 +148,21 @@ export function SuperpositionJourney() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div>
+        {/* `min-w-0`: a grid item's `min-width` defaults to `auto`, which
+            resolves to its min-content width, and this item contains a KaTeX
+            equation that has no break opportunity inside it. So the item sized
+            itself to the formula's 523px min-content and dragged the whole row
+            with it, which is grid blowout. Two things followed. The equation's
+            own `.katex-display { overflow-x: auto }` never got the chance to
+            act, because the column had already grown to fit rather than
+            forcing the formula to scroll. And the readouts beside it were
+            pulled along, which is how a "0.71" ended up 438px outside
+            `.instrument`'s clip at 200% text zoom, measured on the rendered
+            page with an ancestor walk rather than guessed at.
+            The `minmax(0,1fr)` on the track does the same job, but only from
+            `lg` up; below that the implicit track is `auto` and unguarded,
+            which is exactly where a 375px phone at 200% zoom lives. */}
+        <div className="min-w-0">
           <SuperpositionJourneyCanvas
             columns={columns}
             measuredIndex={measuredIndex}

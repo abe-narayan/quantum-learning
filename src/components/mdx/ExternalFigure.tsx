@@ -174,7 +174,21 @@ export function ExternalFigure({
         {(number != null || caption) && (
           <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
             {number != null ? <TechLabel className="text-pillar">{`Fig. ${number}`}</TechLabel> : null}
-            {caption ? <span className="text-sm text-foreground">{caption}</span> : null}
+            {/* `min-w-0` + `[overflow-wrap:anywhere]`, not `break-words`: this
+                figure sits in `overflow-hidden` (the `figure` above), so a
+                caption that cannot shrink is clipped with no scrollbar to
+                say so — the same unreachable-not-safe defect class as an
+                overflowing inline code span, reached through 200% text zoom
+                (WCAG 1.4.4) rather than viewport width. `break-words` adds
+                the same in-word soft-wrap points but is not counted toward
+                *min-content*, which is what this flex item's default
+                `min-width: auto` resolves to, so it never actually shrunk
+                the box; `anywhere` is. At 200% zoom `p-3`/`sm:p-4` on the
+                figcaption double too (Tailwind spacing is in `rem`), which
+                is what turned a comfortable caption into one 8 to 52px
+                short of fitting its own box. Measured with
+                `scripts/audit/a11y.mjs --routes "/current-quantum"`. */}
+            {caption ? <span className="min-w-0 text-sm text-foreground [overflow-wrap:anywhere]">{caption}</span> : null}
           </p>
         )}
         <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-subtle-foreground">

@@ -26,7 +26,7 @@ export const singleAmplitudePhaseArgument: ConceptualProblem = {
       {
         phrases: ["one nonzero amplitude", "only one amplitude", "single amplitude", "only one nonzero", "no second amplitude", "only the |1⟩ term", "just one term", "one term", "nothing in the |0⟩ slot"],
         missingFeedback:
-          "Count first. Say how many nonzero components a state proportional to |1> actually has.",
+          "Count first. Say how many nonzero components a state proportional to |1> has.",
       },
       {
         phrases: ["always global", "nothing to be relative to", "cannot be relative", "can not be relative", "no relative phase exists", "nothing to compare against", "nothing to compare it against", "only an overall factor", "overall factor", "unobservable", "invisible to every measurement", "drops out of every probability"],
@@ -56,7 +56,7 @@ export const singleAmplitudePhaseArgument: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "Relative phase requires two amplitudes to compare; a state with only one nonzero amplitude can only ever pick up a global phase.",
-    whyCorrect: "This is exactly why Y|0⟩=i|1⟩ and X|0⟩=|1⟩ land at the same Bloch point: |0⟩ has only one nonzero amplitude after either gate, so the extra i is forced to be global.",
+    whyCorrect: "This is why Y|0⟩=i|1⟩ and X|0⟩=|1⟩ land at the same Bloch point: |0⟩ has only one nonzero amplitude after either gate, so the extra i is forced to be global.",
     whyWrong: [
       "Assuming a phase factor like i or −1 is automatically observable because it looks different written down. Observability depends on whether the phase is global or relative, not on its appearance on the page.",
       "Applying the X-basis P(+) formula here. That formula assumes two nonzero amplitudes; with α=0 there is no interference term for a phase to enter.",

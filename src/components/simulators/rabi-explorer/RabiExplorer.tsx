@@ -245,16 +245,21 @@ export function RabiExplorer() {
   return (
     <SimulatorInstrument
       label="Rabi driving: two-level system"
-      readout={<Readout label="P(1)" value={p1.toFixed(3)} />}
+      readout={<Readout label="Chance of measuring |1⟩" value={p1.toFixed(3)} />}
       footnote="Next: real qubits also lose coherence while being driven; see that decay in the Noise & Decoherence Explorer."
       stageClassName="space-y-6"
       stage={
         <>
+          {/* Only lightly trimmed, deliberately: this is the paragraph that
+              earns this instrument its `warmed-up` rather than `open` level
+              (see the SIMULATOR_INDEX comment on `/simulators`), because it
+              is what defines V and Δ before the readouts below use them.
+              Cutting the definitions to hit a smaller target would just move
+              the gap the level system exists to be honest about. */}
           <p className="text-sm text-muted-foreground">
-            A qubit starts in its low-energy state, |0⟩. You shine a control pulse on it: a microwave tone
-            for a superconducting qubit, a laser for a trapped ion or neutral atom. The pulse does not
-            &ldquo;set&rdquo; the qubit to |1⟩; it drives it smoothly back and forth between |0⟩ and |1⟩ for
-            as long as you leave it on. Two knobs control that: how hard you push (
+            A qubit starts in |0⟩. A control pulse, a microwave tone or a laser depending on the hardware,
+            drives it smoothly back and forth between |0⟩ and |1⟩ for as long as it&rsquo;s on, never simply
+            &ldquo;setting&rdquo; it to |1⟩. Two knobs control that: how hard you push (
             <span className="font-mono text-pillar">V</span>), and how well your pulse&rsquo;s frequency
             matches the qubit&rsquo;s own (<span className="font-mono text-pillar">Δ</span>).
           </p>
@@ -309,7 +314,10 @@ export function RabiExplorer() {
               <BlochSphereCanvas blochPoint={blochPoint} className="mx-auto w-full max-w-[260px]" />
             </div>
           </div>
-
+        </>
+      }
+      stageAfter={
+        <>
           <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
             <div className="overflow-x-auto">
               <KatexMath
@@ -352,29 +360,28 @@ export function RabiExplorer() {
       }
       controls={
         <>
-          <div className="flex justify-end">
+          <RabiControls
+            driveStrength={driveStrength}
+            onDriveStrengthChange={handleDriveStrengthChange}
+            detuning={detuning}
+            onDetuningChange={handleDetuningChange}
+            sampleIndex={sampleIndex}
+            maxSampleIndex={SAMPLES}
+            currentTLabel={`t = ${current.t.toFixed(2)}`}
+            onSampleIndexChange={(i) => {
+              setIsPlaying(false);
+              setSampleIndex(i);
+            }}
+            isPlaying={isPlaying}
+            onTogglePlay={handleTogglePlay}
+            onReset={handleReset}
+            prefersReducedMotion={prefersReducedMotion}
+          />
+          {/* Last, not first: see the note in GroverExplorer's controls. */}
+          <div className="mt-6 flex justify-end">
             <Button size="sm" variant="secondary" onClick={handleCopyLink}>
               {copied ? "Copied!" : "Copy link"}
             </Button>
-          </div>
-          <div className="mt-4">
-            <RabiControls
-              driveStrength={driveStrength}
-              onDriveStrengthChange={handleDriveStrengthChange}
-              detuning={detuning}
-              onDetuningChange={handleDetuningChange}
-              sampleIndex={sampleIndex}
-              maxSampleIndex={SAMPLES}
-              currentTLabel={`t = ${current.t.toFixed(2)}`}
-              onSampleIndexChange={(i) => {
-                setIsPlaying(false);
-                setSampleIndex(i);
-              }}
-              isPlaying={isPlaying}
-              onTogglePlay={handleTogglePlay}
-              onReset={handleReset}
-              prefersReducedMotion={prefersReducedMotion}
-            />
           </div>
         </>
       }

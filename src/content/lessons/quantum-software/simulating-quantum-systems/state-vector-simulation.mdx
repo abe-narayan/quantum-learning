@@ -211,7 +211,7 @@ same circuit, down to floating-point precision.
 
 <Callout type="note">
 **Thinking "simulation" means "approximation."** State-vector simulation
-computes EXACT amplitudes (up to floating-point precision). The
+computes *exact* amplitudes (up to floating-point precision). The
 approximation, when it exists, is in techniques like Tensor Network
 Methods (a later lesson in this course), not in the state-vector
 approach itself.
@@ -270,7 +270,7 @@ and transistors, vs. Physical Qubit Platforms' actual qubits) differs.
    </details>
 
 2. Contrast state-vector simulation with shot-based sampling
-   (`sampleMeasurements`): which one gives EXACT probabilities, and
+   (`sampleMeasurements`): which one gives *exact* probabilities, and
    which only estimates them?
 
    <details className="answer-reveal">
@@ -312,7 +312,7 @@ and transistors, vs. Physical Qubit Platforms' actual qubits) differs.
    truncating small amplitudes."** It reverses the two roles and invents
    a truncation the engine does not perform. Nothing is thresholded away;
    the worked H-on-a-3-qubit-register example above rewrites all eight
-   slots, zeros included, precisely because nothing announces in advance
+   slots, zeros included, because nothing announces in advance
    which ones are zero.
 
    The reason the contrast matters beyond bookkeeping is that only one of
@@ -355,7 +355,7 @@ and transistors, vs. Physical Qubit Platforms' actual qubits) differs.
    state does not. A classical machine must hold all $2^n$ amplitudes, so
    it pays memory that doubles with every qubit, and stops somewhere in
    the forties. A real quantum computer holds the same state while
-   storing none of those numbers anywhere, which is exactly why it does
+   storing none of those numbers anywhere, which is why it does
    not pay that cost, and, in the same breath, exactly why it cannot show
    the amplitudes to anyone.
 

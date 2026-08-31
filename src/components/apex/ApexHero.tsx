@@ -152,6 +152,43 @@ export function ApexHero({ courses, lessons }: { courses: Course[]; lessons: Les
             you have finished, it does not gate anything.
           </Lede>
 
+          {/* The primary action this page did not have, moved up to sit
+              right after the standfirst, ahead of the tier ladder. It used to
+              sit below the prerequisites grid, then below the ladder;
+              measured with `scripts/audit/orientation.mjs --widths 375`,
+              even the ladder position still left the *button itself* past the
+              812px mobile fold ("Begin at" was visible, "Start this course"
+              was not, the two lines of course title and description in
+              between were exactly the difference). `HowItWorks` sends the
+              already-expert reader straight here to "judge the site on that
+              material", so this is the first thing they should be able to
+              act on. Kept in this page's own preprint register rather than by
+              importing the core pages' components: a rule, a running-head
+              label, and one filed entry. The course is `courses[0]`, i.e.
+              curriculum order, the same rule the four core track pages use
+              for their hero CTA, so it is derived rather than picked. */}
+          {entry ? (
+            <div className="mt-8 flex flex-col gap-4 border-l-2 border-pillar-edge pl-5 sm:flex-row sm:items-end sm:justify-between sm:border-l-0 sm:pl-0">
+              <div>
+                <TechLabel as="p">Begin at</TechLabel>
+                <p className="mt-2 font-display text-2xl font-semibold leading-tight text-foreground">
+                  {entry.course.title}
+                </p>
+                <p className="mt-2 max-w-lede text-sm leading-relaxed text-muted-foreground">
+                  {entry.lessonCount} lessons
+                  {entry.lesson ? <> &middot; opens on &ldquo;{entry.lesson.title}&rdquo;</> : null}
+                  {". "}
+                  First of the {courses.length} in curriculum order. What each of the others
+                  requires is filed under &sect; 02 below.
+                </p>
+              </div>
+              <Button href={entry.href} size="lg" className="shrink-0">
+                Start this course →
+                <span className="sr-only">: {entry.course.title}</span>
+              </Button>
+            </div>
+          ) : null}
+
           {/* Tier 4 of 4, drawn with the identical four-rung ladder that
               /mechanics carries at tier 1. Same component, same position, so
               the difference between the ground floor and the summit is read
@@ -217,43 +254,6 @@ export function ApexHero({ courses, lessons }: { courses: Course[]; lessons: Les
             />
           </div>
         </div>
-
-        {/* The primary action this page did not have.
-            `HowItWorks` sends the already-expert reader straight here to
-            "judge the site on that material", and until now the page carried
-            none of the three controls every core track page shares (the
-            hero-level "Start: <course> →", `PillarLessonStrip`, `PillarNext`):
-            the first real lesson title lived several hundred pixels down
-            inside `ApexCourseIndex`.
-            Kept in this page's own preprint register rather than by importing
-            the core pages' components: a rule, a running-head label, and one
-            filed entry. The course is `courses[0]`, i.e. curriculum order, the
-            same rule the four core track pages use for their hero CTA, so it
-            is derived rather than picked. */}
-        {entry ? (
-          <>
-            <FadeRule className="my-10 sm:my-14" />
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <TechLabel as="p">Begin at</TechLabel>
-                <p className="mt-2 font-display text-2xl font-semibold leading-tight text-foreground">
-                  {entry.course.title}
-                </p>
-                <p className="mt-2 max-w-lede text-sm leading-relaxed text-muted-foreground">
-                  {entry.lessonCount} lessons
-                  {entry.lesson ? <> &middot; opens on &ldquo;{entry.lesson.title}&rdquo;</> : null}
-                  {". "}
-                  First of the {courses.length} in curriculum order. What each of the others
-                  requires is filed under &sect; 02 below.
-                </p>
-              </div>
-              <Button href={entry.href} size="lg" className="shrink-0">
-                Start this course →
-                <span className="sr-only">: {entry.course.title}</span>
-              </Button>
-            </div>
-          </>
-        ) : null}
       </Section>
     </FullBleed>
   );

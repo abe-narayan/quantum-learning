@@ -53,6 +53,6 @@ export const accountingTableRecall: ConceptualProblem = {
   explanation: {
     correctIdea: "A complete, honest accounting names every scoped-out piece specifically, rather than leaving gaps implicit.",
     whyCorrect: "This matches the capstone's own explicit table exactly.",
-    whyWrong: ["Vague answers like 'some of the hard parts' don't demonstrate having actually located the two specific, named gaps."],
+    whyWrong: ["Vague answers like 'some of the hard parts' don't demonstrate having located the two specific, named gaps."],
   },
 };

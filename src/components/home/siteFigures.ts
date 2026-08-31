@@ -17,8 +17,9 @@ import { buildSearchIndex } from "@/lib/search";
  * extra two as the concept map and "the density-matrix pillar's dedicated
  * mixture explorer". Both were already counted: the density-matrix explorer
  * is one of the fourteen on the bench, and the concept map is listed as its
- * own destination in `ExploreSection` two rows below the simulator row that
- * was quietly counting it a second time. The result was a homepage claiming
+ * own destination in the homepage contents index (`SiteContents`) a row below
+ * the simulator row that was quietly counting it a second time. The result was
+ * a homepage claiming
  * more instruments than `/simulators` ("Fourteen live instruments") and
  * `/about` (which has always derived it) will show you.
  *
@@ -26,8 +27,9 @@ import { buildSearchIndex } from "@/lib/search";
  * `buildSearchIndex` has to be added here too: a compile error rather than a
  * silent wrong number, which is the trade this file makes on purpose.
  *
- * Server-only by construction. Both readers (`Hero`, `ExploreSection`) are
- * Server Components, and `lib/search` is type-only in its imports, so nothing
+ * Server-only by construction. All three readers (`Hero`, `EntryChooser`,
+ * `SiteContents`) are Server Components, and `lib/search` is type-only in its
+ * imports, so nothing
  * here crosses the client boundary. See
  * `src/lib/design/__tests__/clientBoundary.test.ts`.
  */

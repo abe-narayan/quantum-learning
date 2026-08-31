@@ -37,6 +37,13 @@
  * worst pixel. A regime whose worst pixel keeps every voice at 4.5:1 is
  * quiet enough by construction, whatever it draws.
  *
+ * It also reports the painted share and the peak alpha, which are the other
+ * half of the question. Quiet enough is a floor, not a goal: a field nobody
+ * can see passes every assertion here and fails the design brief, and that is
+ * exactly what the light theme did at a peak alpha of 11/255. Read the two
+ * halves together — the contrast lines say whether the field is safe, the
+ * alpha and painted columns say whether it is there.
+ *
  * Usage:
  *   node scripts/audit/field.mjs [--routes "/,/software"] [--frames 120]
  */
@@ -119,6 +126,12 @@ const PROBE = String.raw`(async (frames) => {
   const samples = [];
   let painted = 0;
   let total = 0;
+  // The loudest alpha anywhere in the sample, independent of which pixel is
+  // the worst for contrast. This is "is the field visible at all", and it is
+  // not derivable from the luminance columns: on paper a very dark mark at a
+  // near-zero alpha and a mid mark at a healthy one can land on the same
+  // luminance while looking nothing alike.
+  let maxAlpha = 0;
   for (let f = 0; f < frames; f++) {
     await new Promise((r) => requestAnimationFrame(r));
     const d = g.getImageData(0, 0, c.width, c.height).data;
@@ -129,6 +142,7 @@ const PROBE = String.raw`(async (frames) => {
       const a = d[i + 3] / 255;
       if (a === 0) continue;
       painted++;
+      if (a > maxAlpha) maxAlpha = a;
       const r = d[i] * a + gp[0] * (1 - a);
       const gg = d[i + 1] * a + gp[1] * (1 - a);
       const b = d[i + 2] * a + gp[2] * (1 - a);
@@ -144,6 +158,7 @@ const PROBE = String.raw`(async (frames) => {
     peak,
     trough: trough.L <= 1 ? trough : peak,
     voices,
+    maxAlpha,
     paintedShare: total ? painted / total : 0,
     p50: pct(0.5),
     p90: pct(0.9),
@@ -175,14 +190,24 @@ async function main() {
     for (const [route, regime] of routes) {
       let worst = null;
       let worstRatio = Infinity;
+      let missing = false;
       for (const fraction of [0, 0.35, 0.75]) {
         await page.goto(`${BASE}${route}`);
         await page.eval(`window.scrollTo(0, Math.round((document.documentElement.scrollHeight - window.innerHeight) * ${fraction}))`);
-        await new Promise((r) => setTimeout(r, 500));
+        // Long enough for a cold `next dev` route to finish compiling,
+        // hydrate and mount the canvas. At 500ms a route being compiled for
+        // the first time reported "no field canvas", which — before the
+        // `missing` bookkeeping below — was then skipped, and the run still
+        // printed "every regime clears AA for every voice" having measured
+        // two of the eight. A harness that reads a page that has not
+        // rendered as a pass is the exact failure mode this directory's
+        // header warns about.
+        await new Promise((r) => setTimeout(r, 1200));
         const result = await page.eval(`(${PROBE})(${FRAMES})`);
         if (result.error) {
           console.log(`${route} (${regime}): ${result.error}`);
           worst = null;
+          missing = true;
           break;
         }
         // Whichever extreme is closest in luminance to any voice is the one
@@ -198,7 +223,20 @@ async function main() {
           worstRatio = ratio;
         }
       }
+      if (missing) failures++;
       if (!worst) continue;
+      // A canvas that exists and painted nothing used to sail through: every
+      // voice trivially clears AA against a ground the field never touched,
+      // and the run printed a pass. That is the same failure the alpha column
+      // exists to make visible, so it is an error rather than a note — the
+      // one case it legitimately fires on (`prefers-reduced-motion`, where
+      // the field paints a single static frame) still paints, so a zero here
+      // means a regime that drew nothing.
+      if (worst.paintedShare === 0) {
+        console.log(`${route.padEnd(12)} ${regime.padEnd(9)} FAILS: the canvas painted no pixels\n`);
+        failures++;
+        continue;
+      }
 
       let scale = 1;
       const lines = VOICE_TOKENS.map((token) => {
@@ -226,11 +264,22 @@ async function main() {
         }
         return `      ${token.padEnd(22)} ${ratio.toFixed(2)}:1  ${ok ? "ok" : "FAILS AA"}`;
       });
+      // Peak alpha is reported alongside the luminances because the two
+      // answer different questions and only one of them is the contrast
+      // budget. Luminance says whether the field is *safe*;
+      // alpha, in 8-bit units of the canvas's own backing store, says whether
+      // it is *there* at all — and the two come apart hard between themes,
+      // because a mark on paper spends far more contrast per unit alpha than
+      // the same mark on the dark ground does. A light theme sitting at the
+      // AA line with a peak alpha of 11/255 is the shape of that failure, and
+      // nothing in the luminance columns shows it.
+      const alpha8 = (a) => `${Math.round(a * 255)}/255`;
       console.log(
         `${route.padEnd(12)} ${regime.padEnd(9)} painted ${(worst.paintedShare * 100).toFixed(2)}%  ` +
           `L p50=${worst.p50.toFixed(4)} p90=${worst.p90.toFixed(4)} p99=${worst.p99.toFixed(4)} ` +
           `peak=${worst.peak.L.toFixed(4)} trough=${worst.trough.L.toFixed(4)} ground=${worst.groundL.toFixed(4)} ` +
-          `(worst rgb ${worst.peak.rgb.join(",")} / ${worst.trough.rgb.join(",")})`
+          `(worst rgb ${worst.peak.rgb.join(",")} / ${worst.trough.rgb.join(",")}` +
+          `, peak alpha ${alpha8(worst.maxAlpha)})`
       );
       console.log(lines.join("\n"));
       console.log(`      needs x${scale.toFixed(3)} to clear every voice\n`);
@@ -239,7 +288,11 @@ async function main() {
   } finally {
     await chrome.close();
   }
-  console.log(failures ? `${failures} voice/regime pairs below AA` : "every regime clears AA for every voice");
+  console.log(
+    failures
+      ? `${failures} regime failures (a voice below AA, or a regime that never rendered)`
+      : "every regime clears AA for every voice"
+  );
   process.exit(failures ? 1 : 0);
 }
 

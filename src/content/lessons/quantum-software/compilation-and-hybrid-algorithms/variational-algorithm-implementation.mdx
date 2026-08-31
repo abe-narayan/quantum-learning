@@ -27,7 +27,7 @@ export const costLandscapeGrid = Array.from({ length: 15 }, (_, i) => {
 export const lessonMeta = {
   title: "Variational Algorithm Implementation",
   description:
-    "Closing the loop this track has been building toward: a VQE ansatz built from this platform's own QuantumCircuit (not Quantum Algorithms II's separate matrix-based ansatzState) lands its grid search exactly on ⟨Z⟩'s true minimum, matching exactGroundStateEnergy to full precision, then extends to a two-parameter Hamiltonian and converges to within 0.04% of the true ground energy by grid search alone.",
+    "A VQE ansatz built from this platform's own QuantumCircuit lands its grid search exactly on ⟨Z⟩'s true minimum, matching exactGroundStateEnergy to full precision, then extends to a two-parameter Hamiltonian and converges to within 0.04% of the true ground energy by grid search alone.",
   course: "compilation-and-hybrid-algorithms",
   module: "variational-algorithm-implementation",
   order: 1,
@@ -260,7 +260,7 @@ special, checkable coincidence of that specific problem's structure.
    which a simulator can do and a device cannot. On real hardware the
    equivalent move is to rotate the basis before measuring, one extra
    gate and a *separate measurement setting* per non-commuting term. That
-   is precisely why the Hybrid Workflows lesson's cost arithmetic
+   is why the Hybrid Workflows lesson's cost arithmetic
    multiplies by the number of Pauli terms: each one is its own set of
    circuit executions.
 
@@ -270,7 +270,7 @@ special, checkable coincidence of that specific problem's structure.
 
    </details>
 
-2. Why does $H=Z$'s ground state land EXACTLY on a grid point
+2. Why does $H=Z$'s ground state land *exactly* on a grid point
    ($\theta=\pi$) while $H=0.6Z+0.8X$'s optimal parameters don't land
    as precisely on this lesson's grid?
 
@@ -316,7 +316,7 @@ special, checkable coincidence of that specific problem's structure.
 
    </details>
 
-3. Explain why building the SAME VQE physics through two different code
+3. Explain why building the *same* VQE physics through two different code
    paths (direct matrix vs. circuit-as-data) serves as a
    correctness check on both implementations.
 
@@ -341,7 +341,7 @@ special, checkable coincidence of that specific problem's structure.
 
    **"Both call the same gate helpers, so agreement confirms the
    helpers."** This would make the check vacuous. A shared layer is
-   exactly where a common bug hides, and running the same wrong function
+   where a common bug hides, and running the same wrong function
    twice produces the same wrong answer twice. The value here comes from
    the paths *not* sharing that layer.
 
@@ -438,9 +438,9 @@ special, checkable coincidence of that specific problem's structure.
 - A VQE ansatz built with `QuantumCircuit` (`circuit.ry(0,theta)`)
   reproduces Quantum Algorithms II's matrix-based `ansatzState` physics
   exactly, computed through a different software path.
-- Grid-search optimization finds $H=Z$'s ground energy EXACTLY
+- Grid-search optimization finds $H=Z$'s ground energy *exactly*
   ($\theta=\pi$, $\langle Z\rangle=-1$), matching
-  `exactGroundStateEnergy` precisely.
+  `exactGroundStateEnergy`.
 - A two-parameter extension ($H=0.6Z+0.8X$) converges to within
   $0.04\%$ of the true ground energy, limited only by grid resolution,
   the same variational-method pattern established all the way back in

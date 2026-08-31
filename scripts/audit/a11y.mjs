@@ -462,6 +462,36 @@ const CLIP_PROBE = String.raw`(() => {
   // what a reader of this output will re-measure; 'cause' names which of the
   // two cases it is.
   const CONTENT_TAGS = new Set(['IMG', 'CANVAS', 'VIDEO', 'IFRAME', 'INPUT', 'TEXTAREA', 'SELECT', 'SVG']);
+
+  /**
+   * Advances the walker to the first node after node's whole subtree,
+   * returning it, or null once the subtree is exhausted.
+   *
+   * This replaces two bugs that between them attributed clipped content to the
+   * wrong element on nearly every route.
+   *
+   * The climb used to run up = up.parentNode; next = up.nextSibling while
+   * up !== root, which means it could reach root itself and then take
+   * **root's own next sibling**, a node entirely outside the subtree being
+   * measured. The walker was then pointed there and happily carried on
+   * through unrelated DOM, which is why a course card was reported as
+   * clipping the footer's "StudyQuantum. All rights reserved."
+   *
+   * It then did walker.currentNode = next; walker.nextNode(), which returns
+   * the node *after* next and so never tested next itself. A skipped
+   * subtree immediately followed by a second one that also needed skipping
+   * put a deliberately-hidden element straight into the measurement.
+   */
+  const skipSubtree = (walker, node, root) => {
+    let next = null;
+    for (let up = node; up && up !== root; up = up.parentNode) {
+      if (up.nextSibling) { next = up.nextSibling; break; }
+    }
+    // Never leave the subtree, whatever the tree shape.
+    if (!next || !root.contains(next)) return null;
+    walker.currentNode = next;
+    return next;
+  };
   const contentOverflow = (root) => {
     const box = root.getBoundingClientRect();
     const cs = getComputedStyle(root);
@@ -496,13 +526,31 @@ const CLIP_PROBE = String.raw`(() => {
           ecs.clipPath === 'inset(50%)' ||
           (ecs.webkitLineClamp && ecs.webkitLineClamp !== 'none')
         ) {
-          // Jump the walker past this subtree.
-          let next = node.nextSibling;
-          let up = node;
-          while (!next && up.parentNode && up !== root) { up = up.parentNode; next = up.nextSibling; }
-          walker.currentNode = next ?? root;
-          node = next ? walker.nextNode() : null;
+          node = skipSubtree(walker, node, root);
           continue;
+        }
+        // A descendant that clips or scrolls on its own account shows only
+        // what fits inside its own box, so that box is what has to fit inside
+        // root, and its contents are somebody else's problem (or reachable
+        // by scrolling, which is not a 1.4.4 loss at all).
+        //
+        // Without this, text inside a legitimately scrollable region had its
+        // true unclamped page position measured against the *outer* element's
+        // edge. A wide equation inside .katex-display, which carries its own
+        // overflow-x: auto and a keyboard tab stop, reported hundreds of
+        // pixels of a "⟩" outside an ancestor panel. That number was not real,
+        // and being the largest it also became worst, hiding the genuinely
+        // clipped text sitting beside it.
+        if (node !== root) {
+          const clipsItself = (v) => v && v !== 'visible';
+          if (clipsItself(ecs.overflowX) || clipsItself(ecs.overflowY)) {
+            consider(
+              [node.getBoundingClientRect()],
+              (node.textContent || '').trim().slice(0, 45) || node.tagName.toLowerCase()
+            );
+            node = skipSubtree(walker, node, root);
+            continue;
+          }
         }
         if (CONTENT_TAGS.has(node.tagName.toUpperCase())) {
           consider([node.getBoundingClientRect()], node.tagName.toLowerCase());
@@ -553,20 +601,20 @@ const CLIP_PROBE = String.raw`(() => {
 // Paint contrast — the ground a reader actually gets
 // ---------------------------------------------------------------------------
 //
-// `responsive.mjs` composites the DOM background stack on a canvas, which is
+// responsive.mjs composites the DOM background stack on a canvas, which is
 // correct as far as it goes and cannot go far enough on this site. Two of the
 // layers behind body text are not ancestors of it and never appear in that
 // walk:
 //
-//   `.atmosphere`   (globals.css §10, z-index -20) — two pillar-tinted radial
+//   .atmosphere   (globals.css §10, z-index -20) — two pillar-tinted radial
 //                   pools and a vertical density ramp, painted by PillarScope
-//   `.field-canvas` (z-index -10) — the animated environment, whose pixels are
-//                   whatever `regimes.ts` drew this frame
+//   .field-canvas (z-index -10) — the animated environment, whose pixels are
+//                   whatever regimes.ts drew this frame
 //
-// Both are `position: fixed` siblings behind the whole page, so text sitting
-// on the page ground is read over `--depth-0` *plus both of them*, and the
-// DOM-walking checker reports the ratio against `--depth-0` alone.
-// `compositedContrast.test.ts` models the atmosphere analytically and models
+// Both are position: fixed siblings behind the whole page, so text sitting
+// on the page ground is read over --depth-0 *plus both of them*, and the
+// DOM-walking checker reports the ratio against --depth-0 alone.
+// compositedContrast.test.ts models the atmosphere analytically and models
 // the canvas not at all, because a rAF-driven canvas has no closed form.
 //
 // So: hide every glyph, photograph the page, and read the real pixels. What

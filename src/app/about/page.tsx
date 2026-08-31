@@ -50,6 +50,23 @@ const SIMULATOR_COUNT = buildSearchIndex([], [], [], []).filter(
 ).length;
 
 /**
+ * The page's four sections, in document order, for the "On this page" strip.
+ *
+ * The `label` is not always the heading verbatim: the strip is a row of chips
+ * competing for one line on a phone, so "How the content is sourced and
+ * checked" is shortened to "How it is checked". Each `id` is set on the
+ * matching `<h2>` below, and `aboutSections.test.ts` asserts every id here has
+ * exactly one heading carrying it — an anchor pointing at nothing scrolls
+ * nowhere and reports no error.
+ */
+const ABOUT_SECTIONS = [
+  { id: "how-it-is-taught", label: "How it is taught" },
+  { id: "who-it-is-for", label: "Who it is for" },
+  { id: "verification", label: "How it is checked" },
+  { id: "scope", label: "What this is not" },
+] as const;
+
+/**
  * What this page is for: a visitor who has not decided whether to trust the
  * site yet. That reader is not served by adjectives, they are served by
  * specifics they can check (real counts, a named verification mechanism they
@@ -109,7 +126,44 @@ export default async function AboutPage() {
             remembered in your own browser and sent nowhere.
           </p>
         </Reveal>
+
+        {/* This page exists for a reader deciding whether to trust the
+            curriculum, and the two sections that answer that directly — how
+            the content is checked, and what the site refuses to claim — sat
+            roughly 2,400px and 3,400px down a 4,916px page at 375px wide. A
+            sceptic who does not scroll never reaches the evidence. This is
+            the page's shape, stated in its first screen, and the shortest
+            route to the part they came for.
+
+            Plain in-page anchors: no scroll-spy, no sticky rail, no client
+            component. The four ids below are also the deep links this page
+            did not previously have, so "the bit where they say what they
+            don't claim" is now quotable as a URL.
+
+            Above the readouts, not below them. At 375px the readouts block
+            is a six-cell grid and pushed this strip to y=996 on an 812px
+            screen, i.e. straight back below the fold it exists to be above.
+            The order it leaves is also the right one to read: what the page
+            is, how to move through it, then the numbers. */}
         <Reveal delay={90}>
+          <nav aria-label="On this page" className="mt-8">
+            <p className="tech-label text-subtle-foreground">On this page</p>
+            <ul className="mt-2 flex flex-wrap gap-2">
+              {ABOUT_SECTIONS.map((section) => (
+                <li key={section.id}>
+                  <a
+                    href={`#${section.id}`}
+                    className="inline-flex min-h-11 items-center rounded-(--radius-tight) border border-border bg-surface px-3 text-sm text-muted-foreground transition-[color,border-color] duration-(--dur-fast) ease-instrument hover:border-border-strong hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    {section.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </Reveal>
+
+        <Reveal delay={140}>
           <Readouts
             className="mt-8"
             items={[
@@ -131,7 +185,9 @@ export default async function AboutPage() {
       <Section width="wide" tight>
         <Reveal className="grid gap-5 sm:grid-cols-2">
           <Panel className="p-6">
-            <h2 className="font-display text-lg font-semibold text-foreground">How it is taught</h2>
+            <h2 id="how-it-is-taught" className="scroll-mt-24 font-display text-lg font-semibold text-foreground">
+              How it is taught
+            </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               The math and physics come before the algorithms and the hardware, in that order, and
               nothing is asserted that the curriculum has not already built. Where a result can be
@@ -145,7 +201,9 @@ export default async function AboutPage() {
             </p>
           </Panel>
           <Panel className="p-6">
-            <h2 className="font-display text-lg font-semibold text-foreground">Who it is for</h2>
+            <h2 id="who-it-is-for" className="scroll-mt-24 font-display text-lg font-semibold text-foreground">
+              Who it is for
+            </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               <span className="text-foreground">Starting from little or nothing:</span>{" "}
               {/* `ENTRY_BAR` now carries the calculus clause itself, so the sentence that
@@ -184,7 +242,10 @@ export default async function AboutPage() {
 
         <Reveal delay={80} className="mt-5">
           <Instrument label="Verification">
-            <h2 className="font-display text-lg font-semibold text-foreground">
+            <h2
+              id="verification"
+              className="scroll-mt-24 font-display text-lg font-semibold text-foreground"
+            >
               How the content is sourced and checked
             </h2>
             <ul className="mt-3 space-y-3 text-sm leading-relaxed text-muted-foreground">
@@ -223,7 +284,10 @@ export default async function AboutPage() {
         <Reveal delay={120} className="mt-5">
           <Panel className="p-6">
             <TechLabel>Scope</TechLabel>
-            <h2 className="mt-1.5 font-display text-lg font-semibold text-foreground">
+            <h2
+              id="scope"
+              className="mt-1.5 scroll-mt-24 font-display text-lg font-semibold text-foreground"
+            >
               What this is not
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">

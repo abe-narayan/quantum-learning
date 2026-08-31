@@ -5,9 +5,15 @@ import { CourseProgressBadge } from "./CourseProgressBadge";
 import { LessonCompletionMark } from "./LessonCompletionMark";
 import { DifficultyMark } from "./DifficultyMark";
 import { getCourseHref } from "./courseHref";
-import { getCourse } from "@/lib/content/curriculum";
+import { COURSES, getCourse } from "@/lib/content/curriculum";
+import { pillarVisual } from "@/lib/design/pillars";
 import { cn } from "@/lib/utils";
 import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
+
+/** How many forward edges the "Leads to" line names before it counts the
+ *  rest. Three is what fits on one line at 320px without the sentence
+ *  turning into a manifest of its own. */
+const MAX_LEADS_TO_SHOWN = 3;
 
 /**
  * ============================================================
@@ -90,10 +96,12 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  *
  *   RAISED (`relative z-10`, selectable, independently clickable):
  *     description · "Requires …" line and each prerequisite link · the
- *     right-hand stats block (DifficultyMark, hours, CourseProgressBadge) ·
- *     the "N of M lessons written" caption (`w-fit`,
- *     so only the words leave the card target) · every module row, authored
- *     (a link to its lesson) and unauthored (a plain span) alike.
+ *     "Leads to …" line and each dependent link · the right-hand stats block
+ *     (DifficultyMark, hours, CourseProgressBadge) · the module manifest's
+ *     `<summary>` (a real control — under the overlay it would look like a
+ *     disclosure and navigate to the course instead) and the manifest it
+ *     opens · every module row, authored (a link to its lesson) and
+ *     unauthored (a plain span) alike.
  *
  *   DELIBERATELY UNDER the overlay, i.e. still "click the card":
  *     the panel padding and the gaps between blocks · the `Course NN` index
@@ -104,6 +112,30 @@ import type { Course, LessonMetaWithSlug } from "@/lib/content/types";
  * the progress bar would carve two more holes in the card's click target for
  * no gain — neither is text anyone copies, and the bar carries no content at
  * all.
+ *
+ * ------------------------------------------------------------
+ * Deciding before clicking, and why the manifest folds
+ * ------------------------------------------------------------
+ * A card has to answer five questions before a reader commits: what it
+ * teaches (the title and description), roughly what level (`DifficultyMark`
+ * and the hours), what it assumes ("Requires …"), what it leads to ("Leads
+ * to …"), and how much of it exists (the bar and the manifest summary). Only
+ * the fourth was missing, and it is the one that turns a catalog entry into
+ * a position in a curriculum: it is the reverse prerequisite edge, computed
+ * from `COURSES`, so a new course that lists this one appears here with no
+ * authoring.
+ *
+ * The module manifest answers a sixth question — "which lessons exactly" —
+ * and that one is not a *decision* question, it is what you read after you
+ * have decided. Open by default it was also the single largest thing on
+ * `/learn`: measured at 375px, the 32 manifests were 13,074px of a
+ * 38,397px page, a third of the whole scroll, and `/learn` is the page a
+ * reader lands on from "Browse the curriculum". So it is a native
+ * `<details>`, collapsed, with the authoring-completeness caption that used
+ * to sit under the progress bar promoted to its summary — the caption was
+ * already the one-line description of what is inside, so the fold costs a
+ * row rather than adding one. Every lesson link is one keystroke or tap
+ * away, and every course also has its own page with the manifest open.
  */
 export function CourseList({
   courses,
@@ -134,8 +166,25 @@ export function CourseList({
         const prerequisiteCourses = course.prerequisites
           .map((slug) => getCourse(slug))
           .filter((prerequisite): prerequisite is Course => Boolean(prerequisite));
+        // The forward edge, read straight off the graph: the courses that
+        // name this one as a prerequisite. Cross-track dependents carry their
+        // track name, because "this Computing course opens a Hardware course"
+        // is the fact a reader is scanning a track page for and the title
+        // alone does not say it.
+        const dependentCourses = COURSES.filter((candidate) =>
+          candidate.prerequisites.includes(course.slug)
+        );
+        const shownDependents = dependentCourses.slice(0, MAX_LEADS_TO_SHOWN);
+        const hiddenDependentCount = dependentCourses.length - shownDependents.length;
         const progressPercent = totalModules > 0 ? Math.round((authoredModules / totalModules) * 100) : 0;
         const courseHref = getCourseHref(course.slug, authoredLessonSlugs[0]);
+        // Two facts on one baseline: what opening this shows you, and how
+        // much of it exists. The second half is the caption that used to sit
+        // alone under the progress bar and is the only thing distinguishing
+        // authoring completeness from the reader's own progress badge above.
+        const manifestAuthoring = isContentComplete
+          ? "all written"
+          : `${authoredModules} written so far`;
 
         return (
           <Panel
@@ -161,9 +210,20 @@ export function CourseList({
             )}
           >
             <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="max-w-2xl">
+              {/* `min-w-0`: `max-w-2xl` is only a ceiling, not a shrink hint,
+                  so without this the column's own `min-width: auto` (its
+                  widest unbreakable word, e.g. in the title or description)
+                  could still exceed the row's available width at 200% text
+                  zoom (WCAG 1.4.4), by as little as a few px — enough to
+                  clip through the card's `overflow-hidden`. */}
+              <div className="min-w-0 max-w-2xl">
                 <TechLabel>Course {String(index + 1).padStart(2, "0")}</TechLabel>
-                <h3 className="mt-1.5 font-display text-xl font-semibold tracking-tight sm:text-2xl">
+                {/* `[overflow-wrap:anywhere]`: the display face is large
+                    enough (`text-xl`/`sm:text-2xl`) that at 200% text zoom a
+                    single long word in the title ("Approximation") can, on
+                    its own, exceed the column's available width by a few px
+                    even with normal wrapping between words (WCAG 1.4.4). */}
+                <h3 className="mt-1.5 font-display text-xl font-semibold tracking-tight [overflow-wrap:anywhere] sm:text-2xl">
                   <Link
                     href={courseHref}
                     data-course-link
@@ -200,9 +260,52 @@ export function CourseList({
                     ))}
                   </p>
                 ) : null}
+                {shownDependents.length > 0 ? (
+                  // Same `relative z-10` reasoning as the "Requires" line
+                  // above, and the same inline-link exception to the 44px
+                  // target rule. The two lines are deliberately the same
+                  // voice and the same size: they are the two directions of
+                  // one edge, and a reader should be able to read the card's
+                  // position in the graph in one glance down its left edge.
+                  <p className="relative z-10 mt-1.5 text-xs text-subtle-foreground">
+                    <span className="font-tech uppercase tracking-meta">Leads to </span>
+                    {shownDependents.map((dependent, dependentIndex) => {
+                      // The short track name, not the full pillar title:
+                      // "Advanced Topics in Quantum Mechanics (Quantum
+                      // Mechanics)" spends nine characters restating the end
+                      // of the title it annotates. `pillarVisual` is the same
+                      // short-label source the filter chips and the jump nav
+                      // use, so one vocabulary across the page.
+                      const dependentTrack =
+                        dependent.pillar === course.pillar
+                          ? undefined
+                          : pillarVisual(dependent.pillar).short;
+                      return (
+                        <span key={dependent.slug}>
+                          {dependentIndex > 0 ? ", " : null}
+                          <Link
+                            href={getCourseHref(dependent.slug)}
+                            className="underline decoration-border-strong underline-offset-2 transition-colors hover:text-pillar-text hover:decoration-pillar-edge focus-visible:text-pillar-text"
+                          >
+                            {dependent.title}
+                          </Link>
+                          {dependentTrack ? <span> ({dependentTrack})</span> : null}
+                        </span>
+                      );
+                    })}
+                    {hiddenDependentCount > 0 ? <span> and {hiddenDependentCount} more</span> : null}
+                  </p>
+                ) : null}
               </div>
 
-              <div className="relative z-10 flex shrink-0 flex-col items-end gap-2.5">
+              {/* `min-w-0`, not `shrink-0`: the header row above is already
+                  `flex-wrap`, but a `shrink-0` column still renders at its
+                  own max-content width even alone on its own wrapped line —
+                  `DifficultyMark`'s ticks-plus-label alone can exceed the
+                  card's available width at 200% text zoom (WCAG 1.4.4).
+                  `min-w-0` lets this column (and, through it, `DifficultyMark`'s
+                  own internal `flex-wrap`) actually give up width. */}
+              <div className="relative z-10 flex min-w-0 flex-col items-end gap-2.5">
                 <DifficultyMark difficulty={course.difficulty} />
                 {/* Just the length here. The "N/M lessons" fraction that used
                     to sit beside it said exactly what the progress bar and its
@@ -235,22 +338,63 @@ export function CourseList({
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              {/* `w-fit` keeps the raised box tight around the caption text
-                  rather than spanning the panel, so only the words — not the
-                  empty strip beside them — come out of the card click target. */}
-              {/* "Content available — 47%" named neither whose progress this
-                  is nor what the missing 53% would be. The counts say it
-                  outright, in the same words the module manifest below uses,
-                  and the visitor's own progress is the separately-labelled
-                  badge above. */}
-              <p className="relative z-10 mt-1.5 w-fit tech-label text-subtle-foreground">
-                {isContentComplete
-                  ? `All ${totalModules} lessons written`
-                  : `${authoredModules} of ${totalModules} lessons written`}
-              </p>
             </div>
 
-            <ol className="mt-5 grid gap-2 sm:grid-cols-2">
+            {/* The caption that used to sit alone under the bar is now this
+                disclosure's summary. "Content available — 47%" named neither
+                whose progress it was nor what the missing 53% would be; the
+                counts say it outright, in the same words the manifest inside
+                uses, and the visitor's own progress is the separately-labelled
+                badge above.
+
+                `relative z-10` for the same reason every other real control on
+                this card carries it: left under the stretched `::after` it
+                would look like a disclosure and navigate to the course
+                instead. `w-fit` keeps the raised box tight around the words,
+                so only they — not the empty strip beside them — come out of
+                the card's click target.
+
+                `max-w-full` plus `flex-wrap` on top of that `w-fit`: per
+                CLAUDE.md's own note, `w-fit` is `width: fit-content`, which
+                never shrinks below its children's combined min-content — the
+                icon, "N lessons", "·" and "all written"/"N written so far"
+                all sitting on one un-wrapping line. At 200% text zoom that
+                combined run measured 328px against a 228px card (WCAG
+                1.4.4), spilling out through the panel's `overflow-hidden`
+                well past its edge. `max-w-full` caps the box at the width
+                `w-fit` is trying to hug *within*, and `flex-wrap` lets the
+                line genuinely break there instead of just being capped and
+                still overflowing. */}
+            <details className="group/manifest mt-3">
+              <summary
+                className={cn(
+                  "relative z-10 flex w-fit max-w-full flex-wrap min-h-11 cursor-pointer list-none items-center gap-x-2 gap-y-1",
+                  "rounded-(--radius-tight) pr-1 tech-label text-subtle-foreground",
+                  "transition-colors hover:text-foreground",
+                  "[&::-webkit-details-marker]:hidden"
+                )}
+              >
+                <svg
+                  aria-hidden="true"
+                  data-decorative=""
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                  className="h-3.5 w-3.5 shrink-0 text-pillar-text transition-transform group-open/manifest:rotate-90"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m7.5 5 5 5-5 5" />
+                </svg>
+                <span className="min-w-0 text-muted-foreground [overflow-wrap:anywhere]">
+                  {totalModules} lesson{totalModules === 1 ? "" : "s"}
+                </span>
+                <span aria-hidden="true" data-decorative="">
+                  ·
+                </span>
+                <span className="min-w-0 [overflow-wrap:anywhere]">{manifestAuthoring}</span>
+              </summary>
+
+              <ol className="relative z-10 mt-3 grid gap-2 sm:grid-cols-2">
               {course.modules.map((module, moduleIndex) => {
                 const lesson = lessonByModule.get(module.slug);
                 return (
@@ -278,7 +422,7 @@ export function CourseList({
                     {lesson ? (
                       <Link
                         href={`/lessons/${lesson.slug}`}
-                        className="group/module relative z-10 flex min-h-11 items-center justify-between gap-3 rounded-(--radius-tight) px-3 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted"
+                        className="group/module relative z-10 flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 rounded-(--radius-tight) px-3 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted"
                       >
                         <span className="flex min-w-0 items-baseline gap-2">
                           <span className="font-tech text-micro text-subtle-foreground">
@@ -318,9 +462,30 @@ export function CourseList({
                             {lesson.title}
                           </span>
                         </span>
-                        <span className="flex shrink-0 items-center gap-2.5">
+                        {/* `ml-auto`, not `justify-between` on the row: at
+                            200% text zoom this group's own min-content width
+                            (icon + "45 min", both un-shrinkable atomic
+                            content) can exceed what is left beside the title,
+                            and `justify-between` on a no-wrap flex row has no
+                            way to relieve that short of clipping it — which is
+                            exactly the WCAG 1.4.4 failure this replaced. The
+                            row now carries `flex-wrap`, so this group drops to
+                            its own line when it does not fit, and `ml-auto`
+                            keeps it flush right whether it shares the first
+                            line or owns a second one (an auto margin absorbs
+                            all the free space before the item on its line,
+                            which for a lone wrapped item is the whole line).
+                            Not `shrink-0` either, even once wrapped alone:
+                            a `shrink-0` item still renders at its own
+                            max-content width regardless of what line it is
+                            on, so at 2x zoom "45 min" alone could still be
+                            wider than the row and clip. `min-w-0` lets this
+                            group (and via default `flex-shrink`, its "45 min"
+                            child) actually give up width down to wrapping
+                            between "45" and "min" if it has to. */}
+                        <span className="ml-auto flex min-w-0 items-center gap-2.5">
                           <LessonCompletionMark slug={lesson.slug} />
-                          <span className="font-tech text-micro tabular-nums text-subtle-foreground">
+                          <span className="font-tech text-micro tabular-nums text-subtle-foreground [overflow-wrap:anywhere]">
                             {lesson.estimatedMinutes} min
                           </span>
                           {/* `max-sm:hidden`: this is a hover affordance, and a
@@ -366,7 +531,8 @@ export function CourseList({
                   </li>
                 );
               })}
-            </ol>
+              </ol>
+            </details>
           </Panel>
         );
       })}

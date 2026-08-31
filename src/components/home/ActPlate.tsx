@@ -58,12 +58,12 @@ export function ActPlate({
           <FadeRule className="min-w-0 flex-1" />
         </div>
 
-        <SectionTitle id={id} level={2} size="md" className="mt-5 max-w-3xl">
+        <SectionTitle id={id} level={2} size="md" className="mt-4 max-w-3xl">
           {title}
         </SectionTitle>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{premise}</p>
 
-        <div className="mt-8 max-w-2xl border-l-2 border-border-strong pl-4">
+        <div className="mt-6 max-w-2xl border-l-2 border-border-strong pl-4">
           <TechLabel>Behind the page</TechLabel>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{fieldPlain}</p>
           <p className="mt-1 font-tech text-xs leading-relaxed text-subtle-foreground">

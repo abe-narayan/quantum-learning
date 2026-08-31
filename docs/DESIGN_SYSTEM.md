@@ -829,17 +829,40 @@ reasoned against `--foreground` alone, while `Lede` is `--muted-foreground` at
 2026-08-30 measurement of the canvas's own backing store, over 70 frames and 3
 scroll positions per regime, found **seven of the eight regimes taking a text
 voice below AA, and three taking body text below it**: `graph` reached 2.40:1
-against `--foreground` on `/software`. Light mode needs `--field-strength`
-particularly, because light `--subtle-foreground` starts at 4.98:1 on
-`--depth-0`, half a point of margin before anything is painted at all.
+against `--foreground` on `/software`.
+
+**And then the light half of that fix went too far, which is the more useful
+half of this story.** Light `--subtle-foreground` was #656e7e, 4.98:1 on
+`--depth-0`: under half a point of margin before anything is painted at all.
+`--field-strength` was driven to 0.3 to fit under it, and paper ended up with
+a peak alpha of 11/255 — a background nobody could see, passing every check
+that existed, because every check that existed was a ceiling. The note in
+`globals.css` then ruled out the obvious fix, darkening the token, because one
+step down collides with `--muted-foreground`, which `contrast.test.ts` holds
+apart on purpose. That is where it went wrong: the answer to the collision is
+to move **both** secondary voices, not to abandon the fix. They are now
+#5d6678 and #505867, still 1.24:1 apart, and the room the field has on paper
+goes from 0.10 to 0.20 of relative luminance — 4.0 to 8.5 points of CIE L*,
+which is roughly where dark has always been. `--field-strength` is 0.62 there
+and the worst voice on the worst pixel of any regime measures 4.71:1, against
+4.56:1 in dark.
+
+WCAG's ratio is far stingier near white than near black, so a light theme
+sitting at the same measured ratio as a dark one is perceptually much emptier.
+That is the trap: **quiet enough is a floor, not a goal.** `field.mjs` reports
+painted share and peak alpha next to the contrast lines for exactly that
+reason, and `fieldLoudness.test.ts` now holds a floor under both the light
+palette's headroom and `--field-strength` itself.
 
 `scripts/audit/field.mjs` is the check, and it exits non-zero while any
-regime/voice pair is under AA. `compositedContrast.test.ts` remains correct
-about what it models, which is the CSS atmosphere; it cannot see the canvas,
-which has no closed form. Run both.
+regime/voice pair is under AA, or while any regime failed to render at all.
+`compositedContrast.test.ts` remains correct about what it models, which is
+the CSS atmosphere; it cannot see the canvas, which has no closed form. Run
+both, in **both** themes.
 
 If you cannot comfortably read body copy over the field, it is too strong, and
-now there is a number for it.
+there is a number for it. If you cannot tell the field is there, it is too
+weak, and there is now a number for that too.
 
 ---
 

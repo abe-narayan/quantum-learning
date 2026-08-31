@@ -4,6 +4,7 @@ import { Section } from "@/components/ui/Section";
 import { Eyebrow, SectionTitle, Lede } from "@/components/ui/Typography";
 import { ConceptMapSurface } from "@/components/map/ConceptMapSurface";
 import { ConceptOutline } from "@/components/map/ConceptOutline";
+import { CONCEPT_NODES } from "@/lib/content/concepts";
 import { getAllLessonsMeta } from "@/lib/content/lessons";
 import { buildPageMetadata, BASE_URL } from "@/lib/pageMetadata";
 import { buildBreadcrumbSchema } from "@/lib/structuredData";
@@ -52,14 +53,22 @@ export default async function MapPage() {
             was on the map but not what the picture *was* or where to click.
             The explorer immediately below carries the first actions. */}
         <Lede className="mt-4">
-          This is a map of every idea on StudyQuantum and what you need to understand before each
-          one.
+          {CONCEPT_NODES.length} ideas from across the six tracks, drawn with a line from each one
+          to whatever you need to understand first.
         </Lede>
+        {/* Was a list of the six track names followed by what a selection
+            shows. Naming the tracks here spent a line on something the page
+            repeats as its own headings a screen later; what it did not say is
+            why anyone would open this rather than /learn. These are the two
+            questions a dependency graph answers and an ordered curriculum
+            index cannot: "what do I have to know before X", and "I have just
+            finished Y, what does that open". */}
         <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted-foreground">
-          It spans all six tracks: Quantum Mechanics, Quantum Computing, Quantum Hardware,
-          Quantum Software, Quantum Mastery and Apex. Select any concept for its definition, the
-          lessons that teach it, the full chain of what comes first, and what it unlocks next.
-          Read it as a graph or as a plain list, whichever you prefer.
+          Use it to find what stands between you and a topic you want, or what a topic you have
+          just finished leads to. Select any concept for a plain-language definition, the lessons
+          that teach it, the full chain of what comes first, and what it unlocks next. Read it as
+          a graph or as a list of every concept in prerequisite order; the list is the default on
+          a phone, where a graph this wide does not fit on the screen.
         </p>
 
         {/* The explorer is client-only (`ssr: false`), so this route used to

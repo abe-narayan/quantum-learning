@@ -52,7 +52,7 @@ export const hardSphereCrossSectionAtKaHalf: NumericProblem = {
         value: 0.5,
         tolerance: 0.002,
         feedback:
-          "This looks like a comparison against the low-energy limit 4πa² instead of against the unitarity cap. The two denominators differ by a factor of (ka)², which is exactly why the cap ratio depends on ka so differently.",
+          "This looks like a comparison against the low-energy limit 4πa² instead of against the unitarity cap. The two denominators differ by a factor of (ka)², which is why the cap ratio depends on ka so differently.",
       },
     ],
   },

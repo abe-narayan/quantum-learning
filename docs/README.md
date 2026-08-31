@@ -51,6 +51,7 @@ been re-checked, the file says that too.
 | [`SCIENCE_AUDIT.md`](SCIENCE_AUDIT.md) | Verification that the visual redesign altered no scientific or mathematical content, including a mechanical multiset comparison of every LaTeX span across the whole diff. | Covers one diff only. Its **Method** section is the reusable part. |
 | [`CITATION_AUDIT.md`](CITATION_AUDIT.md) | Every research citation and dated historical claim in the corpus, checked against the actual literature. 44 of 45 accurate; one date corrected. | Re-run 2026-08-30 over all 51 `<ResearchConnection>`, 19 `<HistoricalMoment>` and 141 figure credits; 8 corrections made, all logged. Coverage is current. |
 | [`PRELAUNCH_AUDIT.md`](PRELAUNCH_AUDIT.md) | The 2026-08-30 pre-launch sprint: recovery from an interrupted session, the defect classes that actually cost something (derived-vs-typed counts, contradictions between surfaces, silently unrendered math, content clipped rather than overflowing), the practice-answer gap closed from 140/218 to 218/218, and the rendered-page audit harnesses in `scripts/audit/`. | Its §6 lists what is still open. The `/about` authorship gap needs the owner, not an agent. |
+| [`DISCOVERABILITY_SPRINT.md`](DISCOVERABILITY_SPRINT.md) | The 2026-08-30 orientation sprint: the homepage rebuilt around what a first-time visitor should do next, the six track pages that had zero first-screen actions on a phone, the hero simulation that stopped before anything tunnelled, and both corpora read for filler. Adds `orientation.mjs`. | Its §2 records four more harness bugs of the class this file warns about, including a crashed page measuring as a clean one and prose detection that was wrong three times before it was right. §7 carries the open items. |
 | [`PERF_AUDIT.md`](PERF_AUDIT.md) | Measured production-build numbers, the client-boundary findings, and the remaining performance punch list. | Measurement sections are appended to over time. §G carries a dated status per open item. |
 | [`LESSON_ENRICHMENT.md`](LESSON_ENRICHMENT.md) | Corpus survey: per-lesson visual and interaction density, and named intervention opportunities. | **Its central premise is overturned.** The narrative components it found unused are now used 691 times across all 219 lessons. The census tables are stale; the method is not. |
 
@@ -64,11 +65,12 @@ correctly sets `X-Frame-Options: DENY`, which closes the narrow-iframe
 shortcut too.
 
 `scripts/audit/` holds a dependency-free Chrome DevTools Protocol client
-(`cdp.mjs`) and four harnesses on top of it. No new dependency: Chrome is
+(`cdp.mjs`) and five harnesses on top of it. No new dependency: Chrome is
 already installed and Node 22+ ships a global `WebSocket`.
 
 | Script | What it answers |
 | --- | --- |
+| `orientation.mjs` | Whether a first-time visitor can tell what to do without scrolling: forward actions in the first screen (breadcrumbs excluded, because a link back the way you came does not orient anyone), where the first substantial prose sits, and page height. Fetches the status code separately and refuses to measure a 5xx, since a crashed page measures beautifully. `--widths`, `--routes`, `--require-forward`. |
 | `responsive.mjs` | Horizontal overflow, tap targets under 44px, text under 12px, console errors and uncaught exceptions, and WCAG contrast of every text node against its **actually painted** background. `--widths`, `--routes`. |
 | `a11y.mjs` | Semantics and keyboard, from Chrome's computed accessibility tree and **real dispatched key events** rather than a guess at tab order from DOM order. `--theme`, `--checks`. |
 | `field.mjs` | How loud the background field actually paints, against the ceiling `regimes.ts` declares. |
@@ -85,6 +87,41 @@ stacking context. Each produced confident, wrong blockers, and **a checker that
 cries wolf is worse than none**, because the tempting response is to relax the
 threshold that would have caught the real one. Where the browser can be asked
 directly (paint the colour, call `elementFromPoint`, press the key), ask it.
+
+The same trap caught `orientation.mjs` repeatedly while it was being written,
+and the list below is why this warning is not boilerplate. Counting only `<a>`
+and `<button>` reported the glossary, whose primary control is a filter field, as
+almost stranded; the selector now includes form controls. Its prose detection
+was wrong three separate ways before it was right: `<p>`-only missed a problem
+statement rendered through `ScrollableMathText`, any-long-`textContent` matched
+a container of thirty short links at y=0, and own-direct-text then matched
+clipped screen-reader copy. It needs all three of own text, a real box, and not
+hidden.
+Worse, a parallel edit put the dev server into a compile error for about a
+minute, and `/glossary` and `/about` measured as ordinary pages with two
+sensible forward actions above the fold, which were the global error boundary's
+buttons. **A crashed page measures beautifully.** That harness now fetches the
+status code separately from the navigation and refuses to report a 5xx as a
+measurement at all.
+
+`a11y.mjs`'s clip probe carried two of its own, found at the end of the same
+sprint. Its TreeWalker could take *root's own next sibling* when skipping a
+clipped subtree and walk off into unrelated DOM (a course card was reported as
+clipping the site footer), and it resumed with `currentNode = next` followed by
+`nextNode()`, which never tests `next` itself. Separately it measured text
+inside a legitimately scrollable descendant against the outer element's edge,
+inventing a large overflow that then masked the real one beside it. Between
+them they misattributed almost all of 32 findings and produced one outright
+false positive. Both are fixed; the lesson is that a checker naming the wrong
+cause costs nearly as much as one crying wolf.
+
+**Do not run two of these at once on the same port.** `launchChrome` decides
+Chrome is ready by polling `/json/version` until it answers, which an *already
+running* Chrome does immediately: the second spawn fails to bind, the poll
+succeeds against the first browser, and the two audits then drive each other's
+tabs and report plausible nonsense. `orientation.mjs` defaults to a random port
+for that reason; the other four still default to 9333, so pass distinct ports
+when running them in parallel.
 
 ## The checks that enforce all of this
 

@@ -100,7 +100,29 @@ export default async function HardwarePage() {
           </p>
         </Reveal>
 
-        <Reveal delay={80}>
+        {/* The primary CTA sits here, right after the intro paragraph, ahead
+            of the tier ladder and briefing: measured with
+            `scripts/audit/orientation.mjs --widths 375`, the only forward
+            actions this page offered above the 812px fold were the ladder's
+            incidental cross-track links (Software, Mechanics, Computing),
+            never the actual "start learning" button. The ladder and briefing
+            are still the very next things a reader meets. */}
+        {firstCourse ? (
+          <Reveal delay={80} className="mt-7 block">
+            <Button href={heroHref} size="lg">
+              Start: {firstCourse.title} →
+            </Button>
+            <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
+              <span>
+                {facts.firstCourseLessonCount} lessons
+                {firstLesson ? <> &middot; begins with &ldquo;{firstLesson.title}&rdquo;</> : null}
+              </span>
+              <DifficultyMark difficulty={firstCourse.difficulty} />
+            </p>
+          </Reveal>
+        ) : null}
+
+        <Reveal delay={100}>
           {/* Same four-rung ladder, same position, as every other pillar
               page: it is the one element that carries the hierarchy between
               them, so it cannot be styled per page. */}
@@ -113,7 +135,7 @@ export default async function HardwarePage() {
           />
         </Reveal>
 
-        <Reveal delay={100}>
+        <Reveal delay={120}>
           <Readouts className="mt-8" items={pillarReadoutItems(facts)} />
           {/* The track's own instrument readouts, kept separate from the
               shared course/lesson/hour row above: these describe the physical
@@ -127,21 +149,6 @@ export default async function HardwarePage() {
             ]}
           />
         </Reveal>
-
-        {firstCourse ? (
-          <Reveal delay={120} className="mt-7 block">
-            <Button href={heroHref} size="lg">
-              Start: {firstCourse.title} →
-            </Button>
-            <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
-              <span>
-                {facts.firstCourseLessonCount} lessons
-                {firstLesson ? <> &middot; begins with &ldquo;{firstLesson.title}&rdquo;</> : null}
-              </span>
-              <DifficultyMark difficulty={firstCourse.difficulty} />
-            </p>
-          </Reveal>
-        ) : null}
 
         <p className="mt-6 max-w-lede border-l-2 border-pillar-edge pl-4 text-xs leading-relaxed text-subtle-foreground">
           The wiring lighting up behind this page is not decoration either: {field.fieldCaption.toLowerCase()},

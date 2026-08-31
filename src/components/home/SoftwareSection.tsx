@@ -56,13 +56,13 @@ export function SoftwareSection() {
           </Lede>
         </Reveal>
 
-        <div className="relative mx-auto mt-14 max-w-4xl">
+        <div className="relative mx-auto mt-10 max-w-4xl">
           <div
             aria-hidden="true"
             data-decorative=""
             className="pointer-events-none absolute inset-x-0 top-5 hidden h-px bg-gradient-to-r from-pillar via-pillar-dim to-transparent md:block"
           />
-          <ol className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-6">
+          <ol className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between md:gap-6">
             {PIPELINE.map((step, index) => (
               <Reveal as="li" key={step.title} delay={index * 90} className="flex gap-4 md:flex-1 md:flex-col md:items-center md:text-center">
                 <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-pillar-edge bg-surface font-tech text-sm font-semibold text-pillar ring-4 ring-background">
@@ -77,7 +77,7 @@ export function SoftwareSection() {
           </ol>
         </div>
 
-        <div className="mt-16 border-t border-border pt-14">
+        <div className="mt-12 border-t border-border pt-10">
           <SplitFigure
             align="start"
             text={
@@ -87,7 +87,7 @@ export function SoftwareSection() {
                     Find out what you understood
                   </h4>
                   {/* Deliberately *not* a second description of the problem
-                      corpus. `ExploreSection`, one section below this, already
+                      corpus. `SiteContents`, in the orientation layer, already
                       catalogues it (how many, filterable by what) and used to
                       say almost word for word what this paragraph said about
                       exact grading and multiple choice. This one is about the

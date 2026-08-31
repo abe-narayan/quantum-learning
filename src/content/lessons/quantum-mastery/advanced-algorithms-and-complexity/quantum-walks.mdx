@@ -147,7 +147,7 @@ export const walkGraphClassicalEdges = walkGraphEdges(walkGraphClassicalNodes);
 export const lessonMeta = {
   title: "Quantum Walks",
   description:
-    "Deriving the coined discrete-time quantum walk on a line via a coin operator and conditional shift, deriving its momentum-space dispersion relation to show the spreading is ballistic (∝t) rather than the classical walk's diffusive (∝√t), verified numerically against a real classical random walk, plus the continuous-time walk's exact identity with Hamiltonian simulation of a graph's adjacency matrix.",
+    "Derives the coined discrete-time quantum walk on a line via a coin operator and conditional shift, showing from its dispersion relation that spreading is ballistic (∝t) rather than the classical walk's diffusive (∝√t), verified numerically. Plus the continuous-time walk's exact identity with Hamiltonian simulation of a graph's adjacency matrix.",
   course: "advanced-algorithms-and-complexity",
   module: "quantum-walks",
   order: 3,
@@ -377,8 +377,8 @@ height is unmistakable.
 
 A bar chart plots probability against position; laying the reachable
 positions out as an actual line graph, nodes lit up when their
-probability exceeds the average $1/(\text{number of reachable
-positions})$, makes the *shape* of where probability sits easier to
+probability exceeds the average, one over the number of reachable
+positions, makes the *shape* of where probability sits easier to
 read at a glance than a skyline of bars. At $T=12$ (13 reachable
 positions, mean threshold $\approx0.0769$):
 
@@ -473,8 +473,8 @@ the edges, as the $T=4$ worked example already shows) density within it.
 **Expecting the horn peak to shrink *monotonically* at every step.**
 This lesson's own explorer above shows otherwise: computed directly
 with the same `hadamardWalk` function driving the frames, the peak
-height across $T=0,4,8,16,24,32,40$ is $1.000,\,0.375,\,0.2266,
-\,0.2105,\,0.1596,\,0.1156,\,0.1235$, a reproducible *increase*
+height across $T=0,4,8,16,24,32,40$ is $1.000$, $0.375$, $0.2266$,
+$0.2105$, $0.1596$, $0.1156$, $0.1235$, a reproducible *increase*
 from $T=32$ to $T=40$, not a mistake to hide. The overall $1/\sqrt T$-
 style envelope (peak $\times$ light-cone width stays order-$1$, since
 probability is conserved) does shrink on average, but the exact density

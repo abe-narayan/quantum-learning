@@ -40,7 +40,7 @@ export const noiseSimFrames = noiseSimResults.map((result, i) => ({
 export const lessonMeta = {
   title: "Noise Simulation",
   description:
-    "A noisy simulator interleaves ideal gate evolution with a Kraus-channel noise model after every gate, demonstrated exactly: H then H should implement identity, returning perfectly to |0⟩ with zero noise (verified), but with dephasing interleaved, the same two-gate circuit returns only 90% of the way to |0⟩ instead.",
+    "A noisy simulator interleaves ideal gate evolution with a Kraus-channel noise model after every gate: H then H should implement identity, returning perfectly to |0⟩ with zero noise, verified, but with dephasing interleaved, the same two-gate circuit returns only 90% of the way to |0⟩ instead.",
   course: "simulating-quantum-systems",
   module: "noise-simulation",
   order: 1,
@@ -121,7 +121,7 @@ costs the same amount of purity.
   explanation="The first H sends the Bloch vector from the north pole out to the equator, along x, where dephasing shortens it to 0.8 and purity falls to ≈0.82. The second H rotates that shortened vector onto the z axis, and dephasing shrinks only x and y, so it finds nothing to act on: purity holds at ≈0.82. A third noisy H swings the vector back onto x, dephasing bites again, and purity drops to ≈0.70. Noise accumulation trends downward overall, but not gate by gate without exception. Check all three values on the live bars below."
 />
 
-With that dephasing channel interleaved, the SAME circuit no longer
+With that dephasing channel interleaved, the *same* circuit no longer
 returns cleanly: $P(0)\approx0.9$ (not $1.0$), and purity drops to
 $\approx0.82$, a directly computed illustration of what "noise degrades
 circuit fidelity" means numerically, not just qualitatively.
@@ -206,7 +206,7 @@ not just the gate count.
 <Callout type="note">
 **Assuming this platform's single-qubit scope is a permanent, general
 limitation of noise simulation.** It's a deliberate, stated scope choice
-for THIS platform's lessons. Real noise simulators (and a correctly
+for *this* platform's lessons. Real noise simulators (and a correctly
 generalized version of this engine) do handle multi-qubit circuits, via
 the tensor-product gate expansion this lesson names but doesn't build.
 </Callout>
@@ -296,7 +296,7 @@ the tensor-product gate expansion this lesson names but doesn't build.
    $x=0.640$, and purity falls to $\tfrac12(1+0.4096)=0.7048$.
 
    The engine's staircase, computed live: purity runs
-   $1,\ 0.8200,\ 0.8200,\ 0.7048,\ 0.7048,\ 0.6311,\ 0.6311$ across zero
+   $1$, $0.8200$, $0.8200$, $0.7048$, $0.7048$, $0.6311$, $0.6311$ across zero
    through six gates. Down on odd gates, flat on even ones. The trend is
    downward and the step-by-step claim is false.
 

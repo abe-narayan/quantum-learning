@@ -52,7 +52,7 @@ export const yErrorDoubleDetection: ConceptualProblem = {
     finalAnswer: "Y=iXZ means the two mechanisms each see and correct their own component of the combined error, independently and simultaneously.",
   },
   explanation: {
-    correctIdea: "This is exactly why concatenating the two 3-qubit codes, rather than picking just one, is necessary and sufficient for arbitrary single-qubit errors.",
+    correctIdea: "This is why concatenating the two 3-qubit codes, rather than picking just one, is necessary and sufficient for arbitrary single-qubit errors.",
     whyCorrect: "This directly connects the very first lesson's Pauli decomposition argument to the concrete 9-qubit construction.",
     whyWrong: ["Claiming a Y error needs a third, separate mechanism misses that it's already fully covered by the two existing mechanisms acting together."],
   },

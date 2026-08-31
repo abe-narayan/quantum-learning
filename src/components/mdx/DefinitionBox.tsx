@@ -85,8 +85,19 @@ export function DefinitionBox({
           </span>
           {/* `text-lg sm:text-xl`, matching `TheoremBox` step for step: the
               two are one family and must not drift apart on size. */}
+          {/* `min-w-0` alone shrinks the flex item to the row's available
+              width, but at 200% text zoom (WCAG 1.4.4) the panel is narrow
+              enough that a single long word in the title
+              ("nondeterministic") is wider than that whole available width,
+              and normal wrapping only breaks at spaces. `[overflow-wrap:
+              anywhere]` is the part that lets the word itself break, so the
+              title stays inside the panel's `overflow-hidden` clip instead
+              of losing its tail with no scrollbar to say so. Measured with
+              `scripts/audit/a11y.mjs --checks resize` on
+              `DefinitionBox title="NP (nondeterministic polynomial time,
+              verifier form)"`. */}
           {title && (
-            <span className="font-display text-lg font-semibold text-foreground sm:text-xl">
+            <span className="min-w-0 font-display text-lg font-semibold text-foreground [overflow-wrap:anywhere] sm:text-xl">
               {title}
             </span>
           )}

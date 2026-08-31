@@ -57,6 +57,6 @@ export const bosonsVsFermionsClustering: ConceptualProblem = {
   explanation: {
     correctIdea: "Placing both cases side by side makes the asymmetry between bosons and fermions completely explicit, rather than treating exclusion as an isolated fact about fermions alone.",
     whyCorrect: "Matches both this lesson's and the previous lesson's constructions.",
-    whyWrong: ["Describing only the fermion case misses that the SAME mathematical operation, applied to bosons, gives the opposite, unrestricted conclusion. The contrast is the point."],
+    whyWrong: ["Describing only the fermion case misses that the same mathematical operation, applied to bosons, gives the opposite, unrestricted conclusion. The contrast is the point."],
   },
 };

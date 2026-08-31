@@ -14,7 +14,7 @@ export const repeatedSameAxisMeasurement: MultipleChoiceProblem = {
   },
   question: {
     type: "multiple-choice",
-    prompt: "If a z-oriented SG apparatus gives 'up', and a SECOND z-oriented apparatus immediately follows (same axis, nothing in between), what is P(up again)?",
+    prompt: "If a z-oriented SG apparatus gives 'up', and a second z-oriented apparatus immediately follows (same axis, nothing in between), what is P(up again)?",
     options: [
       { id: "a", text: "1 (certain)" },
       { id: "b", text: "0.5" },

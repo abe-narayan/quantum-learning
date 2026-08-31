@@ -262,11 +262,11 @@ $$
 I(A:B) = 1 + 1 - 1 = 1 \text{ bit}
 $$
 
-Exactly the classical mutual information of two perfectly correlated
+The classical mutual information of two perfectly correlated
 coin flips, unsurprising since this state *is* two perfectly
 correlated classical bits with a density-matrix label. This $I(A:B)=1$
 sits strictly between an uncorrelated pair's $I(A:B)=0$ and the maximally
-entangled Bell state's $I(A:B)=2$, which is exactly the problem: mutual
+entangled Bell state's $I(A:B)=2$, which is the problem: mutual
 information alone cannot distinguish "correlated" from "entangled" (both
 give a nonzero number), and it is the gap the next quantity closes.
 
@@ -338,7 +338,7 @@ $$
 
 The right-hand half is **subadditivity**, and subtracting $S(\rho_B)$
 from it is what makes $I(A:B)\geq0$: mutual information is never
-negative, exactly as classically. The left-hand half, rearranged the same
+negative, just as classically. The left-hand half, rearranged the same
 way, gives
 
 $$
@@ -362,7 +362,7 @@ $$
 
 defined for a channel $\mathcal N$ that takes some input system to
 output $B$ (with $A$ standing in for a reference system purifying the
-input, exactly the purification construction Schmidt Decomposition and
+input, the purification construction Schmidt Decomposition and
 Purification built). $I(A{>}B)>0$ exactly when $S(A|B)<0$: coherent
 information is positive precisely when the channel preserves enough
 quantum correlation with the reference to make quantum information
@@ -370,7 +370,7 @@ recoverable on the other side. Its regularized version,
 $Q(\mathcal N)=\lim_{n\to\infty}\tfrac1n\max I(A{>}B)$ over $n$ uses of
 the channel, *is* the channel's quantum capacity (the LSD theorem,
 Lloyd-Shor-Devetak), stated here, not proved, and picked back up in
-this course's capstone, which asks exactly how much quantum information
+this course's capstone, which asks how much quantum information
 a noisy channel can carry.
 
 ## When Conditional Entropy Goes Negative
@@ -384,7 +384,7 @@ useless and $H(A|B)=H(A)$. Every classical intuition about
 
 Quantum mechanics breaks it, and $S(A|B)=-1$ bit for the Bell state is
 the single most quoted, most surprising result in quantum information
-theory precisely because of what it does *not* mean. It does not mean
+theory because of what it does *not* mean. It does not mean
 you know more than everything about $A$. It means the question "what is
 $A$'s state, on its own?" has stopped making sense: $\rho_A$ is
 maximally mixed and carries zero information by itself, while $\rho_{AB}$
@@ -397,7 +397,7 @@ whoever already holds $B$, so that they can reconstruct the full joint
 state (the **quantum state merging** protocol, Horodecki-Oppenheim-Winter
 2005). When $S(A|B)<0$, state merging *generates* $|S(A|B)|$ EPR pairs
 as a byproduct instead of consuming qubits. Negative conditional
-entropy is a resource, not a paradox, and it is exactly why "how much
+entropy is a resource, not a paradox, and it is why "how much
 can be learned/sent" needs $S(A|B)$ and $I(A{>}B)$ as precise vocabulary
 rather than loose analogy to the classical case.
 
@@ -494,11 +494,11 @@ someone knows "more than everything" about $A$.** It is none of these.
 $\rho_A$ on its own is still exactly as mixed as its entropy says (1 bit,
 maximally uncertain, for the Bell state); what's negative is a
 *difference*, $S(\rho_{AB})-S(\rho_B)$, and that difference is negative
-precisely because $\rho_{AB}$ is *more* pure (lower entropy) than
+because $\rho_{AB}$ is *more* pure (lower entropy) than
 $\rho_B$ alone, which can only happen through entanglement. Classical
 joint distributions can never do this ($H(AB)\geq H(B)$ always, since
 classical joint uncertainty can't be less than either marginal's), which
-is exactly why this has no classical counterpart to sanity-check it
+is why this has no classical counterpart to sanity-check it
 against.
 </Callout>
 
@@ -536,7 +536,7 @@ agree only at the extremes ($p=0$ and $p=1$), not everywhere in between.
    The factor of two is the interesting part, and it is not bookkeeping.
    Mutual information counts *total* correlation, and an ebit carries its
    correlation twice over: once classically and once quantum
-   mechanically. Superdense coding is the operational statement of exactly
+   mechanically. Superdense coding is the operational statement of
    that, one shared ebit plus one transmitted qubit conveying two
    classical bits. The entanglement entropy $S(\rho_A)$ is the half that
    counts the entanglement; $I(A:B)$ is the whole.
@@ -592,11 +592,11 @@ agree only at the extremes ($p=0$ and $p=1$), not everywhere in between.
    $H(AB)=H(A)=H(B)$ identically, for any weights and not just $0.8/0.2$.
    Mutual information then reduces to
    $I(A:B)=H(A)+H(B)-H(AB)=H(A)$: one shared random variable's worth of
-   correlation, which is exactly what perfect correlation should be worth.
+   correlation, which is what perfect correlation should be worth.
 
    Set that against the Bell state and the whole lesson's distinction is
    visible in one ratio. There, $I(A:B)=2S(\rho_A)$; here,
-   $I(A:B)=1\cdot S(\rho_A)$. The missing factor of two is precisely the
+   $I(A:B)=1\cdot S(\rho_A)$. The missing factor of two is the
    entanglement, and the other quantities confirm it:
    $S(A|B)=0.721928-0.721928=0$, non-negative and so consistent with the
    classical floor, and the coherent information
@@ -661,7 +661,7 @@ agree only at the extremes ($p=0$ and $p=1$), not everywhere in between.
    is about as sharp a warning against reading a single-copy number as a
    verdict as the subject offers.
 
-   For this particular family more can actually be said, and it points the
+   For this particular family more can be said, and it points the
    other way. At $p=0.5$ the Werner state's concurrence is
    $(3p-1)/2=0.25>0$, so it is entangled, and every entangled two-qubit
    state is distillable (the Horodecki two-qubit result). So Alice and Bob

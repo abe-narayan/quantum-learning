@@ -8,6 +8,7 @@ import {
 } from "@/lib/quantum/timeEvolution";
 import { barrierPotential, freeParticlePotential } from "@/lib/quantum/potentials";
 import { PRESETS, defaultParamValues, getPreset } from "../wavefunction-explorer/presets";
+import { DEFAULT_AUTOPLAY_FRAMES } from "../wavefunction-explorer/autoplayRun";
 
 /**
  * What the Wavefunction Explorer actually puts on screen, checked against
@@ -20,8 +21,12 @@ import { PRESETS, defaultParamValues, getPreset } from "../wavefunction-explorer
  * than at the author's defaults.
  */
 
-/** The instrument's own automatic first playback, from WavefunctionSimulation's AUTOPLAY_FRAME_LIMIT. */
-const AUTOPLAY_FRAMES = 260;
+/**
+ * The instrument's own automatic first playback. Imported rather than typed:
+ * the budget now lives in `autoplayRun.ts` and a preset may override it (only
+ * `tunneling` does). Every preset exercised in this file uses the default.
+ */
+const AUTOPLAY_FRAMES = DEFAULT_AUTOPLAY_FRAMES;
 
 describe("wavefunction explorer presets", () => {
   it("starts every preset from a normalized state, at every slider extreme", () => {

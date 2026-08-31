@@ -66,7 +66,7 @@ export const jordanWignerPresets = [
 export const lessonMeta = {
   title: "Quantum Simulation of Molecules",
   description:
-    "The electronic structure problem's combinatorial Hilbert space made concrete, then a fully explicit 2-mode Jordan-Wigner mapping built from this platform's own Matrix/Complex primitives and verified numerically (not just asserted) to satisfy {a₁,a₂†}=0, framing VQE and phase estimation as this field's two honestly-scoped paths toward a near-term-plausible quantum advantage.",
+    "The electronic structure problem's combinatorial Hilbert space made concrete, then a fully explicit 2-mode Jordan-Wigner mapping verified numerically, not just asserted, to satisfy {a₁,a₂†}=0. Frames VQE and phase estimation as this field's two honestly-scoped paths toward a near-term-plausible quantum advantage.",
   course: "simulation-and-compilation-frontiers",
   module: "quantum-simulation-of-molecules",
   order: 5,
@@ -540,7 +540,7 @@ elsewhere in this track for QSVT versus Trotterization.
    mapped operator on modes $j$ and $k$ carries $Z$ on every mode between
    them, so its Pauli weight grows with the distance and reaches $O(n)$
    for a molecular Hamiltonian's long-range terms. Every one of those
-   $Z$'s becomes gates in a Trotter step. That is precisely the cost the
+   $Z$'s becomes gates in a Trotter step. That is the cost the
    Bravyi-Kitaev and related encodings were designed to reduce, trading
    Jordan-Wigner's simple locality for $O(\log n)$ operator weight. The
    $Z$-string is not a technicality; it is one of the main line items in

@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { qaoaCircuit, expectedCutSize, bruteForceMaxCut } from "@/lib/quantum/qaoa";
 import { GraphDiagram, type GraphNode, type GraphEdge } from "@/components/visualizations/GraphDiagram";
-import { KatexMath } from "@/components/ui/KatexMath";
 import { QAOAControls } from "./QAOAControls";
 import { QAOA_GRAPH_PRESETS } from "./presets";
 import { Readout } from "@/components/ui/Typography";
@@ -191,7 +190,7 @@ export function QAOAExplorer() {
   return (
     <SimulatorInstrument
       label="Max-Cut QAOA: p=1"
-      readout={<Readout label="Ratio" value={`${ratioPercent}%`} />}
+      readout={<Readout label="Share of the best split" value={`${ratioPercent}%`} />}
       footnote="Next: this p=1 circuit is the same one grid-searched by hand in the QAOA lesson; here you're doing that search yourself."
       stageClassName="space-y-6"
       stage={
@@ -213,11 +212,14 @@ export function QAOAExplorer() {
           />
         </div>
 
+        {/* Trimmed: the "tunes two angles" claim is now said once, not twice,
+            since `SimulatorFraming`'s "What this shows" below already names
+            both angles. What Max-Cut is and what the dashed lines mean stay,
+            since reading the diagram above depends on both. */}
         <p className="text-sm text-muted-foreground">
-          Max-Cut: split the dots into two groups so that as many lines as possible run <em>between</em> the
-          groups rather than inside one. Those crossing lines are dashed above; the count is the
-          &ldquo;cut&rdquo;. Checking every possible split gets hopeless fast, so QAOA instead tunes two
-          angles until measuring the circuit tends to hand you a good split.
+          Max-Cut: split the dots into two groups so as many lines as possible run <em>between</em> them
+          rather than inside one. Crossing lines are dashed above; their count is the &ldquo;cut&rdquo;.
+          Checking every split gets hopeless fast, so QAOA tunes two angles instead.
         </p>
 
         <div
@@ -230,27 +232,28 @@ export function QAOAExplorer() {
           you are at {(ratio * 100).toFixed(1)}% of optimal.
         </div>
 
-        {/* No `overflow-x-auto` here: the only child is a block-level
-            `.katex-display`, which fills this content box and carries its own
-            horizontal scroll (globals.css §6), so this box never had anything to
-            scroll, and `overflow-x: auto` with `overflow-y: visible` computes the
-            y axis to `auto` too, which would silently clip a tall equation. The tab
-            stop the slab needs now lives on `.katex-display` itself; see
-            `focusableDisplayHtml` in src/components/ui/KatexMath.tsx. */}
-        <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
-          <KatexMath
-            tex={`\\langle \\text{cut}\\rangle(\\gamma=${gamma.toFixed(2)},\\,\\beta=${beta.toFixed(2)}) = ${expected.toFixed(4)}, \\quad \\text{true max} = ${trueMax}`}
-            display
-          />
-        </div>
-
+        </>
+      }
+      stageAfter={
+        <>
+        {/* The KaTeX slab that used to sit here rendered
+            "⟨cut⟩(γ=…, β=…) = 2.0000, true max = 3" immediately above this
+            panel, which shows those same two numbers with labels a reader can
+            act on, and above a narration line that has already said both in
+            words. Three statements of one pair of numbers, of which the
+            equation was the only one that needed the reader to already read
+            angle-bracket notation. The labelled panel is the one that stays. */}
         <div className="grid gap-3 rounded-panel border border-border bg-surface-muted/40 p-4 sm:grid-cols-2">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Expected cut ⟨C⟩</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Average edges cut, ⟨C⟩
+            </p>
             <p className="mt-1 font-mono text-lg text-pillar">{expected.toFixed(3)}</p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Brute-force optimum</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Best possible split
+            </p>
             <p className="mt-1 font-mono text-lg text-accent">{trueMax}</p>
           </div>
         </div>

@@ -205,59 +205,21 @@ export default async function MasteryPage() {
           Where the notation becomes the object
         </SectionTitle>
         <Lede width="reading" className="mt-5">{PILLAR_INFO.description}</Lede>
-        <Reveal delay={60}>
-          <p className="mt-4 max-w-reading text-base leading-relaxed text-muted-foreground">
-            Five self-contained structures, each making rigorous what the
-            core curriculum used but never proved: the spectral theorem
-            beyond bounded self-adjoint operators, the general
-            angular-momentum coupling behind the Wigner-Eckart theorem and
-            Berry&rsquo;s geometric phase, the Schmidt decomposition and the
-            Lindblad master equation, a formal BQP with a real
-            Trotter-Suzuki error bound, and quantum Shannon theory&rsquo;s
-            POVMs, Stinespring dilation, and channel capacities.
-          </p>
-        </Reveal>
-        <Reveal delay={90}>
-          <Readouts
-            className="mt-8"
-            items={[
-              { label: "Courses", value: courses.length },
-              { label: "Total depth", value: totalHours, unit: "hrs" },
-              // "31/31" read as a progress bar stuck at the end rather than
-              // as a finished track. Same rule as `pillarReadoutItems` and
-              // /learn: the fraction is a hedge against an authoring gap, so
-              // it appears only while there is a gap.
-              authoredModules === totalModules
-                ? { label: "Lessons", value: authoredModules }
-                : { label: "Lessons authored", value: `${authoredModules}/${totalModules}` },
-              { label: "Difficulty", value: "Master", unit: "graduate" },
-            ]}
-          />
-        </Reveal>
-        {/* The same four-rung ladder every pillar page carries, in the same
-            place. Mastery is tier 3: the rigorous second pass, one rung below
-            Apex and one above the core tracks, and before this element existed
-            nothing on the page said so in a form a reader could take in at a
-            glance. */}
-        <Reveal delay={105}>
-          <TierLadder pillar="quantum-mastery" className="mt-8" />
-        </Reveal>
-        <Reveal delay={120}>
-          <ReadinessReadout
-            className="mt-8 max-w-reading"
-            label="Prerequisites assumed"
-            pillarLabel="Quantum Mastery"
-            direct={directPrereqs}
-            chain={prereqChain}
-          />
-        </Reveal>
 
-        {/* Five doors, one named. The other four are real links on the same
-            line rather than a second control, because this track genuinely
-            has no single on-ramp and a page that pretended otherwise would be
-            lying about the structure its own dependency table draws. */}
+        {/* Five doors, one named (see the "primary action this page did not
+            have" note above `entryCourses`). Moved up to sit right after the
+            standfirst rather than below the readouts, ladder and readiness
+            readout: measured with `scripts/audit/orientation.mjs --widths
+            375`, that stack alone ran past the 812px mobile fold and left
+            this page with zero forward actions on a phone, the same "sent
+            here and offered no way to start" problem for mobile that this
+            block already solved on desktop. The other four entries are real
+            links on the same line rather than a second control, because this
+            track genuinely has no single on-ramp and a page that pretended
+            otherwise would be lying about the structure its own dependency
+            table draws. */}
         {shallowestEntry ? (
-          <Reveal delay={140} className="mt-8 block">
+          <Reveal delay={60} className="mt-8 block">
             <div className="border-l-2 border-pillar-edge pl-5">
               <TechLabel as="p" className="text-pillar-text">
                 Start here
@@ -307,6 +269,53 @@ export default async function MasteryPage() {
             </div>
           </Reveal>
         ) : null}
+
+        <Reveal delay={80}>
+          <p className="mt-8 max-w-reading text-base leading-relaxed text-muted-foreground">
+            Five self-contained structures, each making rigorous what the
+            core curriculum used but never proved: the spectral theorem
+            beyond bounded self-adjoint operators, the general
+            angular-momentum coupling behind the Wigner-Eckart theorem and
+            Berry&rsquo;s geometric phase, the Schmidt decomposition and the
+            Lindblad master equation, a formal BQP with a real
+            Trotter-Suzuki error bound, and quantum Shannon theory&rsquo;s
+            POVMs, Stinespring dilation, and channel capacities.
+          </p>
+        </Reveal>
+        <Reveal delay={100}>
+          <Readouts
+            className="mt-8"
+            items={[
+              { label: "Courses", value: courses.length },
+              { label: "Total depth", value: totalHours, unit: "hrs" },
+              // "31/31" read as a progress bar stuck at the end rather than
+              // as a finished track. Same rule as `pillarReadoutItems` and
+              // /learn: the fraction is a hedge against an authoring gap, so
+              // it appears only while there is a gap.
+              authoredModules === totalModules
+                ? { label: "Lessons", value: authoredModules }
+                : { label: "Lessons authored", value: `${authoredModules}/${totalModules}` },
+              { label: "Difficulty", value: "Master", unit: "graduate" },
+            ]}
+          />
+        </Reveal>
+        {/* The same four-rung ladder every pillar page carries, in the same
+            place. Mastery is tier 3: the rigorous second pass, one rung below
+            Apex and one above the core tracks, and before this element existed
+            nothing on the page said so in a form a reader could take in at a
+            glance. */}
+        <Reveal delay={115}>
+          <TierLadder pillar="quantum-mastery" className="mt-8" />
+        </Reveal>
+        <Reveal delay={130}>
+          <ReadinessReadout
+            className="mt-8 max-w-reading"
+            label="Prerequisites assumed"
+            pillarLabel="Quantum Mastery"
+            direct={directPrereqs}
+            chain={prereqChain}
+          />
+        </Reveal>
       </Section>
 
       {/* -------------------------------------------------------------
@@ -343,7 +352,7 @@ export default async function MasteryPage() {
                     {internalPrereq ? (
                       <Link
                         href={getCourseHref(internalPrereq.slug, firstAuthoredLessonSlug(internalPrereq.slug, lessons))}
-                        className="hover:underline"
+                        className="inline-flex min-h-11 items-center hover:underline"
                       >
                         <Badge tone="brand">After: {internalPrereq.title}</Badge>
                       </Link>
@@ -352,7 +361,7 @@ export default async function MasteryPage() {
                       <Link
                         key={prereq.slug}
                         href={getCourseHref(prereq.slug, firstAuthoredLessonSlug(prereq.slug, lessons))}
-                        className="hover:underline"
+                        className="inline-flex min-h-11 items-center hover:underline"
                       >
                         <Badge tone="neutral">
                           {prereq.title} · {pillarTitle(prereq.pillar)}
@@ -394,7 +403,7 @@ export default async function MasteryPage() {
                       <Link
                         key={dependent.slug}
                         href={getCourseHref(dependent.slug, firstAuthoredLessonSlug(dependent.slug, lessons))}
-                        className="hover:underline"
+                        className="inline-flex min-h-11 items-center hover:underline"
                       >
                         <Badge tone="accent">{dependent.title}</Badge>
                       </Link>
@@ -586,7 +595,7 @@ export default async function MasteryPage() {
                 voice this hand-off moment already used. */}
             <Link
               href={pillarVisual("apex").route}
-              className="tech-label inline-flex shrink-0 items-center gap-2 rounded-(--radius-tight) border border-pillar-edge px-4 py-2.5 text-pillar-text transition-[color,background-color,border-color,transform] duration-(--dur-fast) ease-instrument hover:bg-pillar-wash active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="tech-label inline-flex min-h-11 shrink-0 items-center gap-2 rounded-(--radius-tight) border border-pillar-edge px-4 py-2.5 text-pillar-text transition-[color,background-color,border-color,transform] duration-(--dur-fast) ease-instrument hover:bg-pillar-wash active:scale-[0.98] motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Continue to Apex →
             </Link>

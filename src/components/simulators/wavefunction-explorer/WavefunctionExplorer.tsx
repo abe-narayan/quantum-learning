@@ -324,7 +324,19 @@ export function WavefunctionExplorer({
                   // the control had no focus indicator in its normal state.
                   // Tying the ring to the label colour makes it readable on
                   // that fill by construction, because the label already is.
-                  "min-h-11 px-4 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset " +
+                  //
+                  // `[overflow-wrap:anywhere]`: the parent pill is `w-fit`,
+                  // which per its own CSS definition never shrinks below its
+                  // children's min-content — and "|φ(k)|²" has no space to
+                  // wrap at, so its min-content is the whole unbroken string.
+                  // At 200% text zoom that string alone can exceed the
+                  // parent's `max-w-full` cap, and the excess spilled past
+                  // the pill's own `overflow-hidden` into the surrounding
+                  // instrument (WCAG 1.4.4). Only `anywhere` counts toward a
+                  // flex item's min-content size, so it is what actually lets
+                  // the pill (and this segment) shrink; `break-words` here
+                  // would leave the same width and fix nothing.
+                  "min-h-11 px-4 py-1 text-xs font-medium [overflow-wrap:anywhere] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset " +
                   (mode === option.id
                     ? "bg-pillar text-brand-foreground focus-visible:ring-brand-foreground"
                     : "bg-surface text-muted-foreground hover:bg-surface-muted focus-visible:ring-pillar")

@@ -82,9 +82,33 @@ export default async function ComputingPage() {
       />
 
       <Section width="wide">
-        <SplitFigure
-          align="start"
-          text={
+        {/* Written out rather than the shared `SplitFigure`, whose two
+            children are always DOM-ordered text-then-figure (only their
+            *visual* left/right can flip, via `reverse`). This hero's text
+            column carries the tier ladder, the briefing and its own
+            prerequisite links, the readouts, and a closing caption, all of
+            which run well past where the shorter figure column ends; with
+            `SplitFigure` (`align="start"`) the figure's own Bloch-sphere
+            control was the LAST stop in the whole hero's tab sequence, and it
+            sits near the row's top. Measured with
+            `scripts/audit/a11y.mjs --routes "/computing"`: the briefing's own
+            last prerequisite link (the text column's last focusable element)
+            to the sphere jumped back 823px. Reordering the two columns in the
+            DOM (figure first, text second, with `lg:col-start-*` restoring
+            the original visual left/right regardless of DOM order) drains
+            the short figure column first instead, so the tab sequence ends
+            on the text column's own last stop, where the eye already is.
+            `order-2`/`order-1` (unprefixed, so only below `lg`) keep the
+            single-column phone layout in its original text-then-figure
+            reading order; see ComputingSection.tsx on the homepage for the
+            same fix, same measurements. */}
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.35fr] lg:items-start lg:gap-14">
+          <div className="order-2 min-w-0 lg:col-start-2">
+            <Reveal delay={100} y={16}>
+              <LazyBlochSphereHeroExplorer />
+            </Reveal>
+          </div>
+          <div className="order-1 min-w-0 lg:col-start-1 lg:row-start-1">
             <Reveal>
               <Eyebrow>Quantum Computing</Eyebrow>
               <SectionTitle level={1} size="xl" className="mt-4">
@@ -95,7 +119,30 @@ export default async function ComputingPage() {
                 circuits together, entangle them, and reason formally about what you&rsquo;ve
                 built with density matrices and Bell tests.
               </Lede>
-              <p className="mt-4 max-w-[38rem] text-sm leading-relaxed text-muted-foreground">
+              {/* The primary CTA sits right after the standfirst rather than
+                  below the tier ladder and briefing. On a phone those two
+                  blocks (the foundations tier's ENTRY_BAR sentence is the
+                  long one) push past 500px on their own, which left this
+                  button below the 812px fold with zero forward actions above
+                  it: measured with `scripts/audit/orientation.mjs --widths
+                  375`. The ladder, briefing and the algorithms paragraph are
+                  still the very next things a reader meets. */}
+              {firstCourse ? (
+                <div className="mt-7">
+                  <Button href={heroHref} size="lg">
+                    Start: {firstCourse.title} →
+                  </Button>
+                  <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
+                    <span>
+                      {facts.firstCourseLessonCount} lessons
+                      {firstLesson ? <> &middot; begins with &ldquo;{firstLesson.title}&rdquo;</> : null}
+                    </span>
+                    <DifficultyMark difficulty={firstCourse.difficulty} />
+                  </p>
+                </div>
+              ) : null}
+
+              <p className="mt-6 max-w-[38rem] text-sm leading-relaxed text-muted-foreground">
                 Then run the algorithms that actually use it: Deutsch-Jozsa, Grover, Shor, VQE,
                 QAOA, and the error correction that keeps any of it working.
               </p>
@@ -113,33 +160,13 @@ export default async function ComputingPage() {
 
               <Readouts className="mt-8" items={pillarReadoutItems(facts)} />
 
-              {firstCourse ? (
-                <div className="mt-7">
-                  <Button href={heroHref} size="lg">
-                    Start: {firstCourse.title} →
-                  </Button>
-                  <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
-                    <span>
-                      {facts.firstCourseLessonCount} lessons
-                      {firstLesson ? <> &middot; begins with &ldquo;{firstLesson.title}&rdquo;</> : null}
-                    </span>
-                    <DifficultyMark difficulty={firstCourse.difficulty} />
-                  </p>
-                </div>
-              ) : null}
-
               <p className="mt-6 max-w-sm border-l-2 border-pillar-edge pl-4 text-xs leading-relaxed text-subtle-foreground">
                 The background behind this page is not decoration either: {field.fieldCaption.toLowerCase()},
                 the same Larmor precession the sphere beside this text lets you drive by hand.
               </p>
             </Reveal>
-          }
-          figure={
-            <Reveal delay={100} y={16}>
-              <LazyBlochSphereHeroExplorer />
-            </Reveal>
-          }
-        />
+          </div>
+        </div>
       </Section>
 
       <Section width="reading" tight aria-labelledby="computing-start-heading">

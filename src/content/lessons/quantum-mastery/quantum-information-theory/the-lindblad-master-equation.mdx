@@ -14,7 +14,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "The Lindblad Master Equation",
   description:
-    "The continuous-time differential equation that Open Quantum Systems & Kraus Operators deliberately left unbuilt, derived as the most general Markovian CP generator, then shown to reproduce this platform's existing discrete amplitude-damping channel exactly at every timestep, not just in an infinitesimal limit.",
+    "The continuous-time differential equation deliberately left unbuilt earlier, derived as the most general Markovian CP generator, then shown to reproduce this platform's existing discrete amplitude-damping channel exactly at every timestep, not just in an infinitesimal limit.",
   course: "quantum-information-theory",
   module: "the-lindblad-master-equation",
   order: 4,
@@ -229,10 +229,10 @@ $$
 \rho_{11}(t) = \rho_{11}(0)\,e^{-\Gamma t} = \rho_{11}(0)\,e^{-t/T_1}, \qquad \rho_{01}(t) = \rho_{01}(0)\,e^{-\Gamma t/2} = \rho_{01}(0)\,e^{-t/(2T_1)}
 $$
 
-The population decays exactly as T1 & T2 Decoherence defined it. The
+The population decays as T1 & T2 Decoherence defined it. The
 *coherence* decays at exactly **half** that rate in the exponent; this
 single fact, derived here for the first time on this platform, is about
-to reproduce the $T_2\leq2T_1$ bound exactly.
+to reproduce the $T_2\leq2T_1$ bound.
 
 ### The discrete channel is this solution, evaluated at $t=dt$: exactly, not approximately
 
@@ -263,7 +263,7 @@ chosen, matching this platform's engine to full numerical precision:
   ariaLabel="Continuous exponential decay e^(-t/T1) of P(1) plotted against the discrete Kraus channel stepped forward with gamma(dt), for T1=2, showing the two curves coincide exactly"
 />
 
-The *coherence* matches just as exactly: starting from $\rho=|+\rangle\langle+|$ (so
+The *coherence* matches exactly too: starting from $\rho=|+\rangle\langle+|$ (so
 $\rho_{01}(0)=1/2$) and stepping `amplitudeDampingChannel(gamma(dt))`
 forward with `applyChannelRepeatedly` reproduces
 $|\rho_{01}(t)|=\rho_{01}(0)\,e^{-t/(2T_1)}$ exactly at every sampled
@@ -434,7 +434,7 @@ argument, not what's being used for this specific numerical check.
 
    using cyclicity of the trace on the jump term and
    $\mathrm{Tr}\{A,\rho\}=2\,\mathrm{Tr}(A\rho)$ on the anticommutator. The
-   factor of $\tfrac12$ in the boxed equation is there for exactly this
+   factor of $\tfrac12$ in the boxed equation is there for this
    reason: it is the unique coefficient that makes the anticommutator's
    trace cancel the jump term's. Change it and the equation stops
    describing probability. That is worth knowing when reading the boxed
@@ -572,7 +572,7 @@ argument, not what's being used for this specific numerical check.
    K_0^\dagger K_0+\sum_{k\geq1}K_k^\dagger K_k=I+i\big(H^\dagger-H\big)\,dt+O(dt^2).
    $$
 
-   Hermiticity is precisely the condition that kills the surviving term.
+   Hermiticity is the condition that kills the surviving term.
 
    Quantify the damage when it fails. Write $H=H_R+iH_I$ with $H_R,H_I$
    Hermitian; then $i(H^\dagger-H)=2H_I$, so

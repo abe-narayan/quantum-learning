@@ -44,7 +44,41 @@ export function findChrome() {
 }
 
 /** Launches a private, headless Chrome and resolves once its CDP port answers. */
+/** Does something already answer CDP on this port? */
+async function portIsBusy(port) {
+  try {
+    const res = await fetch(`http://127.0.0.1:${port}/json/version`, {
+      signal: AbortSignal.timeout(1500),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function launchChrome({ port = 9333 } = {}) {
+  // Find a port nobody is on before spawning.
+  //
+  // The readiness poll below decides Chrome is up when `/json/version`
+  // answers, and an *already running* Chrome answers it instantly. So when the
+  // port was taken, the spawned Chrome failed to bind, exited, and every
+  // command after that drove the other run's tabs: two audits interleaved and
+  // reported plausible nonsense rather than failing. Each harness picks a
+  // different default port, which is enough until two copies of the *same*
+  // harness run at once, which is routine when several agents work in
+  // parallel.
+  let chosen = port;
+  for (let attempt = 0; attempt < 20 && (await portIsBusy(chosen)); attempt += 1) {
+    chosen = 9400 + Math.floor(Math.random() * 400);
+  }
+  if (await portIsBusy(chosen)) {
+    throw new Error(`no free debugging port found near ${port}`);
+  }
+  if (chosen !== port) {
+    process.stderr.write(`  port ${port} was busy; using ${chosen}\n`);
+  }
+  port = chosen;
+
   const userDataDir = mkdtempSync(path.join(tmpdir(), "sq-audit-"));
   const proc = spawn(
     findChrome(),
@@ -63,8 +97,22 @@ export async function launchChrome({ port = 9333 } = {}) {
     { stdio: "ignore", detached: false }
   );
 
+  // Closes the race the check above cannot: two runs can both find the port
+  // free and then both spawn, and the loser exits instead of binding. If our
+  // own child is gone, a port that answers is somebody else's browser, and
+  // attaching to it is the failure this whole guard exists to prevent.
+  let exited = false;
+  proc.on("exit", () => {
+    exited = true;
+  });
+
   const deadline = Date.now() + 30_000;
   for (;;) {
+    if (exited) {
+      throw new Error(
+        `Chrome exited before port ${port} answered; another browser probably holds it`
+      );
+    }
     try {
       const res = await fetch(`http://127.0.0.1:${port}/json/version`);
       if (res.ok) break;

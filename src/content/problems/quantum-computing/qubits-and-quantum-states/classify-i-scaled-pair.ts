@@ -40,7 +40,7 @@ export const classifyIScaledPair: MultipleChoiceProblem = {
       b: "A relative phase would multiply only ONE of the two coefficients by a phase factor. Here, BOTH coefficients got multiplied by the same factor, $i$.",
       c: "There is a simple relationship: $|\\psi_4\\rangle = i|\\psi_1\\rangle$, every coefficient scaled by the same factor. That's the definition of global phase.",
     },
-    defaultIncorrectFeedback: "Check whether both coefficients were multiplied by the SAME factor, or only one of them.",
+    defaultIncorrectFeedback: "Check whether both coefficients were multiplied by the same factor, or only one of them.",
   },
   hints: [
     { text: "Compare the ratio of |ψ₄⟩'s coefficients to |ψ₁⟩'s coefficients, term by term." },

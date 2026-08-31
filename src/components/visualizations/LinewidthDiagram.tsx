@@ -166,14 +166,23 @@ export function LinewidthDiagram({
             />
             {/* Both axis names 10 -> 13 units (~7.5px -> ~9.8px in a ~256px column).
                 At 13 the longer one is ~264 units and, anchored at x = 312, starts
-                around x = 48 - clear of the 28-unit left pad. */}
+                around x = 48 - clear of the 28-unit left pad.
+
+                "relative to line center", not "relative to center": at 42
+                characters the longer wording was running text over
+                `scripts/audit/responsive.mjs`'s 40-character running-text
+                threshold, painting at 13 x 254/340 = 9.71px effective on a
+                320px phone - under that check's 12px floor even though it
+                clears this file's own ~9px in-SVG guard. "line" is
+                redundant here (the whole panel is the emission line), so
+                dropping it gets to 36 characters without losing the claim. */}
             <text
               x={WIDTH - CURVE_PAD_X}
               y={CURVE_PAD_Y + curveHeight + 16}
               textAnchor="end"
               className="fill-muted-foreground text-[13px]"
             >
-              emission energy (relative to line center)
+              emission energy (relative to center)
             </text>
             <text x={CURVE_PAD_X} y={CURVE_PAD_Y - 4} className="fill-muted-foreground text-[13px]">
               intensity

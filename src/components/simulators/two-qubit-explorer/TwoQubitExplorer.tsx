@@ -270,11 +270,18 @@ export function TwoQubitExplorer() {
       stageClassName="space-y-6"
       stage={
         <>
+          {/* Lightly trimmed: the independent-vs-entangled definition below
+              in `SimulatorFraming`'s "What this shows" restates the opening
+              clause here, so "genuinely" and the parenthetical drop. The
+              non-locality clarification (nothing travels) and the closing
+              pointer to the table stay: the second is referenced by name
+              in the comment on `CorrelationView` below, so its wording is
+              kept exact. */}
           <p className="text-sm text-muted-foreground">
-            Two qubits can be genuinely independent (knowing one tells you nothing about the other) or
-            they can be <em>entangled</em>, where neither has a state of its own and measuring one instantly
-            fixes the other. Nothing travels between them; the correlation was always in the pair. The
-            correlation table below is where the difference shows up.
+            Two qubits can be independent, knowing one tells you nothing about the other, or{" "}
+            <em>entangled</em>, where neither has a state of its own and measuring one instantly fixes the
+            other. Nothing travels between them: the correlation was always in the pair. The correlation
+            table below is where the difference shows up.
           </p>
 
           <div
@@ -287,6 +294,16 @@ export function TwoQubitExplorer() {
             ) : null}
           </div>
 
+          {/* The correlation table first, then the panels that decompose it.
+              The instrument's own intro says "the correlation table below is
+              where the difference shows up", and it was the fourth thing
+              below: a prediction quiz and two numeric panels stood between
+              the reader and the one picture that answers the question. */}
+          <CorrelationView state={state} />
+        </>
+      }
+      stageAfter={
+        <>
           <Predict
             question="The pair starts in a Bell state. Measure qubit 0 only. What can you then say about qubit 1?"
             options={[
@@ -299,7 +316,6 @@ export function TwoQubitExplorer() {
 
           <StatePanel state={state} />
           <ReducedStatesPanel state={state} />
-          <CorrelationView state={state} />
 
           <SimulatorFraming
             shows="Whether two qubits act independently or become entangled: correlated in a way no classical coin pair can be."

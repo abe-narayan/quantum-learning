@@ -106,7 +106,7 @@ export const qspCurveFrames = qspDegrees.map((degree, i) => ({
 export const lessonMeta = {
   title: "Quantum Signal Processing",
   description:
-    "Derives the quantum signal processing protocol exactly for degree-1 and degree-2 phase sequences, verifying on this platform's own Complex/Matrix classes that every all-zero-phase sequence produces exactly a Chebyshev polynomial, that tuned phases can multiply that polynomial by a controllable complex phase, and that they can even collapse a sequence's effective degree. This is the algebra behind the field's most-used 'compile a target polynomial into classical phase angles' trick.",
+    "Derives quantum signal processing exactly for degree-1 and degree-2 phase sequences, verifying that an all-zero-phase sequence produces a Chebyshev polynomial and that tuned phases can multiply it by a controllable complex phase or collapse its effective degree. The algebra behind compiling a target polynomial into classical phase angles.",
   course: "algorithmic-frontiers",
   module: "quantum-signal-processing",
   order: 2,
@@ -135,9 +135,9 @@ export const lessonMeta = {
 
 ## Access Solved, Transformation Still Open
 
-The previous lesson showed how to bury an arbitrary bounded operator $A$ inside a bigger unitary, as a block that a quantum computer can actually run. That solved *access*: given a block encoding, you can apply $A$ (probabilistically) to a state. It didn't solve *shaping*: Hamiltonian simulation wants $e^{-iHt}$, a linear-systems solver wants $H^{-1}$, an eigenvalue filter wants a step function, and none of these is $A$ itself. Each is some *function of* $A$'s eigenvalues (or singular values). Block encoding alone gives you no lever for turning "access to $A$" into "access to $f(A)$" for a chosen $f$.
+The previous lesson showed how to bury an arbitrary bounded operator $A$ inside a bigger unitary, as a block that a quantum computer can run. That solved *access*: given a block encoding, you can apply $A$ (probabilistically) to a state. It didn't solve *shaping*: Hamiltonian simulation wants $e^{-iHt}$, a linear-systems solver wants $H^{-1}$, an eigenvalue filter wants a step function, and none of these is $A$ itself. Each is some *function of* $A$'s eigenvalues (or singular values). Block encoding alone gives you no lever for turning "access to $A$" into "access to $f(A)$" for a chosen $f$.
 
-Quantum signal processing (QSP) is that lever, built first in the simplest possible setting: a single qubit, with no block encoding involved yet at all. Fix one real number $x\in[-1,1]$ (this stands in for one eigenvalue of $A$; the multi-eigenvalue, whole-matrix version is exactly what the next lesson, [The Quantum Singular Value Transformation](/lessons/apex/algorithmic-frontiers/the-quantum-singular-value-transformation), builds by combining this lesson with the previous one). QSP shows that alternating one *fixed*, $x$-dependent single-qubit rotation with a short sequence of *tunable* phase rotations produces a single-qubit unitary whose top-left entry is an honest, computable polynomial in $x$, and that essentially any target polynomial (subject to precise, checkable conditions) can be reached this way by choosing the phases alone. No new circuit is designed for each new $f$; only the classical numbers change.
+Quantum signal processing (QSP) is that lever, built first in the simplest possible setting: a single qubit, with no block encoding involved yet at all. Fix one real number $x\in[-1,1]$ (this stands in for one eigenvalue of $A$; the multi-eigenvalue, whole-matrix version is what the next lesson, [The Quantum Singular Value Transformation](/lessons/apex/algorithmic-frontiers/the-quantum-singular-value-transformation), builds by combining this lesson with the previous one). QSP shows that alternating one *fixed*, $x$-dependent single-qubit rotation with a short sequence of *tunable* phase rotations produces a single-qubit unitary whose top-left entry is an honest, computable polynomial in $x$, and that essentially any target polynomial (subject to precise, checkable conditions) can be reached this way by choosing the phases alone. No new circuit is designed for each new $f$; only the classical numbers change.
 
 ## Interleaving One Rotation With Many Phases
 
@@ -158,7 +158,7 @@ It is unitary for every $x\in[-1,1]$, not just approximately: $W(x)W(x)^\dagger$
   ariaLabel="The product W(0.5) times W(0.5) dagger, computed via the platform's real Matrix and Complex classes, shown next to the 2x2 identity matrix for direct comparison; they match exactly"
 />
 
-$W(x)$ has a second, equivalent form worth deriving once: since the Pauli matrix $X$ satisfies $X^2=I$, the exponential series $e^{i\theta X}=\sum_n(i\theta X)^n/n!$ splits into even and odd powers of $X$ (even powers collapse to $I$, odd powers to $X$), giving the operator-valued Euler identity $e^{i\theta X}=\cos\theta\,I+i\sin\theta\,X$. Setting $\theta=\arccos x$ (so $\cos\theta=x$ and, since $\arccos$ returns an angle in $[0,\pi]$ where sine is non-negative, $\sin\theta=\sqrt{1-x^2}=s$) gives exactly
+$W(x)$ has a second, equivalent form worth deriving once: since the Pauli matrix $X$ satisfies $X^2=I$, the exponential series $e^{i\theta X}=\sum_n(i\theta X)^n/n!$ splits into even and odd powers of $X$ (even powers collapse to $I$, odd powers to $X$), giving the operator-valued Euler identity $e^{i\theta X}=\cos\theta\,I+i\sin\theta\,X$. Setting $\theta=\arccos x$ (so $\cos\theta=x$ and, since $\arccos$ returns an angle in $[0,\pi]$ where sine is non-negative, $\sin\theta=\sqrt{1-x^2}=s$) gives
 
 $$
 W(x)=e^{i\arccos(x)\,X}.
@@ -213,7 +213,7 @@ The much deeper direction, that essentially *any* polynomial satisfying these ne
 
 <TheoremBox title="Quantum signal processing (Low, Chuang, and collaborators)" provenance="cited">
 
-Fix $d\geq0$. A polynomial $P:[-1,1]\to\mathbb{C}$ arises as the $(0,0)$ entry of $U_{\vec\phi}(x)$ for some phase sequence $\phi_0,\dots,\phi_d$ if and only if $\deg P\leq d$, $P$ has parity matching $d$, $|P(x)|\leq1$ on $[-1,1]$, and a technical completeness condition holds: there exists a complementary polynomial $Q(x)$ (degree $\leq d$, parity matching $d-1$) such that $|P(x)|^2+(1-x^2)|Q(x)|^2=1$ for every $x\in[-1,1]$, exactly the extra structure needed so that $P$ and $Q$ can be assembled into an actual unitary's two independent rows.
+Fix $d\geq0$. A polynomial $P:[-1,1]\to\mathbb{C}$ arises as the $(0,0)$ entry of $U_{\vec\phi}(x)$ for some phase sequence $\phi_0,\dots,\phi_d$ if and only if $\deg P\leq d$, $P$ has parity matching $d$, $|P(x)|\leq1$ on $[-1,1]$, and a technical completeness condition holds: there exists a complementary polynomial $Q(x)$ (degree $\leq d$, parity matching $d-1$) such that $|P(x)|^2+(1-x^2)|Q(x)|^2=1$ for every $x\in[-1,1]$, the extra structure needed so that $P$ and $Q$ can be assembled into an actual unitary's two independent rows.
 
 </TheoremBox>
 
@@ -271,7 +271,7 @@ $$
 
 manifestly degree $\leq2$ and even (matching $d=2$), and, since it is a difference of two unit-modulus-weighted terms, $|P(x)|\leq1$ still holds for every $x$, by the same unitarity argument as before, for *any* $\phi_0,\phi_1,\phi_2$.
 
-**The trivial case, all phases zero.** The formula collapses to $P(x)=x^2-(1-x^2)=2x^2-1$, exactly the degree-2 Chebyshev polynomial of the first kind, $T_2(x)=\cos(2\arccos x)=2x^2-1$ (via the standard double-angle identity $\cos2\theta=2\cos^2\theta-1$). This is not a coincidence of $d=2$: using $W(x)=e^{i\arccos(x)X}$ from above, the all-zero-phase QSP unitary of *any* length $d$ is simply
+**The trivial case, all phases zero.** The formula collapses to $P(x)=x^2-(1-x^2)=2x^2-1$, the degree-2 Chebyshev polynomial of the first kind, $T_2(x)=\cos(2\arccos x)=2x^2-1$ (via the standard double-angle identity $\cos2\theta=2\cos^2\theta-1$). This is not a coincidence of $d=2$: using $W(x)=e^{i\arccos(x)X}$ from above, the all-zero-phase QSP unitary of *any* length $d$ is simply
 
 $$
 U_{\vec 0}(x)=W(x)^d=e^{id\arccos(x)X}=\cos\!\big(d\arccos x\big)\,I+i\sin\!\big(d\arccos x\big)\,X,
@@ -297,7 +297,7 @@ Before reading on, commit to how far the degree can fall.
 
 ## One Signal, Many Classical Knobs
 
-Every layer of QSP does the same two things: $W(x)$ is a "measurement" of the signal $x$ (the one place in the whole circuit where $x$ actually enters), and each $S(\phi_k)$ is a purely classical dial, contributing nothing about $x$ at all. Alternating them $d$ times lets the circuit "consult" $x$ exactly $d$ times, which is exactly why the resulting polynomial's degree is capped at $d$: no more information about $x$ can enter than the number of times $W(x)$ was called. The phases don't change how many times $x$ is consulted; they change how the results of those consultations interfere with each other, which is the mechanism that turned $\phi_0=\phi_1=\pi/4$ into an overall phase multiplying $x$, and turned $\phi_1=\pi/2$ into total destructive interference of the entire $x^2$ term.
+Every layer of QSP does the same two things: $W(x)$ is a "measurement" of the signal $x$ (the one place in the whole circuit where $x$ actually enters), and each $S(\phi_k)$ is a purely classical dial, contributing nothing about $x$ at all. Alternating them $d$ times lets the circuit "consult" $x$ exactly $d$ times, which is why the resulting polynomial's degree is capped at $d$: no more information about $x$ can enter than the number of times $W(x)$ was called. The phases don't change how many times $x$ is consulted; they change how the results of those consultations interfere with each other, which is the mechanism that turned $\phi_0=\phi_1=\pi/4$ into an overall phase multiplying $x$, and turned $\phi_1=\pi/2$ into total destructive interference of the entire $x^2$ term.
 
 ## Redesign a Circuit, or Solve for Phases
 
@@ -329,7 +329,7 @@ The word "solved" deserves one qualification, because it is the standard place a
 
 ## Degrees 1 and 2, Multiplied Out
 
-**Everything below is computed by this platform's own `Complex` and `Matrix` classes. `signalRotation(x)` builds $W(x)$ from its literal entries, `phaseRotation(phi)` builds $e^{i\phi Z}$, and `qspUnitary(x, phis)` multiplies them together exactly as the definition above specifies; no formula is hand-typed and plotted separately from what was verified.**
+**Everything below is computed by this platform's own `Complex` and `Matrix` classes. `signalRotation(x)` builds $W(x)$ from its literal entries, `phaseRotation(phi)` builds $e^{i\phi Z}$, and `qspUnitary(x, phis)` multiplies them together as the definition above specifies; no formula is hand-typed and plotted separately from what was verified.**
 
 **$d=1$, trivial phases $(\phi_0,\phi_1)=(0,0)$**, predicted $P(x)=x$:
 
@@ -392,7 +392,7 @@ The largest imaginary part anywhere across the four curves is {maxChebyshevImagi
 ## Phase Conventions and Achievable Polynomials
 
 <Callout type="warning">
-**Assuming the achieved polynomial always has degree *exactly* $d$.** The bound is *at most* $d$. The degree-collapse example above, $(\phi_0,\phi_1,\phi_2)=(0,\pi/2,0)$, is an explicit, verified $d=2$ sequence whose achieved polynomial is the *constant* $i$, a degree-$0$ result. The achievability theorem's degree bound is an upper bound, not an exact count, precisely because special phase choices can make the leading coefficient's two unit-modulus terms cancel.
+**Assuming the achieved polynomial always has degree *exactly* $d$.** The bound is *at most* $d$. The degree-collapse example above, $(\phi_0,\phi_1,\phi_2)=(0,\pi/2,0)$, is an explicit, verified $d=2$ sequence whose achieved polynomial is the *constant* $i$, a degree-$0$ result. The achievability theorem's degree bound is an upper bound, not an exact count, because special phase choices can make the leading coefficient's two unit-modulus terms cancel.
 </Callout>
 
 <Callout type="warning">
@@ -414,7 +414,7 @@ The largest imaginary part anywhere across the four curves is {maxChebyshevImagi
 
    Three wrong turns are each worth naming, because they fail differently.
 
-   The first is answering $\pi/2$, on the intuition that a quarter turn is what flips a sign. It does not: $e^{i\pi/2}=i$, so $P(x)=ix$, purely *imaginary*. That is not a negative real number; it is not a real number at all, and this is exactly the trap the lesson's second warning callout is about.
+   The first is answering $\pi/2$, on the intuition that a quarter turn is what flips a sign. It does not: $e^{i\pi/2}=i$, so $P(x)=ix$, purely *imaginary*. That is not a negative real number; it is not a real number at all, and this is the trap the lesson's second warning callout is about.
 
    The second is answering $2\pi$. That does make $P$ real, since $e^{2\pi i}=1$, but real and *positive*: $P(x)=x$ again, the identity case in disguise. Being real is the condition $\phi_0+\phi_1\in\pi\mathbb{Z}$; being negative selects the *odd* multiples out of that set, and $2\pi$ is even.
 
@@ -445,11 +445,11 @@ The largest imaginary part anywhere across the four curves is {maxChebyshevImagi
    P(x)=\big(e^{iA}+e^{iB}\big)x^2-e^{iB} .
    $$
 
-   The $x^2$ coefficient is a *sum of two* unit vectors, and two unit vectors cancel when they are antiparallel, which is exactly the condition $A-B=2\phi_1=\pi$. The constant coefficient is a *single* unit vector with nothing to cancel against. One term cannot destructively interfere with itself, whatever you set the phases to.
+   The $x^2$ coefficient is a *sum of two* unit vectors, and two unit vectors cancel when they are antiparallel, which is the condition $A-B=2\phi_1=\pi$. The constant coefficient is a *single* unit vector with nothing to cancel against. One term cannot destructively interfere with itself, whatever you set the phases to.
 
    **What that implies about achievable constants.** Whenever the leading coefficient does vanish, what is left is $P(x)=-e^{iB}$, of modulus exactly $1$. So a $d=2$ sequence can produce *any* constant on the unit circle and no constant inside it. Sweeping $\phi_0$ with $\phi_1=\pi/2,\ \phi_2=0$ through the engine gives $P=i$, then $-0.295520+0.955336i$, then $-0.841471+0.540302i$, then $-0.909297-0.416147i$, each with $|P|=1.000000000000$ and each genuinely constant (identical to twelve decimals at $x=0.55$ and $x=0.91$). The zero polynomial is unreachable. So is the constant $\tfrac12$.
 
-   That result is a good place to check the achievability theorem against the closed form, since the two arrive independently. For a constant $P=c$, the completeness condition $|P(x)|^2+(1-x^2)|Q(x)|^2=1$ evaluated at $x=1$ forces $|c|=1$ immediately, and then $(1-x^2)|Q(x)|^2=0$ for all $x$ forces $Q\equiv0$. The theorem predicts unit-modulus constants and nothing else, which is precisely what multiplying the matrices out produced. Two routes agreeing is evidence neither one quietly dropped a hypothesis.
+   That result is a good place to check the achievability theorem against the closed form, since the two arrive independently. For a constant $P=c$, the completeness condition $|P(x)|^2+(1-x^2)|Q(x)|^2=1$ evaluated at $x=1$ forces $|c|=1$ immediately, and then $(1-x^2)|Q(x)|^2=0$ for all $x$ forces $Q\equiv0$. The theorem predicts unit-modulus constants and nothing else, which is what multiplying the matrices out produced. Two routes agreeing is evidence neither one quietly dropped a hypothesis.
 
    It also says degree collapse is worse than it sounds. "Degree $0$" makes it sound like the sequence still computes something, just something simple. It does not: a unit-modulus constant multiplies the encoded block by a phase and destroys every trace of $x$. That is why the lesson's callout treats collapse as a failure mode to detect in a phase sequence rather than a shortcut to exploit.
 
@@ -466,7 +466,7 @@ The largest imaginary part anywhere across the four curves is {maxChebyshevImagi
 
    Every path spends the same total. **One consultation of $W(x)$ buys exactly one degree**, whether it is spent as a bare $x$ or as half of a $(1-x^2)$ pair. The phases contribute zero degrees, because they contribute no $x$. So the achievable degree is capped at $d$, with parity matching $d$, and the only thing the phases can do is make leading terms cancel, which spends the budget *down* in steps of two (question 2 above is that happening) and never up. Degree $d+1$ would require a $(d+1)$-th consultation of $x$, and the circuit does not contain one.
 
-   The wrong turn worth naming is the opposite over-estimate. Seeing $s=\sqrt{1-x^2}$, noticing that $s^2=1-x^2$ is quadratic, and concluding that $d$ copies of $W$ could reach degree $2d$. Each $s$ costs a $W$-call of its own; a pair of them costs two calls and delivers two degrees, exactly the same exchange rate as two bare $x$'s. At $d=2$ the all-$s$ path gives $(is)(is)=-(1-x^2)$, degree $2$, not degree $4$. And running the all-zero-phase $d=3$ sequence through the engine returns $T_3(x)=4x^3-3x$ to twelve decimals at both $x=0.37$ and $x=-0.8$, with an imaginary part of exactly zero: degree $3$, not $6$.
+   The wrong turn worth naming is the opposite over-estimate. Seeing $s=\sqrt{1-x^2}$, noticing that $s^2=1-x^2$ is quadratic, and concluding that $d$ copies of $W$ could reach degree $2d$. Each $s$ costs a $W$-call of its own; a pair of them costs two calls and delivers two degrees, the same exchange rate as two bare $x$'s. At $d=2$ the all-$s$ path gives $(is)(is)=-(1-x^2)$, degree $2$, not degree $4$. And running the all-zero-phase $d=3$ sequence through the engine returns $T_3(x)=4x^3-3x$ to twelve decimals at both $x=0.37$ and $x=-0.8$, with an imaginary part of exactly zero: degree $3$, not $6$.
 
    A second wrong turn is hoping the non-polynomial $s$ smuggles something in, on the grounds that the entries of $W$ are not all polynomials. They are not, and it does not matter: the parity structure keeps odd powers of $s$ out of the $(0,0)$ entry entirely. That is a fact about *which matrix element you read*, not about which phases you chose, so no phase sequence can reach around it.
 

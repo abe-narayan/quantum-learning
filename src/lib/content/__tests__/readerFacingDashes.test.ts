@@ -21,14 +21,15 @@ import { describe, expect, it } from "vitest";
  * stripped first, because an em dash in a code comment is fine and this
  * codebase uses them heavily there.
  *
- * `.ts` files are deliberately NOT covered. The only em dashes left in them
- * are inside regex character classes that match the character on purpose,
- * such as `CLAUSE_BREAK_PUNCTUATION = /[.;:!?\n—]/` in the conceptual
- * validator and the unicode-minus normalisation in the numeric one. Telling a
- * regex literal from a string literal needs a parser rather than a regex, and
- * a test that had to carry an allowlist of "these em dashes are fine" would
- * rot into noise. UI strings in `.tsx` cover the reader-facing risk; the rest
- * is code.
+ * **`.ts` files outside tests** are covered too, but only inside **string
+ * literals**, and that distinction is the whole trick. Those files contain em
+ * dashes that are entirely correct: the conceptual validator's
+ * clause-break character class and the numeric validator's unicode-minus
+ * normalisation both match the character on purpose. A regex literal is not a
+ * string literal, so scanning only string literals excludes them by
+ * construction, with no allowlist to rot. Reader-facing copy really does live
+ * in `.ts` (`lib/entryBar.ts`, `lib/nav.ts` and `lib/structuredData.ts` all
+ * hold sentences a visitor reads), so leaving that half uncovered was a gap.
  *
  * ## What this does not forbid
  *
@@ -48,6 +49,25 @@ const BANNED = [
   { char: "―", name: "horizontal bar (U+2015)" },
   { char: "⸺", name: "two-em dash (U+2E3A)" },
   { char: "⸻", name: "three-em dash (U+2E3B)" },
+];
+
+/**
+ * The same characters written so the source file does not contain them.
+ *
+ * The scan above matches literal codepoints, so every one of these would pass
+ * it and still put an em dash in front of a reader: a `—` escape in a
+ * string literal, an HTML entity in JSX or MDX, or a `fromCharCode` call.
+ * None of them is used anywhere in `src` today, and this is not a suspicion
+ * that someone will smuggle one in deliberately. It is that the rule already
+ * bans three *other* dash codepoints specifically so it cannot be satisfied by
+ * swapping the character, and a rule that can be satisfied by swapping the
+ * *encoding* is exactly as hollow. Cheaper to close than to argue about.
+ */
+const ENCODED = [
+  { pattern: /\\u2014|\\u2015|\\u2E3A|\\u2E3B/gi, name: "unicode escape for an em dash" },
+  { pattern: /&mdash;|&horbar;/gi, name: "HTML entity for an em dash" },
+  { pattern: /&#8212;|&#8213;|&#x2014;|&#x2015;/gi, name: "numeric entity for an em dash" },
+  { pattern: /fromCharCode\(\s*8212\s*\)|fromCodePoint\(\s*8212\s*\)/g, name: "charCode em dash" },
 ];
 
 const CONTENT_ROOT = path.join(process.cwd(), "src/content");
@@ -80,6 +100,53 @@ function collectUi(dir: string): string[] {
 
 const uiFiles = collectUi(SRC_ROOT);
 
+/** Every `.ts` under `src/`, minus test files, their directories, and content. */
+function collectLogic(dir: string): string[] {
+  const found: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === "__tests__") continue;
+    const full = path.join(dir, entry.name);
+    // `src/content` is already covered in full by the first check.
+    if (entry.isDirectory()) {
+      if (full === CONTENT_ROOT) continue;
+      found.push(...collectLogic(full));
+    } else if (
+      entry.name.endsWith(".ts") &&
+      !entry.name.endsWith(".d.ts") &&
+      !entry.name.includes(".test.")
+    ) {
+      found.push(full);
+    }
+  }
+  return found;
+}
+
+const logicFiles = collectLogic(SRC_ROOT);
+
+/**
+ * Every string literal in a source file, with comments already removed.
+ *
+ * Scanning literals rather than whole lines is what lets `.ts` be covered at
+ * all. A regex literal is not matched here, so the validators' deliberate
+ * `[.;:!?\n-]`-style character classes are excluded by construction rather
+ * than by an allowlist that would need maintaining.
+ */
+function stringLiterals(source: string): { text: string; line: number }[] {
+  // `[\s\S]` rather than `.` with the `s` flag: dotAll needs an
+  // ES2018 target and `tsconfig.json` sets ES2017, so the flag does not
+  // typecheck. This matches the same thing, including a backslash escape
+  // that spans a line break inside a template literal.
+  const pattern = /"(?:[^"\\]|\\[\s\S])*"|'(?:[^'\\]|\\[\s\S])*'|`(?:[^`\\]|\\[\s\S])*`/g;
+  const found: { text: string; line: number }[] = [];
+  for (const match of source.matchAll(pattern)) {
+    found.push({
+      text: match[0],
+      line: source.slice(0, match.index ?? 0).split(/\r?\n/).length,
+    });
+  }
+  return found;
+}
+
 describe("reader-facing prose", () => {
   it("scans the whole content corpus, so a pass cannot be vacuous", () => {
     // 219 lessons plus 556 problems, so the floor is far below the real total
@@ -97,6 +164,70 @@ describe("reader-facing prose", () => {
         "sentence: a period, comma, colon, semicolon, parentheses, or a " +
         "rewrite. Do not do a blind character substitution, and do not swap in " +
         "an en dash to get past this test."
+    ).toEqual([]);
+  });
+
+  it("has no em dashes in a string literal in any .ts module", () => {
+    expect(
+      logicFiles.length,
+      "no .ts modules found outside tests; the walk has rotted"
+    ).toBeGreaterThan(40);
+
+    const offenders: string[] = [];
+    for (const file of logicFiles) {
+      const source = stripComments(readFileSync(file, "utf8"));
+      for (const literal of stringLiterals(source)) {
+        for (const { char, name } of BANNED) {
+          if (!literal.text.includes(char)) continue;
+          offenders.push(
+            `${path.relative(SRC_ROOT, file).replace(/\\/g, "/")}:${literal.line} ${name}  ` +
+              literal.text.replace(/\s+/g, " ").slice(0, 90)
+          );
+        }
+      }
+    }
+
+    expect(
+      offenders,
+      "reader-facing copy lives in .ts as well as .tsx (the entry bar, the nav " +
+        "descriptions, the site description). Regex literals are not scanned, " +
+        "so a character class that matches an em dash on purpose is not a " +
+        "finding and does not need an exemption."
+    ).toEqual([]);
+  });
+
+  it("cannot be satisfied by encoding the character instead", () => {
+    const targets = [
+      ...files.map((file) => ({ file, root: CONTENT_ROOT, source: readFileSync(file, "utf8") })),
+      ...uiFiles.map((file) => ({
+        file,
+        root: SRC_ROOT,
+        source: stripComments(readFileSync(file, "utf8")),
+      })),
+      ...logicFiles.map((file) => ({
+        file,
+        root: SRC_ROOT,
+        source: stripComments(readFileSync(file, "utf8")),
+      })),
+    ];
+
+    const offenders: string[] = [];
+    for (const { file, root, source } of targets) {
+      for (const { pattern, name } of ENCODED) {
+        for (const match of source.matchAll(pattern)) {
+          const line = source.slice(0, match.index ?? 0).split(/\r?\n/).length;
+          offenders.push(
+            `${path.relative(root, file).replace(/\\/g, "/")}:${line} ${name}  ${match[0]}`
+          );
+        }
+      }
+    }
+
+    expect(
+      offenders,
+      "an em dash written as an escape, an HTML entity or a charCode reaches " +
+        "the reader exactly as the literal character does. Use punctuation " +
+        "that makes grammatical sense in the sentence instead."
     ).toEqual([]);
   });
 

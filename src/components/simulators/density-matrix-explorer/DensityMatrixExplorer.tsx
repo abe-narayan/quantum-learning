@@ -227,16 +227,21 @@ export function DensityMatrixExplorer() {
   return (
     <SimulatorInstrument
       label="Density matrix: mixed states"
-      readout={<Readout label="Purity" value={purityValue.toFixed(3)} />}
+      readout={<Readout label="Purity" hint="1 = a definite state" value={purityValue.toFixed(3)} />}
       footnote="Next: see what happens when a real noise channel (not a hand-picked mixture) pulls a pure state toward the center → try the Noise &amp; Decoherence Explorer."
       stage={
         <>
+          {/* Trimmed, not cut: this still has to carry the superposition-vs-
+              mixture distinction in plain words on its own (see the `level`
+              justification on `/simulators`'s own SIMULATOR_INDEX entry for
+              this instrument), so only the closing restatement (surface
+              distance = unknown information) goes, since the caption under
+              the sphere below says the same thing about the picture itself. */}
           <p className="mb-4 text-sm text-muted-foreground">
-            There are two different ways not to know what a qubit will do. In a superposition, the qubit
-            genuinely has no answer yet. In a <em>mixture</em>, it does have one; you just weren&rsquo;t
-            told which. This instrument builds the second kind: pick two states, set how often each one is
-            the true one, and the density matrix ρ is what an experimenter who only knows those odds can
-            say. Distance from the sphere&rsquo;s surface is exactly how much they don&rsquo;t know.
+            There are two different ways not to know what a qubit will do. In a superposition, it genuinely
+            has no answer yet; in a <em>mixture</em>, it has one, you just weren&rsquo;t told which. Pick
+            two states and a weight below, and the density matrix ρ is what an experimenter who only knows
+            the odds can say.
           </p>
 
           <div className="mx-auto max-w-sm">
@@ -254,9 +259,11 @@ export function DensityMatrixExplorer() {
             {narration}
           </div>
 
-          <div className="mt-6">
-            <DensityMatrixStatePanel rho={rho} purityValue={purityValue} entropyValue={entropyValue} validation={validation} />
-          </div>
+        </>
+      }
+      stageAfter={
+        <>
+          <DensityMatrixStatePanel rho={rho} purityValue={purityValue} entropyValue={entropyValue} validation={validation} />
 
           <SimulatorFraming
             shows="The Bloch vector of a mixture is the probability-weighted average of its components&rsquo; own vectors. That&rsquo;s why the point moves smoothly toward the center as the mixing weight balances out, rather than jumping discontinuously."
@@ -272,23 +279,22 @@ export function DensityMatrixExplorer() {
       }
       controls={
         <>
-          <div className="flex justify-end">
+          <DensityMatrixControls
+            component1={component1}
+            component2={component2}
+            weight={weight}
+            activePresetId={activePresetId}
+            onComponent1Change={handleComponent1Change}
+            onComponent2Change={handleComponent2Change}
+            onWeightChange={handleWeightChange}
+            onApplyMixturePreset={applyMixturePreset}
+            onReset={reset}
+          />
+          {/* Last, not first: see the note in GroverExplorer's controls. */}
+          <div className="mt-6 flex justify-end">
             <Button size="sm" variant="secondary" onClick={handleCopyLink}>
               {copied ? "Copied!" : "Copy link"}
             </Button>
-          </div>
-          <div className="mt-4">
-            <DensityMatrixControls
-              component1={component1}
-              component2={component2}
-              weight={weight}
-              activePresetId={activePresetId}
-              onComponent1Change={handleComponent1Change}
-              onComponent2Change={handleComponent2Change}
-              onWeightChange={handleWeightChange}
-              onApplyMixturePreset={applyMixturePreset}
-              onReset={reset}
-            />
           </div>
         </>
       }

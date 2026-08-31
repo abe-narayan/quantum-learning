@@ -71,7 +71,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Block Encodings and Linear Combinations of Unitaries",
-    "description": "Introduces block encodings, the modern universal input model for quantum linear algebra, and derives the linear-combination-of-unitaries (LCU) construction explicitly, verifying on a real two-qubit circuit that post-selecting an ancilla exactly reproduces an arbitrary bounded operator applied to the system register.",
+    "description": "Introduces block encodings, the modern universal input model for quantum linear algebra, and derives the linear-combination-of-unitaries (LCU) construction, verifying on a real two-qubit circuit that post-selecting an ancilla exactly reproduces an arbitrary bounded operator applied to the system register.",
     "course": "algorithmic-frontiers",
     "module": "block-encodings-and-linear-combinations-of-unitaries",
     "order": 1,
@@ -120,7 +120,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Quantum Signal Processing",
-    "description": "Derives the quantum signal processing protocol exactly for degree-1 and degree-2 phase sequences, verifying on this platform's own Complex/Matrix classes that every all-zero-phase sequence produces exactly a Chebyshev polynomial, that tuned phases can multiply that polynomial by a controllable complex phase, and that they can even collapse a sequence's effective degree. This is the algebra behind the field's most-used 'compile a target polynomial into classical phase angles' trick.",
+    "description": "Derives quantum signal processing exactly for degree-1 and degree-2 phase sequences, verifying that an all-zero-phase sequence produces a Chebyshev polynomial and that tuned phases can multiply it by a controllable complex phase or collapse its effective degree. The algebra behind compiling a target polynomial into classical phase angles.",
     "course": "algorithmic-frontiers",
     "module": "quantum-signal-processing",
     "order": 2,
@@ -198,7 +198,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Decoding Surface Codes",
-    "description": "Surface Codes in Depth built the lattice and named the defect pair. This lesson turns 'which stabilizers flagged' into an actual algorithm: minimum-weight perfect matching on a graph of defects, worked by hand until it succeeds and until it deliberately fails, plus the real exponential-suppression-below-threshold law that makes bigger patches worth building.",
+    "description": "Turns 'which stabilizers flagged' into an actual algorithm: minimum-weight perfect matching on a graph of defects, worked by hand until it succeeds and until it deliberately fails, plus the real exponential-suppression-below-threshold law that makes bigger patches worth building.",
     "course": "fault-tolerance-frontiers",
     "module": "decoding-surface-codes",
     "order": 2,
@@ -226,7 +226,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Lattice Surgery",
-    "description": "Two separate surface-code patches have no natural transversal two-qubit gate between them. This lesson derives the real fix, lattice surgery's merge and split operations, and shows how a sequence of them, plus an ancilla patch and classically-controlled Pauli corrections, assembles a full logical CNOT from nothing but the same local stabilizer measurements the code already needs for error correction.",
+    "description": "Two separate surface-code patches have no natural transversal two-qubit gate between them. This lesson derives the real fix, lattice surgery's merge and split operations, and shows how a sequence of them, plus an ancilla patch and classical Pauli corrections, assembles a full logical CNOT from the code's own stabilizer measurements.",
     "course": "fault-tolerance-frontiers",
     "module": "lattice-surgery",
     "order": 3,
@@ -334,7 +334,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: What We Know and Don't",
-    "description": "This course's four lessons of real theorems, real conjectures, and real open questions, organized into one calibrated three-tier map, plus the one skill that map is actually for: classifying any new claim about quantum computational power, including 'quantum supremacy' experiments, precisely and honestly.",
+    "description": "This course's four lessons of real theorems, real conjectures, and real open questions, organized into one calibrated three-tier map, plus the one skill that map is for: classifying any new claim about quantum computational power, including 'quantum supremacy' experiments, precisely and honestly.",
     "course": "quantum-complexity-theory",
     "module": "capstone-what-we-know-and-dont",
     "order": 5,
@@ -360,7 +360,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Complexity Classes: P, NP, and BQP",
-    "description": "BQP and Oracle Complexity proved what oracle separations do and don't say about BPP vs. BQP; this lesson places BQP within the classical P/NP/PSPACE landscape and sorts every relationship among them into proven, disproven, and still undecided, taking the two directions of NP versus BQP and the status of P versus BQP as its three worked cases.",
+    "description": "Places BQP within the classical P/NP/PSPACE landscape and sorts every relationship among them into proven, disproven, and still undecided, taking the two directions of NP versus BQP and the status of P versus BQP as its three worked cases.",
     "course": "quantum-complexity-theory",
     "module": "complexity-classes-p-np-and-bqp",
     "order": 1,
@@ -432,7 +432,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Local Hamiltonian Problem",
-    "description": "The prerequisite lesson closed by observing that a many-body ground state has no known compact classical description yet fits as a poly-size quantum witness. This lesson makes that precise: the k-Local Hamiltonian problem is defined exactly, shown to sit inside QMA via an estimation argument on the witness itself, and shown to be QMA-hard via a structural sketch of Kitaev's history-state construction.",
+    "description": "A many-body ground state has no known compact classical description, yet fits as a poly-size quantum witness. This lesson makes that precise: the k-Local Hamiltonian problem is defined exactly, shown to sit inside QMA via an estimation argument on the witness, and shown to be QMA-hard via a sketch of Kitaev's history-state construction.",
     "course": "quantum-complexity-theory",
     "module": "the-local-hamiltonian-problem",
     "order": 3,
@@ -461,7 +461,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: The Quantum Computing Landscape Today",
-    "description": "The last lesson of the entire StudyQuantum curriculum: a full retracing of the journey from the postulates of quantum mechanics to today's research frontier, an honest and calibrated map of what quantum computing has actually proven, credibly evidenced, and still left open, and the platform's closing statement of what completing it actually equips you to do.",
+    "description": "The curriculum's last lesson: a full retracing of the journey from the postulates of quantum mechanics to today's research frontier, an honest and calibrated map of what quantum computing has actually proven, credibly evidenced, and still left open, and a closing statement of what completing it equips you to do.",
     "course": "research-methods-and-synthesis",
     "module": "capstone-the-quantum-computing-landscape-today",
     "order": 5,
@@ -486,7 +486,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Distinguishing Theorem from Heuristic",
-    "description": "An explicit four-question checklist, built directly on the Quantum Complexity Theory capstone's proven/conjectured/open framework, for classifying any quantum-computing claim as a theorem, a well-supported heuristic, a conjecture, or genuinely open, practiced on real results this platform already built.",
+    "description": "An explicit four-question checklist, built on a proven/conjectured/open framework, for classifying any quantum-computing claim as a theorem, a well-supported heuristic, a conjecture, or genuinely open, practiced on real results this platform already built.",
     "course": "research-methods-and-synthesis",
     "module": "distinguishing-theorem-from-heuristic",
     "order": 2,
@@ -560,7 +560,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Reproducing and Designing Experiments",
-    "description": "Evaluating Quantum Advantage Claims asked whether a claim's classical baseline was fair; this lesson asks the complementary question of whether the claim is even reproducible in the first place: exact circuit, exact hardware or simulator with a calibration snapshot, the exact classical post-processing pipeline, and a shot count large enough that the reported number means anything statistically. Works a real standard-error calculation and designs a complete, decidable benchmark for a QAOA claim from this platform's own worked example.",
+    "description": "Reproducing a claim means fixing the exact circuit, hardware or simulator with a calibration snapshot, the classical post-processing pipeline, and a shot count large enough for the reported number to mean anything statistically. Works a real standard-error calculation and designs a complete, decidable benchmark for a QAOA claim.",
     "course": "research-methods-and-synthesis",
     "module": "reproducing-and-designing-experiments",
     "order": 4,
@@ -615,7 +615,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Clifford+T Synthesis and Resource Counting",
-    "description": "The gate-decomposition prerequisite showed every gate reduces to native rotations exactly; a fault-tolerant device instead needs an approximate Clifford+T sequence, and this lesson shows why the algorithm used to find that sequence, not just its length, decides whether a T-count is thousands or hundreds.",
+    "description": "Every gate reduces to native rotations exactly; a fault-tolerant device instead needs an approximate Clifford+T sequence, and this lesson shows why the algorithm used to find that sequence, not just its length, decides whether a T-count is thousands or hundreds.",
     "course": "simulation-and-compilation-frontiers",
     "module": "clifford-t-synthesis-and-resource-counting",
     "order": 3,
@@ -644,7 +644,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Noise-Aware Compilation and Resource Estimation",
-    "description": "Quantum Compilation & Transpilation counted SWAP overhead on a uniform, error-blind linear chain; this lesson adds the two pieces a real device forces onto that count: a 4-logical-qubit routing example's exact SWAP total, and a remapping of the same 17-gate circuit that changes not one gate, only which physical coupler each gate runs on, then costs both layouts against a real per-edge error table.",
+    "description": "Adds the two pieces a real device forces onto SWAP-overhead counting beyond a uniform, error-blind linear chain: a 4-logical-qubit routing example's exact SWAP total, and a remapping of the same 17-gate circuit that changes only which physical coupler each gate runs on, then costs both layouts against a real per-edge error table.",
     "course": "simulation-and-compilation-frontiers",
     "module": "noise-aware-compilation-and-resource-estimation",
     "order": 4,
@@ -669,7 +669,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Quantum Simulation of Molecules",
-    "description": "The electronic structure problem's combinatorial Hilbert space made concrete, then a fully explicit 2-mode Jordan-Wigner mapping built from this platform's own Matrix/Complex primitives and verified numerically (not just asserted) to satisfy {a₁,a₂†}=0, framing VQE and phase estimation as this field's two honestly-scoped paths toward a near-term-plausible quantum advantage.",
+    "description": "The electronic structure problem's combinatorial Hilbert space made concrete, then a fully explicit 2-mode Jordan-Wigner mapping verified numerically, not just asserted, to satisfy {a₁,a₂†}=0. Frames VQE and phase estimation as this field's two honestly-scoped paths toward a near-term-plausible quantum advantage.",
     "course": "simulation-and-compilation-frontiers",
     "module": "quantum-simulation-of-molecules",
     "order": 5,
@@ -725,7 +725,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "When Classical Simulation Works",
-    "description": "Two independent reasons a quantum circuit's output can be predicted on an ordinary computer: the Gottesman-Knill theorem's stabilizer tableau, and the tensor-network bond-dimension bound. Each one is blind to exactly the property the other tracks, which is why a real quantum-advantage experiment has to be engineered to defeat both at once.",
+    "description": "Two independent reasons a quantum circuit's output can be predicted on an ordinary computer: the Gottesman-Knill theorem's stabilizer tableau, and the tensor-network bond-dimension bound. Each is blind to exactly what the other tracks, which is why a real quantum-advantage experiment must defeat both at once.",
     "course": "simulation-and-compilation-frontiers",
     "module": "when-classical-simulation-works",
     "order": 2,
@@ -1966,7 +1966,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Calibration",
-    "description": "Control Electronics' θ=2Ωt formula is useless without knowing the qubit's actual Rabi frequency Ω. A Rabi calibration experiment finds it by scanning pulse duration and locating the first population-transfer peak, demonstrated here by recovering a hidden Ω to within 0.1% purely from scanned exactTwoLevelTransitionProbability data.",
+    "description": "The θ=2Ωt formula is useless without knowing the qubit's actual Rabi frequency Ω. A Rabi calibration experiment finds it by scanning pulse duration and locating the first population-transfer peak, demonstrated here by recovering a hidden Ω to within 0.1% purely from scanned data.",
     "course": "control-and-readout",
     "module": "calibration",
     "order": 1,
@@ -2008,7 +2008,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Cryogenic Systems",
-    "description": "Why superconducting and spin qubits need millikelvin cooling, made precise: the Bose-Einstein thermal occupation n̄=1/(exp(ħω/k_BT)-1) for a 5 GHz qubit is ~10⁻⁷ at 15 mK and exceeds 1000 at room temperature, and the same formula fixes exactly where in between a qubit stops having a reliable ground state. A computed reason dilution refrigerators exist.",
+    "description": "Why superconducting and spin qubits need millikelvin cooling, made precise: the Bose-Einstein occupation n̄=1/(exp(ħω/k_BT)-1) for a 5 GHz qubit is ~10⁻⁷ at 15 mK and exceeds 1000 at room temperature, fixing exactly where a qubit stops having a reliable ground state. The computed reason dilution refrigerators exist.",
     "course": "control-and-readout",
     "module": "cryogenic-systems",
     "order": 1,
@@ -2056,7 +2056,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Crosstalk",
-    "description": "T1/T2 are single-qubit noise; crosstalk is a multi-qubit problem: driving one qubit's gate unintentionally rotates a neighbor too. Built directly from this platform's existing gate engine: an intended X on qubit 0 with an ε-strength leak onto qubit 1 gives fidelity cos²(ε/2) exactly, verified to 1e-15.",
+    "description": "T1/T2 are single-qubit noise; crosstalk is a multi-qubit problem: driving one qubit's gate unintentionally rotates a neighbor too. Built from this platform's gate engine: an intended X on qubit 0 with an ε-strength leak onto qubit 1 gives fidelity cos²(ε/2) exactly, verified to 1e-15.",
     "course": "noise-decoherence-and-scaling",
     "module": "crosstalk",
     "order": 1,
@@ -2074,7 +2074,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Roadmaps to Fault Tolerance",
-    "description": "Closing this course by connecting every noise source covered, T1/T2, crosstalk, compounding gate error, to the concrete physical-to-logical qubit overhead (often estimated in the hundreds to low thousands of physical qubits per logical qubit) that real hardware roadmaps target, and being honest about how far current devices are from that goal.",
+    "description": "Closes the course by connecting every noise source covered, T1/T2, crosstalk, compounding gate error, to the physical-to-logical qubit overhead, often in the hundreds to low thousands of physical qubits per logical qubit, that real hardware roadmaps target, and how far current devices are from that goal.",
     "course": "noise-decoherence-and-scaling",
     "module": "roadmaps-to-fault-tolerance",
     "order": 1,
@@ -2134,7 +2134,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "T1 & T2 Decoherence",
-    "description": "T1 and T2 aren't new physics. They're Advanced Topics in Quantum Mechanics' amplitude damping and dephasing channels, connected to continuous exponential decay via decayProbabilityForTimestep, verified exactly: stepping a discrete Kraus channel over one full T1 gives P(1)=e⁻¹ to 9 decimal places, for any step count.",
+    "description": "T1 and T2 aren't new physics. They're amplitude damping and dephasing channels, connected to continuous exponential decay via decayProbabilityForTimestep, verified exactly: stepping a discrete Kraus channel over one full T1 gives P(1)=e⁻¹ to 9 decimal places, for any step count.",
     "course": "noise-decoherence-and-scaling",
     "module": "t1-and-t2-decoherence",
     "order": 1,
@@ -2224,7 +2224,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Spin Qubits",
-    "description": "A qubit encoded directly in a single electron's (or nucleus's) spin, confined in a semiconductor quantum dot: Angular Momentum & Spin's spin-1/2 two-level system itself, built into solid-state hardware small enough that fabrication tooling from the existing semiconductor industry applies almost directly, though registers are still on the order of ten qubits.",
+    "description": "A qubit encoded directly in a single electron's (or nucleus's) spin, confined in a semiconductor quantum dot: the spin-1/2 two-level system built into solid-state hardware small enough that existing semiconductor fabrication tooling applies almost directly, though registers are still on the order of ten qubits.",
     "course": "physical-qubit-platforms",
     "module": "spin-qubits",
     "order": 1,
@@ -2248,7 +2248,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Superconducting Qubits",
-    "description": "A qubit built from a nonlinear LC circuit cooled to millikelvin temperatures: the Josephson junction that makes it anharmonic (so it behaves like a two-level system, not a harmonic oscillator), driven by microwave pulses whose duration is a computable gate time reusing this platform's own two-level Rabi model.",
+    "description": "A qubit built from a nonlinear LC circuit cooled to millikelvin temperatures: the Josephson junction that makes it anharmonic, so it behaves like a two-level system, not a harmonic oscillator, driven by microwave pulses whose duration is a computable gate time reusing this platform's own Rabi model.",
     "course": "physical-qubit-platforms",
     "module": "superconducting-qubits",
     "order": 1,
@@ -2290,7 +2290,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Barren Plateaus and Variational Trainability",
-    "description": "Deriving why a variational circuit's parameter-shift gradient has exactly zero mean, then motivating why its variance shrinks exponentially in qubit count via the concentration-of-measure argument, verified numerically by scaling VQE's own single-qubit ansatz pattern up to 2, 3, 4, 5, and 6 qubits and measuring real gradient variance at each size.",
+    "description": "Derives why a variational circuit's parameter-shift gradient has exactly zero mean, then why its variance shrinks exponentially in qubit count via the concentration-of-measure argument, verified numerically by scaling VQE's own single-qubit ansatz pattern up to 2 through 6 qubits and measuring real gradient variance at each size.",
     "course": "advanced-algorithms-and-complexity",
     "module": "barren-plateaus-and-variational-trainability",
     "order": 5,
@@ -2335,7 +2335,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: What Scale Actually Requires",
-    "description": "Synthesizing BQP's oracle-relative separations, Trotterization's derived error bound, and barren plateaus' exponential trainability wall into one honest account of what separates every toy result this platform verifies exactly from at-scale quantum advantage, and what real research is doing about each wall.",
+    "description": "Synthesizes BQP's oracle-relative separations, Trotterization's derived error bound, and barren plateaus' exponential trainability wall into one honest account of what separates every toy result verified exactly in this platform from at-scale quantum advantage, and what real research is doing about each wall.",
     "course": "advanced-algorithms-and-complexity",
     "module": "capstone-what-scale-actually-requires",
     "order": 6,
@@ -2378,7 +2378,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Phase Estimation Precision and QFT Depth",
-    "description": "Deriving the exact closed-form measurement probability of quantum phase estimation for a phase that is not exactly representable in n bits, the 4/π² success guarantee and a tail-probability bound, both proved from elementary geometric-series algebra, plus exact QFT gate counts and an approximate QFT's provable, submultiplicativity-lemma-based error bound.",
+    "description": "Derives the exact closed-form measurement probability of quantum phase estimation for a phase not exactly representable in n bits: the 4/π² success guarantee and a tail-probability bound, both proved from elementary geometric-series algebra, plus exact QFT gate counts and an approximate QFT's provable error bound.",
     "course": "advanced-algorithms-and-complexity",
     "module": "phase-estimation-precision-and-qft-depth",
     "order": 4,
@@ -2397,7 +2397,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Quantum Walks",
-    "description": "Deriving the coined discrete-time quantum walk on a line via a coin operator and conditional shift, deriving its momentum-space dispersion relation to show the spreading is ballistic (∝t) rather than the classical walk's diffusive (∝√t), verified numerically against a real classical random walk, plus the continuous-time walk's exact identity with Hamiltonian simulation of a graph's adjacency matrix.",
+    "description": "Derives the coined discrete-time quantum walk on a line via a coin operator and conditional shift, showing from its dispersion relation that spreading is ballistic (∝t) rather than the classical walk's diffusive (∝√t), verified numerically. Plus the continuous-time walk's exact identity with Hamiltonian simulation of a graph's adjacency matrix.",
     "course": "advanced-algorithms-and-complexity",
     "module": "quantum-walks",
     "order": 3,
@@ -2416,7 +2416,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: What Rigor Buys You",
-    "description": "Four heuristic shortcuts the earlier curriculum used freely ('check A=A†,' 'sum over eigenvalues,' 'use |p⟩ like any other ket,' 'match boundary conditions and move on'), reexamined against this course's actual theorems, and one honest exception, the half-line momentum operator, showing exactly why rigor is worth having even when the shortcuts never failed.",
+    "description": "Four heuristic shortcuts the earlier curriculum used freely, from 'check A=A†' to 'match boundary conditions and move on,' reexamined against this course's actual theorems, plus one honest exception, the half-line momentum operator, showing why rigor is worth having even when the shortcuts never failed.",
     "course": "hilbert-space-and-spectral-theory",
     "module": "capstone-what-rigor-buys-you",
     "order": 6,
@@ -2469,7 +2469,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Green's Functions and Resolvents",
-    "description": "The resolvent (E−H)⁻¹ packages every bound state and every scattering state of a Hamiltonian into one analytic object: its poles are exactly the bound-state energies, and its branch cut is exactly the continuous spectrum, derived and then verified against the already-known infinite-well and free-particle eigenvalues.",
+    "description": "The resolvent (E−H)⁻¹ packages every bound state and every scattering state of a Hamiltonian into one analytic object: its poles are exactly the bound-state energies, and its branch cut is exactly the continuous spectrum, derived and verified against the already-known infinite-well and free-particle eigenvalues.",
     "course": "hilbert-space-and-spectral-theory",
     "module": "greens-functions-and-resolvents",
     "order": 4,
@@ -2494,7 +2494,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Hilbert Spaces and Self-Adjointness",
-    "description": "Every earlier course checked A = A† and called it a day. Here that check splits into two distinct conditions, symmetric versus self-adjoint, distinguished only by whether the operator's domain matches its adjoint's domain, and the momentum operator on a half-line is a worked example where they come apart entirely.",
+    "description": "Every earlier course checked A = A† and called it a day. Here that check splits into two distinct conditions, symmetric versus self-adjoint, distinguished only by whether the operator's domain matches its adjoint's domain, and the momentum operator on a half-line is a worked example where they come apart.",
     "course": "hilbert-space-and-spectral-theory",
     "module": "hilbert-spaces-and-self-adjointness",
     "order": 1,
@@ -2519,7 +2519,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Sturm-Liouville Theory",
-    "description": "The general eigenvalue-problem theorem hiding behind every solvable potential this platform has taught: real eigenvalues, orthogonal eigenfunctions, and a complete eigenbasis, proved once from a single boundary-term identity, then tested against two problems that look nothing alike, the infinite well and the hydrogen radial equation.",
+    "description": "The general eigenvalue-problem theorem hiding behind every solvable potential taught so far: real eigenvalues, orthogonal eigenfunctions, and a complete eigenbasis, proved once from a single boundary-term identity, then tested against two problems that look nothing alike, the infinite well and the hydrogen radial equation.",
     "course": "hilbert-space-and-spectral-theory",
     "module": "sturm-liouville-theory",
     "order": 5,
@@ -2569,7 +2569,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "CSS Codes and the General Stabilizer Formalism",
-    "description": "Stabilizer Formalism Basics renamed the 3-qubit bit-flip code's syndrome measurements. This lesson generalizes to arbitrary [[n,k,d]] stabilizer codes, then builds the Steane [[7,1,3]] code explicitly from a single classical Hamming code, with every stabilizer, every commutation check, and the code distance itself computed, not asserted.",
+    "description": "Generalizes stabilizer syndrome measurement to arbitrary [[n,k,d]] stabilizer codes, then builds the Steane [[7,1,3]] code explicitly from a single classical Hamming code, with every stabilizer, every commutation check, and the code distance itself computed, not asserted.",
     "course": "quantum-information-theory",
     "module": "css-codes-and-the-general-stabilizer-formalism",
     "order": 7,
@@ -2619,7 +2619,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Relative Entropy and Mixed-State Entanglement",
-    "description": "Quantum relative entropy, proved non-negative via Klein's inequality, then the general (mixed-state) Wootters concurrence formula Concurrence: A Two-Qubit Entanglement Measure explicitly named and refused to compute, built here and evaluated explicitly on a state that is actually mixed, not pure in disguise.",
+    "description": "Quantum relative entropy, proved non-negative via Klein's inequality, then the general mixed-state Wootters concurrence formula, previously named and left uncomputed, built here and evaluated explicitly on a state that is actually mixed, not pure in disguise.",
     "course": "quantum-information-theory",
     "module": "relative-entropy-and-mixed-state-entanglement",
     "order": 5,
@@ -2695,7 +2695,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Lindblad Master Equation",
-    "description": "The continuous-time differential equation that Open Quantum Systems & Kraus Operators deliberately left unbuilt, derived as the most general Markovian CP generator, then shown to reproduce this platform's existing discrete amplitude-damping channel exactly at every timestep, not just in an infinitesimal limit.",
+    "description": "The continuous-time differential equation deliberately left unbuilt earlier, derived as the most general Markovian CP generator, then shown to reproduce this platform's existing discrete amplitude-damping channel exactly at every timestep, not just in an infinitesimal limit.",
     "course": "quantum-information-theory",
     "module": "the-lindblad-master-equation",
     "order": 4,
@@ -2746,7 +2746,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: What Can Be Sent Through Noise",
-    "description": "The whole course's throughline, generalized measurement, Stinespring dilation, entropy and information measures, data processing, entanglement distillation, converges on one computable question: exactly how many classical bits and how many quantum bits survive one use of a given noisy channel, and why those two numbers can be worlds apart.",
+    "description": "The course's throughline, generalized measurement, Stinespring dilation, entropy, data processing, entanglement distillation, converges on one computable question: how many classical bits and how many quantum bits survive one use of a noisy channel, and why those two numbers can be worlds apart.",
     "course": "quantum-shannon-theory",
     "module": "capstone-what-can-be-sent-through-noise",
     "order": 6,
@@ -2796,7 +2796,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "POVMs and Generalized Measurement",
-    "description": "The Measurement Postulate, Generalized and Quantum Channels: Kraus and Choi both stopped at orthogonal projective measurement; this lesson proves that's a special case of the strictly more general POVM formalism, the only framework rigorous enough to even state the optimal state-discrimination question underlying quantum cryptography and dispersive qubit readout.",
+    "description": "Prior lessons on measurement and quantum channels both stopped at orthogonal projective measurement. This lesson proves that's a special case of the strictly more general POVM formalism, the only framework rigorous enough to state the optimal state-discrimination question underlying quantum cryptography and dispersive qubit readout.",
     "course": "quantum-shannon-theory",
     "module": "povms-and-generalized-measurement",
     "order": 1,
@@ -2845,7 +2845,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Stinespring Dilation and Channel Purification",
-    "description": "Quantum Channels: Kraus and Choi proved every CPTP map has a Kraus form but never said where the Kraus operators physically come from; this lesson derives their origin from scratch, building the explicit two-qubit unitary that reproduces amplitude damping's own K0 and K1 exactly, and showing a channel's dilation is just a purification of its Choi state.",
+    "description": "Quantum channels are known to have a Kraus form, but not where the Kraus operators physically come from. This lesson derives their origin from scratch, building the explicit two-qubit unitary that reproduces amplitude damping's own K0 and K1 exactly, and showing a channel's dilation is just a purification of its Choi state.",
     "course": "quantum-shannon-theory",
     "module": "stinespring-dilation-and-channel-purification",
     "order": 2,
@@ -2895,7 +2895,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Capstone: Symmetry and the Classical Limit",
-    "description": "Berry phase, the adiabatic theorem, and WKB, three seemingly separate topics, are three convergent routes to the same place: the classical/geometric structure hiding inside quantum phase. This capstone makes the convergence explicit, computing both kinds of phase for the same slowly traversed loop and letting the loop's duration settle which of the two is a fact about the path and which is a fact about the clock.",
+    "description": "Berry phase, the adiabatic theorem, and WKB are three convergent routes to the same place: the classical/geometric structure hiding inside quantum phase. This capstone makes it explicit, computing both kinds of phase for the same slowly traversed loop and letting the loop's duration settle which is path and which is clock.",
     "course": "symmetry-scattering-and-semiclassical-methods",
     "module": "capstone-symmetry-and-the-classical-limit",
     "order": 1,
@@ -2914,7 +2914,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Clebsch-Gordan Coefficients and the Wigner-Eckart Theorem",
-    "description": "Addition of Angular Momentum solved the two-spin-1/2 case by inspection. This lesson derives the general j₁⊗j₂ Clebsch-Gordan recursion, verifies it explicitly for l=1⊗s=1/2 (the exact table Degenerate Perturbation Theory borrowed), then proves the Wigner-Eckart theorem and reads off selection rules from symmetry alone, no integral needed.",
+    "description": "Derives the general j₁⊗j₂ Clebsch-Gordan recursion, verifies it explicitly for l=1⊗s=1/2, the exact table a later lesson borrows, then proves the Wigner-Eckart theorem and reads off selection rules from symmetry alone, no integral needed.",
     "course": "symmetry-scattering-and-semiclassical-methods",
     "module": "clebsch-gordan-coefficients-and-the-wigner-eckart-theorem",
     "order": 1,
@@ -2940,7 +2940,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Coherent and Squeezed States",
-    "description": "The harmonic oscillator states that most resemble a classical trajectory: eigenstates of the annihilation operator, built directly on The Quantum Harmonic Oscillator's ladder operators, proved here to saturate the uncertainty bound with equal position and momentum spread. Squeezed states break that equality on purpose, and working out what the trade costs is what makes the name 'squeezing' literal.",
+    "description": "The harmonic oscillator states that most resemble a classical trajectory: eigenstates of the annihilation operator, proved here to saturate the uncertainty bound with equal position and momentum spread. Squeezed states break that equality on purpose, and working out what the trade costs makes the name squeezing literal.",
     "course": "symmetry-scattering-and-semiclassical-methods",
     "module": "coherent-and-squeezed-states",
     "order": 1,
@@ -2965,7 +2965,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Degenerate Perturbation Theory and Fine Structure",
-    "description": "Fine Structure (Introduction) named the spin-orbit calculation and explicitly declined to do it. This lesson closes that loop: derive degenerate perturbation theory properly (diagonalize H′ within the degenerate subspace first), apply it to hydrogen's 2p spin-orbit coupling, and compute the actual 2p₃/₂–2p₁/₂ splitting in eV.",
+    "description": "Derives degenerate perturbation theory properly, diagonalizing H′ within the degenerate subspace first, applies it to hydrogen's 2p spin-orbit coupling, and computes the actual 2p₃/₂–2p₁/₂ splitting in eV, the calculation a prior lesson named and declined to do.",
     "course": "symmetry-scattering-and-semiclassical-methods",
     "module": "degenerate-perturbation-theory-and-fine-structure",
     "order": 1,
@@ -2991,7 +2991,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Adiabatic Theorem and Berry Phase",
-    "description": "A Hamiltonian that changes slowly enough keeps a system in its instantaneous eigenstate, proved here directly from the time-dependent Schrödinger equation. Applied to a spin-1/2 dragged around a cone by a slowly rotating field, the same derivation produces Berry's famous geometric phase, computed here as a real discretized loop integral and matched to −½ the solid angle traced.",
+    "description": "A Hamiltonian that changes slowly enough keeps a system in its instantaneous eigenstate, proved directly from the time-dependent Schrödinger equation. Applied to a spin-1/2 dragged around a cone by a rotating field, the same derivation produces Berry's geometric phase, computed as a discretized loop integral matched to −½ the solid angle traced.",
     "course": "symmetry-scattering-and-semiclassical-methods",
     "module": "the-adiabatic-theorem-and-berry-phase",
     "order": 1,
@@ -3017,7 +3017,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Three-Dimensional Scattering and the S-Matrix",
-    "description": "Scattering Off a Step Potential and Resonant Transmission Through a Barrier solved 1D scattering exactly. This lesson generalizes to a real 3D central potential: the partial-wave expansion, phase shifts δₗ, the cross-section formula built from them, and the S-matrix, worked explicitly for hard-sphere scattering with a closed-form δ₀=−ka and a famous low-energy cross-section limit that is not the sphere's geometric shadow.",
+    "description": "Generalizes 1D scattering to a real 3D central potential: the partial-wave expansion, phase shifts δₗ, the cross-section formula built from them, and the S-matrix, worked explicitly for hard-sphere scattering with a closed-form δ₀=−ka and a famous low-energy cross-section limit that is not the sphere's geometric shadow.",
     "course": "symmetry-scattering-and-semiclassical-methods",
     "module": "three-dimensional-scattering-and-the-s-matrix",
     "order": 1,
@@ -3061,7 +3061,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Decoherence & the Quantum-to-Classical Transition",
-    "description": "Applying the dephasing channel repeatedly to |+⟩ drives its off-diagonal coherence from 0.5 toward exactly 0 and its purity from 1.0 toward exactly 0.5 (maximally mixed), a direct numerical demonstration of why macroscopic superpositions don't survive contact with an environment, using nothing but repeated Kraus-channel application.",
+    "description": "Applying the dephasing channel repeatedly to |+⟩ drives its off-diagonal coherence from 0.5 toward exactly 0 and its purity from 1.0 toward exactly 0.5, maximally mixed: a direct numerical demonstration of why macroscopic superpositions don't survive contact with an environment, using only repeated Kraus-channel application.",
     "course": "advanced-quantum-mechanics",
     "module": "decoherence-and-the-quantum-to-classical-transition",
     "order": 1,
@@ -3085,7 +3085,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Open Quantum Systems & Kraus Operators",
-    "description": "Every evolution this platform has built so far (Wave Mechanics' time evolution, Entanglement's 'unitary evolution and measurement of density matrices') was CLOSED-system: no environment. Kraus operators, ρ→ΣₖKₖρKₖ†, extend this to open systems: non-unitary, trace-preserving, and the actual mathematical language of decoherence.",
+    "description": "Every evolution built so far, time evolution, unitary evolution and measurement of density matrices, was closed-system: no environment. Kraus operators, ρ→ΣₖKₖρKₖ†, extend this to open systems: non-unitary, trace-preserving, and the actual mathematical language of decoherence.",
     "course": "advanced-quantum-mechanics",
     "module": "open-quantum-systems-and-kraus-operators",
     "order": 1,
@@ -3113,7 +3113,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Path Integral Formulation (Introduction)",
-    "description": "Feynman's alternative to the Schrödinger equation: sum a weight exp(-S/ħ) over every possible path, not just the classical one. Verified here in Euclidean (imaginary) time, where the free-particle path sum is a convergent numerical integral: splitting one time interval into two and summing over every intermediate position reproduces the exact propagator to 1 part in 10¹⁵.",
+    "description": "Feynman's alternative to the Schrödinger equation: sum a weight exp(-S/ħ) over every possible path, not just the classical one. Verified in Euclidean time: splitting one interval into two and summing over every intermediate position reproduces the exact free-particle propagator to 1 part in 10¹⁵.",
     "course": "advanced-quantum-mechanics",
     "module": "the-path-integral-formulation",
     "order": 1,
@@ -3270,7 +3270,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The Variational Method",
-    "description": "⟨H⟩ for ANY normalized trial wavefunction is guaranteed ≥ the true ground energy, a one-line inequality that turns 'guess a wavefunction, then minimize over its parameters' into a rigorous approximation method, checked here by minimizing a Gaussian trial's ⟨H⟩ on the harmonic oscillator and landing within 0.004% of the exact answer.",
+    "description": "⟨H⟩ for any normalized trial wavefunction is guaranteed ≥ the true ground energy, a one-line inequality that turns 'guess a wavefunction, then minimize over its parameters' into a rigorous approximation method, checked here by minimizing a Gaussian trial's ⟨H⟩ on the harmonic oscillator to within 0.004% of the exact answer.",
     "course": "approximation-methods",
     "module": "the-variational-method",
     "order": 1,
@@ -3294,7 +3294,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "The WKB Approximation",
-    "description": "The semiclassical quantization condition ∫p(x)dx=(n+½)πħ, applied to the harmonic oscillator, reproduces the exact spectrum Eₙ=(n+½)ħω to within ~0.05% at the engine's grid resolution. A route through classical mechanics and de Broglie wavelengths, unrelated to perturbation theory or the variational method, arriving at (nearly) the same answer anyway.",
+    "description": "The semiclassical quantization condition ∫p(x)dx=(n+½)πħ, applied to the harmonic oscillator, reproduces the exact spectrum Eₙ=(n+½)ħω to within ~0.05%. A route through classical mechanics and de Broglie wavelengths, unrelated to perturbation theory or the variational method, that arrives at nearly the same answer anyway.",
     "course": "approximation-methods",
     "module": "the-wkb-approximation",
     "order": 1,
@@ -3318,7 +3318,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Time-Dependent Perturbation Theory",
-    "description": "First-order time-dependent perturbation theory gives a closed-form transition probability for a suddenly-switched-on coupling, verified here against a direct 2-level Runge-Kutta integration: nearly exact for weak coupling, and dramatically wrong (predicting the wrong long-time probability entirely) once the coupling gets strong.",
+    "description": "First-order time-dependent perturbation theory gives a closed-form transition probability for a suddenly-switched-on coupling, verified against a direct 2-level Runge-Kutta integration: nearly exact for weak coupling, and dramatically wrong, predicting the wrong long-time probability entirely, once the coupling gets strong.",
     "course": "approximation-methods",
     "module": "time-dependent-perturbation-theory",
     "order": 1,
@@ -4479,7 +4479,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Gate Decomposition",
-    "description": "Real hardware only implements a small native gate set (typically RZ and one more axis of rotation). Every other gate this platform uses decomposes into that set, verified exactly: H=Ry(π/2)Rz(π), X=Rz(π)Ry(π), Z=Rz(π), S=Rz(π/2), T=Rz(π/4), each checked to machine precision against the engine's own matrices, using the equivalence that is physically correct for a gate rather than the one a linear-algebra library would reach for by default.",
+    "description": "Real hardware implements only a small native gate set, typically RZ and one more rotation axis. Every other gate decomposes into that set, verified to machine precision: H=Ry(π/2)Rz(π), X=Rz(π)Ry(π), Z=Rz(π), S=Rz(π/2), T=Rz(π/4), using the physically correct decomposition, not what a linear-algebra library would default to.",
     "course": "compilation-and-hybrid-algorithms",
     "module": "gate-decomposition",
     "order": 1,
@@ -4503,7 +4503,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Hybrid Quantum-Classical Workflows",
-    "description": "VQE and QAOA (Quantum Algorithms II) were built as physics: a parametrized circuit and an energy function. This lesson names the SOFTWARE PATTERN underneath both, a repeated quantum-evaluate/classical-update loop, and shows every previous course's compilation concerns (transpilation, decomposition, noise) apply on EVERY iteration, not just once.",
+    "description": "VQE and QAOA were built as physics: a parametrized circuit and an energy function. This lesson names the software pattern underneath both, a repeated quantum-evaluate/classical-update loop, and shows every prior course's compilation concerns, transpilation, decomposition, noise, apply on every iteration, not just once.",
     "course": "compilation-and-hybrid-algorithms",
     "module": "hybrid-workflows",
     "order": 1,
@@ -4539,7 +4539,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Quantum Error Mitigation",
-    "description": "Quantum SDKs Overview named error mitigation as one of the real features this platform's own SDK-pattern demo falls short of; this lesson builds it: zero-noise extrapolation's linear-in-noise-level formula, derived from the same depolarizing channel used elsewhere and checked against this platform's own applyChannelRepeatedly, plus readout-error mitigation's confusion-matrix inversion, worked numerically end to end.",
+    "description": "Builds error mitigation from scratch: zero-noise extrapolation's linear-in-noise-level formula, derived from the same depolarizing channel used elsewhere and checked against this platform's own applyChannelRepeatedly, plus readout-error mitigation's confusion-matrix inversion, worked numerically end to end.",
     "course": "compilation-and-hybrid-algorithms",
     "module": "quantum-error-mitigation",
     "order": 1,
@@ -4576,7 +4576,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Variational Algorithm Implementation",
-    "description": "Closing the loop this track has been building toward: a VQE ansatz built from this platform's own QuantumCircuit (not Quantum Algorithms II's separate matrix-based ansatzState) lands its grid search exactly on ⟨Z⟩'s true minimum, matching exactGroundStateEnergy to full precision, then extends to a two-parameter Hamiltonian and converges to within 0.04% of the true ground energy by grid search alone.",
+    "description": "A VQE ansatz built from this platform's own QuantumCircuit lands its grid search exactly on ⟨Z⟩'s true minimum, matching exactGroundStateEnergy to full precision, then extends to a two-parameter Hamiltonian and converges to within 0.04% of the true ground energy by grid search alone.",
     "course": "compilation-and-hybrid-algorithms",
     "module": "variational-algorithm-implementation",
     "order": 1,
@@ -4612,7 +4612,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Quantum SDKs Overview",
-    "description": "Qiskit, Cirq, and PennyLane look different on the surface but share the same core structure this platform's QuantumCircuit already demonstrates: build a circuit as data, target a backend (simulator or hardware), and read results back, with framework-specific differences mostly in ergonomics and target ecosystem, not fundamental capability.",
+    "description": "Qiskit, Cirq, and PennyLane look different on the surface but share the same core structure: build a circuit as data, target a backend, simulator or hardware, and read results back, with framework-specific differences mostly in ergonomics and target ecosystem, not fundamental capability.",
     "course": "programming-quantum-computers",
     "module": "quantum-sdks-overview",
     "order": 1,
@@ -4630,7 +4630,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Simulators vs. Real Hardware",
-    "description": "Writing Your First Circuit isolated pure shot noise; real hardware adds physical error (Noise, Decoherence & Scaling) on top, plus queue time and a hard qubit-count ceiling a simulator doesn't have, while an ideal noiseless simulator hits an entirely different wall: exponential memory cost in qubit count.",
+    "description": "Real hardware adds physical error on top of pure shot noise, plus queue time and a hard qubit-count ceiling a simulator doesn't have, while an ideal noiseless simulator hits an entirely different wall: exponential memory cost in qubit count.",
     "course": "programming-quantum-computers",
     "module": "simulators-vs-real-hardware",
     "order": 1,
@@ -4648,7 +4648,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Writing Your First Circuit",
-    "description": "A complete, hands-on walkthrough: build a 3-qubit GHZ circuit, run it exactly to get its true probabilities, then sample it 5000 times and watch the measured counts wander around those numbers by as much, and only as much, as binomial shot noise predicts. The full build-run-sample workflow in one worked example.",
+    "description": "A complete, hands-on walkthrough: build a 3-qubit GHZ circuit, run it exactly to get its true probabilities, then sample it 5000 times and watch the measured counts wander by as much, and only as much, as binomial shot noise predicts. The full build-run-sample workflow in one worked example.",
     "course": "programming-quantum-computers",
     "module": "writing-your-first-circuit",
     "order": 1,
@@ -4684,7 +4684,7 @@ export const LESSON_METAS: LessonMetaWithSlug[] = [
   },
   {
     "title": "Noise Simulation",
-    "description": "A noisy simulator interleaves ideal gate evolution with a Kraus-channel noise model after every gate, demonstrated exactly: H then H should implement identity, returning perfectly to |0⟩ with zero noise (verified), but with dephasing interleaved, the same two-gate circuit returns only 90% of the way to |0⟩ instead.",
+    "description": "A noisy simulator interleaves ideal gate evolution with a Kraus-channel noise model after every gate: H then H should implement identity, returning perfectly to |0⟩ with zero noise, verified, but with dephasing interleaved, the same two-gate circuit returns only 90% of the way to |0⟩ instead.",
     "course": "simulating-quantum-systems",
     "module": "noise-simulation",
     "order": 1,

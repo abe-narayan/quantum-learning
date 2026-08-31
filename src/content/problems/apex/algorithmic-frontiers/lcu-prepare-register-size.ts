@@ -48,7 +48,7 @@ export const lcuPrepareRegisterSize: NumericProblem = {
   solution: {
     steps: [
       { description: "A $k$-qubit ancilla register has $2^k$ computational basis states, and PREPARE needs one per term, so the requirement is $2^k\\geq m=5$." },
-      { description: "$k=2$ gives $2^2=4$, too few. $k=3$ gives $2^3=8\\geq5$, enough (with 3 of PREPARE's basis states simply left at zero amplitude)." },
+      { description: "$k=2$ gives $2^2=4$, too few. $k=3$ gives $2^3=8\\geq5$, enough (with 3 of PREPARE's basis states left at zero amplitude)." },
     ],
     finalAnswer: "3 ancilla qubits (⌈log₂5⌉ = 3).",
   },

@@ -170,7 +170,13 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
   return (
     <SimulatorInstrument
       label={`Syndrome extraction: ${mode === "bit-flip" ? "bit-flip" : "phase-flip"} code`}
-      readout={<Readout label="Syndrome" value={`(${result.syndrome[0]}, ${result.syndrome[1]})`} />}
+      readout={
+        <Readout
+          label="Syndrome"
+          hint="the two agreement checks"
+          value={`(${result.syndrome[0]}, ${result.syndrome[1]})`}
+        />
+      }
       footnote="Next: real codes correct both error types at once; see why the repetition code alone can't in the Error Correction lesson."
       // StateInspector's amplitude table reads 8 basis-state rows across
       // three columns; full-width stage instead of splitting against a
@@ -179,11 +185,17 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
       stageClassName="space-y-6"
       stage={
         <>
+          {/* Lightly trimmed: the "without ever measuring the logical qubit"
+              claim below in `SimulatorFraming` restates the opening clause
+              here, so it drops; the actual mechanism (spread across three,
+              check agreement) is unique to this paragraph and stays, since
+              it is what the readout below (labelled "the two agreement
+              checks") assumes the reader already has. */}
           <p className="text-sm text-muted-foreground">
-            You cannot check a qubit for errors by looking at it; looking destroys it. The trick is to spread
-            one qubit&rsquo;s worth of information across three, then ask only whether they still{" "}
-            <em>agree with each other</em>. That question has an answer you can safely read out, and it
-            names the broken qubit without ever revealing what was being stored.
+            You cannot check a qubit for errors by looking at it, looking destroys it. The trick: spread one
+            qubit&rsquo;s information across three, then ask only whether they still{" "}
+            <em>agree with each other</em>. That answer names the broken qubit without ever revealing what
+            was stored.
           </p>
 
           {/* `role="status"` + `aria-atomic="true"`: a role-less live region's
@@ -197,6 +209,10 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
                   result.correctedQubit === null ? "no error" : `qubit ${result.correctedQubit}`
                 }${outcomeNote}.`}
           </div>
+        </>
+      }
+      stageAfter={
+        <>
           <StateInspector state={result.corrected} />
 
           <SimulatorFraming
@@ -224,12 +240,6 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
       }
       controls={
         <div className="space-y-6">
-          <div className="flex justify-end">
-            <Button size="sm" variant="secondary" onClick={handleCopyLink}>
-              {copied ? "Copied!" : "Copy link"}
-            </Button>
-          </div>
-
           <ControlSection
             id="syndrome-inject"
             title={`Inject ${errorLabel} error(s)`}
@@ -327,6 +337,13 @@ export function SyndromeExplorer({ mode }: { mode: "bit-flip" | "phase-flip" }) 
               ]}
             />
           </ControlSection>
+
+          {/* Last, not first: see the note in GroverExplorer's controls. */}
+          <div className="flex justify-end">
+            <Button size="sm" variant="secondary" onClick={handleCopyLink}>
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+          </div>
         </div>
       }
     />

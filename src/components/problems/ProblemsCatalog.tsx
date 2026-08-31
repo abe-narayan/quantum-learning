@@ -27,6 +27,63 @@ import type { ProblemDifficulty, ProblemMeta, ProblemType } from "@/lib/problems
 const RESULTS_ID = "problem-results";
 const LIST_END_ID = "problems-list-end";
 
+/**
+ * ============================================================
+ * How many problems render before the reader asks for more
+ * ============================================================
+ * Measured in headless Chrome, unfiltered: this page was **85,023px tall at
+ * 375px** and 47,363px at 1280. That is 105 phone screens of continuous
+ * scrolling, and the served HTML carried 1,138 anchors — a number
+ * `ui/ListBypass.tsx` already documents as the reason this page needed a
+ * second skip link. A catalog that cannot be reached by scrolling is not a
+ * catalog; the filters were carrying the entire navigational load, and a
+ * reader who did not use them was simply lost.
+ *
+ * So the list renders in batches. `PAGE_SIZE` is a measured number, not a
+ * round one: 48 problem entries plus their pillar headers lands the
+ * unfiltered page near 8,000px at 375px, which is about ten screens — long
+ * enough to feel like a catalog worth browsing, short enough that reaching
+ * the end is a decision rather than an expedition. `STEP` is the same, so
+ * "show more" is always the same size of commitment.
+ *
+ * Deliberately NOT an IntersectionObserver auto-loader. Infinite scroll
+ * destroys the end of a document — the footer, the bypass landing pad, the
+ * "back to the filters" link — and it takes the browser's own find-in-page
+ * with it, which on a page of 556 exercises is the tool a reader is most
+ * likely to reach for.
+ */
+const PAGE_SIZE = 48;
+const STEP = 48;
+
+/**
+ * Spends a render budget across already-grouped sections, in order.
+ *
+ * Groups keep their **full** `items` array, so every header count
+ * ("48 problems", "3/48 solved") still describes the whole group rather than
+ * the visible slice of it — reporting a truncated total as if it were the
+ * real one is the exact class of lie `CLAUDE.md`'s "counts are derived" rule
+ * exists to prevent. Only `featured` and `rest`, the arrays that actually
+ * render rows, are cut.
+ *
+ * Exported for `__tests__/problemPaging.test.ts`.
+ */
+export function budgetGroups<G extends { items: ProblemMeta[]; featured: ProblemMeta[]; rest: ProblemMeta[] }>(
+  groups: G[],
+  limit: number
+): G[] {
+  let remaining = Math.max(0, limit);
+  const out: G[] = [];
+  for (const group of groups) {
+    if (remaining <= 0) break;
+    const featured = group.featured.slice(0, remaining);
+    remaining -= featured.length;
+    const rest = group.rest.slice(0, remaining);
+    remaining -= rest.length;
+    out.push({ ...group, featured, rest });
+  }
+  return out;
+}
+
 type PillarFilter = "all" | Pillar;
 type DifficultyFilter = "all" | ProblemDifficulty;
 type TypeFilter = "all" | ProblemType;
@@ -431,6 +488,60 @@ export function ProblemsCatalog({
     [filtered, progressBySlug]
   );
 
+  /**
+   * How many problem entries are rendered right now. See `PAGE_SIZE`.
+   *
+   * Reset on a *filter* change, not on a change to `filtered`. The two are not
+   * the same: `filtered` is recomputed whenever progress loads, so keying the
+   * reset to it would snap a reader who had pressed "Show more" twice back to
+   * the first batch on the post-hydration catch-up render, for no reason they
+   * could see. `active` is the four filter values and changes only when the
+   * reader changes one, which is the moment a fresh list genuinely begins.
+   *
+   * Adjusted *during render* against the filter state it was counted for,
+   * rather than in an effect. Both work; only this one is correct. An effect
+   * runs after the browser has already painted, so a reader who filters 556
+   * problems down to 12 while paged to 300 gets one frame of all 12 rendered
+   * under a stale scroll position before the reset lands — and
+   * `react-hooks/set-state-in-effect` fails the build over it, which is how
+   * this was caught. React documents this exact shape for "state that depends
+   * on a prop or another piece of state"; the render that sets it is discarded
+   * before any DOM is touched.
+   */
+  // A string key, not `active`'s object identity. `useMemo` is a performance
+  // hint, not a guarantee: React is free to discard a memo cache, and a fresh
+  // `active` object with identical contents would silently page the reader
+  // back to the first batch. The four values are what "the same list" means.
+  const filterKey = `${pillar}|${difficulty}|${type}|${status}`;
+  const [shown, setShown] = useState(PAGE_SIZE);
+  const [shownFor, setShownFor] = useState(filterKey);
+  if (shownFor !== filterKey) {
+    setShownFor(filterKey);
+    setShown(PAGE_SIZE);
+  }
+
+  const renderedCount = Math.min(shown, filtered.length);
+  const remainingCount = filtered.length - renderedCount;
+
+  /**
+   * The one control on this page that can unmount itself, and the same fix
+   * the three self-unmounting controls in `ProblemViewClient` carry: the last
+   * press exhausts the list and takes the button with it, dropping focus to
+   * `<body>` so the reader's next Tab restarts at the top of a page they just
+   * paged to the bottom of. `ListBypassEnd` is the element that survives the
+   * change, is already `tabIndex={-1}`, and is exactly where the reader has
+   * arrived — the end of the list, with its route back to the filters.
+   */
+  const showMore = useCallback(() => {
+    const next = shown + STEP;
+    setShown(next);
+    if (next < filtered.length) return;
+    // After paint, so the node exists in its post-update form.
+    requestAnimationFrame(() => {
+      document.getElementById(LIST_END_ID)?.focus({ preventScroll: true });
+    });
+  }, [shown, filtered.length]);
+
   // With no topic filter applied, group into one section per pillar
   // (curriculum order) instead of one undifferentiated wall of problems —
   // the same "grid of cards is not finished" bar every pillar page is held
@@ -448,11 +559,12 @@ export function ProblemsCatalog({
       if (!byPillar.has(problemPillar)) byPillar.set(problemPillar, []);
       byPillar.get(problemPillar)!.push(problem);
     }
-    return PILLAR_ORDER.filter((p) => byPillar.has(p)).map((p) => {
+    const groups = PILLAR_ORDER.filter((p) => byPillar.has(p)).map((p) => {
       const items = sortByCourseOrder(byPillar.get(p)!);
       return { pillar: p, items, ...splitFeatured(items) };
     });
-  }, [filtered, pillar]);
+    return budgetGroups(groups, shown);
+  }, [filtered, pillar, shown]);
 
   // Once a topic is picked, there's room (and reason) to go one level
   // deeper than pillar: group by course, the same "grouped runs" idea
@@ -466,11 +578,12 @@ export function ProblemsCatalog({
       if (!byCourse.has(problem.course)) byCourse.set(problem.course, []);
       byCourse.get(problem.course)!.push(problem);
     }
-    return COURSES.filter((course) => byCourse.has(course.slug)).map((course) => {
+    const groups = COURSES.filter((course) => byCourse.has(course.slug)).map((course) => {
       const items = byCourse.get(course.slug)!;
       return { course, items, ...splitFeatured(items) };
     });
-  }, [filtered, pillar]);
+    return budgetGroups(groups, shown);
+  }, [filtered, pillar, shown]);
 
   return (
     <div>
@@ -680,6 +793,14 @@ export function ProblemsCatalog({
           {activeFilters.length > 0
             ? ` matching ${activeFilters.map((filter) => filter.label.toLowerCase()).join(", ")}`
             : ""}
+          {/* The second half of the sentence exists because the first half
+              stopped being the whole truth once the list started rendering in
+              batches: "556 problems" above a page showing 48 of them is a
+              number a reader cannot reconcile with what they can see. Saying
+              both here also means "Show more" announces its own effect — this
+              region is the live one, and it is `aria-atomic`, so the whole
+              sentence is re-read with the new figure. */}
+          {remainingCount > 0 ? `, showing the first ${renderedCount}` : ""}
         </p>
         {solvedCount > 0 ? (
           <p className="tech-label text-pillar-text">
@@ -693,9 +814,12 @@ export function ProblemsCatalog({
           buttons, and the only skip link on it lands above all of them. The
           link sits below the results header so that a reader who has just
           filtered hears the count first and then gets the option to leave. */}
-      {filtered.length > 0 ? (
+      {/* Counted against what is rendered, not against `filtered`. The whole
+          basis of the reader's decision here is how many Tab presses they are
+          skipping, and after batching those are two different numbers. */}
+      {renderedCount > 0 ? (
         <ListBypassLink targetId={LIST_END_ID}>
-          Skip past the {filtered.length} {filtered.length === 1 ? "problem" : "problems"} below
+          Skip past the {renderedCount} {renderedCount === 1 ? "problem" : "problems"} below
         </ListBypassLink>
       ) : null}
 
@@ -814,13 +938,47 @@ export function ProblemsCatalog({
         </div>
       )}
 
-      {filtered.length > 0 ? (
+      {/*
+        The end of the batch, and the two things a reader can do about it.
+
+        Both are offered, and in that order, because they answer different
+        questions. "Show more" is for a reader who is browsing and wants the
+        next stretch of the same list. The sentence under it is for the reader
+        this page was actually failing: 556 problems is not a list anyone
+        should page through 48 at a time, and the filter strip above is the
+        real instrument for finding one. Pointing back at it is not an apology
+        for the button, it is the better answer.
+      */}
+      {remainingCount > 0 ? (
+        <div className="mt-10 border-t border-border pt-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            {renderedCount} of {filtered.length} shown. Filtering will find a particular problem
+            faster than paging through them.
+          </p>
+          {/* Both controls are real 44px buttons rather than one button and an
+              inline text link: an underlined `<button>` inside a `<p>` measured
+              189x20 at 320px, which the responsive audit reports as an
+              undersized tap target and which the harness's "a link inside a
+              paragraph is inline text" exemption does not cover. */}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <Button onClick={showMore} className="min-h-11">
+              Show {Math.min(STEP, remainingCount)} more
+            </Button>
+            <Button variant="secondary" onClick={goToResults} className="min-h-11">
+              Back to the filters
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      {renderedCount > 0 ? (
         <ListBypassEnd
           id={LIST_END_ID}
           backTo={RESULTS_ID}
           backLabel="Back to the filters"
         >
-          End of the problem catalog. {filtered.length} of {problems.length} problems listed.
+          End of the problem catalog. {renderedCount} of {filtered.length} matching problems listed,
+          from {problems.length} in all.
         </ListBypassEnd>
       ) : null}
     </div>

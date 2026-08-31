@@ -114,9 +114,20 @@ export const NAV_ITEMS: NavItem[] = [
     description: "Fourteen simulators running the real numerics, not scripted animations.",
   },
   {
-    label: "Map",
+    // "Map" alone named nothing a first-time visitor could act on — a map of
+    // what? The destination calls itself "The concept map" in its `<h1>` and
+    // "Concept Map" in its metadata title, so the label was a truncation of
+    // the page's own name rather than a shorter synonym for it. Restored to
+    // the name the page uses. It only fits because this item now lives in the
+    // Reference panel rather than the flat bar (see REFERENCE_NAV_ITEMS).
+    label: "Concept map",
     href: "/map",
-    description: "An interactive map of how key concepts depend on each other.",
+    // Was "An interactive map of how key concepts depend on each other."
+    // "Interactive" and "key concepts" are both filler: everything on this
+    // site is interactive, and "key" concedes that the reader cannot tell
+    // which concepts. The replacement states the two questions the graph
+    // exists to answer, which are the reasons to open it.
+    description: "Every concept on the site, and what to learn before each one.",
   },
   {
     label: "Glossary",
@@ -159,6 +170,71 @@ export const NAV_ITEMS: NavItem[] = [
     // page: what the site deliberately does not claim.
     description: "Who StudyQuantum is for, how it is checked, and what it does not claim.",
   },
+];
+
+/** Pulls the `NAV_ITEMS` entry for a route. Throws rather than returning
+ *  `undefined` so a mistyped href in a grouping below is a module-load error
+ *  at the first import, not a silently missing link in the header. */
+function navItem(href: string): NavItem {
+  const item = NAV_ITEMS.find((entry) => entry.href === href);
+  if (!item) throw new Error(`No NAV_ITEMS entry for ${href}`);
+  return item;
+}
+
+/**
+ * How the **desktop bar** groups `NAV_ITEMS`. Not a second list of
+ * destinations: both arrays below are looked up out of `NAV_ITEMS` by href, so
+ * there is still exactly one place a top-level route and its copy are written
+ * down, and `navGrouping.test.ts` asserts the two partitions cover it exactly.
+ *
+ * Why the bar is grouped at all, measured rather than argued. With all seven
+ * items flat, the header row at 1280 and 1440 was *over* its own width budget,
+ * not near it: `Container` caps at 1152px, its padding leaves 1088px, and the
+ * three flex children came to 145 + 608 + 303 plus two 16px gaps = exactly
+ * 1088 — with two of them already relieving the pressure by wrapping. The
+ * "Current Quantum" link rendered 98x56 beside seven 36px-tall siblings, the
+ * "Start learning" button rendered 108x54, and the brand link was being
+ * compressed from its natural 153px to 145px. That is every desktop width from
+ * `lg` (1024px) upward, on all 830 pages: the bar was not occasionally tight,
+ * it was permanently wrapped.
+ *
+ * The three items that moved are also the three the brief names as the ones a
+ * newcomer cannot decode from the label alone (`/map`, `/glossary`,
+ * `/current-quantum`). In the panel they each get their `description` rendered
+ * beside them, which is strictly more than the flat bar gave them — the flat
+ * bar showed a `title` tooltip, which no touch device has and no keyboard user
+ * gets. So this is not "hide three links": it is "stop showing three names
+ * with no explanation, and show three names with one".
+ *
+ * "Reference" is not a new word invented for this: it is already what the
+ * footer calls this exact group (`FOOTER_REFERENCE_ITEMS`, rendered under a
+ * `<nav aria-label="Reference and tools">`). The mobile drawer keeps all of
+ * them flat and unnested — see the comment on the drawer's "Explore" group in
+ * Navbar.tsx for why a disclosure inside a disclosure is the wrong shape on a
+ * phone.
+ */
+export const REFERENCE_NAV_ITEMS: NavItem[] = [
+  navItem("/map"),
+  navItem("/glossary"),
+  navItem("/current-quantum"),
+];
+
+/**
+ * The items the desktop bar renders flat, in bar order. `TracksDropdown` is
+ * injected after "Learn" and the Reference dropdown before "About" by
+ * `Navbar.tsx`; this array holds only the plain links, because those two are
+ * components rather than destinations and have no href of their own.
+ *
+ * "About" stays in the bar rather than joining Reference on purpose: it is the
+ * page a reader goes to when they are deciding whether to believe any of this,
+ * and a trust page one interaction further away is a worse trade than a
+ * six-item bar.
+ */
+export const PRIMARY_NAV_ITEMS: NavItem[] = [
+  navItem("/learn"),
+  navItem("/simulators"),
+  navItem("/problems"),
+  navItem("/about"),
 ];
 
 /**

@@ -54,7 +54,7 @@ export const diagnosingTheI4Counterexample: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "The purity identity's derivation is amplitude-based and requires a pure global state from its very first line.",
-    whyCorrect: "I/4 fails this precondition entirely, which is exactly why applying the entropy-as-entanglement idea to it gives a wrong answer.",
+    whyCorrect: "I/4 fails this precondition entirely, which is why applying the entropy-as-entanglement idea to it gives a wrong answer.",
     whyWrong: ["Saying 'the eigenvalues are wrong' misses the deeper point: the proof's setup itself doesn't apply, not just its numeric conclusion."],
   },
 };

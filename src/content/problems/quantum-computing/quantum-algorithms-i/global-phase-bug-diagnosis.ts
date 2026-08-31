@@ -53,7 +53,7 @@ export const globalPhaseBugDiagnosis: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "Global phase is unobservable. That is a fact about quantum mechanics, not a testing quirk, and it applies to any overall e^{iθ}, not just −1.",
-    whyCorrect: "This is exactly why the lesson's fix required testing groverDiffusion(|s⟩)=|s⟩ directly, an intermediate check insensitive to being 'washed out' by later measurement.",
+    whyCorrect: "This is why the lesson's fix required testing groverDiffusion(|s⟩)=|s⟩ directly, an intermediate check insensitive to being 'washed out' by later measurement.",
     whyWrong: ["Saying 'the test just wasn't thorough enough' misses the specific reason: no measurement-probability-only test, however thorough, could ever catch this class of bug."],
   },
 };

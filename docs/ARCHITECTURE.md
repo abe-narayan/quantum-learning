@@ -80,7 +80,20 @@ redundancy, since a first-time visitor had no way to tell "Learn" from
 "Mechanics" from the labels alone. The dropdown renders as a two-column grid
 once there are six entries (an instrument-panel grid, not a scrolling list)
 and closes on Escape, outside click, and blur — see the long comment on
-`TracksDropdown` for the accessibility reasoning. The desktop nav still
+`NavDropdown` for the accessibility reasoning.
+
+**Superseded 2026-08-30.** The bar is now six slots, not eight: **Learn ·
+Tracks▾ · Simulators · Problems · Reference▾ · About**, with Glossary, Concept
+map and Current Quantum moved into a second **Reference** dropdown. The flat
+bar was permanently over its width budget rather than occasionally tight: the
+container caps at 1152px, padding leaves 1088, and brand + nav + CTA came to
+145 + 608 + 303 plus two 16px gaps, i.e. exactly 1088, with "Current Quantum"
+and the "Start learning" CTA both wrapping at *every* desktop width from 1024
+to 1600. `TracksDropdown` was generalised into `NavDropdown` and is now used
+twice, so its accessibility behaviour has one home. `NAV_ITEMS` remains the
+canonical list; `PRIMARY_NAV_ITEMS` and `REFERENCE_NAV_ITEMS` are derived from
+it by href, so a renamed route throws at module load. "Reference" is the word
+the footer already used for this exact group. The desktop nav still
 switches to a hamburger menu below the `lg` breakpoint; **Quantum Mastery**
 was, for a long stretch, the one pillar with no landing page of its own
 (the pillar-route table pointed it at `/learn` and the Tracks nav simply
@@ -2739,7 +2752,9 @@ lesson/content edit made in the same sprint by other, parallel work.
 - **Navigation restructured**, finally carrying out what Session 13
   deferred: the six pillar pages moved out of the flat navbar into a
   grouped **Tracks** dropdown (`TRACK_NAV_ITEMS`, `TracksDropdown` in
-  `Navbar.tsx`), closing on Escape/outside-click/blur. See §1.
+  `Navbar.tsx`), closing on Escape/outside-click/blur. See §1. (That
+  component is now `NavDropdown`, generalised to serve a second
+  **Reference** dropdown as well; see §1's 2026-08-30 note.)
 - **New test coverage**: `src/lib/design/__tests__/pillars.test.ts`,
   `src/lib/design/__tests__/contrast.test.ts` (a WCAG AA guard that parses
   the real stylesheet rather than a restated fixture), and

@@ -114,8 +114,32 @@ export default async function MechanicsPage() {
             rigorously enough that its results are derived here rather than asserted.
           </Lede>
         </Reveal>
-        <Reveal delay={80}>
-          <p className="mt-4 max-w-lede text-base leading-relaxed text-muted-foreground">
+        {/* The primary CTA sits here, right after the Lede, rather than below
+            the tier ladder and briefing. On a phone those two blocks alone
+            (the foundations tier's ENTRY_BAR sentence is the long one) run to
+            ~290px, which pushed this button past the 812px fold with zero
+            forward actions above it: measured with
+            `scripts/audit/orientation.mjs --widths 375`. Moving it up costs
+            nothing, the ladder and briefing are still the very next thing a
+            reader meets, and it is what gives this page the one clickable
+            first action the homepage's other destinations already have. */}
+        {firstCourse ? (
+          <Reveal delay={80} className="mt-7 block">
+            <Button href={heroHref} size="lg">
+              Start: {firstCourse.title} →
+            </Button>
+            <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
+              <span>
+                {facts.firstCourseLessonCount} lessons
+                {firstLesson ? <> &middot; begins with &ldquo;{firstLesson.title}&rdquo;</> : null}
+              </span>
+              <DifficultyMark difficulty={firstCourse.difficulty} />
+            </p>
+          </Reveal>
+        ) : null}
+
+        <Reveal delay={100}>
+          <p className="mt-6 max-w-lede text-base leading-relaxed text-muted-foreground">
             Linear algebra and complex numbers first, then state vectors, operators, and the
             Schrödinger equation, built up rigorously through the hydrogen atom and open quantum
             systems. Build intuition with the Wavefunction Explorer (real wave-packet evolution
@@ -129,11 +153,11 @@ export default async function MechanicsPage() {
             floor" here and "this is the summit" on /apex, and it has to be
             the same object in the same place on both for that contrast to be
             readable at all. */}
-        <Reveal delay={90}>
+        <Reveal delay={110}>
           <TierLadder pillar="quantum-mechanics" className="mt-8" />
         </Reveal>
 
-        <Reveal delay={100}>
+        <Reveal delay={120}>
           <PillarBriefing
             className="mt-8"
             facts={facts}
@@ -141,24 +165,9 @@ export default async function MechanicsPage() {
           />
         </Reveal>
 
-        <Reveal delay={120}>
+        <Reveal delay={140}>
           <Readouts className="mt-8" items={pillarReadoutItems(facts)} />
         </Reveal>
-
-        {firstCourse ? (
-          <Reveal delay={140} className="mt-7 block">
-            <Button href={heroHref} size="lg">
-              Start: {firstCourse.title} →
-            </Button>
-            <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-foreground">
-              <span>
-                {facts.firstCourseLessonCount} lessons
-                {firstLesson ? <> &middot; begins with &ldquo;{firstLesson.title}&rdquo;</> : null}
-              </span>
-              <DifficultyMark difficulty={firstCourse.difficulty} />
-            </p>
-          </Reveal>
-        ) : null}
 
         <Marginalia className="mt-8">
           The field behind this page is not decoration: {field.fieldCaption.toLowerCase()}, drawn

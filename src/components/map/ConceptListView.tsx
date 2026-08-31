@@ -2,7 +2,7 @@ import { PILLARS } from "@/lib/content/curriculum";
 import { DifficultyMark } from "@/components/curriculum/DifficultyMark";
 import { cn } from "@/lib/utils";
 import type { ConceptGraph } from "@/lib/content/concepts";
-import type { Difficulty } from "@/lib/content/types";
+import { DIFFICULTY_LABEL, type Difficulty } from "@/lib/content/types";
 
 /**
  * The text alternative to the pannable/zoomable graph: every concept, grouped
@@ -79,12 +79,54 @@ export function ConceptListView({
                   .map((id) => nodesById.get(id)?.title)
                   .filter((title): title is string => Boolean(title));
 
+                /**
+                 * The row's accessible name, and *only* the row's name.
+                 *
+                 * Without this the name is whatever the button contains,
+                 * concatenated: title + difficulty + "Step N" + "Completed" +
+                 * the whole "Requires: A, B, C" line. On the ten deepest
+                 * concepts that came to between 123 and 200 characters — a
+                 * paragraph read out in full every time focus lands, 59 times
+                 * down the page, on the view that *is* the map below 640px.
+                 * `scripts/audit/a11y.mjs` flags anything over 120 as a
+                 * blocker and it is right to: the name is what a screen
+                 * reader repeats, and the prerequisites are the part of it a
+                 * reader wants once, on the row they stopped at.
+                 *
+                 * So the prerequisite line moves to `aria-describedby`, which
+                 * is announced after the name and which every major screen
+                 * reader lets the user skip or suppress. It is the same text,
+                 * the same element, still visible, still inside the button
+                 * (the whole row stays one target, which is what makes it
+                 * usable under a thumb) — only its role in the accessibility
+                 * tree changes, from part of the label to a description.
+                 *
+                 * Everything else the row shows visually is folded into the
+                 * name explicitly, because an `aria-label` replaces the
+                 * button's contents outright: drop the difficulty or the
+                 * completion tick from this string and they stop being
+                 * announced at all, which is a worse bug than the one being
+                 * fixed.
+                 */
+                const detailId = `map-list-detail-${node.id}`;
+                const hasDetail = isRoot || prereqTitles.length > 0;
+                const label = [
+                  node.title,
+                  difficulty ? DIFFICULTY_LABEL[difficulty] : null,
+                  `step ${node.depth + 1}`,
+                  isCompleted ? "completed" : null,
+                ]
+                  .filter(Boolean)
+                  .join(", ");
+
                 return (
                   <li key={node.id}>
                     <button
                       type="button"
                       onClick={() => onSelect(node.id)}
                       aria-current={isSelected ? "true" : undefined}
+                      aria-label={label}
+                      aria-describedby={hasDetail ? detailId : undefined}
                       className={cn(
                         "flex min-h-11 w-full flex-col justify-center gap-0.5 rounded-(--radius-tight) border px-3 py-2 text-left transition-colors duration-(--dur-fast)",
                         isSelected
@@ -122,11 +164,16 @@ export function ConceptListView({
                         </span>
                       </span>
                       {isRoot ? (
-                        <span className="w-fit rounded-full border border-pillar-edge bg-pillar-wash px-1.5 py-0.5 text-micro font-semibold uppercase tracking-meta text-pillar-text">
+                        <span
+                          id={detailId}
+                          className="w-fit rounded-full border border-pillar-edge bg-pillar-wash px-1.5 py-0.5 text-micro font-semibold uppercase tracking-meta text-pillar-text"
+                        >
                           Start here: no prerequisites
                         </span>
                       ) : prereqTitles.length > 0 ? (
-                        <span className="text-xs text-muted-foreground">Requires: {prereqTitles.join(", ")}</span>
+                        <span id={detailId} className="text-xs text-muted-foreground">
+                          Requires: {prereqTitles.join(", ")}
+                        </span>
                       ) : null}
                     </button>
                   </li>

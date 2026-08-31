@@ -201,25 +201,14 @@ export default async function SoftwarePage() {
           </p>
         </Reveal>
 
-        <Reveal delay={80}>
-          {/* Same four-rung ladder, same position, as every other pillar
-              page: it is the one element that carries the hierarchy between
-              them, so it cannot be styled per page. */}
-          <TierLadder pillar="quantum-software" className="mt-8" />
-
-          <PillarBriefing
-            className="mt-8"
-            facts={facts}
-            outcome="Trace a circuit from source, through transpilation onto a real device's connectivity, to the bitstrings that come back, and say why a 50-qubit simulation is not an option."
-          />
-        </Reveal>
-
-        <Reveal delay={100}>
-          <Readouts className="mt-8" items={pillarReadoutItems(facts)} />
-        </Reveal>
-
+        {/* The primary CTA sits here, right after the standfirst, ahead of
+            the tier ladder and briefing: measured with
+            `scripts/audit/orientation.mjs --widths 375`, this page offered
+            zero forward actions above the 812px fold before this move. The
+            ladder and briefing are still the very next things a reader
+            meets. */}
         {firstCourse ? (
-          <Reveal delay={120} className="mt-7 block">
+          <Reveal delay={80} className="mt-7 block">
             <Button href={heroHref} size="lg">
               Start: {firstCourse.title} →
             </Button>
@@ -232,6 +221,23 @@ export default async function SoftwarePage() {
             </p>
           </Reveal>
         ) : null}
+
+        <Reveal delay={100}>
+          {/* Same four-rung ladder, same position, as every other pillar
+              page: it is the one element that carries the hierarchy between
+              them, so it cannot be styled per page. */}
+          <TierLadder pillar="quantum-software" className="mt-8" />
+
+          <PillarBriefing
+            className="mt-8"
+            facts={facts}
+            outcome="Trace a circuit from source, through transpilation onto a real device's connectivity, to the bitstrings that come back, and say why a 50-qubit simulation is not an option."
+          />
+        </Reveal>
+
+        <Reveal delay={120}>
+          <Readouts className="mt-8" items={pillarReadoutItems(facts)} />
+        </Reveal>
 
         <Reveal delay={140}>
           {/* The track's own instrument readout, kept separate from the shared

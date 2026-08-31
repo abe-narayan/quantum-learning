@@ -234,7 +234,7 @@ export function EquationReveal({
                 opening it. */}
             <summary
               className={cn(
-                "flex min-h-11 w-fit cursor-pointer select-none list-none items-center gap-2 pr-2",
+                "flex min-h-11 w-fit max-w-full cursor-pointer select-none list-none items-center gap-2 pr-2",
                 "[&::-webkit-details-marker]:hidden"
               )}
             >
@@ -249,8 +249,25 @@ export function EquationReveal({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="m7.5 5 5 5-5 5" />
               </svg>
-              <TechLabel className="text-pillar">Full term glossary</TechLabel>
-              <span className="text-xs text-subtle-foreground">
+              {/* `min-w-0 [overflow-wrap:anywhere]` on both text children, not
+                  `break-words`: `summary` is `w-fit` (a click target that
+                  hugs its content rather than stretching full width), and
+                  `width: fit-content` still respects the row's available
+                  space as an upper bound *if* its children can shrink below
+                  their own text — which, unbroken, they could not. At 200%
+                  text zoom on a narrow viewport this pushed the row 80px past
+                  the space `<details>` had, through `.instrument`'s
+                  `overflow-hidden` with no scrollbar and no other symptom
+                  (measured with `scripts/audit/a11y.mjs --width 375 --checks
+                  resize`, traced to this element with an ancestor-chain walk
+                  rather than assumed). Only `anywhere` is counted when the
+                  browser computes a flex item's min-content size, which is
+                  what its default `min-width: auto` resolves to (same
+                  reasoning `CurrentQuantumCard` and `TheoremBox` already
+                  carry) — `break-words` would have left the row the same
+                  width and fixed nothing. */}
+              <TechLabel className="min-w-0 text-pillar [overflow-wrap:anywhere]">Full term glossary</TechLabel>
+              <span className="min-w-0 text-xs text-subtle-foreground [overflow-wrap:anywhere]">
                 all {terms.length} definitions, always readable
               </span>
             </summary>

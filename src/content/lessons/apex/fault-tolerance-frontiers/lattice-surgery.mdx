@@ -9,7 +9,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Lattice Surgery",
   description:
-    "Two separate surface-code patches have no natural transversal two-qubit gate between them. This lesson derives the real fix, lattice surgery's merge and split operations, and shows how a sequence of them, plus an ancilla patch and classically-controlled Pauli corrections, assembles a full logical CNOT from nothing but the same local stabilizer measurements the code already needs for error correction.",
+    "Two separate surface-code patches have no natural transversal two-qubit gate between them. This lesson derives the real fix, lattice surgery's merge and split operations, and shows how a sequence of them, plus an ancilla patch and classical Pauli corrections, assembles a full logical CNOT from the code's own stabilizer measurements.",
   course: "fault-tolerance-frontiers",
   module: "lattice-surgery",
   order: 3,
@@ -533,7 +533,7 @@ ordinary qubits.
 
    The practical reading is the cheerful one. $A$ is a bus, not a
    register. It never carried the answer at any point in the protocol,
-   which is precisely why consuming it costs nothing except its chip area
+   which is why consuming it costs nothing except its chip area
    and the rounds it occupied, and why that area is free again for the
    next gate the moment the measurement lands.
 

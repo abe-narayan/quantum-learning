@@ -1,22 +1,23 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { SplitOperatorEvolver, probabilityNearGridEdges } from "@/lib/quantum/timeEvolution";
+import { SplitOperatorEvolver } from "@/lib/quantum/timeEvolution";
 import type { Wavefunction1D } from "@/lib/quantum/wavefunction";
 import type { PresetSetup } from "./presets";
+import { autoplayFrameLimit, hasWrappedAround } from "./autoplayRun";
 import { momentumDisplayRange, WavefunctionCanvas, type CanvasMode } from "./WavefunctionCanvas";
 import { StatePanel } from "./StatePanel";
 import { PlaybackControls } from "./PlaybackControls";
 import { ComparisonPanel } from "./ComparisonPanel";
 
 /**
- * How many animation frames the first-contact autoplay pass advances before
- * pausing itself, the same bounded-pass convention (and the same budget)
- * as WavefunctionHeroExplorer's AUTOPLAY_FRAME_LIMIT: long enough to show
- * the physics actually develop, short enough to read as a proof-of-concept
- * rather than a looping background animation.
+ * The first-contact autoplay pass uses the same bounded-pass convention, and
+ * the same per-preset budget, as the homepage hero: `autoplayFrameLimit`
+ * returns `DEFAULT_AUTOPLAY_FRAMES` unless the configuration asks for its own.
+ * Only `tunneling` currently does, and `presets.ts` documents why 260 frames
+ * left that preset stopped mid-collision on this bench too, not just on the
+ * homepage.
  */
-const AUTOPLAY_FRAME_LIMIT = 260;
 
 /**
  * Owns everything that evolves over time for one fixed configuration: the
@@ -50,6 +51,7 @@ export function WavefunctionSimulation({
     () => new SplitOperatorEvolver(setup.grid, setup.potential, setup.dt, 1),
     [setup]
   );
+  const frameLimit = autoplayFrameLimit(setup);
 
   const [psi, setPsi] = useState<Wavefunction1D>(setup.psi0);
   const [t, setT] = useState(0);
@@ -86,8 +88,8 @@ export function WavefunctionSimulation({
   // One bounded autoplay pass on first contact, the bench's "open
   // mid-phenomenon" rule for an instrument whose whole point is time
   // evolution. Runs once per mount (a preset/parameter change remounts via
-  // `key`, exactly like the homepage hero), is capped at
-  // AUTOPLAY_FRAME_LIMIT frames by the animation loop below, and is skipped
+  // `key`, exactly like the homepage hero), is capped at this configuration's
+  // `autoplayFrameLimit` by the animation loop below, and is skipped
   // entirely under reduced motion. Frames only advance while visible, so a
   // below-the-fold embed effectively starts its pass on first scroll into
   // view.
@@ -113,7 +115,13 @@ export function WavefunctionSimulation({
       setT((prev) => prev + setup.dt * stepsThisFrame);
       if (autoplayRef.current) {
         autoplayFramesRef.current += 1;
-        if (autoplayFramesRef.current >= AUTOPLAY_FRAME_LIMIT) {
+        // The budget, or the periodic wrap, whichever comes first. Past the
+        // wrap the packet is re-entering from the far side and every
+        // position-space number on this page (including the transmitted and
+        // reflected fractions in the comparison panel) has stopped describing
+        // one packet. The narration below already says so; there is no reason
+        // for an automatic pass nobody asked for to keep running into it.
+        if (autoplayFramesRef.current >= frameLimit || hasWrappedAround(next)) {
           autoplayRef.current = false;
           setIsPlaying(false);
           return;
@@ -127,7 +135,7 @@ export function WavefunctionSimulation({
       cancelled = true;
       cancelAnimationFrame(frameId);
     };
-  }, [isPlaying, isVisible, evolver, setup.stepsPerFrame, setup.dt, speed, prefersReducedMotion]);
+  }, [isPlaying, isVisible, evolver, setup.stepsPerFrame, setup.dt, speed, prefersReducedMotion, frameLimit]);
 
   function handleTogglePlay() {
     autoplayRef.current = false;
@@ -214,12 +222,13 @@ export function WavefunctionSimulation({
    */
   const momentumRange = useMemo(() => momentumDisplayRange(setup.psi0), [setup.psi0]);
 
-  const edgeProbability = useMemo(() => probabilityNearGridEdges(psi), [psi]);
-  const hasWrappedAround = edgeProbability > 1e-3;
+  // Same predicate the autoplay loop stops on, on the same threshold; the one
+  // shared definition lives in `autoplayRun`.
+  const wrappedAround = useMemo(() => hasWrappedAround(psi), [psi]);
 
   const narration = setup.isStationary
     ? `t = ${t.toFixed(2)}. This is an energy eigenstate: its shape has not changed and never will, no matter how long you run it. Switch to the Re / Im view and you'll see what is still moving: the phase turns while the probability sits perfectly still.`
-    : hasWrappedAround
+    : wrappedAround
       ? `t = ${t.toFixed(2)}. The packet has reached the end of the simulation box, which wraps around, so part of it is now re-entering from the far side. The position and width figures below stop describing a single packet from here on; press Reset to run it again.`
       : `t = ${t.toFixed(2)}. The packet is centred at x = ${psi
           .expectationPosition()
@@ -261,7 +270,7 @@ export function WavefunctionSimulation({
       {/*
         The visible narration is deliberately not the live region. This
         instrument steps on every animation frame, and it autoplays a bounded
-        260-frame pass on first contact without anyone pressing anything, so a
+        pass on first contact without anyone pressing anything, so a
         `polite` region attached here rewrote itself ~60 times a second and a
         screen reader spent the whole run being cut off mid-sentence, never
         completing one. Same split as RabiExplorer: the eye reads the live

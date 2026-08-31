@@ -8,7 +8,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Hybrid Quantum-Classical Workflows",
   description:
-    "VQE and QAOA (Quantum Algorithms II) were built as physics: a parametrized circuit and an energy function. This lesson names the SOFTWARE PATTERN underneath both, a repeated quantum-evaluate/classical-update loop, and shows every previous course's compilation concerns (transpilation, decomposition, noise) apply on EVERY iteration, not just once.",
+    "VQE and QAOA were built as physics: a parametrized circuit and an energy function. This lesson names the software pattern underneath both, a repeated quantum-evaluate/classical-update loop, and shows every prior course's compilation concerns, transpilation, decomposition, noise, apply on every iteration, not just once.",
   course: "compilation-and-hybrid-algorithms",
   module: "hybrid-workflows",
   order: 1,
@@ -73,7 +73,7 @@ Every variational algorithm follows the same repeated pattern:
 
 This is what `runVqe` and `runQaoa` (Quantum Algorithms II)
 already implement, just described here as a general software pattern
-rather than a physics algorithm, the SAME structure Quantum SDKs
+rather than a physics algorithm, the *same* structure Quantum SDKs
 Overview named as PennyLane's specific area of strength. Drawn as a
 loop, the classical-quantum handoff (and where it repeats from) is
 easier to see at a glance than it was in the list above:
@@ -119,7 +119,7 @@ circuit's one-time compilation cost.
 ### What runs where
 
 The quantum device does exactly one job: prepare $|\psi(\vec\theta)\rangle$
-and report measurement statistics. EVERY OTHER STEP, proposing new
+and report measurement statistics. *Every other step*, proposing new
 parameters, computing the cost function from measurement results,
 deciding convergence, runs on ordinary classical hardware. This
 division is why these are called "hybrid" algorithms: neither purely
@@ -299,13 +299,13 @@ optimization run needs.
    iteration; that is what makes it a NISQ algorithm. The costs are
    multiplied by the iteration count, and the iteration count is set by
    how hard the optimization is, not by anything the circuit designer
-   controls. Which is exactly why connectivity-aware ansatz design is
+   controls. Which is why connectivity-aware ansatz design is
    high leverage here specifically: shaving the four to two halves a
    thousand two-qubit gates across the run.
 
    </details>
 
-3. Which specific step in the hybrid loop is the ONLY one that must run
+3. Which specific step in the hybrid loop is the *only* one that must run
    on an actual quantum device, and why can't classical hardware perform
    it efficiently instead? Then state the honest limit of that "can't"
    for the ansätze actually used in practice.

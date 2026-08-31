@@ -104,9 +104,21 @@ export function CurrentQuantumCard({
             "isolate transition-colors duration-(--dur-fast) ease-instrument has-[a[data-entry-link]:hover]:border-pillar-edge has-[a[data-entry-link]:focus-visible]:border-pillar-edge"
         )}
         label={
-          <span className="inline-flex items-center gap-1.5">
+          // `[overflow-wrap:anywhere]` on the text, not `break-words`, and the
+          // difference is the whole fix. Both introduce soft wrap
+          // opportunities inside a word, but only `anywhere` is counted when
+          // the browser computes an element's *min-content* size — and a flex
+          // item's default `min-width: auto` resolves to exactly that. This
+          // strip is a flex row inside `.instrument`'s `overflow-hidden`, and
+          // at the 200% text size WCAG 1.4.4 asks for its `p-4`/`px-4`
+          // paddings double too (Tailwind spacing is in `rem`), leaving the
+          // label about 220px of a 252px card. "Cryptography" set in
+          // `.tech-label` at 0.14em tracking wants 235px, so with
+          // `break-words` the item still refused to shrink and 15px of it was
+          // clipped away. Measured with `scripts/audit/a11y.mjs --width 375`.
+          <span className="inline-flex min-w-0 flex-wrap items-center gap-1.5">
             <CategoryIcon aria-hidden="true" data-decorative="" className="h-3.5 w-3.5 shrink-0 text-pillar" />
-            {category.label}
+            <span className="min-w-0 [overflow-wrap:anywhere]">{category.label}</span>
           </span>
         }
         readout={
@@ -129,10 +141,21 @@ export function CurrentQuantumCard({
           </>
         }
       >
-        <Heading className="relative z-10 font-display text-lg font-semibold leading-snug text-foreground sm:text-xl">
+        {/* `break-words`. `Instrument` frames itself with `overflow-hidden`,
+            and these titles are the site's longest single line of display
+            type — real research headlines, full of slash- and hyphen-joined
+            runs ("Harvard/QuEra/MIT", "Post-Quantum Cryptography") that a
+            browser will not break by default. At the 200% text size WCAG
+            1.4.4 requires, twelve of the 32 cards pushed their title past the
+            frame: 394px of text in a 252px box on the worst of them, with
+            `overflow-hidden` swallowing the remainder. Clipped, so no
+            scrollbar, no symptom, and the headline simply ends mid-word.
+            Measured with `scripts/audit/a11y.mjs --width 375`, which reports
+            it as a blocker. */}
+        <Heading className="relative z-10 break-words font-display text-lg font-semibold leading-snug text-foreground sm:text-xl">
           {entry.title}
         </Heading>
-        <p className="relative z-10 mt-2.5 text-sm leading-relaxed text-muted-foreground">
+        <p className="relative z-10 mt-2.5 break-words text-sm leading-relaxed text-muted-foreground">
           {entry.summary}
         </p>
 
@@ -154,7 +177,7 @@ export function CurrentQuantumCard({
 
         <div className="mt-4 rounded-(--radius-tight) border-l-2 border-pillar-edge bg-pillar-wash px-4 py-3">
           <TechLabel className="text-pillar-text">Why this matters</TechLabel>
-          <p className="relative z-10 mt-1.5 text-sm leading-relaxed text-foreground">
+          <p className="relative z-10 mt-1.5 break-words text-sm leading-relaxed text-foreground">
             {entry.whyThisMatters}
           </p>
           {lessonTitle ? (
@@ -168,7 +191,19 @@ export function CurrentQuantumCard({
               className="mt-2.5 inline-flex min-h-11 flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-pillar-text after:absolute after:inset-0 after:content-[''] hover:underline"
             >
               <span aria-hidden="true">&#8646;</span>
-              <span>Explained in: {lessonTitle}</span>
+              {/* `min-w-0 break-words`. This span is a flex item, so its
+                  default `min-width: auto` refuses to shrink below its
+                  longest unbreakable run, and the lesson titles it carries
+                  are long ("Explained in: Computational Cost & Scaling").
+                  At the 200% text size WCAG 1.4.4 asks for, the surrounding
+                  `p-4`/`px-4` paddings double as well (Tailwind spacing is in
+                  `rem`), leaving this line about 122px inside a 252px card,
+                  and it was clipped by `.instrument`'s `overflow-hidden`.
+                  `[overflow-wrap:anywhere]` rather than `break-words` for the
+                  reason spelled out on the category label above: only
+                  `anywhere` counts toward min-content, which is what
+                  `min-width: auto` resolves to here. */}
+              <span className="min-w-0 [overflow-wrap:anywhere]">Explained in: {lessonTitle}</span>
               {visual ? <span className="tech-label text-subtle-foreground">{visual.short}</span> : null}
             </Link>
           ) : null}

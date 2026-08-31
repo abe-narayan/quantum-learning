@@ -141,7 +141,7 @@ $$
 U_C(\gamma)|z\rangle = e^{-i\gamma\cdot(\text{cut count of }z)}|z\rangle
 $$
 
-`applyCostUnitary` implements exactly this, computing each basis index's
+`applyCostUnitary` implements this, computing each basis index's
 cut count directly (summing $1$ for every edge whose two endpoint bits
 differ) and multiplying by the corresponding phase, with **no change to
 any measurement probability** (a pure phase operator, checked directly:
@@ -239,7 +239,7 @@ maximum, and adding layers ($p>1$) usually helps without promising to.
    more than $2$ of its edges, and the pendant edge is always cuttable.
    `bruteForceMaxCut` returns $3$.
 
-   That gap is exactly what QAOA is being asked to close, and its size
+   That gap is what QAOA is being asked to close, and its size
    varies by graph even at fixed edge count. The baseline is free and
    uninformative; the ceiling requires knowing the graph's structure, and
    finding it is the NP-hard part.
@@ -248,7 +248,7 @@ maximum, and adding layers ($p>1$) usually helps without promising to.
    rather than of random guessing. It is what you get with no circuit at
    all, which is why the lesson insists it is the number every QAOA result
    has to beat before it has shown anything. A run reporting an expected
-   cut of $2$ on a four-edge graph has demonstrated precisely nothing.
+   cut of $2$ on a four-edge graph has demonstrated nothing.
 
    </details>
 
@@ -272,8 +272,8 @@ maximum, and adding layers ($p>1$) usually helps without promising to.
    Computationally that means: take the basis index $z$, read its bits,
    count the edges whose two endpoint bits differ, and multiply that one
    amplitude by a phase. No row of a matrix is ever touched, and no
-   amplitude is ever mixed with another. `applyCostUnitary` does exactly
-   this, one index at a time.
+   amplitude is ever mixed with another. `applyCostUnitary` does this,
+   one index at a time.
 
    The cost saving is the reason it matters. A general $2^n\times2^n$
    matrix-vector product is $O(4^n)$ multiply-adds. Here the work is
@@ -349,7 +349,7 @@ maximum, and adding layers ($p>1$) usually helps without promising to.
    <details className="answer-reveal">
    <summary>Answer</summary>
 
-   Because $X$ is precisely the operator that flips a bit, so $e^{-i\beta X_i}$
+   Because $X$ is the operator that flips a bit, so $e^{-i\beta X_i}$
    partially flips vertex $i$'s colour: it moves amplitude between
    $|{\ldots}0_i{\ldots}\rangle$ and $|{\ldots}1_i{\ldots}\rangle$ in a
    controlled amount set by $\beta$. Summed over all vertices, $B$
@@ -378,7 +378,7 @@ maximum, and adding layers ($p>1$) usually helps without promising to.
    lesson's own sweep shows the expected cut climbing to $1.875$ at
    $\beta=\pi/8$, then falling to $0.375$ at $\beta=3\pi/8$, below the
    $1.5$ baseline, and returning to the baseline at $\pi/2$. It is a
-   rotation angle, so overshooting undoes the work, exactly as running
+   rotation angle, so overshooting undoes the work, just as running
    Grover past its optimum does.
 
    </details>
@@ -390,7 +390,7 @@ maximum, and adding layers ($p>1$) usually helps without promising to.
 - Max-Cut's cost Hamiltonian $C=\sum(1-Z_iZ_j)/2$ has eigenvalue equal to
   the cut count, for any coloring.
 - The cost unitary is a pure phase operator (verified: leaves every
-  probability unchanged); the mixer is what actually moves amplitude.
+  probability unchanged); the mixer is what moves amplitude.
 - The uniform superposition's expected cut size is exactly $|E|/2$ for
   any graph, a checkable baseline before any optimization runs.
 

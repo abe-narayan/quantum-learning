@@ -6,24 +6,19 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { SplitOperatorEvolver } from "@/lib/quantum/timeEvolution";
 import type { Wavefunction1D } from "@/lib/quantum/wavefunction";
-import { defaultParamValues, getPreset, type PresetId, type PresetSetup } from "./presets";
-import { WavefunctionCanvas } from "./WavefunctionCanvas";
+import { defaultParamValues, getPreset, type PresetSetup } from "./presets";
+import { WavefunctionHeroCanvas } from "./WavefunctionHeroCanvas";
+import { autoplayFrameLimit, hasWrappedAround } from "./autoplayRun";
+import {
+  heroDisplay,
+  heroLegend,
+  heroNarration,
+  HERO_PRESET_IDS,
+  HERO_PRESET_LABELS,
+  HERO_TRY_THIS,
+  type HeroPresetId,
+} from "./heroRun";
 import { usePrefersReducedMotion } from "@/components/simulators/bloch-sphere/usePrefersReducedMotion";
-
-const HERO_PRESET_IDS: readonly PresetId[] = ["free-gaussian", "tunneling", "harmonic-superposition"];
-const HERO_PRESET_LABELS: Record<string, string> = {
-  "free-gaussian": "Free particle",
-  tunneling: "Tunnel through a barrier",
-  "harmonic-superposition": "Harmonic oscillator",
-};
-const HERO_PRESETS = HERO_PRESET_IDS.map((id) => getPreset(id));
-
-/**
- * How many animation frames one autoplay run advances before pausing
- * itself: long enough to show the physics actually develop, short enough
- * to read as a proof-of-concept rather than a looping background animation.
- */
-const AUTOPLAY_FRAME_LIMIT = 260;
 
 /**
  * Owns the actual time-evolving state for one fixed preset. Deliberately
@@ -34,9 +29,11 @@ const AUTOPLAY_FRAME_LIMIT = 260;
  * something an effect has to synchronize after the fact.
  */
 function WavefunctionHeroSimulation({
+  presetId,
   setup,
   prefersReducedMotion,
 }: {
+  presetId: HeroPresetId;
   setup: PresetSetup;
   prefersReducedMotion: boolean;
 }) {
@@ -44,6 +41,23 @@ function WavefunctionHeroSimulation({
     () => new SplitOperatorEvolver(setup.grid, setup.potential, setup.dt, 1),
     [setup]
   );
+
+  /**
+   * How long this run lasts, and why it is not one number for all three
+   * presets.
+   *
+   * It used to be a flat 260 frames, and on the tunneling preset that was the
+   * wrong number in the most expensive possible way: the packet was still
+   * arriving at the barrier when the run stopped, mid-collision, with 11% of
+   * its probability inside the wall and nothing yet on the far side. The hero
+   * of a page about quantum mechanics showed a bump sliding sideways and
+   * freezing. `presets.ts` documents the measurements behind the tunneling
+   * preset's own budget (and behind moving its packet 10 units closer, which
+   * is what makes a budget of this size enough).
+   */
+  const frameLimit = autoplayFrameLimit(setup);
+  const display = useMemo(() => heroDisplay(presetId, setup), [presetId, setup]);
+  const legend = useMemo(() => heroLegend(presetId), [presetId]);
 
   const [psi, setPsi] = useState<Wavefunction1D>(setup.psi0);
   const psiRef = useRef(psi);
@@ -53,8 +67,8 @@ function WavefunctionHeroSimulation({
    * The autoplay run is gated on the panel actually being on screen, and
    * that gate is the whole reason this observer exists.
    *
-   * `AUTOPLAY_FRAME_LIMIT` frames is about 4.3 seconds, after which the run
-   * stops itself. `LazyWavefunctionHeroExplorer` mounts this component on an
+   * The run stops itself after `frameLimit` frames (4.3 to 5 seconds,
+   * depending on the preset). `LazyWavefunctionHeroExplorer` mounts this component on an
    * idle-after-paint timer whose comment says "this widget is always above
    * the fold (it's the homepage hero)". **That is true at `lg` and false on a
    * phone**: `SplitFigure` collapses below `lg` with the figure second, so at
@@ -82,7 +96,7 @@ function WavefunctionHeroSimulation({
   const [onScreen, setOnScreen] = useState(() => typeof IntersectionObserver === "undefined");
   const autoStartedRef = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  /** True once one autoplay run has reached `AUTOPLAY_FRAME_LIMIT`. */
+  /** True once one autoplay run has ended, whether on the frame budget or on the wrap guard below. */
   const [runComplete, setRunComplete] = useState(false);
 
   useEffect(() => {
@@ -110,10 +124,14 @@ function WavefunctionHeroSimulation({
 
   // Reduced motion: skip the animation loop entirely and compute the run's
   // final frame directly (no requestAnimationFrame, no intermediate state).
+  // The frame it lands on is the same one the animated run stops at, which is
+  // the point of choosing that frame by the physics: on the tunneling preset
+  // this reader gets the settled two-lobe picture, not a packet frozen
+  // half-way into a wall.
   const settledPsi = useMemo(() => {
     if (!prefersReducedMotion) return null;
-    return evolver.stepMultiple(setup.psi0, setup.stepsPerFrame * AUTOPLAY_FRAME_LIMIT);
-  }, [prefersReducedMotion, evolver, setup]);
+    return evolver.stepMultiple(setup.psi0, setup.stepsPerFrame * frameLimit);
+  }, [prefersReducedMotion, evolver, setup, frameLimit]);
 
   useEffect(() => {
     if (!isPlaying || prefersReducedMotion) return;
@@ -127,7 +145,16 @@ function WavefunctionHeroSimulation({
       setPsi(next);
       framesRef.current += 1;
 
-      if (framesRef.current >= AUTOPLAY_FRAME_LIMIT) {
+      // Two ways to end, and the second one is not redundant. The box is
+      // periodic (the split-operator method's FFT makes it so), and once the
+      // packet reaches an edge it re-enters from the far side: norm is still
+      // exactly 1, nothing errors, and every position-space quantity quietly
+      // stops describing one packet. On the tunneling preset that turns a
+      // measured 2.7% transmission into 18.9% of nonsense. The frame budget is
+      // chosen to stop well before that at each preset's own defaults, but a
+      // budget is a fixed number and the crossing time is not, so the run also
+      // stops the moment the wrap detector fires.
+      if (framesRef.current >= frameLimit || hasWrappedAround(next)) {
         setIsPlaying(false);
         setRunComplete(true);
         return;
@@ -140,7 +167,7 @@ function WavefunctionHeroSimulation({
       cancelled = true;
       cancelAnimationFrame(frameId);
     };
-  }, [isPlaying, evolver, setup.stepsPerFrame, prefersReducedMotion]);
+  }, [isPlaying, evolver, setup.stepsPerFrame, prefersReducedMotion, frameLimit]);
 
   function handleTogglePlay() {
     if (!isPlaying && runComplete) {
@@ -153,6 +180,7 @@ function WavefunctionHeroSimulation({
   }
 
   const displayedPsi = prefersReducedMotion ? settledPsi! : psi;
+  const narration = heroNarration(presetId, displayedPsi, setup);
 
   return (
     <>
@@ -160,7 +188,33 @@ function WavefunctionHeroSimulation({
         ref={panelRef}
         className="mt-4 overflow-hidden rounded-panel border border-border bg-surface-muted/40 p-3"
       >
-        <WavefunctionCanvas grid={setup.grid} psi={displayedPsi} potential={setup.potential} mode="density" />
+        <WavefunctionHeroCanvas
+          grid={setup.grid}
+          psi={displayedPsi}
+          potential={setup.potential}
+          display={display}
+          legend={legend}
+          barrier={setup.barrier}
+        />
+      </div>
+
+      {/* What you are seeing, in plain words, from the state on screen. The
+          `min-h` reserves the tallest of the three sentences this preset can
+          show so the controls below it do not jump as the phase changes: three
+          lines at the narrowest homepage column, two from `sm` up. */}
+      <p className="mt-4 min-h-16 rounded-panel border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground sm:min-h-14">
+        {narration}
+      </p>
+      {/*
+        The visible sentence is deliberately not the live region. This run
+        steps on every animation frame and starts on its own, so a `polite`
+        region attached to it would rewrite itself sixty times a second and a
+        screen reader would spend the whole run being cut off mid-sentence.
+        Same split as the `/simulators` bench: the eye reads the live sentence,
+        the ear gets one clean announcement of where the run actually stopped.
+      */}
+      <div aria-live="polite" className="sr-only">
+        {isPlaying ? "" : narration}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
@@ -182,7 +236,9 @@ function WavefunctionHeroSimulation({
         </Link>
       </div>
 
-      <p className="mt-4 text-xs text-muted-foreground">
+      <p className="mt-3 text-xs text-muted-foreground">{HERO_TRY_THIS[presetId]}</p>
+
+      <p className="mt-2 text-xs text-muted-foreground">
         {prefersReducedMotion
           ? "This is the exact result of a real split-operator time evolution run to completion, not a video."
           : "This is a real numerical simulation: an actual FFT and split-operator time evolution, computed live in your browser."}
@@ -202,7 +258,7 @@ function WavefunctionHeroSimulation({
 export function WavefunctionHeroExplorer() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  const [presetId, setPresetId] = useState<PresetId>(HERO_PRESETS[0].id);
+  const [presetId, setPresetId] = useState<HeroPresetId>(HERO_PRESET_IDS[0]);
   const preset = useMemo(() => getPreset(presetId), [presetId]);
   const setup = useMemo(() => preset.build(defaultParamValues(preset)), [preset]);
 
@@ -243,12 +299,12 @@ export function WavefunctionHeroExplorer() {
       </p>
 
       <div className="mt-6 flex flex-wrap gap-2">
-        {HERO_PRESETS.map((p) => (
+        {HERO_PRESET_IDS.map((id) => (
           <button
-            key={p.id}
+            key={id}
             type="button"
-            onClick={() => setPresetId(p.id)}
-            aria-pressed={p.id === presetId}
+            onClick={() => setPresetId(id)}
+            aria-pressed={id === presetId}
             // Two fixes over the previous class strings, which differed only
             // in colour:
             //   - `min-h-11`: at `py-1.5` around 12px text these stood about
@@ -259,17 +315,22 @@ export function WavefunctionHeroExplorer() {
             // The border is now on both states so selecting one no longer
             // shifts the row by 2px, matching `visualizations/PresetToggle`.
             className={
-              p.id === presetId
+              id === presetId
                 ? "inline-flex min-h-11 items-center rounded-full border border-pillar bg-pillar px-4 py-1.5 text-xs font-medium text-brand-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 : "inline-flex min-h-11 items-center rounded-full border border-border bg-surface px-4 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pillar focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             }
           >
-            {HERO_PRESET_LABELS[p.id]}
+            {HERO_PRESET_LABELS[id]}
           </button>
         ))}
       </div>
 
-      <WavefunctionHeroSimulation key={presetId} setup={setup} prefersReducedMotion={prefersReducedMotion} />
+      <WavefunctionHeroSimulation
+        key={presetId}
+        presetId={presetId}
+        setup={setup}
+        prefersReducedMotion={prefersReducedMotion}
+      />
     </div>
   );
 }

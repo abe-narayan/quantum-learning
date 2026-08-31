@@ -118,7 +118,7 @@ export const extraSuccessProbabilities = extraTestStates.map((entry) => {
 export const lessonMeta = {
   title: "Block Encodings and Linear Combinations of Unitaries",
   description:
-    "Introduces block encodings, the modern universal input model for quantum linear algebra, and derives the linear-combination-of-unitaries (LCU) construction explicitly, verifying on a real two-qubit circuit that post-selecting an ancilla exactly reproduces an arbitrary bounded operator applied to the system register.",
+    "Introduces block encodings, the modern universal input model for quantum linear algebra, and derives the linear-combination-of-unitaries (LCU) construction, verifying on a real two-qubit circuit that post-selecting an ancilla exactly reproduces an arbitrary bounded operator applied to the system register.",
   course: "algorithmic-frontiers",
   module: "block-encodings-and-linear-combinations-of-unitaries",
   order: 1,
@@ -151,7 +151,7 @@ APEX starts from the one idea that has reorganized quantum-algorithms research s
 
 The immediately preceding lesson simulated $e^{-iHt}$ by chopping time into $n$ small steps and applying each local piece of $H$ in sequence, paying a quantified $O(1/n)$ price in accuracy for every noncommuting pair of terms. That construction is narrow in one specific way: it only ever produces a *unitary*, a time-evolution operator, because $e^{-iHt}$ is always unitary for Hermitian $H$. Enormous swaths of quantum algorithms, though, want to apply something that *isn't* unitary at all: a projector, a non-Hermitian matrix, a Green's function, a covariance matrix, the inverse $H^{-1}$ that a linear-systems solver needs. A quantum computer's native operations are all unitary, so none of these can be applied directly.
 
-Block encoding is the general answer: embed an *arbitrary* matrix $A$ (not necessarily unitary, not necessarily Hermitian, not necessarily square in the fully general version) as a small corner of some bigger unitary $U$ that a quantum computer can actually run. Everything downstream (Hamiltonian simulation via quantum signal processing, quantum linear-systems solvers, amplitude-based algorithms, Gibbs-state preparation) is then just algebra performed *on the block encoding itself*, without ever needing $A$ to be unitary in the first place. This lesson builds the construction from scratch and verifies, numerically and exactly, that it does what it claims.
+Block encoding is the general answer: embed an *arbitrary* matrix $A$ (not necessarily unitary, not necessarily Hermitian, not necessarily square in the fully general version) as a small corner of some bigger unitary $U$ that a quantum computer can run. Everything downstream (Hamiltonian simulation via quantum signal processing, quantum linear-systems solvers, amplitude-based algorithms, Gibbs-state preparation) is then just algebra performed *on the block encoding itself*, without ever needing $A$ to be unitary in the first place. This lesson builds the construction from scratch and verifies, numerically and exactly, that it does what it claims.
 
 <ExternalFigure
   src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Professor_Andrew_Childs.jpg"
@@ -170,7 +170,7 @@ Let $A$ be an $s\times s$ matrix with operator norm $\|A\|\leq1$ (a normalizatio
 
 <EquationReveal
   terms={[
-    { id: "U", symbol: "U", gloss: "The unitary a quantum computer can actually run, acting on both the system register and an ancilla register." },
+    { id: "U", symbol: "U", gloss: "The unitary a quantum computer can run, acting on both the system register and an ancilla register." },
     { id: "A", symbol: "A", gloss: "The target matrix, not necessarily unitary, being embedded inside U." },
     { id: "anc", symbol: "|0⟩_anc", gloss: "The ancilla register, post-selected on the all-zero state; that is the condition under which U's action reduces to A." },
     { id: "I", symbol: "I_sys", gloss: "The identity on the system register. A acts there, untouched by the ancilla projection." },
@@ -187,7 +187,7 @@ $$
 U = \begin{pmatrix} A & * \\ * & * \end{pmatrix},
 $$
 
-where the three $*$ blocks are whatever they need to be to make $U$ unitary overall (their exact values are never used; only their existence, which guarantees $U$ is a valid unitary, matters). The $\|A\|\leq1$ requirement is exactly the constraint that makes this possible: a unitary matrix's every entry, and more strongly every block's operator norm, is bounded by $1$, so a matrix with $\|A\|>1$ could never appear as a literal sub-block of *any* unitary.
+where the three $*$ blocks are whatever they need to be to make $U$ unitary overall (their exact values are never used; only their existence, which guarantees $U$ is a valid unitary, matters). The $\|A\|\leq1$ requirement is the constraint that makes this possible: a unitary matrix's every entry, and more strongly every block's operator norm, is bounded by $1$, so a matrix with $\|A\|>1$ could never appear as a literal sub-block of *any* unitary.
 
 ### The post-selection interpretation
 
@@ -197,15 +197,15 @@ $$
 U\big(|0\rangle_{\text{anc}}|\psi\rangle_{\text{sys}}\big) = |0\rangle_{\text{anc}}\big(A|\psi\rangle\big) + \sum_{k\neq0}|k\rangle_{\text{anc}}\big(B_k|\psi\rangle\big)
 $$
 
-for whatever operators $B_k$ the other blocks of $U$ happen to implement. Measuring the ancilla register: with probability $\|A|\psi\rangle\|^2$, the outcome is $0\cdots0$, and the system register is left, post-measurement, in the *exactly normalized* state $A|\psi\rangle/\|A|\psi\rangle\|$. This is the entire operational meaning of a block encoding: **it applies $A$ to $|\psi\rangle$ probabilistically**, succeeding with probability $\|A|\psi\rangle\|^2$ and failing (leaving the system in some other, generally useless state) otherwise.
+for whatever operators $B_k$ the other blocks of $U$ happen to implement. Measuring the ancilla register: with probability $\|A|\psi\rangle\|^2$, the outcome is $0\cdots0$, and the system register is left, post-measurement, in the *normalized* state $A|\psi\rangle/\|A|\psi\rangle\|$. This is the entire operational meaning of a block encoding: **it applies $A$ to $|\psi\rangle$ probabilistically**, succeeding with probability $\|A|\psi\rangle\|^2$ and failing (leaving the system in some other, generally useless state) otherwise.
 
 <Callout type="note">
-That success probability can be small: for a generic $A$ and $\psi$, nothing guarantees $\|A|\psi\rangle\|^2$ is anywhere near $1$. This is precisely the regime the *[Grover's Algorithm: Amplitude Amplification](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification)* lesson's technique was built for: boosting a small "good outcome" probability toward $1$ using $O(1/\sqrt{p})$ repetitions instead of $O(1/p)$, by amplifying the same reflection structure. Applied to a block encoding specifically, this quadratic speedup in overcoming a small success probability is one of the main reasons block encodings, rather than some other input model, became the field's standard.
+That success probability can be small: for a generic $A$ and $\psi$, nothing guarantees $\|A|\psi\rangle\|^2$ is anywhere near $1$. This is the regime the *[Grover's Algorithm: Amplitude Amplification](/lessons/quantum-computing/quantum-algorithms-i/grovers-algorithm-amplitude-amplification)* lesson's technique was built for: boosting a small "good outcome" probability toward $1$ using $O(1/\sqrt{p})$ repetitions instead of $O(1/p)$, by amplifying the same reflection structure. Applied to a block encoding specifically, this quadratic speedup in overcoming a small success probability is one of the main reasons block encodings, rather than some other input model, became the field's standard.
 </Callout>
 
 ### Linear combinations of unitaries (LCU)
 
-Block encodings would be a curiosity without a systematic way to *build* one for a matrix you actually care about. The linear-combination-of-unitaries (LCU) technique does exactly that, for any $A$ that can be written as a weighted sum of unitaries:
+Block encodings would be a curiosity without a systematic way to *build* one for a matrix you actually care about. The linear-combination-of-unitaries (LCU) technique does that, for any $A$ that can be written as a weighted sum of unitaries:
 
 $$
 A = \sum_{i=0}^{m-1}\alpha_iU_i, \qquad \alpha_i>0,\ U_i\text{ unitary}, \qquad \|\alpha\|_1=\sum_i\alpha_i.
@@ -292,7 +292,7 @@ active research problem in its own right, not a preprocessing detail.
 
 ## SELECT and PREPARE Know Nothing About Physics
 
-Nothing about SELECT or PREPARE "knows" what $A$ means physically: the whole construction is pure linear algebra, indexing a menu of unitaries by an ancilla and taking a coherent, not classical, weighted combination of running them. The coherence is the entire point: SELECT is applied to a *superposition* of ancilla values, so the system register actually ends up in a superposition of $U_0|\psi\rangle,U_1|\psi\rangle,\dots$ with relative phases and amplitudes intact, which is exactly what lets PREPARE$^\dagger$ interfere those branches back together into $A|\psi\rangle$ on the $|0\rangle_{\text{anc}}$ branch. Measuring the ancilla in the computational basis at the end is what forces a choice between "the interference worked" ($|0\rangle$, system left with $A|\psi\rangle$) and "it didn't" (any other outcome, system left with some other combination the derivation above doesn't determine and doesn't need to).
+Nothing about SELECT or PREPARE "knows" what $A$ means physically: the whole construction is pure linear algebra, indexing a menu of unitaries by an ancilla and taking a coherent, not classical, weighted combination of running them. The coherence is the entire point: SELECT is applied to a *superposition* of ancilla values, so the system register ends up in a superposition of $U_0|\psi\rangle,U_1|\psi\rangle,\dots$ with relative phases and amplitudes intact, which is what lets PREPARE$^\dagger$ interfere those branches back together into $A|\psi\rangle$ on the $|0\rangle_{\text{anc}}$ branch. Measuring the ancilla in the computational basis at the end is what forces a choice between "the interference worked" ($|0\rangle$, system left with $A|\psi\rangle$) and "it didn't" (any other outcome, system left with some other combination the derivation above doesn't determine and doesn't need to).
 
 ## From "I Have a Matrix" to "I Have a Circuit"
 
@@ -318,7 +318,7 @@ $$
 
 computed directly from $A$'s actual entries ($a=0.5,\,d=-0.5,\,b=0.5$, read off the matrix above). The `eigenvaluesOfRealSymmetric2x2` helper returns $\lambda_+=$ {matrixAEigenvalues[0].toFixed(6)} and $\lambda_-=$ {matrixAEigenvalues[1].toFixed(6)} (`matrixAEigenvalues`), both inside $[-1,1]$, so $\|A\|=\max|\lambda_\pm|\leq1$ as required.
 
-**PREPARE.** With $\alpha_0=\alpha_1=\tfrac12$, $\sqrt{\alpha_i/\|\alpha\|_1}=\sqrt{1/2}$ for both $i$, so PREPARE is exactly a single Hadamard on the one ancilla qubit ($\lceil\log_22\rceil=1$ qubit suffices): $H|0\rangle=\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$, matching the required amplitudes exactly.
+**PREPARE.** With $\alpha_0=\alpha_1=\tfrac12$, $\sqrt{\alpha_i/\|\alpha\|_1}=\sqrt{1/2}$ for both $i$, so PREPARE is a single Hadamard on the one ancilla qubit ($\lceil\log_22\rceil=1$ qubit suffices): $H|0\rangle=\tfrac{1}{\sqrt2}(|0\rangle+|1\rangle)$, matching the required amplitudes exactly.
 
 **SELECT.** SELECT must apply $X$ to the system qubit when the ancilla reads $|0\rangle$, and $Z$ when it reads $|1\rangle$. This platform's `applyControlledGate`/`applyCZ`/`applyCNOT` fire when the *control* qubit is $|1\rangle$, which directly gives the $i=1$ branch as a plain controlled-$Z$ (`CZ`). The $i=0$ branch needs the opposite polarity, built with the standard "anti-control" trick: conjugating the ancilla with $X$ before and after a normal controlled-$X$ (`CNOT`) relabels which physical ancilla value the controlled gate reacts to, so `X`–`CNOT`–`X` fires exactly when the *original*, unflipped ancilla was $|0\rangle$. **PREPARE$^\dagger$** is another Hadamard, since $H^\dagger=H$.
 
@@ -378,7 +378,7 @@ Before the callouts spell out the caveat, price a different matrix.
 ## Normalization and Post-Selection Slips
 
 <Callout type="warning">
-**Thinking the success probability of a block encoding is generically $1/2$, because that's what this lesson's worked example gave.** It isn't. This example's constant $0.5$ success probability, for *every* input state, is a direct consequence of the specific algebraic fact $A^2=\tfrac12I$ (since $X$ and $Z$ anticommute), verified above, not assumed. A generic block-encoded $A$ has a success probability $\|A|\psi\rangle\|^2$ that depends on $|\psi\rangle$ and can be arbitrarily close to $0$, which is exactly why amplitude amplification is a standard companion technique to block encodings in practice, not an optional add-on.
+**Thinking the success probability of a block encoding is generically $1/2$, because that's what this lesson's worked example gave.** It isn't. This example's constant $0.5$ success probability, for *every* input state, is a direct consequence of the specific algebraic fact $A^2=\tfrac12I$ (since $X$ and $Z$ anticommute), verified above, not assumed. A generic block-encoded $A$ has a success probability $\|A|\psi\rangle\|^2$ that depends on $|\psi\rangle$ and can be arbitrarily close to $0$, which is why amplitude amplification is a standard companion technique to block encodings in practice, not an optional add-on.
 </Callout>
 
 <Callout type="warning">
@@ -406,7 +406,7 @@ Before the callouts spell out the caveat, price a different matrix.
 
    Now evaluate the bracket. Taking the adjoint of $\text{PREPARE}|0\rangle=\sum_j\sqrt{\alpha_j/\|\alpha\|_1}\,|j\rangle$ turns that ket into a bra, $\langle0|\text{PREPARE}^\dagger=\sum_j\sqrt{\alpha_j/\|\alpha\|_1}\,\langle j|$, and applying it to $|i\rangle$ leaves $\sum_j\sqrt{\alpha_j/\|\alpha\|_1}\,\langle j|i\rangle$. Orthonormality says $\langle j|i\rangle=\delta_{ji}$: every $j\neq i$ contributes exactly zero, and what is left is the single weight $\sqrt{\alpha_i/\|\alpha\|_1}$ belonging to the branch you are standing on.
 
-   **Name which sum collapses.** The wrong turn here is to read the argument as "orthonormality kills all but one term, so only $U_0$ survives." Nothing of the kind happens. The sum over $i$ survives completely intact, all $m$ terms of it, and that survival is precisely what makes the output a linear *combination* rather than one unitary. There are two nested sums, and the one that collapses is the inner sum over $j$ hidden inside each coefficient $\langle0|\text{PREPARE}^\dagger|i\rangle$. One sum is killed, the other is kept, and confusing them turns a correct derivation into a claim the circuit does not make.
+   **Name which sum collapses.** The wrong turn here is to read the argument as "orthonormality kills all but one term, so only $U_0$ survives." Nothing of the kind happens. The sum over $i$ survives completely intact, all $m$ terms of it, and that survival is what makes the output a linear *combination* rather than one unitary. There are two nested sums, and the one that collapses is the inner sum over $j$ hidden inside each coefficient $\langle0|\text{PREPARE}^\dagger|i\rangle$. One sum is killed, the other is kept, and confusing them turns a correct derivation into a claim the circuit does not make.
 
    That distinction is also what makes the two square roots multiply into something linear. PREPARE deposits $\sqrt{\alpha_i/\|\alpha\|_1}$ on the way in and PREPARE$^\dagger$ deposits a second copy of the *same* factor on the way out, and they are the same factor only because orthonormality forced the outgoing bra to select index $i$ rather than a blend. Their product is $\alpha_i/\|\alpha\|_1$, linear in $\alpha_i$, which is why the block comes out as $A/\|\alpha\|_1$ and not as something built from $\sqrt{\alpha_i}$ or $\alpha_i^2$.
 
@@ -431,11 +431,11 @@ Before the callouts spell out the caveat, price a different matrix.
 
    The part that is easy to wave past is what happens on those two padded branches. SELECT still has to be a unitary on the *entire* register, all eight ancilla values included, so $U_6$ and $U_7$ need some definition; the conventional choice is the identity. They contribute nothing to the encoded block, because they are entered with amplitude exactly zero, but "contributes nothing" and "may be left undefined" are different statements and only the first one is true. Padding is a real design step in the circuit, not an accounting fiction.
 
-   Nothing about the padding disturbs the normalization either. A term carrying $\alpha=0$ adds nothing to $\|\alpha\|_1=\sum_{i=0}^{5}\alpha_i$, so the subnormalization factor and the post-selection success probability are exactly what they would be for a hypothetical register sized exactly to six.
+   Nothing about the padding disturbs the normalization either. A term carrying $\alpha=0$ adds nothing to $\|\alpha\|_1=\sum_{i=0}^{5}\alpha_i$, so the subnormalization factor and the post-selection success probability are what they would be for a hypothetical register sized exactly to six.
 
    The wrong turn is answering $6$, one qubit per term. A $k$-qubit register indexes $2^k$ branches rather than $k$ of them, so the ancilla width is *logarithmic* in $m$. That is not a technicality; it is why LCU stays affordable at all for a molecular Hamiltonian with $O(n^4)$ Pauli terms, where the ancilla register is only about $4\log_2n$ qubits wide. A second wrong turn is answering $8$, which is the number of basis states the register provides, not the number of qubits providing them.
 
-   What the ancilla count conceals is where the cost genuinely lives. SELECT contains $m$ controlled unitaries, linear in $m$. And with *distinct* coefficients PREPARE is no longer the single Hadamard of the worked example but a general state preparation over six prescribed amplitudes, generically $O(m)$ gates as well. The $m=2$ equal-coefficient example hides both of those, which is exactly why it is a safe example and a misleading one to generalize from.
+   What the ancilla count conceals is where the cost genuinely lives. SELECT contains $m$ controlled unitaries, linear in $m$. And with *distinct* coefficients PREPARE is no longer the single Hadamard of the worked example but a general state preparation over six prescribed amplitudes, generically $O(m)$ gates as well. The $m=2$ equal-coefficient example hides both of those, which is why it is a safe example and a misleading one to generalize from.
 
    </details>
 
@@ -481,7 +481,7 @@ Before the callouts spell out the caveat, price a different matrix.
 - A **block encoding** of a matrix $A$ (with $\|A\|\leq1$) is a unitary $U$ whose ancilla-$|0\rangle$ sub-block equals $A$ exactly; operationally, running $U$ on $|0\rangle_{\text{anc}}|\psi\rangle$ and post-selecting the ancilla on $|0\rangle$ leaves the system in $A|\psi\rangle$ (normalized), with success probability $\|A|\psi\rangle\|^2$.
 - **LCU** (linear combination of unitaries) builds a block encoding of $A/\|\alpha\|_1$ for any $A=\sum_i\alpha_iU_i$ via PREPARE (an ancilla superposition weighted by $\sqrt{\alpha_i/\|\alpha\|_1}$), SELECT (apply $U_i$ conditioned on ancilla $=|i\rangle$), and PREPARE$^\dagger$, derived exactly above, not merely asserted.
 - Verified numerically and exactly on $A=(X+Z)/2$: a real six-gate, two-qubit circuit built from this platform's actual gate-application functions reproduces $A$ as its top-left block to machine precision, and reproduces $A|\psi\rangle$ on the post-selected branch for a genuine complex-amplitude input state, with success probability confirmed to be a constant $0.5$ for this specific $A$ (traced to $A^2=\tfrac12I$), not a general property of block encodings.
-- Block encodings are now the field's standard input model for linear-algebra-flavored quantum algorithms. Hamiltonian simulation, linear-systems solving, and more are phrased as "given a block encoding, apply QSVT," which is exactly where this course goes next.
+- Block encodings are now the field's standard input model for linear-algebra-flavored quantum algorithms. Hamiltonian simulation, linear-systems solving, and more are phrased as "given a block encoding, apply QSVT," which is where this course goes next.
 
 ## What a Block Encoding Still Owes You
 

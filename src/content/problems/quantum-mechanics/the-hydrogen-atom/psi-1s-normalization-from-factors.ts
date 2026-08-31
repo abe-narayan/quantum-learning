@@ -27,7 +27,7 @@ export const psi1sNormalizationFromFactors: NumericProblem = {
     tolerance: 0.01,
     nearMisses: [
       { value: 2, tolerance: 0.02, feedback: "2 adds the two normalization integrals. The 3D integral factorizes into a product of the radial and angular pieces, not a sum of them." },
-      { value: 12.566370614359172, tolerance: 0.05, feedback: "4π is the total solid angle. Y₀⁰ carries the 1/√(4π) that cancels it, which is exactly why the angular integral comes out at 1 rather than 4π." },
+      { value: 12.566370614359172, tolerance: 0.05, feedback: "4π is the total solid angle. Y₀⁰ carries the 1/√(4π) that cancels it, which is why the angular integral comes out at 1 rather than 4π." },
       { value: 0.5, tolerance: 0.01, feedback: "0.5 would leave the state half-normalized. Each factor is separately normalized to 1, so their product cannot come out below either of them." },
     ],
     incorrectFeedback: "The radial and angular factors are each separately normalized, and the full 3D norm is their product. A result far from that product points at one of the underlying checks, not at ψ = R·Y itself.",

@@ -44,7 +44,7 @@ export const blockEncodingSubnormalizationFactorOfAUnitaryBlock: NumericProblem 
       {
         value: 1,
         feedback:
-          "1 would mean the block is M itself, which no unitary can offer: M has an entry of magnitude 2, and every entry of a unitary matrix is bounded by 1. That impossibility is exactly why a subnormalization factor has to exist at all.",
+          "1 would mean the block is M itself, which no unitary can offer: M has an entry of magnitude 2, and every entry of a unitary matrix is bounded by 1. That impossibility is why a subnormalization factor has to exist at all.",
       },
     ],
   },

@@ -238,16 +238,20 @@ export function NoiseExplorer() {
   return (
     <SimulatorInstrument
       label="Noise channel: open-system decoherence"
-      readout={<Readout label="Purity" value={purityValue.toFixed(3)} />}
+      readout={<Readout label="Purity" hint="1 = a definite state" value={purityValue.toFixed(3)} />}
       footnote="Next: this is exactly the T1/T2 decay hardware engineers measure; see it framed that way in the Quantum Hardware lessons."
       stageClassName="space-y-6"
       stage={
         <>
+          {/* Trimmed: "leaks information to its environment, step by step" is
+              now said once, not twice, since `SimulatorFraming`'s "What this
+              shows" below already says it in almost the same words. What
+              stays is unique to reading this particular picture: what the
+              arrow's depth inside the sphere means. */}
           <p className="text-sm text-muted-foreground">
-            A qubit is never truly alone: it leaks information into everything around it, a little at a time.
-            This runs that leakage for real, one step at a time. The arrow is the qubit&rsquo;s state. On the
-            sphere&rsquo;s surface means a definite quantum state, and the further inside the surface it
-            sinks, the more of that state has been lost to the environment for good.
+            A qubit leaks information to its environment a little at a time; this runs that leakage step by
+            step. The arrow is the qubit&rsquo;s state: on the surface means a definite quantum state, and
+            the deeper inside, the more has been lost for good.
           </p>
 
           <div className="mx-auto max-w-sm">
@@ -267,6 +271,10 @@ export function NoiseExplorer() {
             <DecayCurve samples={purityTrajectory} currentStep={clampedSteps} label="Purity over channel applications" />
           </div>
 
+        </>
+      }
+      stageAfter={
+        <>
           <DensityMatrixStatePanel rho={rho} purityValue={purityValue} entropyValue={entropyValue} validation={validation} />
 
           <Predict
@@ -299,24 +307,23 @@ export function NoiseExplorer() {
       }
       controls={
         <>
-          <div className="flex justify-end">
+          <NoiseControls
+            presetId={presetId}
+            onPresetChange={handlePresetChange}
+            channel={channel}
+            onChannelChange={handleChannelChange}
+            strength={strength}
+            onStrengthChange={handleStrengthChange}
+            steps={clampedSteps}
+            maxSteps={MAX_STEPS}
+            onStepsChange={setSteps}
+            onReset={() => setSteps(0)}
+          />
+          {/* Last, not first: see the note in GroverExplorer's controls. */}
+          <div className="mt-6 flex justify-end">
             <Button size="sm" variant="secondary" onClick={handleCopyLink}>
               {copied ? "Copied!" : "Copy link"}
             </Button>
-          </div>
-          <div className="mt-4">
-            <NoiseControls
-              presetId={presetId}
-              onPresetChange={handlePresetChange}
-              channel={channel}
-              onChannelChange={handleChannelChange}
-              strength={strength}
-              onStrengthChange={handleStrengthChange}
-              steps={clampedSteps}
-              maxSteps={MAX_STEPS}
-              onStepsChange={setSteps}
-              onReset={() => setSteps(0)}
-            />
           </div>
         </>
       }

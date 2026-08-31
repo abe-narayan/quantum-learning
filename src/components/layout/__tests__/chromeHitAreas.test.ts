@@ -97,11 +97,17 @@ describe("the chrome's undersized controls", () => {
   it("keeps every footer reference link a full 44px row", () => {
     // `min-h-11` rather than the padding trick, because these sit at a 28px
     // pitch and the padding trick would overlap adjacent targets by 16px —
-    // which mis-taps worse than an undersized target does. They stay
-    // `inline-flex` (so the box hugs the label) on purpose too: the list is
-    // two columns on a phone, and a full-width target would put the two
-    // columns' boxes against each other.
-    expect(FOOTER).toContain("inline-flex min-h-11 items-center rounded-sm");
+    // which mis-taps worse than an undersized target does.
+    //
+    // `flex w-full`, not the `inline-flex` box-hugs-the-label this asserted
+    // before. Hugging was justified as keeping the two phone columns' boxes
+    // apart, which `gap-x-6` (24px) already does; what it actually produced
+    // was 36x44 and 38x44 targets for "Learn" and "About", reported by
+    // `responsive.mjs --widths 375` on every route in the site. Filling the
+    // grid cell is what makes the *width* clear 44 too, so the assertion is
+    // stricter than it was, not looser.
+    expect(FOOTER).toContain("flex min-h-11 w-full items-center rounded-sm");
+    expect(FOOTER).not.toContain("inline-flex min-h-11 items-center rounded-sm");
   });
 });
 

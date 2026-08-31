@@ -67,7 +67,14 @@ export function LessonInstrumentLine({
           curriculum and the header row stays one line. */}
       <DifficultyMark difficulty={difficulty} withHint={difficulty === "foundational"} />
 
-      <dl className="flex flex-wrap items-center gap-x-5 gap-y-2.5">
+      {/* `min-w-0`: without it, `dl` is a flex item whose automatic minimum
+          size defaults to its own min-content rather than 0, which wins over
+          every `min-w-0` and every line-clamp set on its descendants (the
+          position `dd`'s title span among them) and pushed the whole row past
+          the viewport at 320px with no scrollbar to show it (`body` carries
+          `overflow-x: clip`). The fix has to be here, one level above where
+          the clamping lives, not on the clamped span itself. */}
+      <dl className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-2.5">
         {hasPosition ? (
           <div className="flex min-w-0 items-center gap-2">
             <dt className="tech-label text-subtle-foreground">Module</dt>
@@ -89,8 +96,30 @@ export function LessonInstrumentLine({
               >
                 <span className="block h-full bg-pillar" style={{ width: `${progressPercent}%` }} />
               </span>
+              {/* `line-clamp-2`, not `truncate`.
+                  This span is the "you are here" rung that the block
+                  comment above says is named nowhere else above the fold,
+                  so unlike a lesson title or a section heading there is no
+                  second copy of it anywhere on screen. Clipping it does not
+                  cost the reader a repetition, it costs them the whole
+                  fact.
+                  And it was clipping constantly, not rarely. Module titles
+                  in `curriculum.ts` run to 58 characters and 54 of them
+                  exceed 40, against roughly 150px of room beside "Module 07
+                  / 9" at 375px, which is about 25 characters of `text-xs`.
+                  A rung that is present but unreadable takes the space and
+                  delivers nothing. At 200% text zoom `a11y.mjs` measured
+                  241px of "Complexity Classes: P, NP, and BQP" outside a
+                  149px box, which is a WCAG 1.4.4 content loss.
+                  Two lines rather than unbounded wrapping keeps the
+                  original concern honest: the row's height can now depend
+                  on the title, but only by one line, so a long module name
+                  cannot push the first teaching sentence down without
+                  limit. */}
               {moduleTitle ? (
-                <span className="min-w-0 truncate text-xs text-muted-foreground">{moduleTitle}</span>
+                <span className="min-w-0 line-clamp-2 text-xs text-muted-foreground">
+                  {moduleTitle}
+                </span>
               ) : null}
             </dd>
           </div>

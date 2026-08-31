@@ -53,7 +53,7 @@ export const whyPromiseIsNecessary: ConceptualProblem = {
   },
   explanation: {
     correctIdea: "The promise is what guarantees the amplitude sum lands at exactly one of two distinguishable extremes.",
-    whyCorrect: "This is exactly why the derivation's 'exactly ±1 or exactly 0' conclusion required the promise as an assumption.",
+    whyCorrect: "This is why the derivation's 'exactly ±1 or exactly 0' conclusion required the promise as an assumption.",
     whyWrong: ["Saying 'the algorithm still runs' is true but misses the actual question. It runs, but its single-query output is no longer a reliable indicator of anything without the promise."],
   },
 };

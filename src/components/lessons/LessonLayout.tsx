@@ -276,7 +276,11 @@ export function LessonLayout({
       <ReadingProgressBar containerId={LESSON_PROSE_ID} />
       {/* `data-difficulty` feeds the earned master-density shift in
           globals.css (tighter prose leading on master lessons only). */}
-      <Container data-difficulty={meta.difficulty} className="pb-20 pt-10 sm:pt-14">
+      {/* `pt-6` on a phone, not `pt-10`. 40px of empty page under a 64px
+          sticky navbar, above an 11px breadcrumb label, is 16px spent on air
+          in the one band this pass is trying to give back to the teaching;
+          the desktop rhythm is unchanged, where there is room for it. */}
+      <Container data-difficulty={meta.difficulty} className="pb-20 pt-6 sm:pt-14">
         {/* Every crumb is `inline-flex min-h-11 items-center`, which is the
             recipe `ProblemLayout`'s breadcrumb already uses and the one the
             footer's reference links use. It is not decoration.
@@ -344,26 +348,47 @@ export function LessonLayout({
         </nav>
 
         {/* ============================================================
-            The pre-content stack, compressed to three instruments
+            The pre-content stack, and the band it used to be
             ============================================================
             docs/BEGINNER_REVIEW.md's headline friction here was "five
             stacked instruments before 'Motivation'": difficulty +
             readouts, progress rule, prerequisites, objectives — each
             individually justified, together a wall between the reader and
-            the first sentence of the lesson.
-
-            Nothing was deleted and nothing was pushed below the fold. The
+            the first sentence of the lesson. An earlier pass collapsed the
             three blocks that all answered the *same* question ("how hard,
-            how far in, how long") collapse into one dense
-            `LessonInstrumentLine` row — same facts, instrument scale
-            instead of display scale, plus the module name the breadcrumb
-            never reached. `PrerequisiteReadout` keeps its position
-            unchanged: docs/BEGINNER_REVIEW.md calls it the single best
-            beginner-honesty mechanism on the site, it is the highest-value
-            item above the fold, and it stays fully expanded for every
-            reader. Only `LessonObjectives` gained a fold, and only on
-            advanced/master lessons — see its doc comment for why that
-            reader, and not the beginner, is the one who can spare it. */}
+            how far in, how long") into one dense `LessonInstrumentLine`
+            row, and stopped there, on the grounds that nothing left in the
+            band was junk.
+
+            Nothing left in it is junk, and it was still a screenful.
+            Measured at 375x812 before this pass, the first teaching
+            paragraph started at 905px on the entry lesson, 1163px on a
+            mid-curriculum one and 1321px on an Apex lesson: on a phone, a
+            reader's whole first screen of a *lesson* was chrome about the
+            lesson. Two of the four blocks below therefore became one-line
+            controls instead of open blocks, and the contents toggle moved
+            up into this stack from its old position below it:
+
+            - `LessonInstrumentLine` — unchanged, one row.
+            - `PrerequisiteReadout` — unchanged, still fully expanded for
+              every reader on every lesson. docs/BEGINNER_REVIEW.md calls it
+              the single best beginner-honesty mechanism on the site, it is
+              the highest-value item above the fold, and folding it would
+              hide the one fact a reader arriving from search cannot afford
+              to miss.
+            - `LessonObjectives` — now folded for everyone rather than only
+              for advanced/master readers. See its doc comment: the entry
+              lesson is precisely the page where the fold pays, because it
+              is the one whose lede is short enough for the teaching to
+              reach the first viewport once this is a single row.
+            - `TableOfContentsMobile` — same control, one line instead of
+              two, and inside the stack rather than 32px below it. It is a
+              *preview* of the lesson in exactly the sense the objectives
+              list is, so the two read as a pair.
+
+            What deliberately stays above the teaching: the breadcrumb (the
+            only "where am I" on the page), the title, the lede, the
+            instrument row, and the prerequisite readout. */}
         <div className="mt-6 max-w-reading">
           <SectionTitle level={1} size="xl">
             {meta.title}
@@ -393,14 +418,15 @@ export function LessonLayout({
             distantAt={upstream ? DISTANT_UPSTREAM_LESSONS : undefined}
           />
 
-          <LessonObjectives
-            className="mt-(--rhythm-tight)"
-            objectives={meta.objectives}
-            difficulty={meta.difficulty}
-          />
+          {/* The two previews, as a pair. Either can be absent — a lesson
+              with no `objectives`, or one with fewer than four `##` sections
+              — and `space-y-3` then costs nothing, so this never leaves a
+              gap where a missing control was. */}
+          <div className="mt-(--rhythm-tight) space-y-3">
+            <LessonObjectives objectives={meta.objectives} />
+            <TableOfContentsMobile containerId={LESSON_PROSE_ID} />
+          </div>
         </div>
-
-        <TableOfContentsMobile containerId={LESSON_PROSE_ID} />
 
         {/* Two-column at `lg`: prose keeps its own `max-w-reading` regardless
             of which branch of `has-[nav:empty]` is active, so this grid

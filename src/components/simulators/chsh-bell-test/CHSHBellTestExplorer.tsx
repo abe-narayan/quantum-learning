@@ -108,23 +108,46 @@ export function CHSHBellTestExplorer() {
   return (
     <SimulatorInstrument
       label="CHSH Bell test: entangled pair"
-      readout={<Readout label="S" value={sValue.toFixed(3)} />}
+      // A bare "S" is this bench's clearest example of a readout that teaches
+      // nobody anything on its own: it is the number the whole instrument
+      // exists to produce, and it was labelled with a letter the reader meets
+      // for the first time two paragraphs further down. The letter stays in
+      // the value's own vocabulary (the narration, the gauge, the footnote all
+      // still say S); `hint` says what S is, in the body voice rather than
+      // `TechLabel`'s uppercase mono, which is not a beginner-gloss voice.
+      readout={<Readout label="S" hint="how correlated the pair is" value={sValue.toFixed(3)} />}
       footnote="S > 2 rules out every local hidden-variable theory; 2√2 ≈ 2.83 (Tsirelson's bound) is the quantum limit."
-      stageClassName="space-y-6"
+      // `space-y-3`, not the `space-y-6` every sibling on this bench opens
+      // with, below the 42rem container threshold `SimulatorInstrument`
+      // itself collapses the split layout at. This stage sat 25px past the
+      // 716px first-screen budget (measured at 375x812, mount top at y=96),
+      // the smallest overage on the bench, so a spacing-only trim closes it
+      // without touching the paragraph, the S readout box or the gauge
+      // themselves. `@min-[42rem]:space-y-6` restores the original rhythm
+      // once the container is wide enough to run the split layout, so
+      // desktop is untouched; see the matching `@min-[42rem]:` pair on the
+      // live-region box and the gauge caption below.
+      stageClassName="space-y-3 @min-[42rem]:space-y-6"
       stage={
         <>
+        {/* Trimmed from five sentences to two: the classical-bound claim
+            (never exceed 2) and its meaning are what `SimulatorFraming`'s
+            "What this shows" and this instrument's own footnote already say,
+            almost word for word. What neither says is who is doing the
+            measuring, which the sealed-envelope image and the Alice/Bob setup
+            below are for. */}
         <p className="text-sm text-muted-foreground">
-          Two particles are prepared together, then carried far apart. Alice measures one, Bob measures the
-          other, each choosing between two angles. If each particle had simply been carrying its answer
-          all along, the way a pair of sealed envelopes would, then a certain combination of their
-          results, called S, could never exceed 2. Real entangled particles exceed it. This computes S
-          from your angles, exactly.
+          Alice and Bob, far apart, each measure one particle from an entangled pair, at one of two angles.
+          If each had simply carried its answer along, like a sealed envelope, S below could never pass 2.
+          This computes S from your angles, exactly.
         </p>
 
         <div
           aria-live="polite"
           className={cn(
-            "rounded-panel border px-4 py-3 text-sm text-foreground",
+            // `py-2`, restored to the original `py-3` from 42rem up; see the
+            // `stageClassName` note above.
+            "rounded-panel border px-4 py-2 text-sm text-foreground @min-[42rem]:py-3",
             exceedsClassical ? "border-accent/40 bg-accent/10" : "border-pillar/25 bg-pillar/5"
           )}
         >
@@ -142,12 +165,15 @@ export function CHSHBellTestExplorer() {
         </div>
 
         <div>
-          <p className="mb-2 text-xs font-medium text-muted-foreground">
+          <p className="mb-1 text-xs font-medium text-muted-foreground @min-[42rem]:mb-2">
             CHSH value S against the classical and quantum bounds
           </p>
           <CHSHGauge sValue={sValue} />
         </div>
-
+        </>
+      }
+      stageAfter={
+        <>
         <div className="rounded-panel border border-border bg-surface-muted/60 px-4 py-3">
           <p className="text-xs font-medium text-muted-foreground">
             The four correlations S is built from. Note the last one is <em>subtracted</em>

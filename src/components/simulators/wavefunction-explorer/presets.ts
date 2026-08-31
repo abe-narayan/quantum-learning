@@ -44,6 +44,23 @@ export type PresetSetup = {
   isStationary: boolean;
   /** For the tunneling preset: the x value separating "reflected" from "transmitted" probability. */
   boundary?: number;
+  /**
+   * Rectangular-barrier geometry, for presets that have one. Display code
+   * needs the two edges and the height to draw the wall as an object rather
+   * than as a dashed polyline, and recovering them from the `potential` array
+   * afterwards is guesswork (the array cannot say whether a nonzero region is
+   * a barrier, a well wall or the arm of a parabola).
+   */
+  barrier?: { center: number; halfWidth: number; height: number };
+  /**
+   * How many animation frames one automatic playback pass should run for
+   * *this* configuration, when the physics wants something other than the
+   * shared default. Both autoplaying components (the homepage hero and the
+   * `/simulators` bench) treat this as the frame budget for their one
+   * self-stopping pass; see TUNNELING_AUTOPLAY_FRAMES for the only preset
+   * that currently sets it, and why.
+   */
+  autoplayFrames?: number;
 };
 
 export type PresetDefinition = {
@@ -228,6 +245,50 @@ const SUPERPOSITION: PresetDefinition = {
   },
 };
 
+/**
+ * Where the incident packet starts, and how long one autoplay pass runs.
+ * Both numbers are set by the same measurement, taken on the real evolver at
+ * this preset's defaults (dt = 0.005, stepsPerFrame = 8, so 0.04 time units
+ * per frame; momentum 2, barrier height 3, half-width 1, packet width 2).
+ *
+ * The packet used to start at x = -20. At the group velocity p/m = 2 that is
+ * 250 frames of a bump sliding rightwards *before anything happens*, and the
+ * autoplay pass then in force stopped at frame 260: mean position -2.71,
+ * still left of the barrier, 11.4% of the probability sitting inside the wall
+ * mid-collision. The homepage hero and the `/simulators` bench both showed a
+ * packet approaching a barrier and freezing. Nothing tunneled on screen.
+ *
+ * Starting at x = -10 costs nothing physically. The transmitted fraction is
+ * fixed by |phi(k)|^2, which free evolution leaves exactly invariant, so it
+ * settles at the same 2.708% either way (verified: identical to four decimal
+ * places), and at 5 sigma from the barrier the packet's initial overlap with
+ * it is 3.8e-6.
+ *
+ * From there the run reads, in frames: arrival at ~60, the collision peaking
+ * at ~120 (20.1% of the probability inside the wall), the transmitted lobe
+ * clear of the barrier by ~180, and the split settled from ~200 onwards
+ * (2.708%, drifting by less than 0.001 of a percentage point after that).
+ *
+ * 300 is where the pass stops, and the reason is separation rather than
+ * settling: at frame 300 the reflected peak sits at x = -14.5 and the
+ * transmitted peak at x = +17.3, about 32 units apart on a grid whose useful
+ * window is 64 wide, with 1e-5 of the probability left inside the wall. A
+ * reader sees two objects, not one object smeared across a barrier.
+ *
+ * The far end of the window is the periodic box. The FFT makes the grid
+ * wrap, so the reflected packet eventually re-enters from the right and
+ * P(transmitted) climbs to a meaningless 18.9%: `probabilityNearGridEdges`
+ * first exceeds 1e-3 at frame ~515, and by 660 the reported transmission is
+ * visibly corrupted. Stopping at 300 leaves a margin of over 200 frames.
+ * That margin is comfortable at the defaults and not at the ends of the
+ * sliders (momentum 6 crosses the barrier classically and reaches the edge by
+ * frame ~240), which is why both autoplaying components also stop the pass
+ * the moment the wrap detector fires, rather than trusting the count alone.
+ */
+const TUNNELING_PACKET_CENTER = -10;
+const TUNNELING_PACKET_WIDTH = 2;
+const TUNNELING_AUTOPLAY_FRAMES = 300;
+
 const TUNNELING: PresetDefinition = {
   id: "tunneling",
   label: "Tunneling Through a Barrier",
@@ -248,8 +309,22 @@ const TUNNELING: PresetDefinition = {
   build: (p) => {
     const grid = createGrid(1024, 0.1);
     const potential = barrierPotential(grid, 0, p.barrierHalfWidth, p.barrierHeight);
-    const psi0 = Wavefunction1D.gaussianPacket(grid, { center: -20, width: 2, momentum: p.momentum });
-    return { grid, potential, psi0, dt: 0.005, stepsPerFrame: 8, isStationary: false, boundary: 0 };
+    const psi0 = Wavefunction1D.gaussianPacket(grid, {
+      center: TUNNELING_PACKET_CENTER,
+      width: TUNNELING_PACKET_WIDTH,
+      momentum: p.momentum,
+    });
+    return {
+      grid,
+      potential,
+      psi0,
+      dt: 0.005,
+      stepsPerFrame: 8,
+      isStationary: false,
+      boundary: 0,
+      barrier: { center: 0, halfWidth: p.barrierHalfWidth, height: p.barrierHeight },
+      autoplayFrames: TUNNELING_AUTOPLAY_FRAMES,
+    };
   },
 };
 

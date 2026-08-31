@@ -10,7 +10,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Gate Decomposition",
   description:
-    "Real hardware only implements a small native gate set (typically RZ and one more axis of rotation). Every other gate this platform uses decomposes into that set, verified exactly: H=Ry(π/2)Rz(π), X=Rz(π)Ry(π), Z=Rz(π), S=Rz(π/2), T=Rz(π/4), each checked to machine precision against the engine's own matrices, using the equivalence that is physically correct for a gate rather than the one a linear-algebra library would reach for by default.",
+    "Real hardware implements only a small native gate set, typically RZ and one more rotation axis. Every other gate decomposes into that set, verified to machine precision: H=Ry(π/2)Rz(π), X=Rz(π)Ry(π), Z=Rz(π), S=Rz(π/2), T=Rz(π/4), using the physically correct decomposition, not what a linear-algebra library would default to.",
   course: "compilation-and-hybrid-algorithms",
   module: "gate-decomposition",
   order: 1,
@@ -36,7 +36,7 @@ Every circuit this platform has ever built (Bell states, Grover's algorithm, <Te
 
 ## Which Gates the Device Actually Has
 
-Quantum Compilation & Transpilation settled WHICH qubits a gate can act
+Quantum Compilation & Transpilation settled *which* qubits a gate can act
 on. The prior question, the one that has to be answered before routing
 means anything, is WHAT gates a device can apply at all. Real hardware
 typically implements only a small **native
@@ -120,7 +120,7 @@ decompositions look like this:
 />
 
 Step through all five verified gates one at a time and the "how many
-native rotations does THIS gate need" question becomes concrete for
+native rotations does *this* gate need" question becomes concrete for
 every gate this platform uses, including the three the two fixed
 diagrams above leave out:
 
@@ -231,7 +231,7 @@ gives population 1 in $|1\rangle$, exactly matching $X|0\rangle=|1\rangle$.
 ## Demanding Equality Where Phase Is Free
 
 <Callout type="warning">
-**Requiring EXACT matrix equality (no phase tolerance) when checking a
+**Requiring exact matrix equality (no phase tolerance) when checking a
 decomposition.** This is too strict, and physically wrong. Global
 phase is unobservable, so a decomposition that's correct up to phase IS
 a correct decomposition, and demanding exact equality would incorrectly

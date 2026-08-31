@@ -152,7 +152,7 @@ export function PillarLessonStrip({
           <li key={row.lesson.slug} data-pillar={row.pillar}>
             <Link
               href={`/lessons/${row.lesson.slug}`}
-              className="group flex min-h-11 items-center gap-3 rounded-(--radius-tight) px-2.5 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted"
+              className="group flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 rounded-(--radius-tight) px-2.5 py-2 transition-colors duration-(--dur-fast) ease-mech hover:bg-surface-muted focus-visible:bg-surface-muted"
             >
               <span
                 aria-hidden="true"
@@ -178,10 +178,16 @@ export function PillarLessonStrip({
                   the whole string. Wrapping to a second line costs a few pixels
                   of row height; `min-h-11` already reserved most of it. */}
               <span className="flex min-w-0 flex-1 flex-col">
-                <span className="text-sm font-medium text-foreground group-hover:text-pillar-text">
+                {/* `[overflow-wrap:anywhere]`: normal wrapping already
+                    handles a multi-word title, but at 200% text zoom a
+                    single long word ("Superconducting") can alone exceed
+                    this narrow column, and with no space to wrap at it
+                    spilled past `.instrument`'s `overflow-hidden` (WCAG
+                    1.4.4) instead of breaking within itself. */}
+                <span className="text-sm font-medium text-foreground group-hover:text-pillar-text [overflow-wrap:anywhere]">
                   {row.lesson.title}
                 </span>
-                <span className="tech-label leading-snug text-subtle-foreground">
+                <span className="tech-label leading-snug text-subtle-foreground [overflow-wrap:anywhere]">
                   {/* The pillar number above is decorative; this is where the
                       pillar's name actually reaches a screen reader, and it
                       doubles as the "which of the six is this" cue for a
@@ -198,7 +204,20 @@ export function PillarLessonStrip({
                     pillar channel, so the ticks tint with the row. */}
                 <DifficultyMark difficulty={row.lesson.difficulty} className="mt-1" />
               </span>
-              <span className="shrink-0 font-tech text-micro tabular-nums text-subtle-foreground">
+              {/* `ml-auto`, not a bare `shrink-0` beside a no-wrap row: at 200%
+                  text zoom this span's own min-content width (an
+                  un-shrinkable "45 min" run) can outgrow what the row has
+                  left beside the title column, and a no-wrap flex row has no
+                  way to relieve that short of clipping it (WCAG 1.4.4). The
+                  row now carries `flex-wrap`, so this drops to its own line
+                  when it does not fit, and `ml-auto` keeps it flush right
+                  whether it shares the first line or owns a second one —
+                  same fix as the equivalent duration column in
+                  `CourseList`. Not `shrink-0` either: a `shrink-0` item stays
+                  at its own max-content width even alone on a wrapped line,
+                  so "45 min" could still be wider than the row itself at 2x
+                  zoom; `min-w-0` is what actually lets it give up width. */}
+              <span className="ml-auto min-w-0 font-tech text-micro tabular-nums text-subtle-foreground">
                 {row.lesson.estimatedMinutes} min
               </span>
             </Link>

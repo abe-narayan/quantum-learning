@@ -157,12 +157,6 @@ export function GlossaryFilter({
 
   return (
     <>
-      {filtering ? null : (
-        <div className="mb-10">
-          <GlossaryStartHere terms={startHereTerms} />
-        </div>
-      )}
-
       <div className="lg:grid lg:grid-cols-[2.75rem_1fr] lg:items-start lg:gap-10">
       {/* Persistent alphabet index, desktop: a sticky rail of real in-page
           anchors (not buttons), so it's a genuine jump-list a keyboard or
@@ -349,6 +343,33 @@ export function GlossaryFilter({
           </nav>
         </div>
 
+        {/* The reading-order tier, moved to *below* the filter bar rather
+            than above the whole grid.
+
+            Measured at 375px: the filter field sat at y=4251 on an 812px
+            screen, because these fifteen full-size cards ran ahead of it.
+            The bar is `sticky top-16` and so is meant to follow the reader
+            down a 121,000px page — but a sticky element does not exist until
+            its own position scrolls into view, so on a phone the one control
+            for finding a term was four screens down, and the page's first
+            screen offered a single forward action. A glossary's commonest
+            visit is "look up one word"; that reader should not have to scroll
+            past a reading list to reach the search field.
+
+            Nothing is demoted by the move. "Start here" is still the first
+            *content* on the page, immediately under the bar, still ahead of
+            A; and it is now inside the sticky bar's scroll context, so the
+            filter and the A-Z stay pinned above it while the reader reads it.
+
+            Still hidden while filtering: a fixed reading order is not a
+            search result, and leaving it above a filtered list would put
+            fifteen non-matching terms ahead of the matches. */}
+        {filtering ? null : (
+          <div className="mb-10 mt-6">
+            <GlossaryStartHere terms={startHereTerms} />
+          </div>
+        )}
+
         {filtered.length > 0 ? (
           <div className="mt-2">
             {/* See `ui/ListBypass.tsx` for the counted case. In short: this
@@ -531,13 +552,27 @@ export function GlossaryFilter({
                               is the entry called "Quantum Teleportation",
                               while this is the *lesson* that teaches it. The
                               visible title stays a contiguous run at the
-                              front of the name for SC 2.5.3. */}
+                              front of the name for SC 2.5.3.
+
+                              `-my-3.5 py-3.5` is the padding-cancelled-by-
+                              margin trick `PillarLessonStrip` and
+                              `simulators/page.tsx` already use: it grows the
+                              20px line box to a 44px hit area while the
+                              negative margin pulls the outer edge back to
+                              nothing, so the row this sits in (and the
+                              121,000px page) does not grow by it. These three
+                              links, not the "See also" row above, because
+                              WCAG 2.5.8's inline exception genuinely covers
+                              that one (fragments of a comma-separated
+                              sentence); these read as a row of standalone
+                              actions, the stronger case for a real target
+                              size. */}
                           {coveredIn.map((lesson) => (
                             <Link
                               key={lesson.slug}
                               href={`/lessons/${lesson.slug}`}
                               aria-label={`${lesson.title} lesson`}
-                              className="text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar"
+                              className="-my-3.5 py-3.5 text-sm text-pillar-text underline decoration-pillar-edge underline-offset-2 hover:decoration-pillar"
                             >
                               {lesson.title}
                             </Link>
@@ -571,7 +606,7 @@ export function GlossaryFilter({
                             <Link
                               href={simulatorHref(term.simulatorId)}
                               aria-label={`Try the simulator for ${term.title}`}
-                              className="text-sm text-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar"
+                              className="-my-3.5 py-3.5 text-sm text-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar"
                             >
                               Try the simulator
                             </Link>
@@ -580,7 +615,7 @@ export function GlossaryFilter({
                             <Link
                               href={`/map?concept=${term.id}`}
                               aria-label={`See how this connects on the map: ${term.title}`}
-                              className="text-sm text-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar"
+                              className="-my-3.5 py-3.5 text-sm text-foreground underline decoration-border underline-offset-2 hover:text-pillar-text hover:decoration-pillar"
                             >
                               See how this connects on the map
                             </Link>

@@ -120,7 +120,19 @@ export function QuantumStateDisplay({
             {probabilities.map((probability, index) =>
               probability > PROBABILITY_EPSILON ? (
                 <div key={index} className="flex items-center gap-3 text-sm">
-                  <span className="tech-value w-16 shrink-0 text-muted-foreground">
+                  {/* `w-16`/`w-14` keep the ket and percentage columns aligned
+                      down the list at ordinary sizes, and `[overflow-wrap:
+                      anywhere]` keeps a basis ket or a percentage — each one
+                      unbreakable run with no space to wrap at — from spilling
+                      past that box at 200% text zoom. Neither is `shrink-0`:
+                      `w-16`/`w-14` are still only the *preferred* size, and at
+                      2x zoom the two together no longer fit next to the
+                      progress bar even with wrapped text (their combined
+                      declared width alone exceeds this row's available
+                      space), so they also need to be allowed to shrink
+                      narrower than their normal width, which is what actually
+                      lets the wrap engage. */}
+                  <span className="tech-value w-16 text-muted-foreground [overflow-wrap:anywhere]">
                     |{state.basisLabel(index)}⟩
                   </span>
                   <div
@@ -132,7 +144,7 @@ export function QuantumStateDisplay({
                       style={{ width: `${probability * 100}%` }}
                     />
                   </div>
-                  <span className="tech-value w-14 shrink-0 text-right text-xs text-muted-foreground">
+                  <span className="tech-value w-14 text-right text-xs text-muted-foreground [overflow-wrap:anywhere]">
                     {Math.round(probability * 100)}%
                   </span>
                 </div>

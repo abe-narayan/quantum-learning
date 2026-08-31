@@ -31,7 +31,7 @@ export const sameAxisPerfectCorrelation: NumericProblem = {
     type: "numeric",
     value,
     tolerance: 0.01,
-    incorrectFeedback: "θ_a-θ_b = 0 whenever both angles are equal, regardless of what that shared angle actually is.",
+    incorrectFeedback: "θ_a-θ_b = 0 whenever both angles are equal, regardless of what that shared angle is.",
     nearMisses: [
       {
         value: Math.cos(theta),

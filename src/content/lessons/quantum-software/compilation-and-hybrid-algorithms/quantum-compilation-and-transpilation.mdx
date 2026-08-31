@@ -75,7 +75,7 @@ this platform's `cnotOnLinearChain` implements, using nothing
 beyond `applySwap` and `applyCNOT` (both already built and tested in
 Quantum Gates & Circuits). This platform's test suite confirms
 directly: running `cnotOnLinearChain` for control=0, target=3 on a test
-state gives EXACTLY the same final amplitudes (difference $<10^{-9}$)
+state gives *exactly* the same final amplitudes (difference $<10^{-9}$)
 as an idealized, connectivity-ignoring `applyCNOT(state, 0, 3)`. The
 SWAP network reproduces the correct logical result, at a computable,
 nonzero cost.
@@ -260,8 +260,8 @@ plus the original CNOT, a huge multiplier for a distant qubit pair.
 
 <Callout type="note">
 **Thinking SWAP-network transpilation changes what the circuit
-COMPUTES.** It doesn't. This platform's own test suite confirms the
-SWAP-network version gives EXACTLY the same result as the idealized
+computes.** It doesn't. This platform's own test suite confirms the
+SWAP-network version gives *exactly* the same result as the idealized
 direct CNOT; only the physical execution path (and cost) differs, not
 the logical outcome.
 </Callout>

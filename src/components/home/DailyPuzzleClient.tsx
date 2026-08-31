@@ -156,7 +156,12 @@ export function DailyPuzzleClient({
         <>
           <Heading className="font-display text-lg font-semibold text-foreground">{problem.title}</Heading>
           <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{problem.prompt}</p>
-          <div className="mt-4 flex items-center gap-4">
+          {/* `flex-wrap`: at 200% text zoom the two un-shrinkable columns
+              ("Difficulty" and "Time" are each one atomic word) no longer
+              both fit on one line beside each other (WCAG 1.4.4) — wrapping
+              drops "Time" to its own line instead of letting it spill past
+              `.instrument`'s `overflow-hidden`. */}
+          <div className="mt-4 flex flex-wrap items-center gap-4">
             <div className="flex flex-col gap-1">
               <TechLabel>Difficulty</TechLabel>
               <TechValue className="capitalize">{problem.difficulty}</TechValue>
@@ -192,7 +197,7 @@ export function DailyPuzzleClient({
             <br />
             <SkeletonLine className="w-5/6" />
           </p>
-          <div className="mt-4 flex items-center gap-4" aria-hidden="true">
+          <div className="mt-4 flex flex-wrap items-center gap-4" aria-hidden="true">
             <div className="flex flex-col gap-1">
               <TechLabel>Difficulty</TechLabel>
               <TechValue>

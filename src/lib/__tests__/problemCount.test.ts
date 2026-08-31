@@ -5,6 +5,8 @@ import { NAV_ITEMS, PROBLEM_COUNT_TOKEN, navDescription } from "@/lib/nav";
 import { PROBLEM_COUNT, SITE_DESCRIPTION } from "@/lib/structuredData";
 import { LESSON_METAS } from "@/lib/content/lessonMeta.generated";
 import { SIMULATOR_COUNT } from "@/components/home/siteFigures";
+import { getCoursesByPillar } from "@/lib/content/curriculum";
+import type { Pillar } from "@/lib/content/types";
 
 /**
  * ============================================================
@@ -148,6 +150,144 @@ describe("the site's problem count", () => {
       `the OpenGraph card states counts that no longer match the corpus ` +
         `(${LESSON_METAS.length} lessons, ${SIMULATOR_COUNT} simulators)`
     ).toEqual([]);
+  });
+
+  /**
+   * The three counts that are spelled out as a word rather than a numeral.
+   *
+   * `SITE_DESCRIPTION` above is pinned because it interpolates a digit, which
+   * is easy to match. These three do not: `nav.ts` says "Fourteen simulators",
+   * and `/simulators` says "Fourteen quantum simulators" in its metadata and
+   * "Fourteen live instruments" on the page. Nothing checked any of them.
+   *
+   * They are typed out for a real reason rather than through carelessness.
+   * `SIMULATOR_COUNT` derives itself by building the search index, and `nav.ts`
+   * is imported by `Navbar`, a client component in the root layout, so
+   * importing the constant there would drag `lib/search` into every page's
+   * bundle and break the client-boundary budget. The literal has to stay.
+   *
+   * What does not have to stay is the drift. A test file is under no such
+   * constraint, so it can import both and hold them together. This is the
+   * failure `CLAUDE.md` records as having already shipped once: a hand-typed
+   * 549 against a corpus of 556, rendered on every page. Adding a fifteenth
+   * simulator would otherwise leave three surfaces quietly saying Fourteen.
+   */
+  it("keeps every spelled-out simulator count in step with SIMULATOR_COUNT", () => {
+    const NUMBER_WORDS = [
+      "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+      "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+      "sixteen", "seventeen", "eighteen", "nineteen", "twenty",
+    ];
+    const expected = NUMBER_WORDS[SIMULATOR_COUNT];
+    expect(
+      expected,
+      `SIMULATOR_COUNT is ${SIMULATOR_COUNT}, outside this test's number-word ` +
+        "list. Extend NUMBER_WORDS."
+    ).toBeDefined();
+
+    // Comments are not scanned: `nav.ts` explains the arrangement in prose that
+    // names the other two literals, and matching that would be a false find.
+    const stripComments = (source: string) =>
+      source.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+
+    const surfaces = ["src/lib/nav.ts", "src/app/simulators/page.tsx"];
+    const claims: string[] = [];
+    const wrong: string[] = [];
+
+    for (const relative of surfaces) {
+      const source = stripComments(
+        readFileSync(path.join(process.cwd(), relative), "utf8")
+      );
+      const pattern = new RegExp(
+        `\\b(${NUMBER_WORDS.join("|")})\\s+(?:quantum\\s+)?(?:simulators|live instruments)\\b`,
+        "gi"
+      );
+      for (const match of source.matchAll(pattern)) {
+        claims.push(`${relative}: "${match[0]}"`);
+        if (match[1].toLowerCase() !== expected) wrong.push(`${relative}: "${match[0]}"`);
+      }
+    }
+
+    expect(
+      claims.length,
+      "found no spelled-out simulator count in nav.ts or /simulators; either " +
+        "they now interpolate the constant (in which case delete this test) or " +
+        "the matcher has rotted and is passing vacuously"
+    ).toBeGreaterThanOrEqual(3);
+
+    expect(
+      wrong,
+      `these surfaces spell a simulator count that is no longer right. ` +
+        `SIMULATOR_COUNT is ${SIMULATOR_COUNT}, so they should read "${expected}".`
+    ).toEqual([]);
+  });
+
+  /**
+   * The same failure, one tier up: spelled-out course counts for Apex and
+   * Mastery.
+   *
+   * Found by a reviewer checking the claim that "every printed figure on the
+   * homepage is derived from a registry", which was overstated. Four
+   * reader-facing sentences hand-type the number five: Apex's landing page and
+   * its hero both say "five courses", and Mastery's page and the homepage's
+   * index row both say "Five self-contained structures". All four are correct
+   * today and none of them is pinned, which is precisely the state
+   * "Fourteen simulators" was in before the test above.
+   *
+   * These are spelled out for readability rather than for a bundle constraint,
+   * so they could in principle interpolate. They read better as words, and a
+   * test costs nothing, so the words stay and the drift does not.
+   */
+  it("keeps every spelled-out course count in step with the curriculum", () => {
+    const NUMBER_WORDS = [
+      "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+      "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+      "sixteen", "seventeen", "eighteen", "nineteen", "twenty",
+    ];
+    const word = (n: number) => NUMBER_WORDS[n];
+
+    // What each sentence is counting, and which pillar answers it.
+    const CLAIMS: { file: string; phrase: string; pillar: Pillar }[] = [
+      { file: "src/app/apex/page.tsx", phrase: "courses", pillar: "apex" },
+      { file: "src/components/apex/ApexHero.tsx", phrase: "courses", pillar: "apex" },
+      {
+        file: "src/app/mastery/page.tsx",
+        phrase: "self-contained structures",
+        pillar: "quantum-mastery",
+      },
+      {
+        file: "src/components/home/SiteContents.tsx",
+        phrase: "self-contained structures",
+        pillar: "quantum-mastery",
+      },
+    ];
+
+    const stripComments = (source: string) =>
+      source.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+
+    const found: string[] = [];
+    const wrong: string[] = [];
+
+    for (const { file, phrase, pillar } of CLAIMS) {
+      const expected = word(getCoursesByPillar(pillar).length);
+      const source = stripComments(readFileSync(path.join(process.cwd(), file), "utf8"));
+      const pattern = new RegExp(`\\b(${NUMBER_WORDS.join("|")})\\s+${phrase}\\b`, "gi");
+      for (const match of source.matchAll(pattern)) {
+        found.push(`${file}: "${match[0]}"`);
+        if (match[1].toLowerCase() !== expected) {
+          wrong.push(`${file}: "${match[0]}" but ${pillar} has ${expected} courses`);
+        }
+      }
+    }
+
+    expect(
+      found.length,
+      "found no spelled-out course count in the Apex or Mastery copy; either " +
+        "it now interpolates (delete this test) or the matcher has rotted and " +
+        "is passing vacuously"
+    ).toBeGreaterThanOrEqual(CLAIMS.length);
+
+    expect(wrong, "a tier states a course count its curriculum no longer has").toEqual([]);
   });
 
   it("is what the Problems nav item renders", () => {

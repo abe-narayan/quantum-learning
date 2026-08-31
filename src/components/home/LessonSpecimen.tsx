@@ -83,16 +83,14 @@ export async function LessonSpecimen() {
   const bellState = applyCNOT(afterHadamard, 0, 1);
 
   return (
-    <div className="mt-12 border-t border-border pt-12">
+    <div className="mt-10 border-t border-border pt-10">
       <TechLabel as="p">Specimen</TechLabel>
       <SectionTitle level={3} size="md" className="mt-2">
         One section of one lesson, running here
       </SectionTitle>
       <p className="mt-3 max-w-lede text-sm leading-relaxed text-muted-foreground">
-        Not a screenshot and not a mock-up. Everything below is built from the
-        components a lesson page uses, and the two state vectors in it are
-        computed by the same engine, on this page, from the same three lines
-        the lesson itself runs.
+        Not a screenshot. Both state vectors below were computed on this page by the
+        same engine the lesson runs, in the components a lesson page uses.
       </p>
 
       {/* Deliberately **not** wrapped in an `Instrument`. `QuantumStateDisplay`
@@ -123,15 +121,6 @@ export async function LessonSpecimen() {
           estimatedMinutes={lesson.estimatedMinutes}
         />
 
-        {/* The lesson's own first learning objective, read from the registry
-            rather than paraphrased. It is what the two panels below do. */}
-        {lesson.objectives.length > 0 ? (
-          <p className="mt-5 text-sm leading-relaxed text-foreground">
-            <span className="tech-label text-subtle-foreground">Objective 01 &middot; </span>
-            {lesson.objectives[0]}
-          </p>
-        ) : null}
-
         <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
           Start from two qubits, both zero. Apply a Hadamard to the first one
           only, which puts it in an even superposition and leaves the second
@@ -148,10 +137,8 @@ export async function LessonSpecimen() {
         <QuantumStateDisplay state={bellState} label="then CNOT(0, 1)" />
 
         <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
-          Neither qubit now has a state of its own. That claim is the rest of
-          the lesson: a short proof that no pair of single-qubit states
-          multiplies out to this one, then the measurement that tells it apart
-          from two coins glued together
+          Neither qubit now has a state of its own. Proving that no pair of
+          single-qubit states multiplies out to this one is the rest of the lesson
           {problemCount > 0 ? (
             <>
               , then {problemCount} graded problems on it, marked against a real
@@ -174,9 +161,7 @@ export async function LessonSpecimen() {
         </p>
 
         <p className="mt-6 border-t border-border pt-4 text-xs leading-relaxed text-subtle-foreground">
-          Every amplitude and percentage above was computed while this page was
-          built, by the same <code>src/lib/quantum</code> engine the lesson
-          uses. Nothing in the two panels is typed in.
+          Nothing in the two panels is typed in.
         </p>
       </div>
     </div>

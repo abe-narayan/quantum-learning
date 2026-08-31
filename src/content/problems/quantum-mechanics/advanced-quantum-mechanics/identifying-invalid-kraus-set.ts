@@ -30,7 +30,7 @@ export const identifyingInvalidKrausSet: MultipleChoiceProblem = {
       c: "X is unitary (X†X=I), so this is trace-preserving.",
       d: "H is unitary (H†H=I), so this is trace-preserving.",
     },
-    defaultIncorrectFeedback: "Check K₀†K₀ for each option. Any UNITARY single operator automatically satisfies K₀†K₀=I, but a scaled, non-unitary operator generally does not.",
+    defaultIncorrectFeedback: "Check K₀†K₀ for each option. Any unitary single operator automatically satisfies K₀†K₀=I, but a scaled, non-unitary operator generally does not.",
   },
   hints: [
     { text: "A single Kraus operator K₀ is trace-preserving exactly when K₀†K₀=I, which is the definition of unitarity. So the question is which of the four fails to be unitary." },

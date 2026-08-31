@@ -55,7 +55,7 @@ export const queryLowerBoundVersusWallClockTime: ConceptualProblem = {
     partialFeedback:
       "Part of it is there. Three things have to appear together: the single quantity the theorem bounds, the exemption the model grants everything else, and the reason a bounded count of that quantity still leaves a duration undetermined on this device.",
     modelAnswers: [
-      "Theta(sqrt N) counts oracle calls and nothing else. The model charges you nothing for the computation between queries, which is exactly why one proof can cover every algorithm. On the bench that exemption is fiction: one query is ten thousand gates, so until you know the gate cost of the oracle the theorem fixes no runtime at all.",
+      "Theta(sqrt N) counts oracle calls and nothing else. The model charges you nothing for the computation between queries, which is why one proof can cover every algorithm. On the bench that exemption is fiction: one query is ten thousand gates, so until you know the gate cost of the oracle the theorem fixes no runtime at all.",
       "It bounds the number of queries. Everything else is free in the model, so the diffusion step and the compiled marking circuit cost the theorem nothing. That is why it says nothing about runtime in seconds, neither a floor nor a ceiling, until someone tells you how long one query takes.",
     ],
   },

@@ -164,26 +164,81 @@ export function Instrument({
     <Component
       {...named}
       role={nameableRole(Component, named)}
+      // `overflow-hidden` stays. It was tempting to swap it for `overflow-x-
+      // auto` sitewide (mirroring `.katex-display` in globals.css) after
+      // measuring two real 200%-zoom clips — 438px of a live readout on
+      // `/lessons/.../what-is-a-qubit` (`InteractiveSection` embedding
+      // `SuperpositionJourney`) and 40px of `BlochSphereHeroExplorer`'s own
+      // `aria-hidden -inset-10` glow bleed, both traced with
+      // `scripts/audit/tmp/overflow-culprit.mjs` and `instrument-overflow-
+      // probe.mjs`. Two things ruled that out:
+      //
+      //   1. `src/lib/design/__tests__/scrollRegions.test.ts`: a scroll
+      //      container needs a keyboard tab stop
+      //      (`tabIndex={0} role="group"/"region"`), which `.instrument`
+      //      cannot supply as a blanket default the way `compare-states-
+      //      explorer` supplies it for one specific container — the ~43
+      //      call sites cover simulators, prose blocks and static cards
+      //      alike, and a static card doesn't need a tab stop that lands on
+      //      nothing.
+      //   2. `responsive.mjs`'s overflow walker treats any ancestor
+      //      `overflow-x: auto|hidden|clip` as containment and stops
+      //      looking past it (`containedSideways`, by design — a wide table
+      //      in a `ScrollableFigure` is the fix, not the bug). `Instrument`
+      //      wraps a large share of the site's content, so making every
+      //      instance `auto` would exempt everything inside every panel
+      //      from that check, permanently, sitewide — trading one visible
+      //      defect for an invisible one.
+      //
+      // So the actual fix for the 438px case is the `min-w-0` missing on
+      // `SuperpositionJourney`'s `grid` item (`src/components/visualizations
+      // /superposition-journey/SuperpositionJourney.tsx`, out of this
+      // component's reach): without it, that item never shrinks below the
+      // KaTeX equation's unbroken min-content width, so `.katex-display`'s
+      // own `overflow-x: auto` (globals.css §6) never gets a chance to act.
+      // `overflow-hidden` here is correctly clipping a caller's layout bug,
+      // not creating one — see the report for the follow-up this needs.
       className={cn("instrument overflow-hidden", className)}
     >
       {label || readout ? (
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border px-4 py-2.5 sm:px-5">
-          {label ? <TechLabel>{label}</TechLabel> : <span />}
+          {label ? <TechLabel className="min-w-0 [overflow-wrap:anywhere]">{label}</TechLabel> : <span />}
           {/* `flex-wrap` because a readout is data. The outer row wraps the
               label and the readout onto separate lines on a narrow screen,
               which leaves this group ~256px at 320px — enough for one value,
               not always for three (a date, a difficulty ladder and a units
-              string), and a non-wrapping row would have pushed the last one
-              out through the `overflow-hidden` on `.instrument` above, where
-              it is clipped rather than scrollable and so disappears with no
-              symptom. `gap-y-1` keeps a wrapped second line tight against the
-              first instead of inheriting the 16px horizontal gap. */}
-          {readout ? <div className="flex flex-wrap items-center gap-x-4 gap-y-1">{readout}</div> : null}
+              string), and a non-wrapping row would push the last one out
+              through `.instrument`'s `overflow-hidden` above, where it is
+              clipped rather than scrollable and so disappears with no
+              symptom (`CurrentQuantumCard`'s category chip hit exactly
+              this). `flex-wrap` on this row only rearranges
+              *multiple* readout items across lines; a single readout that is
+              itself one unbreakable run still needs somewhere to shrink,
+              which is what `min-w-0 [overflow-wrap:anywhere]` on both this
+              wrapper and the label above gives it — `anywhere`, not
+              `break-words`, because only `anywhere` is counted when the
+              browser computes a flex item's min-content size, which is what
+              its default `min-width: auto` resolves to (same reasoning
+              `CurrentQuantumCard` and `TheoremBox` already carry). A reading
+              this can't reach: content that is not text at all (a canvas, a
+              wide non-wrapping KaTeX formula, a grid that never got a
+              `min-w-0` of its own upstream) has nothing for `overflow-wrap`
+              to act on and still clips here — that is a caller-side layout
+              bug this wrapper cannot fix from outside, not a reason to make
+              this container itself a scroll region (see the note on
+              `overflow-hidden` above for why not). `gap-y-1` keeps a wrapped
+              second line tight against the first instead of inheriting the
+              16px horizontal gap. */}
+          {readout ? (
+            <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1 [overflow-wrap:anywhere]">
+              {readout}
+            </div>
+          ) : null}
         </div>
       ) : null}
       <div className={cn("p-4 sm:p-5", bodyClassName)}>{children}</div>
       {footnote ? (
-        <div className="border-t border-border px-4 py-2.5 text-xs text-subtle-foreground sm:px-5">
+        <div className="border-t border-border px-4 py-2.5 text-xs text-subtle-foreground [overflow-wrap:anywhere] sm:px-5">
           {footnote}
         </div>
       ) : null}

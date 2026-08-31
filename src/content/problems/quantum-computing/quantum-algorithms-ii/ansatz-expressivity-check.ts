@@ -43,7 +43,7 @@ export const ansatzExpressivityCheck: MultipleChoiceProblem = {
   },
   explanation: {
     correctIdea: "Expressivity of an ansatz asks whether it can reach the state you need. For one qubit, two real parameters are enough.",
-    whyCorrect: "This is exactly why the lesson's VQE tests can guarantee convergence to the true E₀, not merely an approximation.",
+    whyCorrect: "This is why the lesson's VQE tests can guarantee convergence to the true E₀, not merely an approximation.",
     whyWrong: [
       { optionId: "b", text: "Ry and Rz do not commute in general, so the order still matters for which state a given (θ, φ) produces." },
       { optionId: "c", text: "Different Hamiltonians generally have different ground states. The ansatz's job is to reach whichever one is needed." },

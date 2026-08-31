@@ -393,15 +393,36 @@ function SimulatorMount({ id, children }: { id: string; children: ReactNode }) {
   return (
     <div data-pillar={sim.pillar} id={id} className="scroll-mt-24">
       <Eyebrow className="text-pillar">
-        <Link href={visual.route} className="hover:underline focus-visible:underline">
+        {/* `inline-block py-3.5 -my-3.5`: this is a standalone link, not one
+            inside a sentence, so WCAG 2.5.8's inline-text exception does not
+            cover it, and at the eyebrow's own type it painted a 77x17 target,
+            the smallest on the whole route and repeated fourteen times. The
+            eyebrow's line box is 17px, so 14px of padding each side is what
+            clears 44 (`py-3` measured 41), and the equal negative margin gives
+            the margin box its original height back so nothing below it moves:
+            these fourteen headers already cost 211-287px each at 375px and
+            every one of those pixels is above the instrument. Verified at
+            77x45 by `responsive.mjs`, which measures the expanded hit area
+            rather than trusting the class name. */}
+        <Link
+          href={visual.route}
+          className="inline-block -my-3.5 py-3.5 hover:underline focus-visible:underline"
+        >
           {visual.short}
         </Link>
       </Eyebrow>
       <SectionTitle level={3} size="sm" className="mt-1">
         {sim.label}
       </SectionTitle>
-      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{sim.physics}</p>
-      <p className="mt-1 max-w-2xl text-sm text-pillar-text">{sim.why}</p>
+      {/* `sim.physics` is deliberately not repeated here. It already ran once,
+          verbatim, on the bench-directory card (`SimulatorNav` above) that the
+          reader just tapped to land on this exact instrument, and reprinting
+          it cost 60-70px directly above the instrument on every one of these
+          thirteen mounts at 375px, the single biggest one-line saving
+          available anywhere in this header. `sim.why`, the reason to actually
+          open it rather than what it demonstrates, is not said anywhere else
+          on the page and stays. */}
+      <p className="mt-2 max-w-2xl text-sm text-pillar-text">{sim.why}</p>
       <p className="mt-3 max-w-2xl text-xs text-subtle-foreground">
         <span className="font-medium text-muted-foreground">{level.label}.</span> {level.blurb}
         {sim.lesson ? (

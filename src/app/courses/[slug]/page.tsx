@@ -391,7 +391,17 @@ export default async function CoursePage({ params }: CoursePageProps) {
                       className="-mx-2 flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-(--radius-tight) px-2 py-2.5 transition-colors hover:bg-surface-muted"
                     >
                       <span className="text-sm font-medium text-foreground">{prereq.title}</span>
-                      <span className="flex shrink-0 items-center gap-3">
+                      {/* Not `shrink-0`: at 200% text zoom `DifficultyMark` plus
+                          `PrerequisiteStatus` refused to shrink at all and
+                          measured 511px of un-shrinkable flex item against a
+                          277px row (WCAG 1.4.4) — the same shape of bug the
+                          "Also needs …" row below fixes with `min-w-0`, and
+                          the same fix here: `min-w-0` lets the group (and, via
+                          their own default `flex-shrink`, its two children)
+                          actually give up width, and `flex-wrap` lets it drop
+                          to its own line when the row (already `flex-wrap`)
+                          has none left beside the title. */}
+                      <span className="flex min-w-0 flex-wrap items-center gap-3">
                         <DifficultyMark difficulty={prereq.difficulty} />
                         <PrerequisiteStatus lessonSlugs={lessonSlugs} />
                       </span>
@@ -423,9 +433,34 @@ export default async function CoursePage({ params }: CoursePageProps) {
             >
               {register.length > 0 ? (
                 <>
+                  {/* "By the end of this course", not "From the first lesson
+                      on", which is what this said and which was false on the
+                      one page it mattered most.
+
+                      `technicalRegister` reads the title, description and
+                      objectives of EVERY lesson in the course and joins them,
+                      so the chips describe the course as a whole. The old
+                      sentence made that a claim about lesson 1. On
+                      /courses/qubits-and-quantum-states, the door the homepage
+                      sends "I have never studied quantum physics" through,
+                      four of the five chips were false of lesson 1: it lists
+                      COMPLEX NUMBERS while `what-is-a-qubit` says in as many
+                      words that "every calculation in this lesson works if you
+                      treat alpha and beta as ordinary numbers" and that the
+                      complex case is built from scratch in the next lesson,
+                      and it lists READING AND WRITING PROOFS, which that
+                      lesson's objectives never mention. It happened to be true
+                      on /courses/mathematical-foundations, which is why it
+                      survived.
+
+                      This is the failure CLAUDE.md records for the entry bar,
+                      six wordings of one claim with two of them false, reached
+                      again by a sentence that is not built from `entryBar.ts`
+                      and so is not covered by `entryBar.test.ts`. The wording
+                      now says what the data actually supports. */}
                   <p className="text-sm leading-relaxed text-foreground">
                     {prerequisiteRows.length === 0
-                      ? "“No prerequisites” is not the same as “no background.” From the first lesson on, you will be reading and writing in this vocabulary:"
+                      ? "“No prerequisites” is not the same as “no background.” By the end of this course you will be reading and writing in this vocabulary:"
                       : "You will be reading and writing in this vocabulary throughout:"}
                   </p>
                   <ul className="mt-3 flex flex-wrap gap-1.5">
@@ -581,7 +616,18 @@ export default async function CoursePage({ params }: CoursePageProps) {
                               {module.title}
                             </span>
                           </span>
-                          <span className="flex shrink-0 flex-wrap items-center gap-3">
+                          {/* `min-w-0`, not `shrink-0`: paired with `flex-wrap`
+                              alone, `shrink-0` never actually lets this group
+                              wrap, because a `shrink-0` item takes its
+                              max-content (single-line) size regardless of
+                              available room, so the wrap it declares never
+                              gets a reason to engage — the group just sits at
+                              its natural width and spills past the row (WCAG
+                              1.4.4) at 200% text zoom instead. `min-w-0` lets
+                              the outer row's own `flex-wrap` actually
+                              constrain this group, which is what lets it wrap
+                              internally. */}
+                          <span className="flex min-w-0 flex-wrap items-center gap-3">
                             <DifficultyMark difficulty={lesson.difficulty} />
                             <span className="font-tech text-xs text-subtle-foreground">
                               {lesson.estimatedMinutes} min
@@ -718,7 +764,11 @@ export default async function CoursePage({ params }: CoursePageProps) {
                           {getPillar(candidate.pillar)?.title ?? candidate.pillar}
                         </span>
                       </span>
-                      <span className="flex shrink-0 items-center gap-3">
+                      {/* `min-w-0 flex-wrap`, not `shrink-0`: same fix as the
+                          Prerequisites row above, for the same reason — a
+                          rigid group beside title text that wraps is exactly
+                          the shape that clips at 200% zoom. */}
+                      <span className="flex min-w-0 flex-wrap items-center gap-3">
                         <DifficultyMark difficulty={candidate.difficulty} />
                         <span className="font-tech text-xs text-subtle-foreground">
                           {candidate.estimatedHours}h
@@ -732,30 +782,33 @@ export default async function CoursePage({ params }: CoursePageProps) {
           </Reveal>
         ) : null}
 
-        {/* Last resort, and it has to exist: if the graph ever grows a course
-            with no reverse edge and nothing newly open behind it, this page
-            still ends on a named destination rather than a full stop. */}
-        {dependentRows.length === 0 && !showNowOpen ? (
-          <Reveal delay={100} className="mt-5">
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              The whole track is on{" "}
-              <Link
-                href={trackPath(course.pillar)}
-                className="text-pillar-text underline decoration-border-strong underline-offset-2 hover:decoration-pillar-edge"
-              >
-                {pillarInfo?.title ?? "its track page"}
-              </Link>
-              , and every course on the site is on the{" "}
-              <Link
-                href="/learn"
-                className="text-pillar-text underline decoration-border-strong underline-offset-2 hover:decoration-pillar-edge"
-              >
-                curriculum overview
-              </Link>
-              .
-            </p>
-          </Reveal>
-        ) : null}
+        {/* Unconditional, and it used to fire only for a course with no
+            reverse edge and nothing newly open behind it. That covered the
+            dead-end case and left the common one short: a course whose
+            forward edges are all blocked ends on a list of things the reader
+            cannot open yet, and even a course with a clean next step has no
+            answer to "what else is there?" anywhere on the page below the
+            breadcrumb. Two links at the end of a course page cost one line
+            and are the only sideways move it offers. */}
+        <Reveal delay={100} className="mt-5">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            The whole track is on{" "}
+            <Link
+              href={trackPath(course.pillar)}
+              className="text-pillar-text underline decoration-border-strong underline-offset-2 hover:decoration-pillar-edge"
+            >
+              {pillarInfo?.title ?? "its track page"}
+            </Link>
+            , and every course on the site is on the{" "}
+            <Link
+              href="/learn"
+              className="text-pillar-text underline decoration-border-strong underline-offset-2 hover:decoration-pillar-edge"
+            >
+              curriculum overview
+            </Link>
+            .
+          </p>
+        </Reveal>
       </Section>
     </PillarScope>
   );

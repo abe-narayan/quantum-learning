@@ -53,8 +53,16 @@ need a number, re-derive it or cite the module that owns it.
 
 **Reader-facing prose contains no em dashes.** That covers lesson MDX,
 problem content and UI strings, and it is enforced by
-`src/lib/content/__tests__/readerFacingDashes.test.ts` over all of
-`src/content` plus every `.tsx` outside tests. En dashes are correct
+`src/lib/content/__tests__/readerFacingDashes.test.ts` over three scopes: all
+of `src/content`, every `.tsx` outside tests with comments stripped, and every
+`.ts` outside tests **inside string literals only**. That last restriction is
+what makes the `.ts` half possible: a regex literal is not a string literal, so
+the validators' deliberate `[.;:!?\n—]` character classes are excluded by
+construction rather than by an allowlist that would rot. A further check covers
+the same character written so the file does not contain it: a `\u2014` escape,
+an HTML entity, or a `fromCharCode`. The rule already bans three other dash
+codepoints so it cannot be met by swapping the character, and one that can be
+met by swapping the encoding is exactly as hollow. En dashes are correct
 typography and are left alone: the corpus uses about 111 of them, for name
 pairs (Cauchy-Schwarz), page ranges and axis pairs.
 
@@ -66,9 +74,11 @@ you check a layout, measure `scrollWidth` against `clientWidth` on the
 element, not `documentElement.scrollWidth` against the viewport.
 
 **Audits that need a rendered page live in `scripts/audit/`.** A
-dependency-free CDP client plus harnesses for responsive layout, accessibility
-(real key events and Chrome's computed accessibility tree), background
-loudness, and peak build memory. Use them rather than reasoning about layout
-from source, and read the "why this exists" header of any one you extend:
-four bugs in those harnesses came from substituting a proxy for what the
-browser actually does.
+dependency-free CDP client plus harnesses for orientation (what a first-time
+visitor can act on without scrolling), responsive layout, accessibility (real
+key events and Chrome's computed accessibility tree), background loudness, and
+peak build memory. Use them rather than reasoning about layout from source, and
+read the "why this exists" header of any one you extend: every bug found in
+those harnesses so far came from substituting a proxy for what the browser
+actually does, and the worst of them made a crashed page measure as a clean
+one.

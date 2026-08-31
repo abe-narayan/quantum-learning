@@ -15,7 +15,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Quantum SDKs Overview",
   description:
-    "Qiskit, Cirq, and PennyLane look different on the surface but share the same core structure this platform's QuantumCircuit already demonstrates: build a circuit as data, target a backend (simulator or hardware), and read results back, with framework-specific differences mostly in ergonomics and target ecosystem, not fundamental capability.",
+    "Qiskit, Cirq, and PennyLane look different on the surface but share the same core structure: build a circuit as data, target a backend, simulator or hardware, and read results back, with framework-specific differences mostly in ergonomics and target ecosystem, not fundamental capability.",
   course: "programming-quantum-computers",
   module: "quantum-sdks-overview",
   order: 1,
@@ -97,7 +97,7 @@ PennyLane are three different skins over the same three boxes:
 ### How this looks in real Qiskit
 
 This platform's `QuantumCircuit` is deliberately minimal, so it's worth
-seeing what the SAME Bell-state circuit built above (`h(0).cnot(0,1)`)
+seeing what the *same* Bell-state circuit built above (`h(0).cnot(0,1)`)
 looks like in each of the three SDKs this lesson surveys.
 First, Qiskit, IBM's SDK, using only the small, stable core of its API
 (circuit construction and gates, not a specific execution/backend
@@ -188,7 +188,7 @@ Quantum Systems' noise-simulation lesson), or real hardware
 or care which backend it's targeting: that separation of concerns is
 the whole point.
 
-The SAME Bell circuit (`h(0).cnot(0,1)`), run against two different
+The *same* Bell circuit (`h(0).cnot(0,1)`), run against two different
 backends this platform's own engine implements, makes this
 concrete: an exact backend returns the ideal amplitudes directly; a
 shot-sampled backend, standing in for what any real or noisy backend
@@ -472,7 +472,7 @@ compilation, and much more).
   build-target-read structure.
 - This platform's `QuantumCircuit` illustrates that same structure in
   simplified form, not a production-grade SDK.
-- A "backend" abstracts over WHICH execution engine (simulator or
+- A "backend" abstracts over *which* execution engine (simulator or
   hardware) runs a circuit, letting the same circuit code target very
   different systems.
 

@@ -135,8 +135,8 @@ phase state):
 ### Deriving the pre-measurement state
 
 After the Hadamards, the precision register is
-$\frac{1}{\sqrt{2^t}}\sum_{x=0}^{2^t-1}|x\rangle$, with $x$'s bits exactly
-the precision qubits. Each controlled-$U^{2^{t-1-q}}$, conditioned on
+$\frac{1}{\sqrt{2^t}}\sum_{x=0}^{2^t-1}|x\rangle$, with $x$'s bits the
+precision qubits. Each controlled-$U^{2^{t-1-q}}$, conditioned on
 precision qubit $q$ being $1$, multiplies the eigenstate by
 $e^{2\pi i\varphi\cdot2^{t-1-q}}$ (since $|\psi\rangle$ is a $U$-eigenstate,
 applying $U^{2^{t-1-q}}$ just raises the eigenvalue to that power). Summing
@@ -200,7 +200,7 @@ register measures $|011\rangle=|3\rangle$ with certainty. Directly from the
 engine: `phaseEstimation` with this $U$, eigenstate, and $t=3$ gives
 probability $1.0$ (to 6 decimal places) on the combined index
 corresponding to precision register $=3$, eigenstate qubit $=1$. That is
-the derived value exactly, to the last decimal place the engine reports.
+the derived value, to the last decimal place the engine reports.
 
 <BarChart
   bars={[0, 1, 2, 3, 4, 5, 6, 7].map((x) => ({
@@ -435,7 +435,7 @@ single one worked out by hand.
    one $\varphi_j$, chosen at random with probability $|c_j|^2$, and
    collapses the target onto the matching $|u_j\rangle$.
 
-   That is exactly Shor's arrangement, and it is why the subroutine is
+   That is Shor's arrangement, and it is why the subroutine is
    usable at all there. Nobody can prepare an eigenstate of modular
    multiplication by $a$ without already knowing the period, which is the
    thing being computed. What Shor does instead is feed in $|1\rangle$,
@@ -480,6 +480,6 @@ hand-waves.
 Later, in the Quantum Mastery track, [Phase Estimation Precision and QFT
 Depth](/lessons/quantum-mastery/advanced-algorithms-and-complexity/phase-estimation-precision-and-qft-depth)
 extends this lesson's exact-phase-only treatment to phases that aren't
-exactly representable in any finite register, deriving the resulting
-precision/error tradeoff exactly.
+exactly representable in any finite register, and derives the resulting
+precision/error tradeoff.
 </NextDiscovery>

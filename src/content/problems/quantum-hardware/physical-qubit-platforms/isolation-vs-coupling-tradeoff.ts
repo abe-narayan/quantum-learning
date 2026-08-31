@@ -34,7 +34,7 @@ export const isolationVsCouplingTradeoff: ConceptualProblem = {
     incorrectFeedback: "The two halves are the same fact seen twice, and the answer has to say so. Name the property of a trapped ion's energy levels that keeps the environment from reaching them, then point out that a gate drive is also part of the environment. Whatever makes the first true makes the second hard, and the answer should say what that costs in gate duration.",
     partialFeedback: "Good. Now make the causal link explicit rather than listing the two facts side by side: say why the very thing that protects the qubit is what forces the gate mechanism to be feeble and to take as long as it does.",
     modelAnswers: [
-      "Trapped ions are extremely well isolated: the qubit lives in atomic levels that the environment barely touches, which is exactly why coherence times are so long. But the same isolation means external fields couple to them weakly, so gates have to be laser-driven and end up slow, in the microseconds.",
+      "Trapped ions are extremely well isolated: the qubit lives in atomic levels that the environment barely touches, which is why coherence times are so long. But the same isolation means external fields couple to them weakly, so gates have to be laser-driven and end up slow, in the microseconds.",
       "You cannot have it both ways. Good isolation from noise is also isolation from your control fields, so the coupling is weak and gates take microseconds rather than nanoseconds.",
     ],
   },

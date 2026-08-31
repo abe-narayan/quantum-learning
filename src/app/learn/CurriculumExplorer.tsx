@@ -102,7 +102,13 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
 
   return (
     <div>
-      <div className="instrument overflow-hidden">
+      {/* `id` so each track section below can offer a way back to this
+          instrument. The catalog is tens of thousands of pixels tall on a
+          phone (26,959px at 375px after this sprint's course-card fold, down
+          from 38,397px), and until now the jump nav was a one-way door: a
+          reader who took it into Apex had 22,000px of scrolling between them
+          and the only control that moves between tracks. */}
+      <div id="tracks" className="instrument overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-2.5 sm:px-5">
           <span className="tech-label">Scan the curriculum</span>
           {/* `aria-live` so a filter change is *announced*, not left as a
@@ -378,6 +384,34 @@ export function CurriculumExplorer({ lessons }: { lessons: LessonMetaWithSlug[] 
                   </p>
                 )}
               </div>
+
+              {/* The way back out of a track, at the end of the track. Six of
+                  these render, so the accessible name carries which track it
+                  is leaving — otherwise a screen reader's link list is six
+                  entries reading "Back to all six tracks". The visible label
+                  stays a contiguous run at the front of that name (WCAG 2.5.3
+                  Label in Name), the same construction the "Full track page"
+                  link above uses.
+
+                  `inline-flex min-h-11 items-center`, not the `-my-3 py-3`
+                  the "Full track page" link uses: that recipe exists to keep
+                  a link on a shared baseline with a heading beside it, and
+                  buys only 24px of padding around a 13px `.tech-label` line
+                  box — 37px, which `responsive.mjs` correctly flagged. This
+                  link sits alone on its own line, so it can simply be 44px
+                  tall, the same way every breadcrumb crumb is. */}
+              <p className="mt-8">
+                <a
+                  href="#tracks"
+                  aria-label={`Back to all ${PILLARS.length} tracks: from ${pillar.title}`}
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-(--radius-tight) tech-label text-subtle-foreground transition-colors duration-(--dur-fast) hover:text-pillar-text"
+                >
+                  <span aria-hidden="true" data-decorative="">
+                    ↑
+                  </span>
+                  Back to all {PILLARS.length} tracks
+                </a>
+              </p>
             </section>
           );
         })}

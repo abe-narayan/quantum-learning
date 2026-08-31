@@ -74,10 +74,16 @@ export async function CurriculumStrip() {
             way it does. Six different wordings of this claim existed across
             the site once, two of them false, so anything that restates it in
             its own words is somewhere it can drift out of true again. */}
+        {/* The last clause is the one sentence `ExploreSection` existed to
+            say ("the order is a recommendation, not a gate"), moved to the
+            place that actually shows the order. It was the heading of a
+            section nine thousand pixels down, where a reader who had already
+            decided the ladder was a gate would never reach it. */}
         <p className="max-w-xl text-sm text-muted-foreground">
           Six tracks, each a stack of courses, and every lesson, problem and simulator on the site
           belongs to one of them. Foundational assumes {ENTRY_BAR_MATH}. Master assumes the five
-          tracks above it.
+          tracks above it. Nothing is locked, so this order is a recommendation rather than a
+          gate: if a track two rungs above you looks interesting, open it.
         </p>
       </div>
 

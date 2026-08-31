@@ -194,17 +194,37 @@
      number per theme rather than a second per-regime table: on paper the
      darkest mark is the same dim ink everywhere.
 
-     0.3 is low, and the reason is worth knowing before anyone raises it: on
-     paper `--subtle-foreground` (#656e7e) starts at **4.98:1** against
-     `--depth-0`, which is 0.48 of margin over the AA floor before anything
-     is drawn behind it at all. Almost any texture spends that. The
-     alternative was darkening the token, and it is not available: the next
-     step down collides with `--muted-foreground` (#566072), and
-     `contrast.test.ts` holds those two apart on purpose, because a contrast
-     fix that pushes one voice onto the other passes AA individually while
-     silently collapsing the hierarchy. So the field yields instead. That
-     also happens to be right for the theme: this is the notebook, and a
-     printed page does not glow.
+     This token was 0.3 for one day, and the note here defended it: on paper
+     `--subtle-foreground` was #656e7e, which starts at **4.98:1** against
+     `--depth-0` — 0.48 of margin over the AA floor before anything is drawn
+     behind it at all. Almost any texture spends that, so the field yielded
+     until its peak alpha was 11/255 and paper had no atmosphere left. The
+     note then ruled out the obvious fix, darkening the token, on the grounds
+     that one step down collides with `--muted-foreground` (#566072), which
+     `contrast.test.ts` holds apart on purpose because a contrast fix that
+     pushes one voice onto the other passes AA individually while silently
+     collapsing the hierarchy.
+
+     That last step is where it went wrong, and the correction is what the
+     current numbers are made of. The collision is real, and the answer to it
+     is to move **both** voices, not to abandon the fix: `--subtle-foreground`
+     is #5d6678 and `--muted-foreground` #505867, which holds their separation
+     at 1.24:1 (it was 1.23:1) while `--foreground` stays a clear 2.66:1 above
+     the pair. Every ratio in the light theme improved. What the change buys
+     the field is the whole point of it: `--subtle-foreground` now starts at
+     5.59:1, so the ground may fall to luminance 0.764 rather than 0.869, and
+     the room the field has to work in on paper goes from 0.10 to 0.20 — from
+     4.0 to 8.5 points of CIE L*, which is where the dark theme has always
+     been (its peak sits about 10.8 L* off its ground). WCAG's ratio is far
+     stingier near white than near black, which is why paper needs twice the
+     luminance room to look the same amount alive.
+
+     0.62 spends about four fifths of that: measured over 70 frames at three
+     scroll positions per regime, the worst voice on the worst pixel of any
+     regime is 4.71:1, against 4.56:1 in dark. Paper is now the safer of the
+     two themes, not the emptier one. Raising it further is possible and not
+     free — at 0.75 the same measurement lands on 4.51:1, which is inside the
+     sampling noise of a moving image.
 
      Dark is 1 because `REGIME_COMPOSITE_CEILING` in regimes.ts is already
      tuned against the dark ground. */
@@ -470,8 +490,15 @@
     --surface-muted: var(--depth-2);
     --surface-raised: var(--depth-3);
 
-    --muted-foreground: #566072;
-    --subtle-foreground: #656e7e;
+    /* Both secondary voices sit one step darker than the values this theme
+       shipped with (#566072 / #656e7e). See the note on the pair in section 1;
+       the short version is that `--subtle-foreground` at 4.98:1 left the
+       background environment 0.10 of luminance to work in on paper, which is
+       not enough to see, and the pair had to move together or the hierarchy
+       between them would have collapsed. Must stay verbatim-identical to the
+       explicit light block. */
+    --muted-foreground: #505867;
+    --subtle-foreground: #5d6678;
 
     --border: #d7dbe4;
     --border-strong: #b3bbca;
@@ -511,10 +538,12 @@
     --pillar-edge-alpha: 0.4;
     --pillar-glow-alpha: 0.1;
     --atmosphere-strength: 0.55;
-    /* See --field-strength in section 1: paper has about a twentieth of
-       the dark ground's luminance headroom before the field takes
-       --subtle-foreground under AA. Measured, not chosen. */
-    --field-strength: 0.3;
+    /* See --field-strength in section 1: paper has roughly a fifth of the
+       dark ground's luminance headroom before the field takes
+       --subtle-foreground under AA, and this spends about four fifths of it.
+       Measured, not chosen. Must stay verbatim-identical to the explicit
+       light block. */
+    --field-strength: 0.62;
   }
 
   /* Apex in light mode: still the most severe pillar, but expressed as a
@@ -569,8 +598,10 @@
   --surface-muted: var(--depth-2);
   --surface-raised: var(--depth-3);
 
-  --muted-foreground: #566072;
-  --subtle-foreground: #656e7e;
+  /* Verbatim-identical to the system-light block above; see the note there
+     and the fuller one on --field-strength in section 1. */
+  --muted-foreground: #505867;
+  --subtle-foreground: #5d6678;
 
   --border: #d7dbe4;
   --border-strong: #b3bbca;
@@ -611,7 +642,7 @@
   --atmosphere-strength: 0.55;
   /* Verbatim-identical to the system-light block above, as the whole light
      ramp must be. */
-  --field-strength: 0.3;
+  --field-strength: 0.62;
 }
 
 :root[data-theme="light"] [data-pillar="apex"] {
@@ -866,6 +897,51 @@ body {
 .katex-display:focus-visible {
   outline: none;
   box-shadow: inset 0 0 0 2px var(--pillar-accent);
+}
+
+/* A blanket "make every inline .katex a scrollable inline-block" rule was
+   tried here and reverted. It fixed the 12 confirmed horizontal overflows
+   (see the lesson-content fixes for those instead), but `overflow-x: auto`
+   forces `overflow-y` to a non-visible value too (CSS Overflow's "one axis
+   non-visible forces the other out of visible" rule), and KaTeX's own
+   internal layout — a radical's overbar, a stacked fraction, `\sqrt` in
+   general — deliberately extends outside its own box using absolute
+   offsets that rely on that overflow staying visible. `overflow-y: hidden`
+   clipped those glyphs on lessons far outside the 10 files that motivated
+   the rule (`what-is-a-qubit`'s `$i=\sqrt{-1}$` among them), a WCAG 1.4.4
+   content-loss regression measured with `scripts/audit/a11y.mjs --checks
+   resize`, worse than the silent-clip bug it was fixing. There is no safe
+   universal vertical padding for this: the clip amount depends on each
+   formula's own tallest glyph, and KaTeX explicitly does not support
+   restricting overflow on `.katex` for exactly this reason. Fixed at the
+   content layer instead: the confirmed overflowing formulas were reworded
+   (a flat comma-separated list split into several short `$...$` terms, a
+   `\texttt` identifier moved out of math) or, where the formula was real
+   derivation content that cannot be reworded losslessly, promoted to
+   `$$...$$` display math, which already has a correct, padded scroll
+   treatment above. */
+
+/* An inline code token in lesson prose (an identifier, a function call like
+   `optimalGroverIterations(6)`) has no space in it for the browser's default
+   line-break algorithm to use, so it does not wrap on its own the way a
+   sentence does: it just keeps its own full width and pushes past the
+   reading column. At 320px this is invisible in the normal sense, because
+   `body` carries `overflow-x: clip` (see CLAUDE.md and
+   docs/DESIGN_SYSTEM.md): there is no scrollbar and no ragged edge, the
+   token's tail is simply gone. Measured across the corpus: 510 inline code
+   spans longer than 22 characters, in 152 of 219 lesson files, so this is one
+   styling rule to fix, not hundreds of call sites to rewrap by hand.
+   `overflow-wrap: anywhere` lets a long token break at any character once it
+   has no better option, rather than only at existing soft-wrap points (which
+   is what `break-word` restricts itself to, and a single-token span has
+   none). Scoped to `:not(pre code)`: a fenced code block's `<code>` inside
+   `<pre>` already gets its own horizontal scrollbar from the typography
+   plugin, and turning that into wrapped text would defeat indentation.
+   Unlayered, matching `.katex-display` above and for the same reason: it has
+   to beat the typography plugin's own unlayered `code` rule, which sets no
+   wrapping behavior at all. */
+.prose :where(code):not(:where(pre code)) {
+  overflow-wrap: anywhere;
 }
 
 /* ----------------------------------------------------------------------------

@@ -116,7 +116,7 @@ export function MechanicsSection() {
             entry for a reader who wants more. Every later appearance on the
             page can then stand unglossed. See docs/BEGINNER_REVIEW.md
             blocker 3. */}
-        <Reveal delay={60} className="mt-8 border-l-2 border-pillar-edge pl-4">
+        <Reveal delay={60} className="mt-6 border-l-2 border-pillar-edge pl-4">
           <TechLabel>Notation</TechLabel>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
             <span className="font-tech text-foreground">|0⟩</span>, spoken &ldquo;ket
@@ -132,7 +132,7 @@ export function MechanicsSection() {
           </p>
         </Reveal>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2">
           {PHENOMENA.map((phenomenon, index) => {
             const Glyph = phenomenon.Glyph;
             return (

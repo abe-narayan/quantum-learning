@@ -249,8 +249,8 @@ export function TableOfContentsDesktop({ containerId }: { containerId: string })
 
 /**
  * Mobile/tablet collapsible toggle, meant to sit just below the lesson
- * header. Two changes from a plain disclosure make this "genuinely usable
- * on a phone" rather than a shrunk desktop control:
+ * header, beside `LessonObjectives`. Two changes from a plain disclosure make
+ * this "genuinely usable on a phone" rather than a shrunk desktop control:
  *
  * 1. The closed trigger names the *current* section (falling back to a
  *    section count when nothing is active yet), so a reader glancing at it
@@ -261,8 +261,29 @@ export function TableOfContentsDesktop({ containerId }: { containerId: string })
  *    contract `Navbar`'s `TracksDropdown` implements — instead of only via
  *    a second tap on the trigger, which is easy to miss on a touchscreen
  *    once the list has scrolled the trigger off-screen.
+ *
+ * The trigger is one line, not two. Label above value is display scale for
+ * two facts that fit on one baseline, and it cost 27px of the band between
+ * the lesson title and its first teaching sentence on every lesson in the
+ * corpus — the same trade `LessonInstrumentLine` already made when it
+ * collapsed three stacked readouts into one instrument row. Nothing is
+ * dropped: the section number, the total and the current section's title are
+ * all still printed, and the title `truncate`s rather than wrapping so the
+ * row's height cannot depend on how long a heading happens to be.
+ *
+ * `className` rather than a fixed `mt-8 max-w-reading`: `LessonLayout` now
+ * places this inside the header stack, directly under the objectives
+ * disclosure, and that stack owns the measure and the rhythm. `lg:hidden`
+ * stays here — that is this component's own identity, not its caller's
+ * business.
  */
-export function TableOfContentsMobile({ containerId }: { containerId: string }) {
+export function TableOfContentsMobile({
+  containerId,
+  className,
+}: {
+  containerId: string;
+  className?: string;
+}) {
   const { entries, activeId, hasEnoughHeadings } = useTocEntries(containerId);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -300,12 +321,7 @@ export function TableOfContentsMobile({ containerId }: { containerId: string }) 
   return (
     <div
       ref={containerRef}
-      // `max-w-reading`, the lesson page's reading measure, not `max-w-3xl`
-      // (48rem): this sits directly between the pre-content stack and the
-      // prose column, both of which are 46rem, so the extra 32px put the
-      // contents toggle's right edge outside both of its neighbours at every
-      // viewport between `sm` and `lg`. See LessonMetaStrip.tsx.
-      className="mt-8 max-w-reading lg:hidden"
+      className={cn("lg:hidden", className)}
       onBlur={(event) => {
         if (!containerRef.current?.contains(event.relatedTarget as Node | null)) {
           setIsOpen(false);
@@ -332,13 +348,31 @@ export function TableOfContentsMobile({ containerId }: { containerId: string }) 
         // printing on every lesson. An attribute that exists for styling
         // should not be one whose presence depends on runtime state.
         data-toc-toggle=""
-        className="flex w-full min-h-11 items-center justify-between gap-3 rounded-panel border border-border bg-surface-muted/60 px-4 py-3 text-left text-sm transition-colors hover:bg-surface-muted"
+        className="flex w-full min-h-11 items-center justify-between gap-3 rounded-panel border border-border bg-surface-muted/60 px-4 py-2.5 text-left text-sm transition-colors hover:bg-surface-muted"
       >
-        <span className="flex min-w-0 flex-col">
-          <span className="tech-label text-subtle-foreground">
-            {activeIndex >= 0 ? `Section ${activeIndex + 1} of ${entries.length}` : "Contents"}
+        <span className="flex min-w-0 items-baseline gap-2.5">
+          <span className="shrink-0 tech-label text-subtle-foreground">
+            {activeIndex >= 0 ? `Section ${activeIndex + 1} / ${entries.length}` : "Contents"}
           </span>
-          <span className="mt-1 truncate font-medium text-foreground">{currentLabel}</span>
+          {/* Truncate a section title, never the fallback count.
+              A section title that gets clipped here costs the reader nothing:
+              the same words are the heading in the page below and a row in
+              the panel this button opens, one tap away. "N sections" is not
+              duplicated anywhere, so clipping it loses the only copy. At 200%
+              text zoom (WCAG 1.4.4) it did exactly that, measured on the Apex
+              lesson: 131px of content in a 39px box, because the `shrink-0`
+              span beside it doubles too and takes the row. The count is short
+              enough to sit next to that span at any zoom, so it simply keeps
+              its width. */}
+          <span
+            className={
+              activeIndex >= 0
+                ? "truncate text-sm text-muted-foreground"
+                : "shrink-0 text-sm text-muted-foreground"
+            }
+          >
+            {currentLabel}
+          </span>
         </span>
         <svg
           aria-hidden="true"

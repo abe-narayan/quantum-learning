@@ -209,14 +209,39 @@ export function TechValue({
  * a tech label above a value. Rendered as a `<div>` of two elements rather
  * than a `<dl>` so it can be dropped anywhere; use `Readouts` below when a
  * group of them genuinely is a description list.
+ *
+ * `hint`, and why it exists rather than a longer `label`.
+ * ------------------------------------------------------------------
+ * `label` renders through `TechLabel`: uppercase, tracked, mono, the
+ * instrument-metadata voice. That voice is right for a short name like "S"
+ * or "Purity"; it is the wrong voice for a beginner gloss explaining what
+ * that name means. Before this prop existed, every call site that wanted one
+ * had nowhere to put it but `label` itself, so readouts across the simulator
+ * bench shipped as `label="S: how correlated the pair is"` and
+ * `label="Purity: 1 = a definite state"`, both rendered in the same
+ * shouting, monospaced type as "STEP" and "CHANCE OF THE MARKED ITEM"
+ * elsewhere on the same page. `hint` is a second line, in the quiet, mixed-
+ * case body voice, between the label and the value, exactly where a gloss
+ * belongs and nowhere near `TechLabel`'s tracking or case transform.
+ *
+ * A **prop**, not a `className` appended to `label`, for the reason `Panel`'s
+ * `bodyClassName` documents at length: `cn()` is a plain join with no
+ * tailwind-merge, so two utilities of equal specificity in the same layer are
+ * settled by stylesheet emission order, not by which one a call site wrote
+ * last. A prop is decided here, before `cn()` ever runs, so there is nothing
+ * left for that coin toss to settle.
  */
 export function Readout({
   label,
+  hint,
   value,
   unit,
   className,
 }: {
   label: ReactNode;
+  /** A short gloss under the label, in the body voice rather than the tech
+   *  one, e.g. "how correlated the pair is". Optional. */
+  hint?: ReactNode;
   value: ReactNode;
   unit?: ReactNode;
   className?: string;
@@ -224,6 +249,7 @@ export function Readout({
   return (
     <div className={cn("flex flex-col gap-1", className)}>
       <TechLabel>{label}</TechLabel>
+      {hint ? <span className="text-xs leading-snug text-subtle-foreground">{hint}</span> : null}
       <span className="flex items-baseline gap-1">
         <TechValue className="text-lg">{value}</TechValue>
         {unit ? <span className="text-xs text-subtle-foreground">{unit}</span> : null}

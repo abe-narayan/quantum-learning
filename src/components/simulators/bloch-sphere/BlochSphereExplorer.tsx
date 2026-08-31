@@ -73,8 +73,27 @@ export function BlochSphereExplorer() {
   const [activePresetId, setActivePresetId] = useState<string | null>(() =>
     initialAngles ? matchPresetId(initialAngles) : "0"
   );
+  // The opening narration says what to do next, not only what is on screen.
+  //
+  // Every other instrument on this bench opens mid-phenomenon; this one
+  // deliberately does not, and the reason is recorded in
+  // `BlochSphereControls`: five lessons instruct the reader to start from
+  // |0⟩, so the mount state stays there. The cost of that decision is that
+  // first contact is the one point on the sphere where nothing this
+  // instrument is about is visible: the arrow sits on the axis, the odds read
+  // 100/0, φ moves nothing, and Measure returns 0 however many times it is
+  // pressed. A reader who arrives, presses the most obvious button twice and
+  // gets the same answer twice has learned that this is a picture of a
+  // certainty, which is the opposite of the point.
+  //
+  // The φ slider's hint already explains the degeneracy, but it is a hint on
+  // one control in a rail that sits ~1000px below the sphere at 375px. This
+  // line is the first thing under the sphere at every width, so it is where
+  // the way out belongs.
   const [narration, setNarration] = useState<string>(() =>
-    initialAngles ? "Restored the shared state from your link." : "Prepared |0⟩, the north pole of the Bloch sphere."
+    initialAngles
+      ? "Restored the shared state from your link."
+      : "Prepared |0⟩, the north pole. Measuring from here gives 0 every time, which is the one thing a qubit shares with an ordinary bit. Press H, or pick |+⟩, to tilt it onto the equator, and measuring becomes a genuine coin flip."
   );
   const [lastMeasurement, setLastMeasurement] = useState<0 | 1 | null>(null);
   const [collapseFlash, setCollapseFlash] = useState(false);
@@ -245,21 +264,45 @@ export function BlochSphereExplorer() {
       readout={
         <Readouts
           items={[
-            { label: "P(0)", value: Math.round(probabilities[0] * 100), unit: "%" },
-            { label: "P(1)", value: Math.round(probabilities[1] * 100), unit: "%" },
+            // This is the "No background needed" instrument, the one
+            // /simulators sends a cold reader to first, so its two headline
+            // numbers cannot be the one pair of symbols on the bench a reader
+            // is expected to already parse. The notation is still taught,
+            // three lines down in the state panel and all over the controls.
+            { label: "Chance of 0", value: Math.round(probabilities[0] * 100), unit: "%" },
+            { label: "Chance of 1", value: Math.round(probabilities[1] * 100), unit: "%" },
           ]}
         />
       }
       footnote="Drag the sphere, or focus it and use the arrow keys, to rotate the view. The vector&rsquo;s position is the quantum state itself."
       stage={
         <>
-          <div className="mx-auto max-w-sm">
+          {/* `max-w-[244px]` below 42rem, not the `max-w-sm` (384px) this
+              instrument opened at unconditionally. This was the largest
+              overage among the bench's two "best value" cases: at 375x812
+              the sphere alone (343px wide, since the column beats max-w-sm)
+              ran the first control 81px past the 716px first-screen budget.
+              244px is close to, not equal to, the cap `RabiExplorer` already
+              ships for this same `BlochSphereCanvas` on its own bench mount
+              (260px): the axis names and pole kets are drawn at 15 viewBox
+              units on a 400-unit viewBox, so effective type size is
+              15 x width / 400, and RabiExplorer's own comment documents a
+              ~9px floor those labels must clear. 244px clears it at 9.15px,
+              with a little more headroom kept in hand than this instrument
+              needed on its own (see the narration box below for where the
+              rest of the 81px came from). `@min-[42rem]:max-w-sm` restores
+              the original size once the container is wide enough to run the
+              split layout, so desktop is untouched. */}
+          <div className="mx-auto max-w-[244px] @min-[42rem]:max-w-sm">
             <BlochSphereCanvas blochPoint={renderPoint} pulse={collapseFlash} className="mx-auto w-full" />
           </div>
 
+          {/* `mt-1`/`py-1` below 42rem, restored to `mt-4`/`py-3` above it,
+              same reasoning as the sphere cap just above: a mobile-only
+              tightening of chrome around content that does not change. */}
           <div
             aria-live="polite"
-            className="mt-4 rounded-panel border border-pillar-edge bg-pillar-wash px-4 py-3 text-sm text-foreground"
+            className="mt-1 rounded-panel border border-pillar-edge bg-pillar-wash px-4 py-1 text-sm text-foreground @min-[42rem]:mt-4 @min-[42rem]:py-3"
           >
             {narration}
             {lastMeasurement !== null ? (
@@ -267,9 +310,11 @@ export function BlochSphereExplorer() {
             ) : null}
           </div>
 
-          <div className="mt-6">
-            <BlochSphereStatePanel state={state} angles={angles} />
-          </div>
+        </>
+      }
+      stageAfter={
+        <>
+          <BlochSphereStatePanel state={state} angles={angles} />
 
           <SimulatorFraming
             shows="Every single-qubit state is a point on this sphere. Gates are rotations of that point, and measurement is a random snap to a pole."
@@ -291,25 +336,24 @@ export function BlochSphereExplorer() {
       }
       controls={
         <>
-          <div className="flex justify-end">
+          <BlochSphereControls
+            angles={angles}
+            probabilities={probabilities}
+            disabled={isAnimating}
+            activePresetId={activePresetId}
+            onApplyPreset={applyPreset}
+            onManualAngles={applyManualAngles}
+            onApplyGate={applyGate}
+            onApplyRotation={applyRotation}
+            onMeasure={applyMeasurement}
+            onReset={reset}
+          />
+
+          {/* Last, not first: see the note in GroverExplorer's controls. */}
+          <div className="mt-6 flex justify-end">
             <Button size="sm" variant="secondary" onClick={handleCopyLink}>
               {copied ? "Copied!" : "Copy link"}
             </Button>
-          </div>
-
-          <div className="mt-4">
-            <BlochSphereControls
-              angles={angles}
-              probabilities={probabilities}
-              disabled={isAnimating}
-              activePresetId={activePresetId}
-              onApplyPreset={applyPreset}
-              onManualAngles={applyManualAngles}
-              onApplyGate={applyGate}
-              onApplyRotation={applyRotation}
-              onMeasure={applyMeasurement}
-              onReset={reset}
-            />
           </div>
         </>
       }

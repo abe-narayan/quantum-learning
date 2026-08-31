@@ -17,7 +17,7 @@ export const practiceProblems = getProblemMetaForLesson(
 export const lessonMeta = {
   title: "Capstone: What Can Be Sent Through Noise",
   description:
-    "The whole course's throughline, generalized measurement, Stinespring dilation, entropy and information measures, data processing, entanglement distillation, converges on one computable question: exactly how many classical bits and how many quantum bits survive one use of a given noisy channel, and why those two numbers can be worlds apart.",
+    "The course's throughline, generalized measurement, Stinespring dilation, entropy, data processing, entanglement distillation, converges on one computable question: how many classical bits and how many quantum bits survive one use of a noisy channel, and why those two numbers can be worlds apart.",
   course: "quantum-shannon-theory",
   module: "capstone-what-can-be-sent-through-noise",
   order: 6,
@@ -244,7 +244,7 @@ through $\mathcal N$ once.
 **Hypotheses.** $\mathcal N$ is CPTP on a finite-dimensional system. The
 encoder may prepare *any* state of $n$ inputs, entangled across channel
 uses included, and the decoder may perform *any* joint POVM on all $n$
-outputs at once. Those two freedoms are exactly why the limit below
+outputs at once. Those two freedoms are why the limit below
 cannot be dropped: restricting to product inputs and per-use
 measurements gives a strictly smaller quantity for some channels.
 
@@ -290,7 +290,7 @@ input to environment via a reference system $A$, so the joint
 reference-output-environment state is pure. In a pure global state, a
 subsystem and its complement always share the same entropy, so
 $S(\rho_{AB}) = S_e$. That gives $I_c(\rho,\mathcal N) = S(\rho_B) -
-S(\rho_{AB}) = -S(A|B)$, exactly that lesson's
+S(\rho_{AB}) = -S(A|B)$, that lesson's
 coherent information, just with $S_e$ standing in for $S(\rho_{AB})$
 because the environment is easier to reason about for a channel than an
 explicit reference system. Unlike $\chi$, $I_c$ can be negative, itself
@@ -345,7 +345,7 @@ classical information sent down the identical physical wire.
 (the same two conjugate-basis states BB84: Quantum Key Distribution
 encodes bit $0$ in, one per basis) through the depolarizing channel
 $\mathcal N_p(\rho)=(1-p)\rho+p\,I/2$, compute the exact Holevo quantity
-$\chi(p)$, then find exactly where the channel's quantum capacity hits
+$\chi(p)$, then find where the channel's quantum capacity hits
 zero.**
 
 ### The classical side: $\chi(p)$ for a non-orthogonal ensemble
@@ -359,7 +359,7 @@ Notice this is **not** $1$ bit, even at zero noise. An *orthogonal*
 ensemble like $\{|0\rangle,|1\rangle\}$ does reach exactly the
 noiseless maximum, $\chi(0)=$ {orthogonalChiAt0.toFixed(0)} bit, computed
 the identical way; BB84's whole security argument rests on using
-$|0\rangle$ and $|+\rangle$ precisely because they are **not**
+$|0\rangle$ and $|+\rangle$ because they are **not**
 orthogonal ($|\langle0|+\rangle|^2=\tfrac12$), which is why
 $\chi(0)\approx0.601$ here, strictly less than $1$. Holevo's bound is
 already doing real work on this ensemble before any channel noise is
@@ -372,7 +372,7 @@ $\chi(1)=$ {chiAt1.toFixed(5)}.
 
 $\chi(p)\to0$ exactly at $p=1$: full depolarization erases every trace
 of which state was sent, so no measurement can recover any information,
-matching Holevo's theorem exactly at its own boundary case.
+matching Holevo's theorem at its own boundary case.
 
 This $\chi(p)$ is one specific ensemble's number, an honest, real
 computation, but by HSW's proven additivity for the depolarizing
@@ -394,14 +394,14 @@ $p<1$, hitting exactly zero only at full depolarization $p=1$.
   explanation="The hashing-bound lower bound on Q(p) is already negative (clamped to 0) by around p≈0.25, and the channel is proven entanglement-breaking (hence Q=0 exactly) from p=2/3 onward. Meanwhile C(0.5) computed below is still comfortably positive. The same physical channel, at the same noise level, keeps carrying classical bits long after it can no longer carry any quantum information at all. That is this course's central fact."
 />
 
-### The quantum side: exactly where $Q(p)$ dies
+### The quantum side: where $Q(p)$ dies
 
 Two different, both rigorous, facts about this same channel's
 quantum capacity:
 
 **A certified lower bound.** Feeding the maximally mixed state into
 $\mathcal N_p$ and computing its coherent information gives the
-**hashing bound**, exactly the rate a one-way entanglement-distillation
+**hashing bound**, the rate a one-way entanglement-distillation
 protocol (this course's own previous module) can certify:
 
 $$
@@ -564,7 +564,7 @@ proves an exact zero, and only from $p=\tfrac23$ onward.
    $1-H_2(0.1464)=0.3991$ bits. The accessible information is well below
    $\chi=0.6009$. Holevo bounds what a single measurement on a single copy
    can extract; reaching $\chi$ requires block coding over many uses, which
-   is precisely what HSW's theorem supplies. (That $0.3991$ happens to
+   is what HSW's theorem supplies. (That $0.3991$ happens to
    equal $1-\chi$ here is a coincidence of $s=1/\sqrt2$, where the trace
    distance equals the overlap, and not a general identity.)
 

@@ -84,7 +84,7 @@ inputs that two of them are likely to collide on the same output). The
 quantum algorithm below finds $s$ with high probability using only $O(n)$
 queries. That's a genuine, unconditional exponential separation between
 quantum and randomized classical <Term id="query-complexity-black-box-model">query complexity</Term>, the first algorithm to
-show one, and its circuit shape is exactly the template Shor's algorithm
+show one, and its circuit shape is the template Shor's algorithm
 scales up next: Hadamards, one oracle call, Hadamards again, then reading
 off something tied to a hidden algebraic object.
 
@@ -159,7 +159,7 @@ $$
 $$
 
 Summing the surviving amplitudes across all $2^{n-1}$ pairs shows the
-nonzero probability is spread *uniformly* over exactly the $2^{n-1}$
+nonzero probability is spread *uniformly* over the $2^{n-1}$
 strings orthogonal to $s$, each with probability $1/2^{n-1}$, never on
 any string that isn't orthogonal to $s$, and never concentrated on just
 one of them.
@@ -196,8 +196,8 @@ circuit:
   />
 </InteractiveSection>
 
-Every one of the seven sweeps lands probability exactly $1/4$ on exactly
-the four $z$'s orthogonal to that $s$, and exactly $0$ everywhere else.
+Every one of the seven sweeps lands probability exactly $1/4$ on the
+four $z$'s orthogonal to that $s$, and exactly $0$ everywhere else.
 This is the boxed result above, now checked well past one convenient example.
 
 ### Solving for s: linear algebra over F₂
@@ -235,7 +235,7 @@ What it hands you, every single run, is one linear constraint on $s$.
 The quantum speedup is in how *cheaply* those constraints arrive (one
 oracle call per constraint, versus the classical cost of finding even one
 colliding pair by chance); assembling them into $s$ is honest, unglamorous
-classical linear algebra, exactly the same "quantum finds structure,
+classical linear algebra, the same "quantum finds structure,
 classical post-processing finishes the job" division of labor Shor's
 algorithm uses next.
 
@@ -311,7 +311,7 @@ doesn't hand you the answer directly.
 
    Contrast this with $s=01$, where the pairs are $\{00,01\}$ and
    $\{10,11\}$ and $f$ is $0,0,2,2$. Same 2-to-1 structure, different
-   pairing, and the pairing is precisely what encodes $s$.
+   pairing, and the pairing is what encodes $s$.
 
    The wrong turn is checking only that $f$ takes each of its values twice
    and calling that the promise. Balanced would give that too, and Simon's

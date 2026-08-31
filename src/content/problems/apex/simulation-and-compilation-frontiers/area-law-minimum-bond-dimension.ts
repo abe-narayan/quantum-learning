@@ -15,7 +15,7 @@ export const areaLawMinimumBondDimension: NumericProblem = {
   question: {
     type: "numeric",
     prompt:
-      "A family of gapped, local 1D Hamiltonians has ground states whose entanglement entropy across every spatial cut is bounded by exactly 2 bits, independent of system size n (an area law). A bond dimension chi can carry at most log2(chi) bits across a cut, so any MPS representing such a state needs log2(chi) at least as large as the entropy actually present there. Taking a cut that saturates the 2-bit bound, what is the minimum integer bond dimension chi it can be represented with?",
+      "A family of gapped, local 1D Hamiltonians has ground states whose entanglement entropy across every spatial cut is bounded by exactly 2 bits, independent of system size n (an area law). A bond dimension chi can carry at most log2(chi) bits across a cut, so any MPS representing such a state needs log2(chi) at least as large as the entropy present there. Taking a cut that saturates the 2-bit bound, what is the minimum integer bond dimension chi it can be represented with?",
     inputHint: "a single integer",
   },
   answer: {

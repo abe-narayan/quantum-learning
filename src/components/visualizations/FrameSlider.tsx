@@ -61,12 +61,21 @@ export function FrameSlider({
           `aria-valuetext` below. Without the `aria-label` a screen reader
           would read the current value twice, once stale-looking and once
           humanized. */}
+      {/* `flex-wrap`, plus `min-w-0` on the label text: at 200% text zoom a
+          longer `label` ("Number of channel applications") and `valueLabel`
+          ("6 applications") no longer both fit one line (WCAG 1.4.4) —
+          wrapping drops the value onto its own line instead of letting it
+          spill past this control's `.instrument` ancestor's
+          `overflow-hidden`. `justify-between` still right-aligns the value
+          when both sides do share a line, and keeps it flush right on a
+          line of its own (a lone flex item on a wrapped line absorbs the
+          leftover space before it under `space-between`). */}
       <label
         htmlFor={inputId}
-        className="flex items-center justify-between text-xs font-medium text-foreground"
+        className="flex flex-wrap items-center justify-between gap-x-2 text-xs font-medium text-foreground"
       >
-        <span>{effectiveLabel}</span>
-        <span className="font-mono text-muted-foreground">{valueLabel}</span>
+        <span className="min-w-0 [overflow-wrap:anywhere]">{effectiveLabel}</span>
+        <span className="min-w-0 font-mono text-muted-foreground [overflow-wrap:anywhere]">{valueLabel}</span>
       </label>
       <input
         id={inputId}

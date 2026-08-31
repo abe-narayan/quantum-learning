@@ -23,7 +23,7 @@ export const purityNotStrictlyMonotonic: ConceptualProblem = {
       {
         phrases: ["exactly equal", "the same value", "the same number", "0.82", "not strictly less", "did not drop", "stayed the same", "identical value"],
         missingFeedback:
-          "Go back to the lesson's computed numbers. Say what the one-gate and two-gate purities actually were relative to each other.",
+          "Go back to the lesson's computed numbers. Say what the one-gate and two-gate purities were relative to each other.",
       },
       {
         phrases: ["gate-specific", "depends on", "interaction with the noise"],

@@ -62,6 +62,6 @@ export const provingTheVariationalTheorem: ConceptualProblem = {
   explanation: {
     correctIdea: "The proof needs no knowledge of what the true eigenstates are. It uses only that they exist and that E_0 is the smallest eigenvalue, by definition.",
     whyCorrect: "Matches the derivation in the lesson's Mathematical Development section.",
-    whyWrong: ["Arguing from a SPECIFIC trial family, such as the Gaussian, rather than a general expansion does not establish the theorem for all possible trial states."],
+    whyWrong: ["Arguing from a specific trial family, such as the Gaussian, rather than a general expansion does not establish the theorem for all possible trial states."],
   },
 };

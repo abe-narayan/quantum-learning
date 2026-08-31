@@ -94,7 +94,11 @@ export function GateControls({
             </Button>
           ))}
         </div>
-        <div className="mt-3 flex items-center gap-2">
+        {/* `flex-wrap`: at 200% text zoom the button plus this caption no
+            longer fit one line (WCAG 1.4.4) — wrapping drops the caption to
+            its own line instead of letting it spill past the instrument's
+            `overflow-hidden`. */}
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <Button
             variant="secondary"
             size="sm"
@@ -104,7 +108,9 @@ export function GateControls({
           >
             Measure q{targetQubit}
           </Button>
-          <p className="text-xs text-muted-foreground">Adds a measurement marker to the diagram.</p>
+          <p className="min-w-0 text-xs text-muted-foreground [overflow-wrap:anywhere]">
+            Adds a measurement marker to the diagram.
+          </p>
         </div>
       </ControlSection>
 

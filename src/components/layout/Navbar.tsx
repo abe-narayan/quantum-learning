@@ -13,7 +13,15 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Wordmark } from "@/components/layout/Wordmark";
 import { ROUTE_TO_PILLAR, detectPillar, isProblemPage } from "@/components/layout/pillarRoutes";
 import { useFieldState } from "@/components/field/fieldStore";
-import { NAV_ITEMS, START_LEARNING_HREF, TRACK_NAV_ITEMS, navDescription } from "@/lib/nav";
+import type { NavItem } from "@/lib/nav";
+import {
+  NAV_ITEMS,
+  PRIMARY_NAV_ITEMS,
+  REFERENCE_NAV_ITEMS,
+  START_LEARNING_HREF,
+  TRACK_NAV_ITEMS,
+  navDescription,
+} from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 function isActive(pathname: string, href: string) {
@@ -44,7 +52,7 @@ function navCurrent(pathname: string, href: string): "page" | "true" | undefined
  * box), so the current section reads as a lit tab on an instrument face.
  */
 const ACTIVE_MARK_CLASSES =
-  "relative after:absolute after:inset-x-2.5 after:-bottom-[14px] after:h-[2px] after:bg-brand after:content-['']";
+  "relative after:absolute after:inset-x-2 after:-bottom-[14px] after:h-[2px] after:bg-brand after:content-[''] xl:after:inset-x-2.5";
 
 // The one hover/focus/active convention every interactive element in this
 // file converges on: the same transition list + pressed-state scale used by
@@ -129,12 +137,42 @@ function sectionLabel(pathname: string, pillar: Pillar | undefined): string | un
   return NAV_ITEMS.find((item) => isActive(pathname, item.href))?.label;
 }
 
-/** Desktop-only dropdown grouping the six track/pillar pages. */
-function TracksDropdown({ pathname }: { pathname: string }) {
+/**
+ * Desktop-only disclosure grouping several nav destinations under one label.
+ *
+ * One component, two instances ("Tracks" over the six pillar pages,
+ * "Reference" over the concept map, glossary and Current Quantum). It was
+ * written for Tracks alone and generalised rather than copied, because every
+ * paragraph of reasoning below — Escape returning focus to the trigger, the
+ * `onBlur` close, `aria-controls` only while the panel exists, the deliberate
+ * refusal of `role="menu"` — is a bug someone already found here once, and a
+ * second hand-copied disclosure is a second place for one of them to be
+ * dropped silently.
+ */
+function NavDropdown({
+  label,
+  items,
+  panelId,
+  pathname,
+  problemCount,
+  /** Panel layout. Six entries read better as a grid; three read better as a
+   *  column, where a 2-column grid would leave a hole in the last cell. */
+  columns,
+}: {
+  label: string;
+  items: NavItem[];
+  panelId: string;
+  pathname: string;
+  /** Only used to resolve `{problems}` in a description — see `navDescription`.
+   *  No grouping renders `/problems` today, but the token is silent when it
+   *  leaks, so every surface that prints a `NavItem.description` resolves it. */
+  problemCount: number;
+  columns: 1 | 2;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const isTrackActive = TRACK_NAV_ITEMS.some((item) => isActive(pathname, item.href));
+  const isGroupActive = items.some((item) => isActive(pathname, item.href));
 
   useEffect(() => {
     if (!isOpen) return;
@@ -188,7 +226,7 @@ function TracksDropdown({ pathname }: { pathname: string }) {
         // relationship entirely. This matches how `SearchTrigger` handles the
         // same situation. `aria-expanded` alone is what carries the state
         // while the panel does not exist.
-        aria-controls={isOpen ? "tracks-dropdown-panel" : undefined}
+        aria-controls={isOpen ? panelId : undefined}
         // The other half of "where am I", which this trigger was missing. When
         // the reader is on one of the six track pages this button carries the
         // lit-tab underline every other current nav item gets, but the panel
@@ -196,20 +234,20 @@ function TracksDropdown({ pathname }: { pathname: string }) {
         // reader user tabbing the bar had no equivalent of that underline at
         // all. `aria-current` is a global attribute and `"true"` is the right
         // value here: this is the current *item in the set*, not the page.
-        aria-current={isTrackActive ? "true" : undefined}
+        aria-current={isGroupActive ? "true" : undefined}
         onClick={() => setIsOpen((open) => !open)}
         className={cn(
-          "flex items-center gap-1 rounded-(--radius-tight) px-2.5 py-2 text-sm font-medium",
+          "flex items-center gap-1 rounded-(--radius-tight) px-2 py-2 text-sm font-medium xl:px-2.5",
           INTERACTIVE_CLASSES,
-          isTrackActive || isOpen
+          isGroupActive || isOpen
             ? "bg-surface-muted text-foreground"
             : "text-muted-foreground hover:text-foreground",
           // Only the *active* case gets the underline — an open-but-not-current
           // dropdown is a hover state, not a location.
-          isTrackActive && ACTIVE_MARK_CLASSES
+          isGroupActive && ACTIVE_MARK_CLASSES
         )}
       >
-        Tracks
+        {label}
         <svg
           aria-hidden="true"
           viewBox="0 0 20 20"
@@ -238,10 +276,13 @@ function TracksDropdown({ pathname }: { pathname: string }) {
         // a menu. Tab order still follows source order (row-major), which
         // matches how the grid reads visually.
         <div
-          id="tracks-dropdown-panel"
-          className="absolute left-0 top-full z-50 mt-2 grid w-[19rem] grid-cols-1 gap-1 rounded-panel border border-border bg-surface p-2 shadow-lg sm:w-[27rem] sm:grid-cols-2"
+          id={panelId}
+          className={cn(
+            "absolute left-0 top-full z-50 mt-2 grid grid-cols-1 gap-1 rounded-panel border border-border bg-surface p-2 shadow-lg",
+            columns === 2 ? "w-[19rem] sm:w-[27rem] sm:grid-cols-2" : "w-[21rem]"
+          )}
         >
-          {TRACK_NAV_ITEMS.map((item) => (
+          {items.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -263,7 +304,9 @@ function TracksDropdown({ pathname }: { pathname: string }) {
                 <PillarDot pillar={ROUTE_TO_PILLAR[item.href]} />
                 {item.label}
               </span>
-              <span className="text-xs leading-snug text-muted-foreground">{item.description}</span>
+              <span className="text-xs leading-snug text-muted-foreground">
+                {navDescription(item, problemCount)}
+              </span>
             </Link>
           ))}
         </div>
@@ -290,7 +333,7 @@ function DesktopNavLink({
       // a `{problems}` token that only the server-supplied count can fill.
       title={navDescription(item, problemCount)}
       className={cn(
-        "rounded-(--radius-tight) px-2.5 py-2 text-sm font-medium",
+        "rounded-(--radius-tight) px-2 py-2 text-sm font-medium xl:px-2.5",
         INTERACTIVE_CLASSES,
         current ? `bg-surface-muted text-foreground ${ACTIVE_MARK_CLASSES}` : "text-muted-foreground hover:text-foreground"
       )}
@@ -300,8 +343,34 @@ function DesktopNavLink({
   );
 }
 
-function MobileNavLink({ item, pathname, onNavigate }: { item: (typeof NAV_ITEMS)[number]; pathname: string; onNavigate: () => void }) {
+function MobileNavLink({
+  item,
+  pathname,
+  onNavigate,
+  /**
+   * When set, the item's one-line description renders under its label.
+   *
+   * The drawer's "Explore" group used to be six bare words — Simulators, Map,
+   * Glossary, Problems, Current Quantum, About — while the "Tracks" group
+   * directly above it gave every one of its six entries a description, on the
+   * stated grounds that "Mechanics" and "Mastery" are not self-explanatory to
+   * someone on their first visit. That is at least as true of "Map" and
+   * "Current Quantum", which are the two labels on this site a newcomer is
+   * least able to decode; the copy already existed in `NAV_ITEMS` and was
+   * being rendered only as a desktop `title` tooltip, which a phone cannot
+   * show at all. This is the surface where the drawer *is* the navigation, and
+   * it was the one surface not using it.
+   */
+  problemCount,
+}: {
+  item: NavItem;
+  pathname: string;
+  onNavigate: () => void;
+  problemCount?: number;
+}) {
   const current = navCurrent(pathname, item.href);
+  const description =
+    problemCount === undefined ? null : navDescription(item, problemCount);
   return (
     <Link
       href={item.href}
@@ -320,14 +389,28 @@ function MobileNavLink({ item, pathname, onNavigate }: { item: (typeof NAV_ITEMS
         // (`IconButton`, `FilterChips`, `PillarLessonStrip`'s rows), which is
         // the wrong place to be a rounding error. `gap-1` (4px) between rows
         // means the expanded boxes still do not touch.
-        "flex min-h-11 items-center rounded-(--radius-tight) px-3 py-2 text-sm font-medium",
+        // `flex-col justify-center` rather than `items-center` once a second
+        // line can appear: with a description the row is two stacked lines,
+        // without one it is a single line vertically centred in the same
+        // 44px box, so the two shapes still share a rhythm.
+        "flex min-h-11 flex-col justify-center rounded-(--radius-tight) px-3 py-2 text-sm font-medium",
         INTERACTIVE_CLASSES,
         current
           ? "border-l-2 border-brand bg-surface-muted pl-2.5 text-foreground"
           : "border-l-2 border-transparent pl-2.5 text-muted-foreground hover:bg-surface-muted hover:text-foreground"
       )}
     >
-      {item.label}
+      {/* The label is always `text-foreground`, current or not. It used to
+          inherit the row's muted colour, which put a nav *label* at the same
+          weight as the supporting copy below it once that copy existed. The
+          current row is still unmistakable: it keeps the lit left rule and
+          the filled background. */}
+      <span className="text-foreground">{item.label}</span>
+      {description ? (
+        <span className="mt-0.5 text-xs font-normal leading-snug text-muted-foreground">
+          {description}
+        </span>
+      ) : null}
     </Link>
   );
 }
@@ -381,14 +464,14 @@ export function Navbar({
   const pillar = routePillar ?? (isProblemPage(pathname) ? scopePillar : undefined);
   const section = sectionLabel(pathname, routePillar);
 
-  // Same disclosure contract `TracksDropdown` implements above (§9 of
+  // Same disclosure contract `NavDropdown` implements above (§9 of
   // docs/DESIGN_SYSTEM.md names it as the standard to match): Escape closes
   // and hands focus back to the trigger, and a pointerdown outside closes.
   //
-  // Two deliberate differences from `TracksDropdown`, both forced by this
+  // Two deliberate differences from `NavDropdown`, both forced by this
   // panel's shape:
   //
-  // 1. No `onBlur` close. `TracksDropdown` can use one because its trigger
+  // 1. No `onBlur` close. `NavDropdown` can use one because its trigger
   //    and panel share a single container element. Here they don't — the
   //    trigger lives in the header row, the panel is a sibling below the
   //    `Container` — so the equivalent would have to sit on `<header>` and
@@ -403,13 +486,13 @@ export function Navbar({
   //    would only fight the natural order.
   //
   // Both listeners are attached only while the menu is open, and the whole
-  // effect is skipped otherwise — same shape as `TracksDropdown`'s.
+  // effect is skipped otherwise — same shape as `NavDropdown`'s.
   useEffect(() => {
     if (!isMenuOpen) return;
     function handlePointerDown(event: PointerEvent) {
       const target = event.target as Node;
       // The trigger has to be excluded explicitly, unlike in
-      // `TracksDropdown` where its shared container covered it: without
+      // `NavDropdown` where its shared container covered it: without
       // this, tapping the (open) menu button would close the panel here and
       // then have its own `onClick` toggle it straight back open.
       if (menuPanelRef.current?.contains(target) || menuButtonRef.current?.contains(target)) return;
@@ -443,7 +526,15 @@ export function Navbar({
     // opaque instrument-panel fill reads as "mounted equipment" instead and
     // costs nothing.
     <header className="sticky top-0 z-50 border-b border-border bg-surface">
-      <Container className="flex h-16 items-center justify-between gap-4">
+      {/* `lg:gap-3 xl:gap-4`, not a flat `gap-4`. The three groups in this row
+          only just fit at `lg` (1024px), where the desktop bar appears but the
+          container is still 128px narrower than its 1152px cap: at a flat
+          gap-4 the "Start learning" button was squeezed to 114px against the
+          116px its label needs on one line, and wrapped to 54px in a 64px row
+          — two pixels. The mobile gap is left alone deliberately; the 320px
+          width budget in the comment on the brand link below is accounted for
+          to the pixel against `gap-4`. */}
+      <Container className="flex h-16 items-center justify-between gap-4 lg:gap-3 xl:gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <Link
             href="/"
@@ -509,12 +600,36 @@ export function Navbar({
           ) : null}
         </div>
 
+        {/* Six slots: Learn · Tracks▾ · Simulators · Problems · Reference▾ ·
+            About. It was eight, and eight did not fit — see the measurement
+            in the comment on REFERENCE_NAV_ITEMS in src/lib/nav.ts. The
+            ordering is by what a visitor does, left to right: read the path,
+            pick a subject, use a tool, practise, look something up, decide
+            whether to trust it. */}
         <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
-          {NAV_ITEMS.slice(0, 1).map((item) => (
+          {PRIMARY_NAV_ITEMS.slice(0, 1).map((item) => (
             <DesktopNavLink key={item.href} item={item} pathname={pathname} problemCount={problemCount} />
           ))}
-          <TracksDropdown pathname={pathname} />
-          {NAV_ITEMS.slice(1).map((item) => (
+          <NavDropdown
+            label="Tracks"
+            items={TRACK_NAV_ITEMS}
+            panelId="tracks-dropdown-panel"
+            pathname={pathname}
+            problemCount={problemCount}
+            columns={2}
+          />
+          {PRIMARY_NAV_ITEMS.slice(1, 3).map((item) => (
+            <DesktopNavLink key={item.href} item={item} pathname={pathname} problemCount={problemCount} />
+          ))}
+          <NavDropdown
+            label="Reference"
+            items={REFERENCE_NAV_ITEMS}
+            panelId="reference-dropdown-panel"
+            pathname={pathname}
+            problemCount={problemCount}
+            columns={1}
+          />
+          {PRIMARY_NAV_ITEMS.slice(3).map((item) => (
             <DesktopNavLink key={item.href} item={item} pathname={pathname} problemCount={problemCount} />
           ))}
         </nav>
@@ -550,7 +665,7 @@ export function Navbar({
             className={cn("text-foreground hover:bg-surface-muted lg:hidden", INTERACTIVE_CLASSES)}
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMenuOpen}
-            // Same as TracksDropdown above: the drawer is unmounted when
+            // Same as NavDropdown above: the drawer is unmounted when
             // closed, so the IDREF is only pointed at a real element.
             aria-controls={isMenuOpen ? "mobile-menu-panel" : undefined}
             onClick={() => setIsMenuOpen((open) => !open)}
@@ -629,7 +744,13 @@ export function Navbar({
 
               <div className="flex flex-col gap-1">
                 {NAV_ITEMS.slice(0, 1).map((item) => (
-                  <MobileNavLink key={item.href} item={item} pathname={pathname} onNavigate={() => setIsMenuOpen(false)} />
+                  <MobileNavLink
+                    key={item.href}
+                    item={item}
+                    pathname={pathname}
+                    onNavigate={() => setIsMenuOpen(false)}
+                    problemCount={problemCount}
+                  />
                 ))}
               </div>
 
@@ -675,13 +796,27 @@ export function Navbar({
                 </ul>
               </div>
 
+              {/* Flat and in full, in the same order as `NAV_ITEMS` — the
+                  desktop bar's Reference grouping is not repeated here. A
+                  disclosure inside a disclosure is the wrong shape on a
+                  phone (the same argument the Tracks list above makes), and
+                  the reason the desktop bar groups at all is a width budget
+                  a drawer does not have. Every row now carries its
+                  description, which is what makes a flat list of seven
+                  readable rather than seven bare nouns. */}
               <div>
                 <p className="tech-label mb-2 px-3 text-subtle-foreground">
                   Explore
                 </p>
                 <div className="flex flex-col gap-1">
                   {NAV_ITEMS.slice(1).map((item) => (
-                    <MobileNavLink key={item.href} item={item} pathname={pathname} onNavigate={() => setIsMenuOpen(false)} />
+                    <MobileNavLink
+                      key={item.href}
+                      item={item}
+                      pathname={pathname}
+                      onNavigate={() => setIsMenuOpen(false)}
+                      problemCount={problemCount}
+                    />
                   ))}
                 </div>
               </div>

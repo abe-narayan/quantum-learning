@@ -63,7 +63,7 @@ export function PeriodFindingExplorer() {
   return (
     <SimulatorInstrument
       label="Period finding: Shor&rsquo;s subroutine"
-      readout={<Readout label="r" value={order} />}
+      readout={<Readout label="r" hint="how often the pattern repeats" value={order} />}
       footnote="Next: this distribution is what Shor's algorithm classically post-processes (continued fractions) to recover r; see that step worked through in the lesson."
       // Up to 2^7 = 128 bars at the highest counting-qubit count; splitting
       // against a 320px rail leaves each bar too thin to read even when the
@@ -72,12 +72,15 @@ export function PeriodFindingExplorer() {
       stageClassName="space-y-6"
       stage={
         <>
+          {/* Trimmed: the Shor's-algorithm framing now lives once, in
+              `SimulatorFraming`'s "What this shows" below and the footnote,
+              instead of three times across this paragraph, that block and the
+              footnote. What only this paragraph defines, and keeps, is r
+              itself, which the readout above names but does not define. */}
           <p className="text-sm text-muted-foreground">
-            Factoring a big number is hard; finding how often a repeating pattern repeats is not, and the
-            two turn out to be the same problem. Multiply a by itself over and over, always keeping the
-            remainder after dividing by N, and the answers eventually loop. How long that loop is, is
-            r. This is the quantum subroutine that finds r, and it is the whole reason Shor&rsquo;s
-            algorithm threatens today&rsquo;s public-key encryption.
+            Factoring a big number is hard, but finding how often a repeating pattern repeats is not, and the
+            two turn out to be the same problem. Multiply a by itself, always keeping the remainder mod N,
+            and the answers eventually loop: how long that loop is, is r.
           </p>
 
           <div
@@ -102,7 +105,10 @@ export function PeriodFindingExplorer() {
               height={220}
             />
           </div>
-
+        </>
+      }
+      stageAfter={
+        <>
           {/* No `overflow-x-auto` here: the only child is a block-level
               `.katex-display`, which fills this content box and carries its own
               horizontal scroll (globals.css §6), so this box never had anything to
